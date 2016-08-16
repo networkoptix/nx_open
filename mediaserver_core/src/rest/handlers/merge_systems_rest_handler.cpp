@@ -67,46 +67,96 @@ namespace
     }
 }
 
-int QnMergeSystemsRestHandler::executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor *owner)
+struct MergeSystemData
 {
-    Q_UNUSED(path)
+    MergeSystemData():
+        takeRemoteSettings(false),
+        mergeOneServer(false),
+        ignoreIncompatible(false)
+    {
+    }
+
+    MergeSystemData(const QnRequestParams& params):
+        url(params.value(lit("url"))),
+        getKey(params.value(lit("getKey"))),
+        postKey(params.value(lit("postKey"))),
+        takeRemoteSettings(params.value(lit("takeRemoteSettings"), lit("false")) != lit("false")),
+        mergeOneServer(params.value(lit("oneServer"), lit("false")) != lit("false")),
+        ignoreIncompatible(params.value(lit("ignoreIncompatible"), lit("false")) != lit("false"))
+    {
+    }
+
+    QString url;
+    QString getKey;
+    QString postKey;
+    bool takeRemoteSettings;
+    bool mergeOneServer;
+    bool ignoreIncompatible;
+};
+
+#define MergeSystemData_Fields (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (MergeSystemData),
+    (json),
+    _Fields)
+
+
+
+int QnMergeSystemsRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    Q_UNUSED(path);
+    return execute(std::move(MergeSystemData(params)), owner, result);
+}
+
+int QnMergeSystemsRestHandler::executePost(
+    const QString& path,
+    const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    Q_UNUSED(path);
+    Q_UNUSED(params);
+    MergeSystemData data = QJson::deserialized<MergeSystemData>(body);
+    return execute(std::move(data), owner, result);
+}
+
+int QnMergeSystemsRestHandler::execute(
+    MergeSystemData data,
+    const QnRestConnectionProcessor* owner,
+    QnJsonRestResult &result)
+{
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
-    QUrl url = params.value(lit("url"));
 
-    const QString getKey(params.value(lit("getKey")));
-    const QString postKey(params.value(lit("postKey")));
+    if (data.mergeOneServer)
+        data.takeRemoteSettings = false;
 
-    bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
-    bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
-    bool ignoreIncompatible = params.value(lit("ignoreIncompatible"), lit("false")) != lit("false");
-
-    if (mergeOneServer)
-        takeRemoteSettings = false;
-
-    if (url.isEmpty()) {
+    if (data.url.isEmpty()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"url\""), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("url")));
         return nx_http::StatusCode::ok;
     }
 
+    QUrl url(data.url);
     if (!url.isValid()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Received invalid parameter url %1")
-            .arg(url.toString()), cl_logDEBUG1);
+            .arg(data.url), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::InvalidParameter, lit("url")));
         return nx_http::StatusCode::ok;
     }
 
-    if (getKey.isEmpty())
+    if (data.getKey.isEmpty())
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"getKey\""), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
@@ -133,13 +183,13 @@ int QnMergeSystemsRestHandler::executeGet(
         QUrl requestUrl(url);
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
         requestUrl.setQuery(lit("showAddresses=true"));
-        addAuthToRequest(requestUrl, getKey);
+        addAuthToRequest(requestUrl, data.getKey);
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
             auto status = getClientResponse(client);
             NX_LOG(lit("QnMergeSystemsRestHandler. Error requesting url %1: %2")
-                .arg(url.toString()).arg(QLatin1String(nx_http::StatusCode::toString(status))),
+                .arg(data.url).arg(QLatin1String(nx_http::StatusCode::toString(status))),
                 cl_logDEBUG1);
             if (status == nx_http::StatusCode::unauthorized)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
@@ -157,17 +207,9 @@ int QnMergeSystemsRestHandler::executeGet(
     if (remoteModuleInformation.systemName.isEmpty())
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Remote (%1) system name is empty")
-            .arg(url.toString()), cl_logDEBUG1);
+            .arg(data.url), cl_logDEBUG1);
         /* Hmm there's no system name. It would be wrong system. Reject it. */
         result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
-        return nx_http::StatusCode::ok;
-    }
-
-    if (takeRemoteSettings && !qnCommon->moduleInformation().cloudSystemId.isEmpty())
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings is forbidden because system owner is cloud user")
-            .arg(takeRemoteSettings), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("NOT_LOCAL_OWNER"));
         return nx_http::StatusCode::ok;
     }
 
@@ -177,15 +219,15 @@ int QnMergeSystemsRestHandler::executeGet(
         bool isLocalInCloud = !qnCommon->moduleInformation().cloudSystemId.isEmpty();
         bool isRemoteInCloud = !remoteModuleInformation.cloudSystemId.isEmpty();
 
-        if (takeRemoteSettings && isLocalInCloud)
+        if (data.takeRemoteSettings && isLocalInCloud)
             canMerge = false;
-        else if (!takeRemoteSettings && isRemoteInCloud)
+        else if (!data.takeRemoteSettings && isRemoteInCloud)
             canMerge = false;
     }
     if (!canMerge)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge systems bound to cloud")
-            .arg(url.toString()), cl_logDEBUG1);
+            .arg(data.url), cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD"));
         return nx_http::StatusCode::ok;
     }
@@ -195,7 +237,7 @@ int QnMergeSystemsRestHandler::executeGet(
                            QnModuleFinder::instance()->isCompatibilityMode();
     bool compatible = remoteModuleInformation.hasCompatibleVersion();
 
-    if ((!ignoreIncompatible && !compatible) || !customizationOK)
+    if ((!data.ignoreIncompatible && !compatible) || !customizationOK)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. Local customization %1, remote customization %2")
             .arg(QnAppInfo::customizationName()).arg(remoteModuleInformation.customization),
@@ -206,7 +248,7 @@ int QnMergeSystemsRestHandler::executeGet(
 
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     bool isDefaultSystemName;
-    if (takeRemoteSettings)
+    if (data.takeRemoteSettings)
         isDefaultSystemName = remoteModuleInformation.serverFlags.testFlag(Qn::SF_NewSystem);
     else
         isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(Qn::SF_NewSystem));
@@ -217,20 +259,20 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (takeRemoteSettings)
+    if (data.takeRemoteSettings)
     {
         if (!backupDatabase())
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
-                .arg(takeRemoteSettings), cl_logDEBUG1);
+                .arg(data.takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, getKey, postKey, owner))
+        if (!applyRemoteSettings(data.url, remoteModuleInformation.systemName, data.getKey, data.postKey, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
-                .arg(takeRemoteSettings), cl_logDEBUG1);
+                .arg(data.takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
@@ -239,15 +281,15 @@ int QnMergeSystemsRestHandler::executeGet(
         if (!backupDatabase())
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
-                .arg(takeRemoteSettings), cl_logDEBUG1);
+                .arg(data.takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, getKey, postKey, mergeOneServer, owner))
+        if (!applyCurrentSettings(data.url, data.getKey, data.postKey, data.mergeOneServer, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
-                .arg(takeRemoteSettings), cl_logDEBUG1);
+                .arg(data.takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
@@ -288,7 +330,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     const QString& getKey,
     const QString& postKey,
     bool oneServer,
-    const QnRestConnectionProcessor *owner)
+    const QnRestConnectionProcessor* owner)
 {
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
