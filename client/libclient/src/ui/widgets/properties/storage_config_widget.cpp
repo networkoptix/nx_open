@@ -210,6 +210,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->realtimeBackupControlButton->hide(); /* Unused in the current version. */
 
+    ui->estimatedTimeLabel->hide(); /* Unused in the current version. */
+
     setWarningStyle(ui->cannotStartBackupLabel);
     setWarningStyle(ui->realtimeBackupWarningLabel);
 
