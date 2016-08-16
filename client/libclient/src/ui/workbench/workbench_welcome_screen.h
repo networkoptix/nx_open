@@ -28,6 +28,8 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
+    Q_PROPERTY(QString softwareVersion READ softwareVersion)
+
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
 
@@ -61,6 +63,8 @@ public: // Properties
     bool globalPreloaderVisible() const;
 
     void setGlobalPreloaderVisible(bool value);
+
+    QString softwareVersion() const;
 
 public slots:
     bool isAcceptableDrag(const UrlsList& urls);

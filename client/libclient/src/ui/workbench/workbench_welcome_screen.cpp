@@ -11,6 +11,7 @@
 
 #include <watchers/cloud_status_watcher.h>
 #include <utils/common/delayed.h>
+#include <utils/common/app_info.h>
 #include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -223,6 +224,11 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
 
     m_receivingResources = value;
     emit globalPreloaderVisibleChanged();
+}
+
+QString QnWorkbenchWelcomeScreen::softwareVersion() const
+{
+    return lit("%1").arg(QnAppInfo::applicationVersion());
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)

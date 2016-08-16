@@ -294,4 +294,14 @@ Rectangle
         }
     }
 
+    NxLabel
+    {
+        x: 8;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 8;
+
+        text: context.softwareVersion;
+        standardColor: Style.darkerColor(Style.colors.windowText, 1);
+        font: Qt.font({ pixelSize: 11, weight: Font.Normal})
+    }
 }
