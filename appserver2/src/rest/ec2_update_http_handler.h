@@ -124,7 +124,7 @@ public:
         auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
         processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail
 
-        processor.processUpdateAsync(command, tran, queryDoneHandler);
+        processor.processUpdateAsync(command, data, queryDoneHandler);
         {
             QnMutexLocker lk(&m_mutex);
             while(!finished)
