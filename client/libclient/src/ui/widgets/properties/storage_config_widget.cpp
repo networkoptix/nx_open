@@ -194,8 +194,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     m_backupCancelled(false),
     m_updating(false),
     m_quality(qnGlobalSettings->backupQualities()),
-    m_backupNewCameras(qnGlobalSettings->backupNewCamerasByDefault()),
     m_camerasToBackup(),
+    m_backupNewCameras(qnGlobalSettings->backupNewCamerasByDefault()),
     m_realtimeBackupMovie(new QMovie(devicePixelRatio() == 1
         ? lit(":/skin/archive_backup/backup_in_progress.gif")
         : lit(":/skin/archive_backup/backup_in_progress@2x.gif")))
