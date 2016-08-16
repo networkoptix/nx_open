@@ -228,8 +228,11 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     }
 
     QnResourcePtr rpRes = qnResPool->getResourceById(cameraResource->getId());
-    rpRes->setStatus(Qn::Offline);
-    rpRes->initAsync(true);
+    if (rpRes)
+    {
+        rpRes->setStatus(Qn::Offline);
+        rpRes->initAsync(true);
+    }
 }
 
 void QnAppserverResourceProcessor::at_mutexTimeout()

@@ -16,6 +16,7 @@ SHARETARGET=$TARGET/share
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
+SYSTEMDTARGET=/etc/systemd/system
 BETA=""
 if [[ "${beta}" == "true" ]]; then
   BETA="-beta"
@@ -32,6 +33,7 @@ SHARESTAGE=$STAGE$SHARETARGET
 ETCSTAGE=$STAGE$ETCTARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
+SYSTEMDSTAGE=$STAGE$SYSTEMDTARGET
 
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 SERVER_SHARE_PATH=${libdir}/share
@@ -50,6 +52,7 @@ mkdir -p $ETCSTAGE
 mkdir -p $SHARESTAGE
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
+mkdir -p $SYSTEMDSTAGE
 
 # Copy dbsync 2.2
 if [ '${arch}' != 'arm' ]
@@ -112,6 +115,7 @@ install -m 755 bin/mediaserver $BINSTAGE
 # Copy upstart and sysv script
 install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf
 install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE/$COMPANY_NAME-mediaserver
+install -m 644 systemd/networkoptix-mediaserver.service $SYSTEMDSTAGE/$COMPANY_NAME-mediaserver.service
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN

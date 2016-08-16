@@ -1,11 +1,12 @@
 #ifndef cl_ThreadQueue_h_2236
-#define cl_ThreadQueue_h_2236
+#define cl_ThreadQueue_h_2236 
 
 #include <vector>
 
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/semaphore.h>
 
 
@@ -23,11 +24,12 @@ public:
     CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
         : m_headIndex(0),
         m_bufferLen(0),
-        m_maxSize( maxSize )
+        m_maxSize( maxSize ),
+        m_cs(QnMutex::Recursive)
     {
-        reallocateBufferUnsafe(maxSize);
+        reallocateBuffer(maxSize);
     }
-
+    
     ~CLThreadQueue() {
         clear();
     }
@@ -38,10 +40,9 @@ public:
     }
 
     bool contains(const T& val) const
-    {
-        QnMutexLocker lock(&m_mutex);
-        for (int i = 0; i < m_bufferLen; ++i)
-        {
+    { 
+        QnMutexLocker mutex( &m_cs );
+        for (int i = 0; i < m_bufferLen; ++i) {
             if (atUnsafe(i) == val)
                 return true;
         }
@@ -50,34 +51,36 @@ public:
 
     template<typename ValueRef>
     bool push(ValueRef&& val)
-    {
-        QnMutexLocker lock(&m_mutex);
+    { 
+        QnMutexLocker mutex( &m_cs );
+
+
         if ((uint)m_bufferLen == m_buffer.size())
-            reallocateBufferUnsafe(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
+            reallocateBuffer(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
 
 
         // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
         //if ( m_queue.size()>=m_maxSize )    return false; <- wrong aproach
 
-        //m_queue.enqueue(val);
+        //m_queue.enqueue(val); 
         int index = (m_headIndex + m_bufferLen) % m_buffer.size();
         m_buffer[index] = std::forward<ValueRef>(val);
         m_bufferLen++;
 
-        m_waitCond.wakeAll();
+        m_sem.release(); 
 
         return true;
     }
 
     T front() const
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker mutex( &m_cs );
         return m_buffer[m_headIndex];
     }
-
+    
     const T& at(int i) const
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex + i;
         return m_buffer[index % m_buffer.size()];
     }
@@ -90,24 +93,25 @@ public:
 
     void setAt(const T& value, int i)
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex + i;
         m_buffer[index % m_buffer.size()] = value;
     }
 
     T last() const
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex + m_bufferLen - 1;
         return m_bufferLen > 0 ? m_buffer[index % m_buffer.size()]: T();
     }
 
 
-    bool pop(T& val, quint32 time = ULONG_MAX)
+    bool pop(T& val, quint32 time = INFINITE)
     {
-        QnMutexLocker lock(&m_mutex);
-        if (m_bufferLen == 0)
-            m_waitCond.wait(&m_mutex, time);
+        if (!m_sem.tryAcquire(1,time)) // in case of INFINITE wait the value passed to tryAcquire will be negative ( it will wait forever )
+            return false;
+
+        QnMutexLocker mutex( &m_cs );
 
         if (m_bufferLen > 0)
         {
@@ -116,7 +120,7 @@ public:
             if ((uint)m_headIndex >= m_buffer.size())
                 m_headIndex = 0;
             m_bufferLen--;
-            return true;
+            return true; 
         }
 
         return false;
@@ -124,7 +128,8 @@ public:
 
     void removeFirst(int count)
     {
-        QnMutexLocker lock(&m_mutex);
+        m_sem.tryAcquire(count);
+        QnMutexLocker mutex( &m_cs );
         for (int i = 0; i < count; ++i)
         {
             m_buffer[m_headIndex++] = T();
@@ -136,7 +141,7 @@ public:
 
     void removeAt(int index)
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker mutex( &m_cs );
         removeAtUnsafe(index);
     }
 
@@ -156,18 +161,18 @@ public:
 
     void lock() const
     {
-        m_mutex.lock();
+        m_cs.lock();
     }
 
     void unlock() const
     {
-        m_mutex.unlock();
+        m_cs.unlock();
     }
 
     template <class ConditionFunc>
     void detachDataByCondition(const ConditionFunc& cond, const QVariant& opaque = QVariant())
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex;
         for (int i = 0; i < m_bufferLen; ++i)
         {
@@ -187,17 +192,17 @@ public:
         return m_maxSize;
     }
 
-    void setMaxSize(int value)
+    void setMaxSize(int value) 
     {
-        QnMutexLocker lock(&m_mutex);
         m_maxSize = value;
-        reallocateBufferUnsafe(qMax(m_maxSize, (int) m_buffer.size()));
+        reallocateBuffer(qMax(m_maxSize, (int) m_buffer.size()));
     }
 
     void clear()
     {
-        QnMutexLocker lock(&m_mutex);
+        QnMutexLocker mutex( &this->m_cs );
 
+        this->m_sem.tryAcquire(m_bufferLen);
         int index = m_headIndex;
         for (int i = 0; i < m_bufferLen; ++i)
         {
@@ -208,15 +213,12 @@ public:
         m_headIndex = 0;
     }
 
-    void wakeAll()
-    {
-        m_waitCond.wakeAll();
-    }
-
 private:
     // for grow only
-    void reallocateBufferUnsafe(int newSize)
+    void reallocateBuffer(int newSize)
     {
+        QnMutexLocker mutex( &m_cs );
+
         int oldSize = (int) m_buffer.size();
         m_buffer.resize(newSize);
 
@@ -243,11 +245,11 @@ private:
 protected:
     std::vector<T> m_buffer;
     int m_headIndex;
-    std::atomic<int> m_bufferLen;
+    int m_bufferLen;
 
     int m_maxSize;
-    mutable QnMutex m_mutex;
-    QnWaitCondition m_waitCond;
+    mutable QnMutex m_cs;
+    QnSemaphore m_sem;
 };
 
 template <typename T>
@@ -259,9 +261,9 @@ public:
         m_bufferLen(0),
         m_maxSize( maxSize )
     {
-        reallocateBufferUnsafe(maxSize);
+        reallocateBuffer(maxSize);
     }
-
+    
     ~QnUnsafeQueue() {
         clear();
     }
@@ -271,15 +273,15 @@ public:
         return m_bufferLen == 0;
     }
 
-    bool push(const T& val)
-    {
+    bool push(const T& val) 
+    { 
         if ((uint)m_bufferLen == m_buffer.size())
-            reallocateBufferUnsafe(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
+            reallocateBuffer(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
 
         // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
         //if ( m_queue.size()>=m_maxSize )    return false; <- wrong aproach
 
-        //m_queue.enqueue(val);
+        //m_queue.enqueue(val); 
         int index = (m_headIndex + m_bufferLen) % m_buffer.size();
         m_buffer[index] = val;
         m_bufferLen++;
@@ -314,7 +316,7 @@ public:
             if ((uint)m_headIndex >= m_buffer.size())
                 m_headIndex = 0;
             m_bufferLen--;
-            return true;
+            return true; 
         }
         return false;
     }
@@ -352,11 +354,10 @@ public:
         return m_maxSize;
     }
 
-    void setMaxSize(int value)
+    void setMaxSize(int value) 
     {
-        QnMutexLocker lock(&m_mutex);
         m_maxSize = value;
-        reallocateBufferUnsafe(qMax(m_maxSize, (int) m_buffer.size()));
+        reallocateBuffer(qMax(m_maxSize, (int) m_buffer.size()));
     }
 
     void clear()
@@ -373,7 +374,7 @@ public:
 
 private:
     // for grow only
-    void reallocateBufferUnsafe(int newSize)
+    void reallocateBuffer(int newSize)
     {
         int oldSize = (int) m_buffer.size();
         m_buffer.resize(newSize);

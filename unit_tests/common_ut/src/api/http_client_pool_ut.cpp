@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/media/custom_output_stream.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>

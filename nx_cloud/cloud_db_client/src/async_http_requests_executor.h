@@ -37,7 +37,9 @@ public:
     AsyncRequestsExecutor(
         network::cloud::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
     :
-        m_cdbEndPointFetcher(cdbEndPointFetcher)
+        m_cdbEndPointFetcher(
+            std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
+                cdbEndPointFetcher))
     {
     }
 
@@ -146,7 +148,9 @@ private:
     QString m_username;
     QString m_password;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
-    network::cloud::CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
+    std::unique_ptr<
+        network::cloud::CloudModuleEndPointFetcher::ScopedOperation
+    > m_cdbEndPointFetcher;
 
     /*!
         \param completionHandler Can be invoked within this call if failed to initiate async request

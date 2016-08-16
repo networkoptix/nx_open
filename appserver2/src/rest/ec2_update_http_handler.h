@@ -121,9 +121,10 @@ public:
                 finished = true;
                 m_cond.wakeAll();
             };
-        m_connection->queryProcessor()->getAccess(owner->accessRights()).
-            processUpdateAsync(command, data, queryDoneHandler);
+        auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
+        processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail
 
+        processor.processUpdateAsync(command, tran, queryDoneHandler);
         {
             QnMutexLocker lk(&m_mutex);
             while(!finished)
@@ -132,16 +133,6 @@ public:
 
         if (m_customAction)
             m_customAction(data);
-
-        // Update local data.
-        if (errorCode == ErrorCode::ok)
-        {
-            // Add audit record before notification to ensure removed resource is still alive.
-            m_connection->auditManager()->addAuditRecord(
-                command,
-                data,
-                owner->authSession());
-        }
 
         switch (errorCode)
         {

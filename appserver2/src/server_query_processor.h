@@ -15,6 +15,7 @@
 #include <transaction/binary_transaction_serializer.h>
 #include <api/app_server_connection.h>
 #include <ec_connection_notification_manager.h>
+#include "ec_connection_audit_manager.h"
 
 namespace ec2 {
 
@@ -47,7 +48,8 @@ public:
     virtual ~ServerQueryProcessor() {}
 
     ServerQueryProcessor(const Qn::UserAccessData &userAccessData):
-        m_userAccessData(userAccessData)
+        m_userAccessData(userAccessData),
+        m_auditManager(nullptr)
     {
     }
 
@@ -258,6 +260,8 @@ public:
             });
     }
 
+    void setAuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession);
+
 private:
     /**
      * @param syncFunction ErrorCode(QnTransaction<QueryDataType>&,
@@ -458,9 +462,7 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        QnAppServerConnectionFactory::getConnection2()
-            ->notificationManager()
-            ->triggerNotification(tran);
+        triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
 
         transactionsToSend->push_back(std::bind(SendTransactionFunction(), tran));
 
@@ -557,9 +559,30 @@ private:
             });
     }
 
+    template<class DataType>
+    void triggerNotification(
+        const AbstractECConnectionPtr& connection,
+        const QnTransaction<DataType>& tran)
+    {
+        // Add audit record before notification to ensure removed resource is still alive.
+        if (m_auditManager)
+        {
+            m_auditManager->addAuditRecord(
+                tran.command,
+                tran.params,
+                m_authSession);
+        }
+
+        connection->notificationManager()->triggerNotification(tran);
+    }
+
 private:
     static QnMutex m_updateDataMutex;
     Qn::UserAccessData m_userAccessData;
+
+
+    ECConnectionAuditManager* m_auditManager;
+    QnAuthSession m_authSession;
 };
 
 } // namespace detail
