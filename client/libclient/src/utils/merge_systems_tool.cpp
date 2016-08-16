@@ -55,21 +55,25 @@ QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
 {
 }
 
-void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password)
+void QnMergeSystemsTool::pingSystem(const QUrl& url, const QAuthenticator& userAuth)
 {
     if (!m_serverByRequestHandle.isEmpty())
         return;
 
     m_foundModule.first = NotFoundError;
 
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
-    for (const QnMediaServerResourcePtr &server: onlineServers)
-    {
-        int handle = server->apiConnection()->pingSystemAsync(url, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
-        m_serverByRequestHandle[handle] = server;
-        NX_LOG(lit("QnMergeSystemsTool: ping request to %1 via %2").arg(url.toString()).arg(server->getApiUrl().toString()), cl_logDEBUG1);
-    }
+
+    PingSystemCtx ctx;
+    ctx.url = url;
+    ctx.auth = userAuth;
+
+    QnForeignServerConnectionPtr remoteConnection(new QnForeignServerConnection());
+    remoteConnection->setUrl(url);
+    ctx.remoteConnection = remoteConnection;
+    int handle = remoteConnection->getNonceAsync(url, this, SLOT(at_getNonceForPingFinished(int, QnGetNonceReply, int, QString)));
+    m_pingSystemRequests[handle] = ctx;
 }
+
 
 int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth, bool ownSettings)
 {
@@ -121,6 +125,36 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
         ctx.ignoreIncompatible,
         this,
         SLOT(at_mergeSystem_finished(int, QnModuleInformation, int, QString)));
+}
+
+void QnMergeSystemsTool::at_getNonceForPingFinished(
+    int status,
+    const QnGetNonceReply& nonceReply,
+    int handle,
+    const QString& errorString)
+{
+    PingSystemCtx& ctx = m_pingSystemRequests[handle];
+
+    QByteArray getKey = createHttpQueryAuthParam(
+        ctx.auth.user(),
+        ctx.auth.password(),
+        nonceReply.realm,
+        "GET",
+        nonceReply.nonce.toUtf8());
+
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for (const QnMediaServerResourcePtr &server : onlineServers)
+    {
+        int handle = server->apiConnection()->pingSystemAsync(
+            ctx.url,
+            QLatin1String(getKey),
+            this,
+            SLOT(at_pingSystem_finished(int, QnModuleInformation, int, QString)));
+        m_serverByRequestHandle[handle] = server;
+        NX_LOG(lit("QnMergeSystemsTool: ping request to %1 via %2").arg(ctx.url.toString()).arg(server->getApiUrl().toString()), cl_logDEBUG1);
+    }
+
+    m_pingSystemRequests.remove(handle);
 }
 
 int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth)

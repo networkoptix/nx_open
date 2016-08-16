@@ -78,9 +78,12 @@ void QnMergeSystemsDialog::done(int result)
     {
         m_successfullyFinished = false;
 
-        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_adminPassword);
+        context()->instance<QnWorkbenchUserWatcher>()->setUserName(m_remoteOwnerCredentials.user());
+        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_remoteOwnerCredentials.password());
+
         QUrl url = QnAppServerConnectionFactory::url();
-        url.setPassword(m_adminPassword);
+        url.setUserName(m_remoteOwnerCredentials.user());
+        url.setPassword(m_remoteOwnerCredentials.password());
         QnAppServerConnectionFactory::setUrl(url);
 
         menu()->trigger(QnActions::ReconnectAction);
@@ -150,22 +153,30 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
     ui->urlComboBox->setCurrentText(url.toString());
 }
 
-void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
+void QnMergeSystemsDialog::at_testConnectionButton_clicked()
+{
     NX_ASSERT(context()->user()->isOwner());
     if (!context()->user()->isOwner())
         return;
 
     m_discoverer.clear();
     m_url.clear();
-    m_adminPassword.clear();
+    m_remoteOwnerCredentials = QAuthenticator();
     m_successfullyFinished = false;
     updateConfigurationBlock();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
+    QString login = ui->loginEdit->text();
     QString password = ui->passwordEdit->text();
 
     if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
         updateErrorLabel(tr("The URL is invalid."));
+        updateConfigurationBlock();
+        return;
+    }
+
+    if (login.isEmpty()) {
+        updateErrorLabel(tr("The login cannot be empty."));
         updateConfigurationBlock();
         return;
     }
@@ -177,8 +188,9 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
-    m_adminPassword = password;
-    m_mergeTool->pingSystem(m_url, m_adminPassword);
+    m_remoteOwnerCredentials.setUser(login);
+    m_remoteOwnerCredentials.setPassword(password);
+    m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -196,10 +208,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     if (!ownSettings)
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
 
-    QAuthenticator auth;
-    auth.setUser(lit("admin")); //< todo: update UI
-    auth.setPassword(m_adminPassword);
-    m_mergeTool->mergeSystem(m_discoverer, m_url, auth, ownSettings);
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_remoteOwnerCredentials, ownSettings);
     ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 

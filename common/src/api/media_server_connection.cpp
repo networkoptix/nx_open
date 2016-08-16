@@ -824,10 +824,11 @@ int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &sys
     return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
 }
 
-int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot) {
+int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString& getKey, QObject *target, const char *slot)
+{
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("password", password);
+    params << QnRequestParam("getKey", getKey);
 
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }

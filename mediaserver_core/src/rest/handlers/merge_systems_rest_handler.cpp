@@ -148,7 +148,8 @@ int QnMergeSystemsRestHandler::execute(
     }
 
     QUrl url(data.url);
-    if (!url.isValid()) {
+    if (!url.isValid())
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Received invalid parameter url %1")
             .arg(data.url), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(

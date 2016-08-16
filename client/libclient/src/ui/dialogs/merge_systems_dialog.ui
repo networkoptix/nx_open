@@ -90,17 +90,31 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <widget class="QLineEdit" name="passwordEdit">
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="passwordLabel">
                 <property name="text">
                  <string>Password:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="LoginLabel">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="loginEdit">
+                <property name="text">
+                 <string>admin</string>
                 </property>
                </widget>
               </item>
@@ -297,6 +311,7 @@ The servers from the remote system should appear in your system soon.</string>
  </customwidgets>
  <tabstops>
   <tabstop>urlComboBox</tabstop>
+  <tabstop>loginEdit</tabstop>
   <tabstop>passwordEdit</tabstop>
   <tabstop>testConnectionButton</tabstop>
   <tabstop>currentSystemRadioButton</tabstop>

@@ -29,7 +29,7 @@ public:
 
     explicit QnMergeSystemsTool(QObject *parent = 0);
 
-    void pingSystem(const QUrl &url, const QString &password);
+    void pingSystem(const QUrl &url, const QAuthenticator& auth);
     int mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth, bool ownSettings);
     int configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& auth);
 
@@ -41,6 +41,7 @@ private slots:
     void at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString);
     void at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString);
     void at_getNonceForMergeFinished(int status, const QnGetNonceReply& nonce, int handle, const QString& errorString);
+    void at_getNonceForPingFinished(int status, const QnGetNonceReply& nonceReply, int handle, const QString& errorString);
 private:
     QHash<int, QnMediaServerResourcePtr> m_serverByRequestHandle;
 
@@ -68,6 +69,16 @@ private:
         int mergeRequestHandle;
     };
 
+    struct PingSystemCtx
+    {
+        PingSystemCtx() {}
+
+        QnForeignServerConnectionPtr remoteConnection;
+        QUrl url;
+        QAuthenticator auth;
+    };
+
     QHash<int, MergeSystemCtx> m_mergeSystemRequests;
+    QHash<int, PingSystemCtx> m_pingSystemRequests;
     QPair<ErrorCode, QnModuleInformation> m_foundModule;
 };

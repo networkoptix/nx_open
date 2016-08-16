@@ -9,6 +9,7 @@
 #include "network/tcp_connection_priv.h"
 #include "utils/common/app_info.h"
 #include <nx/network/simple_http_client.h>
+#include <http/custom_headers.h>
 
 //#define START_LICENSES_DEBUG
 
@@ -26,7 +27,7 @@ int QnPingSystemRestHandler::executeGet(
     Q_UNUSED(path)
 
     QUrl url = params.value(lit("url"));
-    QString password = params.value(lit("password"));
+    QString getKey = params.value(lit("getKey"));
 
     if (url.isEmpty())
     {
@@ -42,21 +43,17 @@ int QnPingSystemRestHandler::executeGet(
         return CODE_OK;
     }
 
-    if (password.isEmpty())
+    if (getKey.isEmpty())
     {
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return CODE_OK;
     }
 
-    QAuthenticator auth;
-    auth.setUser(lit("admin"));
-    auth.setPassword(password);
-
     QnModuleInformation moduleInformation;
     {
         int status;
-        moduleInformation = remoteModuleInformation(url, auth, status);
+        moduleInformation = remoteModuleInformation(url, getKey, status);
         if (status != CL_HTTP_SUCCESS)
         {
             if (status == CL_HTTP_AUTH_REQUIRED)
@@ -66,7 +63,7 @@ int QnPingSystemRestHandler::executeGet(
             return CODE_OK;
         }
     }
-    
+
 
     if (moduleInformation.systemName.isEmpty())
     {
@@ -99,7 +96,7 @@ int QnPingSystemRestHandler::executeGet(
     {
 
         /* Check if there is a valid starter license in the remote system. */
-        QnLicenseList remoteLicensesList = remoteLicenses(url, auth);
+        QnLicenseList remoteLicensesList = remoteLicenses(url, QAuthenticator());
 
         /* Warn that some of the licenses will be deactivated. */
         QnLicenseListHelper remoteHelper(remoteLicensesList);
@@ -116,11 +113,13 @@ int QnPingSystemRestHandler::executeGet(
 
 QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
         const QUrl &url,
-        const QAuthenticator &auth,
+        const QString& getKey,
         int &status)
 {
-    CLSimpleHTTPClient client(url, defaultTimeoutMs, auth);
-    status = client.doGET(lit("api/moduleInformationAuthenticated"));
+    CLSimpleHTTPClient client(url, defaultTimeoutMs, QAuthenticator());
+    status = client.doGET(
+        lit("api/moduleInformationAuthenticated?%1=%2").
+        arg(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME)).arg(getKey));
 
     if (status != CL_HTTP_SUCCESS)
         return QnModuleInformation();
