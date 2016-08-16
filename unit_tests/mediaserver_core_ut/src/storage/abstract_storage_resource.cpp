@@ -632,7 +632,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 	*	Total recorded size is 100'000 * 10240 bytes ~= 980 mb.
 	*	Hence roughly we should have in the end:
 	*		- 1st - 170mb
-	*		- 2nd - 340mb
+	*		- 2nd - 330mb
 	*		- 3rd - 500mb
 	*	Hence, a fair delta amount would be around dozen(s) of megabytes. 
 	*	Let it be 10mb in the first check and 20mb in the second check.

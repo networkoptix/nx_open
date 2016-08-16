@@ -631,7 +631,7 @@ void QnStorageDb::handleError(nx::media_db::Error error)
     QnMutexLocker lk(&m_errorMutex);
     if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
 	{
-		if (error == nx::media_db::Error::ReadError && m_readErrorCount > kMaxReadErrorCount)
+		if (error == nx::media_db::Error::ReadError && m_readErrorCount >= kMaxReadErrorCount)
 		{
 			NX_LOG(lit("%1 DB read error %2. Read errors count = %3")
 					   .arg(Q_FUNC_INFO)
