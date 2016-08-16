@@ -448,7 +448,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="backupSettingsButton2">
+             <widget class="QPushButton" name="backupSettingsButtonDuplicate">
               <property name="text">
                <string notr="true">&lt;Backup Settings&gt;</string>
               </property>

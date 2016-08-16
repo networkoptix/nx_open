@@ -101,8 +101,8 @@ namespace
             QStyleOptionViewItem opt(option);
             initStyleOption(&opt, index);
 
-            bool editableColumn = opt.state.testFlag(QStyle::State_Enabled) &&
-                index.column() == QnStorageListModel::StoragePoolColumn;
+            bool editableColumn = opt.state.testFlag(QStyle::State_Enabled)
+              && index.column() == QnStorageListModel::StoragePoolColumn;
 
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
@@ -111,8 +111,8 @@ namespace
             {
                 opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
             }
-            else if (index.column() < QnStorageListModel::RemoveActionColumn &&
-                !index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
+            else if (index.column() < QnStorageListModel::RemoveActionColumn
+                 && !index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
             {
                 painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
             }
@@ -215,8 +215,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     setWarningStyle(ui->cannotStartBackupLabel);
     setWarningStyle(ui->realtimeBackupWarningLabel);
 
-    ui->backupSettingsButton2->setText(ui->backupSettingsButton->text());
-    connect(ui->backupSettingsButton2, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
+    ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
+    connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
 
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
@@ -1018,8 +1018,8 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
     bool isMainPool = pool == QnServerStoragesPool::Main;
 
     /* Here we must check actual backup schedule, not ui-selected. */
-    bool backupIsInProgress = m_server && m_server->getBackupSchedule().backupType != Qn::Backup_RealTime &&
-        qnServerStorageManager->backupStatus(m_server).state != Qn::BackupState_None;
+    bool backupIsInProgress = m_server && m_server->getBackupSchedule().backupType != Qn::Backup_RealTime
+        && qnServerStorageManager->backupStatus(m_server).state != Qn::BackupState_None;
 
     ui->addExtStorageToMainBtn->setEnabled(!backupIsInProgress);
 
