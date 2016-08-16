@@ -7,9 +7,11 @@
 
 #include <ui/common/aligner.h>
 #include <ui/common/palette.h>
+#include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/input_field.h>
 
 #include <watchers/cloud_status_watcher.h>
@@ -38,6 +40,9 @@ public:
     void at_loginButton_clicked();
     void at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status);
     void at_cloudStatusWatcher_error();
+
+public:
+    QnBusyIndicatorWidget* busyIndicator;
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
@@ -48,6 +53,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->setupUi(this);
 
     Q_D(QnLoginToCloudDialog);
+
+    d->busyIndicator->setParent(ui->loginButton);
 
     ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
@@ -80,6 +87,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->loginInputField->setFocus();
     d->updateUi();
+    d->lockUi(false);
 
     setResizeToContentsMode(Qt::Vertical);
 }
@@ -95,8 +103,10 @@ void QnLoginToCloudDialog::setLogin(const QString& login)
 
 QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent) :
     QObject(parent),
-    q_ptr(parent)
+    q_ptr(parent),
+    busyIndicator(new QnBusyIndicatorWidget(parent))
 {
+    new QnWidgetAnchor(busyIndicator);
 }
 
 void QnLoginToCloudDialogPrivate::updateUi()
@@ -115,6 +125,9 @@ void QnLoginToCloudDialogPrivate::lockUi(bool locked)
     q->ui->passwordInputField->setReadOnly(locked);
     q->ui->stayLoggedInChackBox->setEnabled(!locked);
     q->ui->loginButton->setEnabled(!locked);
+
+    q->ui->loginButton->setText(locked ? QString() : tr("Login"));
+    busyIndicator->setVisible(locked);
 }
 
 void QnLoginToCloudDialogPrivate::unlockUi()

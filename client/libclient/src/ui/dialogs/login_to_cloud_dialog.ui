@@ -100,7 +100,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Login</string>
+        <string notr="true">&lt;Login&gt;</string>
        </property>
       </widget>
      </item>
