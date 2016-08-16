@@ -83,7 +83,6 @@ angular.module('cloudApp')
             var search = $scope.search;
             return  $scope.search == '' ||
                     hasMatch(L.system.mySystemSearch, search) && (system.ownerAccountEmail == $scope.account.email) ||
-                    hasMatch(Config.systemStatuses[system.stateOfHealth].label, search) ||
                     hasMatch(system.name, search) ||
                     hasMatch(system.ownerFullName, search) ||
                     hasMatch(system.ownerAccountEmail, search);
