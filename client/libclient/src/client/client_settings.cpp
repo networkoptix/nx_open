@@ -23,9 +23,9 @@
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
-namespace {
-    const QString xorKey = lit("ItIsAGoodDayToDie");
-
+namespace
+{
+    const QString kEncodeXorKey = lit("ItIsAGoodDayToDie");
 } // anonymous namespace
 
 QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
@@ -108,7 +108,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         return baseValue;
     }
     case CLOUD_PASSWORD:
-        return nx::utils::xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
+        return nx::utils::xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), kEncodeXorKey);
 
     case SHOW_ONCE_MESSAGES:
     {
@@ -159,7 +159,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         break;
     }
     case CLOUD_PASSWORD:
-        base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(), xorKey));
+        base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(), kEncodeXorKey));
         break;
 
     case SHOW_ONCE_MESSAGES:

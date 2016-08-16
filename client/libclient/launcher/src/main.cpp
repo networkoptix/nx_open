@@ -8,9 +8,6 @@
 #include "version.h"
 #include <iostream>
 
-
-
-
 // -------------------------------------------------------------------------- //
 // boost/preprocessor/cat.hpp
 // -------------------------------------------------------------------------- //
@@ -27,39 +24,18 @@
 #
 # /* See http://www.boost.org for most recent version. */
 #
-# ifndef BOOST_PREPROCESSOR_CAT_HPP
-# define BOOST_PREPROCESSOR_CAT_HPP
+#ifndef BOOST_PREPROCESSOR_CAT_HPP
+#define BOOST_PREPROCESSOR_CAT_HPP
 #
-//# include <boost/preprocessor/config/config.hpp>
+#define BOOST_PP_CAT(a, b) BOOST_PP_CAT_OO((a, b))
+#define BOOST_PP_CAT_OO(par) BOOST_PP_CAT_I ## par
 #
-# /* BOOST_PP_CAT */
+#define BOOST_PP_CAT_I(a, b) BOOST_PP_CAT_II(a ## b)
+#define BOOST_PP_CAT_II(res) res
 #
-# if ~BOOST_PP_CONFIG_FLAGS() & BOOST_PP_CONFIG_MWCC()
-#    define BOOST_PP_CAT(a, b) BOOST_PP_CAT_I(a, b)
-# else
-#    define BOOST_PP_CAT(a, b) BOOST_PP_CAT_OO((a, b))
-#    define BOOST_PP_CAT_OO(par) BOOST_PP_CAT_I ## par
-# endif
-#
-# if ~BOOST_PP_CONFIG_FLAGS() & BOOST_PP_CONFIG_MSVC()
-#    define BOOST_PP_CAT_I(a, b) a ## b
-# else
-#    define BOOST_PP_CAT_I(a, b) BOOST_PP_CAT_II(a ## b)
-#    define BOOST_PP_CAT_II(res) res
-# endif
-#
-# endif
-
-
-
-
-
-
-#if defined(_MSC_VER) || defined(__BORLANDC__)
-typedef signed __int64 int64_t;
-#else
-typedef signed long long int64_t;
 #endif
+
+typedef signed __int64 int64_t;
 
 #define CLIENT_FILE_NAME BOOST_PP_CAT(L, QN_CLIENT_EXECUTABLE_NAME)
 
@@ -107,7 +83,7 @@ wstring getDstDir()
 
 wstring extractFilePath(const wstring& fileName)
 {
-    int pos = fileName.find_last_of(L'/');
+    size_t pos = fileName.find_last_of(L'/');
     return fileName.substr(0, pos);
 }
 
@@ -127,7 +103,8 @@ wstring toNativeSeparator(const wstring& path)
     return value;
 }
 
-int createDirectory(const wstring& path) {
+int createDirectory(const wstring& path)
+{
     wchar_t* buffer = new wchar_t[path.length() + 16];
     wsprintf(buffer, L"mkdir \"%s\"", toNativeSeparator(path).c_str());
     int result = _wsystem(buffer);
@@ -177,23 +154,35 @@ bool startProcessAsync(wchar_t* commandline, const wstring& dstDir)
     PROCESS_INFORMATION lpProcessInfo;
     memset(&lpStartupInfo, 0, sizeof(lpStartupInfo));
     memset(&lpProcessInfo, 0, sizeof(lpProcessInfo));
-    return CreateProcess(0, commandline,
-        NULL, NULL, NULL, NULL, NULL,
-        dstDir.c_str(),
-        &lpStartupInfo,
-        &lpProcessInfo);
+
+    return CreateProcess(
+        0,              /*< lpApplicationName */
+        commandline,    /*< lpCommandLine */
+        NULL,           /*< lpProcessAttributes */
+        NULL,           /*< lpThreadAttributes */
+        false,          /*< bInheritHandles */
+        NULL,           /*< dwCreationFlags */
+        NULL,           /*< lpEnvironment */
+        dstDir.c_str(), /*< lpCurrentDirectory */
+        &lpStartupInfo, /*< lpStartupInfo */
+        &lpProcessInfo  /*< lpProcessInformation */
+    );
 }
 
 int launchFile(const wstring& executePath)
 {
+    static const int kMaximumFileCatalogSize = 1024 * 1024;
+
     ifstream srcFile;
     srcFile.open(executePath.c_str(), std::ios_base::binary);
     if (!srcFile.is_open())
         return -1;
 
-    srcFile.seekg(-sizeof(int64_t)*2, std::ios::end); // skip magic, and nov pos
-    int64_t magic, novPos, indexTablePos;
+    // skip magic, and nov pos
+    int magicOffset = -2 * static_cast<int>(sizeof(int64_t));
+    srcFile.seekg(magicOffset, std::ios::end);
 
+    int64_t magic, novPos, indexTablePos;
     srcFile.read((char*) &novPos, sizeof(int64_t));
     srcFile.read((char*) &magic, sizeof(int64_t));
     if (magic != MAGIC)
@@ -203,15 +192,15 @@ int launchFile(const wstring& executePath)
     int64_t indexEofPos = (int64_t)srcFile.tellg(); // + sizeof(int64_t);
     srcFile.read((char*) &indexTablePos, sizeof(int64_t));
 
-    if (indexEofPos - indexTablePos > 1024*16)
+    auto catalogSize = indexEofPos - indexTablePos;
+    if (catalogSize > kMaximumFileCatalogSize)
         return -3; // too long file catalog
 
-    vector<int64_t> filePosList;
-    vector<wstring> fileNameList;
-
-    char* buffer = new char[indexEofPos - indexTablePos];
+    char* buffer = new char[catalogSize];
     try
     {
+        vector<int64_t> filePosList;
+        vector<wstring> fileNameList;
         srcFile.seekg(indexTablePos);
         int64_t curPos = indexTablePos;
         while (srcFile.tellg() < indexEofPos)
@@ -239,38 +228,22 @@ int launchFile(const wstring& executePath)
         set<wstring> checkedDirs;
         checkDir(checkedDirs, dstDir);
 
-        for (; i < filePosList.size()-1; ++i) {
+        for (; i < filePosList.size()-1; ++i)
+        {
             wstring fullFileName = getFullFileName(dstDir, fileNameList[i]);
             checkDir(checkedDirs, extractFilePath(fullFileName));
             extractFile(srcFile, fullFileName, filePosList[i], filePosList[i+1] - filePosList[i]);
         }
         srcFile.close();
 
-        // check if MSVC MSI exists
-        INSTALLSTATE state;
-        if (sizeof(char*) == 4)
-            state = MsiQueryProductState(L"{BD95A8CD-1D9F-35AD-981A-3E7925026EBB}");
-        else
-            state = MsiQueryProductState(L"{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}");
-        if (state != INSTALLSTATE_DEFAULT)
-        {
-            wchar_t buffer[MAX_PATH + 16];
-            wchar_t* arch = sizeof(char*) == 4 ? L"x86" : L"x64";
-            wsprintf(buffer, L"\"%s\\vcredist_%s.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
-            int result = _wsystem(buffer);
-
-            // give ms antivirus enough time to have installed redist checked
-            Sleep(5000);
-        }
-
         // start client
-
+        static const wchar_t kPathTemplate[](L"\"%s\" \"%s\" --exported");
         wchar_t buffer[MAX_PATH*2 +3];
-        wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, CLIENT_FILE_NAME).c_str(), executePath.c_str());
+        wsprintf(buffer, kPathTemplate, getFullFileName(dstDir, CLIENT_FILE_NAME).c_str(), executePath.c_str());
         if (!startProcessAsync(buffer, dstDir))
         {
             // todo: refactor it. Current version have different 'exe' name for installer and debug mode. So, try both names
-            wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"desktop_client.exe").c_str(), executePath.c_str());
+            wsprintf(buffer, kPathTemplate, getFullFileName(dstDir, L"desktop_client.exe").c_str(), executePath.c_str());
             startProcessAsync(buffer, dstDir);
         }
 
@@ -300,29 +273,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                        LPTSTR    lpCmdLine,
                        int       nCmdShow)
 {
-    if (std::wstring(lpCmdLine).empty()) {
+    if (std::wstring(lpCmdLine).empty())
+    {
         wchar_t exepath[MAX_PATH];
         GetModuleFileName(0, exepath, MAX_PATH);
         launchFile(exepath);
     }
-    else {
+    else
+    {
         launchFile(unquoteStr(lpCmdLine));
     }
     return 0;
 }
-
-/*
-int _tmain(int argc, _TCHAR* argv[])
-{
-    if (argc == 1)
-    {
-        launchFile(wstring(argv[0]));
-    }
-    else if (argc == 2)
-    {
-        launchFile(wstring(argv[1]));
-    }
-
-	return 0;
-}
-*/
