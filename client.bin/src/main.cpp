@@ -32,6 +32,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtGui/QScreen>
 #include <QtGui/QDesktopServices>
 #include <QScopedPointer>
 #include <QtSingleApplication>
@@ -542,6 +543,23 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         !qnRuntime->isDevMode() &&
         QnAppInfo::beta())
         context->action(QnActions::BetaVersionMessageAction)->trigger();
+
+
+    for (const auto screen: QApplication::screens())
+    {
+        static const qreal kMinHiDpiRatio = 1.49;  //< At least 1.5x
+
+        const auto pysicalDpi = screen->physicalDotsPerInch();
+        const auto logicalDpi = screen->logicalDotsPerInch();
+        const auto dpiAspect = (qFuzzyIsNull(pysicalDpi) ? 1 : logicalDpi / pysicalDpi);
+        const auto targetRatio = std::max(dpiAspect, screen->devicePixelRatio());
+
+        if (targetRatio < kMinHiDpiRatio)
+            continue;
+
+        context->action(QnActions::HiDpiSupportMessageAction)->trigger();
+        break;
+    }
 
 #ifdef _DEBUG
     /* Show FPS in debug. */

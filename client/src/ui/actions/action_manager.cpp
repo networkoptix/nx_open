@@ -852,6 +852,11 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Show Beta Version Warning Message"));
 
+    factory(QnActions::HiDpiSupportMessageAction).
+        flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Show HiDpi Support Warning Message"));
+
     factory(QnActions::AllowStatisticsReportMessageAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
