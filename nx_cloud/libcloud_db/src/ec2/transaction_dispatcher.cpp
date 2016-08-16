@@ -18,17 +18,21 @@ namespace ec2 {
 
 using namespace ::ec2;
 
-TransactionDispatcher::TransactionDispatcher(TransactionLog* const transactionLog)
+TransactionDispatcher::TransactionDispatcher(
+    TransactionLog* const transactionLog,
+    nx::db::AsyncSqlQueryExecutor* const dbManager)
 :
-    m_transactionLog(transactionLog)
+    m_transactionLog(transactionLog),
+    m_dbManager(dbManager)
 {
     registerTransactionHandler<::ec2::ApiCommand::saveUser, ::ec2::ApiUserData>(nullptr);
 }
 
-bool TransactionDispatcher::processTransaction(
+void TransactionDispatcher::dispatchTransaction(
+    TransactionTransportHeader transportHeader,
     Qn::SerializationFormat tranFormat,
     const QByteArray& serializedTransaction,
-    const ::ec2::QnTransactionTransportHeader& transportHeader)
+    TransactionProcessedHandler handler)
 {
     if (tranFormat == Qn::UbjsonFormat)
     {
@@ -36,15 +40,19 @@ bool TransactionDispatcher::processTransaction(
         QnUbjsonReader<QByteArray> stream(&serializedTransaction);
         if (!QnUbjson::deserialize(&stream, &transaction))
         {
-            NX_LOGX(lit("Failed to deserialized ubjson transaction received from TODO. size %1")
+            NX_LOGX(lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
+                .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
                 .arg(serializedTransaction.size()), cl_logDEBUG1);
-            return false;
+            m_aioTimer.post(
+                [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
+            return;
         }
 
         return dispatchTransaction(
-            transportHeader,
-            transaction,
-            &stream);
+            std::move(transportHeader),
+            std::move(transaction),
+            &stream,
+            std::move(handler));
     }
     else if (tranFormat == Qn::JsonFormat)
     {
@@ -53,25 +61,33 @@ bool TransactionDispatcher::processTransaction(
         //TODO #ak take tranObject from cache
         if (!QJson::deserialize(serializedTransaction, &tranObject))
         {
-            NX_LOGX(lit("Failed to parse json transaction received from TODO. size %1")
+            NX_LOGX(lm("Failed to parse json transaction received from (%1, %2). size %3")
+                .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
                 .arg(serializedTransaction.size()), cl_logDEBUG1);
-            return false;
+            m_aioTimer.post(
+                [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
+            return;
         }
         if (!QJson::deserialize(tranObject["tran"], &transaction))
         {
-            NX_LOGX(lit("Failed to deserialize json transaction received from TODO. size %1")
+            NX_LOGX(lm("Failed to deserialize json transaction received from (%1, %2). size %3")
+                .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
                 .arg(serializedTransaction.size()), cl_logDEBUG1);
-            return false;
+            m_aioTimer.post(
+                [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
+            return;
         }
 
         return dispatchTransaction(
-            transportHeader,
-            transaction,
-            tranObject["tran"].toObject());
+            std::move(transportHeader),
+            std::move(transaction),
+            tranObject["tran"].toObject(),
+            std::move(handler));
     }
     else
     {
-        return false;
+        m_aioTimer.post(
+            [handler = std::move(handler)]{ handler(api::ResultCode::badRequest); });
     }
 }
 

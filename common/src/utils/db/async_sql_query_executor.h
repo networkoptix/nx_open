@@ -14,10 +14,11 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/threadqueue.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/thread/mutex.h>
+#include <utils/common/threadqueue.h>
 
 #include "request_execution_thread.h"
 #include "request_executor.h"
@@ -51,9 +52,9 @@ public:
     */
     template<typename InputData, typename OutputData>
     void executeUpdate(
-        std::function<DBResult(QSqlDatabase*, const InputData&, OutputData* const)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData input,
-        std::function<void(DBResult, InputData, OutputData&&)> completionHandler ) 
+        nx::utils::MoveOnlyFunc<void(DBResult, InputData, OutputData)> completionHandler ) 
     {
         openOneMoreConnectionIfNeeded();
 
@@ -69,9 +70,9 @@ public:
     //!Overload for updates with no output data
     template<typename InputData>
     void executeUpdate(
-        std::function<DBResult(QSqlDatabase*, const InputData&)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, const InputData&)> dbUpdateFunc,
         InputData input,
-        std::function<void(DBResult, InputData)> completionHandler )
+        nx::utils::MoveOnlyFunc<void(DBResult, InputData)> completionHandler )
     {
         openOneMoreConnectionIfNeeded();
 
@@ -86,8 +87,8 @@ public:
 
     //!Overload for updates with no input data
     void executeUpdate(
-        std::function<DBResult( QSqlDatabase* )> dbUpdateFunc,
-        std::function<void( DBResult )> completionHandler )
+        nx::utils::MoveOnlyFunc<DBResult( QSqlDatabase* )> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void( DBResult )> completionHandler )
     {
         openOneMoreConnectionIfNeeded();
 
@@ -100,8 +101,8 @@ public:
     }
 
     void executeUpdateWithoutTran(
-        std::function<DBResult( QSqlDatabase* )> dbUpdateFunc,
-        std::function<void( DBResult )> completionHandler )
+        nx::utils::MoveOnlyFunc<DBResult( QSqlDatabase* )> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void( DBResult )> completionHandler )
     {
         openOneMoreConnectionIfNeeded();
 
@@ -115,8 +116,8 @@ public:
 
     template<typename OutputData>
     void executeSelect(
-        std::function<DBResult( QSqlDatabase*, OutputData* const )> dbSelectFunc,
-        std::function<void( DBResult, OutputData )> completionHandler )
+        nx::utils::MoveOnlyFunc<DBResult( QSqlDatabase*, OutputData* const )> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void( DBResult, OutputData )> completionHandler )
     {
         openOneMoreConnectionIfNeeded();
 

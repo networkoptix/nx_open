@@ -34,6 +34,8 @@
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "ec2/connection_manager.h"
+#include "ec2/transaction_dispatcher.h"
+#include "ec2/transaction_log.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
@@ -187,7 +189,9 @@ int CloudDBProcess::exec()
         EventManager eventManager(settings);
         m_eventManager = &eventManager;
 
-        ec2::ConnectionManager ec2ConnectionManager(settings);
+        ec2::TransactionLog transactionLog;
+        ec2::TransactionDispatcher transactionDispatcher(&transactionLog, &dbManager);
+        ec2::ConnectionManager ec2ConnectionManager(settings, &transactionDispatcher);
 
         SystemManager systemManager(
             settings,

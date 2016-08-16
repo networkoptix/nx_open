@@ -21,7 +21,10 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/data/api_peer_data.h>
 
+#include <utils/common/counter.h>
+
 #include "access_control/auth_types.h"
+#include "transaction_transport_header.h"
 
 
 namespace nx_http {
@@ -39,13 +42,17 @@ class Settings;
 
 namespace ec2 {
 
+class TransactionDispatcher;
 class TransactionTransport;
+class TransactionTransportHeader;
 
 /** Managers ec2 transaction connections from mediaservers */
 class ConnectionManager
 {
 public:
-    ConnectionManager(const conf::Settings& settings);
+    ConnectionManager(
+        const conf::Settings& settings,
+        TransactionDispatcher* const transactionDispatcher);
     virtual ~ConnectionManager();
 
     /** mediaserver calls this method to open 2-way transaction exchange channel */
@@ -92,13 +99,29 @@ private:
     constexpr static const int kConnectionBySystemIdAndPeerIdIndex = 1;
 
     const conf::Settings& m_settings;
+    TransactionDispatcher* const m_transactionDispatcher;
     const ::ec2::ApiPeerData m_localPeerData;
     ConnectionDict m_connections;
     std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
     QnMutex m_mutex;
+    QnCounter m_startedAsyncCallsCounter;
 
     void addNewConnection(ConnectionContext connectionContext);
+    template<int connectionIndexNumber, typename ConnectionKeyType>
+        void removeExistingConnection(
+            QnMutexLockerBase* const /*lock*/,
+            ConnectionKeyType connectionKey);
     void removeConnection(const nx::String& connectionId);
+    void onGotTransaction(
+        const nx::String& connectionId,
+        Qn::SerializationFormat tranFormat,
+        const QByteArray& data,
+        TransactionTransportHeader transportHeader);
+    void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);
+    void fetchDataFromConnectRequest(
+        const nx_http::Request& request,
+        ::ec2::ApiPeerData* const remotePeer,
+        nx::String* const contentEncoding);
 };
 
 }   // namespace ec2

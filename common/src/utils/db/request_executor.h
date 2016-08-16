@@ -10,6 +10,8 @@
 
 #include <QtSql/QSqlDatabase>
 
+#include <nx/utils/move_only_func.h>
+
 #include "types.h"
 
 
@@ -43,9 +45,9 @@ class UpdateExecutor
 {
 public:
     UpdateExecutor(
-        std::function<DBResult(QSqlDatabase* const, const InputData&)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&)> dbUpdateFunc,
         InputData&& input,
-        std::function<void(DBResult, InputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(DBResult, InputData)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
@@ -83,9 +85,9 @@ public:
     }
 
 private:
-    std::function<DBResult(QSqlDatabase* const, const InputData&)> m_dbUpdateFunc;
+    nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&)> m_dbUpdateFunc;
     InputData m_input;
-    std::function<void(DBResult, InputData)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(DBResult, InputData)> m_completionHandler;
 };
 
 //!Executor of data update requests with output data
@@ -96,9 +98,9 @@ class UpdateWithOutputExecutor
 {
 public:
     UpdateWithOutputExecutor(
-        std::function<DBResult(QSqlDatabase* const, const InputData&, OutputData* const)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData&& input,
-        std::function<void(DBResult, InputData, OutputData&&)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(DBResult, InputData, OutputData&&)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
@@ -140,9 +142,9 @@ public:
     }
 
 private:
-    std::function<DBResult(QSqlDatabase* const, const InputData&, OutputData* const)> m_dbUpdateFunc;
+    nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&, OutputData* const)> m_dbUpdateFunc;
     InputData m_input;
-    std::function<void(DBResult, InputData, OutputData&&)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(DBResult, InputData, OutputData&&)> m_completionHandler;
 };
 
 
@@ -152,8 +154,8 @@ class UpdateWithoutAnyDataExecutor
 {
 public:
     UpdateWithoutAnyDataExecutor(
-        std::function<DBResult(QSqlDatabase* const)> dbUpdateFunc,
-        std::function<void(DBResult)> completionHandler)
+        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_completionHandler(std::move(completionHandler))
@@ -190,8 +192,8 @@ public:
     }
 
 private:
-    std::function<DBResult(QSqlDatabase* const)> m_dbUpdateFunc;
-    std::function<void(DBResult)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> m_dbUpdateFunc;
+    nx::utils::MoveOnlyFunc<void(DBResult)> m_completionHandler;
 };
 
 
@@ -201,8 +203,8 @@ class UpdateWithoutAnyDataExecutorNoTran
 {
 public:
     UpdateWithoutAnyDataExecutorNoTran(
-        std::function<DBResult(QSqlDatabase* const)> dbUpdateFunc,
-        std::function<void(DBResult)> completionHandler)
+        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_completionHandler(std::move(completionHandler))
@@ -221,8 +223,8 @@ public:
     }
 
 private:
-    std::function<DBResult(QSqlDatabase* const)> m_dbUpdateFunc;
-    std::function<void(DBResult)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> m_dbUpdateFunc;
+    nx::utils::MoveOnlyFunc<void(DBResult)> m_completionHandler;
 };
 
 
@@ -234,8 +236,8 @@ class SelectExecutor
 {
 public:
     SelectExecutor(
-        std::function<DBResult(QSqlDatabase*, OutputData* const)> dbSelectFunc,
-        std::function<void(DBResult, OutputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, OutputData* const)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult, OutputData)> completionHandler)
     :
         m_dbSelectFunc(std::move(dbSelectFunc)),
         m_completionHandler(std::move(completionHandler))
@@ -253,8 +255,8 @@ public:
     }
 
 private:
-    std::function<DBResult(QSqlDatabase*, OutputData* const)> m_dbSelectFunc;
-    std::function<void(DBResult, OutputData)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, OutputData* const)> m_dbSelectFunc;
+    nx::utils::MoveOnlyFunc<void(DBResult, OutputData)> m_completionHandler;
 };
 
 }   //namespace db

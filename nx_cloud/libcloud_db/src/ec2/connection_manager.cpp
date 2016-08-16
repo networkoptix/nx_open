@@ -13,7 +13,9 @@
 
 #include "access_control/authorization_manager.h"
 #include "stree/cdb_ns.h"
+#include "transaction_dispatcher.h"
 #include "transaction_transport.h"
+#include "transaction_transport_header.h"
 
 
 namespace nx {
@@ -22,19 +24,23 @@ namespace ec2 {
 
 static const QnUuid kCdbGuid("{A1D368E4-3D01-4B18-8642-898272D7CDA9}");
 
-ConnectionManager::ConnectionManager(const conf::Settings& settings)
+ConnectionManager::ConnectionManager(
+    const conf::Settings& settings,
+    TransactionDispatcher* const transactionDispatcher)
 :
     m_settings(settings),
+    m_transactionDispatcher(transactionDispatcher),
     m_localPeerData(kCdbGuid, QnUuid::createUuid(), Qn::PT_CloudServer, Qn::UbjsonFormat)
 {
 }
 
 ConnectionManager::~ConnectionManager()
 {
+    m_startedAsyncCallsCounter.wait();
 }
 
 void ConnectionManager::createTransactionConnection(
-    nx_http::HttpServerConnection* const connection,
+    nx_http::HttpServerConnection* const /*connection*/,
     stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
@@ -58,37 +64,9 @@ void ConnectionManager::createTransactionConnection(
             nx_http::ConnectionEvents());
     auto connectionId = connectionIdIter->second;
 
-    QUrlQuery query = QUrlQuery(request.requestLine.url.query());
-    const bool isClient = query.hasQueryItem("isClient");
-    const bool isMobileClient = query.hasQueryItem("isMobile");
-    QnUuid remoteGuid = QnUuid(query.queryItemValue("guid"));
-    QnUuid remoteRuntimeGuid = QnUuid(query.queryItemValue("runtime-guid"));
-    if (remoteGuid.isNull())
-        remoteGuid = QnUuid::createUuid();
-
-    const Qn::PeerType peerType =
-        isMobileClient ? Qn::PT_MobileClient :
-        isClient ? Qn::PT_DesktopClient :
-        Qn::PT_Server;
-
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
-    if (query.hasQueryItem("format"))
-        QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
-
-    //checking content encoding requested by remote peer
-    auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
+    ::ec2::ApiPeerData remotePeer;
     nx::String contentEncoding;
-    if (acceptEncodingHeaderIter != request.headers.end())
-    {
-        nx_http::header::AcceptEncodingHeader acceptEncodingHeader(
-            acceptEncodingHeaderIter->second);
-        if (acceptEncodingHeader.encodingIsAllowed("identity"))
-            contentEncoding = "identity";
-        else if (acceptEncodingHeader.encodingIsAllowed("gzip"))
-            contentEncoding = "gzip";
-    }
-
-    ::ec2::ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+    fetchDataFromConnectRequest(request, &remotePeer, &contentEncoding);
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent = 
@@ -100,7 +78,9 @@ void ConnectionManager::createTransactionConnection(
             contentEncoding](
                 nx_http::HttpServerConnection* connection)
         {
+            const nx::String systemIdLocal(systemId.c_str());
             auto newTransport = std::make_unique<TransactionTransport>(
+                systemIdLocal,
                 connectionId,
                 m_localPeerData,
                 remotePeer,
@@ -111,7 +91,7 @@ void ConnectionManager::createTransactionConnection(
             ConnectionContext context{
                 std::move(newTransport),
                 connectionId,
-                std::make_pair(nx::String(systemId.c_str()), remotePeer.id.toByteArray()) };
+                std::make_pair(systemIdLocal, remotePeer.id.toByteArray()) };
 
             addNewConnection(std::move(context));
         };
@@ -132,10 +112,10 @@ void ConnectionManager::createTransactionConnection(
 }
 
 void ConnectionManager::pushTransaction(
-    nx_http::HttpServerConnection* const connection,
+    nx_http::HttpServerConnection* const /*connection*/,
     stree::ResourceContainer authInfo,
     nx_http::Request request,
-    nx_http::Response* const response,
+    nx_http::Response* const /*response*/,
     nx_http::HttpRequestProcessedHandler completionHandler)
 {
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
@@ -164,39 +144,54 @@ void ConnectionManager::pushTransaction(
                 std::move(request.headers),
                 request.messageBody);
         });
+
+    completionHandler(nx_http::StatusCode::ok, nullptr, nx_http::ConnectionEvents());
 }
 
 void ConnectionManager::addNewConnection(ConnectionContext context)
 {
     QnMutexLocker lk(&m_mutex);
 
-    auto& connectionBySystemIdAndPeerIdIndex =
-        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
-    auto existingConnectionIter =
-        connectionBySystemIdAndPeerIdIndex.find(context.systemIdAndPeerId);
-    if (existingConnectionIter != connectionBySystemIdAndPeerIdIndex.end())
+    removeExistingConnection<
+        kConnectionBySystemIdAndPeerIdIndex,
+        decltype(context.systemIdAndPeerId)>(&lk, context.systemIdAndPeerId);
+
+    context.connection->setOnConnectionClosed(
+        std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
+    context.connection->setOnGotTransaction(
+        std::bind(
+            &ConnectionManager::onGotTransaction,
+            this, context.connection->connectionGuid().toByteArray(),
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+    m_connections.insert(std::move(context));
+}
+
+template<int connectionIndexNumber, typename ConnectionKeyType>
+void ConnectionManager::removeExistingConnection(
+    QnMutexLockerBase* const /*lock*/,
+    ConnectionKeyType connectionKey)
+{
+    auto& connectionIndex = m_connections.get<connectionIndexNumber>();
+    auto existingConnectionIter = connectionIndex.find(connectionKey);
+    if (existingConnectionIter != connectionIndex.end())
     {
         //removing existing connection
         std::unique_ptr<TransactionTransport> existingConnection;
-        connectionBySystemIdAndPeerIdIndex.modify(
+        connectionIndex.modify(
             existingConnectionIter,
             [&existingConnection](ConnectionContext& data)
-        {
-            existingConnection = std::move(data.connection);
-        });
+            {
+                existingConnection = std::move(data.connection);
+            });
         TransactionTransport* connectionPtr = existingConnection.get();
         connectionPtr->pleaseStop(
             [existingConnection = std::move(existingConnection)]() mutable
             {
                 existingConnection.reset();
             });
-        connectionBySystemIdAndPeerIdIndex.erase(existingConnectionIter);
+        connectionIndex.erase(existingConnectionIter);
     }
-
-    context.connection->setOnConnectionClosed(
-        std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
-
-    m_connections.insert(std::move(context));
 }
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
@@ -215,7 +210,82 @@ void ConnectionManager::removeConnection(const nx::String& connectionId)
     index.erase(iter);
     lk.unlock();
 
-    connectionContext.connection.reset();   //< freeing connection with no mutex locker
+    //::ec2::TransactionTransportBase does not support its removal 
+    //  in signal handler, so have to remove it delayed...
+    //TODO #ak have to ensure somehow that no events 
+    //  from connectionContext.connection are delivered
+    auto connectionPtr = connectionContext.connection.get();
+    connectionPtr->pleaseStop(
+        [connection = std::move(connectionContext.connection)]() mutable
+        {
+            connection.reset();
+        });
+}
+
+void ConnectionManager::onGotTransaction(
+    const nx::String& connectionId,
+    Qn::SerializationFormat tranFormat,
+    const QByteArray& data,
+    TransactionTransportHeader transportHeader)
+{
+    m_transactionDispatcher->dispatchTransaction(
+        std::move(transportHeader),
+        tranFormat,
+        std::move(data),
+        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
+            api::ResultCode resultCode)
+        {
+            onTransactionDone(connectionId, resultCode);
+        });
+}
+
+void ConnectionManager::onTransactionDone(
+    const nx::String& connectionId,
+    api::ResultCode resultCode)
+{
+    if (resultCode != api::ResultCode::ok)
+    {
+        //closing connection in case of failure
+        QnMutexLocker lk(&m_mutex);
+        removeExistingConnection<kConnectionByIdIndex, nx::String>(&lk, connectionId);
+    }
+}
+
+void ConnectionManager::fetchDataFromConnectRequest(
+    const nx_http::Request& request,
+    ::ec2::ApiPeerData* const remotePeer,
+    nx::String* const contentEncoding)
+{
+    QUrlQuery query = QUrlQuery(request.requestLine.url.query());
+    const bool isClient = query.hasQueryItem("isClient");
+    const bool isMobileClient = query.hasQueryItem("isMobile");
+    QnUuid remoteGuid = QnUuid(query.queryItemValue("guid"));
+    QnUuid remoteRuntimeGuid = QnUuid(query.queryItemValue("runtime-guid"));
+    if (remoteGuid.isNull())
+        remoteGuid = QnUuid::createUuid();
+
+    const Qn::PeerType peerType =
+    isMobileClient ? Qn::PT_MobileClient :
+        isClient ? Qn::PT_DesktopClient :
+        Qn::PT_Server;
+
+    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
+    if (query.hasQueryItem("format"))
+        QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
+
+    //checking content encoding requested by remote peer
+    auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
+    if (acceptEncodingHeaderIter != request.headers.end())
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncodingHeader(
+            acceptEncodingHeaderIter->second);
+        if (acceptEncodingHeader.encodingIsAllowed("identity"))
+            *contentEncoding = "identity";
+        else if (acceptEncodingHeader.encodingIsAllowed("gzip"))
+            *contentEncoding = "gzip";
+    }
+
+    *remotePeer = ::ec2::ApiPeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 }
 
 }   // namespace ec2
