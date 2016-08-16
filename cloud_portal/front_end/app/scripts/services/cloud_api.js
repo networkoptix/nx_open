@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('cloudApi', ['$http', '$q', function ($http, $q) {
+    .factory('cloudApi', ['$http', '$q', '$localStorage', function ($http, $q, $localStorage) {
 
         var apiBase = Config.apiBase;
 
@@ -52,6 +52,7 @@ angular.module('cloudApp')
         }
 
         function clearCache(){
+            $localStorage.$reset();
             cachedResults = {};
             for (var url in cacheReceived){
                 cacheReceived[url] = 0;
@@ -69,6 +70,10 @@ angular.module('cloudApp')
             },
             account: cacheGet(apiBase + '/account'),
             login:function(email, password, remember){
+                clearCache();
+                var storage = remember?
+                $localStorage.email = email;
+                $localStorage.password = password;
                 return $http.post(apiBase + '/account/login',{
                     email: email,
                     password: password,
@@ -137,32 +142,26 @@ angular.module('cloudApp')
             systems: getSystems,
 
             system: function(systemId){
-
-
-                var defer = $q.defer();
-
                 function requestSystem(){
-                    $http.get(apiBase + '/systems/' + systemId).then(function(success){
-                        defer.resolve(success);
-                    },function(error){
-                        defer.reject(error);
-                    });
+                    return $http.get(apiBase + '/systems/' + systemId);
                 }
 
-                getSystems('fromCache').then(function(systemsCache){
+                return getSystems('fromCache').then(function(systemsCache){
                     //Search our system in cache
                     var system = _.find(systemsCache.data,function(system){
                         return system.id == systemId;
                     });
 
                     if(system) { // Cache success
-                        defer.resolve({data:[system]});
+                        return {data:[system]};
                     }else{ // Cache miss
-                        requestSystem();
+                        return requestSystem();
                     }
                 },requestSystem); // Total cache miss
+            },
 
-                return defer.promise;
+            getSystemNonce:function(systemId){
+                return $http.get(apiBase + '/systems/' + systemId + '/nonce');
             },
 
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),

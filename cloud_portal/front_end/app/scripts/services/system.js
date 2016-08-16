@@ -23,6 +23,12 @@ angular.module('cloudApp')
             this.updateSystemState();
         }
 
+        system.prototype.updateSystemAuth = function(){
+            var self = this;
+            return cloudApi.getSystemNonce().then(function(data){
+                return self.mediaserver.login(data.data.nonce);
+            })
+        };
         system.prototype.updateSystemState = function(){
             this.stateMessage = '';
             if(!this.isAvailable){
@@ -31,8 +37,7 @@ angular.module('cloudApp')
             if(!this.isOnline){
                 this.stateMessage = L.system.offline;
             }
-        }
-
+        };
         system.prototype.checkPermissions = function(){
             var self = this;
             self.permissions = {};
@@ -54,31 +59,38 @@ angular.module('cloudApp')
                     self.permissions.isAdmin = self.info.accessRole.indexOf(Config.accessRoles.globalAdminAccessRoleFlag>=0);
                 }
             }
-        }
+        };
+        system.prototype.getInfoAndPermissions = function(){
+            return cloudApi.system(self.id).then(function(result){
+                var error = false
+                if (error = cloudApi.checkResponseHasError(result)){
+                    return $q.reject(error);
+                }
+
+
+                if(self.info){
+                    $.extend(true, self.info, result.data[0]); // Update
+                }else{
+                    self.info = result.data[0];
+                }
+
+                self.isOnline = self.info.stateOfHealth == Config.systemStatuses.onlineStatus;
+                self.isMine = self.info.ownerAccountEmail == self.currentUserEmail;
+
+                self.checkPermissions();
+
+                return self.info;
+            });
+        };
         system.prototype.getInfo = function(){
             if(!this.infoPromise){
                 var deferred = $q.defer();
                 var self = this;
-                this.infoPromise = cloudApi.system(self.id).then(function(result){
-                    var error = false
-                    if (error = cloudApi.checkResponseHasError(result)){
-                        return $q.reject(error);
-                    }
 
-
-                    if(self.info){
-                        $.extend(true, self.info, result.data[0]); // Update
-                    }else{
-                        self.info = result.data[0];
-                    }
-
-                    self.isOnline = self.info.stateOfHealth == Config.systemStatuses.onlineStatus;
-                    self.isMine = self.info.ownerAccountEmail == self.currentUserEmail;
-
-                    self.checkPermissions();
-
-                    return self.info;
-                });
+                this.infoPromise = $q.all([
+                    this.updateSystemAuth(),
+                    this.getInfoAndPermissions()
+                ]);
             }
             return this.infoPromise;
         };
@@ -89,7 +101,7 @@ angular.module('cloudApp')
             return cloudApi.users(this.id).then(function(result){
                 return result.data;
             })
-        }
+        };
 
 
         function normalizePermissionString(permissions){
@@ -107,7 +119,7 @@ angular.module('cloudApp')
             }
             guid = guid.replace(/[{}0\-]/gi,'');
             return guid == '';
-        }
+        };
 
 
         system.prototype.isOwner = function(user){

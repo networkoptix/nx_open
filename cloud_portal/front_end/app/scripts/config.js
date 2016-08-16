@@ -3,6 +3,7 @@
 var Config = {
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
+    gatewayUrl: 'http://cloud-demo.hdw.mx:3347'
     clientProtocol: 'nx-vms:',
     nativeDomain: 'cloud-demo.hdw.mx',
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds

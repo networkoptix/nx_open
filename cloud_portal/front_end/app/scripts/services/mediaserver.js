@@ -6,44 +6,67 @@ angular.module('cloudApp')
         function gateway(serverId){
             return Config.apiBase + '/systems/' + serverId  + '/proxy';
         }
+        function direct_gateway(serverId){
+            return Config.gatewayUrl + '/' + serverId;
+        }
 
         function emulateResponse(data){
             var deferred = $q.defer();
             deferred.resolve({data:data});
             return deferred.promise;
         }
-        var service = function(systemId){
+        var service = function(systemId){ 
             return{
-                digest:function(login,password,realm,nonce){
+                digest:function(login, password, realm, nonce){
                     var digest = md5(login + ':' + realm + ':' + password);
                     var method = md5('GET:');
                     var authDigest = md5(digest + ':' + nonce + ':' + method);
                     var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
                     return auth;
                 },
+                login:function(nonce){
+                    return $localStorage[systemId] = {auth: this.digest($localStorage.email, $localStorage.password, Config.realm, nonce)};
+                },
+                logout:function(){
+                    $localStorage[systemId] = null;
+                },
+                auth:function(){
+                    if($localStorage[systemId] && $localStorage[systemId].auth){
+                        return $localStorage[systemId].auth;
+                    }
+                    return null;
+                },
+                
+                _get:function(url){
+                    var auth =  this.auth();
+                    if(auth){
+                        if(url.indexOf('?') == -1){
+                            url += '?auth=';
+                        }else{
+                            url += '&auth=';
+                        }
+                        return $http.get(direct_gateway(systemId) + url + auth);
+                    }
+                    return $http.get(gateway(systemId) + url);
+                },
+                _post:function(url, data){
+                    return $http.post(gateway(systemId) + url, data);
+                },
+                
                 getCurrentUser: function(){
-                    return $http.get(gateway(systemId) + '/ec2/getCurrentUser');
+                    return this._get('/ec2/getCurrentUser');
                 },
                 getAggregatedUsersData: function(){
-                    return $http.get(gateway(systemId) + '/api/aggregator?exec_cmd=ec2%2FgetUsers&exec_cmd=ec2%2FgetPredefinedRoles&exec_cmd=ec2%2FgetUserGroups');
-                },
-                getUsers: function(){
-                    return $http.get(gateway(systemId) + '/ec2/getUsers');
-                },
-                getPredefinedRoles: function(){
-                    return $http.get(gateway(systemId) + '/ec2/getPredefinedRoles');
-                },
-                getUserGroups: function(){
-                    return $http.get(gateway(systemId) + '/ec2/getUserGroups');
+                    return this._get('/api/aggregator?exec_cmd=ec2%2FgetUsers&exec_cmd=ec2%2FgetPredefinedRoles&exec_cmd=ec2%2FgetUserGroups');
                 },
                 saveUser: function(user){
-                    return $http.post(gateway(systemId) + '/ec2/saveUser', this.cleanUserObject(user));
+                    return this._post('/ec2/saveUser', this.cleanUserObject(user));
                 },
                 deleteUser: function(userId){
-                    return $http.post(gateway(systemId) + '/ec2/removeUser', {id:userId});
+                    return this._post('/ec2/removeUser', {id:userId});
                 },
                 changeSystemName:function(systemName){
-                    return $http.post(gateway(systemId) + '/web/api/configure', {
+                    return this._post('/web/api/configure', {
                         systemName:systemName
                     });
                 },
