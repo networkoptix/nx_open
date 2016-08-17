@@ -59,7 +59,7 @@ QnObject {
     Timer {
         id: failureTimer
 
-        interval: resourceHelper.protocol == QnMediaResourceHelper.Mjpeg ? 20 * 1000 : 120 * 1000
+        interval: 120 * 1000
         repeat: false
         running: false
         onTriggered: {

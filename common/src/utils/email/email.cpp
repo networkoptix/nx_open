@@ -13,7 +13,8 @@
 namespace {
     typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
 
-    const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b");
+    /* Top-level domains can already be up to 30 symbols length for now, so do not limiting them. */
+    const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,255}\\b");
 
     const int tlsPort = 587;
     const int sslPort = 465;
@@ -33,8 +34,8 @@ QnEmailSmtpServerPreset::QnEmailSmtpServerPreset():
 
 QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(const QString &server, QnEmail::ConnectionType connectionType /* = Tls*/, int port /* = 0*/):
     server(server),
-    connectionType(connectionType), 
-    port(port) 
+    connectionType(connectionType),
+    port(port)
 {}
 
 QnEmailSettings::QnEmailSettings():
@@ -57,12 +58,9 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType) {
     }
 }
 
-bool QnEmailSettings::isValid() const {
-    return 
-        !email.isEmpty() && 
-        !server.isEmpty() && 
-        !user.isEmpty() && 
-        !password.isEmpty();
+bool QnEmailSettings::isValid() const
+{
+    return !email.isEmpty() && !server.isEmpty();
 }
 
 bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* = false*/) const {
@@ -75,7 +73,7 @@ bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* =
     if (connectionType != other.connectionType) return false;
     if (port != other.port)                     return false;
     if (timeout != other.timeout)               return false;
-    
+
     return !compareView || (simple == other.simple);
 }
 

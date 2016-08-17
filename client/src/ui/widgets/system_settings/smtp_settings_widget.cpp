@@ -26,13 +26,13 @@ namespace {
 
 
 
-QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) 
+QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::SmtpSettingsWidget)
     , m_simpleSettingsWidget(new QnSmtpSimpleSettingsWidget(this))
     , m_advancedSettingsWidget(new QnSmtpAdvancedSettingsWidget(this))
-    , m_testSettingsWidget(new QnSmtpTestConnectionWidget(this))    
+    , m_testSettingsWidget(new QnSmtpTestConnectionWidget(this))
     , m_updating(false)
 
 {
@@ -47,7 +47,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
     Q_ASSERT_X(ui->stackedWidget->indexOf(m_simpleSettingsWidget)   == SimplePage,  Q_FUNC_INFO, "Index check");
     Q_ASSERT_X(ui->stackedWidget->indexOf(m_advancedSettingsWidget) == AdvancedPage,Q_FUNC_INFO, "Index check");
     Q_ASSERT_X(ui->stackedWidget->indexOf(m_testSettingsWidget)     == TestingPage, Q_FUNC_INFO, "Index check");
-        
+
     auto checkedChanged = [this]{
         if (!m_updating)
             emit hasChangesChanged();
@@ -58,8 +58,8 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
     connect(m_testSettingsWidget,       &QnSmtpTestConnectionWidget::finished,          this,   &QnSmtpSettingsWidget::finishTesting);
     connect(m_simpleSettingsWidget,     &QnSmtpSimpleSettingsWidget::settingsChanged,   this,   checkedChanged);
     connect(m_advancedSettingsWidget,   &QnSmtpAdvancedSettingsWidget::settingsChanged, this,   checkedChanged);
-    
-    connect(qnGlobalSettings,           &QnGlobalSettings::emailSettingsChanged,        this,   &QnSmtpSettingsWidget::loadDataToUi);   
+
+    connect(qnGlobalSettings,           &QnGlobalSettings::emailSettingsChanged,        this,   &QnSmtpSettingsWidget::loadDataToUi);
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
@@ -71,8 +71,8 @@ void QnSmtpSettingsWidget::loadDataToUi() {
 
     finishTesting();
 
-    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings(); 
-    
+    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
+
     m_simpleSettingsWidget->setSettings(QnSimpleSmtpSettings::fromSettings(settings));
     m_advancedSettingsWidget->setSettings(settings);
 
@@ -103,7 +103,7 @@ QnEmailSettings QnSmtpSettingsWidget::settings() const {
     QnEmailSettings result = ui->advancedCheckBox->isChecked()
         ? m_advancedSettingsWidget->settings()
         : m_simpleSettingsWidget->settings().toSettings(QnEmailSettings());
-    
+
     result.simple = !ui->advancedCheckBox->isChecked();
     return result;
 }
@@ -131,8 +131,8 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         m_simpleSettingsWidget->setSettings(QnSimpleSmtpSettings::fromSettings(m_advancedSettingsWidget->settings()));
     }
 
-    ui->stackedWidget->setCurrentIndex(toggled 
-        ? AdvancedPage 
+    ui->stackedWidget->setCurrentIndex(toggled
+        ? AdvancedPage
         : SimplePage
         );
 }
@@ -141,7 +141,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     if (m_testSettingsWidget->testSettings(settings())) {
         ui->controlsWidget->setEnabled(false);
         ui->stackedWidget->setCurrentIndex(TestingPage);
-    }       
+    }
 }
 
 

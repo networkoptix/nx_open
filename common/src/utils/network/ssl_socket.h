@@ -157,7 +157,7 @@ public:
     /*
     *   allowNonSecureConnect - allow mixed ssl and non ssl connect for socket
     */
-    TCPSslServerSocket(bool allowNonSecureConnect = true);
+    TCPSslServerSocket(int ipVersion, bool allowNonSecureConnect = true);
 
     virtual AbstractStreamSocket* accept() override;
 

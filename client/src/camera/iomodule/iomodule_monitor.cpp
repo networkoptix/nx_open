@@ -40,14 +40,24 @@ QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera):
 
 bool QnIOModuleMonitor::open()
 {
-    QnMutexLocker lk( &m_mutex );
-    m_httpClient.reset();
+    {
+        nx_http::AsyncHttpClientPtr httpClient;
+        QnMutexLocker lk(&m_mutex);
+        std::swap(httpClient, m_httpClient);
+    }
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnIOModuleMonitor::at_MonitorResponseReceived, Qt::DirectConnection );
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnIOModuleMonitor::at_MonitorMessageBodyAvailable, Qt::DirectConnection );
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnIOModuleMonitor::at_MonitorConnectionClosed, Qt::DirectConnection );
-    httpClient->setMessageBodyReadTimeoutMs(HTTP_READ_TIMEOUT);
+    m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient->setMessageBodyReadTimeoutMs(HTTP_READ_TIMEOUT);
+
+    connect(
+        m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        this, &QnIOModuleMonitor::at_MonitorResponseReceived, Qt::DirectConnection);
+    connect(
+        m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+        this, &QnIOModuleMonitor::at_MonitorMessageBodyAvailable, Qt::DirectConnection);
+    connect(
+        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        this, &QnIOModuleMonitor::at_MonitorConnectionClosed, Qt::DirectConnection);
 
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(std::make_shared<QnMessageBodyParser>(this));
@@ -58,7 +68,7 @@ bool QnIOModuleMonitor::open()
     if (m_camera->getStatus() < Qn::Online)
         return false;
 
-    httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    m_httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     QUrl requestUrl(server->getApiUrl());
     requestUrl.setPath(lit("/api/iomonitor"));
     QUrlQuery query;
@@ -72,21 +82,18 @@ bool QnIOModuleMonitor::open()
         requestUrl.setPort(route.addr.port);
     }
 
-    httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
-    httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
+    m_httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
+    m_httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
 
-
-    if (!httpClient->doGet( requestUrl ))
+    if (!m_httpClient->doGet( requestUrl ))
         return false;
-    m_httpClient = std::move( httpClient );
+
     return true;
 }
 
 void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
-    Q_ASSERT( httpClient );
     QnMutexLocker lk( &m_mutex );
-
     if (httpClient != m_httpClient)
         return;
 
@@ -106,14 +113,16 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr 
             arg(m_camera->getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
         return;
     }
+
+    lk.unlock();
     emit connectionOpened();
 }
 
 void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
 {
-    Q_ASSERT( httpClient );
-    QnMutexLocker lk( &m_mutex );
-    if (httpClient == m_httpClient) {
+    QnMutexLocker lk(&m_mutex);
+    if (httpClient == m_httpClient)
+    {
         const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
         m_multipartContentParser->processData(msgBodyBuf);
     }
@@ -121,9 +130,13 @@ void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClient
 
 void QnIOModuleMonitor::at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
 {
-    QnMutexLocker lk( &m_mutex );
-    if (httpClient == m_httpClient) {
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (httpClient != m_httpClient)
+            return;
+
         m_httpClient.reset();
-        emit connectionClosed();
     }
+
+    emit connectionClosed();
 }

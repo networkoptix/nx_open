@@ -32,6 +32,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtGui/QScreen>
 #include <QtGui/QDesktopServices>
 #include <QScopedPointer>
 #include <QtSingleApplication>
@@ -120,6 +121,7 @@ extern "C"
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <utils/network/system_socket.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -266,6 +268,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
+
+    SocketFactory::setIpVersion(startupParams.ipVersion);
 
     QnClientModule client(startupParams);
 
@@ -539,6 +543,23 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         !qnRuntime->isDevMode() &&
         QnAppInfo::beta())
         context->action(QnActions::BetaVersionMessageAction)->trigger();
+
+
+    for (const auto screen: QApplication::screens())
+    {
+        static const qreal kMinHiDpiRatio = 1.49;  //< At least 1.5x
+
+        const auto pysicalDpi = screen->physicalDotsPerInch();
+        const auto logicalDpi = screen->logicalDotsPerInch();
+        const auto dpiAspect = (qFuzzyIsNull(pysicalDpi) ? 1 : logicalDpi / pysicalDpi);
+        const auto targetRatio = std::max(dpiAspect, screen->devicePixelRatio());
+
+        if (targetRatio < kMinHiDpiRatio)
+            continue;
+
+        context->action(QnActions::HiDpiSupportMessageAction)->trigger();
+        break;
+    }
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
