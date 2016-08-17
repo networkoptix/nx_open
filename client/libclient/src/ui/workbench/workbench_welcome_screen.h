@@ -28,7 +28,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
-    Q_PROPERTY(QString softwareVersion READ softwareVersion)
+    Q_PROPERTY(QString softwareVersion READ softwareVersion CONSTANT)
 
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);

@@ -228,7 +228,7 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
 
 QString QnWorkbenchWelcomeScreen::softwareVersion() const
 {
-    return lit("%1").arg(QnAppInfo::applicationVersion());
+    return QnAppInfo::applicationVersion();
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
