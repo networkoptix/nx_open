@@ -563,7 +563,8 @@ struct ModifyCameraAttributesAccess
 
 struct ModifyCameraAttributesListAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesDataList& param)
+    template<typename ParamType>
+    bool operator()(const Qn::UserAccessData& accessData, const ParamType& param)
     {
         if (accessData == Qn::kSystemAccess)
             return true;
