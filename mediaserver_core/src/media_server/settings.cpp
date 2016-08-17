@@ -11,6 +11,8 @@
 
 #include <utils/common/app_info.h>
 
+#include "version.h"
+
 
 #ifndef _WIN32
 static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(QnAppInfo::linuxOrganizationName());
@@ -45,7 +47,7 @@ QSettings* MSSettings::roSettings()
 #ifndef _WIN32
                 defaultConfigFileName, QSettings::IniFormat
 #else
-                QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
+                QSettings::SystemScope, QnAppInfo::organizationName(), lit(QN_APPLICATION_NAME)
 #endif
             ) );
         } );
