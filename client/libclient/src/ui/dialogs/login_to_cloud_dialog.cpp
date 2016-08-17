@@ -10,6 +10,7 @@
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/busy_indicator.h>
@@ -57,12 +58,14 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     d->busyIndicator->setParent(ui->loginButton);
 
-    ui->loginInputField->setTitle(tr("Email"));
+    ui->loginInputField->setTitle(tr("E-Mail"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+
+    setWarningStyle(ui->invalidCredentialsLabel);
 
     connect(ui->loginButton,        &QPushButton::clicked,      d, &QnLoginToCloudDialogPrivate::at_loginButton_clicked);
     connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
@@ -73,7 +76,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), QnCloudUrlHelper::aboutUrl()));
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
-    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("welcome_page/cloud_account_logged.png"));
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
@@ -125,19 +128,23 @@ void QnLoginToCloudDialogPrivate::updateUi()
     q->ui->loginButton->setEnabled(
         q->ui->loginInputField->isValid() &&
         q->ui->passwordInputField->isValid());
+
+    q->ui->invalidCredentialsLabel->hide();
 }
 
 void QnLoginToCloudDialogPrivate::lockUi(bool locked)
 {
     Q_Q(QnLoginToCloudDialog);
 
-    q->ui->loginInputField->setEnabled(!locked);
-    q->ui->passwordInputField->setEnabled(!locked);
-    q->ui->stayLoggedInChackBox->setEnabled(!locked);
-    q->ui->learnMoreLabel->setEnabled(!locked);
-    q->ui->restorePasswordLabel->setEnabled(!locked);
-    q->ui->createAccountLabel->setEnabled(!locked);
-    q->ui->loginButton->setEnabled(!locked);
+    const bool enabled = !locked;
+
+    q->ui->loginInputField->setEnabled(enabled);
+    q->ui->passwordInputField->setEnabled(enabled);
+    q->ui->stayLoggedInChackBox->setEnabled(enabled);
+    q->ui->learnMoreLabel->setEnabled(enabled);
+    q->ui->restorePasswordLabel->setEnabled(enabled);
+    q->ui->createAccountLabel->setEnabled(enabled);
+    q->ui->loginButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
 
     q->ui->logoPanel->graphicsEffect()->setEnabled(locked);
     q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
@@ -156,6 +163,8 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
     lockUi();
 
     Q_Q(QnLoginToCloudDialog);
+
+    q->ui->invalidCredentialsLabel->hide();
 
     qnCloudStatusWatcher->setCloudCredentials(QString(), QString());
 
@@ -197,20 +206,30 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     switch (errorCode)
     {
         case QnCloudStatusWatcher::InvalidCredentials:
-            message = tr("Login or password is invalid");
+        {
+            Q_Q(QnLoginToCloudDialog);
+            q->ui->invalidCredentialsLabel->show();
+            q->ui->containerWidget->layout()->activate();
             break;
+        }
         case QnCloudStatusWatcher::UnknownError:
-            message = tr("Can not login to cloud");
+        default:
+        {
+            message = tr("Can not login to the cloud");
             break;
+        }
     }
 
     Q_Q(QnLoginToCloudDialog);
 
-    QnMessageBox::critical(q,
-        helpTopic(q),
-        tr("Error"),
-        message,
-        QDialogButtonBox::Ok);
+    if (!message.isEmpty())
+    {
+        QnMessageBox::critical(q,
+            helpTopic(q),
+            tr("Error"),
+            message,
+            QDialogButtonBox::Ok);
+    }
 
     unlockUi();
 }
