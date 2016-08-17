@@ -254,7 +254,7 @@ void QnTransactionTcpProcessor::run()
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
         // By default all peers have read permissions on all resources
-        auto access = Qn::UserAccessData(d->accessRights);
+        auto access = d->accessRights;
         if (remotePeer.peerType == Qn::PT_Server)
         {
             // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
