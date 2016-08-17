@@ -334,11 +334,6 @@ bool QnResourceAccessManager::hasGlobalPermission(
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
-    if (accessRights.access == Qn::UserAccessData::Access::ReadAllResources &&
-        requiredPermission == Qn::ReadPermission)
-    {
-        return true;
-    }
 
     auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
     if (!user)
