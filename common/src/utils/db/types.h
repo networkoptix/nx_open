@@ -9,6 +9,7 @@
 #include <chrono>
 
 #include <QtCore/QString>
+#include <QtSql/QSqlDatabase>
 
 
 namespace nx {

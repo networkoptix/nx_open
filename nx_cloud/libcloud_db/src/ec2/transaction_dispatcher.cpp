@@ -25,7 +25,6 @@ TransactionDispatcher::TransactionDispatcher(
     m_transactionLog(transactionLog),
     m_dbManager(dbManager)
 {
-    registerTransactionHandler<::ec2::ApiCommand::saveUser, ::ec2::ApiUserData>(nullptr);
 }
 
 void TransactionDispatcher::dispatchTransaction(

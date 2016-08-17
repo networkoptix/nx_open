@@ -20,6 +20,7 @@
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "account_manager.h"
+#include "ec2/transaction_dispatcher.h"
 #include "event_manager.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
@@ -33,13 +34,15 @@ SystemManager::SystemManager(
     nx::utils::TimerManager* const timerManager,
     const AccountManager& accountManager,
     const EventManager& eventManager,
-    nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
+    nx::db::AsyncSqlQueryExecutor* const dbManager,
+    ec2::TransactionDispatcher* const transactionDispatcher) throw(std::runtime_error)
 :
     m_settings(settings),
     m_timerManager(timerManager),
     m_accountManager(accountManager),
     m_eventManager(eventManager),
     m_dbManager(dbManager),
+    m_transactionDispatcher(transactionDispatcher),
     m_dropSystemsTimerId(0),
     m_dropExpiredSystemsTaskStillRunning(false)
 {
@@ -53,6 +56,14 @@ SystemManager::SystemManager(
             std::bind(&SystemManager::dropExpiredSystems, this, _1),
             m_settings.systemManager().dropExpiredSystemsPeriod,
             std::chrono::seconds::zero());
+
+    //registering transaction handler
+    m_transactionDispatcher->registerTransactionHandler
+        <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData>(
+            std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3));
+    m_transactionDispatcher->registerTransactionHandler
+        <::ec2::ApiCommand::removeUser, ::ec2::ApiIdData>(
+            std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3));
 }
 
 SystemManager::~SystemManager()
@@ -1137,7 +1148,9 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemManager::fetchSystemToAccountBinder(QSqlDatabase* connection, int* const /*dummy*/)
+nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
+    QSqlDatabase* connection,
+    int* const /*dummy*/)
 {
     QSqlQuery readSystemToAccountQuery(*connection);
     readSystemToAccountQuery.prepare(
@@ -1232,6 +1245,24 @@ void SystemManager::expiredSystemsDeletedFromDb(
     }
 
     m_dropExpiredSystemsTaskStillRunning = false;
+}
+
+nx::db::DBResult SystemManager::processEc2SaveUser(
+    QSqlDatabase* /*dbConnection*/,
+    const nx::String& /*systemId*/,
+    ::ec2::ApiUserData /*data*/)
+{
+    //TODO #ak
+    return nx::db::DBResult::statementError;
+}
+
+nx::db::DBResult SystemManager::processEc2RemoveUser(
+    QSqlDatabase* /*dbConnection*/,
+    const nx::String& /*systemId*/,
+    ::ec2::ApiIdData /*data*/)
+{
+    //TODO #ak
+    return nx::db::DBResult::statementError;
 }
 
 }   //cdb

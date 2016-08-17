@@ -34,6 +34,7 @@
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "ec2/connection_manager.h"
+#include "ec2/control_message_processor.h"
 #include "ec2/transaction_dispatcher.h"
 #include "ec2/transaction_log.h"
 #include "http_handlers/ping.h"
@@ -192,13 +193,17 @@ int CloudDBProcess::exec()
         ec2::TransactionLog transactionLog;
         ec2::TransactionDispatcher transactionDispatcher(&transactionLog, &dbManager);
         ec2::ConnectionManager ec2ConnectionManager(settings, &transactionDispatcher);
+        ec2::ControlMessageProcessor controlTransactionProcessor(
+            &transactionLog,
+            &transactionDispatcher);
 
         SystemManager systemManager(
             settings,
             &timerManager,
             accountManager,
             eventManager,
-            &dbManager);
+            &dbManager,
+            &transactionDispatcher);
         m_systemManager = &systemManager;
 
         //TODO #ak move following to stree xml

@@ -22,6 +22,8 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
+#include <nx_ec/data/api_data.h>
+#include <nx_ec/data/api_user_data.h>
 #include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 
@@ -37,12 +39,16 @@
 namespace nx {
 namespace cdb {
 
-namespace conf
-{
-    class Settings;
-}
+namespace conf {
+class Settings;
+}   // namespace conf
+
 class AccountManager;
 class EventManager;
+
+namespace ec2 {
+class TransactionDispatcher;
+}   // namespace ec2 
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -63,7 +69,8 @@ public:
         nx::utils::TimerManager* const timerManager,
         const AccountManager& accountManager,
         const EventManager& eventManager,
-        nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
+        nx::db::AsyncSqlQueryExecutor* const dbManager,
+        ec2::TransactionDispatcher* const transactionDispatcher) throw(std::runtime_error);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -188,6 +195,7 @@ private:
     const AccountManager& m_accountManager;
     const EventManager& m_eventManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    ec2::TransactionDispatcher* const m_transactionDispatcher;
     //!map<id, system>
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
@@ -287,6 +295,17 @@ private:
     void expiredSystemsDeletedFromDb(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
         nx::db::DBResult dbResult);
+
+    /** Processes saveUser transaction received from mediaserver */
+    nx::db::DBResult processEc2SaveUser(
+        QSqlDatabase* dbConnection,
+        const nx::String& systemId,
+        ::ec2::ApiUserData data);
+    nx::db::DBResult processEc2RemoveUser(
+        QSqlDatabase* dbConnection,
+        const nx::String& systemId,
+        ::ec2::ApiIdData data);
+
 };
 
 }   //cdb

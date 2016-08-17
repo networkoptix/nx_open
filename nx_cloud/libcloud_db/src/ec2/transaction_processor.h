@@ -61,7 +61,7 @@ class TransactionProcessor
 public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
     typedef nx::utils::MoveOnlyFunc<
-        nx::db::DBResult(QSqlDatabase*, TransactionDataType)
+        nx::db::DBResult(QSqlDatabase*, nx::String /*systemId*/, TransactionDataType)
     > ProcessEc2TransactionFunc;
 
     /**
@@ -154,6 +154,8 @@ private:
         const TransactionContext& transactionContext,
         api::ResultCode* const resultCode)
     {
+        //DB transaction is created down the stack
+
         if (!m_transactionLog->checkIfNeededAndSaveToLog(
                 connection,
                 transactionContext.transportHeader.systemId,
@@ -163,7 +165,10 @@ private:
             return nx::db::DBResult::ok;    //transaction skipped by transaction log
         }
 
-        return m_processTranFunc(connection, transactionContext.transaction.params);
+        return m_processTranFunc(
+            connection,
+            transactionContext.transportHeader.systemId,
+            transactionContext.transaction.params);
     }
 
     void dbProcessingCompleted(
