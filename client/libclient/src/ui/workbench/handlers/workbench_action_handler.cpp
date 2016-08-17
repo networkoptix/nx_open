@@ -283,6 +283,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
 
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
+    connect(action(QnActions::HiDpiSupportMessageAction), &QAction::triggered,
+        this, &QnWorkbenchActionHandler::onHiDpiWarningMessageAction);
+
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
@@ -2206,6 +2209,24 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
         tr("This is a beta version of %1.")
         .arg(qApp->applicationDisplayName()));
+}
+
+void QnWorkbenchActionHandler::onHiDpiWarningMessageAction()
+{
+    static const bool kIsSupportLink = !QnAppInfo::supportLink().isEmpty();
+    static const auto kAddress = (kIsSupportLink
+        ? QnAppInfo::supportLink() : QnAppInfo::supportEmailAddress());
+    static const auto addressPrefix = (kIsSupportLink ? QString() : lit("mailto:"));
+    static const auto kSupportPortalLink = lit("<a href = \"%1%2\">%2</a>")
+        .arg(addressPrefix, kAddress);
+
+    static const auto kComment = "%1 Will be replaced by product name, %2 - by link to support portal";
+    static const auto kMessage =
+        tr("%1 is not optimized for HiDpi screens yet and might look wrong. "
+        "Please write to %2 if you have any problems.", kComment)
+        .arg(QnAppInfo::productNameLong(), kSupportPortalLink);
+
+    QnMessageBox::warning(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {

@@ -98,9 +98,10 @@
 #include "health/system_health.h"
 #include <utils/common/credentials.h>
 #include <core/dataprovider/stream_mixer.h>
+#include <core/resource/resource_data_structures.h>
 
 namespace {
-    volatile bool qn_commonMetaTypes_initialized = false;
+    bool qn_commonMetaTypes_initialized = false;
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
@@ -350,6 +351,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QMap<QString, QString>>>();
 
     qRegisterMetaType<QList<QnCredentials>>();
+    qRegisterMetaType<QnHttpConfigureRequestList>();
+    qRegisterMetaType<QnBitrateList>();
+    qRegisterMetaType<QnBounds>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
@@ -366,6 +370,9 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
+    QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
+    QnJsonSerializer::registerSerializer<QnBitrateList>();
+    QnJsonSerializer::registerSerializer<QnBounds>();
 
     qn_commonMetaTypes_initialized = true;
 }

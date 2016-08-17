@@ -47,18 +47,22 @@ public:
         std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int type,
         int protocol,
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
     Socket(
         std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int sockDesc,
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
     //TODO #ak remove following two constructors
     Socket(
         int type,
         int protocol,
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
     Socket(
         int sockDesc,
+        int ipVersion,
         PollableSystemSocketImpl* impl = nullptr );
 
     Socket(const Socket&) = delete;
@@ -97,18 +101,6 @@ public:
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
-    /**
-     *   Get the local port
-     *   @return local port of socket
-     */
-    unsigned short getLocalPort() const;
-
-    /**
-     *   Set the local port to the specified port and the local address
-     *   to any interface
-     *   @param localPort local port
-     */
-    bool setLocalPort(unsigned short localPort) ;
 
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
@@ -134,11 +126,32 @@ public:
         const QString &service,
         const QString &protocol = QLatin1String("tcp"));
 
-    bool fillAddr( const SocketAddress& socketAddress, sockaddr_in &addr );
+    struct SockAddrPtr
+    {
+        std::shared_ptr<const sockaddr> ptr;
+        socklen_t size;
+
+        SockAddrPtr():
+            ptr(nullptr),
+            size(0)
+        {
+        }
+
+        template<typename T>
+        SockAddrPtr(T* addr):
+            ptr((sockaddr*)addr),
+            size(sizeof(T))
+        {
+            memset(addr, 0, size);
+        }
+    };
+
+    SockAddrPtr makeAddr(const SocketAddress& socketAddress);
     bool createSocket( int type, int protocol );
 
 protected:
     aio::BaseAsyncSocketImplHelper<Pollable>* m_baseAsyncHelper;
+    const int m_ipVersion;
 
 private:
     bool m_nonBlockingMode;
@@ -162,11 +175,8 @@ public:
         bool natTraversal,
         int newConnSD,
         PollableSystemSocketImpl* sockImpl = nullptr );
-
-    CommunicatingSocket(const CommunicatingSocket&) = delete;
-    CommunicatingSocket& operator=(const CommunicatingSocket&) = delete;
-    CommunicatingSocket(CommunicatingSocket&&) = delete;
-    CommunicatingSocket& operator=(CommunicatingSocket&&) = delete;
+        int newConnSD, int ipVersion,
+        PollableSystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 
@@ -213,6 +223,27 @@ private:
 };
 
 
+    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
+    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
+    :
+        m_implDelegate( param1, param2, param3, param4 )
+    {
+    }
+
+    {
+    }
+
+    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
+    SocketImplementationDelegate( AbstractCommunicatingSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
+    :
+        m_implDelegate( abstractSocketPtr, param1, param2, param3, param4 )
+    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
+    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
+    :
+        base_type( this, param1, param2, param3 )
+    {
+    }
+
 /**
  *   TCP socket for communication with other TCP sockets
  */
@@ -226,10 +257,10 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    explicit TCPSocket( bool natTraversal = true );
+    TCPSocket(int ipVersion) ;
 
     //!User by \a TCPServerSocket class
-    explicit TCPSocket( int newConnSD );
+    TCPSocket( int newConnSD, int ipVersion );
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -276,7 +307,7 @@ class NX_NETWORK_API TCPServerSocket
     typedef Socket<AbstractStreamServerSocket> base_type;
 
 public:
-    TCPServerSocket();
+    TCPServerSocket(int ipVersion);
     ~TCPServerSocket();
 
     TCPServerSocket(const TCPServerSocket&) = delete;
@@ -327,13 +358,11 @@ public:
      *   Construct a UDP socket
      */
     explicit UDPSocket( bool natTraversal = true );
-
+    UDPSocket(int ipVersion) ;
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
     UDPSocket& operator=(UDPSocket&&) = delete;
-
-    void setDestPort(unsigned short foreignPort);
 
     /**
      *   Unset foreign address and port
@@ -408,7 +437,7 @@ public:
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
-    sockaddr_in m_destAddr;
+    Socket::SockAddrPtr m_destAddr;
     SocketAddress m_prevDatagramAddress;
 
     void setBroadcast();

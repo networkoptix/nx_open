@@ -8,6 +8,8 @@
 
 #ifdef _WIN32
 #   include <winsock2.h>
+#   include <in6addr.h>
+#   include <ws2ipdef.h>
 #else
 #   include <sys/socket.h>
 #   include <netinet/in.h>
@@ -26,9 +28,7 @@
 
 
 namespace nx {
-
 class DnsResolver;
-
 namespace network {
 
 enum class TransportProtocol
@@ -54,41 +54,21 @@ static const size_t kTypicalMtuSize = 1500;
 class NX_NETWORK_API HostAddress
 {
 public:
-    //!Creates 0.0.0.0 address
-    HostAddress();
     ~HostAddress();
 
     HostAddress( const HostAddress& rhs );
     HostAddress( HostAddress&& rhs );
-    HostAddress( const struct in_addr& sinAddr );
 
-    /*!
-        \param _ipv4 ipv4 address in local byte order
-    */
-    HostAddress( uint32_t _ipv4 );
+    HostAddress( const in_addr& addr );
 
-    /*!
-     *  \param _ipv6 ipv6 address in local byte order (ipv4-mapped
-     */
-    HostAddress( const QByteArray& _ipv6 );
+    HostAddress( const in6_addr& addr = in6addr_any );
 
     HostAddress( const QString& addrStr );
     HostAddress( const char* addrStr );
 
-    //!Returns ip in local byte order
-    /*!
-        \note This method can trigger blocking address resolve. Check 
-    */
-    uint32_t ipv4() const;
-
-    //!Returns ip4-mapped ipv6
-    QByteArray ipv6() const;
-
-    QString toString() const;
     //!Returns \a true if address is resolved. I.e., it's ip address is known
     bool isResolved() const;
     bool isLocalIp() const;
-
     HostAddress& operator=( const HostAddress& rhs );
     HostAddress& operator=( HostAddress&& rhs );
 
@@ -96,20 +76,29 @@ public:
     bool operator!=( const HostAddress& right ) const;
     bool operator<( const HostAddress& right ) const;
 
-    struct in_addr inAddr(bool* ok = nullptr) const;
+    /** Domain name or IP v4 (if can be converted) or IP v6 */
+    QString toString() const;
 
-    /** 127.0.0.1 */
+    /** IP v4 if address is v4 or v6 which can be converted to v4 */
+    boost::optional<in_addr> ipV4() const;
+
+    /** IP v6 if address is v6 or v4 converted to v6 */
+    boost::optional<in6_addr> ipV6() const;
+    bool isLocal() const;
+
     static const HostAddress localhost;
-    /** 0.0.0.0 */
     static const HostAddress anyHost;
 
-private:
-    mutable boost::optional<QString> m_addrStr;
-    mutable struct in_addr m_sinAddr;
-    //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
-    mutable bool m_addressResolved;
+    static boost::optional<QString> ipToString(const in_addr& addr);
+    static boost::optional<QString> ipToString(const in6_addr& addr);
 
-    void initializeFromString(const char* addrStr);
+    static boost::optional<in_addr> ipV4from(const QString& ip);
+    static boost::optional<in6_addr> ipV6from(const QString& ip);
+
+private:
+    mutable boost::optional<QString> m_string;
+    mutable boost::optional<in_addr> m_ipV4;
+    mutable boost::optional<in6_addr> m_ipV6;
 
     // TODO: use IpAddress instead
     friend class nx::DnsResolver;
@@ -124,11 +113,11 @@ public:
 
     SocketAddress();
     ~SocketAddress();
-    SocketAddress(HostAddress _address, quint16 _port);
+    SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 )
     SocketAddress(const QString& str);
-    SocketAddress(const QByteArray& utf8Str);
-    SocketAddress(const char* str);
-    SocketAddress(const QUrl& url);
+    SocketAddress( const QString& str )
+            address = HostAddress(str);
+        }
 
     QString toString() const;
     QUrl toUrl(const QString& scheme = QString()) const;
@@ -136,10 +125,10 @@ public:
     bool operator!=(const SocketAddress& rhs) const;
     bool operator<(const SocketAddress& rhs) const;
     bool isNull() const;
+    {
+        return address == rhs.address && port == rhs.port;
+    }
 
-    static const SocketAddress anyAddress;
-private:
-    void initializeFromString(const QString& str);
 };
 
 inline uint qHash(const SocketAddress &address) {

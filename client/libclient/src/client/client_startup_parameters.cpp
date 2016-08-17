@@ -74,6 +74,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
     addParserParam(commandLineParser, &result.exportedMode,         "--exported");
     addParserParam(commandLineParser, &result.selfUpdateMode,       kSelfUpdateKey);
+    addParserParam(commandLineParser, &result.ipVersion,            "--ip-version");
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");

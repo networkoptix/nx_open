@@ -13,6 +13,7 @@ extern "C"
 #include <utils/common/writer_pool.h>
 #include "recorder/storage_manager.h"
 #include <nx/streaming/config.h>
+#include <media_server/settings.h>
 
 #ifdef Q_OS_WIN
 #include "windows.h"
@@ -23,7 +24,6 @@ extern "C"
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
-const int kMaxBufferSize = 16 * 1024 * 1024;
 const int kMkvMaxHeaderOffset = 1024;
 
 // -------------- QueueFileWriter ------------
@@ -42,16 +42,15 @@ QueueFileWriter::~QueueFileWriter()
 
 qint64 QueueFileWriter::writeRanges(QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> ranges)
 {
-    if (m_needStop)
-        return -1;
-
     FileBlockInfo fb(file);
     fb.ranges = std::move(ranges);
 
 #if 1
     QnMutexLocker lock(&fb.mutex);
-    putData(&fb);
-    fb.condition.wait(&fb.mutex);
+    if (putData(&fb))
+        fb.condition.wait(&fb.mutex);
+    else
+        return -1;
 #else
     // use native NCQ
     for (const auto& range: fb.ranges) {
@@ -74,11 +73,15 @@ void QueueFileWriter::removeOldWritingStatistics(qint64 currentTime)
     }
 }
 
-void QueueFileWriter::putData(FileBlockInfo* fb)
+bool QueueFileWriter::putData(FileBlockInfo* fb)
 {
     QnMutexLocker lock(&m_dataMutex);
+    if (m_needStop)
+        return false;
+
     m_dataQueue.push_back(fb);
     m_dataWaitCond.wakeAll();
+    return true;
 }
 
 QueueFileWriter::FileBlockInfo* QueueFileWriter::popData()
@@ -288,18 +291,22 @@ bool QBufferedFile::updatePos()
 			int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
 			int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
 			int newBufSize = (1 << (curPow + 1)) * 1024;
-#if 0
-			qWarning()
-				<< "File" << (uintptr_t)this
-				<< "Min buf size = " << m_minBufferSize << "."
-				<< "Seek detected. Enlarging from " << m_cycleBuffer.maxSize()
-				<< " to " << fileBlockSize + newBufSize
-				<< ". Delta = " << newBufSize - m_minBufferSize;
-#endif
-			if (newBufSize < kMaxBufferSize)
-			{
+
+            NX_LOG(lit("Seek detected for File: %1. Current FfmpegBufSize: %2. Enlarging up to %3. Delta = %4")
+                    .arg((uintptr_t)this)
+                    .arg(m_minBufferSize)
+                    .arg(newBufSize)
+                    .arg(newBufSize - m_minBufferSize),
+                   cl_logDEBUG1);
+
+            int maxBufferSize = 
+                MSSettings::roSettings()->value(
+                    nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
+                    nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
+
+			if (newBufSize < maxBufferSize)
+            {
 				m_minBufferSize = newBufSize;
-				m_cycleBuffer.resize(fileBlockSize + newBufSize);
 				emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
 			}
 		}

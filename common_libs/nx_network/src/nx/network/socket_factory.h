@@ -9,7 +9,6 @@
 #include <atomic>
 
 #include "abstract_socket.h"
-
 //!Contains factory methods for creating sockets
 /*!
     All factory methods return object created new operator \a new
@@ -69,6 +68,8 @@ public:
     static CreateStreamServerSocketFuncType
         setCreateStreamServerSocketFunc(CreateStreamServerSocketFuncType newFactoryFunc);
 
+    static void setIpVersion( const QString& ipVersion );
+
 private:
     SocketFactory();
     SocketFactory( const SocketFactory& );
@@ -76,8 +77,12 @@ private:
 
     ~SocketFactory();
 
-    static std::atomic< SocketType > s_enforcedStreamSocketType;
-    static std::atomic< bool > s_isSslEnforced;
+    static std::atomic<SocketType> s_enforcedStreamSocketType;
+    static std::atomic<bool> s_isSslEnforced;
+	
+	static std::atomic<int> s_udpIpVersion;
+    static std::atomic<int> s_tcpClientIpVersion;
+    static std::atomic<int> s_tcpServerIpVersion;
 };
 
 #endif  //SOCKET_FACTORY_H

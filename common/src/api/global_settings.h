@@ -158,6 +158,9 @@ public:
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
     bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const;
+	
+    int maxRecorderQueueSizeBytes() const;
+    int maxRecorderQueueSizePackets() const;
 
 signals:
     void initialized();
@@ -248,6 +251,9 @@ private:
     // misc adaptors
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
+
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
 
     AdaptorList m_allAdaptors;
 

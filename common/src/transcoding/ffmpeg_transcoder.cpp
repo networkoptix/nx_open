@@ -113,6 +113,7 @@ int workaround_av_write_trailer(AVFormatContext *s)
     /*
     for(;;){
         AVPacket pkt;
+        av_init_packet(&pkt);
         ret= interleave_packet(s, &pkt, NULL, 1);
         if(ret<0) //FIXME cleanup needed for ret<0 ?
             goto fail;

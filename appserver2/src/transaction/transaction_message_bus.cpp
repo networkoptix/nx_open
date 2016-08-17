@@ -1510,6 +1510,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
+    ConnectionLockGuard connectionLockGuard,
     QSharedPointer<AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const ApiPeerData& remotePeer,
@@ -1530,6 +1531,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
 
     QnTransactionTransport* transport = new QnTransactionTransport(
         connectionGuid,
+        std::move(connectionLockGuard),
         localPeer(),
         remotePeer,
         std::move(socket),
