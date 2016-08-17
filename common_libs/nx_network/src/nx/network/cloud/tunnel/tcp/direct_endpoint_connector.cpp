@@ -52,7 +52,7 @@ void DirectEndpointConnector::connect(
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
     for (const SocketAddress& endpoint: response.forwardedTcpEndpointList)
     {
-        auto tcpSocket = std::make_unique<TCPSocket>();
+        auto tcpSocket = std::make_unique<TCPSocket>(false, AF_INET);
         tcpSocket->bindToAioThread(getAioThread());
         if (!tcpSocket->setNonBlockingMode(true) ||
             !tcpSocket->setSendTimeout(timeout.count()))

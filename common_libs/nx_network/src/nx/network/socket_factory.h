@@ -83,6 +83,12 @@ private:
 	static std::atomic<int> s_udpIpVersion;
     static std::atomic<int> s_tcpClientIpVersion;
     static std::atomic<int> s_tcpServerIpVersion;
+
+    static std::unique_ptr<AbstractStreamSocket> defaultStreamSocketFactoryFunc(
+        NatTraversalType nttType, SocketType forcedSocketType);
+
+    static std::unique_ptr<AbstractStreamServerSocket> defaultStreamServerSocketFactoryFunc(
+        NatTraversalType nttType, SocketType socketType);
 };
 
 #endif  //SOCKET_FACTORY_H

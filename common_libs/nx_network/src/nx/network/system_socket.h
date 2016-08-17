@@ -33,6 +33,26 @@ template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
 }   //aio
 
+struct SockAddrPtr
+{
+    std::shared_ptr<const sockaddr> ptr;
+    socklen_t size;
+
+    SockAddrPtr():
+        ptr(nullptr),
+        size(0)
+    {
+    }
+
+    template<typename T>
+    SockAddrPtr(T* addr):
+        ptr((sockaddr*)addr),
+        size(sizeof(T))
+    {
+        memset(addr, 0, size);
+    }
+};
+
 /**
  *   Base class representing basic communication endpoint
  */
@@ -126,26 +146,6 @@ public:
         const QString &service,
         const QString &protocol = QLatin1String("tcp"));
 
-    struct SockAddrPtr
-    {
-        std::shared_ptr<const sockaddr> ptr;
-        socklen_t size;
-
-        SockAddrPtr():
-            ptr(nullptr),
-            size(0)
-        {
-        }
-
-        template<typename T>
-        SockAddrPtr(T* addr):
-            ptr((sockaddr*)addr),
-            size(sizeof(T))
-        {
-            memset(addr, 0, size);
-        }
-    };
-
     SockAddrPtr makeAddr(const SocketAddress& socketAddress);
     bool createSocket( int type, int protocol );
 
@@ -170,12 +170,13 @@ public:
         bool natTraversal,
         int type,
         int protocol,
+        int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
+
     CommunicatingSocket(
         bool natTraversal,
         int newConnSD,
-        PollableSystemSocketImpl* sockImpl = nullptr );
-        int newConnSD, int ipVersion,
+        int ipVersion,
         PollableSystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
@@ -222,28 +223,6 @@ private:
     bool m_connected;
 };
 
-
-    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
-    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
-    :
-        m_implDelegate( param1, param2, param3, param4 )
-    {
-    }
-
-    {
-    }
-
-    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
-    SocketImplementationDelegate( AbstractCommunicatingSocket* abstractSocketPtr, const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
-    :
-        m_implDelegate( abstractSocketPtr, param1, param2, param3, param4 )
-    template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
-    SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
-    :
-        base_type( this, param1, param2, param3 )
-    {
-    }
-
 /**
  *   TCP socket for communication with other TCP sockets
  */
@@ -257,10 +236,10 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    TCPSocket(int ipVersion) ;
+    TCPSocket(bool natTraversal, int ipVersion);
 
     //!User by \a TCPServerSocket class
-    TCPSocket( int newConnSD, int ipVersion );
+    TCPSocket(int newConnSD, int ipVersion);
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -357,8 +336,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    explicit UDPSocket( bool natTraversal = true );
-    UDPSocket(int ipVersion) ;
+    UDPSocket(bool natTraversal = true, int ipVersion = AF_INET);
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
@@ -437,7 +415,7 @@ public:
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
-    Socket::SockAddrPtr m_destAddr;
+    SockAddrPtr m_destAddr;
     SocketAddress m_prevDatagramAddress;
 
     void setBroadcast();

@@ -105,7 +105,7 @@ void TunnelAcceptor::connectionAckResult(
     auto timeout = m_connectionParameters.rendezvousConnectTimeout.count();
     for (const auto& address : m_peerAddresses)
     {
-        auto udtSocket = std::make_unique<UdtStreamSocket>();
+        auto udtSocket = std::make_unique<UdtStreamSocket>(AF_INET);
         udtSocket->bindToAioThread(m_mediatorConnection->getAioThread());
 
         if ((udpSocket

@@ -18,7 +18,7 @@ TEST( TcpSocket, KeepAliveOptions )
     if( SocketFactory::isStreamSocketTypeEnforced() )
         return;
 
-    const auto socket = std::make_unique< TCPSocket >( false );
+    const auto socket = std::make_unique< TCPSocket >( false, AF_INET );
     boost::optional< KeepAliveOptions > result;
     result.is_initialized();
 
@@ -56,9 +56,24 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
 }
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
-    TEST, TcpSocket,
-    &std::make_unique<TCPServerSocket>,
-    &std::make_unique<TCPSocket>)
+    TEST, TcpSocketV4,
+    [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
+    [](){ return std::make_unique<TCPSocket>(false, AF_INET); })
+
+NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+    TEST, TcpSocketV4to6,
+    [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
+    [](){ return std::make_unique<TCPSocket>(false, AF_INET); })
+
+NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+    TEST, TcpSocketV6,
+    [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
+    [](){ return std::make_unique<TCPSocket>(false, AF_INET6); })
+
+NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+    TEST, TcpSocketV6to4,
+    [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
+    [](){ return std::make_unique<TCPSocket>(false, AF_INET6); })
 
 }   //test
 }   //network

@@ -54,11 +54,12 @@ QByteArray Router::makeMapRequest(Mapping& mapping)
     QDataStream stream(&request, QIODevice::WriteOnly);
     stream.setByteOrder(QDataStream::LittleEndian);
 
+    const auto ipV6 = mapping.internal.address.ipV6();
     RequestHeader header;
     header.version = VERSION;
     header.opcode = Opcode::MAP;
     header.lifeTime = LIFETIME;
-    header.clientIp = mapping.internal.address.ipv6();
+    header.clientIp = QByteArray((char*)&ipV6.get(), sizeof(*ipV6));
 
     MapMessage message;
     message.nonce = mapping.nonce;
@@ -91,8 +92,12 @@ bool Router::parseMapResponse(const QByteArray& response, Mapping& mapping)
     if (message.nonce != mapping.nonce) return false;
     if (message.internalPort != mapping.internal.port) return false;
 
+    in6_addr addr;
+    NX_CRITICAL(message.externalIp.size() == sizeof(addr));
+    std::memcpy(&addr, message.externalIp.data(), sizeof(addr));
+
     mapping.lifeTime = QDateTime::currentDateTime().toTime_t() + header.lifeTime;
-    mapping.external = SocketAddress(HostAddress(message.externalIp), message.externalPort);
+    mapping.external = SocketAddress(HostAddress(addr), message.externalPort);
     return true;
 }
 

@@ -360,11 +360,6 @@ void Socket<InterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()> hand
 }
 
 template<typename InterfaceToImplement>
-unsigned short Socket::getLocalPort() const
-template<typename InterfaceToImplement>
-bool Socket::setLocalPort(unsigned short localPort)  {
-{
-template<typename InterfaceToImplement>
 void Socket<InterfaceToImplement>::cleanUp()
 {
 #ifdef _WIN32
@@ -453,11 +448,11 @@ Socket<InterfaceToImplement>::Socket(
 
 // Function to fill in address structure given an address and port
 template<typename InterfaceToImplement>
-Socket::SockAddrPtr Socket<InterfaceToImplement>::makeAddr(const SocketAddress& socketAddress)
+SockAddrPtr Socket<InterfaceToImplement>::makeAddr(const SocketAddress& socketAddress)
 {
     // NOTE: blocking dns name resolve may happen here
-    if (!HostAddressResolver::isAddressResolved(socketAddress.address) &&
-        !HostAddressResolver::instance()->resolveAddressSync(
+    if (!socketAddress.address.isResolved() &&
+        !SocketGlobals::addressResolver().dnsResolver().resolveAddressSync(
             socketAddress.address.toString(),
             const_cast<HostAddress*>(&socketAddress.address)))
     {
@@ -643,7 +638,7 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
     // Get the address of the requested host
     m_connected = false;
 
-    const auto addr = makeAddr(remoteAddress);
+    const auto addr = this->makeAddr(remoteAddress);
     if (!addr.ptr)
         return false;
 
@@ -654,7 +649,7 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
     if( !isNonBlockingModeBak && !this->setNonBlockingMode( true ) )
         return false;
 
-    int connectResult = ::connect(m_fd, addr.ptr.get(), addr.size);
+    int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
 
     if( connectResult != 0 )
     {
@@ -803,20 +798,20 @@ int CommunicatingSocket<InterfaceToImplement>::send( const void* buffer, unsigne
 template<typename InterfaceToImplement>
 SocketAddress CommunicatingSocket<InterfaceToImplement>::getForeignAddress() const
 {
-    if (m_ipVersion == AF_INET)
+    if (this->m_ipVersion == AF_INET)
     {
         sockaddr_in addr;
         socklen_t addrLen = sizeof(addr);
-        if (::getpeername(m_fd, (sockaddr*)&addr, &addrLen) < 0)
+        if (::getpeername(this->m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
 
         return SocketAddress(addr.sin_addr, ntohs(addr.sin_port));
     }
-    else if (m_ipVersion == AF_INET6)
+    else if (this->m_ipVersion == AF_INET6)
     {
         sockaddr_in6 addr;
         socklen_t addrLen = sizeof(addr);
-        if (::getpeername(m_fd, (sockaddr*)&addr, &addrLen) < 0)
+        if (::getpeername(this->m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
 
         return SocketAddress(addr.sin6_addr, ntohs(addr.sin6_port));
@@ -1257,7 +1252,7 @@ public:
     :
         socketHandle( -1 ),
         ipVersion( _ipVersion ),
-        asyncServerSocketHelper(sock)
+        asyncServerSocketHelper( _sock )
     {
     }
 
@@ -1406,9 +1401,9 @@ bool TCPServerSocket::setListen(int queueLen)
 
 // UDPSocket Code
 
-UDPSocket::UDPSocket(int ipVersion)
+UDPSocket::UDPSocket(bool natTraversal, int ipVersion)
 :
-    base_type(SOCK_DGRAM, IPPROTO_UDP, ipVersion)
+    base_type(natTraversal, SOCK_DGRAM, IPPROTO_UDP, ipVersion),
     m_destAddr()
 {
     setBroadcast();
@@ -1532,6 +1527,7 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
 }
 
 int UDPSocket::send( const void* buffer, unsigned int bufferLen )
+{
     #ifdef _WIN32
         return sendto(
             handle(), (raw_type *)buffer, bufferLen, 0,
@@ -1574,13 +1570,9 @@ void UDPSocket::sendToAsync(
     std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler)
 {
     setDestAddr(foreignEndpoint);
-    SocketAddress resolvedForeignEndpoint(
-        HostAddress(m_destAddr.sin_addr),
-        foreignEndpoint.port);
+
     using namespace std::placeholders;
-    sendAsync(
-        buf,
-        std::bind(completionHandler, _1, std::move(resolvedForeignEndpoint), _2));
+    sendAsync(buf, std::bind(completionHandler, _1, foreignEndpoint, _2));
 }
 
 int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )

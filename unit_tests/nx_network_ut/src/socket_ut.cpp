@@ -274,7 +274,7 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 
 TEST( Socket, HostNameResolve3 )
 {
-    nx::DnsResolver dnsResolver;
+    nx::network::DnsResolver dnsResolver;
 
     {
         HostAddress resolvedAddress;

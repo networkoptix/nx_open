@@ -21,7 +21,7 @@ namespace cloud {
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     TEST, CloudStreamSocketTcp,
-    &std::make_unique<TCPServerSocket>,
+    []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     &std::make_unique<CloudStreamSocket>)
 
 class CloudStreamSocketTest

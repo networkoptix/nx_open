@@ -10,8 +10,12 @@ namespace test {
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     TEST, ExtendedStreamSocket,
-    &std::make_unique<TCPServerSocket>,
-    [](){ return std::make_unique<ExtendedStreamSocket>(std::make_unique<TCPSocket>()); })
+    []() { return std::make_unique<TCPServerSocket>(AF_INET); },
+    []()
+    {
+        return std::make_unique<ExtendedStreamSocket>(
+            std::make_unique<TCPSocket>(false, AF_INET));
+    })
 
 class ExtendedStreamSocketTest:
     public ::testing::Test
@@ -26,7 +30,7 @@ protected:
 
     void SetUp() override
     {
-        server = std::make_unique<TCPServerSocket>();
+        server = std::make_unique<TCPServerSocket>(AF_INET);
         ASSERT_TRUE(server->setReuseAddrFlag(true));
         ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
         ASSERT_TRUE(server->listen(10));;
@@ -34,7 +38,7 @@ protected:
         const auto serverAddress = server->getLocalAddress();
         NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
 
-        client = std::make_unique<TCPSocket>();
+        client = std::make_unique<TCPSocket>(false, AF_INET);
         ASSERT_TRUE(client->setSendTimeout(500));
         ASSERT_TRUE(client->connect(serverAddress, 500));
 

@@ -21,7 +21,7 @@ public:
         m_addressBinder(addressBinder)
     {
         for (size_t i = 0; i < count; ++i)
-            addSocket(std::make_unique<TCPServerSocket>());
+            addSocket(std::make_unique<TCPServerSocket>(AF_INET));
     }
 
     bool bind(const SocketAddress& localAddress) override
@@ -66,7 +66,7 @@ TEST_F(MultipleServerSocketTest, add_remove)
 {
     MultipleServerSocket sock;
 
-    auto tcpServerSocket = std::make_unique<TCPServerSocket>();
+    auto tcpServerSocket = std::make_unique<TCPServerSocket>(AF_INET);
     ASSERT_TRUE(tcpServerSocket->bind(SocketAddress(HostAddress::localhost, 0)));
     ASSERT_TRUE(tcpServerSocket->listen());
     sock.addSocket(std::move(tcpServerSocket));
@@ -82,7 +82,7 @@ TEST_F(MultipleServerSocketTest, add_remove)
 
     for (int i = 0; i < 100; ++i)
     {
-        auto udtServerSocket = std::make_unique<TCPServerSocket>();
+        auto udtServerSocket = std::make_unique<TCPServerSocket>(AF_INET);
         ASSERT_TRUE(udtServerSocket->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(udtServerSocket->listen());
 

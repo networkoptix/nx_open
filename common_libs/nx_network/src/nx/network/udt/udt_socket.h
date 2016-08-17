@@ -98,7 +98,7 @@ class NX_NETWORK_API UdtStreamSocket
     public UdtSocket<AbstractStreamSocket>
 {
 public:
-    UdtStreamSocket();
+    explicit UdtStreamSocket(int ipVersion);
     UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
@@ -157,7 +157,7 @@ class NX_NETWORK_API UdtStreamServerSocket
     public UdtSocket<AbstractStreamServerSocket>
 {
 public:
-    UdtStreamServerSocket();
+    UdtStreamServerSocket(int ipVersion);
     virtual ~UdtStreamServerSocket();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;

@@ -15,6 +15,7 @@
 #include <atomic>
 
 namespace nx {
+namespace network {
 
 DnsResolver::ResolveTask::ResolveTask(
     HostAddress _hostAddress,
@@ -124,11 +125,6 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
     return true;
 }
 
-bool DnsResolver::isAddressResolved( const HostAddress& addr ) const
-{
-    return addr.ipV4() || addr.ipV6();
-}
-
 void DnsResolver::cancel( RequestID reqID, bool waitForRunningHandlerCompletion )
 {
     QnMutexLocker lk( &m_mutex );
@@ -187,4 +183,5 @@ void DnsResolver::run()
     }
 }
 
+} // namespace network
 } // namespace nx

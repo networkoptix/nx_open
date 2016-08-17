@@ -916,7 +916,7 @@ boost::optional<SocketAddress> AddressBinder::random(const SocketAddress& key) c
 
 MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBinder)
 :
-    TCPSocket(),
+    TCPSocket(false, AF_INET),
     m_addressBinder(addressBinder)
 {
 }

@@ -1,5 +1,4 @@
-#ifndef DNS_RESOLVER_H
-#define DNS_RESOLVER_H
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -13,6 +12,7 @@
 #include "socket_common.h"
 
 namespace nx {
+namespace network {
 
 /*!
     \note Thread-safe
@@ -39,17 +39,17 @@ public:
         const HostAddress& addressToResolve,
         std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
         RequestID reqID );
+
     /*!
         \note This method is re-enterable
     */
     bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress );
 
-    //!Returns \a true if address \a addr is resolved
-    static bool isAddressResolved( const HostAddress& addr );
     /*!
         \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
     */
     void cancel( RequestID reqID, bool waitForRunningHandlerCompletion );
+
     //!Returns \a true if at least one resolve operation is scheduled with \a reqID
     bool isRequestIDKnown( RequestID reqID ) const;
 
@@ -81,6 +81,5 @@ private:
     size_t m_currentSequence;
 };
 
+} // namespace network
 } // namespace nx
-
-#endif  //HOST_ADDRESS_RESOLVER_H

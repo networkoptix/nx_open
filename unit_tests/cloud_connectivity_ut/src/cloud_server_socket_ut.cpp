@@ -311,7 +311,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto list = addressBinder.get(addressManager.key);
     ASSERT_EQ(list.size(), 1);
 
-    auto client = std::make_unique<TCPSocket>(false);
+    auto client = std::make_unique<TCPSocket>(false, AF_INET);
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(500));
 
@@ -420,7 +420,7 @@ protected:
 
     void startClient(const SocketAddress& peer)
     {
-        auto socketPtr = std::make_unique<TCPSocket>();
+        auto socketPtr = std::make_unique<TCPSocket>(false, AF_INET);
         auto socket = socketPtr.get();
         const auto timeout = 3000 * utils::TestOptions::timeoutMultiplier();
         ASSERT_TRUE(socketPtr->setSendTimeout(timeout));

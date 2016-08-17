@@ -1,10 +1,4 @@
-/**********************************************************
-* 30 aug 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef SOCKET_COMMON_H
-#define SOCKET_COMMON_H
+#pragma once
 
 #ifdef _WIN32
 #   include <winsock2.h>
@@ -28,8 +22,9 @@
 
 
 namespace nx {
-class DnsResolver;
 namespace network {
+
+class DnsResolver;
 
 enum class TransportProtocol
 {
@@ -41,11 +36,10 @@ enum class TransportProtocol
 static const size_t kUDPHeaderSize = 8;
 static const size_t kIPHeaderSize = 20;
 static const size_t kMaxUDPDatagramSize = 64*1024 - kUDPHeaderSize - kIPHeaderSize;
-
 static const size_t kTypicalMtuSize = 1500;
 
-}   //network
-}   //nx
+} // network
+} // nx
 
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 /*!
@@ -54,37 +48,27 @@ static const size_t kTypicalMtuSize = 1500;
 class NX_NETWORK_API HostAddress
 {
 public:
-    ~HostAddress();
+    HostAddress(const in_addr& addr);
+    HostAddress(const in6_addr& addr = in6addr_any);
 
-    HostAddress( const HostAddress& rhs );
-    HostAddress( HostAddress&& rhs );
+    HostAddress(const QString& addrStr);
+    HostAddress(const char* addrStr);
 
-    HostAddress( const in_addr& addr );
-
-    HostAddress( const in6_addr& addr = in6addr_any );
-
-    HostAddress( const QString& addrStr );
-    HostAddress( const char* addrStr );
-
-    //!Returns \a true if address is resolved. I.e., it's ip address is known
     bool isResolved() const;
-    bool isLocalIp() const;
-    HostAddress& operator=( const HostAddress& rhs );
-    HostAddress& operator=( HostAddress&& rhs );
+    bool isLocal() const;
 
-    bool operator==( const HostAddress& right ) const;
-    bool operator!=( const HostAddress& right ) const;
-    bool operator<( const HostAddress& right ) const;
+    bool operator==(const HostAddress& right) const;
+    bool operator!=(const HostAddress& right) const;
+    bool operator<(const HostAddress& right) const;
 
     /** Domain name or IP v4 (if can be converted) or IP v6 */
-    QString toString() const;
+    const QString& toString() const;
 
     /** IP v4 if address is v4 or v6 which can be converted to v4 */
-    boost::optional<in_addr> ipV4() const;
+    const boost::optional<in_addr>& ipV4() const;
 
     /** IP v6 if address is v6 or v4 converted to v6 */
-    boost::optional<in6_addr> ipV6() const;
-    bool isLocal() const;
+    const boost::optional<in6_addr>& ipV6() const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
@@ -101,7 +85,7 @@ private:
     mutable boost::optional<in6_addr> m_ipV6;
 
     // TODO: use IpAddress instead
-    friend class nx::DnsResolver;
+    friend class nx::network::DnsResolver;
 };
 
 //!Represents host and port (e.g. 127.0.0.1:1234)
@@ -111,24 +95,22 @@ public:
     HostAddress address;
     quint16 port;
 
-    SocketAddress();
-    ~SocketAddress();
-    SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 )
+    SocketAddress(const HostAddress& _address = HostAddress::anyHost, quint16 _port = 0);
     SocketAddress(const QString& str);
-    SocketAddress( const QString& str )
-            address = HostAddress(str);
-        }
+    SocketAddress(const QByteArray& utf8Str);
+    SocketAddress(const char* utf8Str);
+    SocketAddress(const QUrl& url);
 
-    QString toString() const;
-    QUrl toUrl(const QString& scheme = QString()) const;
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
     bool operator<(const SocketAddress& rhs) const;
-    bool isNull() const;
-    {
-        return address == rhs.address && port == rhs.port;
-    }
 
+    QString toString() const;
+    QUrl toUrl(const QString& scheme = QString()) const;
+    bool isNull() const;
+
+    static const SocketAddress anyAddress;
+    static QString trimIpV6(const QString& ip);
 };
 
 inline uint qHash(const SocketAddress &address) {
@@ -136,5 +118,3 @@ inline uint qHash(const SocketAddress &address) {
 }
 
 Q_DECLARE_METATYPE(SocketAddress)
-
-#endif  //SOCKET_COMMON_H

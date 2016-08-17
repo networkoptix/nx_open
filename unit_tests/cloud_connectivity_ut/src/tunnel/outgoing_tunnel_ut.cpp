@@ -67,7 +67,11 @@ public:
             {
                 if (m_connectionShouldWorkFine)
                 {
-                    handler(SystemError::noError, std::make_unique<TCPSocket>(), !m_singleShot);
+                    handler(
+                        SystemError::noError,
+                        std::make_unique<TCPSocket>(false, AF_INET),
+                        !m_singleShot);
+
                     if (m_singleShot)
                         m_connectionShouldWorkFine = false;
                 }
