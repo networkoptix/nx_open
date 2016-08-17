@@ -294,7 +294,7 @@ void SelfUpdater::launchWithAdminPermissions()
 {
 #if defined(Q_OS_WIN)
     /* Start another client instance with admin permissions if required. */
-    nx::utils::runAsAdministratorWithUAC(
+    nx::vms::utils::runAsAdministratorWithUAC(
         qApp->applicationFilePath(),
         QStringList()
         << QnStartupParameters::kSelfUpdateKey
