@@ -2,10 +2,13 @@
 
 #include <QtWidgets/QMenu>
 
-#include <watchers/cloud_status_watcher.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+
+#include <utils/common/app_info.h>
+
+#include <watchers/cloud_status_watcher.h>
 
 //TODO: #dklychkov Uncomment when cloud login is implemented
 //#define DIRECT_CLOUD_CONNECT
@@ -23,13 +26,14 @@ public:
 #endif
 
 public:
-    QMenu* cloudMenu;
+    QMenu* loggedInMenu;
+    QMenu* offlineMenu;
 #ifdef DIRECT_CLOUD_CONNECT
     QMenu* systemsMenu;
 #endif
     QPalette originalPalette;
-    QIcon onlineIcon;
-    QIcon offlineIcon;
+    QIcon loggedInIcon;     /*< User is logged in. */
+    QIcon offlineIcon;      /*< User is logged in, but cloud is unreachable. */
 };
 
 QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
@@ -40,17 +44,18 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     Q_D(QnCloudStatusPanel);
 
     setProperty(style::Properties::kDontPolishFontProperty, true);
-    QFont font = qApp->font();
-    font.setPixelSize(font.pixelSize() - 1);
-    setFont(font);
-
     setPopupMode(QToolButton::InstantPopup);
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    setIcon(d->offlineIcon);
-    adjustIconSize();
 
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
         &QnCloudStatusWatcher::updateSystems);
+
+    connect(this, &QnCloudStatusPanel::clicked, this,
+        [this]
+        {
+            if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
+                action(QnActions::LoginToCloud)->trigger();
+        });
 
     d->updateUi();
 }
@@ -62,26 +67,36 @@ QnCloudStatusPanel::~QnCloudStatusPanel()
 QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent):
     QObject(parent),
     q_ptr(parent),
-    cloudMenu(new QMenu(parent)),
+    loggedInMenu(new QMenu(parent)),
+    offlineMenu(new QMenu(parent)),
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu(nullptr),
 #endif
-    onlineIcon(qnSkin->icon("titlebar/cloud_logged.png")),
-    offlineIcon(qnSkin->icon("titlebar/cloud_not_logged.png"))
+    originalPalette(parent->palette()),
+    loggedInIcon(qnSkin->icon("titlebar/cloud_logged.png")),
+    offlineIcon(qnSkin->icon("titlebar/cloud_offline.png"))
 {
     Q_Q(QnCloudStatusPanel);
+    loggedInMenu->setWindowFlags(loggedInMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    loggedInMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
+    loggedInMenu->addSeparator();
+    loggedInMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
+    loggedInMenu->addAction(q->action(QnActions::LogoutFromCloud));
 
-    cloudMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
-    cloudMenu->setWindowFlags(cloudMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    auto offlineAction = new QAction(this);
+    offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1").arg(QnAppInfo::cloudName()));
+    offlineAction->setEnabled(false);
 
-    cloudMenu->addSeparator();
-    cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
-    cloudMenu->addAction(q->action(QnActions::LogoutFromCloud));
+    offlineMenu->setWindowFlags(loggedInMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    offlineMenu->addAction(offlineAction);
+    offlineMenu->addSeparator();
+    offlineMenu->addAction(q->action(QnActions::LogoutFromCloud));
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this, &QnCloudStatusPanelPrivate::updateUi);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
+        &QnCloudStatusPanelPrivate::updateUi);
 
 #ifdef DIRECT_CLOUD_CONNECT
-    systemsMenu = cloudMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
+    systemsMenu = loggedInMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged, this, &QnCloudStatusPanelPrivate::updateSystems);
     updateSystems();
 #endif
@@ -89,27 +104,43 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 
 void QnCloudStatusPanelPrivate::updateUi()
 {
+    static const int kFontPixelSize = 12;
+
     Q_Q(QnCloudStatusPanel);
 
-    if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
+    QFont font = qApp->font();
+    font.setPixelSize(kFontPixelSize);
+
+    QPalette palette(originalPalette);
+
+    switch (qnCloudStatusWatcher->status())
     {
-        q->setText(QnCloudStatusPanel::tr("Login to cloud..."));
-        q->setIcon(offlineIcon);
-        q->setMenu(nullptr);
-        connect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
-        return;
+        case QnCloudStatusWatcher::LoggedOut:
+            q->setText(QnCloudStatusPanel::tr("Login to cloud..."));
+            q->setIcon(QIcon());
+            q->setMenu(nullptr);
+            font.setWeight(QFont::Normal);
+            palette.setColor(QPalette::ButtonText, palette.color(QPalette::Light));
+            break;
+        case QnCloudStatusWatcher::Online:
+            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setIcon(loggedInIcon);
+            q->setMenu(loggedInMenu);
+            font.setWeight(QFont::Bold);
+            break;
+        case QnCloudStatusWatcher::Offline:
+            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setIcon(offlineIcon);
+            q->setMenu(offlineMenu);
+            font.setWeight(QFont::Bold);
+            break;
+        default:
+            NX_ASSERT(false, "Should never get here.");
+            break;
     }
-
-    // TODO: #dklychkov display status
-    if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
-        q->setPalette(originalPalette);
-    else
-        setWarningStyle(q);
-
-    q->setText(qnCloudStatusWatcher->cloudLogin());
-    q->setIcon(onlineIcon);
-    q->setMenu(cloudMenu);
-    disconnect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
+    q->setFont(font);
+    q->adjustIconSize();
+    q->setPalette(palette);
 }
 
 #ifdef DIRECT_CLOUD_CONNECT
