@@ -31,7 +31,7 @@ namespace {
         else if (str == lit("UNAUTHORIZED"))
             return QnMergeSystemsTool::AuthentificationError;
         else if (str == lit("FORBIDDEN"))
-            return QnMergeSystemsTool::forbiddenError;
+            return QnMergeSystemsTool::ForbiddenError;
         else if (str == lit("NOT_LOCAL_OWNER"))
             return QnMergeSystemsTool::notLocalOwner;
         else if (str == lit("BACKUP_ERROR"))

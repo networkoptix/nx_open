@@ -296,8 +296,6 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         case QnMergeSystemsTool::AuthentificationError:
             message = tr("The password or user name is invalid.");
             break;
-        case QnMergeSystemsTool::ForbiddenError:
-            updateErrorLabel(tr("This user have not permissions for requested operation."));
         case QnMergeSystemsTool::VersionError:
             message = tr("System has an incompatible version.");
             break;
