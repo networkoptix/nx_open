@@ -330,7 +330,7 @@ APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
                        CameraNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       &modifyCameraAttributesListAccess, /* Filter save func */ \
+                       ModifyCameraAttributesListAccess(), /* Filter save func */ \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
@@ -340,7 +340,7 @@ APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
                        CameraNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       &modifyCameraAttributesListAccess, /* Filter save func */ \
+                       ModifyCameraAttributesListAccess(), /* Filter save func */ \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(313, getCamerasEx, ApiCameraDataExList, \
