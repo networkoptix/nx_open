@@ -8,16 +8,16 @@
 class QnLayoutTabBar;
 class QnMainWindowTitleBarWidgetPrivate;
 
-class QnMainWindowTitleBarWidget : public QWidget, public QnWorkbenchContextAware
+class QnMainWindowTitleBarWidget: public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QWidget base_type;
+   using base_type = QWidget;
 
 public:
     explicit QnMainWindowTitleBarWidget(
-            QWidget* parent = nullptr,
-            QnWorkbenchContext* context = nullptr);
+        QWidget* parent = nullptr,
+        QnWorkbenchContext* context = nullptr);
 
     ~QnMainWindowTitleBarWidget();
 

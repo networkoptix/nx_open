@@ -7,28 +7,35 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 
-class QnCloudStatusPanelPrivate : public QObject
+//TODO: #dklychkov Uncomment when cloud login is implemented
+//#define DIRECT_CLOUD_CONNECT
+
+class QnCloudStatusPanelPrivate: public QObject
 {
-    QnCloudStatusPanel *q_ptr;
+    QnCloudStatusPanel* q_ptr;
     Q_DECLARE_PUBLIC(QnCloudStatusPanel)
 public:
-    QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent);
+    QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent);
 
     void updateUi();
+#ifdef DIRECT_CLOUD_CONNECT
     void updateSystems();
+#endif
 
 public:
-    QMenu *cloudMenu;
-    QMenu *systemsMenu;
+    QMenu* cloudMenu;
+#ifdef DIRECT_CLOUD_CONNECT
+    QMenu* systemsMenu;
+#endif
     QPalette originalPalette;
     QIcon onlineIcon;
     QIcon offlineIcon;
 };
 
-QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-    , d_ptr(new QnCloudStatusPanelPrivate(this))
+QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    d_ptr(new QnCloudStatusPanelPrivate(this))
 {
     Q_D(QnCloudStatusPanel);
 
@@ -42,8 +49,8 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
     setIcon(d->offlineIcon);
     adjustIconSize();
 
-    connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher
-        , &QnCloudStatusWatcher::updateSystems);
+    connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
+        &QnCloudStatusWatcher::updateSystems);
 
     d->updateUi();
 }
@@ -52,28 +59,32 @@ QnCloudStatusPanel::~QnCloudStatusPanel()
 {
 }
 
-QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , cloudMenu(new QMenu(parent))
-    , systemsMenu(nullptr)
-    , onlineIcon(qnSkin->icon("titlebar/cloud_logged.png"))
-    , offlineIcon(qnSkin->icon("titlebar/cloud_not_logged.png"))
+QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent):
+    QObject(parent),
+    q_ptr(parent),
+    cloudMenu(new QMenu(parent)),
+#ifdef DIRECT_CLOUD_CONNECT
+    systemsMenu(nullptr),
+#endif
+    onlineIcon(qnSkin->icon("titlebar/cloud_logged.png")),
+    offlineIcon(qnSkin->icon("titlebar/cloud_not_logged.png"))
 {
     Q_Q(QnCloudStatusPanel);
 
     cloudMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
     cloudMenu->setWindowFlags(cloudMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    //TODO: #dklychkov Uncomment when cloud login is implemented
-    //systemsMenu = cloudMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
+
     cloudMenu->addSeparator();
     cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
     cloudMenu->addAction(q->action(QnActions::LogoutFromCloud));
 
-    connect(qnCloudStatusWatcher,     &QnCloudStatusWatcher::statusChanged,           this,   &QnCloudStatusPanelPrivate::updateUi);
-    //TODO: #dklychkov Uncomment when cloud login is implemented
-//    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::cloudSystemsChanged,     this,   &QnCloudStatusPanelPrivate::updateSystems);
-//    updateSystems();
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this, &QnCloudStatusPanelPrivate::updateUi);
+
+#ifdef DIRECT_CLOUD_CONNECT
+    systemsMenu = cloudMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged, this, &QnCloudStatusPanelPrivate::updateSystems);
+    updateSystems();
+#endif
 }
 
 void QnCloudStatusPanelPrivate::updateUi()
@@ -101,14 +112,15 @@ void QnCloudStatusPanelPrivate::updateUi()
     disconnect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
 }
 
+#ifdef DIRECT_CLOUD_CONNECT
 void QnCloudStatusPanelPrivate::updateSystems()
 {
-    const QnCloudSystemList &systems = qnCloudStatusWatcher->cloudSystems();
+    const QnCloudSystemList& systems = qnCloudStatusWatcher->cloudSystems();
 
     systemsMenu->clear();
-    for (const QnCloudSystem &system: systems)
+    for (const QnCloudSystem& system : systems)
     {
-        QAction *action = systemsMenu->addAction(system.name);
+        QAction* action = systemsMenu->addAction(system.name);
         QUrl url;
         //TODO: #dklychkov Prepare URL
         action->setData(url);
@@ -116,3 +128,4 @@ void QnCloudStatusPanelPrivate::updateSystems()
 
     systemsMenu->menuAction()->setVisible(!systemsMenu->actions().isEmpty());
 }
+#endif
