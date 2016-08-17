@@ -33,6 +33,7 @@ namespace{
     const quint16 DEFAULT_AXIS_API_PORT = 80;
     const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
     const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+    const QString AXIS_FIRMWARE_VERSION_PARAM_NAME("Properties.Firmware.Version");
 
     QnAudioFormat toAudioFormat(const QString& codecName)
     {
@@ -410,13 +411,11 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
-        if (status == CL_HTTP_SUCCESS) {
-            QByteArray firmware;
-            http.readAll(firmware);
-            firmware = firmware.mid(firmware.indexOf('=')+1);
-            setFirmware(QString::fromUtf8(firmware));
-        }
+
+        QString firmware;
+        auto status = readAxisParameter(&http, AXIS_FIRMWARE_VERSION_PARAM_NAME, &firmware);
+        if (status == CL_HTTP_SUCCESS)
+            setFirmware(firmware);
     }
 
     if (hasVideo(0))

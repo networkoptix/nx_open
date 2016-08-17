@@ -338,91 +338,54 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
     return result;
 }
 
+QSet<QAuthenticator> DeviceSoapWrapper::getPossibleCredentials(
+    const QString& manufacturer, 
+    const QString& model) const
+{
+    QSet<QAuthenticator> result;
+
+    QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
+    auto credentials = resData.value<QList<QnCredentials>>(
+        Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    for (const auto& credsEntry: credentials)
+        result.insert(credsEntry.toAuthenticator());
+
+    return result;
+}
+
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
 {
-
-    QAuthenticator auth = getDefaultPassword(manufacturer, model);
-    if (!auth.isNull()) {
-        setLogin(auth.user());
-        setPassword(auth.password());
-        return true;
-    }
+    auto possibleCredentials = getPossibleCredentials(manufacturer, model);
 
     calcTimeDrift();
 
-    PasswordList passwords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
-    PasswordList::ConstIterator passwdIter = passwords.begin();
+    auto passwords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
 
-    QString login;
-    QString passwd;
-    int soapRes = SOAP_OK;
-    do {
+    for (const auto& creds: passwords)
+    {
+        QAuthenticator auth;
+        auth.setUser(creds.first);
+        auth.setPassword(creds.second);
+
+        possibleCredentials.insert(auth);
+    }
+
+    for (const auto& auth: possibleCredentials)
+    {
         if (QnResource::isStopping())
             return false;
 
-        QTime timer;
-        timer.restart();
+        setLogin(auth.user());
+        setPassword(auth.password());
 
-        setLogin(login);
-        setPassword(passwd);
+        NetIfacesReq request;
+        NetIfacesResp response;
+        auto soapRes = getNetworkInterfaces(request, response);
 
-        NetIfacesReq request1;
-        NetIfacesResp response1;
-        soapRes = getNetworkInterfaces(request1, response1);
-
-        NX_LOG( QString::fromLatin1("Trying login = '%1' password = '%2'. url=%3. time = %4)").arg(login).arg(passwd).arg(getEndpointUrl()).arg(timer.elapsed()), cl_logDEBUG2 );
-
-        if (soapRes == SOAP_OK || !isNotAuthenticated()) {
-            NX_LOG( lit("Finished picking password"), cl_logDEBUG2 );
+        if (soapRes == SOAP_OK || !isNotAuthenticated())
             return soapRes == SOAP_OK;
-        }
-
-        if (passwdIter == passwords.end()) {
-#if 0
-            //If we had no luck in picking a password, let's try to create a user
-            qDebug() << "Trying to create a user admin/admin";
-            setLogin(QString());
-            setPassword(QString());
-
-            onvifXsd__User newUser;
-            newUser.Username = QString(DEFAULT_ONVIF_LOGIN).toStdString();
-            std::string pass = QString(DEFAULT_ONVIF_PASSWORD).toStdString();
-            newUser.Password = const_cast<std::string*>(&pass);
-
-            for (int i = 0; i <= 2; ++i) {
-                CreateUsersReq request2;
-                CreateUsersResp response2;
-
-                switch (i) {
-                    case 0: newUser.UserLevel = onvifXsd__UserLevel__Administrator; qDebug() << "Trying to create Admin"; break;
-                    case 1: newUser.UserLevel = onvifXsd__UserLevel__Operator; qDebug() << "Trying to create Operator"; break;
-                    case 2: newUser.UserLevel = onvifXsd__UserLevel__User; qDebug() << "Trying to create Regular User"; break;
-                    default: newUser.UserLevel = onvifXsd__UserLevel__Administrator; qWarning() << "OnvifResourceInformationFetcher::findResources: unknown user index."; break;
-                }
-                request2.User.push_back(&newUser);
-
-                soapRes = createUsers(request2, response2);
-                if (soapRes == SOAP_OK) {
-                    qDebug() << "User created!";
-                    setLogin(DEFAULT_ONVIF_LOGIN);
-                    setPassword(DEFAULT_ONVIF_PASSWORD);
-                    return true;
-                }
-
-                qDebug() << "User is NOT created";
-            }
-#endif
-
-            setLogin(QString());
-            setPassword(QString());
-            return false;
-        }
-
-        login = QString::fromUtf8(passwdIter->first);
-        passwd = QString::fromUtf8(passwdIter->second);
-        ++passwdIter;
-
-    } while (true);
+    }
 
     setLogin(QString());
     setPassword(QString());
