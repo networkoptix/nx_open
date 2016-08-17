@@ -50,7 +50,7 @@ private:
 
     QnMediaServerResourcePtr m_discoverer;
     QUrl m_url;
-    QString m_adminPassword;
+    QAuthenticator m_remoteOwnerCredentials;
     bool m_successfullyFinished;
 };
 

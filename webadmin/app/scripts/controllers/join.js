@@ -65,6 +65,9 @@ angular.module('webadminApp')
                 case 'CONFIGURATION_ERROR':
                     errorToShow = L.join.configError;
                     break;
+                case 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':
+                    errorToShow = L.join.cloudError;
+                    break;
                 case 'STARTER_LICENSE_ERROR':
                     errorToShow = L.join.licenceError;
                     dialogs.alert(errorToShow);

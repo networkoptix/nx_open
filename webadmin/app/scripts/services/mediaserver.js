@@ -107,16 +107,22 @@ angular.module('webadminApp')
                 }
                 return $q.reject();
             },
-            getNonce:function(login){
-               return $http.get(proxy + '/web/api/getNonce?userName=' + login);
+            getNonce:function(login, url){
+                if(url){
+                    if(url.indexOf("http:")==0 || url.indexOf("https:")==0){
+                        url = url.substring(url.indexOf("//") + 2);
+                    }
+                    proxy += '/proxy/https/' + url;
+                }
+                return $http.get(proxy + '/web/api/getNonce?userName=' + login);
             },
             logout:function(){
                 $localStorage.$reset();
                 return $http.post(proxy + '/web/api/cookieLogout');
             },
-            digest:function(login,password,realm,nonce){
+            digest:function(login,password,realm,nonce,post){
                 var digest = md5(login + ':' + realm + ':' + password);
-                var method = md5('GET:');
+                var method = md5(post?'POST:':'GET:');
                 var authDigest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
@@ -306,15 +312,27 @@ angular.module('webadminApp')
 
 
             mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
-                if(url.indexOf('http')!=0){
-                    url = 'http://' + url;
-                }
-                return wrapPost(proxy + '/web/api/mergeSystems?' + $.param({
-                    login: remoteLogin,
-                    password: remotePassword,
-                    url: url,
-                    takeRemoteSettings: !keepMySystem
-                }));
+                // 1. get remote nonce
+                // /proxy/http/{url}/api/getNonce
+                var self = this;
+                return self.getNonce(remoteLogin, url).then(function(data){
+                    // 2. calculate digest
+                    var realm = data.data.reply.realm;
+                    var nonce = data.data.reply.nonce;
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+
+                    // 3. pass it to merge request
+                    if(url.indexOf('http')!=0){
+                        url = 'https://' + url;
+                    }
+                    return wrapPost(proxy + '/web/api/mergeSystems?',{
+                        getKey: getKey,
+                        postKey: postKey,
+                        url: url,
+                        takeRemoteSettings: !keepMySystem
+                    });
+                });
             },
             pingSystem: function(url,login,password){
                 if(url.indexOf('http')!=0){
