@@ -82,7 +82,7 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            mediaserver.pingSystem($scope.settings.url, Config.defaultLogin, $scope.settings.password).then(function(r){
+            mediaserver.pingSystem($scope.settings.url, $scope.settings.login, $scope.settings.password).then(function(r){
                 if(r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
@@ -103,7 +103,7 @@ angular.module('webadminApp')
 
             // TODO: $scope.settings.currentPassword here
             mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
-                mediaserver.mergeSystems($scope.settings.url, Config.defaultLogin, $scope.settings.password,
+                mediaserver.mergeSystems($scope.settings.url, $scope.settings.login, $scope.settings.password,
                     $scope.settings.keepMySystem).then(function (r) {
                         if (r.data.error !== '0') {
                             var errorToShow = errorHandler(r.data.errorString);
