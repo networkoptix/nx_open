@@ -43,6 +43,8 @@ public:
     void at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status);
     void at_cloudStatusWatcher_error();
 
+    void showCredentialsError(bool show);
+
 public:
     QnBusyIndicatorWidget* busyIndicator;
 };
@@ -114,6 +116,13 @@ void QnLoginToCloudDialog::setLogin(const QString& login)
     ui->loginInputField->setText(login);
 }
 
+void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)
+{
+    Q_Q(QnLoginToCloudDialog);
+    q->ui->invalidCredentialsLabel->setVisible(show);
+    q->ui->containerWidget->layout()->activate();
+}
+
 QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent) :
     QObject(parent),
     q_ptr(parent),
@@ -129,7 +138,7 @@ void QnLoginToCloudDialogPrivate::updateUi()
         q->ui->loginInputField->isValid() &&
         q->ui->passwordInputField->isValid());
 
-    q->ui->invalidCredentialsLabel->hide();
+    showCredentialsError(false);
 }
 
 void QnLoginToCloudDialogPrivate::lockUi(bool locked)
@@ -138,12 +147,8 @@ void QnLoginToCloudDialogPrivate::lockUi(bool locked)
 
     const bool enabled = !locked;
 
-    q->ui->loginInputField->setEnabled(enabled);
-    q->ui->passwordInputField->setEnabled(enabled);
-    q->ui->stayLoggedInChackBox->setEnabled(enabled);
-    q->ui->learnMoreLabel->setEnabled(enabled);
-    q->ui->restorePasswordLabel->setEnabled(enabled);
-    q->ui->createAccountLabel->setEnabled(enabled);
+    q->ui->logoPanel->setEnabled(enabled);
+    q->ui->containerWidget->setEnabled(enabled);
     q->ui->loginButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
 
     q->ui->logoPanel->graphicsEffect()->setEnabled(locked);
@@ -164,7 +169,7 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     Q_Q(QnLoginToCloudDialog);
 
-    q->ui->invalidCredentialsLabel->hide();
+    showCredentialsError(false);
 
     qnCloudStatusWatcher->setCloudCredentials(QString(), QString());
 
@@ -207,9 +212,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     {
         case QnCloudStatusWatcher::InvalidCredentials:
         {
-            Q_Q(QnLoginToCloudDialog);
-            q->ui->invalidCredentialsLabel->show();
-            q->ui->containerWidget->layout()->activate();
+            showCredentialsError(true);
             break;
         }
         case QnCloudStatusWatcher::UnknownError:
