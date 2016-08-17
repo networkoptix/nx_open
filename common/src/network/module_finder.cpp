@@ -259,6 +259,9 @@ ec2::ApiDiscoveredServerDataList QnModuleFinder::discoveredServers() const
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const
 {
+    if (moduleId == qnCommon->moduleGUID())
+        return qnCommon->moduleInformation();
+
     QnMutexLocker lk(&m_itemsMutex);
     return m_moduleItemById.value(moduleId).moduleInformation;
 }

@@ -6,10 +6,12 @@
 #include <QtQml/QQmlContext>
 
 #include <common/common_module.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 
 #include <watchers/cloud_status_watcher.h>
-
 #include <utils/common/delayed.h>
+#include <utils/common/app_info.h>
 #include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -22,6 +24,7 @@
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
+#include <ui/workbench/workbench_resource.h>
 
 namespace
 {
@@ -74,6 +77,14 @@ namespace
         const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
         NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
         return (style ? style->genericPalette() : QnGenericPalette());
+    }
+
+
+    QnResourceList extractResources(const UrlsList& urls)
+    {
+        QMimeData data;
+        data.setUrls(urls);
+        return QnWorkbenchResource::deserializeResources(&data);
     }
 }
 
@@ -213,6 +224,25 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
 
     m_receivingResources = value;
     emit globalPreloaderVisibleChanged();
+}
+
+QString QnWorkbenchWelcomeScreen::softwareVersion() const
+{
+    return lit("%1").arg(QnAppInfo::applicationVersion());
+}
+
+bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
+{
+    return !extractResources(urls).isEmpty();
+}
+
+void QnWorkbenchWelcomeScreen::makeDrop(const UrlsList& urls)
+{
+    const auto resources = extractResources(urls);
+    if (resources.isEmpty())
+        return;
+
+    menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources));
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(

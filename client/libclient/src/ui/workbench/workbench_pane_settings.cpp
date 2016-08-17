@@ -12,7 +12,7 @@ namespace Qn
             { Qn::WorkbenchPane::Title,         QnPaneSettings(Qn::PaneState::Opened) },
             { Qn::WorkbenchPane::Tree,          QnPaneSettings(Qn::PaneState::Opened, 250) },
             { Qn::WorkbenchPane::Notifications, QnPaneSettings(Qn::PaneState::Opened) },
-            { Qn::WorkbenchPane::Navigation,    QnPaneSettings(Qn::PaneState::Opened) },
+            { Qn::WorkbenchPane::Navigation,    QnPaneSettings(Qn::PaneState::Unpinned) },
             { Qn::WorkbenchPane::Calendar,      QnPaneSettings(Qn::PaneState::Unpinned) },
             { Qn::WorkbenchPane::Thumbnails,    QnPaneSettings(Qn::PaneState::Closed, 48) } };
 

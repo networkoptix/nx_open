@@ -95,7 +95,8 @@ bool QnLayoutExportTool::prepareStorage()
 #ifdef Q_OS_WIN
     if (isExeFile)
     {
-        if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
+        //TODO: #GDM handle other errors
+        if (QnNovLauncher::createLaunchingFile(m_realFilename) != QnNovLauncher::ErrorCode::Ok)
         {
             m_errorMessage = tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).completeBaseName());
             emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required

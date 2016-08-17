@@ -280,4 +280,28 @@ Rectangle
         visible: context.connectingToSystem.length;
     }
 
+    DropArea
+    {
+        anchors.fill: parent;
+        onDropped:
+        {
+            context.makeDrop(drop.urls);
+        }
+
+        onEntered:
+        {
+            drag.accepted = context.isAcceptableDrag(drag.urls);
+        }
+    }
+
+    NxLabel
+    {
+        x: 8;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 8;
+
+        text: context.softwareVersion;
+        standardColor: Style.darkerColor(Style.colors.windowText, 1);
+        font: Qt.font({ pixelSize: 11, weight: Font.Normal})
+    }
 }

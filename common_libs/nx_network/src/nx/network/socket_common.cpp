@@ -285,7 +285,7 @@ QString SocketAddress::toString() const
             (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
 }
 
-QUrl SocketAddress::toUrl(const QString& scheme)
+QUrl SocketAddress::toUrl(const QString& scheme) const
 {
     QUrl url;
     url.setScheme(scheme.isEmpty() ? lit("http") : scheme);

@@ -120,7 +120,7 @@ void QnAdvancedSettingsWidget::at_browseLogsButton_clicked()
 
 void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 {
-    QString backgroundImage = qnSettings->background().imageName;
+    QString backgroundImage = qnSettings->backgroundImage().name;
     /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty())
     {

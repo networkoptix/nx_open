@@ -51,8 +51,11 @@ public:
     QMovie* newMovie(const QString& name, QObject* parent = nullptr);
     QMovie* newMovie(const char* name, QObject* parent = nullptr);
 
-    static QSize maximumSize(const QIcon& icon, QWindow* window = nullptr,
-        QIcon::Mode mode = QIcon::Normal, QIcon::State state = QIcon::Off);
+    static QSize maximumSize(const QIcon& icon, QIcon::Mode mode = QIcon::Normal,
+        QIcon::State state = QIcon::Off, QWindow* window = nullptr);
+
+    static QPixmap maximumSizePixmap(const QIcon& icon, QIcon::Mode mode = QIcon::Normal,
+        QIcon::State state = QIcon::Off, QWindow* window = nullptr);
 
     static QStyle* newStyle(const QnGenericPalette& genericPalette);
 

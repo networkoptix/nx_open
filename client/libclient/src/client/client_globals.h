@@ -242,25 +242,12 @@ namespace Qn
     Q_DECLARE_FLAGS(LightModeFlags, LightModeFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(LightModeFlags)
 
-    enum ClientSkin
+    enum class ImageBehaviour
     {
-        DarkSkin,
-        LightSkin
-    };
-
-    enum BackgroundAnimationMode
-    {
-        DefaultAnimation,
-        RainbowAnimation,
-        CustomAnimation
-    };
-
-    enum ImageBehaviour
-    {
-        StretchImage,
-        CropImage,
-        FitImage,
-        TileImage
+        Stretch,
+        Crop,
+        Fit,
+        Tile
     };
 
     /**
@@ -312,42 +299,16 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour)(Qn::PaneState)(Qn::WorkbenchPane),
-    (metatype)(lexical)(datastream)
+    (Qn::ImageBehaviour),
+    (metatype)(lexical)
+    )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::PaneState)(Qn::WorkbenchPane),
+    (metatype)(lexical)
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::LightModeFlags)(Qn::ShowOnceMessages),
     (metatype)(numeric)
     )
-
-
-//TODO: #GDM #2.4 move back to client_model_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.
-//Looks like problem is in gcc-4.8.1
-
-inline QDataStream &operator<<(QDataStream &stream, const Qn::BackgroundAnimationMode &value)
-{
-    return stream << static_cast<int>(value);
-}
-
-inline QDataStream &operator>>(QDataStream &stream, Qn::BackgroundAnimationMode &value)
-{
-    int tmp;
-    stream >> tmp;
-    value = static_cast<Qn::BackgroundAnimationMode>(tmp);
-    return stream;
-}
-
-inline QDataStream &operator<<(QDataStream &stream, const Qn::ImageBehaviour &value)
-{
-    return stream << static_cast<int>(value);
-}
-
-inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value)
-{
-    int tmp;
-    stream >> tmp;
-    value = static_cast<Qn::ImageBehaviour>(tmp);
-    return stream;
-}
-
