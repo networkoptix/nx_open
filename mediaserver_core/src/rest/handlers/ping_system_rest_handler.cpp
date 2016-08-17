@@ -22,7 +22,7 @@ int QnPingSystemRestHandler::executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
-        const QnRestConnectionProcessor*)
+        const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
@@ -56,8 +56,10 @@ int QnPingSystemRestHandler::executeGet(
         moduleInformation = remoteModuleInformation(url, getKey, status);
         if (status != CL_HTTP_SUCCESS)
         {
-            if (status == CL_HTTP_AUTH_REQUIRED)
+            if (status == nx_http::StatusCode::unauthorized)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
+            else if (status == nx_http::StatusCode::forbidden)
+                result.setError(QnJsonRestResult::CantProcessRequest, lit("FORBIDDEN"));
             else
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
             return CODE_OK;
@@ -118,7 +120,7 @@ QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
 {
     CLSimpleHTTPClient client(url, defaultTimeoutMs, QAuthenticator());
     status = client.doGET(
-        lit("api/moduleInformationAuthenticated?%1=%2").
+        lit("api/moduleInformationAuthenticated?checkOwnerPermissions=true&%1=%2").
         arg(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME)).arg(getKey));
 
     if (status != CL_HTTP_SUCCESS)

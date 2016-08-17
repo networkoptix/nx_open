@@ -38,6 +38,8 @@
 #include <rest/server/json_rest_result.h>
 #include <api/model/system_settings_reply.h>
 #include "api/model/password_data.h"
+#include <rest/helpers/permissions_helper.h>
+#include <rest/server/rest_connection_processor.h>
 
 namespace
 {
@@ -182,7 +184,7 @@ int QnMergeSystemsRestHandler::execute(
         client.setMessageBodyReadTimeoutMs(requestTimeout);
 
         QUrl requestUrl(url);
-        requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
+        requestUrl.setPath(lit("/api/moduleInformationAuthenticated?checkOwnerPermissions=true"));
         requestUrl.setQuery(lit("showAddresses=true"));
         addAuthToRequest(requestUrl, data.getKey);
 
@@ -194,6 +196,8 @@ int QnMergeSystemsRestHandler::execute(
                 cl_logDEBUG1);
             if (status == nx_http::StatusCode::unauthorized)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
+            else if (status == nx_http::StatusCode::unauthorized)
+                result.setError(QnJsonRestResult::CantProcessRequest, lit("FORBIDDEN"));
             else
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
             return nx_http::StatusCode::ok;
