@@ -561,33 +561,43 @@ struct ModifyCameraAttributesAccess
     }
 };
 
-bool modifyCameraAttributesListAccess(const Qn::UserAccessData& accessData, const ApiCameraAttributesDataList& param)
+struct ModifyCameraAttributesListAccess
 {
-	if (accessData == Qn::kSystemAccess)
-		return true;
+	ModifyCameraAttributesListAccess() = default;
+	ModifyCameraAttributesListAccess(const ModifyCameraAttributesListAccess&) = default;
+	ModifyCameraAttributesListAccess(ModifyCameraAttributesListAccess&&) = default;
 
-	for (const auto& p: param)
-		if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
-			return false;
+	ModifyCameraAttributesListAccess& operator = (const ModifyCameraAttributesListAccess&) = default;
+	ModifyCameraAttributesListAccess& operator = (ModifyCameraAttributesListAccess&&) = default;
 
-	QnCamLicenseUsageHelper licenseUsageHelper;
-	QnVirtualCameraResourceList cameras;
-
-	for (const auto& p: param)
+	bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesDataList& param)
 	{
-		auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
-		if (!camera)
-			return false;
-		cameras.push_back(camera);
-		licenseUsageHelper.propose(camera, p.scheduleEnabled);
+		if (accessData == Qn::kSystemAccess)
+			return true;
+
+		for (const auto& p: param)
+			if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
+				return false;
+
+		QnCamLicenseUsageHelper licenseUsageHelper;
+		QnVirtualCameraResourceList cameras;
+
+		for (const auto& p: param)
+		{
+			auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
+			if (!camera)
+				return false;
+			cameras.push_back(camera);
+			licenseUsageHelper.propose(camera, p.scheduleEnabled);
+		}
+
+		for (const auto& camera: cameras)
+			if (licenseUsageHelper.isOverflowForCamera(camera))
+				return false;
+
+		return true;
 	}
-
-	for (const auto& camera: cameras)
-		if (licenseUsageHelper.isOverflowForCamera(camera))
-			return false;
-
-	return true;
-}
+};
 
 struct ReadServerAttributesAccess
 {
