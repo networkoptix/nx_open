@@ -578,7 +578,7 @@ struct ModifyCameraAttributesListAccess
 
         for (const auto& p: param)
         {
-            auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
+            auto camera = qnResPool->getResourceById(p.cameraID).template dynamicCast<QnVirtualCameraResource>();
             if (!camera)
                 return false;
             cameras.push_back(camera);
