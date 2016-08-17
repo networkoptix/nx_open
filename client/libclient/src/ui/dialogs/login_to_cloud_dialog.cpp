@@ -86,6 +86,13 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 
+    auto opacityEffect = new QGraphicsOpacityEffect(this);
+    opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
+    ui->logoPanel->setGraphicsEffect(opacityEffect);
+    opacityEffect = new QGraphicsOpacityEffect(this);
+    opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
+    ui->linksWidget->setGraphicsEffect(opacityEffect);
+
     ui->loginInputField->setFocus();
     d->updateUi();
     d->lockUi(false);
@@ -124,10 +131,16 @@ void QnLoginToCloudDialogPrivate::lockUi(bool locked)
 {
     Q_Q(QnLoginToCloudDialog);
 
-    q->ui->loginInputField->setReadOnly(locked);
-    q->ui->passwordInputField->setReadOnly(locked);
+    q->ui->loginInputField->setEnabled(!locked);
+    q->ui->passwordInputField->setEnabled(!locked);
     q->ui->stayLoggedInChackBox->setEnabled(!locked);
+    q->ui->learnMoreLabel->setEnabled(!locked);
+    q->ui->restorePasswordLabel->setEnabled(!locked);
+    q->ui->createAccountLabel->setEnabled(!locked);
     q->ui->loginButton->setEnabled(!locked);
+
+    q->ui->logoPanel->graphicsEffect()->setEnabled(locked);
+    q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
 
     q->ui->loginButton->setText(locked ? QString() : tr("Login"));
     busyIndicator->setVisible(locked);
