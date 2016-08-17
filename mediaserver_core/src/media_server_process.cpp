@@ -232,6 +232,7 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
+#include <rest/helpers/permissions_helper.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2308,7 +2309,8 @@ void MediaServerProcess::run()
 	addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
-    if (isNewServerInstance || systemName.isDefault())
+    if (!QnPermissionsHelper::isSafeMode() &&
+        (isNewServerInstance || systemName.isDefault()))
     {
         /* In case of error it will be instantly cleaned by the watcher. */
         qnGlobalSettings->resetCloudParams();
