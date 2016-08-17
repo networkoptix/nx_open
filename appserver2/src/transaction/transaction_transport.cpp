@@ -83,6 +83,49 @@ namespace ConnectionType
 }
 
 
+/************************************************************
+*   class QnTransactionTransport::ConnectionLockGuard
+*************************************************************/
+
+ConnectionLockGuard::ConnectionLockGuard()
+{
+}
+
+ConnectionLockGuard::ConnectionLockGuard(const QnUuid& peerGuid)
+:
+    m_peerGuid(peerGuid)
+{
+}
+
+ConnectionLockGuard::ConnectionLockGuard(ConnectionLockGuard&& rhs)
+{
+    m_peerGuid = std::move(rhs.m_peerGuid);
+    rhs.m_peerGuid = QnUuid();
+}
+
+ConnectionLockGuard& ConnectionLockGuard::operator=(ConnectionLockGuard&& rhs)
+{
+    if (this == &rhs)
+        return *this;
+    m_peerGuid = std::move(rhs.m_peerGuid);
+    rhs.m_peerGuid = QnUuid();
+    return *this;
+}
+
+ConnectionLockGuard::~ConnectionLockGuard()
+{
+    if (!m_peerGuid.isNull())
+        QnTransactionTransport::connectDone(m_peerGuid);
+}
+
+/** \a true if peer connection lock has been acquired */
+bool ConnectionLockGuard::acquired() const
+{
+    return !m_peerGuid.isNull();
+}
+
+
+
 static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
 //following value is for VERY slow networks and VERY large transactions (e.g., some large image)
@@ -126,6 +169,7 @@ void QnTransactionTransport::default_initializer()
 
 QnTransactionTransport::QnTransactionTransport(
     const QnUuid& connectionGuid,
+    ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
     QSharedPointer<AbstractStreamSocket> socket,
@@ -142,6 +186,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_peerRole = prAccepting;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
+    m_connectionLockGuard = std::move(connectionLockGuard);
 
     using namespace std::chrono;
     if (!m_outgoingDataSocket->setSendTimeout(
@@ -296,9 +341,6 @@ QnTransactionTransport::~QnTransactionTransport()
     closeSocket();
     //not calling QnTransactionTransport::close since it will emit stateChanged,
         //which can potentially lead to some trouble
-
-    if (m_connected)
-        connectDone(m_remotePeer.id);
 
     if (m_ttFinishCallback)
         m_ttFinishCallback();
@@ -636,17 +678,20 @@ void QnTransactionTransport::connectingCanceledNoLock(const QnUuid& remoteGuid, 
     }
 }
 
-bool QnTransactionTransport::tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator)
+ConnectionLockGuard QnTransactionTransport::tryAcquireConnected(
+    const QnUuid& remoteGuid,
+    bool isOriginator)
 {
     QnMutexLocker lock( &m_staticMutex );
     bool isExist = m_existConn.contains(remoteGuid);
     bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
     bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
-    if (!fail) {
-        m_existConn << remoteGuid;
-        connectingCanceledNoLock(remoteGuid, isOriginator);
-    }
-    return !fail;
+    if (fail)
+        return ConnectionLockGuard();
+    
+    m_existConn << remoteGuid;
+    connectingCanceledNoLock(remoteGuid, isOriginator);
+    return ConnectionLockGuard(remoteGuid);
 }
 
 void QnTransactionTransport::connectDone(const QnUuid& id)
@@ -1378,12 +1423,15 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         }
 
         m_httpClient.reset();
-        if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
+        m_connectionLockGuard = QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true);
+        if (m_connectionLockGuard.acquired())
+        {
             setExtraDataBuffer(data);
             m_peerRole = prOriginating;
             setState(QnTransactionTransport::Connected);
         }
-        else {
+        else
+        {
             cancelConnecting();
         }
     }
