@@ -242,7 +242,10 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
         break;
     }
     case QnMergeSystemsTool::AuthentificationError:
-        updateErrorLabel(tr("The password is invalid."));
+        updateErrorLabel(tr("The password or user name is invalid."));
+        break;
+    case QnMergeSystemsTool::ForbiddenError:
+        updateErrorLabel(tr("This user have not permissions for requested operation."));
         break;
     case QnMergeSystemsTool::VersionError:
         updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
@@ -291,8 +294,10 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         switch (errorCode)
         {
         case QnMergeSystemsTool::AuthentificationError:
-            message = tr("The password is invalid.");
+            message = tr("The password or user name is invalid.");
             break;
+        case QnMergeSystemsTool::ForbiddenError:
+            updateErrorLabel(tr("This user have not permissions for requested operation."));
         case QnMergeSystemsTool::VersionError:
             message = tr("System has an incompatible version.");
             break;

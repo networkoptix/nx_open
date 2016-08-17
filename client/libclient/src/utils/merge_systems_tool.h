@@ -16,6 +16,7 @@ public:
         NoError,
         VersionError,
         AuthentificationError,
+        forbiddenError,
         BackupError,
         NotFoundError,
         StarterLicenseError,

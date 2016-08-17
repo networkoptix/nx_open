@@ -72,6 +72,7 @@ void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModu
         switch (errorCode)
         {
         case QnMergeSystemsTool::AuthentificationError:
+        case QnMergeSystemsTool::ForbiddenError:
             m_error = AuthentificationFailed;
             break;
         default:
