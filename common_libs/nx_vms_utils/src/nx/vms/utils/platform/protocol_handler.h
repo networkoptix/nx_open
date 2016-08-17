@@ -7,6 +7,13 @@ namespace utils {
 
 class SoftwareVersion;
 
+} // namespace utils
+} // namespace nx
+
+namespace nx {
+namespace vms {
+namespace utils {
+
 #if defined(Q_OS_WIN) || defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 
     /**
@@ -20,7 +27,7 @@ NX_UTILS_API bool registerSystemUriProtocolHandler(
     const QString& macOsBundleId,
     const QString& description,
     const QString& customization,
-    const SoftwareVersion& version);
+    const nx::utils::SoftwareVersion& version);
 #endif
 #if defined(Q_OS_WIN)
 NX_UTILS_API bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStringList& parameters);
@@ -28,4 +35,5 @@ NX_UTILS_API bool runAsAdministratorWithUAC(const QString& applicationBinaryPath
 
 
 } // namespace utils
+} // namespace vms
 } // namespace nx

@@ -5,9 +5,13 @@
 #include <QtCore/QSettings>
 #include <nx/utils/software_version.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/utils/desktop_file_linux.h>
 
 namespace nx {
+namespace vms {
 namespace utils {
+
+using nx::utils::SoftwareVersion;
 
 bool registerSystemUriProtocolHandler(
     const QString& protocol,
@@ -26,12 +30,10 @@ bool registerSystemUriProtocolHandler(
 
     const QString handlerFile(QDir(appsLocation).filePath(protocol + lit(".desktop")));
 
-    const QString kEntry(lit("Desktop Entry"));
-
     if (QFile::exists(handlerFile))
     {
         QScopedPointer<QSettings> settings(new QSettings(handlerFile, QSettings::IniFormat));
-        settings->beginGroup(kEntry);
+        settings->beginGroup(lit("Desktop Entry"));
         SoftwareVersion existingVersion(settings->value(lit("Version")).toString());
         if (existingVersion > version)
             return true;
@@ -42,28 +44,17 @@ bool registerSystemUriProtocolHandler(
         }
     }
 
-    // We can't use QSettings to write the file because it escapes spaces in the group names.
-    // This behavior cannot be changed.
+    bool ok = createDesktopFile(
+        handlerFile,
+        applicationBinaryPath,
+        applicationName,
+        description,
+        customization,
+        version,
+        protocol);
 
-    QFile file(handlerFile);
-    if (!file.open(QFile::WriteOnly))
+    if (!ok)
         return false;
-
-    QString result(lit("[%1]\n").arg(kEntry));
-
-    result += lit("Version=%1\n").arg(version.toString());
-    result += lit("Name=%1\n").arg(applicationName);
-    result += lit("Exec=%1 %u\n").arg(applicationBinaryPath);
-    result += lit("Comment=%1\n").arg(description);
-    result += lit("Icon=vmsclient-%1.png\n").arg(customization);
-    result += lit("Type=%1\n").arg(lit("Application"));
-    result += lit("StartupNotify=%1\n").arg(lit("true"));
-    result += lit("Terminal=%1\n").arg(lit("false"));
-    result += lit("NoDisplay=%1\n").arg(lit("true"));
-    result += lit("MimeType=x-scheme-handler/%1\n").arg(protocol);
-
-    file.write(result.toUtf8());
-    file.close();
 
     NX_LOG(lit("Scheme handler file updated: %1").arg(handlerFile), cl_logINFO);
 
@@ -71,4 +62,5 @@ bool registerSystemUriProtocolHandler(
 }
 
 } // namespace utils
+} // namespace vms
 } // namespace nx
