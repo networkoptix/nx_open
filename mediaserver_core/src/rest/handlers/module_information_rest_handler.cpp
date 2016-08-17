@@ -35,7 +35,7 @@ int QnModuleInformationRestHandler::executeGet(
 
     bool allModules = params.value(lit("allModules")) == lit("true");
     bool useAddresses = params.value(lit("showAddresses"), lit("true")) != lit("false");
-    bool checkOwnerPermissions = params.value(lit("checkOwnerPermissions"), lit("true")) != lit("false");
+    bool checkOwnerPermissions = params.value(lit("checkOwnerPermissions"), lit("false")) != lit("false");
 
     if (checkOwnerPermissions)
     {
