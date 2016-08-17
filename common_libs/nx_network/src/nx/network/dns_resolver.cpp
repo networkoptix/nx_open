@@ -104,7 +104,7 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
             default: code = SystemError::dnsServerFailure; break;
         };
 
-        SystemError::setLastErrorCode( SystemError::dnsServerFailure );
+        SystemError::setLastErrorCode( code );
         return false;
     }
 

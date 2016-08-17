@@ -10,7 +10,7 @@
 
 TEST(ArgumentParser, common)
 {
-    char* argv[] = {"/path/to/bin", "-a", "aaa", "--arg1=arg1", "--arg2", "-b", "-c", "ccc", "-ddd", "val_ddd", "-e", "eee", "--arg3=" };
+    const char* argv[] = {"/path/to/bin", "-a", "aaa", "--arg1=arg1", "--arg2", "-b", "-c", "ccc", "-ddd", "val_ddd", "-e", "eee", "--arg3=" };
     const auto argc = sizeof(argv) / sizeof(*argv);
 
     nx::utils::ArgumentParser args(argc, argv);

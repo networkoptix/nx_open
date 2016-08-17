@@ -167,6 +167,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     QString message;
     switch (errorCode)
     {
+        case QnCloudStatusWatcher::NoError:
+            break;
         case QnCloudStatusWatcher::InvalidCredentials:
             message = tr("Login or password is invalid");
             break;

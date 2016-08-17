@@ -28,7 +28,7 @@ void printHelp()
         << std::endl;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
     nx::utils::ArgumentParser args(argc, argv);
     if (args.get("help"))

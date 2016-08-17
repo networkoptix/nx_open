@@ -7,7 +7,7 @@
 
 #include "ptz_preset.h"
 
-bool deserialize(const QString& value, QnPtzPresetRecordHash* target)
+bool deserialize(const QString& /*value*/, QnPtzPresetRecordHash* /*target*/)
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
     return false;
@@ -99,7 +99,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
     bool status = false;
     {
         QnMutexLocker locker(&m_mutex);
-        if (status = doPresetsAction(createPresetActionFunc, preset))
+        if ((status = doPresetsAction(createPresetActionFunc, preset)))
             m_camera->saveParamsAsync();
     }
 
@@ -128,7 +128,7 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset)
     bool status = false;
     {
         QnMutexLocker locker(&m_mutex);
-        if (status = doPresetsAction(updatePresetActionFunc, preset))
+        if ((status = doPresetsAction(updatePresetActionFunc, preset)))
         {
             NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot update preset since corresponding resource does not exist.");
             m_camera->saveParamsAsync();
@@ -154,7 +154,7 @@ bool QnPresetPtzController::removePreset(const QString &presetId)
     bool status = false;
     {
         QnMutexLocker locker(&m_mutex);
-        if (status = doPresetsAction(removePresetActionFunc, QnPtzPreset(presetId, QString())))
+        if ((status = doPresetsAction(removePresetActionFunc, QnPtzPreset(presetId, QString()))))
         {
             NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot remove preset since correspondent resource does not exist.");
             m_camera->saveParamsAsync();

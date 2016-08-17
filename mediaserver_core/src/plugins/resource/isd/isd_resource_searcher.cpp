@@ -413,7 +413,7 @@ bool QnPlISDResourceSearcher::processPacket(
     const QHostAddress& discoveryAddr,
     const SocketAddress& deviceEndpoint,
     const nx_upnp::DeviceInfo& devInfo,
-    const QByteArray& xmlDevInfo)
+    const QByteArray& /*xmlDevInfo*/)
 {
 
 	QN_UNUSED(discoveryAddr);

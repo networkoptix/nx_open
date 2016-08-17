@@ -244,8 +244,6 @@ private:
     QnMutex m_mutex;
 };
 
-Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);
-
 bool QnLog::s_disableLogConfiguration(false);
 
 QnLog::QnLog()

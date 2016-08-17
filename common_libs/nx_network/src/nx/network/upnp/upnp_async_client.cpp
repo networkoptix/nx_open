@@ -48,9 +48,9 @@ public:
         return true;
     }
 
-    virtual bool endElement( const QString& namespaceURI,
-                             const QString& localName,
-                             const QString& qName ) override
+    virtual bool endElement( const QString& /*namespaceURI*/,
+                             const QString& /*localName*/,
+                             const QString& /*qName*/ ) override
     {
         m_awaitedValue = 0;
         return true;

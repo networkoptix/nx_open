@@ -239,7 +239,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
         user->setEmail(ldapUser.email);
         user->generateHash();
 
-        qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &user){});
+        qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     }
 }
 

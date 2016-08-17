@@ -166,7 +166,7 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
 void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 {
     QList<Qt::DayOfWeek> days;
-    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i) {
         Qt::DayOfWeek day = indexToDay(i);
         QCheckBox* checkbox = m_dowCheckboxes[i];
         if (checkbox->isChecked())

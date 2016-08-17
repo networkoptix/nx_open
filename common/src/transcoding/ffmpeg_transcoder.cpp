@@ -360,7 +360,7 @@ bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
 int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
 {
     Q_UNUSED(result)
-    if ((quint64)m_baseTime == AV_NOPTS_VALUE)
+    if (m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - m_startTimeOffset;
 
     if (m_audioCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)

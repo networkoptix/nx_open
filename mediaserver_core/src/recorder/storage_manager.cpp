@@ -1199,7 +1199,7 @@ void QnStorageManager::getRecordedPeriodsInternal(
     const QnVirtualCameraResourceList &cameras,
     qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
     const QList<QnServer::ChunksCatalog> &catalogs,
-    int limit)
+    int /*limit*/)
 {
     for (const QnVirtualCameraResourcePtr &camera: cameras) {
         QString cameraUniqueId = camera->getUniqueId();

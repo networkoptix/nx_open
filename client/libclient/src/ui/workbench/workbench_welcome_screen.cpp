@@ -409,6 +409,8 @@ bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
             m_widget->activateWindow(); //< QTBUG-34414 workaround
             break;
 #endif
+        default:
+            break;
     }
 
     return base_type::eventFilter(obj, event);

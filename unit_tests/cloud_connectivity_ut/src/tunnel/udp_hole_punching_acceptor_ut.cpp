@@ -200,7 +200,7 @@ protected:
             buffer->resize(0);
             socket->readSomeAsync(
                 buffer.get(),
-                [=](SystemError::ErrorCode code, size_t size)
+                [=](SystemError::ErrorCode code, size_t /*size*/)
                 {
                     ASSERT_EQ(code, SystemError::noError);
 

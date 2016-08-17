@@ -293,7 +293,7 @@ void QnDesktopAudioOnlyDataProvider::preprocessAudioBuffers(
 
     for( auto& preprocessItem: preprocessList)
     {
-        NX_ASSERT(preprocessItem->buffer.size() >= static_cast<size_t>(kFrameSizeInBytes));
+        NX_ASSERT(preprocessItem->buffer.size() >= static_cast<int>(kFrameSizeInBytes));
 
         auto frameBufferPtr = preprocessItem->frameBuffer;
         memcpy(

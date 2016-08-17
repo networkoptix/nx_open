@@ -974,7 +974,7 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
     auto hasItemsChange = [items = videoWallResource->items()->getItems(), update]
     {
         /* Quick check */
-        if (items.size() != update.items.size())
+        if ((size_t)items.size() != update.items.size())
             return true;
 
         for (auto updated : update.items)

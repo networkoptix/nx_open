@@ -333,7 +333,7 @@ void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& res
     }
 }
 
-void QnLayoutsModelUnsorted::at_serverFlagsChanged(const QnResourcePtr& resource)
+void QnLayoutsModelUnsorted::at_serverFlagsChanged(const QnResourcePtr& /*resource*/)
 {
 
 }

@@ -1294,8 +1294,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
     {
         const qint64 startTimeUSec = reader->startTime();
         const qint64 endTimeUSec = reader->endTime();
-        widgetLoaded = (quint64)startTimeUSec != AV_NOPTS_VALUE
-            && (quint64)endTimeUSec != AV_NOPTS_VALUE;
+        widgetLoaded = startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE;
 
         /* This can also be true if the current widget has no archive at all and all other synced widgets still have not received rtsp response. */
         bool noRecordedPeriodsFound = startTimeUSec == DATETIME_NOW;
@@ -1355,7 +1354,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 return DATETIME_NOW;
 
             qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
-            if ((quint64)timeUSec == AV_NOPTS_VALUE)
+            if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
 
             if (isSearch && timeUSec < 0)
