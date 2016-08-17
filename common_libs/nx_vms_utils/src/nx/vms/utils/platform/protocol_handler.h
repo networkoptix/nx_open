@@ -20,7 +20,7 @@ namespace utils {
      * Try to register system uri protocol handler.
      * @returns true if the handler registered successfully (or was already registered), false otherwise.
      */
-NX_UTILS_API bool registerSystemUriProtocolHandler(
+NX_VMS_UTILS_API bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
     const QString& applicationName,
@@ -29,8 +29,9 @@ NX_UTILS_API bool registerSystemUriProtocolHandler(
     const QString& customization,
     const nx::utils::SoftwareVersion& version);
 #endif
+
 #if defined(Q_OS_WIN)
-NX_UTILS_API bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStringList& parameters);
+NX_VMS_UTILS_API bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStringList& parameters);
 #endif
 
 
