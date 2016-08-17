@@ -4,7 +4,6 @@
 #include <fstream>
 #include <tchar.h>
 #include <Windows.h>
-#include <Msi.h>
 #include "version.h"
 #include <iostream>
 
