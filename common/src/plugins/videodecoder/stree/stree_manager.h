@@ -31,6 +31,10 @@ public:
         stree::AbstractResourceWriter* const output) const;
     const stree::ResourceNameSet& resourceNameSet() const;
 
+    static std::unique_ptr<stree::AbstractNode> loadStree(
+        QIODevice* const dataSource,
+        const stree::ResourceNameSet& resourceNameSet);
+
 private:
     std::unique_ptr<stree::AbstractNode> m_stree;
     const stree::ResourceNameSet& m_attrNameSet;

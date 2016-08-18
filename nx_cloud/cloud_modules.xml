@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<modules>
-<cdb>
-<endpoint>10.0.2.95:3346</endpoint>
-</cdb>
-<hpm>
-<!--AK's old PC-->
-<endpoint>10.0.2.175:3345</endpoint>
-</hpm>
-</modules>
+
+<sequence>
+
+    <!-- setting default cloud instance -->
+    <set resName="cloud.instance.name" resValue="cloud-demo.hdw.mx"/>
+
+    <!-- detecting cloud instance depending on VMS version -->
+    <condition resName="vms.version.build" matchType="intRange">
+        <set value="0-10000" resName="cloud.instance.name" resValue="alpha.nxvms.cloud"/>
+    </condition>
+
+    <!-- overriding for specific build (if needed) -->
+    <condition resName="vms.version.build">
+        <set value="4728" resName="cloud.instance.name" resValue="cloud-demo.hdw.mx"/>
+    </condition>
+
+
+    <!-- setting cloud module endpoints by instance name. This section needs modifications only if new cloud instance has been added -->
+    <condition resName="cloud.instance.name">
+        <sequence value="cloud-demo.hdw.mx">
+            <set resName="cdb.endpoint" resValue="cloud-demo.hdw.mx:3346"/>
+            <set resName="hpm.endpoint" resValue="cloud-demo.hdw.mx:3345"/>
+            <set resName="notification_module.endpoint" resValue="cloud-demo.hdw.mx:80"/>
+        </sequence>
+
+        <sequence value="alpha.nxvms.cloud">
+            <!-- TODO -->
+        </sequence>
+    </condition>
+
+</sequence>

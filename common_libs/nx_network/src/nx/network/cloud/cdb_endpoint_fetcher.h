@@ -20,12 +20,38 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 
+#include <plugins/videodecoder/stree/node.h>
+#include <plugins/videodecoder/stree/resourcenameset.h>
+
 #include "endpoint_selector.h"
 
 
 namespace nx {
 namespace network {
 namespace cloud {
+
+class CloudInstanceSelectionAttributeNameset
+    :
+    public stree::ResourceNameSet
+{
+public:
+    enum AttributeType
+    {
+        cloudInstanceName = 1,
+        vmsVersionMajor,
+        vmsVersionMinor,
+        vmsVersionBugfix,
+        vmsVersionBuild,
+        vmsVersionFull,
+        vmsBeta,
+        vmsCustomization,
+        cdbEndpoint,
+        hpmEndpoint,
+        notificationModuleEndpoint
+    };
+
+    CloudInstanceSelectionAttributeNameset();
+};
 
 //!Retrieves url to the specified cloud module
 class NX_NETWORK_API CloudModuleEndPointFetcher
@@ -64,16 +90,18 @@ private:
     mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
     nx_http::AsyncHttpClientPtr m_httpClient;
-    QString m_moduleName;
+    const CloudInstanceSelectionAttributeNameset m_nameset;
+    const int m_moduleAttrName;
     std::vector<nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)>>
         m_resolveHandlers;
     std::unique_ptr<AbstractEndpointSelector> m_endpointSelector;
     bool m_requestIsRunning;
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
-    bool parseCloudXml(
-        QByteArray xmlData,
-        std::vector<SocketAddress>* const endpoints);
+    bool findModuleEndpoint(
+        const stree::AbstractNode& treeRoot,
+        const int moduleAttrName,
+        SocketAddress* const moduleEndpoint);
     void signalWaitingHandlers(
         QnMutexLockerBase* const lk,
         nx_http::StatusCode::Value statusCode,
