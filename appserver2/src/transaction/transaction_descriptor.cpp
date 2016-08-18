@@ -563,32 +563,39 @@ struct ModifyCameraAttributesAccess
 
 struct ModifyCameraAttributesListAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesDataList& param)
+    void operator()(const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
     {
         if (accessData == Qn::kSystemAccess)
-            return true;
+            return;
 
-        for (const auto& p: param)
+        for (const auto& p : param)
             if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
-                return false;
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
 
         QnCamLicenseUsageHelper licenseUsageHelper;
         QnVirtualCameraResourceList cameras;
 
-        for (const auto& p: param)
+        for (const auto& p : param)
         {
             auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
             if (!camera)
-                return false;
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
             cameras.push_back(camera);
             licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }
 
-        for (const auto& camera: cameras)
+        for (const auto& camera : cameras)
             if (licenseUsageHelper.isOverflowForCamera(camera))
-                return false;
-
-        return true;
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
     }
 };
 

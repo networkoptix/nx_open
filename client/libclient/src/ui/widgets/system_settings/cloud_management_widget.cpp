@@ -37,11 +37,24 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     for (auto label: { ui->accountLabel, ui->promo1TextLabel, ui->promo2TextLabel, ui->promo3TextLabel })
         setPaletteColor(label, QPalette::WindowText, nxColor);
 
+    ui->arrow1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_arrow.png"));
+    ui->arrow2Label->setPixmap(*ui->arrow1Label->pixmap());
+
     ui->promo1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_1.png"));
     ui->promo2Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_2.png"));
     ui->promo3Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
 
     // TODO: #help Set help topic
+
+    ui->unlinkButton->setText(tr("Disconnect System from %1").arg(QnAppInfo::cloudName()));
+    ui->goToCloudButton->setText(tr("Open %1 Portal").arg(QnAppInfo::cloudName()));
+
+    ui->createAccountButton->setText(tr("Create %1 Account").arg(QnAppInfo::cloudName()));
+    ui->linkButton->setText(tr("Connect System to %1").arg(QnAppInfo::cloudName()));
+
+    ui->promo1TextLabel->setText(tr("1. Create %1\nAccount").arg(QnAppInfo::cloudName()));
+    ui->promo2TextLabel->setText(tr("2. Connect System\nto %1").arg(QnAppInfo::cloudName()));
+    ui->promo3TextLabel->setText(tr("3. Connect to Your Systems\nfrom Anywhere with any\nDevices"));
 
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about %1").arg(QnAppInfo::cloudName()),
                                          QnCloudUrlHelper::aboutUrl()));

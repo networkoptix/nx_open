@@ -52,6 +52,9 @@ private:
 
     void updateThumbnail(const QModelIndex& index = QModelIndex());
 
+    void handleResourceAdded(const QnResourcePtr& resource);
+    void refreshModel();
+
 signals:
     void controlsChanged(bool useAll);
 

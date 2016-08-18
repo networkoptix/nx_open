@@ -17,15 +17,22 @@
 
 #include <utils/common/html.h>
 
-#include <ui/style/custom_style.h>
+#include <ui/common/aligner.h>
+#include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/custom_style.h>
+#include <ui/widgets/common/busy_indicator.h>
+#include <ui/widgets/common/input_field.h>
 
 using namespace nx::cdb;
 
 namespace
 {
     QString kCreateAccountPath = lit("/static/index.html#/register");
+
+    const int kHeaderFontSizePixels = 15;
+    const int kHeaderFontWeight = QFont::DemiBold;
 
     rest::QnConnectionPtr getPublicServerConnection()
     {
@@ -50,12 +57,13 @@ class QnLinkToCloudDialogPrivate : public QObject
 public:
     QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *parent);
 
-    void lockUi(bool lock);
+    void updateUi();
+    void lockUi(bool locked);
     void bindSystem();
 
     void showSuccess();
     void showFailure(const QString &message = QString());
-    void showCredentialsFailure();
+    void showCredentialsError(bool show);
 
 private:
     void at_bindFinished(api::ResultCode result, const api::SystemData &systemData, const rest::QnConnectionPtr &connection);
@@ -66,39 +74,61 @@ public:
         decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
+    QnBusyIndicatorWidget* busyIndicator;
+    QString okTitle;
 };
 
-QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
-    : base_type(parent)
-    , ui(new Ui::QnLinkToCloudDialog)
-    , d_ptr(new QnLinkToCloudDialogPrivate(this))
+QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
+    base_type(parent),
+    ui(new Ui::QnLinkToCloudDialog),
+    d_ptr(new QnLinkToCloudDialogPrivate(this))
 {
     ui->setupUi(this);
 
+    QFont font;
+    font.setPixelSize(kHeaderFontSizePixels);
+    font.setWeight(kHeaderFontWeight);
+    ui->enterCloudAccountLabel->setFont(font);
+    ui->enterCloudAccountLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->enterCloudAccountLabel->setText(tr("Enter %1 Account").arg(QnAppInfo::cloudName()));
+    ui->enterCloudAccountLabel->setForegroundRole(QPalette::Light);
+
+    ui->loginInputField->setTitle(tr("E-Mail"));
+    ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
+
+    ui->passwordInputField->setTitle(tr("Password"));
+    ui->passwordInputField->setEchoMode(QLineEdit::Password);
+    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+    ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
+    ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::restorePasswordUrl()));
+
+    auto aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
+
+    auto opacityEffect = new QGraphicsOpacityEffect(this);
+    opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
+    ui->linksWidget->setGraphicsEffect(opacityEffect);
+
     Q_D(QnLinkToCloudDialog);
 
-    auto *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    auto updateOkButton = [this, okButton]()
-    {
-        okButton->setEnabled(!ui->accountLineEdit->text().isEmpty() &&
-                             !ui->passwordLineEdit->text().isEmpty());
-    };
+    //TODO: #vkutin Create a "QnIndicatorPushButton" and use it here and in QnLoginToCloudDialog
+    d->busyIndicator->setParent(ui->buttonBox->button(QDialogButtonBox::Ok));
 
-    ui->accountLineEdit->setText(qnSettings->cloudLogin());
-    ui->passwordLineEdit->setText(qnSettings->cloudPassword());
+    ui->loginInputField->setText(qnSettings->cloudLogin());
+    ui->passwordInputField->setText(qnSettings->cloudPassword());
 
-    connect(ui->accountLineEdit,    &QLineEdit::textChanged,            d,      updateOkButton);
-    connect(ui->passwordLineEdit,   &QLineEdit::textChanged,            d,      updateOkButton);
+    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLinkToCloudDialogPrivate::updateUi);
+    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLinkToCloudDialogPrivate::updateUi);
 
-    if (!ui->accountLineEdit->text().isEmpty() && !ui->passwordLineEdit->text().isEmpty())
-        okButton->setFocus();
-    else
-        ui->accountLineEdit->selectAll();
-
-    ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
     setWarningStyle(ui->invalidCredentialsLabel);
-    ui->invalidCredentialsLabel->hide();
-    updateOkButton();
+
+    d->lockUi(false);
+    d->updateUi();
+
+    ui->loginInputField->setFocus();
+
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnLinkToCloudDialog::~QnLinkToCloudDialog()
@@ -118,12 +148,15 @@ void QnLinkToCloudDialog::accept()
     base_type::accept();
 }
 
-QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
-    , linkedSuccessfully(false)
+QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog* parent) :
+    QObject(parent),
+    q_ptr(parent),
+    connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
+    linkedSuccessfully(false),
+    busyIndicator(new QnBusyIndicatorWidget(parent))
 {
+    new QnWidgetAnchor(busyIndicator);
+
     const auto cdbEndpoint = qnSettings->cdbEndpoint();
     if (!cdbEndpoint.isEmpty())
     {
@@ -137,18 +170,43 @@ QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *pare
     }
 }
 
-void QnLinkToCloudDialogPrivate::lockUi(bool lock)
+void QnLinkToCloudDialogPrivate::updateUi()
 {
     Q_Q(QnLinkToCloudDialog);
+    auto okButton = q->ui->buttonBox->button(QDialogButtonBox::Ok);
+    okButton->setEnabled(q->ui->loginInputField->isValid()
+                      && q->ui->passwordInputField->isValid());
 
-    const bool enabled = !lock;
+    showCredentialsError(false);
+};
 
-    q->ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
-    q->ui->createAccountLabel->setEnabled(enabled);
+
+void QnLinkToCloudDialogPrivate::showCredentialsError(bool show)
+{
+    Q_Q(QnLinkToCloudDialog);
+    q->ui->invalidCredentialsLabel->setVisible(show);
+    q->ui->credentialsWidget->layout()->activate();
+}
+
+void QnLinkToCloudDialogPrivate::lockUi(bool locked)
+{
+    Q_Q(QnLinkToCloudDialog);
+    const bool enabled = !locked;
+
     q->ui->credentialsWidget->setEnabled(enabled);
+    q->ui->enterCloudAccountLabel->setEnabled(enabled);
 
-    if (enabled)
-        q->ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();
+    q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
+
+    auto okButton = q->ui->buttonBox->button(QDialogButtonBox::Ok);
+    okButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
+    okButton->setFocus();
+
+    if (!okButton->text().isEmpty())
+        okTitle = okButton->text();
+
+    okButton->setText(locked ? QString() : okTitle);
+    busyIndicator->setVisible(locked);
 }
 
 void QnLinkToCloudDialogPrivate::bindSystem()
@@ -168,8 +226,8 @@ void QnLinkToCloudDialogPrivate::bindSystem()
     q->ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 
     cloudConnection = connectionFactory->createConnection(
-                          q->ui->accountLineEdit->text().toStdString(),
-                          q->ui->passwordLineEdit->text().toStdString());
+                          q->ui->loginInputField->text().trimmed().toStdString(),
+                          q->ui->passwordInputField->text().trimmed().toStdString());
 
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnCommon->localSystemName().toStdString();
@@ -196,7 +254,7 @@ void QnLinkToCloudDialogPrivate::showSuccess()
     QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             q->windowTitle(),
-                            tr("The system is successfully linked to %1").arg(q->ui->accountLineEdit->text()),
+                            tr("The system is successfully linked to %1").arg(q->ui->loginInputField->text().trimmed()),
                             QDialogButtonBox::Ok,
                             q->parentWidget());
 
@@ -220,17 +278,6 @@ void QnLinkToCloudDialogPrivate::showFailure(const QString &message)
         messageBox.setInformativeText(message);
 
     messageBox.exec();
-
-    lockUi(false);
-}
-
-void QnLinkToCloudDialogPrivate::showCredentialsFailure()
-{
-    Q_Q(QnLinkToCloudDialog);
-
-    q->ui->invalidCredentialsLabel->show();
-
-    lockUi(false);
 }
 
 void QnLinkToCloudDialogPrivate::at_bindFinished(
@@ -246,17 +293,17 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         {
         case api::ResultCode::badUsername:
         case api::ResultCode::notAuthorized:
-            showCredentialsFailure();
+            showCredentialsError(true);
             break;
         default:
             showFailure(QString()); // TODO: #dklychkov More detailed diagnostics
             break;
         }
+        lockUi(false);
         return;
     }
 
-    const auto &admin = qnResPool->getAdministrator();
-
+    const auto& admin = qnResPool->getAdministrator();
     if (!admin)
     {
         q->reject();
@@ -276,7 +323,7 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
     connection->saveCloudSystemCredentials(
         QString::fromStdString(systemData.id),
         QString::fromStdString(systemData.authKey),
-        q->ui->accountLineEdit->text(),
+        q->ui->loginInputField->text().trimmed(),
         handleReply,
         q->thread());
 }

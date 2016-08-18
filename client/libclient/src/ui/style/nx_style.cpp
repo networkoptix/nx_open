@@ -1640,7 +1640,7 @@ void QnNxStyle::drawControl(
                         rect.setBottom(textRect.bottom());
                         rect.setTop(rect.bottom());
                         focusRect.setLeft(rect.left() - kCompactTabFocusMargin);
-                        focusRect.setRight(rect.right() - kCompactTabFocusMargin);
+                        focusRect.setRight(rect.right() + kCompactTabFocusMargin);
                     }
                     else
                     {

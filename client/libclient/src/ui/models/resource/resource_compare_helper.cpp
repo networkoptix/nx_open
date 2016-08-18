@@ -1,5 +1,7 @@
 #include "resource_compare_helper.h"
 
+#include <client/client_globals.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 

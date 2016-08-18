@@ -17,14 +17,12 @@ namespace
     const int invalidPage = -1;
 }
 
-QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */, Qt::WindowFlags windowFlags /* = 0 */)
-    : base_type(parent, windowFlags)
-    , m_pages()
-    , m_tabWidget(nullptr)
-    , m_readOnly(false)
-    , m_updating(false)
+QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget* parent, Qt::WindowFlags windowFlags) :
+    base_type(parent, windowFlags),
+    m_pages(),
+    m_tabWidget(nullptr),
+    m_updating(false)
 {
-
 }
 
 int QnGenericTabbedDialog::currentPage() const
@@ -243,7 +241,7 @@ void QnGenericTabbedDialog::initializeTabWidget()
     if(m_tabWidget)
         return; /* Already initialized with a direct call to setTabWidget in derived class's constructor. */
 
-    QList<QTabWidget *> tabWidgets = findChildren<QTabWidget *>();
+    QList<QTabWidget *> tabWidgets = findChildren<QTabWidget *>(QString(), Qt::FindDirectChildrenOnly);
     if(tabWidgets.empty()) {
         qnWarning("QnGenericTabbedDialog '%1' doesn't have a QTabWidget.", metaObject()->className());
         return;
@@ -258,7 +256,7 @@ void QnGenericTabbedDialog::initializeTabWidget()
 
 bool QnGenericTabbedDialog::canApplyChanges() const
 {
-    if (m_readOnly)
+    if (isReadOnly())
         return false;
 
     return all_of(m_pages, [](const Page &page)
@@ -269,7 +267,7 @@ bool QnGenericTabbedDialog::canApplyChanges() const
 
 bool QnGenericTabbedDialog::canDiscardChanges() const
 {
-    if (m_readOnly)
+    if (isReadOnly())
         return true;
 
     return all_of(m_pages, [](const Page &page)
@@ -280,7 +278,7 @@ bool QnGenericTabbedDialog::canDiscardChanges() const
 
 bool QnGenericTabbedDialog::hasChanges() const
 {
-    if (m_readOnly)
+    if (isReadOnly())
         return false;
 
     return any_of(m_pages, [](const Page &page)
@@ -303,16 +301,10 @@ QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::modifiedPages() const
     return result;
 }
 
-bool QnGenericTabbedDialog::isReadOnly() const
+void QnGenericTabbedDialog::setReadOnlyInternal()
 {
-    return m_readOnly;
-}
-
-void QnGenericTabbedDialog::setReadOnly( bool readOnly )
-{
-    for(const Page &page: m_pages)
-        page.widget->setReadOnly(readOnly);
-    m_readOnly = readOnly;
+    for (const auto& page : m_pages)
+        page.widget->setReadOnly(isReadOnly());
 }
 
 void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
@@ -336,7 +328,6 @@ void QnGenericTabbedDialog::initializeButtonBox()
     updateButtonBox();
 }
 
-
 void QnGenericTabbedDialog::updateButtonBox()
 {
     if (m_updating || !buttonBox())
@@ -346,10 +337,8 @@ void QnGenericTabbedDialog::updateButtonBox()
     bool canApply = !changesPresent || canApplyChanges();
 
     if (QPushButton *applyButton = buttonBox()->button(QDialogButtonBox::Apply))
-        applyButton->setEnabled(!m_readOnly && changesPresent && canApply);
+        applyButton->setEnabled(!isReadOnly() && changesPresent && canApply);
 
     if (QPushButton *okButton = buttonBox()->button(QDialogButtonBox::Ok))
-        okButton->setEnabled(m_readOnly || canApply);
+        okButton->setEnabled(isReadOnly() || canApply);
 }
-
-

@@ -1,4 +1,3 @@
-
 #include "protocol_handler.h"
 
 #include <QtCore/QDir>
@@ -38,7 +37,7 @@ bool registerAsLaunchService(const QString& applicationPath)
 
 } // Unnamed namespace
 
-bool nx::utils::registerSystemUriProtocolHandler(
+bool nx::vms::utils::registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
     const QString& applicationName,
