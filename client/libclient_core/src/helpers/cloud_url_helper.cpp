@@ -30,7 +30,7 @@ QUrl QnCloudUrlHelper::mainUrl()
 
 QUrl QnCloudUrlHelper::aboutUrl()
 {
-    return makeUrl(lit("/content/about"));
+    return makeUrl(lit("/content/about"), false);
 }
 
 QUrl QnCloudUrlHelper::accountManagementUrl()
