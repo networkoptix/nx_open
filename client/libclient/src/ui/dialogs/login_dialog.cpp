@@ -345,7 +345,8 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
         {
             QUrl url = data.url;
 
-            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(QString(), data.protoVersion);
+            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(
+                QString(), data.protoVersion, data.version);
 
             bool isCompatible = (compatibilityCode == QnConnectionDiagnosticsHelper::Result::Success);
 

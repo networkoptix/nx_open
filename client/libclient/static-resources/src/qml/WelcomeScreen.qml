@@ -153,7 +153,7 @@ Rectangle
 
                 model: QnQmlSortFilterProxyModel
                 {
-                    model: QnSystemsModel {}
+                    model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
                 }

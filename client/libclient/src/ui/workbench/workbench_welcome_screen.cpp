@@ -12,6 +12,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <utils/common/delayed.h>
 #include <utils/common/app_info.h>
+#include <utils/connection_diagnostics_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -229,6 +230,11 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
 QString QnWorkbenchWelcomeScreen::softwareVersion() const
 {
     return QnAppInfo::applicationVersion();
+}
+
+QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
+{
+    return QnConnectionDiagnosticsHelper::minSupportedVersion().toString();
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)

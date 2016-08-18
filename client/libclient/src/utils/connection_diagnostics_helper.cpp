@@ -16,14 +16,21 @@
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 
-namespace
+QnSoftwareVersion QnConnectionDiagnosticsHelper::minSupportedVersion()
 {
-    QnSoftwareVersion kMinSupportedVersion("1.4");
+#if defined(Q_OS_MACX)
+    return QnSoftwareVersion("3.0");
+#else
+    return QnSoftwareVersion("1.4");
+#endif
 }
 
-
-QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QString &brand, int protoVersion)
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(
+    const QString &brand, int protoVersion, const QnSoftwareVersion& version)
 {
+    if (version < minSupportedVersion())
+        return Result::IncompatibleVersion;
+
     if (protoVersion != QnAppInfo::ec2ProtoVersion())
         return Result::IncompatibleProtocol;
 
@@ -33,7 +40,6 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         ? Result::Success
         : Result::IncompatibleBrand;
 }
-
 
 QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode)
 {
@@ -46,7 +52,8 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
     if (errorCode != ec2::ErrorCode::ok)
         return Result::ServerError;
 
-    return validateConnectionLight(connectionInfo.brand, connectionInfo.nxClusterProtoVersion);
+    return validateConnectionLight(connectionInfo.brand, connectionInfo.nxClusterProtoVersion
+        , connectionInfo.version);
 }
 
 
@@ -84,6 +91,21 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
           tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
         + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
 
+    if (connectionInfo.version < minSupportedVersion())
+    {
+        QnMessageBox::warning(
+            parentWidget,
+            Qn::VersionMismatch_Help,
+            strings(ErrorStrings::UnableConnect),
+            tr("You are about to connect to Server which has a different version:") + L'\n'
+            + versionDetails
+            + tr("Compatibility mode for versions lower than %1 is not supported.")
+            .arg(minSupportedVersion().toString()),
+            QDialogButtonBox::Ok
+        );
+        return Result::IncompatibleVersion;
+    }
+
     bool haveExactVersion = false;
     bool needExactVersion = false;
 
@@ -115,20 +137,6 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 );
             return Result::IncompatibleVersion;
         }
-    }
-
-    if (connectionInfo.version < kMinSupportedVersion)
-    {
-        QnMessageBox::warning(
-            parentWidget,
-            Qn::VersionMismatch_Help,
-            strings(ErrorStrings::UnableConnect),
-            tr("You are about to connect to Server which has a different version:") + L'\n'
-            + versionDetails
-            + tr("Compatibility mode for versions lower than %1 is not supported.").arg(kMinSupportedVersion.toString()),
-            QDialogButtonBox::Ok
-            );
-        return Result::IncompatibleVersion;
     }
 
     while (true) {
@@ -279,24 +287,22 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
         result.details = tr("You are trying to connect to incompatible Server.");
         result.helpTopicId = Qn::Login_Help;
     }
+    else if (connectionInfo.version < minSupportedVersion())
+    {
+        result.helpTopicId = Qn::VersionMismatch_Help;
+        result.details = tr("Server has a different version:") + L'\n'
+            + versionDetails
+            + tr("Compatibility mode for versions lower than %1 is not supported.")
+            .arg(minSupportedVersion().toString());
+        result.result = Result::IncompatibleVersion;
+    }
     else if (!qnCommon->engineVersion().isCompatible(connectionInfo.version))
     {
         result.helpTopicId = Qn::VersionMismatch_Help;
 
-        if (connectionInfo.version < kMinSupportedVersion)
-        {
-            result.details = tr("Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("Compatibility mode for versions lower than %1 is not supported.").arg(kMinSupportedVersion.toString());
-            result.result = Result::IncompatibleVersion;
-
-        }
-        else
-        {
-            result.details = tr("Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("You will be asked to restart the client in compatibility mode.");
-        }
+        result.details = tr("Server has a different version:") + L'\n'
+            + versionDetails
+            + tr("You will be asked to restart the client in compatibility mode.");
     }
     else if (connectionInfo.nxClusterProtoVersion != QnAppInfo::ec2ProtoVersion())
     {
