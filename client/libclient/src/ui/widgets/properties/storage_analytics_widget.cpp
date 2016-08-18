@@ -527,6 +527,7 @@ void QnStorageAnalyticsWidget::at_forecastParamsChanged()
 {
     if (m_updating)
         return;
+
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (!ui->forecastTable->isEnabled())
@@ -548,7 +549,7 @@ void QnStorageAnalyticsWidget::at_forecastParamsChanged()
 
     m_forecastModel->setModelData(getForecastData(forecastedSize));
 
-    ui->statsTable->setEnabled(true);
+    ui->forecastTable->setEnabled(true);
 }
 
 QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSizeBytes)
