@@ -311,7 +311,7 @@ TextToWaveServer::TextToWaveServer()
 :
     m_prevTaskID( 1 )
 {
-    m_audioFormat.setSampleRate(32000);
+    m_audioFormat.setSampleRate(16000);
     m_audioFormat.setChannelCount(1);
     m_audioFormat.setCodec(QString("PCM"));
     m_audioFormat.setByteOrder(QnAudioFormat::LittleEndian);
