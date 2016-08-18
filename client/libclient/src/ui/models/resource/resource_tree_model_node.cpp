@@ -1,6 +1,5 @@
 #include "resource_tree_model_node.h"
 
-//#include <common/common_meta_types.h>
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -68,8 +67,6 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     NX_ASSERT(model != NULL);
     m_editable.checked = false;
 }
-
-
 
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, QnUuid())

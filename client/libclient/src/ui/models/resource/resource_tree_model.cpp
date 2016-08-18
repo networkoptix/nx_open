@@ -99,13 +99,20 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     }
 
     /* Connect to context. */
-    connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnResourceTreeModel::at_resPool_resourceAdded,         Qt::QueuedConnection);
-    connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnResourceTreeModel::at_resPool_resourceRemoved,       Qt::QueuedConnection);
-    connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourceTreeModel::at_snapshotManager_flagsChanged);
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourceTreeModel::at_accessController_permissionsChanged);
-    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
-    connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourceTreeModel::at_commonModule_systemNameChanged);
-    connect(qnGlobalSettings,   &QnGlobalSettings::serverAutoDiscoveryChanged,      this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnResourceTreeModel::at_resPool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnResourceTreeModel::at_resPool_resourceRemoved);
+    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
+        &QnResourceTreeModel::at_snapshotManager_flagsChanged);
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        &QnResourceTreeModel::at_accessController_permissionsChanged);
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &QnResourceTreeModel::rebuildTree, Qt::QueuedConnection);
+    connect(qnCommon, &QnCommonModule::systemNameChanged, this,
+        &QnResourceTreeModel::at_commonModule_systemNameChanged);
+    connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged, this,
+        &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this,
         [this](int value)
         {
@@ -143,8 +150,10 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
             }
         });
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this, &QnResourceTreeModel::updateRoleNodes);
-    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this, &QnResourceTreeModel::updateRoleNodes);
+    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
+        &QnResourceTreeModel::updateRoleNodes);
+    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this,
+        &QnResourceTreeModel::updateRoleNodes);
     connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this,
         [this](const QnUuid& id)
         {
