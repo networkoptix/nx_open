@@ -40,6 +40,7 @@ Rectangle
 
         NxSearchEdit
         {
+            visible: (pageSwitcher.pagesCount > 1);
             visualParent: screenHolder;
 
             anchors.bottom: gridHolder.top;
@@ -223,6 +224,15 @@ Rectangle
                         grid.setPage(index, byClick);
                 }
             }
+        }
+
+        EmptyTilesPlaceholder
+        {
+            id: emptyTilePreloader;
+
+            anchors.centerIn: parent;
+            foundServersCount: grid.count;
+            visible: foundServersCount == 0;
         }
 
         NxButton
