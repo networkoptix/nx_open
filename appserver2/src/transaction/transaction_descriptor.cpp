@@ -563,41 +563,40 @@ struct ModifyCameraAttributesAccess
 
 struct ModifyCameraAttributesListAccess
 {
-	ModifyCameraAttributesListAccess() = default;
-	ModifyCameraAttributesListAccess(const ModifyCameraAttributesListAccess&) = default;
-	ModifyCameraAttributesListAccess(ModifyCameraAttributesListAccess&&) = default;
+    void operator()(const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
+    {
+        if (accessData == Qn::kSystemAccess)
+            return;
 
-	ModifyCameraAttributesListAccess& operator = (const ModifyCameraAttributesListAccess&) = default;
-	ModifyCameraAttributesListAccess& operator = (ModifyCameraAttributesListAccess&&) = default;
+        for (const auto& p : param)
+            if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
 
-	template<typename ParamType>
-	bool operator()(const Qn::UserAccessData& accessData, const ParamType& param)
-	{
-		if (accessData == Qn::kSystemAccess)
-			return true;
+        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnVirtualCameraResourceList cameras;
 
-		for (const auto& p: param)
-			if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
-				return false;
+        for (const auto& p : param)
+        {
+            auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
+            if (!camera)
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
+            cameras.push_back(camera);
+            licenseUsageHelper.propose(camera, p.scheduleEnabled);
+        }
 
-		QnCamLicenseUsageHelper licenseUsageHelper;
-		QnVirtualCameraResourceList cameras;
-
-		for (const auto& p: param)
-		{
-			auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
-			if (!camera)
-				return false;
-			cameras.push_back(camera);
-			licenseUsageHelper.propose(camera, p.scheduleEnabled);
-		}
-
-		for (const auto& camera: cameras)
-			if (licenseUsageHelper.isOverflowForCamera(camera))
-				return false;
-
-		return true;
-	}
+        for (const auto& camera : cameras)
+            if (licenseUsageHelper.isOverflowForCamera(camera))
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
+    }
 };
 
 struct ReadServerAttributesAccess

@@ -44,6 +44,8 @@ namespace {
             return QnMergeSystemsTool::ConfigurationError;
         else if (str == lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD"))
             return QnMergeSystemsTool::DependentSystemBoundToCloudError;
+        else if (str == lit("BOTH_SYSTEM_BOUND_TO_CLOUD"))
+            return QnMergeSystemsTool::BothSystemBoundToCloudError;
         else if (str == lit("UNCONFIGURED_SYSTEM"))
             return QnMergeSystemsTool::UnconfiguredSystemError;
         else

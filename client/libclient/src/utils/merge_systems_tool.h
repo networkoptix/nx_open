@@ -23,6 +23,7 @@ public:
         ForbiddenError,
         ConfigurationError,
         DependentSystemBoundToCloudError,
+        BothSystemBoundToCloudError,
         UnconfiguredSystemError,
         notLocalOwner
     };

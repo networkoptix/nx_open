@@ -16,6 +16,7 @@
 #include <api/app_server_connection.h>
 #include <rest/helpers/permissions_helper.h>
 #include <cloud/cloud_connection_manager.h>
+#include "system_settings_handler.h"
 
 
 namespace
@@ -34,7 +35,7 @@ struct SetupRemoveSystemData: public CloudCredentialsData
     }
 
     QString systemName;
-    QMap<QString, QString> systemSettings;
+    QHash<QString, QString> systemSettings;
 };
 
 #define SetupRemoveSystemData_Fields CloudCredentialsData_Fields (systemName)(systemSettings)
@@ -54,21 +55,24 @@ QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
 int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupRemoveSystemData(params)), owner->accessRights(), result);
+    return execute(std::move(SetupRemoveSystemData(params)), owner, result);
 }
 
 int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QN_UNUSED(path, params);
     const SetupRemoveSystemData data = QJson::deserialized<SetupRemoveSystemData>(body);
-    return execute(std::move(data), owner->accessRights(), result);
+    return execute(std::move(data), owner, result);
 }
 
-int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const Qn::UserAccessData& accessRights, QnJsonRestResult &result)
+int QnSetupCloudSystemRestHandler::execute(
+    SetupRemoveSystemData data,
+    const QnRestConnectionProcessor* owner,
+    QnJsonRestResult &result)
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
 
@@ -129,13 +133,8 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const Qn:
         return nx_http::StatusCode::ok;
     }
 
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
-    for (QnAbstractResourcePropertyAdaptor* setting : settings)
-    {
-        auto paramIter = data.systemSettings.find(setting->key());
-        if (paramIter != data.systemSettings.end())
-            setting->setValue(paramIter.value());
-    }
+    QnSystemSettingsHandler settingsHandler;
+    settingsHandler.executeGet(QString(), data.systemSettings, result, owner);
 
     return httpResult;
 }
