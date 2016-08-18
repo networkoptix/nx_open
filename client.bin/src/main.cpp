@@ -548,17 +548,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     for (const auto screen: QApplication::screens())
     {
         static const qreal kMinHiDpiRatio = 1.49;  //< At least 1.5x
+        static const int kFullHdScreenWidth = 1980;
+        static const int kMinHiDpi = 150;
 
         const auto pysicalDpi = screen->physicalDotsPerInch();
         const auto logicalDpi = screen->logicalDotsPerInch();
         const auto dpiAspect = (qFuzzyIsNull(pysicalDpi) ? 1 : logicalDpi / pysicalDpi);
         const auto targetRatio = std::max(dpiAspect, screen->devicePixelRatio());
 
-        if (targetRatio < kMinHiDpiRatio)
-            continue;
-
-        context->action(QnActions::HiDpiSupportMessageAction)->trigger();
-        break;
+        if ((targetRatio > kMinHiDpiRatio)
+            || (pysicalDpi > kMinHiDpi)
+            || (screen->size().width() > kFullHdScreenWidth))
+        {
+            context->action(QnActions::HiDpiSupportMessageAction)->trigger();
+            break;
+        }
     }
 
 #ifdef _DEBUG
