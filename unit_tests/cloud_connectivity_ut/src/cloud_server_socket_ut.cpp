@@ -30,7 +30,7 @@ public:
         size_t clientsLimit)
     :
         m_clientsLimit(clientsLimit),
-        m_server(new TCPServerSocket),
+        m_server(new TCPServerSocket(AF_INET)),
         m_addressManager(std::move(addressManager))
     {
         m_server->bindToAioThread(thread);
@@ -97,7 +97,7 @@ struct FakeTcpTunnelAcceptor
         size_t clientsLimit = 5)
     :
         m_designatedAioThread(designatedAioThread),
-        m_ioThreadSocket(new TCPSocket),
+        m_ioThreadSocket(new TCPSocket(false, AF_INET)),
         m_addressManager(std::move(addressManager)),
         m_hasConnection(hasConnection),
         m_clientsLimit(clientsLimit)

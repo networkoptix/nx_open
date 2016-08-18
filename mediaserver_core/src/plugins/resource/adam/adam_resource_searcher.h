@@ -5,7 +5,7 @@
 #include <memory>
 #include <modbus/modbus_client.h>
 #include "core/resource_management/resource_searcher.h"
-#include "utils/network/socket.h"
+#include "nx/network/socket.h"
 #include <qglobal.h>
 
 

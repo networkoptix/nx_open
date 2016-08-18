@@ -155,7 +155,7 @@ protected:
         const SocketAddress& sourceAddress,
         const SocketAddress& destinationAddress)
     {
-        auto socket = std::make_unique<UdtStreamSocket>();
+        auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(socket->setRendezvous(true));
         ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
         ASSERT_TRUE(socket->setNonBlockingMode(true));
@@ -223,7 +223,7 @@ protected:
 
     void connectClientSocket(const SocketAddress& address)
     {
-        auto socket = std::make_unique<UdtStreamSocket>();
+        auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
         ASSERT_TRUE(socket->setNonBlockingMode(true));
         socket->connectAsync(
@@ -247,7 +247,7 @@ protected:
     {
         if (!m_udtAddressKeeper)
         {
-            m_udtAddressKeeper.reset(new UdtStreamSocket);
+            m_udtAddressKeeper.reset(new UdtStreamSocket(AF_INET));
             EXPECT_TRUE(m_udtAddressKeeper->bind(SocketAddress("127.0.0.1:0")));
         }
 

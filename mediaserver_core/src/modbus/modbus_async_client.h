@@ -1,6 +1,6 @@
 #pragma once
 #include "modbus.h"
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 
 namespace nx_modbus
 {

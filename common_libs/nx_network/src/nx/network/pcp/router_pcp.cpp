@@ -5,6 +5,8 @@
 #include <QElapsedTimer>
 #include <QDateTime>
 
+#include <utils/memory/data_stream_helpers.h>
+
 static const quint32 LIFETIME = 1 * 60 * 60;
 static const int RESPONCE_WAIT = 1000;
 static const int RESPONCE_BUFFER = 1024;
@@ -54,12 +56,11 @@ QByteArray Router::makeMapRequest(Mapping& mapping)
     QDataStream stream(&request, QIODevice::WriteOnly);
     stream.setByteOrder(QDataStream::LittleEndian);
 
-    const auto ipV6 = mapping.internal.address.ipV6();
     RequestHeader header;
     header.version = VERSION;
     header.opcode = Opcode::MAP;
     header.lifeTime = LIFETIME;
-    header.clientIp = QByteArray((char*)&ipV6.get(), sizeof(*ipV6));
+    header.clientIp = dsh::rawBytes(*mapping.internal.address.ipV6());
 
     MapMessage message;
     message.nonce = mapping.nonce;
