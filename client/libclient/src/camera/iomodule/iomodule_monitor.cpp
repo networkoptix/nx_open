@@ -85,9 +85,7 @@ bool QnIOModuleMonitor::open()
     m_httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
     m_httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
 
-    if (!m_httpClient->doGet( requestUrl ))
-        return false;
-
+    m_httpClient->doGet(requestUrl);
     return true;
 }
 
