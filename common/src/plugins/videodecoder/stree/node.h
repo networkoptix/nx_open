@@ -70,12 +70,6 @@ namespace stree
         }
     };
 
-    template<typename Value>
-    Value toPrintable(const Value& val)
-    {
-        return val;
-    }
-
     //!Chooses child node to follow based on some condition
     /*!
         All children have unique values. Attempt to add children with existing value will fail
@@ -122,8 +116,8 @@ namespace stree
                 return;
             }
 
-//            NX_LOG( lit("Stree. Condition. Found child with value %1 by search value %2")
-//                .arg(toPrintable(it->first)).arg(value.toString()), cl_logDEBUG2 );
+            NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
+                .str(it->first).arg(value.toString()), cl_logDEBUG2);
             it->second->get( in, out );
         }
 

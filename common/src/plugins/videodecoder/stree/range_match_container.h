@@ -46,6 +46,11 @@ public:
     {
         return rhs < *this;
     }
+
+    QString toString() const
+    {
+        return QString::fromLatin1("%1-%2").arg(left).arg(right);
+    }
 };
 }   // namespace detail
 
@@ -153,11 +158,5 @@ public:
         return value.value<Key>();
     }
 };
-
-template<typename Key>
-QString toPrintable(const typename detail::Range<Key>& val)
-{
-    return QString::fromLatin1("%1-%2").arg(val.left).arg(val.right);
-}
 
 }   // namespace stree
