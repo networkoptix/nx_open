@@ -35,7 +35,9 @@ namespace {
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
     m_pixmapDirty(true),
-    m_updatesEnabled(true)
+    m_updatesEnabled(true),
+    m_pixmap(),
+    m_opaqueDrag(false)
 {}
 
 QnMaskedProxyWidget::~QnMaskedProxyWidget() {
@@ -102,7 +104,32 @@ bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
     return base_type::eventFilter(object, event);
 }
 
-QRectF QnMaskedProxyWidget::paintRect() const {
+void QnMaskedProxyWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (!m_opaqueDrag)
+        base_type::dragEnterEvent(event);
+}
+
+void QnMaskedProxyWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (!m_opaqueDrag)
+        base_type::dragLeaveEvent(event);
+}
+
+void QnMaskedProxyWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (!m_opaqueDrag)
+        base_type::dragMoveEvent(event);
+}
+
+void QnMaskedProxyWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (!m_opaqueDrag)
+        base_type::dropEvent(event);
+}
+
+QRectF QnMaskedProxyWidget::paintRect() const
+{
     return m_paintRect.isNull() ? rect() : m_paintRect;
 }
 
@@ -141,7 +168,19 @@ void QnMaskedProxyWidget::setPaintGeometry(const QRectF &paintGeometry) {
     ));
 }
 
-bool QnMaskedProxyWidget::isUpdatesEnabled() const {
+bool QnMaskedProxyWidget::opaqueDrag() const
+{
+    return m_opaqueDrag;
+}
+
+void QnMaskedProxyWidget::setOpaqueDrag(bool value)
+{
+    m_opaqueDrag = value;
+    setAcceptDrops(!value);
+}
+
+bool QnMaskedProxyWidget::isUpdatesEnabled() const
+{
     return m_updatesEnabled;
 }
 

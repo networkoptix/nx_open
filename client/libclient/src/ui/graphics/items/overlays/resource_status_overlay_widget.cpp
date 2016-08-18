@@ -18,6 +18,7 @@ const qreal kBaseOpacity = 0.75;
 QGraphicsProxyWidget* makeMaskedProxy(QWidget* source)
 {
     const auto result = new QnMaskedProxyWidget();
+    result->setOpaqueDrag(true);
     result->setWidget(source);
     return result;
 }
@@ -271,8 +272,7 @@ void QnStatusOverlayWidget::setupCentralControls()
 
     const auto holder = new QWidget();
     holder->setLayout(centralLayout);
-    const auto proxy = new QGraphicsProxyWidget();
-    proxy->setWidget(holder);
+    const auto proxy = makeMaskedProxy(holder);
 
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->addItem(proxy);
@@ -295,11 +295,11 @@ void QnStatusOverlayWidget::setupExtrasControls()
 
     // Workaround for incorrect behavior of QGraphicsLinearLayout and QGraphicsProxyWidget
     const auto workaroundProxy = new QWidget();
-    const auto workaroundLyout = new QVBoxLayout();
-    workaroundProxy->setLayout(workaroundLyout);
-    workaroundLyout->addWidget(m_button, 0, Qt::AlignHCenter | Qt::AlignTop);
-    workaroundLyout->addStretch(kBigStretch);
-    workaroundLyout->setContentsMargins(16, 0, 16, 16);
+    const auto workaroundLayout = new QVBoxLayout();
+    workaroundProxy->setLayout(workaroundLayout);
+    workaroundLayout->addWidget(m_button, 0, Qt::AlignHCenter | Qt::AlignTop);
+    workaroundLayout->addStretch(kBigStretch);
+    workaroundLayout->setContentsMargins(16, 0, 16, 16);
 
     const auto buttonProxy = makeMaskedProxy(workaroundProxy);
     layout->addItem(buttonProxy);

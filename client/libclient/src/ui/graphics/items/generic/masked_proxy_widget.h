@@ -14,8 +14,9 @@ class QnMaskedProxyWidget: public QGraphicsProxyWidget {
     Q_PROPERTY(QRectF paintRect READ paintRect WRITE setPaintRect);
     Q_PROPERTY(QRectF paintGeometry READ paintGeometry WRITE setPaintGeometry);
     Q_PROPERTY(QSizeF paintSize READ paintSize WRITE setPaintSize);
+    Q_PROPERTY(bool opaqueDrag READ opaqueDrag WRITE setOpaqueDrag);
 
-    typedef QGraphicsProxyWidget base_type;
+    using base_type = QGraphicsProxyWidget;
 
 public:
     QnMaskedProxyWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
@@ -33,7 +34,8 @@ public:
     QRectF paintGeometry() const;
     void setPaintGeometry(const QRectF &paintGeometry);
 
-    virtual bool eventFilter(QObject *object, QEvent *event) override;
+    bool opaqueDrag() const;
+    void setOpaqueDrag(bool value);
 
     bool isUpdatesEnabled() const;
 
@@ -47,11 +49,19 @@ public slots:
     void enableUpdates() { setUpdatesEnabled(true); }
     void disableUpdates() { setUpdatesEnabled(false); }
 
+protected:
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
+    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
+    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
+    virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override;
+
 private:
     QRectF m_paintRect;
     bool m_pixmapDirty;
     bool m_updatesEnabled;
     QPixmap m_pixmap;
+    bool m_opaqueDrag;
 };
 
 
