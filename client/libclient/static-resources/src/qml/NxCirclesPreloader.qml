@@ -9,7 +9,7 @@ BusyIndicator
 
     property color color: Style.colors.mid;
 
-    implicitWidth: (children.length ? 30 : radiusByIndex(children.length));
+    implicitWidth: (children.length ? 30 : radiusByIndex(children.length) * 2);
     implicitHeight: implicitWidth;
     contentItem: null;
 
