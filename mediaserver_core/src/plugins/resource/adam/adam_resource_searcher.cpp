@@ -5,9 +5,10 @@
 
 #include <modbus/modbus_client.h>
 #include <common/common_module.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/network/system_socket.h>
 
 namespace
 {
@@ -16,11 +17,11 @@ namespace
     const QString kAdamResourceType("AdvantechADAM");
     const QString kHashPrefix("ADVANTECH_ADAM_MODULE_");
 
-    /** 
-     * I have no idea what it means but such a message is used by 
+    /**
+     * I have no idea what it means but such a message is used by
      * Advantech Adam/Apax .NET Utility.
      */
-    const unsigned char kAdamSearchMessage[60] = 
+    const unsigned char kAdamSearchMessage[60] =
     {
         0x4d, 0x41, 0x44, 0x41, 0x00, 0x00, 0x00, 0x83, 0x01, 0x00,
         0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -51,7 +52,7 @@ QnAdamResourceSearcher::QnAdamResourceSearcher()
 }
 
 QnAdamResourceSearcher::~QnAdamResourceSearcher()
-{    
+{
 }
 
 QString QnAdamResourceSearcher::manufacture() const
@@ -68,7 +69,7 @@ QString QnAdamResourceSearcher::generatePhysicalId(const QString& url) const
 }
 
 QByteArray QnAdamResourceSearcher::executeAsciiCommand(
-    nx_modbus::QnModbusClient& client, 
+    nx_modbus::QnModbusClient& client,
     const QString& commandStr)
 {
     QnAdamAsciiCommand command(commandStr);
@@ -92,7 +93,7 @@ QByteArray QnAdamResourceSearcher::executeAsciiCommand(
 
     if(response.data.indexOf("!") != 1)
         return QByteArray();
-    
+
     auto endOfStr = response.data.indexOf("\r");
 
     return response.data.mid(4, endOfStr);
@@ -123,8 +124,8 @@ QString QnAdamResourceSearcher::getAdamModuleFirmware(nx_modbus::QnModbusClient&
 }
 
 QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
-    const QUrl &url, 
-    const QAuthenticator &auth, 
+    const QUrl &url,
+    const QAuthenticator &auth,
     bool doMultichannelCheck)
 {
     QList<QnResourcePtr> result;
@@ -190,10 +191,10 @@ QnResourceList QnAdamResourceSearcher::findResources()
         if (shouldStop())
             return result;
 
-        auto socket = std::make_shared<UDPSocket>(AF_INET);
+        auto socket = std::make_shared<nx::network::UDPSocket>(AF_INET);
         socket->setReuseAddrFlag(true);
 
-        SocketAddress localAddress(iface.address.toString(), 0);    
+        SocketAddress localAddress(iface.address.toString(), 0);
         if (!socket->bind(localAddress))
         {
             qDebug() << "Unable to bind socket to local address" << localAddress.toString();
@@ -234,7 +235,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
                         continue;
 
                     QnUuid typeId = qnResTypePool->getResourceTypeId(
-                        lit("AdvantechADAM"), 
+                        lit("AdvantechADAM"),
                         secRes->getModel());
 
                     if (typeId.isNull())
@@ -297,7 +298,7 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid &resourceTypeI
     result->setTypeId(resourceTypeId);
 
     NX_LOG(lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")
-        .arg(resourceTypeId.toString()), 
+        .arg(resourceTypeId.toString()),
         cl_logDEBUG1);
     return result;
 }

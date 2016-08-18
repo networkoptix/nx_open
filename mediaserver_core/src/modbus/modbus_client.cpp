@@ -5,7 +5,7 @@ using namespace nx_modbus;
 
 namespace
 {
-    const int kDefaultConnectionTimeoutMs = 4000; 
+    const int kDefaultConnectionTimeoutMs = 4000;
     const int kSendTimeout = 4000;
     const int kReceiveTimeout = 4000;
 }
@@ -37,7 +37,7 @@ bool QnModbusClient::initSocket()
     if (m_socket)
         m_socket->shutdown();
 
-    m_socket.reset(SocketFactory::createStreamSocket(false));
+    m_socket = SocketFactory::createStreamSocket(false);
 
     if (!m_socket->setRecvTimeout(kReceiveTimeout)
         || !m_socket->setSendTimeout(kSendTimeout))
@@ -101,7 +101,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
     while (totalBytesSent < data.size())
     {
         bytesSent = m_socket->send(
-            data.constData() + totalBytesSent, 
+            data.constData() + totalBytesSent,
             data.size() - totalBytesSent);
 
         if (bytesSent < 1)
@@ -137,7 +137,7 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
             auto header = ModbusMBAPHeader::decode(
                 QByteArray(m_recvBuffer, ModbusMBAPHeader::size));
 
-            bytesNeeded = header.length 
+            bytesNeeded = header.length
                 + sizeof(decltype(ModbusMBAPHeader::transactionId))
                 + sizeof(decltype(ModbusMBAPHeader::protocolId))
                 + sizeof(decltype(ModbusMBAPHeader::length));
@@ -156,8 +156,8 @@ ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, boo
 }
 
 ModbusResponse QnModbusClient::readHoldingRegisters(
-    quint16 startRegister, 
-    quint16 registerCount, 
+    quint16 startRegister,
+    quint16 registerCount,
     bool* outStatus)
 {
     ModbusRequest request;
@@ -206,7 +206,7 @@ ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilSta
     QDataStream stream(&request.data, QIODevice::WriteOnly);
     stream.setByteOrder(QDataStream::BigEndian);
 
-    stream 
+    stream
         << coilAddress
         << (coilState ? kCoilStateOn : kCoilStateOff);
 
@@ -239,8 +239,8 @@ void QnModbusClient::disconnect()
 }
 
 ModbusResponse QnModbusClient::writeSingleHoldingRegister(
-    quint16 registerAddress, 
-    const QByteArray& data, 
+    quint16 registerAddress,
+    const QByteArray& data,
     bool* outStatus)
 {
     ModbusResponse response;
@@ -261,7 +261,7 @@ ModbusResponse nx_modbus::QnModbusClient::readCoils(
     QDataStream stream(&request.data, QIODevice::WriteOnly);
     stream.setByteOrder(QDataStream::BigEndian);
 
-    stream 
+    stream
         << startCoilAddress
         << coilCount;
 

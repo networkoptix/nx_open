@@ -1,14 +1,13 @@
 #ifdef ENABLE_ADVANTECH
 
-#include <utils/common/log.h>
 #include <core/resource/security_cam_resource.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/common/synctime.h>
-#include <utils/common/timermanager.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "adam_modbus_io_manager.h"
+#include <nx/utils/timer_manager.h>
 
 using namespace nx_io_managment;
 
@@ -61,8 +60,8 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     if (!securityResource)
         return false;
 
-    bool shouldNotStartMonitoring = 
-        securityResource->hasFlags(Qn::foreigner) 
+    bool shouldNotStartMonitoring =
+        securityResource->hasFlags(Qn::foreigner)
         || !securityResource->hasCameraCapabilities(Qn::RelayInputCapability);
 
     if (shouldNotStartMonitoring)
@@ -71,12 +70,12 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_debouncedValues.clear();
 
     QObject::connect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::done, 
+        &m_client, &nx_modbus::QnModbusAsyncClient::done,
         this, &QnAdamModbusIOManager::routeMonitoringFlow,
         Qt::DirectConnection);
 
     QObject::connect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::error, 
+        &m_client, &nx_modbus::QnModbusAsyncClient::error,
         this, &QnAdamModbusIOManager::handleMonitoringError,
         Qt::DirectConnection);
 
@@ -102,11 +101,11 @@ void QnAdamModbusIOManager::stopIOMonitoring()
     m_monitoringIsInProgress = false;
 
     QObject::disconnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::done, 
+        &m_client, &nx_modbus::QnModbusAsyncClient::done,
         this, &QnAdamModbusIOManager::routeMonitoringFlow);
 
     QObject::disconnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::error, 
+        &m_client, &nx_modbus::QnModbusAsyncClient::error,
         this, &QnAdamModbusIOManager::handleMonitoringError);
 }
 
@@ -116,7 +115,7 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
 
     auto coil = getPortCoil(outputId, success);
 
-    auto defaultPortStateIsActive = 
+    auto defaultPortStateIsActive =
         nx_io_managment::isActiveIOPortState(getPortDefaultStateUnsafe(outputId));
 
     nx_modbus::ModbusResponse response;
@@ -151,27 +150,27 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
     return true;
 }
 
-bool QnAdamModbusIOManager::isMonitoringInProgress() const 
+bool QnAdamModbusIOManager::isMonitoringInProgress() const
 {
     return m_monitoringIsInProgress;
 }
 
-QnIOPortDataList QnAdamModbusIOManager::getInputPortList() const 
+QnIOPortDataList QnAdamModbusIOManager::getInputPortList() const
 {
     return m_inputs;
 }
 
-QnIOPortDataList QnAdamModbusIOManager::getOutputPortList() const 
+QnIOPortDataList QnAdamModbusIOManager::getOutputPortList() const
 {
     return m_outputs;
 }
 
-QnIOStateDataList QnAdamModbusIOManager::getPortStates() const 
+QnIOStateDataList QnAdamModbusIOManager::getPortStates() const
 {
     return getDebouncedStates();
 }
 
-nx_io_managment::IOPortState QnAdamModbusIOManager::getPortDefaultState(const QString& portId) const 
+nx_io_managment::IOPortState QnAdamModbusIOManager::getPortDefaultState(const QString& portId) const
 {
     QnMutexLocker lock(&m_mutex);
     return getPortDefaultStateUnsafe(portId);
@@ -223,13 +222,13 @@ bool QnAdamModbusIOManager::initializeIO()
     auto securityResource = dynamic_cast<QnSecurityCamResource*>(m_resource);
 
     auto resourceData = qnCommon->dataPool()->data(
-        securityResource->getVendor(), 
+        securityResource->getVendor(),
         securityResource->getModel());
 
     auto startInputCoil = resourceData.value<quint16>(kAdamStartInputCoilParamName);
     auto startOutputCoil = resourceData.value<quint16>(kAdamStartOutputCoilParamName);
     auto inputCount = resourceData.value<quint16>(kAdamInputCountParamName);
-    auto outputCount = resourceData.value<quint16>(kAdamOutputCountParamName); 
+    auto outputCount = resourceData.value<quint16>(kAdamOutputCountParamName);
 
     for (auto i = startInputCoil; i < startInputCoil + inputCount; ++i)
     {
@@ -281,7 +280,7 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
 
     if (response.isException())
     {
-        qDebug() 
+        qDebug()
             << lit("QnAdamModbusIOManager::processAllPortStatesResponse(), Exception has occured %1")
                 .arg(m_client.getLastErrorString());
         return;
@@ -291,7 +290,7 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
 
     auto inputCount = m_inputs.size();
     auto outputCount = m_outputs.size();
-    
+
     auto fetchedPortStates = response.data.mid(1);
 
     auto startInputCoilBit = getPortCoil(m_inputs[0].id, status);
@@ -322,14 +321,14 @@ void QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& b
     QnMutexLocker lock(&m_mutex);
 
     auto portId = m_ioStates[portIndex].id;
-    auto currentState = 
+    auto currentState =
         nx_io_managment::fromBoolToIOPortState(getBitValue(bytes, bitIndex));
 
-    bool isActive = getBitValue(bytes, bitIndex) 
+    bool isActive = getBitValue(bytes, bitIndex)
         != nx_io_managment::isActiveIOPortState(getPortDefaultStateUnsafe(portId));
 
     bool stateChanged = m_ioStates[portIndex].isActive != isActive;
-        
+
     m_ioStates[portIndex].isActive = isActive;
     m_ioStates[portIndex].timestamp = qnSyncTime->currentMSecsSinceEpoch();
 
@@ -361,10 +360,10 @@ QnIOStateDataList QnAdamModbusIOManager::getDebouncedStates() const
     auto debouncedStates = m_ioStates;
 
     for (auto& state: debouncedStates)
-    { 
+    {
         if (m_debouncedValues.find(state.id) != m_debouncedValues.end())
         {
-            state.isActive = m_debouncedValues[state.id].debouncedValue; 
+            state.isActive = m_debouncedValues[state.id].debouncedValue;
             if (!--m_debouncedValues[state.id].lifetimeCounter)
                 m_debouncedValues.erase(state.id);
         }
@@ -377,7 +376,7 @@ bool QnAdamModbusIOManager::getBitValue(const QByteArray& bytes, quint64 bitInde
 {
     const auto kBitsInByte = 8;
 
-    int byteIndex = bitIndex / kBitsInByte; 
+    int byteIndex = bitIndex / kBitsInByte;
 
     Q_ASSERT(byteIndex < bytes.size());
 
@@ -390,13 +389,13 @@ void QnAdamModbusIOManager::scheduleMonitoringIteration()
 {
     if (m_monitoringIsInProgress)
     {
-        m_inputMonitorTimerId = TimerManager::instance()->addTimer(
+        m_inputMonitorTimerId = nx::utils::TimerManager::instance()->addTimer(
             [this](quint64 timerId)
             {
                 if (timerId == m_inputMonitorTimerId)
                     fetchAllPortStates();
             },
-            kInputPollingIntervalMs);
+            std::chrono::milliseconds(kInputPollingIntervalMs));
     }
 }
 

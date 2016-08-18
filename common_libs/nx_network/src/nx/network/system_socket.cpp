@@ -30,7 +30,6 @@
 #ifdef Q_OS_WIN
 /* Check that the typedef in AbstractSocket is correct. */
 static_assert(boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value, "Invalid socket type is used in AbstractSocket.");
-typedef int socklen_t;
 typedef char raw_type;       // Type used for raw data on this platform
 #else
 #include <sys/types.h>       // For data types
@@ -1275,7 +1274,7 @@ public:
         else
         {
             return nullptr;
-        
+
         }
     }
 };
@@ -1347,7 +1346,7 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
         {
             TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
             d->asyncServerSocketHelper.stopPolling();
-                
+
             completionHandler();
         });
 }

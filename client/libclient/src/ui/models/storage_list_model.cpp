@@ -5,7 +5,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/utils/collection.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 namespace
 {

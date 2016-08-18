@@ -232,7 +232,7 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/socket.h>
 #include <rest/helpers/permissions_helper.h>
 
 #if !defined(EDGE_SERVER)
@@ -2858,7 +2858,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
         lit("Enforces mediator address"), QString());
     commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
-        lit("Force ip version"), QString());		
+        lit("Force ip version"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,

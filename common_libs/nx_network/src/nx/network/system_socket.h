@@ -34,6 +34,10 @@ template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
 }   //aio
 
+#ifdef Q_OS_WIN
+typedef int socklen_t;
+#endif
+
 struct SockAddrPtr
 {
     std::shared_ptr<const sockaddr> ptr;

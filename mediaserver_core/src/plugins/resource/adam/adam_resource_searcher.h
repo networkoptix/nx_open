@@ -29,14 +29,14 @@ public:
     virtual QString manufacture() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url, 
-        const QAuthenticator& auth, 
+        const QUrl& url,
+        const QAuthenticator& auth,
         bool doMultichannelCheck);
 
     virtual QnResourceList findResources() override;
 
     virtual QnResourcePtr createResource(
-        const QnUuid& resourceTypeId, 
+        const QnUuid& resourceTypeId,
         const QnResourceParams& params) override;
 
     virtual bool isSequential() const override { return true; };

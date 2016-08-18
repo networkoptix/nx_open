@@ -17,18 +17,18 @@
 
 class QnSearchTask
 {
-    
+
 public:
     typedef QList<QnAbstractNetworkResourceSearcher*> SearcherList;
     typedef std::function<void(
-        const QnManualCameraSearchCameraList& results, QnSearchTask* const task)> SearchDoneCallback;
+        const QnManualResourceSearchList& results, QnSearchTask* const task)> SearchDoneCallback;
 
     QnSearchTask(){};
 
     QnSearchTask(
-        const QString& addr, 
-        int port, 
-        const QAuthenticator& auth, 
+        const QString& addr,
+        int port,
+        const QAuthenticator& auth,
         bool breakOnGotResult = false);
 
     void setSearchers(const SearcherList& searchers);
@@ -48,8 +48,8 @@ private:
     QUrl m_url;
     QAuthenticator m_auth;
 
-    /** 
-     * If one of the searchers in task found a resource than other searchers in the same task 
+    /**
+     * If one of the searchers in task found a resource than other searchers in the same task
      * won't be launched.
      */
     bool m_breakIfGotResult;
@@ -67,11 +67,11 @@ private:
 //!Scans different addresses simultaneously (using aio or concurrent operations)
 class QnManualCameraSearcher {
 
-    struct SearchTaskQueueContext 
+    struct SearchTaskQueueContext
     {
-        SearchTaskQueueContext() : 
-            isBlocked(false), 
-            isInterrupted(false), 
+        SearchTaskQueueContext() :
+            isBlocked(false),
+            isInterrupted(false),
             runningTaskCount(0) {};
 
         bool isBlocked;
@@ -92,8 +92,8 @@ public:
 
 private:
     QStringList getOnlineHosts(
-        const QString& startAddr, 
-        const QString& endAddr, 
+        const QString& startAddr,
+        const QString& endAddr,
         int port = nx_http::DEFAULT_HTTP_PORT);
 
     void runTasksUnsafe(QThreadPool* threadPool);

@@ -1,6 +1,5 @@
 #include "ioports_view_model.h"
-
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 namespace
 {
@@ -34,7 +33,7 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
     switch(index.column())
     {
     case IdColumn:
-        return elideString(value.id, kMaxIdLength);
+        return nx::utils::elideString(value.id, kMaxIdLength);
     case TypeColumn:
         return portTypeToString(value.portType);
     case DefaultStateColumn:
