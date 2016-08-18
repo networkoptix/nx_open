@@ -122,8 +122,8 @@ namespace stree
                 return;
             }
 
-            NX_LOG( lit("Stree. Condition. Found child with value %1 by search value %2")
-                .arg(toPrintable(it->first)).arg(value.toString()), cl_logDEBUG2 );
+//            NX_LOG( lit("Stree. Condition. Found child with value %1 by search value %2")
+//                .arg(toPrintable(it->first)).arg(value.toString()), cl_logDEBUG2 );
             it->second->get( in, out );
         }
 
