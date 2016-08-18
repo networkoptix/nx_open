@@ -9,7 +9,7 @@
 
 #include "ui_resource_list_dialog.h"
 
-QnResourceListDialog::QnResourceListDialog(QWidget *parent):
+QnResourceListDialog::QnResourceListDialog(QWidget* parent) :
     base_type(parent),
     ui(new Ui::ResourceListDialog())
 {
@@ -24,64 +24,71 @@ QnResourceListDialog::QnResourceListDialog(QWidget *parent):
     ui->doNotAskAgainCheckBox->hide();
 }
 
-QnResourceListDialog::~QnResourceListDialog() {
-    return;
+QnResourceListDialog::~QnResourceListDialog()
+{
 }
 
-bool QnResourceListDialog::isReadOnly() const {
-    return m_model->isReadOnly();
+void QnResourceListDialog::setReadOnlyInternal()
+{
+    m_model->setReadOnly(isReadOnly());
 }
 
-void QnResourceListDialog::setReadOnly(bool readOnly) {
-    m_model->setReadOnly(readOnly);
-}
-
-void QnResourceListDialog::setText(const QString &text) {
+void QnResourceListDialog::setText(const QString& text)
+{
     ui->topLabel->setText(text);
-
     ui->topLabel->setVisible(!text.isEmpty());
 }
 
-QString QnResourceListDialog::text() const {
+QString QnResourceListDialog::text() const
+{
     return ui->topLabel->text();
 }
 
-void QnResourceListDialog::setBottomText(const QString &bottomText) {
+void QnResourceListDialog::setBottomText(const QString& bottomText)
+{
     ui->bottomLabel->setText(bottomText);
-
     ui->bottomLabel->setVisible(!bottomText.isEmpty());
 }
 
-QString QnResourceListDialog::bottomText() const {
+QString QnResourceListDialog::bottomText() const
+{
     return ui->bottomLabel->text();
 }
 
-void QnResourceListDialog::showIgnoreCheckbox() {
+void QnResourceListDialog::showIgnoreCheckbox()
+{
     ui->doNotAskAgainCheckBox->show();
 }
 
-bool QnResourceListDialog::isIgnoreCheckboxChecked() const {
+bool QnResourceListDialog::isIgnoreCheckboxChecked() const
+{
     return ui->doNotAskAgainCheckBox->isChecked();
 }
 
-
-void QnResourceListDialog::setStandardButtons(QDialogButtonBox::StandardButtons standardButtons) {
+void QnResourceListDialog::setStandardButtons(QDialogButtonBox::StandardButtons standardButtons)
+{
     ui->buttonBox->setStandardButtons(standardButtons);
 }
 
-QDialogButtonBox::StandardButtons QnResourceListDialog::standardButtons() const {
+QDialogButtonBox::StandardButtons QnResourceListDialog::standardButtons() const
+{
     return ui->buttonBox->standardButtons();
 }
 
-void QnResourceListDialog::setResources(const QnResourceList &resources) {
+void QnResourceListDialog::setResources(const QnResourceList& resources)
+{
     m_model->setResources(resources);
 }
 
-const QnResourceList &QnResourceListDialog::resources() const {
+const QnResourceList& QnResourceListDialog::resources() const
+{
     return m_model->resources();
 }
 
-QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(
+    QWidget* parent, const QnResourceList& resources, int helpTopicId, const QString& title,
+    const QString& text, const QString& bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly)
+{
     QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(parent));
     dialog->setResources(resources);
     dialog->setWindowTitle(title);
@@ -94,15 +101,21 @@ QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, con
     return dialog->clickedButton();
 }
 
-QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget* parent, const QnResourceList& resources,
+    const QString& title, const QString& text, QDialogButtonBox::StandardButtons buttons, bool readOnly)
+{
     return exec(parent, resources, -1, title, text, QString(), buttons, readOnly);
 }
 
-QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget* parent, const QnResourceList& resources,
+    const QString& title, const QString& text, const QString& bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly)
+{
     return exec(parent, resources, -1, title, text, bottomText, buttons, readOnly);
 }
 
-QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons, bool readOnly) {
+QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget* parent, const QnResourceList& resources,
+    int helpTopicId, const QString& title, const QString& text, QDialogButtonBox::StandardButtons buttons, bool readOnly)
+{
     return exec(parent, resources, helpTopicId, title, text, QString(), buttons, readOnly);
 }
 

@@ -238,7 +238,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::ServerIssuesAction), SIGNAL(triggered()), this, SLOT(at_serverIssuesAction_triggered()));
     connect(action(QnActions::OpenInFolderAction), SIGNAL(triggered()), this, SLOT(at_openInFolderAction_triggered()));
     connect(action(QnActions::DeleteFromDiskAction), SIGNAL(triggered()), this, SLOT(at_deleteFromDiskAction_triggered()));
-    connect(action(QnActions::RemoveLayoutItemAction), SIGNAL(triggered()), this, SLOT(at_removeLayoutItemAction_triggered()));
     connect(action(QnActions::RemoveFromServerAction), SIGNAL(triggered()), this, SLOT(at_removeFromServerAction_triggered()));
     connect(action(QnActions::RenameResourceAction), SIGNAL(triggered()), this, SLOT(at_renameAction_triggered()));
     connect(action(QnActions::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
@@ -1628,49 +1627,6 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
         return;
 
     QnFileProcessor::deleteLocalResources(resources.toList());
-}
-
-void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
-    QnLayoutItemIndexList items = menu()->currentParameters(sender()).layoutItems();
-
-    if (items.size() > 1) {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            QnActionParameterTypes::resources(items),
-            Qn::RemoveItems_Help,
-            tr("Remove Items"),
-            tr("Are you sure you want to remove these %n items from layout?", "", items.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
-            );
-        if (button != QDialogButtonBox::Yes)
-            return;
-    }
-
-    QList<QnUuid> orphanedUuids;
-    foreach(const QnLayoutItemIndex &index, items) {
-        if (index.layout()) {
-            index.layout()->removeItem(index.uuid());
-        }
-        else {
-            orphanedUuids.push_back(index.uuid());
-        }
-    }
-
-    /* If appserver is not running, we may get removal requests without layout resource. */
-    if (!orphanedUuids.isEmpty()) {
-        QList<QnWorkbenchLayout *> layouts;
-        layouts.push_front(workbench()->currentLayout());
-        foreach(const QnUuid &uuid, orphanedUuids) {
-            foreach(QnWorkbenchLayout *layout, layouts) {
-                if (QnWorkbenchItem *item = layout->item(uuid)) {
-                    qnDeleteLater(item);
-                    break;
-                }
-            }
-        }
-    }
-    if (workbench()->currentLayout()->items().isEmpty())
-        workbench()->currentLayout()->setCellAspectRatio(-1.0);
 }
 
 bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {

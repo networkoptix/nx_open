@@ -796,6 +796,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
          * Removes item(s) from layout(s).
          */
         RemoveLayoutItemAction,
+        RemoveLayoutItemFromSceneAction,
 
         /**
          * Removes a resource from Server.

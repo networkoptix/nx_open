@@ -8,13 +8,14 @@
 #include <nx_ec/data/api_media_server_data.h>
 
 #include <ui/common/palette.h>
+#include <ui/common/read_only.h>
 #include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
     const int secsPerDay = 3600 * 24;
     const int daysPerWeek = 7;
-    const int bitsPerMegabit = 1000000;
+    const int bitsPerMegabit = 1024*1024;
     const int bitsPerByte = 8;
 
     /** Default format used all over the app. */
@@ -70,8 +71,6 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
 
     connect(ui->limitBandwithCheckBox, &QCheckBox::stateChanged, this, updateLimitControls);
     updateLimitControls();
-
-
 }
 
 QnBackupScheduleDialog::~QnBackupScheduleDialog()
@@ -191,4 +190,15 @@ void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
         value.backupBitrate = -value.backupBitrate;
 }
 
+void QnBackupScheduleDialog::setReadOnlyInternal()
+{
+    base_type::setReadOnlyInternal();
 
+    ::setReadOnly(ui->comboBoxTimeStart, isReadOnly());
+    ::setReadOnly(ui->comboBoxTimeTo, isReadOnly());
+    ::setReadOnly(ui->limitBandwithCheckBox, isReadOnly());
+    ::setReadOnly(ui->spinBoxBandwidth, isReadOnly());
+
+    for (auto checkbox : m_dowCheckboxes)
+        ::setReadOnly(checkbox, isReadOnly());
+}

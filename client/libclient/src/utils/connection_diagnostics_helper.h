@@ -24,6 +24,8 @@ public:
         ServerError
     };
 
+    static QnSoftwareVersion minSupportedVersion();
+
 #ifdef _DEBUG
     static QString resultToString(Result value);
 #endif //  _DEBUG
@@ -34,8 +36,10 @@ public:
         int helpTopicId;
     };
 
-    /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
-    static Result validateConnectionLight(const QString &brand, int protoVersion);
+    /** Light check of connection validity. Returns Success if we can
+        connect without problems, Failure otherwise. */
+    static Result validateConnectionLight(
+        const QString &brand, int protoVersion, const QnSoftwareVersion& version);
 
     /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
     static Result validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode);

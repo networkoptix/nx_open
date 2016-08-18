@@ -169,6 +169,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     auto batchToggleCheckboxes = [this](const QModelIndex& index)
         {
+            Q_UNUSED(index);
             QnTreeView* tree = static_cast<QnTreeView*>(sender());
             QAbstractItemModel* model = tree->model();
             int column = (tree == ui->controlsTreeView)
@@ -218,6 +219,8 @@ bool QnAccessibleResourcesWidget::hasChanges() const
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
+    refreshModel();
+
     if (m_controlsVisible)
     {
         QSet<QnUuid> checkedControls;
@@ -384,39 +387,23 @@ void QnAccessibleResourcesWidget::initResourcesModel()
     m_resourcesModel->setUserCheckable(false);
     m_resourcesModel->setStatusIgnored(true);
 
-    auto handleResourceAdded = [this](const QnResourcePtr& resource)
-    {
-        if (!resourcePassFilter(resource))
-            return;
-
-        if (m_resourcesModel->resources().contains(resource))
-            return;
-
-        m_resourcesModel->addResource(resource);
-    };
-
-    auto refreshModel = [this, handleResourceAdded]()
-    {
-        m_resourcesModel->setResources(QnResourceList());
-        for (const QnResourcePtr& resource : qnResPool->getResources())
-            handleResourceAdded(resource);
-    };
-
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnAccessibleResourcesWidget::handleResourceAdded);
 
     if (m_filter == QnResourceAccessFilter::LayoutsFilter)
     {
-        connect(qnResPool, &QnResourcePool::resourceAdded, this, [this, handleResourceAdded](const QnResourcePtr& resource)
+        connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr& resource)
         {
             if (!resource.dynamicCast<QnLayoutResource>())
                 return;
 
             /* Looks like hack as we have no dynamic filter model and must maintain list manually.
              * Really the only scenario we should handle is when the layout becomes remote (after it is saved). */
-            connect(resource.data(), &QnResource::flagsChanged, this, handleResourceAdded);
+            connect(resource.data(), &QnResource::flagsChanged, this,
+                &QnAccessibleResourcesWidget::handleResourceAdded);
         });
     }
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, refreshModel](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
     {
         disconnect(resource.data(), nullptr, this, nullptr);
         m_resourcesModel->removeResource(resource);
@@ -424,7 +411,8 @@ void QnAccessibleResourcesWidget::initResourcesModel()
             refreshModel();
     });
 
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+        &QnAccessibleResourcesWidget::refreshModel);
     refreshModel();
 
     connect(m_resourcesModel, &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
@@ -482,6 +470,24 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     ui->detailsWidget->setTargetResource(camera ? camera->getId() : QnUuid());
     ui->detailsWidget->layout()->activate();
+}
+
+void QnAccessibleResourcesWidget::handleResourceAdded(const QnResourcePtr& resource)
+{
+    if (!resourcePassFilter(resource))
+        return;
+
+    if (m_resourcesModel->resources().contains(resource))
+        return;
+
+    m_resourcesModel->addResource(resource);
+}
+
+void QnAccessibleResourcesWidget::refreshModel()
+{
+    m_resourcesModel->setResources(QnResourceList());
+    for (const QnResourcePtr& resource : qnResPool->getResources())
+        handleResourceAdded(resource);
 }
 
 void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* event)

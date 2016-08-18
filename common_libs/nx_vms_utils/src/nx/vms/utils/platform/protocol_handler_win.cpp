@@ -11,7 +11,10 @@
 #include <nx/utils/software_version.h>
 
 namespace nx {
+namespace vms {
 namespace utils {
+
+using nx::utils::SoftwareVersion;
 
 bool registerSystemUriProtocolHandler(
     const QString& protocol,
@@ -100,5 +103,6 @@ bool runAsAdministratorWithUAC(const QString& applicationBinaryPath, const QStri
 }
 
 
-}
-}
+} // namespace utils
+} // namespace vms
+} // namespace nx

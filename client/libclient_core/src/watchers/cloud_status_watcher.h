@@ -76,6 +76,9 @@ public:
 
     void setCloudCredentials(const QString &login, const QString &password, bool initial = false);
 
+    QString temporaryLogin() const;
+    QString temporaryPassword() const;
+
     QString cloudEndpoint() const;
     void setCloudEndpoint(const QString &endpoint);
 

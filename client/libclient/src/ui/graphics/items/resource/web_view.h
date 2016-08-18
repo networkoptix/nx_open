@@ -17,8 +17,7 @@ class QnWebView : public QGraphicsWebView
     Q_PROPERTY(WebViewPageStatus status READ status WRITE setStatus NOTIFY statusChanged)
     Q_PROPERTY(bool canGoBack READ canGoBack WRITE setCanGoBack NOTIFY canGoBackChanged)
 public:
-    QnWebView(const QUrl &url = QUrl()
-        , QGraphicsItem *parent = nullptr);
+    QnWebView(const QUrl &url = QUrl(), QGraphicsItem *parent = nullptr);
 
     virtual ~QnWebView();
 

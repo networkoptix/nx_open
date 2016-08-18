@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtGui/QStandardItem>
+#include <QtGui/QMovie>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 
@@ -18,12 +19,9 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui
-{
+namespace Ui {
     class StorageConfigWidget;
-
 } // namespace Ui
-
 
 class QnStorageListModel;
 class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
@@ -48,10 +46,6 @@ protected:
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
-    void initQualitiesCombo();
-
-    void resetQualities();
-
     void restoreCamerasToBackup();
 
     /** Load initial storages data from resource pool. */
@@ -59,7 +53,7 @@ private:
 
     void updateRebuildInfo();
     void updateBackupInfo();
-    void at_eventsGrid_clicked(const QModelIndex& index);
+    void at_storageView_clicked(const QModelIndex& index);
 
     void applyCamerasToBackup(const QnVirtualCameraResourceList& cameras,
         Qn::CameraBackupQualities quality);
@@ -67,10 +61,10 @@ private:
     void updateCamerasForBackup(const QnVirtualCameraResourceList& cameras);
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras);
-    void updateSelectedCamerasCaption(int selectedCamerasCount);
 
-    void updateColumnWidth();
-    int getColWidth(int col);
+    void updateDisabledStoragesWarning(bool visible);
+
+    void updateIntervalLabels();
 
     void startRebuid(bool isMain);
     void cancelRebuild(bool isMain);
@@ -81,7 +75,12 @@ private:
     /** Check if backup can be started right now - and show additional info if not. */
     bool canStartBackup(const QnBackupStatusData& data, int selectedCamerasCount, QString* info);
 
-    QString backupPositionToString(qint64 backupTimeMs);
+    void invokeBackupSettings();
+
+    static QString backupPositionToString(qint64 backupTimeMs);
+    static QString intervalToString(qint64 backupTimeMs);
+
+    quint64 nextScheduledBackupTimeMs() const;
 
 private slots:
 
@@ -96,15 +95,13 @@ private slots:
 
     void at_addExtStorage(bool addToMain);
 
-    void at_openBackupSchedule_clicked();
-
-    void at_backupTypeComboBoxChange(int index);
-
 private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
     QScopedPointer<QnStorageListModel> m_model;
     QTimer* m_updateStatusTimer;
+    QTimer* m_updateLabelsTimer;
+    QMenu* m_storagePoolMenu;
 
     struct StoragePool
     {
@@ -115,17 +112,20 @@ private:
     StoragePool m_mainPool;
     StoragePool m_backupPool;
     QnServerBackupSchedule m_backupSchedule;
+    qint64 m_lastPerformedBackupTimeMs;
+    qint64 m_nextScheduledBackupTimeMs;
 
     bool m_backupCancelled;
     bool m_updating;
 
     Qn::CameraBackupQualities m_quality;
     QnVirtualCameraResourceList m_camerasToBackup;
+    bool m_backupNewCameras;
+
+    QScopedPointer<QMovie> m_realtimeBackupMovie;
 
 private:
-    void setupGrid(QTableView* tableView, bool isMainPool);
     void applyStoragesChanges(QnStorageResourceList& result,
         const QnStorageModelInfoList& storages) const;
     bool hasStoragesChanges(const QnStorageModelInfoList& storages) const;
-    void updateBackupWidgetsVisibility();
 };

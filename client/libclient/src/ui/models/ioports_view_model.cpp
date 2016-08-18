@@ -7,6 +7,8 @@ namespace
     static const int kColumnSizeExtendPx = 20;
 }
 
+#include <client/client_globals.h>
+
 QnIOPortsViewModel::QnIOPortsViewModel(QObject *parent) :
     base_type(parent)
 {}

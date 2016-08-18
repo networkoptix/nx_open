@@ -3,15 +3,16 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
 
+#include <client/client_globals.h>
+
 #include <common/common_module.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
 #include <ui/style/skin.h>
-#include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 

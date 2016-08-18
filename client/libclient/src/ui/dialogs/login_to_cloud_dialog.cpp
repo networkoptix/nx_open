@@ -7,9 +7,13 @@
 
 #include <ui/common/aligner.h>
 #include <ui/common/palette.h>
+#include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/custom_style.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/input_field.h>
 
 #include <watchers/cloud_status_watcher.h>
@@ -38,6 +42,11 @@ public:
     void at_loginButton_clicked();
     void at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status);
     void at_cloudStatusWatcher_error();
+
+    void showCredentialsError(bool show);
+
+public:
+    QnBusyIndicatorWidget* busyIndicator;
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
@@ -49,12 +58,16 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
-    ui->loginInputField->setTitle(tr("Email"));
+    d->busyIndicator->setParent(ui->loginButton);
+
+    ui->loginInputField->setTitle(tr("E-Mail"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+
+    setWarningStyle(ui->invalidCredentialsLabel);
 
     connect(ui->loginButton,        &QPushButton::clicked,      d, &QnLoginToCloudDialogPrivate::at_loginButton_clicked);
     connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
@@ -65,7 +78,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), QnCloudUrlHelper::aboutUrl()));
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
-    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
@@ -78,8 +91,18 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 
+    auto opacityEffect = new QGraphicsOpacityEffect(this);
+    opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
+    ui->logoPanel->setGraphicsEffect(opacityEffect);
+    opacityEffect = new QGraphicsOpacityEffect(this);
+    opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
+    ui->linksWidget->setGraphicsEffect(opacityEffect);
+
     ui->loginInputField->setFocus();
     d->updateUi();
+    d->lockUi(false);
+
+    ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
 
     setResizeToContentsMode(Qt::Vertical);
 }
@@ -93,10 +116,19 @@ void QnLoginToCloudDialog::setLogin(const QString& login)
     ui->loginInputField->setText(login);
 }
 
+void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)
+{
+    Q_Q(QnLoginToCloudDialog);
+    q->ui->invalidCredentialsLabel->setVisible(show);
+    q->ui->containerWidget->layout()->activate();
+}
+
 QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent) :
     QObject(parent),
-    q_ptr(parent)
+    q_ptr(parent),
+    busyIndicator(new QnBusyIndicatorWidget(parent))
 {
+    new QnWidgetAnchor(busyIndicator);
 }
 
 void QnLoginToCloudDialogPrivate::updateUi()
@@ -105,16 +137,25 @@ void QnLoginToCloudDialogPrivate::updateUi()
     q->ui->loginButton->setEnabled(
         q->ui->loginInputField->isValid() &&
         q->ui->passwordInputField->isValid());
+
+    showCredentialsError(false);
 }
 
 void QnLoginToCloudDialogPrivate::lockUi(bool locked)
 {
     Q_Q(QnLoginToCloudDialog);
 
-    q->ui->loginInputField->setReadOnly(locked);
-    q->ui->passwordInputField->setReadOnly(locked);
-    q->ui->stayLoggedInChackBox->setEnabled(!locked);
-    q->ui->loginButton->setEnabled(!locked);
+    const bool enabled = !locked;
+
+    q->ui->logoPanel->setEnabled(enabled);
+    q->ui->containerWidget->setEnabled(enabled);
+    q->ui->loginButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
+
+    q->ui->logoPanel->graphicsEffect()->setEnabled(locked);
+    q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
+
+    q->ui->loginButton->setText(locked ? QString() : tr("Login"));
+    busyIndicator->setVisible(locked);
 }
 
 void QnLoginToCloudDialogPrivate::unlockUi()
@@ -127,6 +168,8 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
     lockUi();
 
     Q_Q(QnLoginToCloudDialog);
+
+    showCredentialsError(false);
 
     qnCloudStatusWatcher->setCloudCredentials(QString(), QString());
 
@@ -170,20 +213,28 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
         case QnCloudStatusWatcher::NoError:
             break;
         case QnCloudStatusWatcher::InvalidCredentials:
-            message = tr("Login or password is invalid");
+        {
+            showCredentialsError(true);
             break;
+        }
         case QnCloudStatusWatcher::UnknownError:
-            message = tr("Can not login to cloud");
+        default:
+        {
+            message = tr("Can not login to the cloud");
             break;
+        }
     }
 
     Q_Q(QnLoginToCloudDialog);
 
-    QnMessageBox::critical(q,
-        helpTopic(q),
-        tr("Error"),
-        message,
-        QDialogButtonBox::Ok);
+    if (!message.isEmpty())
+    {
+        QnMessageBox::critical(q,
+            helpTopic(q),
+            tr("Error"),
+            message,
+            QDialogButtonBox::Ok);
+    }
 
     unlockUi();
 }

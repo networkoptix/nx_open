@@ -373,6 +373,12 @@ void QnUserSettingsDialog::applyChanges()
     updateButtonBox();
 }
 
+void QnUserSettingsDialog::showEvent(QShowEvent* event)
+{
+    loadDataToUi();
+    base_type::showEvent(event);
+}
+
 void QnUserSettingsDialog::updateControlsVisibility()
 {
     auto mode = m_model->mode();

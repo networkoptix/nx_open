@@ -11,13 +11,12 @@
 
 #include <common/common_module.h>
 
-#include <translation/translation_list_model.h>
-
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/models/translation_list_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
