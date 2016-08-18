@@ -24,6 +24,7 @@
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
+#include <api/model/update_information_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/runtime_info_manager.h>
 
@@ -261,6 +262,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
+    qRegisterMetaType<QnUpdateFreeSpaceReply>();
 
     qRegisterMetaType<QnLdapUser>();
     qRegisterMetaType<QnLdapUsers>();
