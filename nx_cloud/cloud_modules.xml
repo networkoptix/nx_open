@@ -6,17 +6,14 @@
     <set resName="cloud.instance.name" resValue="cloud-demo.hdw.mx"/>
 
     <!-- detecting cloud instance depending on VMS version -->
-    <!--
-    <condition resName="vms.version.build" matchType="intRange">
-        <set value="0-10000" resName="cloud.instance.name" resValue="alpha.nxvms.cloud"/>
+    <condition resName="vms.version.build" matchType="range">
+        <set value="0-1000000" resName="cloud.instance.name" resValue="cloud-demo.hdw.mx"/>
     </condition>
-    -->
 
     <!-- overriding for specific build (if needed) -->
     <condition resName="vms.version.build">
         <set value="4728" resName="cloud.instance.name" resValue="cloud-demo.hdw.mx"/>
     </condition>
-
 
     <!-- setting cloud module endpoints by instance name. This section needs modifications only if new cloud instance has been added -->
     <condition resName="cloud.instance.name">
