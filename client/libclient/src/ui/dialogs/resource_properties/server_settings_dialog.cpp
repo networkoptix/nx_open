@@ -10,7 +10,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/server_settings_widget.h>
-#include <ui/widgets/properties/recording_statistics_widget.h>
+#include <ui/widgets/properties/storage_analytics_widget.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -24,7 +24,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     , ui(new Ui::ServerSettingsDialog)
     , m_server()
     , m_generalPage(new QnServerSettingsWidget(this))
-    , m_statisticsPage(new QnRecordingStatisticsWidget(this))
+    , m_statisticsPage(new QnStorageAnalyticsWidget(this))
     , m_storagesPage(new QnStorageConfigWidget(this))
     , m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
 {
@@ -34,10 +34,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
 
-    /* Handling scenario when user closed the dialog and reopened it again. */
-    connect(this, &QnGenericTabbedDialog::dialogClosed, m_statisticsPage, &QnRecordingStatisticsWidget::resetForecast);
-
-    connect(m_webPageButton, &QPushButton::clicked, this, [this] {
+    connect(m_webPageButton, &QPushButton::clicked, this, [this]()
+    {
         menu()->trigger(QnActions::WebClientAction, m_server);
     });
 

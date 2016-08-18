@@ -16,19 +16,20 @@
 #include <utils/common/connective.h>
 
 class QnRecordingStatsModel;
+class QnTableView;
 
 namespace Ui {
-    class RecordingStatisticsWidget;
+    class StorageAnalyticsWidget;
 }
 
-//TODO: rename to StorageAnalyticsWidget
-class QnRecordingStatisticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
+class QnStorageAnalyticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+{
     Q_OBJECT
+    using base_type = Connective<QnAbstractPreferencesWidget>;
 
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    QnRecordingStatisticsWidget(QWidget* parent = 0);
-    virtual ~QnRecordingStatisticsWidget();
+    QnStorageAnalyticsWidget(QWidget* parent = 0);
+    virtual ~QnStorageAnalyticsWidget();
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
@@ -37,12 +38,10 @@ public:
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
 
-    /** Clean 'forecast' state. */
-    void resetForecast();
-
 private:
     void updateData();
-    void updateColors();
+    void setupTableView(QnTableView* table, QAbstractItemModel* model);
+    QnTableView* currentTable() const;
 
 private slots:
     void at_gotStatiscits(int status, const QnRecordingStatsReply& data, int requestNum);
@@ -52,7 +51,6 @@ private slots:
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
     void at_forecastParamsChanged();
-
 
 private:
     void requestFinished();
@@ -69,7 +67,7 @@ private:
     int bytesToSliderPosition (qint64 value) const;
 
 private:
-    QScopedPointer<Ui::RecordingStatisticsWidget> ui;
+    QScopedPointer<Ui::StorageAnalyticsWidget> ui;
 
     QnMediaServerResourcePtr m_server;
 

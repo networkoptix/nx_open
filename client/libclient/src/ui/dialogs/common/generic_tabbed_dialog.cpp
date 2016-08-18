@@ -241,7 +241,7 @@ void QnGenericTabbedDialog::initializeTabWidget()
     if(m_tabWidget)
         return; /* Already initialized with a direct call to setTabWidget in derived class's constructor. */
 
-    QList<QTabWidget *> tabWidgets = findChildren<QTabWidget *>();
+    QList<QTabWidget *> tabWidgets = findChildren<QTabWidget *>(QString(), Qt::FindDirectChildrenOnly);
     if(tabWidgets.empty()) {
         qnWarning("QnGenericTabbedDialog '%1' doesn't have a QTabWidget.", metaObject()->className());
         return;
