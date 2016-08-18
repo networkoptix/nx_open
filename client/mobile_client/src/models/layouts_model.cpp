@@ -335,7 +335,7 @@ void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& res
 
 void QnLayoutsModelUnsorted::at_serverFlagsChanged(const QnResourcePtr& resource)
 {
-
+    Q_UNUSED(resource);
 }
 
 QnLayoutsModel::QnLayoutsModel(QObject* parent) :
