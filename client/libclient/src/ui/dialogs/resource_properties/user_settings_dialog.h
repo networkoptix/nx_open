@@ -47,6 +47,8 @@ protected:
     virtual bool hasChanges() const override;
     virtual void applyChanges() override;
 
+    virtual void showEvent(QShowEvent* event) override;
+
 private:
     void updateControlsVisibility();
     void permissionsChanged();
