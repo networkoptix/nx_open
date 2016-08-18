@@ -28,6 +28,8 @@
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/models/storage_list_model.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/globals.h>
+#include <ui/style/nx_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/storage_space_slider.h>
@@ -88,8 +90,11 @@ namespace
         {
             QSize result = base_type::sizeHint(option, index);
 
-            if (index.column() == QnStorageListModel::StoragePoolColumn)
+            if (index.column() == QnStorageListModel::StoragePoolColumn
+                && index.flags().testFlag(Qt::ItemIsEditable))
+            {
                 result.rwidth() += style::Metrics::kArrowSize + style::Metrics::kStandardPadding;
+            }
 
             return result;
         }
@@ -102,10 +107,29 @@ namespace
             initStyleOption(&opt, index);
 
             bool editableColumn = opt.state.testFlag(QStyle::State_Enabled)
-              && index.column() == QnStorageListModel::StoragePoolColumn;
+              && index.column() == QnStorageListModel::StoragePoolColumn
+              && index.flags().testFlag(Qt::ItemIsEditable);
 
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
+
+            if (index.column() == QnStorageListModel::StoragePoolColumn && !editableColumn)
+                opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
+
+            if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
+            {
+                if (auto style = QnNxStyle::instance())
+                {
+                    QnPaletteColor color = style->mainColor(QnNxStyle::Colors::kBlue);
+                    if (!hovered)
+                        color = color.darker(2);
+                    opt.palette.setColor(QPalette::Text, color);
+                }
+                else
+                {
+                    opt.palette.setColor(QPalette::Text, QPalette().color(QPalette::Link));
+                }
+            }
 
             if (editableColumn && hovered)
             {
@@ -507,7 +531,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
 
     if (index.column() == QnStorageListModel::StoragePoolColumn)
     {
-        if (!m_model->canChangeStoragePool(record))
+        if (!m_model->canChangeStoragePool(record) || !index.flags().testFlag(Qt::ItemIsEditable))
             return;
 
         auto findAction = [this](bool isBackup) -> QAction*

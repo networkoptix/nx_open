@@ -177,7 +177,8 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
         }
 
         case StoragePoolColumn:
-            return storageData.isBackup ? tr("Backup") : tr("Main");
+            return !storageData.isWritable ? tr("Inaccessible")
+                  : storageData.isBackup ? tr("Backup") : tr("Main");
 
         case TypeColumn:
             return storageData.storageType;
@@ -206,47 +207,11 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 : QString();
         }
 
-#if 0
-        case ChangeGroupActionColumn:
-        {
-            /* Calculate predefined column width */
-            if (forcedText)
-                return tr("Use as backup storage");
-
-            if (m_readOnly)
-                return QString();
-
-            if (!storageData.isWritable)
-                return tr("Inaccessible"); //FIXME!!! DONT LOSE THIS INFO
-
-            if (!canMoveStorage(storageData))
-                return QString();
-
-            return storageData.isBackup
-                ? tr("Use as main storage")
-                : canMoveStorage(storageData)
-                ? tr("Use as backup storage")
-                : QString();
-        }
-#endif
         default:
             break;
     }
 
     return QString();
-}
-
-QVariant QnStorageListModel::foregroundData(const QModelIndex& index) const
-{
-    if (m_readOnly)
-        return QVariant();
-
-    QnStorageModelInfo storageData = storage(index);
-
-    if (index.column() == RemoveActionColumn && canRemoveStorage(storageData))
-        return m_linkBrush;
-
-    return QVariant();
 }
 
 QVariant QnStorageListModel::mouseCursorData(const QModelIndex& index) const
@@ -281,8 +246,6 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
     {
         case Qt::DisplayRole:
             return displayData(index, false);
-        case Qt::ForegroundRole:
-            return foregroundData(index);
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(index);
         case Qt::CheckStateRole:
@@ -333,8 +296,6 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
             return true;
 
         QnStorageModelInfo storageData = storage(index);
-        if (!storageData.isWritable)
-            return false;
 
         if (isStorageInRebuild(storageData))
             return false;
@@ -348,10 +309,14 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
 
     Qt::ItemFlags flags = Qt::ItemIsSelectable;
 
-    if (isEnabled(index) && (index.column() != StoragePoolColumn ||
-        canChangeStoragePool(storage(index))))
-    {
+    if (isEnabled(index))
         flags |= Qt::ItemIsEnabled;
+
+    if (index.column() == StoragePoolColumn)
+    {
+        auto s = storage(index);
+        if (s.isWritable && canChangeStoragePool(s))
+            flags |= Qt::ItemIsEditable;
     }
 
     if (index.column() == CheckBoxColumn)

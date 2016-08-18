@@ -81,7 +81,6 @@ protected:
 
 private:
     QString displayData(const QModelIndex& index, bool forcedText) const;
-    QVariant foregroundData(const QModelIndex& index) const;
     QVariant mouseCursorData(const QModelIndex& index) const;
     QVariant checkstateData(const QModelIndex& index) const;
 
