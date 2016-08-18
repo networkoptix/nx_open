@@ -944,12 +944,7 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
     /* If layout is changed, it will automatically be saved here (and become shared if needed).
      * Also we do not grant direct access to cameras anyway as layout will become shared
      * and do not ask confirmation, so we do not use common saveLayout() method anyway. */
-    if (!snapshotManager()->save(layout,
-        [this]
-        (bool success, const QnLayoutResourcePtr &layout)
-        {
-            QN_UNUSED(success, layout);
-        }))
+    if (!snapshotManager()->save(layout))
         return;
 
 
