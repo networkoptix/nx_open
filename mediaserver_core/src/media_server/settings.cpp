@@ -44,7 +44,7 @@ QSettings* MSSettings::roSettings()
 #ifndef _WIN32
                 defaultConfigFileName, QSettings::IniFormat
 #else
-                QSettings::SystemScope, QnAppInfo::organizationName(), lit(QN_APPLICATION_NAME)
+                QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
 #endif
             ) );
         } );

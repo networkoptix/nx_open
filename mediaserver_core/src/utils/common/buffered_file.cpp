@@ -14,6 +14,7 @@ extern "C"
 #include "recorder/storage_manager.h"
 #include <nx/streaming/config.h>
 #include <media_server/settings.h>
+#include "nx/utils/log/log.h"
 
 #ifdef Q_OS_WIN
 #include "windows.h"
@@ -299,7 +300,7 @@ bool QBufferedFile::updatePos()
                     .arg(newBufSize - m_minBufferSize),
                    cl_logDEBUG1);
 
-            int maxBufferSize = 
+            int maxBufferSize =
                 MSSettings::roSettings()->value(
                     nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
                     nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();

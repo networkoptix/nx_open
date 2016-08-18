@@ -3,12 +3,10 @@
 #ifdef ENABLE_ADVANTECH
 
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
 #include <atomic>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
-#include <utils/common/timermanager.h>
 #include <modbus/modbus_async_client.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
 
@@ -65,7 +63,7 @@ protected:
 
 private:
     QnIOPortDataList mergeIOPortData(
-        const QnIOPortDataList& fromDevice, 
+        const QnIOPortDataList& fromDevice,
         const QnIOPortDataList& saved) const;
 
     void setPortDefaultStates();
@@ -75,7 +73,7 @@ private:
     std::unique_ptr<QnAbstractIOManager> m_ioManager;
     std::map<quint64, PortTimerEntry> m_autoResetTimers;
 
-    
+
 
     mutable QnMutex m_mutex;
 

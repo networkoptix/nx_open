@@ -1,6 +1,6 @@
 #pragma once
 #include "modbus.h"
-#include <utils/network/system_socket.h>
+#include <nx/network/socket.h>
 
 namespace nx_modbus
 {
@@ -49,15 +49,15 @@ private:
     bool initSocket();
     void readAsync(quint64 currentRequestSequenceNum);
     void asyncSendDone(
-        AbstractSocket* sock, 
-        quint64 currentRequestSequenceNum, 
-        SystemError::ErrorCode errorCode, 
+        AbstractSocket* sock,
+        quint64 currentRequestSequenceNum,
+        SystemError::ErrorCode errorCode,
         size_t bytesWritten);
 
     void onSomeBytesReadAsync(
-        AbstractSocket* sock, 
+        AbstractSocket* sock,
         quint64 currentRequestSequenceNum,
-        SystemError::ErrorCode errorCode, 
+        SystemError::ErrorCode errorCode,
         size_t bytesRead);
 
     void processState(quint64 currentRequestSequenceNum);

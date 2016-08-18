@@ -7,7 +7,7 @@
 #include <QtXml/QXmlDefaultHandler>
 #include "core/resource_management/resource_pool.h"
 #include <nx/network/nettools.h>
-#include <nx/network/system_socket.h>
+#include <nx/network/socket.h>
 
 #include <utils/common/app_info.h>
 
