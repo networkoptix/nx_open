@@ -8,6 +8,7 @@
 
 #ifdef Q_OS_WIN
 #   include <winsock2.h>
+#   include <WS2tcpip.h>
 #else
 #   include <sys/socket.h>
 #   include <sys/types.h>

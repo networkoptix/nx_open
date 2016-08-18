@@ -14,7 +14,6 @@
 #include <common/common_globals.h>
 
 #ifdef Q_OS_WIN
-#  include <ws2tcpip.h>
 #  include <iphlpapi.h>
 #  include <Mstcpip.h>
 #  include "win32_socket_tools.h"
