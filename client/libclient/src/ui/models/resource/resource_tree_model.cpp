@@ -1653,6 +1653,11 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
                 QnActionParameters(droppable).
                 withArgument(Qn::LayoutResourceRole, layout)
             );
+
+            menu()->trigger(
+                QnActions::SaveLayoutAction,
+                QnActionParameters(layout)
+            );
         }
     }
 

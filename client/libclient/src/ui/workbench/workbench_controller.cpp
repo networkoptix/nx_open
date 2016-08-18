@@ -483,15 +483,17 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return workbench()->mapper();
 }
 
-bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
+bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
 {
-    if (event->type() == QEvent::Close) {
-        if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
+    if (event->type() == QEvent::Close)
+    {
+        if (QnResourceWidget* widget = qobject_cast<QnResourceWidget*>(watched))
+        {
             /* Clicking on close button of a widget that is not selected should clear selection. */
-            if(!widget->isSelected())
+            if (!widget->isSelected())
                 display()->scene()->clearSelection();
 
-            menu()->trigger(QnActions::RemoveLayoutItemAction, widget);
+            menu()->trigger(QnActions::RemoveLayoutItemFromSceneAction, widget);
             event->ignore();
             return true;
         }

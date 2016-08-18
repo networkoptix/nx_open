@@ -21,6 +21,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/messages/layouts_handler_messages.h>
@@ -30,14 +31,17 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>     //TODO: #GDM dependencies
 #include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
 #include <ui/workbench/workbench_state_manager.h>
 
-#include <utils/common/counter.h>
 #include <nx/utils/string.h>
+
+#include <utils/common/counter.h>
+#include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
@@ -99,6 +103,11 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
     connect(action(QnActions::ShareLayoutAction),                   &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered);
     connect(action(QnActions::StopSharingLayoutAction),             &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered);
     connect(action(QnActions::OpenNewTabAction),                    &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered);
+
+    connect(action(QnActions::RemoveLayoutItemAction), &QAction::triggered, this,
+        &QnWorkbenchLayoutsHandler::at_removeLayoutItemAction_triggered);
+    connect(action(QnActions::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
+        &QnWorkbenchLayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(), &QnWorkbench::layoutsChanged, this, &QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged, Qt::QueuedConnection);
@@ -357,6 +366,66 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     snapshotManager()->save(newLayout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
+}
+
+void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave)
+{
+
+    if (items.size() > 1)
+    {
+        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+            mainWindow(),
+            QnActionParameterTypes::resources(items),
+            Qn::RemoveItems_Help,
+            tr("Remove Items"),
+            tr("Are you sure you want to remove these %n items from layout?", "", items.size()),
+            QDialogButtonBox::Yes | QDialogButtonBox::No
+        );
+        if (button != QDialogButtonBox::Yes)
+            return;
+    }
+
+    QList<QnUuid> orphanedUuids;
+    QSet<QnLayoutResourcePtr> layouts;
+    for (const QnLayoutItemIndex &index : items)
+    {
+        if (index.layout())
+        {
+            index.layout()->removeItem(index.uuid());
+            layouts << index.layout();
+        }
+        else
+        {
+            orphanedUuids.push_back(index.uuid());
+        }
+    }
+
+    /* If appserver is not running, we may get removal requests without layout resource. */
+    if (!orphanedUuids.isEmpty())
+    {
+        QList<QnWorkbenchLayout *> layouts;
+        layouts.push_front(workbench()->currentLayout());
+        for (const QnUuid &uuid : orphanedUuids)
+        {
+            for (QnWorkbenchLayout* layout : layouts)
+            {
+                if (QnWorkbenchItem* item = layout->item(uuid))
+                {
+                    qnDeleteLater(item);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (workbench()->currentLayout()->items().isEmpty())
+        workbench()->currentLayout()->setCellAspectRatio(-1.0);
+
+    if (autoSave)
+    {
+        for (const auto& layout : layouts)
+            menu()->trigger(QnActions::SaveLayoutAction, layout);
+    }
 }
 
 QnWorkbenchLayoutsHandler::LayoutChange QnWorkbenchLayoutsHandler::calculateLayoutChange(const QnLayoutResourcePtr& layout)
@@ -947,7 +1016,6 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
     if (!snapshotManager()->save(layout))
         return;
 
-
     /* Admins anyway have all shared layouts. */
     if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         return;
@@ -997,6 +1065,16 @@ void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
+}
+
+void QnWorkbenchLayoutsHandler::at_removeLayoutItemAction_triggered()
+{
+    removeLayoutItems(menu()->currentParameters(sender()).layoutItems(), true);
+}
+
+void QnWorkbenchLayoutsHandler::at_removeLayoutItemFromSceneAction_triggered()
+{
+    removeLayoutItems(menu()->currentParameters(sender()).layoutItems(), false);
 }
 
 void QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged()
