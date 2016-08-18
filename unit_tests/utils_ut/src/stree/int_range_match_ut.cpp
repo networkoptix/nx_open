@@ -3,6 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
+#include <cstring>
 #include <string>
 
 #include <gtest/gtest.h>
