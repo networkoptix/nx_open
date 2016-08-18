@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 
 #include "modbus.h"
 

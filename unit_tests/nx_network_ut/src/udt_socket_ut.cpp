@@ -182,7 +182,7 @@ TEST(SocketUdt_UdtPollSet, general)
 }
 #endif
 
-NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST_F, SocketUdt,
     [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
     [](){ return std::make_unique<UdtStreamSocket>(AF_INET); })
@@ -190,7 +190,7 @@ NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
 static std::unique_ptr<UdtStreamSocket> rendezvousUdtSocket(
     std::chrono::milliseconds connectTimeout)
 {
-    auto socket = std::make_unique<UdtStreamSocket>();
+    auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
     EXPECT_TRUE(socket->setRendezvous(true));
     EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
     EXPECT_TRUE(socket->setNonBlockingMode(true));

@@ -232,7 +232,7 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 #include <rest/helpers/permissions_helper.h>
 
 #if !defined(EDGE_SERVER)
