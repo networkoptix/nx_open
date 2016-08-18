@@ -48,6 +48,8 @@ private:
 
     void removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave);
 
+    void shareLayoutWith(const QnLayoutResourcePtr &layout, const QnResourceAccessSubject &subject);
+
     struct LayoutChange
     {
         QnLayoutResourcePtr layout;

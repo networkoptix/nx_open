@@ -428,6 +428,39 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
     }
 }
 
+void QnWorkbenchLayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layout,
+    const QnResourceAccessSubject &subject)
+{
+    NX_ASSERT(layout && subject.isValid());
+    if (!layout || !subject.isValid())
+        return;
+
+    NX_ASSERT(!layout->isFile());
+    if (layout->isFile())
+        return;
+
+    if (!layout->isShared())
+        layout->setParentId(QnUuid());
+    NX_ASSERT(layout->isShared());
+
+    /* If layout is changed, it will automatically be saved here (and become shared if needed).
+    * Also we do not grant direct access to cameras anyway as layout will become shared
+    * and do not ask confirmation, so we do not use common saveLayout() method anyway. */
+    if (!snapshotManager()->save(layout))
+        return;
+
+    /* Admins anyway have all shared layouts. */
+    if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+        return;
+
+    auto accessible = qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
+    if (accessible.contains(layout->getId()))
+        return;
+
+    accessible << layout->getId();
+    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
+}
+
 QnWorkbenchLayoutsHandler::LayoutChange QnWorkbenchLayoutsHandler::calculateLayoutChange(const QnLayoutResourcePtr& layout)
 {
     LayoutChange result;
@@ -998,34 +1031,15 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
         ? QnResourceAccessSubject(user)
         : QnResourceAccessSubject(qnResourceAccessManager->userGroup(roleId));
 
-    NX_ASSERT(layout && subject.isValid());
-    if (!layout || !subject.isValid())
-        return;
+    QnUserResourcePtr owner = layout->getParentResource().dynamicCast<QnUserResource>();
+    if (owner && owner == user)
+        return; /* Sharing layout with its owner does nothing. */
 
-    NX_ASSERT(!layout->isFile());
-    if (layout->isFile())
-        return;
+    /* Here layout will become shared, and owner will keep access rights. */
+    if (owner && !layout->isShared())
+        shareLayoutWith(layout, owner);
 
-    if (!layout->isShared())
-        layout->setParentId(QnUuid());
-    NX_ASSERT(layout->isShared());
-
-    /* If layout is changed, it will automatically be saved here (and become shared if needed).
-     * Also we do not grant direct access to cameras anyway as layout will become shared
-     * and do not ask confirmation, so we do not use common saveLayout() method anyway. */
-    if (!snapshotManager()->save(layout))
-        return;
-
-    /* Admins anyway have all shared layouts. */
-    if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
-        return;
-
-    auto accessible = qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
-    if (accessible.contains(layout->getId()))
-        return;
-
-    accessible << layout->getId();
-    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
+    shareLayoutWith(layout, subject);
 }
 
 void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()

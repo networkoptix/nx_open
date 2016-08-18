@@ -1666,24 +1666,8 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     {
         for (const QnLayoutResourcePtr &sourceLayout : sourceResources.filtered<QnLayoutResource>())
         {
-            QnUserResourcePtr owner = sourceLayout->getParentResource().dynamicCast<QnUserResource>();
-
-            if (owner && owner == targetUser)
-                continue; /* Dropping resource into its owner does nothing. */
-
             if (sourceLayout->isFile())
                 continue;
-
-            if (owner && !sourceLayout->isShared())
-            {
-                TRACE("Sharing layout " << sourceLayout->getName() << " with original owner " << owner->getName())
-                /* Here layout will become shared, and owner will keep access rights. */
-                menu()->trigger(
-                    QnActions::ShareLayoutAction,
-                    QnActionParameters(sourceLayout).
-                    withArgument(Qn::UserResourceRole, owner)
-                );
-            }
 
             TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
             menu()->trigger(
