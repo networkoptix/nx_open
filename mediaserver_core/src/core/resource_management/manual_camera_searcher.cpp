@@ -32,29 +32,29 @@ namespace {
      * @param resource                      Camera resource.
      * @return                              True if resource is already in resource pool, false otherwise.
      */
-    bool resourceExistsInPool(const QnResourcePtr &resource) 
+    bool resourceExistsInPool(const QnResourcePtr &resource)
     {
         bool existResource = false;
         QnResourcePtr res = qnResPool->getResourceByUniqueId(resource->getUniqueId());
-        if (res && qnResPool->getResourceById(res->getParentId())) 
+        if (res && qnResPool->getResourceById(res->getParentId()))
         {
             existResource = true; // already in resource pool
         }
-        else 
+        else
         {
             // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition checking for IP address
             QnSecurityCamResourcePtr netRes = resource.dynamicCast<QnSecurityCamResource>();
-            if (netRes) 
+            if (netRes)
             {
                 QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
                 existResList = existResList.filtered(
-                    [](const QnNetworkResourcePtr& res) 
-                    { 
+                    [](const QnNetworkResourcePtr& res)
+                    {
                         bool hasParent = qnResPool->getResourceById(res->getParentId());
                         return hasParent && res->getStatus() != Qn::Offline;
                     });
 
-                for(const QnNetworkResourcePtr& existRes: existResList) 
+                for(const QnNetworkResourcePtr& existRes: existResList)
                 {
                     QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
                     if (!existCam)
@@ -104,14 +104,12 @@ namespace {
     }
 
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers()
-    QnManualCameraSearchCameraList mapFunction() const {
-        QnManualCameraSearchCameraList results;
     {
         QList<QnAbstractNetworkResourceSearcher*> result;
 
-        for(QnAbstractResourceSearcher* as: QnResourceDiscoveryManager::instance()->plugins()) 
+        for(QnAbstractResourceSearcher* as: QnResourceDiscoveryManager::instance()->plugins())
         {
-            QnAbstractNetworkResourceSearcher* ns = 
+            QnAbstractNetworkResourceSearcher* ns =
                 dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
             Q_ASSERT(ns);
 
@@ -123,9 +121,9 @@ namespace {
 }
 
 QnSearchTask::QnSearchTask(
-    const QString& addr, 
-    int port, 
-    const QAuthenticator& auth, 
+    const QString& addr,
+    int port,
+    const QAuthenticator& auth,
     bool breakOnGotResult):
 
     m_auth(auth),
@@ -174,7 +172,7 @@ bool QnSearchTask::doesInterruptTaskProcessing() const
 
 void QnSearchTask::doSearch()
 {
-    QnManualCameraSearchCameraList results;
+    QnManualResourceSearchList results;
     for (const auto& checker: m_searchers)
     {
         auto seqResults = checker->checkHostAddr(m_url, m_auth, true);
@@ -182,17 +180,17 @@ void QnSearchTask::doSearch()
         for (const auto& res: seqResults)
         {
             QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>();
-            Q_ASSERT( ns );
+            Q_ASSERT(camRes);
             // Checking, if found resource is reserved by some other searcher
             if(camRes && !CameraDriverRestrictionList::instance()->driverAllowedForCamera(
-                checker->manufacture(), 
-                camRes->getVendor(), 
+                checker->manufacture(),
+                camRes->getVendor(),
                 camRes->getModel()))
             {
                 continue;   //< Camera is not allowed to be used with this driver.
             }
 
-            results.push_back(fromResource(res));
+            results.push_back(entryFromResource(res));
         }
 
         if (!results.isEmpty() && m_breakIfGotResult)
@@ -229,16 +227,16 @@ QnManualCameraSearcher::QnManualCameraSearcher():
 {
 }
 
-QnManualCameraSearcher::~QnManualCameraSearcher() 
+QnManualCameraSearcher::~QnManualCameraSearcher()
 {
 }
 
 bool QnManualCameraSearcher::run(
-    QThreadPool* threadPool, 
-    const QString& startAddr, 
-    const QString& endAddr, 
-    const QAuthenticator& auth, 
-    int port ) 
+    QThreadPool* threadPool,
+    const QString& startAddr,
+    const QString& endAddr,
+    const QAuthenticator& auth,
+    int port )
 {
 
     {
@@ -252,13 +250,13 @@ bool QnManualCameraSearcher::run(
         m_searchQueueContexts.clear();
         m_cancelled = false;
     }
-    
-    QnSearchTask::SearchDoneCallback callback = 
-        [this, threadPool](const QnManualCameraSearchCameraList& results, QnSearchTask* const task)
+
+    QnSearchTask::SearchDoneCallback callback =
+        [this, threadPool](const QnManualResourceSearchList& results, QnSearchTask* const task)
         {
             QnMutexLocker lock(&m_mutex);
             auto queueName = task->url().toString();
-            
+
             m_remainingTaskCount--;
 
             auto& context = m_searchQueueContexts[queueName];
@@ -303,7 +301,7 @@ bool QnManualCameraSearcher::run(
 
     if (endAddr.isNull())
         onlineHosts.push_back(startAddr);
-    else 
+    else
         onlineHosts = getOnlineHosts(startAddr, endAddr, port);
 
     for (const auto& host: onlineHosts)
@@ -322,7 +320,7 @@ bool QnManualCameraSearcher::run(
         m_searchQueueContexts[hostToCheck] = SearchTaskQueueContext();
 
         m_remainingTaskCount++;
-        
+
         for (const auto& searcher: parallelSearchers)
         {
             QnSearchTask::SearcherList searcherList;
@@ -341,7 +339,7 @@ bool QnManualCameraSearcher::run(
     m_totalTaskCount = m_remainingTaskCount;
     int kMaxWaitTimeMs = 2000;
 
-    auto hasRunningTasks = 
+    auto hasRunningTasks =
         [this]() -> bool
         {
             for (const auto& context: m_searchQueueContexts)
@@ -356,12 +354,12 @@ bool QnManualCameraSearcher::run(
             return false;
         };
 
-    
+
     QnMutexLocker lock(&m_mutex);
-    m_state = QnManualCameraSearchStatus::CheckingHost;
+    m_state = QnManualResourceSearchStatus::CheckingHost;
     if (m_cancelled)
     {
-        m_state = QnManualCameraSearchStatus::Aborted;
+        m_state = QnManualResourceSearchStatus::Aborted;
         return true;
     }
 
@@ -371,8 +369,8 @@ bool QnManualCameraSearcher::run(
         m_waitCondition.wait(&m_mutex, kMaxWaitTimeMs);
 
     if (!m_cancelled)
-        m_state = QnManualCameraSearchStatus::Finished;
-    
+        m_state = QnManualResourceSearchStatus::Finished;
+
     return true;
 }
 
@@ -383,11 +381,11 @@ void QnManualCameraSearcher::cancel() {
 
     switch (m_state)
     {
-        case QnManualCameraSearchStatus::Finished:
+        case QnManualResourceSearchStatus::Finished:
         {
             return;
         }
-        case QnManualCameraSearchStatus::CheckingOnline:
+        case QnManualResourceSearchStatus::CheckingOnline:
         {
             m_ipChecker.pleaseStop();
             m_ipChecker.join();
@@ -399,23 +397,23 @@ void QnManualCameraSearcher::cancel() {
         }
     }
 
-    m_state = QnManualCameraSearchStatus::Aborted;
+    m_state = QnManualResourceSearchStatus::Aborted;
 }
 
-QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const 
+QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 {
     QnMutexLocker lock( &m_mutex );
     QnManualCameraSearchProcessStatus result;
 
-    switch (m_state) 
+    switch (m_state)
     {
-        case QnManualCameraSearchStatus::CheckingHost:
+        case QnManualResourceSearchStatus::CheckingHost:
         {
             result.cameras = m_results;
             break;
         }
-        case QnManualCameraSearchStatus::Finished:
-        case QnManualCameraSearchStatus::Aborted:
+        case QnManualResourceSearchStatus::Finished:
+        case QnManualResourceSearchStatus::Aborted:
         {
             result.cameras = m_results;
             break;
@@ -426,51 +424,51 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         }
     }
 
-    switch (m_state) 
+    switch (m_state)
     {
-        case QnManualCameraSearchStatus::Finished:
-        case QnManualCameraSearchStatus::Aborted:
+        case QnManualResourceSearchStatus::Finished:
+        case QnManualResourceSearchStatus::Aborted:
         {
-            result.status = QnManualCameraSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
+            result.status = QnManualResourceSearchStatus(m_state, MAX_PERCENT, MAX_PERCENT);
             NX_LOG(lit(" -----------------1 %1 : %2")
                 .arg(result.status.current)
-                .arg(result.status.total), 
+                .arg(result.status.total),
                 cl_logDEBUG1 );
             break;
         }
-        case QnManualCameraSearchStatus::CheckingOnline:
+        case QnManualResourceSearchStatus::CheckingOnline:
         {
             Q_ASSERT(m_hostRangeSize);
-            int currentProgress = m_ipChecker.hostsChecked() 
-                * PORT_SCAN_MAX_PROGRESS_PERCENT 
+            int currentProgress = m_ipChecker.hostsChecked()
+                * PORT_SCAN_MAX_PROGRESS_PERCENT
                 / m_hostRangeSize;
 
-            result.status = QnManualCameraSearchStatus(m_state, currentProgress, MAX_PERCENT);
+            result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
 
             NX_LOG(lit(" -----------------2 %1 : %2")
                 .arg(result.status.current)
-                .arg(result.status.total), 
+                .arg(result.status.total),
                 cl_logDEBUG1 );
             break;
         }
-        case QnManualCameraSearchStatus::CheckingHost:
+        case QnManualResourceSearchStatus::CheckingHost:
         {
-            auto currentPercent = m_totalTaskCount ? 
-               std::floor(0.5  
-                    + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT) 
-                    * (m_totalTaskCount - m_remainingTaskCount) 
+            auto currentPercent = m_totalTaskCount ?
+               std::floor(0.5
+                    + (static_cast<double>(MAX_PERCENT) - PORT_SCAN_MAX_PROGRESS_PERCENT)
+                    * (m_totalTaskCount - m_remainingTaskCount)
                     / m_totalTaskCount) + PORT_SCAN_MAX_PROGRESS_PERCENT : 0;
 
-            result.status = QnManualCameraSearchStatus(
+            result.status = QnManualResourceSearchStatus(
                 m_state,
                 currentPercent,
-                MAX_PERCENT); 
+                MAX_PERCENT);
 
             break;
         }
         default:
         {
-            result.status = QnManualCameraSearchStatus(m_state, 0, MAX_PERCENT);
+            result.status = QnManualResourceSearchStatus(m_state, 0, MAX_PERCENT);
             break;
         }
     }
@@ -479,7 +477,7 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
 }
 
 QStringList QnManualCameraSearcher::getOnlineHosts(
-    const QString& startAddr, 
+    const QString& startAddr,
     const QString& endAddr,
     int port)
 {
@@ -494,15 +492,15 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
     {
         QnMutexLocker lock(&m_mutex);
         m_hostRangeSize = endIPv4Addr - startIPv4Addr;
-        m_state = QnManualCameraSearchStatus::CheckingOnline;
+        m_state = QnManualResourceSearchStatus::CheckingOnline;
 
         if (m_cancelled)
         {
-            m_state = QnManualCameraSearchStatus::Aborted;
+            m_state = QnManualResourceSearchStatus::Aborted;
             return QStringList();
         }
     }
-    
+
     onlineHosts = m_ipChecker.onlineHosts(
         QHostAddress(startAddr),
         QHostAddress(endAddr),
@@ -512,7 +510,7 @@ QStringList QnManualCameraSearcher::getOnlineHosts(
         QnMutexLocker lock( &m_mutex );
         if( m_cancelled )
         {
-            m_state = QnManualCameraSearchStatus::Aborted;
+            m_state = QnManualResourceSearchStatus::Aborted;
             return QStringList();
         }
     }
@@ -524,7 +522,7 @@ void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
 {
     if (m_cancelled)
     {
-        m_state = QnManualCameraSearchStatus::Aborted;
+        m_state = QnManualResourceSearchStatus::Aborted;
         return;
     }
 
@@ -536,7 +534,7 @@ void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
             totalRunningTasks += context.runningTaskCount;
     }
 
-    auto canRunTask = 
+    auto canRunTask =
         [&totalRunningTasks, threadPool, this]() -> bool
         {
             bool allQueuesAreBlocked = true;
@@ -555,7 +553,7 @@ void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
         };
 
     /**
-     * We are launching tasks until count of running tasks do not exceeds 
+     * We are launching tasks until count of running tasks do not exceeds
      * maximum thread count in pool.
      */
     while(canRunTask())
