@@ -24,7 +24,7 @@ namespace network {
 namespace cloud {
 
 CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
-    QString moduleName,
+    const QString& moduleName,
     std::unique_ptr<AbstractEndpointSelector> endpointSelector)
 :
     m_moduleAttrName(m_nameset.findResourceByName(moduleName).id),
@@ -127,7 +127,7 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
             nx_http::StatusCode::notFound,
             SocketAddress());
 
-    endpointSelected(nx_http::StatusCode::ok, moduleEndpoint);
+    endpointSelected(&lk, nx_http::StatusCode::ok, moduleEndpoint);
 }
 
 bool CloudModuleEndPointFetcher::findModuleEndpoint(
@@ -159,7 +159,7 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
         QnAppInfo::customizationName());
 
     stree::ResourceContainer outputData;
-    treeRoot.get(inputData, &outputData);
+    treeRoot.get(stree::MultiSourceResourceReader(inputData, outputData), &outputData);
 
     QString foundEndpointStr;
     if (outputData.get(moduleAttrName, &foundEndpointStr))
@@ -185,17 +185,16 @@ void CloudModuleEndPointFetcher::signalWaitingHandlers(
 }
 
 void CloudModuleEndPointFetcher::endpointSelected(
+    QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value result,
     SocketAddress selectedEndpoint)
 {
-    QnMutexLocker lk(&m_mutex);
-
     if (result != nx_http::StatusCode::ok)
-        return signalWaitingHandlers(&lk, result, std::move(selectedEndpoint));
+        return signalWaitingHandlers(lk, result, std::move(selectedEndpoint));
 
     NX_ASSERT(!m_endpoint);
     m_endpoint = selectedEndpoint;
-    signalWaitingHandlers(&lk, result, selectedEndpoint);
+    signalWaitingHandlers(lk, result, selectedEndpoint);
 }
 
 
@@ -238,9 +237,9 @@ CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
     registerResource(vmsVersionFull, "vms.version.full", QVariant::String);
     registerResource(vmsBeta, "vms.beta", QVariant::String);
     registerResource(vmsCustomization, "vms.customization", QVariant::String);
-    registerResource(cdbEndpoint, "cdb.endpoint", QVariant::String);
-    registerResource(hpmEndpoint, "hpm.endpoint", QVariant::String);
-    registerResource(notificationModuleEndpoint, "notification_module.endpoint", QVariant::String);
+    registerResource(cdbEndpoint, "cdb", QVariant::String);
+    registerResource(hpmEndpoint, "hpm", QVariant::String);
+    registerResource(notificationModuleEndpoint, "notification_module", QVariant::String);
 }
 
 } // namespace cloud

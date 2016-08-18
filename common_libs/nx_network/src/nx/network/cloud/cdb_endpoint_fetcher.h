@@ -75,7 +75,7 @@ public:
     };
 
     CloudModuleEndPointFetcher(
-        QString moduleName,
+        const QString& moduleName,
         std::unique_ptr<AbstractEndpointSelector> endpointSelector);
     ~CloudModuleEndPointFetcher();
 
@@ -107,6 +107,7 @@ private:
         nx_http::StatusCode::Value statusCode,
         const SocketAddress& endpoint);
     void endpointSelected(
+        QnMutexLockerBase* const lk,
         nx_http::StatusCode::Value result,
         SocketAddress selectedEndpoint);
 };
