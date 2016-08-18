@@ -1664,6 +1664,11 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     /* Drop layout on user means sharing this layout. */
     else if (QnUserResourcePtr targetUser = targetResource.dynamicCast<QnUserResource>())
     {
+        /* Technically it works right, but layout becomes shared and appears in "Shared layouts"
+         * node, not under user, where it was dragged. Disabling to not confuse user. */
+        if (targetUser->role() == Qn::UserRole::CustomUserGroup)
+            return;
+
         for (const QnLayoutResourcePtr &sourceLayout : sourceResources.filtered<QnLayoutResource>())
         {
             if (sourceLayout->isFile())
