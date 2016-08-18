@@ -23,6 +23,25 @@ namespace {
 
 const int kUpdateLockTimeoutMs = 1000;
 
+typedef QSharedPointer<QnBaseDirectoryBackup> QnDirectoryBackupPtr;
+
+QString backupPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("/../../backup");
+#else
+    return lit("/backup");
+#endif
+}
+
+QString applauncherPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("/Contents/MacOS/");
+#endif
+    return QString();
+}
+
 }
 
 namespace nx {
@@ -72,24 +91,6 @@ bool SelfUpdater::registerUriHandler()
 #endif
 }
 
-QString backupPostfix()
-{
-#if defined(Q_OS_MACX)
-    return lit("/../../backup");
-#else
-    return lit("/backup");
-#endif
-}
-
-QString applauncherPostfix()
-{
-#if defined(Q_OS_MACX)
-    return lit("/Contents/MacOS/");
-#endif
-    return QString();
-}
-
-typedef QSharedPointer<QnBaseDirectoryBackup> QnDirectoryBackupPtr;
 QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString& to)
 {
     const QStringList kTargetFileFilters =
