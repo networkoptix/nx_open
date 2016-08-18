@@ -1,13 +1,15 @@
 #include "ptz_tour_widget.h"
 #include "ui_ptz_tour_widget.h"
 
+#include <client/client_globals.h>
+
 #include <core/ptz/ptz_tour.h>
 
 #include <ui/models/ptz_tour_spots_model.h>
 #include <ui/delegates/ptz_tour_item_delegate.h>
 
 #include <utils/common/event_processors.h>
-#include <common/common_globals.h>
+
 
 QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     QWidget(parent),
@@ -73,7 +75,7 @@ void QnPtzTourWidget::at_addSpotButton_clicked() {
     m_model->insertRow(m_model->rowCount());
 
     ui->tableView->setCurrentIndex(m_model->index(m_model->rowCount() - 1, 0));
-    
+
     for(int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
         if(ui->tableView->horizontalHeader()->sectionResizeMode(i) == QHeaderView::ResizeToContents)
             ui->tableView->resizeColumnToContents(i);

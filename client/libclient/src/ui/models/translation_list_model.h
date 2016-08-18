@@ -1,11 +1,11 @@
-#ifndef QN_TRANSLATION_LIST_MODEL_H
-#define QN_TRANSLATION_LIST_MODEL_H
+#pragma once
 
 #include <QtCore/QAbstractListModel>
 
-#include "translation.h"
+#include <translation/translation.h>
 
-class QnTranslationListModel: public QAbstractListModel {
+class QnTranslationListModel: public QAbstractListModel
+{
     Q_OBJECT
     typedef QAbstractListModel base_type;
 
@@ -28,5 +28,3 @@ private:
     QList<QnTranslation> m_translations;
     bool m_hasExternal;
 };
-
-#endif // QN_TRANSLATION_LIST_MODEL_H

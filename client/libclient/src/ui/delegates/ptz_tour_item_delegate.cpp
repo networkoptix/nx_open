@@ -3,7 +3,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QSpinBox>
 
-#include <common/common_globals.h>
+#include <client/client_globals.h>
 
 #include <core/ptz/ptz_preset.h>
 

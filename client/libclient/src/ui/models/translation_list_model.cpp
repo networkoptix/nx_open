@@ -3,7 +3,7 @@
 
 #include <QtGui/QIcon>
 
-#include <common/common_globals.h>
+#include <client/client_globals.h>
 
 
 QnTranslationListModel::QnTranslationListModel(QObject *parent):
@@ -22,7 +22,7 @@ void QnTranslationListModel::setTranslations(const QList<QnTranslation> &transla
     beginResetModel();
 
     m_translations = translations;
-    
+
     m_hasExternal = false;
     for(const QnTranslation &translation: m_translations) {
         if(!isInternal(translation)) {
