@@ -1628,17 +1628,29 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     /* We can add media resources to layout */
     if (QnLayoutResourcePtr layout = targetResource.dynamicCast<QnLayoutResource>())
     {
-        QnResourceList medias;
-        for (const QnResourcePtr& res : sourceResources)
-        {
-            if (res.dynamicCast<QnMediaResource>())
-                medias.push_back(res);
-        }
-        if (!medias.isEmpty())
+        QnResourceList droppable = sourceResources.filtered(
+            [](const QnResourcePtr& resource)
+            {
+                /* Allow to drop cameras. */
+                if (resource.dynamicCast<QnMediaResource>())
+                    return true;
+
+                /* Allow to drop servers. */
+                if (resource.dynamicCast<QnMediaServerResource>())
+                    return true;
+
+                /* Allow to drop webpages. */
+                if (resource.dynamicCast<QnWebPageResource>())
+                    return true;
+
+                return false;
+            });
+
+        if (!droppable.isEmpty())
         {
             menu()->trigger(
                 QnActions::OpenInLayoutAction,
-                QnActionParameters(medias).
+                QnActionParameters(droppable).
                 withArgument(Qn::LayoutResourceRole, layout)
             );
         }
