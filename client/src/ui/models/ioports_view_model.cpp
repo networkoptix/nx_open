@@ -5,7 +5,6 @@
 namespace
 {
     static const int kMaxIdLength = 20;
-    static const int kColumnSizeExtendPx = 20;
 }
 
 QnIOPortsViewModel::QnIOPortsViewModel(QObject *parent) :
@@ -78,7 +77,8 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
         return false;
 
 
-    switch(role) {
+    switch(role)
+    {
     case Qn::IOPortDataRole:
         return QVariant::fromValue<QnIOPortData>(m_data.at(index.row()));
     case Qt::DisplayRole:
@@ -98,16 +98,6 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
             return boldFont;
         }
         break;
-    case Qt::SizeHintRole:
-        {
-            QFont font = qApp->font();
-            if (index.column() == IdColumn)
-                font.setBold(true);
-            QFontMetrics metrics(font);
-            QSize textSize = metrics.size(Qt::TextSingleLine, textData(index));
-            textSize.setWidth(textSize.width() + kColumnSizeExtendPx);
-            return textSize;
-        }
     default:
         break;
     }
