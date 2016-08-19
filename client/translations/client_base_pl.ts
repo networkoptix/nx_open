@@ -1192,7 +1192,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usuń zakładkę...</translation>
     </message>
     <message>
         <source>Monitor in New Tab</source>
@@ -2019,7 +2019,7 @@ to view more bookmarks</source>
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skanowanie hostów...(%1)</translation>
     </message>
     <message>
         <source>Finishing searching...</source>
@@ -2949,7 +2949,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wszyscy użytkownicy</translation>
     </message>
     <message>
         <source>%1 users</source>
@@ -3853,10 +3853,6 @@ to view more bookmarks</source>
         <translation>Czy na pewno chcesz usunąć to połączenie: %1?</translation>
     </message>
     <message>
-        <source>Invalid Paramaters</source>
-        <translation>Nieprawidłowe parametry</translation>
-    </message>
-    <message>
         <source>Connection already exists.</source>
         <translation>Połaczenie już istnieje.</translation>
     </message>
@@ -3870,7 +3866,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Invalid Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nieprawidłowe parametry</translation>
     </message>
 </context>
 <context>
@@ -4286,7 +4282,7 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ustawienia serwera...</translation>
     </message>
     <message>
         <source>Open Device</source>
@@ -4946,10 +4942,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5000,6 +4992,10 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7362,7 +7358,7 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     </message>
     <message>
         <source>Unable to set position on camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nie udało się pobrać  pozycji z kamery</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>

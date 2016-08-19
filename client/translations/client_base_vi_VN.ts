@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
+<?xml version='1.0' encoding='utf-8'?>
+<TS language="vi_VN" sourcelanguage="en_US" version="2.1">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -33,8 +32,8 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>Use '
+' to split message in two lines (required)</comment>
         <translation>phóng timeline
 để xem nhiều dấu</translation>
     </message>
@@ -1205,7 +1204,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -1308,15 +1307,15 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>%1h </source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>%1m </source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Unknown</source>
@@ -1705,12 +1704,12 @@ to view more bookmarks</source>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
-        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
+        <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
         <translation>đến</translation>
     </message>
     <message>
         <source>to</source>
-        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
+        <extracomment>"to" is from the sentence "Send e-mail _to_:"</extracomment>
         <translation>đến</translation>
     </message>
     <message>
@@ -1997,12 +1996,12 @@ to view more bookmarks</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
+        <source>%1 doesn't support two-way audio</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2259,15 +2258,15 @@ to view more bookmarks</source>
         <translation>sự phản đối</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other devices' recording durations.</source>
         <translation>Cảnh báo! Giá trị tối thiểu cao có thể làm giảm khoảng thời gian ghi âm các thiết bị khác.</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other cameras' recording durations.</source>
         <translation>Cảnh báo! Giá trị tối thiểu cao có thể làm giảm khoảng thời gian ghi âm các máy ảnh khác.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity.</source>
         <translation>Chuyển động ghi âm bị vô hiệu hóa. Xin vui lòng đến trang thiết lập chuyển động đến khu vực thiết lập chuyển động và độ nhạy của máy ảnh.</translation>
     </message>
     <message>
@@ -2623,7 +2622,7 @@ to view more bookmarks</source>
         <translation>lỗi</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for writing.</source>
+        <source>Could not open file '%1' for writing.</source>
         <translation>Không thể mở tập tin %1 cho văn bản.</translation>
     </message>
     <message>
@@ -2639,7 +2638,7 @@ to view more bookmarks</source>
         <translation>tin tức</translation>
     </message>
     <message>
-        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
+        <source>Database was successfully backed up into file '%1'.</source>
         <translation>Cơ sở dữ liệu đã được sao lưu thành công lên tập tin %1.</translation>
     </message>
     <message>
@@ -2647,7 +2646,7 @@ to view more bookmarks</source>
         <translation>Mở cơ sở dữ liệu sao lưu...</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for reading.</source>
+        <source>Could not open file '%1' for reading.</source>
         <translation>Không thể mở tập tin %1 để đọc.</translation>
     </message>
     <message>
@@ -2663,12 +2662,12 @@ to view more bookmarks</source>
         <translation>Sao lưu cơ sở dữ liệu đã được tải lên máy chủ. Xin lỗi đợi tôi một chút.</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation>Cơ sở dữ liệu được phục hồi thành công từ tập tin &apos;%1&apos;. Máy chủ Media sẽ được khởi động lại.</translation>
+        <source>Database was successfully restored from file '%1'. Media server will be restarted.</source>
+        <translation>Cơ sở dữ liệu được phục hồi thành công từ tập tin '%1'. Máy chủ Media sẽ được khởi động lại.</translation>
     </message>
     <message>
-        <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation>Một lỗi đã xảy ra trong khi khôi phục lại cơ sở dữ liệu từ tập tin &apos;%1&apos;.</translation>
+        <source>An error has occurred while restoring the database from file '%1'.</source>
+        <translation>Một lỗi đã xảy ra trong khi khôi phục lại cơ sở dữ liệu từ tập tin '%1'.</translation>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
@@ -2686,47 +2685,47 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation type="unfinished">Không thể tìm thấy các coder audio '%1'。</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation type="unfinished">Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <source>Primary audio device isn't selected.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings</source>
         <translation>44.1kHz và 48Khz định dạng âm thanh không được hỗ trợ bởi thiết bị âm thanh chụp! Hãy chọn thiết bị âm thanh khác hoặc giá trị không có trong cài đặt ghi lại màn hình</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Không thể tìm thấy các bộ mã hóa video &apos;%1&apos;。</translation>
+        <translation>Không thể tìm thấy các bộ mã hóa video '%1'。</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
         <translation>Không thể khởi tạo bộ mã hóa video.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation>Không thể tìm thấy các coder audio '%1'。</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Không thể khởi tạo thiết bị âm thanh &apos;%1&apos;。</translation>
+        <source>Could not initialize audio device '%1'.</source>
+        <translation>Không thể khởi tạo thiết bị âm thanh '%1'。</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2740,15 +2739,15 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.</source>
         <translation>44.1kHz và 48Khz định dạng âm thanh không được hỗ trợ bởi thiết bị âm thanh chụp! Hãy chọn thiết bị âm thanh khác hoặc giá trị không có trong cài đặt ghi lại màn hình.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Không thể tìm thấy các bộ mã hóa video &apos;%1&apos;。</translation>
+        <translation>Không thể tìm thấy các bộ mã hóa video '%1'。</translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
+        <source>Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.</source>
         <translation>Không thể tạo tập tin tạm thời trong thư mục %1. Hãy cấu hình Main Truyền thông Folder năng thâu Screen.</translation>
     </message>
     <message>
@@ -2768,16 +2767,16 @@ to view more bookmarks</source>
         <translation>Không thể để phân bổ âm thanh dòng sản lượng.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation>Không thể tìm thấy các coder audio '%1'。</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Không thể khởi tạo thiết bị âm thanh &apos;%1&apos;。</translation>
+        <source>Could not initialize audio device '%1'.</source>
+        <translation>Không thể khởi tạo thiết bị âm thanh '%1'。</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2950,31 +2949,31 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%nms</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -3050,8 +3049,8 @@ to view more bookmarks</source>
         <translation>Chọn thư mục...</translation>
     </message>
     <message>
-        <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation>thư mục &apos;%1&apos; không tồn tại.</translation>
+        <source>Folder '%1' does not exist.</source>
+        <translation>thư mục '%1' không tồn tại.</translation>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
@@ -3127,16 +3126,16 @@ to view more bookmarks</source>
         <translation>tiết kiệm như</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>văn khố &apos;%1&apos; đã tồn tại, Bạn muốn ghi đè lên nó?</translation>
+        <source>File '%1' already exists. Overwrite?</source>
+        <translation>văn khố '%1' đã tồn tại, Bạn muốn ghi đè lên nó?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>Không thể ghi đè lên tập tin</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>văn khố '%1' Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
     </message>
 </context>
 <context>
@@ -3261,12 +3260,12 @@ to view more bookmarks</source>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>Không thể bật IO port &apos;%1&apos;</translation>
+        <source>Failed to turn on IO port '%1'</source>
+        <translation>Không thể bật IO port '%1'</translation>
     </message>
     <message>
-        <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>Không để tắt cổng IO &apos;%1&apos;</translation>
+        <source>Failed to turn off IO port '%1'</source>
+        <translation>Không để tắt cổng IO '%1'</translation>
     </message>
     <message>
         <source>IO port error</source>
@@ -3276,16 +3275,16 @@ to view more bookmarks</source>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>văn khố '%1' Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>xuất khẩu sang &quot;%1&quot;…</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>xuất khẩu sang "%1"…</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
-        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+        <extracomment>"Could not export camera AXIS1334"</extracomment>
         <translation>Không thể xuất thiết bị %1.</translation>
     </message>
     <message>
@@ -3753,10 +3752,6 @@ to view more bookmarks</source>
         <translation>Bạn có chắc chắn muốn xóa kết nối này: %1?</translation>
     </message>
     <message>
-        <source>Invalid Paramaters</source>
-        <translation>Lập luận không hợp lệ</translation>
-    </message>
-    <message>
         <source>Connection already exists.</source>
         <translation>Kết nối đã tồn tại.</translation>
     </message>
@@ -3871,8 +3866,8 @@ to view more bookmarks</source>
         <translation>trực tiếp</translation>
     </message>
     <message>
-        <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (Tour &quot;%2&quot; đang được thực thi)</translation>
+        <source>%1 (Tour "%2" is active)</source>
+        <translation>%1 (Tour "%2" đang được thực thi)</translation>
     </message>
     <message>
         <source>Zoom Window</source>
@@ -4012,8 +4007,8 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>lịch trình không hợp lệ</translation>
     </message>
     <message>
-        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Phần thứ hai được vô hiệu hóa trên các máy ảnh. Tùy chọn chuyển động + LQ không có hiệu lực. Nhấn &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
+        <translation>Phần thứ hai được vô hiệu hóa trên các máy ảnh. Tùy chọn chuyển động + LQ không có hiệu lực. Nhấn "Yes" để thay đổi loại ghi âm để "Luôn luôn" hoặc "Không" để kích hoạt lại dòng thứ hai.</translation>
     </message>
 </context>
 <context>
@@ -4098,8 +4093,8 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Tiêu đề mới không được thiết lập.</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>Bạn có chắc là bạn muốn xóa &apos;%1&apos; ?</translation>
+        <source>Are you sure you want to delete '%1'?</source>
+        <translation>Bạn có chắc là bạn muốn xóa '%1' ?</translation>
     </message>
     <message>
         <source>Custom title:</source>
@@ -4176,7 +4171,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Connect to server...</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Time Synchronization...</source>
@@ -4286,7 +4281,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4450,12 +4445,12 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>phân công lại</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation>Các phím nóng là thời điểm định sẵn &quot;%1&quot; dùng.</translation>
+        <source>This hotkey is used by preset "%1".</source>
+        <translation>Các phím nóng là thời điểm định sẵn "%1" dùng.</translation>
     </message>
     <message>
-        <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation>Hotkey này đã được bay đường &quot;%1&quot; dùng.</translation>
+        <source>This hotkey is used by tour "%1".</source>
+        <translation>Hotkey này đã được bay đường "%1" dùng.</translation>
     </message>
 </context>
 <context>
@@ -4671,7 +4666,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4822,10 +4817,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>Xuất dấu trang ...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Tìm kiếm dấu theo tên, từ khóa hoặc mô tả</translation>
     </message>
@@ -4870,6 +4861,10 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation type="unfinished">
             <numerusform>&lt;%n I/O module(s)&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished">Xuất dấu trang ...</translation>
     </message>
 </context>
 <context>
@@ -5295,11 +5290,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
+' sequence</comment>
         <translation>thẻ html có thể được sử dụng trong văn bản tùy chỉnh:
-&lt;h4&gt;tiêu đề (h1-h6)&lt;/h4&gt;cũng khác nhau &lt;font color=&quot;red&quot;&gt;màu sắc&lt;/font&gt; và &lt;font size=&quot;18&quot;&gt;kích cỡ&lt;/font&gt; có thể được áp dụng. Văn bản có thể là &lt;s&gt;bị ảnh hưởng mạnh&lt;/s&gt;, &lt;u&gt;gạch chân&lt;/u&gt;, &lt;b&gt;Dũng cảm&lt;/b&gt; hoặc là &lt;i&gt;italic&lt;/i&gt;</translation>
+&lt;h4&gt;tiêu đề (h1-h6)&lt;/h4&gt;cũng khác nhau &lt;font color="red"&gt;màu sắc&lt;/font&gt; và &lt;font size="18"&gt;kích cỡ&lt;/font&gt; có thể được áp dụng. Văn bản có thể là &lt;s&gt;bị ảnh hưởng mạnh&lt;/s&gt;, &lt;u&gt;gạch chân&lt;/u&gt;, &lt;b&gt;Dũng cảm&lt;/b&gt; hoặc là &lt;i&gt;italic&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5372,8 +5367,8 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>lịch trình không hợp lệ</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>phần thứ hai được vô hiệu hóa trên máy ảnh này. tùy chọn Motion + LQ không có tác dụng. Nhấn &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
+        <translation>phần thứ hai được vô hiệu hóa trên máy ảnh này. tùy chọn Motion + LQ không có tác dụng. Nhấn "Yes" để thay đổi loại ghi âm để "Luôn luôn" hoặc "Không" để kích hoạt lại dòng thứ hai.</translation>
     </message>
 </context>
 <context>
@@ -5394,8 +5389,8 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>E-Mail vô hiệu</translation>
     </message>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>Không cài đặt trước được tìm thấy. Sử dụng tùy chọn &apos;cao cấp&apos;.</translation>
+        <source>No preset found. Use 'Advanced' option.</source>
+        <translation>Không cài đặt trước được tìm thấy. Sử dụng tùy chọn 'cao cấp'.</translation>
     </message>
 </context>
 <context>
@@ -5938,110 +5933,110 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>auto</source>
-        <comment>AM/PM usage based on user&apos;s system locale.</comment>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>AM/PM usage based on user's system locale.</comment>
+        <extracomment>Translate this into 'none' or 'forced' if you want to switch off automatic detection of Do not translate this string unless you know what you're doing.</extracomment>
         <translation>xe hơi</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>s</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>m</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>h</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>d</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>M</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying day caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying month caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying year caption in timeline's header</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
 </context>
@@ -6060,19 +6055,19 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6141,7 +6136,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Disabled</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Edit user</source>
@@ -6654,19 +6649,19 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <source>In the meantime please adjust your screen's resolution if needed for a better experience.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6696,8 +6691,8 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <translation>Bạn có chắc chắn muốn xóa bookmark này?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
-        <translation>Bạn có chắc chắn bạn muốn xóa dấu &quot;%1&quot;?</translation>
+        <source>Are you sure you want to delete bookmark "%1"?</source>
+        <translation>Bạn có chắc chắn bạn muốn xóa dấu "%1"?</translation>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
@@ -6760,8 +6755,8 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <translation>Video không thể được vì lỗi sau đây：%1</translation>
     </message>
     <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>Không thể ghi đè lên tập tin &apos;%1&apos;, Hãy thử một tên khác.</translation>
+        <source>Could not overwrite file '%1'. Please try a different name.</source>
+        <translation>Không thể ghi đè lên tập tin '%1', Hãy thử một tên khác.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -6779,16 +6774,16 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <translation>thực thi %1 Lưu trữ Truyền thông  (x86) (*.exe)</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>văn khố &apos;%1&apos; Là sử dụng video. Hãy thử tên khác.</translation>
+        <source>File '%1' is used for recording already. Please enter another name.</source>
+        <translation>văn khố '%1' Là sử dụng video. Hãy thử tên khác.</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>Không thể ghi đè lên tập tin</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>văn khố '%1' Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
@@ -6833,16 +6828,16 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <translation>tiết kiệm như</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>văn khố &apos;%1&apos; Đã tồn tại. Bạn có chắc chắn muốn ghi đè lên nó?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>văn khố '%1' Đã tồn tại. Bạn có chắc chắn muốn ghi đè lên nó?</translation>
     </message>
     <message>
         <source>Exporting Video</source>
         <translation>hình ảnh xuất khẩu</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>xuất khẩu sang &quot;%1&quot;…</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>xuất khẩu sang "%1"…</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
@@ -6945,8 +6940,8 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <translation>định dạng đã chọn không được khuyến cáo</translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
-        <translation>định dạng đã chọn không được khuyến cáo cho máy ảnh này do thu nhỏ video. Chúng tôi khuyên bạn nên để xuất phim được lựa chọn một trong hai định dạng &apos;.exe&apos; &apos;.nov&apos; hoặc. Bạn có muốn tiếp tục?</translation>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the '.nov' or '.exe' format. Do you want to continue?</source>
+        <translation>định dạng đã chọn không được khuyến cáo cho máy ảnh này do thu nhỏ video. Chúng tôi khuyên bạn nên để xuất phim được lựa chọn một trong hai định dạng '.exe' '.nov' hoặc. Bạn có muốn tiếp tục?</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
@@ -6958,7 +6953,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -7112,22 +7107,22 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnWorkbenchNavigator</name>
     <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>Giờ: phút: giây</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>Min: sec</translation>
     </message>
     <message>
         <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>yyyy MMM dd</translation>
     </message>
     <message>
         <source>Live</source>
-        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <extracomment>Time slider's tooltip for position on live.</extracomment>
         <translation>Live</translation>
     </message>
     <message>
@@ -7239,12 +7234,12 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Dấu thời gian:</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>văn khố &apos;%1&apos; Đã tồn tại. Bạn có chắc chắn muốn ghi đè lên nó?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>văn khố '%1' Đã tồn tại. Bạn có chắc chắn muốn ghi đè lên nó?</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>văn khố &apos;%1&apos; Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>văn khố '%1' Đã được sử dụng bởi một chương trình khác. Hãy thử tên khác.</translation>
     </message>
     <message>
         <source>Saving Screenshot...</source>
@@ -7283,8 +7278,8 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Không thể lưu ảnh chụp màn hình.</translation>
     </message>
     <message>
-        <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation>Có lỗi xảy ra trong khi tiết kiệm ảnh chụp màn hình &apos;%1&apos;.</translation>
+        <source>An error occurred while saving screenshot '%1'.</source>
+        <translation>Có lỗi xảy ra trong khi tiết kiệm ảnh chụp màn hình '%1'.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7428,8 +7423,8 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Một người dùng khác đã được kiểm soát màn hình này.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
+        <source>%1's Screen</source>
+        <comment>%1 means user's name</comment>
         <translation>Màn hình của %1</translation>
     </message>
     <message>

@@ -985,11 +985,11 @@
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moduł WE/WY</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moduł WE/WY</translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -997,7 +997,7 @@
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moduł WE/WY</translation>
     </message>
 </context>
 <context>

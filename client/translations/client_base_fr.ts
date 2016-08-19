@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="fr" sourcelanguage="en">
+<?xml version='1.0' encoding='utf-8'?>
+<TS language="fr" sourcelanguage="en" version="2.1">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -13,11 +12,11 @@
     </message>
     <message>
         <source>Cannot add new devices while backup process is running.</source>
-        <translation>Ne peut pas ajouter de nouveaux périphériques pendant qu&apos;une sauvegarde est en cours d&apos;exécution.</translation>
+        <translation>Ne peut pas ajouter de nouveaux périphériques pendant qu'une sauvegarde est en cours d'exécution.</translation>
     </message>
     <message>
         <source>Cannot add new cameras while backup process is running.</source>
-        <translation>Ne peut pas ajouter de nouvelles caméras pendant qu&apos;une sauvegarde est en cours d&apos;exécution.</translation>
+        <translation>Ne peut pas ajouter de nouvelles caméras pendant qu'une sauvegarde est en cours d'exécution.</translation>
     </message>
     <message>
         <source>Cannot add new devices because they store archive on external storage.</source>
@@ -33,8 +32,8 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>Use '
+' to split message in two lines (required)</comment>
         <translation>Zoom Ligne de temps
 pour voir plus de signets</translation>
     </message>
@@ -54,11 +53,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Installation failed</source>
-        <translation>Échec de l&apos;installation</translation>
+        <translation>Échec de l'installation</translation>
     </message>
     <message>
         <source>Could not cancel installation</source>
-        <translation>L&apos;installation ne peut être annulée</translation>
+        <translation>L'installation ne peut être annulée</translation>
     </message>
     <message>
         <source>Installation completed</source>
@@ -66,7 +65,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Installation has been cancelled</source>
-        <translation>L&apos;installation a été annulée</translation>
+        <translation>L'installation a été annulée</translation>
     </message>
 </context>
 <context>
@@ -296,7 +295,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Client is not connected to any server</source>
-        <translation>Le Client n&apos;est pas connecté à un serveur</translation>
+        <translation>Le Client n'est pas connecté à un serveur</translation>
     </message>
 </context>
 <context>
@@ -361,7 +360,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Event Log...</source>
-        <translation>Journal d&apos;événement...</translation>
+        <translation>Journal d'événement...</translation>
     </message>
     <message>
         <source>Control Video Wall</source>
@@ -457,11 +456,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Start Screen Recording</source>
-        <translation>Démarrer l&apos;enregistrement d&apos;écran</translation>
+        <translation>Démarrer l'enregistrement d'écran</translation>
     </message>
     <message>
         <source>Stop Screen Recording</source>
-        <translation>Arrêter l&apos;enregistrement d&apos;écran</translation>
+        <translation>Arrêter l'enregistrement d'écran</translation>
     </message>
     <message>
         <source>Go to Fullscreen</source>
@@ -473,11 +472,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
-        <translation>Désactiver l&apos;Animation de Fond</translation>
+        <translation>Désactiver l'Animation de Fond</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
-        <translation>Activer l&apos;Animation de Fond</translation>
+        <translation>Activer l'Animation de Fond</translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -521,7 +520,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
-        <translation>Delayer l&apos;ouverture Mur Vidéo</translation>
+        <translation>Delayer l'ouverture Mur Vidéo</translation>
     </message>
     <message>
         <source>Filter...</source>
@@ -597,11 +596,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Maximize Item</source>
-        <translation>Maximiser l&apos;élément</translation>
+        <translation>Maximiser l'élément</translation>
     </message>
     <message>
         <source>Restore Item</source>
-        <translation>Restaurer l&apos;élément</translation>
+        <translation>Restaurer l'élément</translation>
     </message>
     <message>
         <source>Manage...</source>
@@ -629,7 +628,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Take Screenshot</source>
-        <translation>Prendre une capture d&apos;écran</translation>
+        <translation>Prendre une capture d'écran</translation>
     </message>
     <message>
         <source>Rotate to...</source>
@@ -729,11 +728,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Start Panic Recording</source>
-        <translation>Démarrer l&apos;enregistrement panique</translation>
+        <translation>Démarrer l'enregistrement panique</translation>
     </message>
     <message>
         <source>Stop Panic Recording</source>
-        <translation>Arrêter l&apos;enregistrement panique</translation>
+        <translation>Arrêter l'enregistrement panique</translation>
     </message>
     <message>
         <source>Show Calendar</source>
@@ -861,19 +860,19 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Pin Tree</source>
-        <translation>Attacher l&apos;arborescence</translation>
+        <translation>Attacher l'arborescence</translation>
     </message>
     <message>
         <source>Unpin Tree</source>
-        <translation>Détacher l&apos;arborescence</translation>
+        <translation>Détacher l'arborescence</translation>
     </message>
     <message>
         <source>Show Tree</source>
-        <translation>Afficher l&apos;arborescence</translation>
+        <translation>Afficher l'arborescence</translation>
     </message>
     <message>
         <source>Hide Tree</source>
-        <translation>Cacher l&apos;arborescence</translation>
+        <translation>Cacher l'arborescence</translation>
     </message>
     <message>
         <source>Show Timeline</source>
@@ -885,11 +884,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Preview Search...</source>
-        <translation>Recherche d&apos;aperçu...</translation>
+        <translation>Recherche d'aperçu...</translation>
     </message>
     <message>
         <source>Stop current action</source>
-        <translation>Arrêter l&apos;action en cours</translation>
+        <translation>Arrêter l'action en cours</translation>
     </message>
     <message>
         <source>Alarm/Event Rules...</source>
@@ -933,7 +932,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Change Cell Spacing...</source>
-        <translation>Modifier l&apos;espacement des cellules...</translation>
+        <translation>Modifier l'espacement des cellules...</translation>
     </message>
     <message>
         <source>Layout Settings...</source>
@@ -945,7 +944,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Set as Layout Background</source>
-        <translation>Définir comme mise en page d&apos;arrière plan</translation>
+        <translation>Définir comme mise en page d'arrière plan</translation>
     </message>
     <message>
         <source>Ping...</source>
@@ -981,7 +980,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Image Enhancement...</source>
-        <translation>Amélioration de l&apos;image...</translation>
+        <translation>Amélioration de l'image...</translation>
     </message>
     <message>
         <source>Server Logs...</source>
@@ -990,11 +989,11 @@ pour voir plus de signets</translation>
     <message>
         <source>How-to Videos and FAQ...</source>
         <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
-        <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
+        <translation>(Anglais)Vidéo 'Comment faire...' et FAQ...</translation>
     </message>
     <message>
         <source>Restart application</source>
-        <translation>Redémarrer l&apos;application</translation>
+        <translation>Redémarrer l'application</translation>
     </message>
     <message>
         <source>Activate PTZ Tour</source>
@@ -1002,7 +1001,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Calibrate Fisheye</source>
-        <translation>Calibrer le &apos;fisheye&apos;</translation>
+        <translation>Calibrer le 'fisheye'</translation>
     </message>
     <message>
         <source>Zoom to Selection</source>
@@ -1022,11 +1021,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Select Time Server</source>
-        <translation>Sélectionner l&apos;heure serveur</translation>
+        <translation>Sélectionner l'heure serveur</translation>
     </message>
     <message>
         <source>Activate PTZ Object</source>
-        <translation>Activer l&apos;élément PTZ</translation>
+        <translation>Activer l'élément PTZ</translation>
     </message>
     <message>
         <source>User Management...</source>
@@ -1214,18 +1213,18 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
     <message>
         <source>Image Enhancement - %1</source>
-        <translation>Amélioration de l&apos;image - %1</translation>
+        <translation>Amélioration de l'image - %1</translation>
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation>Amélioration de l&apos;image</translation>
+        <translation>Amélioration de l'image</translation>
     </message>
 </context>
 <context>
@@ -1282,7 +1281,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>No archive data for that position left</source>
-        <translation>Aucune donnée d&apos;archive restante pour cette position</translation>
+        <translation>Aucune donnée d'archive restante pour cette position</translation>
     </message>
     <message>
         <source>Export selected records to a file</source>
@@ -1349,7 +1348,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Watching archive</source>
-        <translation>Visionnement d&apos;archive</translation>
+        <translation>Visionnement d'archive</translation>
     </message>
     <message>
         <source>Exporting video</source>
@@ -1373,7 +1372,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Business rule updated</source>
-        <translation>Règle d&apos;affaires mis à jour</translation>
+        <translation>Règle d'affaires mis à jour</translation>
     </message>
     <message>
         <source>Server removed</source>
@@ -1381,7 +1380,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Business rule removed</source>
-        <translation>Règle d&apos;affaires retiré</translation>
+        <translation>Règle d'affaires retiré</translation>
     </message>
     <message>
         <source>User removed</source>
@@ -1389,7 +1388,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Business rule reseted</source>
-        <translation>Règle d&apos;affaires réinitialisé</translation>
+        <translation>Règle d'affaires réinitialisé</translation>
     </message>
     <message>
         <source>Database restored</source>
@@ -1496,7 +1495,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Red mark means that the archive is still available</source>
-        <translation>Une marque rouge signifie que l&apos;archive est toujours disponible</translation>
+        <translation>Une marque rouge signifie que l'archive est toujours disponible</translation>
     </message>
 </context>
 <context>
@@ -1514,7 +1513,7 @@ pour voir plus de signets</translation>
     <name>QnBackupScheduleDialog</name>
     <message>
         <source>Until finished</source>
-        <translation>Jusqu&apos;à la fin</translation>
+        <translation>Jusqu'à la fin</translation>
     </message>
 </context>
 <context>
@@ -1535,7 +1534,7 @@ pour voir plus de signets</translation>
     <name>QnBookmarkWidget</name>
     <message>
         <source>Do not lock archive</source>
-        <translation>Ne pas verrouiller l&apos;archive</translation>
+        <translation>Ne pas verrouiller l'archive</translation>
     </message>
     <message>
         <source>1 month</source>
@@ -1714,7 +1713,7 @@ pour voir plus de signets</translation>
         <source>Source and %n more cameras</source>
         <translation type="unfinished">
             <numerusform>Source et %n caméras</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message>
@@ -1726,13 +1725,13 @@ pour voir plus de signets</translation>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
-        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
+        <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
         <translatorcomment>? au- de - en - dans ?</translatorcomment>
         <translation>à</translation>
     </message>
     <message>
         <source>to</source>
-        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
+        <extracomment>"to" is from the sentence "Send e-mail _to_:"</extracomment>
         <translatorcomment>? au- de - en - dans ?</translatorcomment>
         <translation>à</translation>
     </message>
@@ -1873,7 +1872,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Interval of Action</source>
-        <translation>Intervalle d&apos;actions</translation>
+        <translation>Intervalle d'actions</translation>
     </message>
 </context>
 <context>
@@ -1900,7 +1899,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Scanning hosts... (%1)</source>
-        <translation>Balayage de l&apos;hôte... (%1)</translation>
+        <translation>Balayage de l'hôte... (%1)</translation>
     </message>
     <message>
         <source>Select target server...</source>
@@ -1920,11 +1919,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>It might take a few moments to populate them in the tree.</source>
-        <translation>Cela peut prendre quelques instants pour apparaitre dans l&apos;arbre.</translation>
+        <translation>Cela peut prendre quelques instants pour apparaitre dans l'arbre.</translation>
     </message>
     <message>
         <source>The specified IP address range has more than 255 addresses.</source>
-        <translation>La plage d&apos;adresse spécifiée contient plus de 255 dans les adresses.</translation>
+        <translation>La plage d'adresse spécifiée contient plus de 255 dans les adresses.</translation>
     </message>
     <message>
         <source>Server went offline - search aborted.</source>
@@ -1936,11 +1935,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Device addition is possible for online servers only.</source>
-        <translation>L&apos;ajout de périphériques est seulement possible pour les serveurs en ligne.</translation>
+        <translation>L'ajout de périphériques est seulement possible pour les serveurs en ligne.</translation>
     </message>
     <message>
         <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation>Le champ d&apos;adresse doit contenir un URL, Adresse IP ou lien RTSP valide.</translation>
+        <translation>Le champ d'adresse doit contenir un URL, Adresse IP ou lien RTSP valide.</translation>
     </message>
     <message>
         <source>No devices selected.</source>
@@ -1960,8 +1959,8 @@ pour voir plus de signets</translation>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
         <translation>
-            <numerusform>Erreur lors de l&apos;ajout de %n périphérique.</numerusform>
-            <numerusform>Erreur lors de l&apos;ajout de %n périphériques.</numerusform>
+            <numerusform>Erreur lors de l'ajout de %n périphérique.</numerusform>
+            <numerusform>Erreur lors de l'ajout de %n périphériques.</numerusform>
         </translation>
     </message>
     <message>
@@ -1985,7 +1984,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>All devices are already in the resource tree.</source>
-        <translation>Tous les périphériques sont déjà dans l&apos;arborescence des ressources.</translation>
+        <translation>Tous les périphériques sont déjà dans l'arborescence des ressources.</translation>
     </message>
     <message>
         <source>No devices found.</source>
@@ -2002,7 +2001,7 @@ pour voir plus de signets</translation>
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation>Balayage de l&apos;hôte... (%1)</translation>
+        <translation>Balayage de l'hôte... (%1)</translation>
     </message>
     <message>
         <source>Finishing searching...</source>
@@ -2024,13 +2023,13 @@ pour voir plus de signets</translation>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
+        <source>%1 doesn't support two-way audio</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2054,7 +2053,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Evaluating media stream for errors.</source>
-        <translation>Évaluation d&apos;erreurs du flux média.</translation>
+        <translation>Évaluation d'erreurs du flux média.</translation>
     </message>
     <message>
         <source>Diagnostics complete!</source>
@@ -2123,8 +2122,8 @@ pour voir plus de signets</translation>
         <source>%1 have no input ports</source>
         <translatorcomment>Wrong warning ? should be %n ?</translatorcomment>
         <translation>
-            <numerusform>%1 n&apos;a auncun port d&apos;entrée</numerusform>
-            <numerusform>%1 n&apos;a aucun ports d&apos;entrées</numerusform>
+            <numerusform>%1 n'a auncun port d'entrée</numerusform>
+            <numerusform>%1 n'a aucun ports d'entrées</numerusform>
         </translation>
     </message>
 </context>
@@ -2250,8 +2249,8 @@ pour voir plus de signets</translation>
         <source>Recording or motion detection is disabled for %1</source>
         <translatorcomment>?? %n ??</translatorcomment>
         <translation>
-            <numerusform>L&apos;enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
-            <numerusform>L&apos;enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
+            <numerusform>L'enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
+            <numerusform>L'enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
         </translation>
     </message>
 </context>
@@ -2269,8 +2268,8 @@ pour voir plus de signets</translation>
         <source>%1 have no output relays</source>
         <translatorcomment>False warning ? should be %n ?</translatorcomment>
         <translation>
-            <numerusform>%1 n&apos;a auncun relais de sortie</numerusform>
-            <numerusform>%1 n&apos;a auncun relais de sortie</numerusform>
+            <numerusform>%1 n'a auncun relais de sortie</numerusform>
+            <numerusform>%1 n'a auncun relais de sortie</numerusform>
         </translation>
     </message>
 </context>
@@ -2280,8 +2279,8 @@ pour voir plus de signets</translation>
         <source>Recording is disabled for %1</source>
         <translatorcomment>Warning ? Should be %n ?</translatorcomment>
         <translation>
-            <numerusform>L&apos;enreg.est désactivé pour %1</numerusform>
-            <numerusform>L&apos;enreg. est désactivé pour %1</numerusform>
+            <numerusform>L'enreg.est désactivé pour %1</numerusform>
+            <numerusform>L'enreg. est désactivé pour %1</numerusform>
         </translation>
     </message>
 </context>
@@ -2300,20 +2299,20 @@ pour voir plus de signets</translation>
         <translation>Attention</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
-        <translation>Attention! Haute valeur minimum pourrait diminuer la durées d&apos;enregistrement des autres périphériques.</translation>
+        <source>Warning! High minimum value could decrease other devices' recording durations.</source>
+        <translation>Attention! Haute valeur minimum pourrait diminuer la durées d'enregistrement des autres périphériques.</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
-        <translation>Attention! Haute valeur minimum pourrait diminuer la durées d&apos;enregistrement des autres caméras.</translation>
+        <source>Warning! High minimum value could decrease other cameras' recording durations.</source>
+        <translation>Attention! Haute valeur minimum pourrait diminuer la durées d'enregistrement des autres caméras.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity.</source>
         <translation>Enregistrement sur mouvement est désactivé. S.V.P. allez à la page de configuration de mouvement pour configurer la zone de mouvement et la sensibilité.</translation>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>Enregistrement sur mouvement est désactivé ou non supporté par certaines des caméras sélectionnées. S.V.P. allez à la page de configuration de mouvement pour s&apos;assurer que c&apos;est supporté et activé.</translation>
+        <translation>Enregistrement sur mouvement est désactivé ou non supporté par certaines des caméras sélectionnées. S.V.P. allez à la page de configuration de mouvement pour s'assurer que c'est supporté et activé.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported on this camera.</source>
@@ -2332,7 +2331,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.</source>
-        <translation>Les paramètre d&apos;enregistrement n&apos;ont pas été sauvegardés. S.V.P. Choisir le la méthode d&apos;enregistrement désiré, ISP, qualité et marquez ceux-ci dans l&apos;horaire.</translation>
+        <translation>Les paramètre d'enregistrement n'ont pas été sauvegardés. S.V.P. Choisir le la méthode d'enregistrement désiré, ISP, qualité et marquez ceux-ci dans l'horaire.</translation>
     </message>
     <message>
         <source>Changes have not been applied.</source>
@@ -2340,7 +2339,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.</source>
-        <translation>La sensibilité de mouvement  n&apos;a pas changée. Pour la changer, dessinez des rectangles sur l&apos;image.</translation>
+        <translation>La sensibilité de mouvement  n'a pas changée. Pour la changer, dessinez des rectangles sur l'image.</translation>
     </message>
     <message>
         <source>License limit exceeded. Changes have been saved, but will not be applied.</source>
@@ -2348,7 +2347,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Could not apply changes.</source>
-        <translation>Impossible d&apos;appliquer les changements.</translation>
+        <translation>Impossible d'appliquer les changements.</translation>
     </message>
     <message>
         <source>Device Settings</source>
@@ -2470,7 +2469,7 @@ pour voir plus de signets</translation>
     <name>QnClientVideoCamera</name>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation>Type de ressource invalide pour l&apos;exportation des données.</translation>
+        <translation>Type de ressource invalide pour l'exportation des données.</translation>
     </message>
 </context>
 <context>
@@ -2523,7 +2522,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>If this error persists, please contact your VMS administrator.</source>
-        <translation>Si l&apos;erreur persiste, S.V.P. contactez votre administrateur VMS.</translation>
+        <translation>Si l'erreur persiste, S.V.P. contactez votre administrateur VMS.</translation>
     </message>
     <message>
         <source> - Client version: %1.</source>
@@ -2535,7 +2534,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:</source>
-        <translation>Vous êtes sur le point de vous connecter sur un serveur d&apos;une version différente:</translation>
+        <translation>Vous êtes sur le point de vous connecter sur un serveur d'une version différente:</translation>
     </message>
     <message>
         <source>These versions are not compatible. Please update your %1.</source>
@@ -2551,7 +2550,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>L&apos;autre version du Client est nécessaire pour établir une connexion à ce Serveur.</translation>
+        <translation>L'autre version du Client est nécessaire pour établir une connexion à ce Serveur.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to restart in compatibility mode.</source>
@@ -2575,7 +2574,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
+        <translation>S.V.P. fermer l'application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
     </message>
     <message>
         <source>Failed to launch compatibility version %1</source>
@@ -2599,7 +2598,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>The username or password you have entered is incorrect. Please try again.</source>
-        <translation>L&apos;ID ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez .</translation>
+        <translation>L'ID ou le mot de passe que vous avez entré est incorrect, S.V.P. réessayez .</translation>
     </message>
     <message>
         <source>Unable to connect to the server</source>
@@ -2607,7 +2606,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Le processus du lanceur n&apos;a pas été trouvé.</translation>
+        <translation>Le processus du lanceur n'a pas été trouvé.</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
@@ -2641,11 +2640,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
-        <translation>Pour générer un&apos;événement générique, S.V.P. se référer à %1.</translation>
+        <translation>Pour générer un'événement générique, S.V.P. se référer à %1.</translation>
     </message>
     <message>
         <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-        <translation>L&apos;événement sera déclenché seulement si l&apos;événement générique remplit toutes les conditions ci-dessus. Si un mot clé est vide, la condition est toujours respectée. Sinon, la condition est respecté si les champs correspondants contient un mot clé.</translation>
+        <translation>L'événement sera déclenché seulement si l'événement générique remplit toutes les conditions ci-dessus. Si un mot clé est vide, la condition est toujours respectée. Sinon, la condition est respecté si les champs correspondants contient un mot clé.</translation>
     </message>
 </context>
 <context>
@@ -2667,8 +2666,8 @@ pour voir plus de signets</translation>
         <translation>Erreur</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation>Ne peut pas ouvrir le fichier &apos;%1&apos; pour l&apos;écriture.</translation>
+        <source>Could not open file '%1' for writing.</source>
+        <translation>Ne peut pas ouvrir le fichier '%1' pour l'écriture.</translation>
     </message>
     <message>
         <source>Downloading Database Backup</source>
@@ -2683,16 +2682,16 @@ pour voir plus de signets</translation>
         <translation>Informations</translation>
     </message>
     <message>
-        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation>La base de données à été sauvegardé avec succès dans le fichier &apos;%1&apos;.</translation>
+        <source>Database was successfully backed up into file '%1'.</source>
+        <translation>La base de données à été sauvegardé avec succès dans le fichier '%1'.</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
         <translation>Ouvrir la sauvegarde de la base de données...</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation>Ne peut pas ouvrir le fichier &apos;%1&apos; pour la lecture.</translation>
+        <source>Could not open file '%1' for reading.</source>
+        <translation>Ne peut pas ouvrir le fichier '%1' pour la lecture.</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -2704,15 +2703,15 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Database backup is being uploaded to the server. Please wait.</source>
-        <translation>La sauvegarde de la base de données est en cours d&apos;envoi sur le serveur. Patientez s’il vous plait.</translation>
+        <translation>La sauvegarde de la base de données est en cours d'envoi sur le serveur. Patientez s’il vous plait.</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation>Base de données restaurée avec succès depuis le fichier &apos;%1&apos;. Serveur Média va être redémarré.</translation>
+        <source>Database was successfully restored from file '%1'. Media server will be restarted.</source>
+        <translation>Base de données restaurée avec succès depuis le fichier '%1'. Serveur Média va être redémarré.</translation>
     </message>
     <message>
-        <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation>Échec de restauration de la base de données à partir du fichier &apos;%1&apos;.</translation>
+        <source>An error has occurred while restoring the database from file '%1'.</source>
+        <translation>Échec de restauration de la base de données à partir du fichier '%1'.</translation>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
@@ -2730,46 +2729,46 @@ pour voir plus de signets</translation>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">Ne peut pas trouver l&apos;encodeur audio %1.</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation type="unfinished">Ne peut pas trouver l'encodeur audio %1.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">Ne peut pas initialiser l&apos;encodeur audio.</translation>
+        <translation type="unfinished">Ne peut pas initialiser l'encodeur audio.</translation>
     </message>
     <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <source>Primary audio device isn't selected.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S.V.P, sélectionnez un autre périphérique audio ou &apos;Aucun&apos; comme valeur dans les paramètres d&apos;enregistrement</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings</source>
+        <translation>Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S.V.P, sélectionnez un autre périphérique audio ou 'Aucun' comme valeur dans les paramètres d'enregistrement</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur vidéo %1.</translation>
+        <translation>Ne peut pas trouver l'encodeur vidéo %1.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur vidéo.</translation>
+        <translation>Ne peut pas initialiser l'encodeur vidéo.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur audio %1.</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation>Ne peut pas trouver l'encodeur audio %1.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
+        <translation>Ne peut pas initialiser l'encodeur audio.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <source>Could not initialize audio device '%1'.</source>
         <translation>Ne peut pas initialiser le périphérique audio %1.</translation>
     </message>
     <message>
@@ -2778,22 +2777,22 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Screen width must be a multiple of 8.</source>
-        <translation>La largeur de l&apos;écran doit être un multiplicateur de 8.</translation>
+        <translation>La largeur de l'écran doit être un multiplicateur de 8.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation>Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S.V.P, sélectionnez un autre périphérique audio ou &apos;Aucun&apos; comme valeur dans les paramètres d&apos;enregistrement.</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.</source>
+        <translation>Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S.V.P, sélectionnez un autre périphérique audio ou 'Aucun' comme valeur dans les paramètres d'enregistrement.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur vidéo %1.</translation>
+        <translation>Ne peut pas trouver l'encodeur vidéo %1.</translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation>Ne peut pas créer un fichier temporaire dans le dossier &apos;%1&apos;. S.V.P, configurez le &apos;Dossier Média Principal&apos; dans les paramètres d&apos;enregistrement.</translation>
+        <source>Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.</source>
+        <translation>Ne peut pas créer un fichier temporaire dans le dossier '%1'. S.V.P, configurez le 'Dossier Média Principal' dans les paramètres d'enregistrement.</translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
@@ -2801,26 +2800,26 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation>La largeur de l&apos;écran doit être un multiplicateur de 8.</translation>
+        <translation>La largeur de l'écran doit être un multiplicateur de 8.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur vidéo.</translation>
+        <translation>Ne peut pas initialiser l'encodeur vidéo.</translation>
     </message>
     <message>
         <source>Could not allocate output audio stream.</source>
         <translation>Ne peut pas allouer une sortie du flux audio.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur audio %1.</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation>Ne peut pas trouver l'encodeur audio %1.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
+        <translation>Ne peut pas initialiser l'encodeur audio.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <source>Could not initialize audio device '%1'.</source>
         <translation>Ne peut pas initialiser le périphérique audio %1.</translation>
     </message>
     <message>
@@ -2853,15 +2852,15 @@ pour voir plus de signets</translation>
     <message numerus="yes">
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
-            <numerusform>Le journal d&apos;événement pour la période de %1 à %2 - %n événement trouvé</numerusform>
-            <numerusform>Le journal d&apos;événement pour la période de %1 à %2 - %n événements trouvés</numerusform>
+            <numerusform>Le journal d'événement pour la période de %1 à %2 - %n événement trouvé</numerusform>
+            <numerusform>Le journal d'événement pour la période de %1 à %2 - %n événements trouvés</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
-            <numerusform>Journal d&apos;événement pour %1  - %n événement trouvé</numerusform>
-            <numerusform>Journal d&apos;événement pour %1  - %n événements trouvés</numerusform>
+            <numerusform>Journal d'événement pour %1  - %n événement trouvé</numerusform>
+            <numerusform>Journal d'événement pour %1  - %n événements trouvés</numerusform>
         </translation>
     </message>
     <message>
@@ -2870,7 +2869,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Any Action</source>
-        <translation>N&apos;importe quel action</translation>
+        <translation>N'importe quel action</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -2943,7 +2942,7 @@ pour voir plus de signets</translation>
         <source>and %1 user(s) more...</source>
         <translation type="unfinished">
             <numerusform>et plus %1 utilisateur(s)...</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2962,11 +2961,11 @@ pour voir plus de signets</translation>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
         <source>Copy archive length settings</source>
-        <translation>Copier paramètres longeur d&apos;archive</translation>
+        <translation>Copier paramètres longeur d'archive</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
-        <translation>Type d&apos;horaire mouvement n&apos;est pas supporté par certaines caméras.</translation>
+        <translation>Type d'horaire mouvement n'est pas supporté par certaines caméras.</translation>
     </message>
     <message>
         <source>Recording cannot be enabled for some cameras.</source>
@@ -2974,7 +2973,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
-        <translation>Paramètres d&apos;horaire ne sont pas compatible avec certain périphériques.</translation>
+        <translation>Paramètres d'horaire ne sont pas compatible avec certain périphériques.</translation>
     </message>
 </context>
 <context>
@@ -2998,36 +2997,36 @@ pour voir plus de signets</translation>
     <message numerus="yes">
         <source>%nms</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -3077,7 +3076,7 @@ pour voir plus de signets</translation>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
         <source>Loading preview, please wait...</source>
-        <translation>Charge l&apos;apercu, S.V.P. patientez...</translation>
+        <translation>Charge l'apercu, S.V.P. patientez...</translation>
     </message>
     <message>
         <source>Error</source>
@@ -3085,11 +3084,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Auto calibration failed. Image is not round.</source>
-        <translation>Échec calibration auto. L&apos;image n&apos;est pas ronde.</translation>
+        <translation>Échec calibration auto. L'image n'est pas ronde.</translation>
     </message>
     <message>
         <source>Auto calibration failed. The image might be too dim.</source>
-        <translation>Échec calibration auto. L&apos;image pourrait être trop terne.</translation>
+        <translation>Échec calibration auto. L'image pourrait être trop terne.</translation>
     </message>
 </context>
 <context>
@@ -3099,8 +3098,8 @@ pour voir plus de signets</translation>
         <translation>Informations</translation>
     </message>
     <message>
-        <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation>Dossier %1 n&apos;existe pas.</translation>
+        <source>Folder '%1' does not exist.</source>
+        <translation>Dossier %1 n'existe pas.</translation>
     </message>
     <message>
         <source>Select folder...</source>
@@ -3135,7 +3134,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Open Event Log</source>
-        <translation>OurvrirJournal d&apos;événement</translation>
+        <translation>OurvrirJournal d'événement</translation>
     </message>
     <message>
         <source>Open Bookmarks List</source>
@@ -3154,7 +3153,7 @@ pour voir plus de signets</translation>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation>Nous avons détecté que votre pilote de carte vidéo n&apos;est peut-être pas installé ou à jour.</translation>
+        <translation>Nous avons détecté que votre pilote de carte vidéo n'est peut-être pas installé ou à jour.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
@@ -3180,7 +3179,7 @@ pour voir plus de signets</translation>
         <translation>Enregistrer sous</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Overwrite?</source>
+        <source>File '%1' already exists. Overwrite?</source>
         <translation>Le fichier %1 existe déjà. Remplacer?</translation>
     </message>
     <message>
@@ -3188,8 +3187,8 @@ pour voir plus de signets</translation>
         <translation>Ne peut pas remplacer le fichier</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus.S.V.P, essayez un autre nom.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>Fichier '%1 'est utilisé par un autre processus.S.V.P, essayez un autre nom.</translation>
     </message>
 </context>
 <context>
@@ -3249,7 +3248,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
-        <translation>Temps d&apos;impulsion(ms)</translation>
+        <translation>Temps d'impulsion(ms)</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -3314,12 +3313,12 @@ pour voir plus de signets</translation>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>Échec d&apos;ouverture du port IO &apos;%1&apos;</translation>
+        <source>Failed to turn on IO port '%1'</source>
+        <translation>Échec d'ouverture du port IO '%1'</translation>
     </message>
     <message>
-        <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>Échec de fermeture du port IO &apos;%1&apos;</translation>
+        <source>Failed to turn off IO port '%1'</source>
+        <translation>Échec de fermeture du port IO '%1'</translation>
     </message>
     <message>
         <source>IO port error</source>
@@ -3329,16 +3328,16 @@ pour voir plus de signets</translation>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus. S.V.P, essayez un autre nom.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>Fichier '%1 'est utilisé par un autre processus. S.V.P, essayez un autre nom.</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>Exportation vers &quot;%1&quot;...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>Exportation vers "%1"...</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
-        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+        <extracomment>"Could not export camera AXIS1334"</extracomment>
         <translation>Ne peut pas exporter le périphérique %1.</translation>
     </message>
     <message>
@@ -3465,7 +3464,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Error while loading users.</source>
-        <translation>Erreur lors du chargement d&apos;usagers.</translation>
+        <translation>Erreur lors du chargement d'usagers.</translation>
     </message>
     <message>
         <source>No new users found.</source>
@@ -3527,7 +3526,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Expiration Date</source>
-        <translation>Date d&apos;expiration</translation>
+        <translation>Date d'expiration</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3551,7 +3550,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation>Aujourd&apos;hui</translation>
+        <translation>Aujourd'hui</translation>
     </message>
     <message>
         <source>Tomorrow</source>
@@ -3589,7 +3588,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation>Vous essayez d&apos;activer une licence incompatible avec votre logiciel. S.V.P. contactez le support pour obtenir une licence valide.</translation>
+        <translation>Vous essayez d'activer une licence incompatible avec votre logiciel. S.V.P. contactez le support pour obtenir une licence valide.</translation>
     </message>
     <message>
         <source>License Activation </source>
@@ -3619,11 +3618,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>You do not have a valid license installed.</source>
-        <translation>Vous n&apos;avez pas de licence valide installée.</translation>
+        <translation>Vous n'avez pas de licence valide installée.</translation>
     </message>
     <message>
         <source>Please activate your commercial or trial license.</source>
-        <translation>S.V.P. activez votre licence commerciale ou d&apos;essai.</translation>
+        <translation>S.V.P. activez votre licence commerciale ou d'essai.</translation>
     </message>
     <message>
         <source>Please activate your commercial license.</source>
@@ -3631,11 +3630,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation.</source>
-        <translation>Une erreur est survenue durant l&apos;activation automatique de licence.</translation>
+        <translation>Une erreur est survenue durant l'activation automatique de licence.</translation>
     </message>
     <message>
         <source>Try to activate your license manually.</source>
-        <translation>Essayez d&apos;activer votre licence manuellement.</translation>
+        <translation>Essayez d'activer votre licence manuellement.</translation>
     </message>
     <message>
         <source>Obtaining licenses from server...</source>
@@ -3647,15 +3646,15 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. A network error has occurred.</source>
-        <translation>Il y a eu un problème à l&apos;activation de votre licence. Erreur réseau survenue.</translation>
+        <translation>Il y a eu un problème à l'activation de votre licence. Erreur réseau survenue.</translation>
     </message>
     <message>
         <source>Unable to activate license:  %1</source>
-        <translation>Impossible d&apos;activer licence: %1</translation>
+        <translation>Impossible d'activer licence: %1</translation>
     </message>
     <message>
         <source>Unable to remove license from server:  %1</source>
-        <translation>Impossible d&apos;enlever la licence du serveur: %1</translation>
+        <translation>Impossible d'enlever la licence du serveur: %1</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to obtain a valid license key.</source>
@@ -3663,11 +3662,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation. Please contact support to activate your license key manually.</source>
-        <translation>Une erreur réseau s&apos;est produite durant l&apos;activation automatique de la licence. S.V.P. contactez le support pour activer votre licence manuellement.</translation>
+        <translation>Une erreur réseau s'est produite durant l'activation automatique de la licence. S.V.P. contactez le support pour activer votre licence manuellement.</translation>
     </message>
     <message>
         <source>The manual activation key file you have selected is invalid. Select a valid manual activation key file to continue. If problem continues, please contact support team.</source>
-        <translation>Fichier de la clé activation manuelle invalide. Sélectionner un fichier d&apos;activation de clé manuelle valide. Si le problème persiste, S.V.P. contacter le support.</translation>
+        <translation>Fichier de la clé activation manuelle invalide. Sélectionner un fichier d'activation de clé manuelle valide. Si le problème persiste, S.V.P. contacter le support.</translation>
     </message>
 </context>
 <context>
@@ -3685,7 +3684,7 @@ pour voir plus de signets</translation>
     <name>QnLicenseWidget</name>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>S.V.P. envoyez un courriel avec le numéro de série et l&apos;ID matériel fournis à %1 pour obtenir une clé d&apos;activation.</translation>
+        <translation>S.V.P. envoyez un courriel avec le numéro de série et l'ID matériel fournis à %1 pour obtenir une clé d'activation.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -3717,11 +3716,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Could not open the file %1</source>
-        <translation>Impossible d&apos;ouvrir le fichier %1</translation>
+        <translation>Impossible d'ouvrir le fichier %1</translation>
     </message>
     <message>
         <source>Activate Trial License</source>
-        <translation>Activer une licence d&apos;essai</translation>
+        <translation>Activer une licence d'essai</translation>
     </message>
     <message>
         <source>Activate Free License</source>
@@ -3788,11 +3787,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>The information you have entered is not valid.</source>
-        <translation>L&apos;information que vous avez entrée est invalide.</translation>
+        <translation>L'information que vous avez entrée est invalide.</translation>
     </message>
     <message>
         <source>Entered hostname is not valid.</source>
-        <translation>Le nom d&apos;hôte entré est invalide.</translation>
+        <translation>Le nom d'hôte entré est invalide.</translation>
     </message>
     <message>
         <source>Host field cannot be empty.</source>
@@ -3813,10 +3812,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>Êtes-vous sûr de vouloir effacer cette connexion %1?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>Paramètres invalides</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -3843,11 +3838,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Preparing Image...</source>
-        <translation>Préparation de l&apos;image...</translation>
+        <translation>Préparation de l'image...</translation>
     </message>
     <message>
         <source>Please wait while image is being prepared...</source>
-        <translation>S.V.P. patientez pendant que l&apos;image est préparée...</translation>
+        <translation>S.V.P. patientez pendant que l'image est préparée...</translation>
     </message>
     <message>
         <source>Dark</source>
@@ -3891,7 +3886,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-        <translation>Cette option n&apos;affecte pas l&apos;horaire d&apos;enregistrement. L&apos;horaire est toujours basé sur l&apos;heure du Serveur.</translation>
+        <translation>Cette option n'affecte pas l'horaire d'enregistrement. L'horaire est toujours basé sur l'heure du Serveur.</translation>
     </message>
     <message>
         <source>Select File...</source>
@@ -3909,8 +3904,8 @@ pour voir plus de signets</translation>
         <translation>PTZ</translation>
     </message>
     <message>
-        <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (Tour &quot;%2&quot; est actif)</translation>
+        <source>%1 (Tour "%2" is active)</source>
+        <translation>%1 (Tour "%2" est actif)</translation>
     </message>
     <message>
         <source>LIVE</source>
@@ -3922,7 +3917,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Image Enhancement</source>
-        <translation>Amélioration de l&apos;image</translation>
+        <translation>Amélioration de l'image</translation>
     </message>
     <message>
         <source>Hi-Res</source>
@@ -3934,7 +3929,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation>Prendre une capture d&apos;écran</translation>
+        <translation>Prendre une capture d'écran</translation>
     </message>
     <message>
         <source>Zoom Window</source>
@@ -3957,7 +3952,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation>Vous êtes sur le point d&apos;unir le système actuel %1 avec le système</translation>
+        <translation>Vous êtes sur le point d'unir le système actuel %1 avec le système</translation>
     </message>
     <message>
         <source>%1 (current)</source>
@@ -3973,11 +3968,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
-        <translation>Utiliser un nom d&apos;hôte précis ou l&apos;adresse IP plutôt que %1.</translation>
+        <translation>Utiliser un nom d'hôte précis ou l'adresse IP plutôt que %1.</translation>
     </message>
     <message>
         <source>This is the current system URL.</source>
-        <translation>Ceci est l&apos;URL actuelle du système.</translation>
+        <translation>Ceci est l'URL actuelle du système.</translation>
     </message>
     <message>
         <source>Merge with %1</source>
@@ -3989,7 +3984,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>The system was not found.</source>
-        <translation>Le système n&apos;a pas été trouvé.</translation>
+        <translation>Le système n'a pas été trouvé.</translation>
     </message>
     <message>
         <source>Could not create a backup of the server database.</source>
@@ -3997,7 +3992,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>System was not found.</source>
-        <translation>Système n&apos;a pas été trouvé.</translation>
+        <translation>Système n'a pas été trouvé.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -4005,7 +4000,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Cannot merge systems.</source>
-        <translation>Impossible d&apos;unir les Systèmes.</translation>
+        <translation>Impossible d'unir les Systèmes.</translation>
     </message>
     <message>
         <source>Success!</source>
@@ -4024,8 +4019,8 @@ pour voir plus de signets</translation>
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation>Attention: Vous êtes sur le point de fusionner avec les systèmes de licences&apos;DÉMARRAGE&apos;
-Comme seulement une licence de &apos;DÉMARRAGE&apos; par système est autorisé après fusion, vous aurez seulement une licence de &apos;DÉMARRAGE restante.
+        <translation>Attention: Vous êtes sur le point de fusionner avec les systèmes de licences'DÉMARRAGE'
+Comme seulement une licence de 'DÉMARRAGE' par système est autorisé après fusion, vous aurez seulement une licence de 'DÉMARRAGE restante.
 Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusionner pour continuer.
 </translation>
     </message>
@@ -4077,8 +4072,8 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>Horaire Invalide</translation>
     </message>
     <message>
-        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Flux secondaire désactivé sur ces caméras. L&apos;option Mouv.+Basse Qualité n&apos;a aucun effet. Appuyez sur &quot;Oui&quot; pour changer le type d&apos;enreg. à &quot;Toujours&quot; ou sur &quot;Non&quot; pour réactiver le flux secondaire.</translation>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
+        <translation>Flux secondaire désactivé sur ces caméras. L'option Mouv.+Basse Qualité n'a aucun effet. Appuyez sur "Oui" pour changer le type d'enreg. à "Toujours" ou sur "Non" pour réactiver le flux secondaire.</translation>
     </message>
 </context>
 <context>
@@ -4157,14 +4152,14 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Clip sound up to %1 seconds</source>
-        <translation>Le Clip de son jusqu&apos;à %1 secondes</translation>
+        <translation>Le Clip de son jusqu'à %1 secondes</translation>
     </message>
     <message>
         <source>New title could not be set.</source>
         <translation>Le nouveau titre ne peut pas être défini.</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;%1&apos;?</source>
+        <source>Are you sure you want to delete '%1'?</source>
         <translation>Êtes-vous sûr que vous voulez supprimer %1?</translation>
     </message>
     <message>
@@ -4250,7 +4245,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Time Synchronization...</source>
-        <translation>Synchronisation de l&apos;Heure...</translation>
+        <translation>Synchronisation de l'Heure...</translation>
     </message>
     <message>
         <source>Server settings...</source>
@@ -4309,7 +4304,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>For full-featured mode please use another computer.</source>
-        <translation>Pour le mode &apos;Toutes fonctions&apos;, S.V.P. utilisez un autre ordinateur.</translation>
+        <translation>Pour le mode 'Toutes fonctions', S.V.P. utilisez un autre ordinateur.</translation>
     </message>
     <message>
         <source>Warning!</source>
@@ -4336,11 +4331,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Screen Recording</source>
-        <translation>Enregistrement d&apos;écran</translation>
+        <translation>Enregistrement d'écran</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation>Certains changements ne prendront effet qu&apos;après le redémarrage de l&apos;application. Voulez-vous redémarrer l&apos;application maintenant ?</translation>
+        <translation>Certains changements ne prendront effet qu'après le redémarrage de l'application. Voulez-vous redémarrer l'application maintenant ?</translation>
     </message>
     <message>
         <source>Settings file is read-only. Please contact your system administrator.</source>
@@ -4356,7 +4351,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4378,7 +4373,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>These tours will become invalid if you remove it.</source>
-        <translation>Ces tours seront invalides si vous l&apos;enlevez.</translation>
+        <translation>Ces tours seront invalides si vous l'enlevez.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
@@ -4398,7 +4393,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation>La configuration de PTZ n&apos;est pas sauvegardée.</translation>
+        <translation>La configuration de PTZ n'est pas sauvegardée.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
@@ -4414,7 +4409,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>An error has occurred while trying to get the current position from camera %1.</source>
-        <translation>Une erreur est survenue en essayant d&apos;obtenir la position de la caméra %1.</translation>
+        <translation>Une erreur est survenue en essayant d'obtenir la position de la caméra %1.</translation>
     </message>
 </context>
 <context>
@@ -4472,13 +4467,13 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message numerus="yes">
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
-            <numerusform>Le préréglage sera activé après %n minute d&apos;inactivité</numerusform>
-            <numerusform>Le préréglage sera activé après %n minutes d&apos;inactivités</numerusform>
+            <numerusform>Le préréglage sera activé après %n minute d'inactivité</numerusform>
+            <numerusform>Le préréglage sera activé après %n minutes d'inactivités</numerusform>
         </translation>
     </message>
     <message>
         <source>less than a minute</source>
-        <translation>Moins d&apos;une minute</translation>
+        <translation>Moins d'une minute</translation>
     </message>
     <message>
         <source>New Tour %1</source>
@@ -4523,12 +4518,12 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>Réassigner</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation>Ce raccourci est utilisé par le préréglage &quot;%1&quot;.</translation>
+        <source>This hotkey is used by preset "%1".</source>
+        <translation>Ce raccourci est utilisé par le préréglage "%1".</translation>
     </message>
     <message>
-        <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation>Ce raccourci est utilisé par le tour &quot;%1&quot;.</translation>
+        <source>This hotkey is used by tour "%1".</source>
+        <translation>Ce raccourci est utilisé par le tour "%1".</translation>
     </message>
 </context>
 <context>
@@ -4679,7 +4674,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>less than an hour</source>
-        <translation>Moins d&apos;une heure</translation>
+        <translation>Moins d'une heure</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
@@ -4748,18 +4743,18 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
-        <translation>La durée d&apos;archive dans le calendrier depuis la première enregistrement</translation>
+        <translation>La durée d'archive dans le calendrier depuis la première enregistrement</translation>
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
     <message>
         <source>Not recording</source>
-        <translation>N&apos;enregistre pas</translation>
+        <translation>N'enregistre pas</translation>
     </message>
     <message>
         <source>Recording everything</source>
@@ -4890,22 +4885,18 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>This URL is already in the address list.</source>
-        <translation>L&apos;URL déjà dans la liste d&apos;adresse.</translation>
+        <translation>L'URL déjà dans la liste d'adresse.</translation>
     </message>
 </context>
 <context>
     <name>QnScreenRecorder</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation>Le sous-système de capture d&apos;écran n&apos;est pas encore initialisé. S.V.P, essayez plus tard.</translation>
+        <translation>Le sous-système de capture d'écran n'est pas encore initialisé. S.V.P, essayez plus tard.</translation>
     </message>
 </context>
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
-    <message>
-        <source>Export bookmark...</source>
-        <translation>Exporter Signet...</translation>
-    </message>
     <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Chercher signets par nom, mots clés ou description</translation>
@@ -4938,22 +4929,26 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>&lt;%n device(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n Périphérique(s)&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n Caméra(s)&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n module(s) I/O &gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished">Exporter Signet...</translation>
     </message>
 </context>
 <context>
@@ -5181,7 +5176,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Could not push updates to servers.</source>
-        <translation>Impossible d&apos;envoyer les MàJ aux serveurs.</translation>
+        <translation>Impossible d'envoyer les MàJ aux serveurs.</translation>
     </message>
     <message numerus="yes">
         <source>The problem is caused by %n servers:</source>
@@ -5213,11 +5208,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Could not install an update to the client.</source>
-        <translation>Impossible d&apos;installer les mises à jour client.</translation>
+        <translation>Impossible d'installer les mises à jour client.</translation>
     </message>
     <message>
         <source>Could not install updates on one or more servers.</source>
-        <translation>Impossible d&apos;installer les MàJ sur un ou plusieurs serveurs.</translation>
+        <translation>Impossible d'installer les MàJ sur un ou plusieurs serveurs.</translation>
     </message>
     <message>
         <source>Checking for updates...</source>
@@ -5269,7 +5264,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Cannot cancel update at this state.</source>
-        <translation>Impossible d&apos;annuler la MàJ dans cet état.</translation>
+        <translation>Impossible d'annuler la MàJ dans cet état.</translation>
     </message>
     <message>
         <source>Please wait until update is finished</source>
@@ -5281,11 +5276,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
+        <translation>S.V.P. fermer l'application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
     </message>
     <message>
         <source>Caution: Applying system updates at the end of the week is not recommended.</source>
-        <translation>Attention: Appliquer les mises à jour du système à la fin de la semaine n&apos;est pas recommandé.</translation>
+        <translation>Attention: Appliquer les mises à jour du système à la fin de la semaine n'est pas recommandé.</translation>
     </message>
     <message>
         <source>Latest Version:</source>
@@ -5305,7 +5300,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Please update the client manually using an installation package.</source>
-        <translation>S.V.P. mettre à jour le client manuellement en utilisant un paquet d&apos;installation.</translation>
+        <translation>S.V.P. mettre à jour le client manuellement en utilisant un paquet d'installation.</translation>
     </message>
     <message>
         <source>Update unsuccessful.</source>
@@ -5313,7 +5308,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation>Quelqu&apos;un a déjà commencé une MàJ.</translation>
+        <translation>Quelqu'un a déjà commencé une MàJ.</translation>
     </message>
     <message>
         <source>Internet Connectivity Problem</source>
@@ -5326,8 +5321,8 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message numerus="yes">
         <source>Authentication failed for %n servers:</source>
         <translation>
-            <numerusform>Échec d&apos;authentification pour %n serveur:</numerusform>
-            <numerusform>Échec d&apos;authentification pour %n serveurs:</numerusform>
+            <numerusform>Échec d'authentification pour %n serveur:</numerusform>
+            <numerusform>Échec d'authentification pour %n serveurs:</numerusform>
         </translation>
     </message>
     <message>
@@ -5340,7 +5335,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Launcher process was not found.</source>
-        <translation>Processus du lanceur n&apos;a pas été trouvé.</translation>
+        <translation>Processus du lanceur n'a pas été trouvé.</translation>
     </message>
     <message>
         <source>No such build is available on update server.</source>
@@ -5348,7 +5343,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Unable to begin update. Updates for one or more servers were not found.</source>
-        <translation>Impossible de démarrer la MàJ. Une MàJ pour un ou plusieurs serveurs n&apos;a pas été trouvée.</translation>
+        <translation>Impossible de démarrer la MàJ. Une MàJ pour un ou plusieurs serveurs n'a pas été trouvée.</translation>
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
@@ -5385,11 +5380,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
+' sequence</comment>
         <translation>Mots clés HTML peuvent être utilisées dans le texte personnalisé:
-&lt;h4&gt;En-têtes (h1-h6)&lt;/h4&gt;Aussi différentes &lt;font color=&quot;red&quot;&gt;couleurs&lt;/font&gt; et &lt;font size=&quot;18&quot;&gt;tailles&lt;/font&gt;peuvent être appliquées. Le texte peut &lt;s&gt;barré&lt;/s&gt;, &lt;u&gt;souligné&lt;/u&gt;, &lt;b&gt;gras&lt;/b&gt; ou &lt;i&gt;italique&lt;/i&gt;</translation>
+&lt;h4&gt;En-têtes (h1-h6)&lt;/h4&gt;Aussi différentes &lt;font color="red"&gt;couleurs&lt;/font&gt; et &lt;font size="18"&gt;tailles&lt;/font&gt;peuvent être appliquées. Le texte peut &lt;s&gt;barré&lt;/s&gt;, &lt;u&gt;souligné&lt;/u&gt;, &lt;b&gt;gras&lt;/b&gt; ou &lt;i&gt;italique&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5419,11 +5414,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>L&apos;IPS actuel dans la grille horaire est %1. L&apos;IPS à été diminuée au maximum de IPS caméra %2.</translation>
+        <translation>L'IPS actuel dans la grille horaire est %1. L'IPS à été diminuée au maximum de IPS caméra %2.</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>Pour le mouvement logiciel 2 IPS sont réservées pour le flux secondaire. L&apos;IPS actuel dans la grille horaire est %1. L&apos;IPS à été diminuée à %2.</translation>
+        <translation>Pour le mouvement logiciel 2 IPS sont réservées pour le flux secondaire. L'IPS actuel dans la grille horaire est %1. L'IPS à été diminuée à %2.</translation>
     </message>
     <message>
         <source>Confirm motion regions reset</source>
@@ -5443,7 +5438,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Do Not Record Motion</source>
-        <translation>N&apos;enregistre pas sur mouvement</translation>
+        <translation>N'enregistre pas sur mouvement</translation>
     </message>
     <message>
         <source>Device Settings</source>
@@ -5462,8 +5457,8 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>Horaire Invalide</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Flux secondaire désactivé sur ces caméras. L&apos;option Mouv.+Basse Qualité n&apos;a aucun effet. Appuyez sur &quot;Oui&quot; pour changer le type d&apos;enreg. à &quot;Toujours&quot; ou sur &quot;Non&quot; pour réactiver le flux secondaire.</translation>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
+        <translation>Flux secondaire désactivé sur ces caméras. L'option Mouv.+Basse Qualité n'a aucun effet. Appuyez sur "Oui" pour changer le type d'enreg. à "Toujours" ou sur "Non" pour réactiver le flux secondaire.</translation>
     </message>
 </context>
 <context>
@@ -5484,8 +5479,8 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>Courriel invalide</translation>
     </message>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>Aucun préréglage trouvé. Utiliser l&apos;option &apos;Avancée&apos;.</translation>
+        <source>No preset found. Use 'Advanced' option.</source>
+        <translation>Aucun préréglage trouvé. Utiliser l'option 'Avancée'.</translation>
     </message>
 </context>
 <context>
@@ -5594,26 +5589,26 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Please check authentication information in device settings</source>
-        <translation>S.V.P. vérifier les informations d&apos;authentification dans les paramètres périphérique</translation>
+        <translation>S.V.P. vérifier les informations d'authentification dans les paramètres périphérique</translation>
     </message>
     <message>
         <source>Please check authentication information in camera settings</source>
-        <translation>S.V.P. vérifier les informations d&apos;authentification dans les paramètres caméra</translation>
+        <translation>S.V.P. vérifier les informations d'authentification dans les paramètres caméra</translation>
     </message>
     <message>
         <source>Please check authentication information in I/O module settings</source>
-        <translation>S.V.P. vérifier les informations d&apos;authentification dans les paramètres module I/O</translation>
+        <translation>S.V.P. vérifier les informations d'authentification dans les paramètres module I/O</translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation>Vous êtes sur le point de lancer la routine de resynchronisation d&apos;archive.</translation>
+        <translation>Vous êtes sur le point de lancer la routine de resynchronisation d'archive.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation>ATTENTION! L&apos;usage de disque dur va augmenter durant le processus de resynchronisation! Selon la taille totale d&apos;archive, cela pourrait prendre plusieurs heures.</translation>
+        <translation>ATTENTION! L'usage de disque dur va augmenter durant le processus de resynchronisation! Selon la taille totale d'archive, cela pourrait prendre plusieurs heures.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
@@ -5645,7 +5640,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation>Reconstruction de l&apos;index d&apos;archive terminée.</translation>
+        <translation>Reconstruction de l'index d'archive terminée.</translation>
     </message>
     <message>
         <source>By Schedule</source>
@@ -5692,7 +5687,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
-        <translation>Ce processus est seulement nécessaire si votre dossier d&apos;archive à été retiré, renommé ou remplacé. Vous pouvez annuler la reconstruction à n&apos;importe quel moment sans perte de données.</translation>
+        <translation>Ce processus est seulement nécessaire si votre dossier d'archive à été retiré, renommé ou remplacé. Vous pouvez annuler la reconstruction à n'importe quel moment sans perte de données.</translation>
     </message>
     <message>
         <source>Select at least one device to start backup.</source>
@@ -5704,7 +5699,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Cannot start backup while archive index rebuild is in progress.</source>
-        <translation>Ne peut pas faire une sauvegarde pendant la reconstruction de l&apos;index d&apos;archive.</translation>
+        <translation>Ne peut pas faire une sauvegarde pendant la reconstruction de l'index d'archive.</translation>
     </message>
     <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
@@ -5714,14 +5709,14 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>%n Camera(s)</source>
         <translation type="unfinished">
             <numerusform>%n Caméra(s)</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
         <translation type="unfinished">
             <numerusform>%n Périphérique(s)</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message>
@@ -5730,11 +5725,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation>En mode &apos;Temps Réel&apos; toutes les données sont sauvegardées en continue.</translation>
+        <translation>En mode 'Temps Réel' toutes les données sont sauvegardées en continue.</translation>
     </message>
     <message>
         <source>Archive backup is completed up to: %1.</source>
-        <translation>Sauvegarde d&apos;archive est complet jusqu&apos;à: %1.</translation>
+        <translation>Sauvegarde d'archive est complet jusqu'à: %1.</translation>
     </message>
 </context>
 <context>
@@ -5753,7 +5748,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Use as backup storage</source>
-        <translation>Utiliser comme stockage d&apos;archive</translation>
+        <translation>Utiliser comme stockage d'archive</translation>
     </message>
     <message>
         <source>Inaccessible</source>
@@ -5785,12 +5780,12 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message>
         <source>Fast Archive Scan - %p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Balayage d&apos;archive rapide - %p%</translation>
+        <translation>Balayage d'archive rapide - %p%</translation>
     </message>
     <message>
         <source>Rebuilding Archive Index - %p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Reconstruction d&apos;index d&apos;archive - %p%</translation>
+        <translation>Reconstruction d'index d'archive - %p%</translation>
     </message>
 </context>
 <context>
@@ -5816,7 +5811,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
-        <translation>Le système a un autre serveur(s) utilisant le même chemin de stockage en réseau. L&apos;enregistrement des données par plusieurs serveurs sur exactement le même endroit est pas recommandé.</translation>
+        <translation>Le système a un autre serveur(s) utilisant le même chemin de stockage en réseau. L'enregistrement des données par plusieurs serveurs sur exactement le même endroit est pas recommandé.</translation>
     </message>
     <message>
         <source>Add storage</source>
@@ -5855,7 +5850,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Time Synchronization</source>
-        <translation>Synchronisation de l&apos;Heure</translation>
+        <translation>Synchronisation de l'Heure</translation>
     </message>
     <message>
         <source>Users</source>
@@ -5878,7 +5873,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation>Certains usagers n&apos;ont pas leurs adresse courriel configuré</translation>
+        <translation>Certains usagers n'ont pas leurs adresse courriel configuré</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
@@ -5886,7 +5881,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation>Sélectionner serveur pour la synchronisation de l&apos;heure des autres</translation>
+        <translation>Sélectionner serveur pour la synchronisation de l'heure des autres</translation>
     </message>
     <message>
         <source>System is in safe mode</source>
@@ -5894,7 +5889,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation>Erreur lors de l&apos;envoie de courriel</translation>
+        <translation>Erreur lors de l'envoie de courriel</translation>
     </message>
     <message>
         <source>Storage is full</source>
@@ -5906,11 +5901,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation>Reconstruction de l&apos;index d&apos;archive terminée</translation>
+        <translation>Reconstruction de l'index d'archive terminée</translation>
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user</source>
-        <translation>Reconstruction de l&apos;index d&apos;archive annulé par l&apos;usager</translation>
+        <translation>Reconstruction de l'index d'archive annulé par l'usager</translation>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
@@ -5930,7 +5925,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation>Certains usagers n&apos;ont pas leurs adresse courriel configuré.</translation>
+        <translation>Certains usagers n'ont pas leurs adresse courriel configuré.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
@@ -5938,7 +5933,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Le serveur temps n&apos;est pas synchronisé et un temps commun n&apos;a pas été détecté automatiquement.</translation>
+        <translation>Le serveur temps n'est pas synchronisé et un temps commun n'a pas été détecté automatiquement.</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
@@ -5950,7 +5945,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation>Vous n&apos;avez pas de licenses.</translation>
+        <translation>Vous n'avez pas de licenses.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
@@ -5958,11 +5953,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Reconstruction de l&apos;index d&apos;archive non terminée sur le serveur suivant:</translation>
+        <translation>Reconstruction de l'index d'archive non terminée sur le serveur suivant:</translation>
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
-        <translation>Reconstruction de l&apos;index d&apos;archive annulée par l&apos;usager sur le serveur suivant:</translation>
+        <translation>Reconstruction de l'index d'archive annulée par l'usager sur le serveur suivant:</translation>
     </message>
     <message>
         <source>Storage is full on the following Server:</source>
@@ -6004,7 +5999,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Offset</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Synchronizing...</source>
@@ -6015,11 +6010,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnTimeServerSelectionWidget</name>
     <message>
         <source>Time is taken from the Internet.</source>
-        <translation>L&apos;Heure est pris depuis Internet.</translation>
+        <translation>L'Heure est pris depuis Internet.</translation>
     </message>
     <message>
         <source>Time is taken from %1.</source>
-        <translation>L&apos;Heure est pris depuis %1.</translation>
+        <translation>L'Heure est pris depuis %1.</translation>
     </message>
 </context>
 <context>
@@ -6030,111 +6025,111 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>auto</source>
-        <comment>AM/PM usage based on user&apos;s system locale.</comment>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>AM/PM usage based on user's system locale.</comment>
+        <extracomment>Translate this into 'none' or 'forced' if you want to switch off automatic detection of Do not translate this string unless you know what you're doing.</extracomment>
         <translation>auto</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying day caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying month caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying year caption in timeline's header</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <translation />
     </message>
 </context>
 <context>
@@ -6152,19 +6147,19 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6218,7 +6213,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation>L&apos;usager %1 a une adresse courriel invalide</translation>
+        <translation>L'usager %1 a une adresse courriel invalide</translation>
     </message>
 </context>
 <context>
@@ -6319,7 +6314,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>User with specified login already exists.</source>
-        <translation>Un usager avec l&apos;identifiant spécifié existe déjà.</translation>
+        <translation>Un usager avec l'identifiant spécifié existe déjà.</translation>
     </message>
     <message>
         <source>Invalid current password.</source>
@@ -6335,7 +6330,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Choose access rights.</source>
-        <translation>Choisissez les droits d&apos;accès.</translation>
+        <translation>Choisissez les droits d'accès.</translation>
     </message>
     <message>
         <source>Owner</source>
@@ -6413,7 +6408,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>New Item</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Delete Screen</source>
@@ -6518,11 +6513,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
-        <translation>La période de temps sélectionnée est trop courte pour effectuer une recherche d&apos;aperçu. S&apos;il vous plait, sélectionner une période plus longue.</translation>
+        <translation>La période de temps sélectionnée est trop courte pour effectuer une recherche d'aperçu. S'il vous plait, sélectionner une période plus longue.</translation>
     </message>
     <message>
         <source>Preview Search for %1</source>
-        <translation>Recherche d&apos;aperçu pour %1</translation>
+        <translation>Recherche d'aperçu pour %1</translation>
     </message>
     <message>
         <source>Layout is locked and cannot be changed.</source>
@@ -6530,11 +6525,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Cannot add item</source>
-        <translation>Impossible d&apos;ajouter l&apos;élément</translation>
+        <translation>Impossible d'ajouter l'élément</translation>
     </message>
     <message>
         <source>Cannot add a local file to Multi-Video</source>
-        <translation>Impossible d&apos;ajouter le fichier locale au Multi-Viédo</translation>
+        <translation>Impossible d'ajouter le fichier locale au Multi-Viédo</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6558,7 +6553,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
+        <translation>S.V.P. fermer l'application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
     </message>
     <message>
         <source>Picture is too big. Maximum size is %1 Mb</source>
@@ -6566,7 +6561,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Error while uploading picture.</source>
-        <translation>Erreur lors de l&apos;envoi de l&apos;image.</translation>
+        <translation>Erreur lors de l'envoi de l'image.</translation>
     </message>
     <message>
         <source>Some components of the system are not updated</source>
@@ -6590,13 +6585,13 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Anonymous Usage Statistics</source>
-        <translation> Statstiques anonyme d&apos;usage</translation>
+        <translation> Statstiques anonyme d'usage</translation>
     </message>
     <message>
         <source>System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.
 If you would like to disable this feature you can do so in the System Settings dialog.</source>
-        <translation>Le système envoie des statistiques d&apos;usage et &apos;crash&apos;aux développeurs du logiciel pour nous aider à améliorer l&apos;expérience utilisateur.
-Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le menu&apos;Paramètres Système&apos;.</translation>
+        <translation>Le système envoie des statistiques d'usage et 'crash'aux développeurs du logiciel pour nous aider à améliorer l'expérience utilisateur.
+Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le menu'Paramètres Système'.</translation>
     </message>
     <message>
         <source>New Layout</source>
@@ -6612,7 +6607,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Unable to perform preview search.</source>
-        <translation>Ne peut pas effectuer une recherche d&apos;aperçu.</translation>
+        <translation>Ne peut pas effectuer une recherche d'aperçu.</translation>
     </message>
     <message>
         <source>Process in progress...</source>
@@ -6624,11 +6619,11 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Updating Background...</source>
-        <translation>Mise à jour du fond d&apos;écran...</translation>
+        <translation>Mise à jour du fond d'écran...</translation>
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation>Le traitement de l&apos;image peut prendre beaucoup de temps. S.V.P, être patient.</translation>
+        <translation>Le traitement de l'image peut prendre beaucoup de temps. S.V.P, être patient.</translation>
     </message>
     <message>
         <source>This is a beta version of %1.</source>
@@ -6636,7 +6631,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Le processus du lanceur n&apos;a pas été trouvé.</translation>
+        <translation>Le processus du lanceur n'a pas été trouvé.</translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
@@ -6683,28 +6678,28 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>
-            <numerusform>%n périphérique sont auto-découvert. Il peut être auto-découvert après l&apos;avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
+            <numerusform>%n périphérique sont auto-découvert. Il peut être auto-découvert après l'avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
             <numerusform>Ces %n périphériques sont auto-découverts. Ils peuvent être auto-découverts après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>
-            <numerusform>%n caméra auto-découverte. Elles peut être auto-découverte après l&apos;avoirs enlevée. Êtes-vous sûr que vous voulez la supprimer?</numerusform>
+            <numerusform>%n caméra auto-découverte. Elles peut être auto-découverte après l'avoirs enlevée. Êtes-vous sûr que vous voulez la supprimer?</numerusform>
             <numerusform>Ces %n caméras sont auto-découvertes. Elles peuvent être auto-découvertes après les avoirs enlevées. Êtes-vous sûr que vous voulez les supprimers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>
-            <numerusform>%n périphériques auto-découvert. Il peut être auto-découvert après l&apos;avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
+            <numerusform>%n périphériques auto-découvert. Il peut être auto-découvert après l'avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
             <numerusform>%n de ces périphériques sont auto-découverts. Ils peuvent être auto-découverts après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>
-            <numerusform>%n caméra auto-découverte. Elle peut être auto-découverte après l&apos;avoirs enlevé. Êtes-vous sûr que vous voulez la supprimer?</numerusform>
+            <numerusform>%n caméra auto-découverte. Elle peut être auto-découverte après l'avoirs enlevé. Êtes-vous sûr que vous voulez la supprimer?</numerusform>
             <numerusform>%n de ces caméras sont auto-découvertes. Elles peuvent être auto-découvert après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</numerusform>
         </translation>
     </message>
@@ -6746,14 +6741,14 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>
-            <numerusform>%n module I/O est auto-découvert. Il peut être auto-découvert après l&apos;avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
+            <numerusform>%n module I/O est auto-découvert. Il peut être auto-découvert après l'avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
             <numerusform>Ces %n modules I/O sont auto-découverts. Ils peuvent être auto-découverts après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>
-            <numerusform>%n  modules I/O auto-découvert. Il peut être auto-découvert après l&apos;avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
+            <numerusform>%n  modules I/O auto-découvert. Il peut être auto-découvert après l'avoir enlevé. Êtes-vous sûr que vous voulez le supprimer?</numerusform>
             <numerusform>%n de ces modules I/O sont auto-découverts. Ils peuvent être auto-découverts après les avoirs enlevés. Êtes-vous sûr que vous voulez les supprimers?</numerusform>
         </translation>
     </message>
@@ -6770,19 +6765,19 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <source>In the meantime please adjust your screen's resolution if needed for a better experience.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6812,8 +6807,8 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <translation>Êtes-vous sûr de vouloir effacer ce signet?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
-        <translation>Êtes-vous sûr de vouloir effacer signet &quot;%1&quot;?</translation>
+        <source>Are you sure you want to delete bookmark "%1"?</source>
+        <translation>Êtes-vous sûr de vouloir effacer signet "%1"?</translation>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
@@ -6823,7 +6818,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <source>Are you sure you want to delete these %n bookmarks?</source>
         <translation type="unfinished">
             <numerusform>Êtes-vous sûr de vouloir effacer ces %n signets?</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -6858,7 +6853,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Save Recording As...</source>
-        <translation>Sauvegarder la l&apos;enregistrement sous...</translation>
+        <translation>Sauvegarder la l'enregistrement sous...</translation>
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
@@ -6874,15 +6869,15 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
-        <translation>Impossible de démarrer l&apos;enregistrement en raison de l&apos;erreur suivante: %1</translation>
+        <translation>Impossible de démarrer l'enregistrement en raison de l'erreur suivante: %1</translation>
     </message>
     <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>Ne peut pas remplacer le fichier &apos;%1&apos;. S.V.P, essayez un autre nom.</translation>
+        <source>Could not overwrite file '%1'. Please try a different name.</source>
+        <translation>Ne peut pas remplacer le fichier '%1'. S.V.P, essayez un autre nom.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
-        <translation>Appuyez sur n&apos;importe quelle touche pour arrêter le tour.</translation>
+        <translation>Appuyez sur n'importe quelle touche pour arrêter le tour.</translation>
     </message>
 </context>
 <context>
@@ -6905,10 +6900,10 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translatorcomment>There&apos;s no need for a Singular if you need one items</translatorcomment>
+        <translatorcomment>There's no need for a Singular if you need one items</translatorcomment>
         <translation>
-            <numerusform>Exactement un élément doit être sélectionné pour l&apos;exportation, mais %n éléments sont actuellement sélectionnés.</numerusform>
-            <numerusform>Exactement un élément doit être sélectionné pour l&apos;exportation, mais %n éléments sont actuellement sélectionnés.</numerusform>
+            <numerusform>Exactement un élément doit être sélectionné pour l'exportation, mais %n éléments sont actuellement sélectionnés.</numerusform>
+            <numerusform>Exactement un élément doit être sélectionné pour l'exportation, mais %n éléments sont actuellement sélectionnés.</numerusform>
         </translation>
     </message>
     <message>
@@ -6929,11 +6924,11 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation>Mise en page actuelle contient des fichiers locaux. Fichiers locaux ne sont pas autorisés pour l&apos;exportation Multi-Vidéo.</translation>
+        <translation>Mise en page actuelle contient des fichiers locaux. Fichiers locaux ne sont pas autorisés pour l'exportation Multi-Vidéo.</translation>
     </message>
     <message>
         <source>AVI format is not recommended</source>
-        <translation>Le format AVI n&apos;est pas recommandé</translation>
+        <translation>Le format AVI n'est pas recommandé</translation>
     </message>
     <message>
         <source>Save As</source>
@@ -6944,31 +6939,31 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <translation>Exportation vidéo</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>Exportation vers &quot;%1&quot;...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>Exportation vers "%1"...</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation>La mise en page actuelle contient des fichiers d&apos;image. Les images ne sont pas autorisées pour une exportation Multi-Vidéo.</translation>
+        <translation>La mise en page actuelle contient des fichiers d'image. Les images ne sont pas autorisées pour une exportation Multi-Vidéo.</translation>
     </message>
     <message>
         <source>Export Layout As...</source>
         <translation>Exporter la mise en page sous...</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>Fichier &apos;%1 &apos;est déjà utilisé par l&apos;enregistrement. S.V.P, essayez un autre nom.</translation>
+        <source>File '%1' is used for recording already. Please enter another name.</source>
+        <translation>Fichier '%1 'est déjà utilisé par l'enregistrement. S.V.P, essayez un autre nom.</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus.S.V.P, essayez un autre nom.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>Fichier '%1 'est utilisé par un autre processus.S.V.P, essayez un autre nom.</translation>
     </message>
     <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation>Le format AVI n&apos;est pas recommandé pour l&apos;exportation d&apos;enregistrement &apos;non continu&apos; quand la piste audio est présente. Voulez-vous continuer?</translation>
+        <translation>Le format AVI n'est pas recommandé pour l'exportation d'enregistrement 'non continu' quand la piste audio est présente. Voulez-vous continuer?</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
         <translation>Le fichier %1 existe déjà. Voulez-vous le remplacer?</translation>
     </message>
     <message>
@@ -6977,7 +6972,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
-        <translation>Plus de 1Go d&apos;espace disque peut être requis et selon la vitesse de votre connexion, cela peut prendre plusieurs minutes à compléter.</translation>
+        <translation>Plus de 1Go d'espace disque peut être requis et selon la vitesse de votre connexion, cela peut prendre plusieurs minutes à compléter.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
@@ -6985,7 +6980,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation>Appliquer Filtres: Rotation, Dérouler, Amélioration d&apos;image, Aspect Personnalisé (requiers transcodes)</translation>
+        <translation>Appliquer Filtres: Rotation, Dérouler, Amélioration d'image, Aspect Personnalisé (requiers transcodes)</translation>
     </message>
     <message>
         <source>exported</source>
@@ -7025,7 +7020,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?</source>
-        <translation>Vous êtes sur le point d&apos;exporter une vidéo avec filtres qui requière un transcodage. Le transcodage peut prendre beaucoup de temps. Voulez-vous continuer ?</translation>
+        <translation>Vous êtes sur le point d'exporter une vidéo avec filtres qui requière un transcodage. Le transcodage peut prendre beaucoup de temps. Voulez-vous continuer ?</translation>
     </message>
     <message>
         <source>Export Complete</source>
@@ -7061,23 +7056,23 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Selected format is not recommended</source>
-        <translation>Le format sélectionné n&apos;est pas recommandé</translation>
+        <translation>Le format sélectionné n'est pas recommandé</translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
-        <translation>Le format sélectionné n&apos;est pas recommandé pour cette caméra à cause du &apos;downscaling&apos; vidéo. Nous recommendons l&apos;exportation du vidéo sélectionné soit au format &apos;.nov&apos; ou &apos;.exe&apos;. Voulez vous continuer?</translation>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the '.nov' or '.exe' format. Do you want to continue?</source>
+        <translation>Le format sélectionné n'est pas recommandé pour cette caméra à cause du 'downscaling' vidéo. Nous recommendons l'exportation du vidéo sélectionné soit au format '.nov' ou '.exe'. Voulez vous continuer?</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
-        <translation>Vous êtes sur le point d&apos;exporter une vidéo plus longue que 30 minutes.</translation>
+        <translation>Vous êtes sur le point d'exporter une vidéo plus longue que 30 minutes.</translation>
     </message>
     <message>
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
-        <translation>Vous êtes sur le point d&apos;exporter plusieurs vidéos avec un total plus long que 30 minutes.</translation>
+        <translation>Vous êtes sur le point d'exporter plusieurs vidéos avec un total plus long que 30 minutes.</translation>
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -7112,7 +7107,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Authentication failed.</source>
-        <translation>Échec d&apos;Authentification.</translation>
+        <translation>Échec d'Authentification.</translation>
     </message>
     <message>
         <source>Please, check the password you have entered.</source>
@@ -7127,8 +7122,8 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation>Attention: Vous êtes sur le point de fusionner avec les systèmes de licences&apos;DÉMARRAGE&apos;
-Comme seulement une licence de &apos;DÉMARRAGE&apos; par système est autorisé après fusion, vous aurez seulement une licence de &apos;DÉMARRAGE restante.
+        <translation>Attention: Vous êtes sur le point de fusionner avec les systèmes de licences'DÉMARRAGE'
+Comme seulement une licence de 'DÉMARRAGE' par système est autorisé après fusion, vous aurez seulement une licence de 'DÉMARRAGE restante.
 Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusionner pour continuer.
 </translation>
     </message>
@@ -7146,7 +7141,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>You can try to update the servers again in the System Administration dialog.</source>
-        <translation>Vous pouvez essayer de faire la MàJ serveur à nouveau dans l&apos;Administration Système.</translation>
+        <translation>Vous pouvez essayer de faire la MàJ serveur à nouveau dans l'Administration Système.</translation>
     </message>
     <message>
         <source>Warning!</source>
@@ -7166,8 +7161,8 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message numerus="yes">
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
         <translation>
-            <numerusform>%n mise en page n&apos;a pas été sauvegardée. Voulez-vous la sauvegarder?</numerusform>
-            <numerusform>%n mises en page n&apos;ont pas été sauvegardées. Voulez-vous les sauvegarder?</numerusform>
+            <numerusform>%n mise en page n'a pas été sauvegardée. Voulez-vous la sauvegarder?</numerusform>
+            <numerusform>%n mises en page n'ont pas été sauvegardées. Voulez-vous les sauvegarder?</numerusform>
         </translation>
     </message>
     <message>
@@ -7217,7 +7212,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>A layout with the same name already exists. You do not have the rights to overwrite it.</source>
-        <translation>Mise en page avec le même nom existe déjà et vous n&apos;avez pas les droits pour la remplacer.</translation>
+        <translation>Mise en page avec le même nom existe déjà et vous n'avez pas les droits pour la remplacer.</translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
@@ -7236,22 +7231,22 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnWorkbenchNavigator</name>
     <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>Live</source>
-        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <extracomment>Time slider's tooltip for position on live.</extracomment>
         <translation>Direct</translation>
     </message>
     <message>
@@ -7291,7 +7286,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>An error has occurred while trying to get the current position from camera %1.</source>
-        <translation>Une erreur est survenue en essayant d&apos;obtenir la position de la caméra %1.</translation>
+        <translation>Une erreur est survenue en essayant d'obtenir la position de la caméra %1.</translation>
     </message>
 </context>
 <context>
@@ -7302,20 +7297,20 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>It is not allowed to make any changes except license activation.</source>
-        <translation>Il est interdit d&apos;apporter des modifications à l&apos;exception de l&apos;activation de licence.</translation>
+        <translation>Il est interdit d'apporter des modifications à l'exception de l'activation de licence.</translation>
     </message>
     <message numerus="yes">
         <source>The following %n items are not saved.</source>
         <translation>
-            <numerusform>%n éléments suivant n&apos;est pas sauvegardé.</numerusform>
+            <numerusform>%n éléments suivant n'est pas sauvegardé.</numerusform>
             <numerusform>Les %n éléments suivants ne sont pas sauvegardés.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
         <translation>
-            <numerusform>Impossible d&apos;enregistrer %n élément au serveur.</numerusform>
-            <numerusform>Impossible d&apos;enregistrer les %n éléments au serveur.</numerusform>
+            <numerusform>Impossible d'enregistrer %n élément au serveur.</numerusform>
+            <numerusform>Impossible d'enregistrer les %n éléments au serveur.</numerusform>
         </translation>
     </message>
     <message>
@@ -7325,7 +7320,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message numerus="yes">
         <source>The following %n items are not deleted.</source>
         <translation>
-            <numerusform>%n élément suivant n&apos;est pas supprimé.</numerusform>
+            <numerusform>%n élément suivant n'est pas supprimé.</numerusform>
             <numerusform>Les %n éléments suivants ne sont pas supprimés.</numerusform>
         </translation>
     </message>
@@ -7352,7 +7347,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Save Screenshot As...</source>
-        <translation>Sauvegarder la capture d&apos;écran sous...</translation>
+        <translation>Sauvegarder la capture d'écran sous...</translation>
     </message>
     <message>
         <source>Save As</source>
@@ -7367,12 +7362,12 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>Horodatage:</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
         <translation>Le fichier %1 existe déjà. Voulez-vous le remplacer?</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus.S.V.P, entrer un autre nom.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>Fichier '%1 'est utilisé par un autre processus.S.V.P, entrer un autre nom.</translation>
     </message>
     <message>
         <source>Saving %1</source>
@@ -7380,7 +7375,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Saving Screenshot...</source>
-        <translation>Sauvegarde capture d&apos;écran...</translation>
+        <translation>Sauvegarde capture d'écran...</translation>
     </message>
     <message>
         <source>No Timestamp</source>
@@ -7408,11 +7403,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Could not save screenshot.</source>
-        <translation>Impossible de sauvegarder la caputre d&apos;écran.</translation>
+        <translation>Impossible de sauvegarder la caputre d'écran.</translation>
     </message>
     <message>
-        <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation>Erreur lors de la sauvegarde de la capture d&apos;écran &apos;%1&apos;.</translation>
+        <source>An error occurred while saving screenshot '%1'.</source>
+        <translation>Erreur lors de la sauvegarde de la capture d'écran '%1'.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7420,7 +7415,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Error while taking screenshot</source>
-        <translation>Erreur lors de la capture d&apos;écran</translation>
+        <translation>Erreur lors de la capture d'écran</translation>
     </message>
 </context>
 <context>
@@ -7524,7 +7519,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Confirm Video Wall stop</source>
-        <translation>Confirmer l&apos;arrêt du Mur Vidéo</translation>
+        <translation>Confirmer l'arrêt du Mur Vidéo</translation>
     </message>
     <message>
         <source>New Matrix %1</source>
@@ -7536,7 +7531,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
-        <translation>Vous n&apos;avez aucune mise en pages sur vos écrans. Matrice ne peux pas être sauvegardée.</translation>
+        <translation>Vous n'avez aucune mise en pages sur vos écrans. Matrice ne peux pas être sauvegardée.</translation>
     </message>
     <message>
         <source>Delete Matrices</source>
@@ -7558,8 +7553,8 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>Un autre usager contrôle déjà cet écran.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
+        <source>%1's Screen</source>
+        <comment>%1 means user's name</comment>
         <translation>Écran %1</translation>
     </message>
     <message>
@@ -7568,7 +7563,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
-        <translation>Il n&apos;y a aucun élément mur vidéo hors ligne lié à ce PC.</translation>
+        <translation>Il n'y a aucun élément mur vidéo hors ligne lié à ce PC.</translation>
     </message>
     <message>
         <source>Video Wall is about to start. Would you like to close this %1 Client instance?</source>
@@ -7611,7 +7606,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>The changes cannot be applied. Unexpected error occurred.</source>
-        <translation>Impossible d&apos;appliquer les changements. Erreur inattendue s&apos;est produite.</translation>
+        <translation>Impossible d'appliquer les changements. Erreur inattendue s'est produite.</translation>
     </message>
 </context>
 <context>

@@ -3840,10 +3840,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid Paramaters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Entered hostname is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4943,10 +4939,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4997,6 +4989,10 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

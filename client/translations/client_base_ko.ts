@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<?xml version='1.0' encoding='utf-8'?>
+<TS language="ko" sourcelanguage="en" version="2.1">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -33,8 +32,8 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>Use '
+' to split message in two lines (required)</comment>
         <translation>자세한 북마크를 보려면 zoom 해주세요</translation>
     </message>
 </context>
@@ -185,7 +184,7 @@ to view more bookmarks</source>
     <name>QObject</name>
     <message>
         <source>None</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Parameter 1 is null.</source>
@@ -255,19 +254,19 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>OpenGL version</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>OpenGL renderer</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>OpenGL vendor</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>OpenGL max texture size</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Support</source>
@@ -279,11 +278,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>%1 version %2 (%3).</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Built for %1-%2 with %3.</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Client is not connected to any server</source>
@@ -672,7 +671,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Low</source>
@@ -684,7 +683,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>PTZ...</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Save Current Position...</source>
@@ -1204,7 +1203,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -1307,15 +1306,15 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>%1h </source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>%1m </source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Unknown</source>
@@ -1395,7 +1394,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>%1 - %2, </source>
-        <translation></translation>
+        <translation />
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -1692,7 +1691,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message>
@@ -1704,12 +1703,12 @@ to view more bookmarks</source>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
-        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
+        <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
         <translation>에</translation>
     </message>
     <message>
         <source>to</source>
-        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
+        <extracomment>"to" is from the sentence "Send e-mail _to_:"</extracomment>
         <translation>로</translation>
     </message>
     <message>
@@ -1820,7 +1819,7 @@ to view more bookmarks</source>
     <name>QnBusinessRulesViewModel</name>
     <message>
         <source>#</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>On</source>
@@ -1836,7 +1835,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>-&gt;</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Action</source>
@@ -1996,12 +1995,12 @@ to view more bookmarks</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
+        <source>%1 doesn't support two-way audio</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2013,7 +2012,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>OK</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>FAILED: %1</source>
@@ -2258,15 +2257,15 @@ to view more bookmarks</source>
         <translation>주의</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other devices' recording durations.</source>
         <translation>경고, 최대/최소값에 따라 장치 녹화 일수 축소 가능.</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other cameras' recording durations.</source>
         <translation>경고, 최대/최소값에 따라 카메라 녹화 일수 축소 가능.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity.</source>
         <translation>모션녹화 설정되지 않음, 카메라 모션설정에서 영역과 민감도 조정 필요.</translation>
     </message>
     <message>
@@ -2482,11 +2481,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source> - Client version: %1.</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source> - Server version: %1.</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:</source>
@@ -2622,8 +2621,8 @@ to view more bookmarks</source>
         <translation>오류</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation>&apos;%1&apos; 쓰기위한 파일을 열수 없습니다.</translation>
+        <source>Could not open file '%1' for writing.</source>
+        <translation>'%1' 쓰기위한 파일을 열수 없습니다.</translation>
     </message>
     <message>
         <source>Downloading Database Backup</source>
@@ -2638,16 +2637,16 @@ to view more bookmarks</source>
         <translation>정보</translation>
     </message>
     <message>
-        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation>&apos;%1&apos; 파일에 데이터베이스 백업이 완료되었습니다.</translation>
+        <source>Database was successfully backed up into file '%1'.</source>
+        <translation>'%1' 파일에 데이터베이스 백업이 완료되었습니다.</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
         <translation>데이터베이스 백업 열기...</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation>&apos;%1&apos; 읽기위한 파일을 열수 없습니다.</translation>
+        <source>Could not open file '%1' for reading.</source>
+        <translation>'%1' 읽기위한 파일을 열수 없습니다.</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -2662,11 +2661,11 @@ to view more bookmarks</source>
         <translation>데이터베이스 백업 서버에 업로드 되고 있습니다. 잠시만 기다려주세요.</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
+        <source>Database was successfully restored from file '%1'. Media server will be restarted.</source>
         <translation>%1 파일로 부터 데이터 베이스의 복원이 완료 되었습니다. 저장서버를 다시 시작하여 주십시오.</translation>
     </message>
     <message>
-        <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
+        <source>An error has occurred while restoring the database from file '%1'.</source>
         <translation>%1 파일로 부터 데이터 베이스를 복원하는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
@@ -2685,7 +2684,7 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <source>Could not find audio encoder '%1'.</source>
         <translation type="unfinished">%1 오디오 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
@@ -2693,19 +2692,19 @@ to view more bookmarks</source>
         <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <source>Primary audio device isn't selected.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>오디오 장치에서 44.1Khz와 48Khz 포멧을 지원하지 않습니다! 다른 오디오 장치를 선택하시거나 화면 녹화 설정에서 &apos;none&apos;값으로 설정을 변경하십시오</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings</source>
+        <translation>오디오 장치에서 44.1Khz와 48Khz 포멧을 지원하지 않습니다! 다른 오디오 장치를 선택하시거나 화면 녹화 설정에서 'none'값으로 설정을 변경하십시오</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
@@ -2716,7 +2715,7 @@ to view more bookmarks</source>
         <translation>비디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <source>Could not find audio encoder '%1'.</source>
         <translation>%1 오디오 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
@@ -2724,8 +2723,8 @@ to view more bookmarks</source>
         <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>&apos;%1&apos; 오디오 장비를 초기화 할 수 없습니다.</translation>
+        <source>Could not initialize audio device '%1'.</source>
+        <translation>'%1' 오디오 장비를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2739,16 +2738,16 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation>오디오 장치에서 44.1Khz와 48Khz 포멧을 지원하지 않습니다! 다른 오디오 장치를 선택하시거나 화면 녹화 설정에서 &apos;none&apos;값으로 설정을 변경하십시오.</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.</source>
+        <translation>오디오 장치에서 44.1Khz와 48Khz 포멧을 지원하지 않습니다! 다른 오디오 장치를 선택하시거나 화면 녹화 설정에서 'none'값으로 설정을 변경하십시오.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>%1 비디어 엔코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation>&apos;%1&apos; 폴더에 임시 파일을 만들 수 없습니다. 화면 녹화설정에서 &apos;주 저장 폴더&apos;를 구성하십시오.</translation>
+        <source>Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.</source>
+        <translation>'%1' 폴더에 임시 파일을 만들 수 없습니다. 화면 녹화설정에서 '주 저장 폴더'를 구성하십시오.</translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
@@ -2767,7 +2766,7 @@ to view more bookmarks</source>
         <translation>오디오 코덱의 출력 스트림을 할당할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <source>Could not find audio encoder '%1'.</source>
         <translation>%1 오디오 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
@@ -2775,8 +2774,8 @@ to view more bookmarks</source>
         <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>&apos;%1&apos; 오디오 장비를 초기화 할 수 없습니다.</translation>
+        <source>Could not initialize audio device '%1'.</source>
+        <translation>'%1' 오디오 장비를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2949,31 +2948,31 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%nms</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -3049,8 +3048,8 @@ to view more bookmarks</source>
         <translation>폴더 선택...</translation>
     </message>
     <message>
-        <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation>&apos;%1&apos; 폴더가 존재하지 않습니다.</translation>
+        <source>Folder '%1' does not exist.</source>
+        <translation>'%1' 폴더가 존재하지 않습니다.</translation>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
@@ -3119,23 +3118,23 @@ to view more bookmarks</source>
     <name>QnGridWidgetHelper</name>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Save As</source>
         <translation>다른이름으로 저장</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>&apos;%1&apos; 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
+        <source>File '%1' already exists. Overwrite?</source>
+        <translation>'%1' 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>파일을 덮어씌울 수 없습니다</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른이름으로 시도 하십시오.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>'%1' 파일은 다른 프로세서에 의해 사용 중입니다. 다른이름으로 시도 하십시오.</translation>
     </message>
 </context>
 <context>
@@ -3179,7 +3178,7 @@ to view more bookmarks</source>
     <name>QnIOPortsViewModel</name>
     <message>
         <source>#</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Type</source>
@@ -3260,11 +3259,11 @@ to view more bookmarks</source>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port &apos;%1&apos;</source>
+        <source>Failed to turn on IO port '%1'</source>
         <translation>IO 포트 %1번 켜기 실패</translation>
     </message>
     <message>
-        <source>Failed to turn off IO port &apos;%1&apos;</source>
+        <source>Failed to turn off IO port '%1'</source>
         <translation>IO 포트 %1번 끄기 실패</translation>
     </message>
     <message>
@@ -3275,16 +3274,16 @@ to view more bookmarks</source>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른이름으로 시도 하십시오.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>'%1' 파일은 다른 프로세서에 의해 사용 중입니다. 다른이름으로 시도 하십시오.</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>&quot;%1&quot;로 내보내기...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>"%1"로 내보내기...</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
-        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+        <extracomment>"Could not export camera AXIS1334"</extracomment>
         <translation>%1 장치 백업 불가.</translation>
     </message>
     <message>
@@ -3379,7 +3378,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Full Name</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Email</source>
@@ -3717,7 +3716,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>&lt;none&gt;</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Connect to Server...</source>
@@ -3750,10 +3749,6 @@ to view more bookmarks</source>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>연결을 삭제하시겠습니까: %1?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>잘못된 변수</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -3847,7 +3842,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>PTZ</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Dewarping</source>
@@ -3870,8 +3865,8 @@ to view more bookmarks</source>
         <translation>라이브</translation>
     </message>
     <message>
-        <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (Tour &quot;%2&quot;연결)</translation>
+        <source>%1 (Tour "%2" is active)</source>
+        <translation>%1 (Tour "%2"연결)</translation>
     </message>
     <message>
         <source>Zoom Window</source>
@@ -4011,7 +4006,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>유효하지 않은 스케줄</translation>
     </message>
     <message>
-        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
         <translation>2nd 스트림이 설정되어 있지 않습니다,Motion+LQ 설정 은 불가합니다. YES를 누르면 항시 녹화 / NO를 누르면 2nd 스트림 재설정 합니다.</translation>
     </message>
 </context>
@@ -4097,8 +4092,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>새로운 타이틀을 설정할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>삭제 하시겠습니까 &apos;%1&apos;?</translation>
+        <source>Are you sure you want to delete '%1'?</source>
+        <translation>삭제 하시겠습니까 '%1'?</translation>
     </message>
     <message>
         <source>Custom title:</source>
@@ -4285,7 +4280,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4350,7 +4345,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnPtzManageModel</name>
     <message>
         <source>#</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Name</source>
@@ -4431,14 +4426,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>None</source>
-        <translation></translation>
+        <translation />
     </message>
 </context>
 <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
         <source>None</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Change hotkey</source>
@@ -4449,12 +4444,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>재할당</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation>이 단축키는 &quot;%1&quot; 프리셋에서 사용합니다.</translation>
+        <source>This hotkey is used by preset "%1".</source>
+        <translation>이 단축키는 "%1" 프리셋에서 사용합니다.</translation>
     </message>
     <message>
-        <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation>이 단축키는 &quot;%1&quot; 투어에서 사용합니다.</translation>
+        <source>This hotkey is used by tour "%1".</source>
+        <translation>이 단축키는 "%1" 투어에서 사용합니다.</translation>
     </message>
 </context>
 <context>
@@ -4604,15 +4599,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>%1 Tb</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>empty</source>
@@ -4670,7 +4665,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4821,12 +4816,8 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>북마크 내보내기</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
-        <translation>북마크 검색&quot;이름순, 태그순, 설명순서&quot;</translation>
+        <translation>북마크 검색"이름순, 태그순, 설명순서"</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -4869,6 +4860,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">
             <numerusform>%n I/O 모듈들</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished">북마크 내보내기</translation>
     </message>
 </context>
 <context>
@@ -5294,11 +5289,11 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
+' sequence</comment>
         <translation>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5332,7 +5327,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Confirm motion regions reset</source>
@@ -5371,7 +5366,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>유효하지 않은 스케줄</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
         <translation>카메라의 2nd 스트림이 활성화 되지 않아,Motion+LQ모드 설정이 되지 않습니다, Yes를 누르면 연속녹화 또는 No를 눌러 2nd 스트림 재설정 합니다.</translation>
     </message>
 </context>
@@ -5393,8 +5388,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>이메일 정보가 유효하지 않습니다</translation>
     </message>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>프리셋을 찾을 수 없습니다. &apos;고급&apos;설정을 사용하세요.</translation>
+        <source>No preset found. Use 'Advanced' option.</source>
+        <translation>프리셋을 찾을 수 없습니다. '고급'설정을 사용하세요.</translation>
     </message>
 </context>
 <context>
@@ -5441,14 +5436,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnSpeedSlider</name>
     <message>
         <source>%1x</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Paused</source>
@@ -5723,7 +5718,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>System has other server(s) using the same network storage path. Recording data by multiple servers to exactly same place is not recommended.</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Add storage</source>
@@ -5937,110 +5932,110 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>auto</source>
-        <comment>AM/PM usage based on user&apos;s system locale.</comment>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>AM/PM usage based on user's system locale.</comment>
+        <extracomment>Translate this into 'none' or 'forced' if you want to switch off automatic detection of Do not translate this string unless you know what you're doing.</extracomment>
         <translation>자동</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>s</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>m</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>h</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>d</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>M</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying day caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying month caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying year caption in timeline's header</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
 </context>
@@ -6059,19 +6054,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6089,7 +6084,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation>&apos;%1&apos; 사용자는 잘못된 이메일 정보 가지고 있음</translation>
+        <translation>'%1' 사용자는 잘못된 이메일 정보 가지고 있음</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
@@ -6324,7 +6319,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Are you sure you want to delete %1?</source>
-        <translation>삭제 하시겠습니까 &apos;%1&apos;?</translation>
+        <translation>삭제 하시겠습니까 '%1'?</translation>
     </message>
 </context>
 <context>
@@ -6652,19 +6647,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <source>In the meantime please adjust your screen's resolution if needed for a better experience.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6694,7 +6689,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>북마클를 삭제하겠습니까?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
+        <source>Are you sure you want to delete bookmark "%1"?</source>
         <translation>%1 북마크를 삭제 하시겠습니까?</translation>
     </message>
     <message>
@@ -6751,15 +6746,15 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
         <translation>다음 오류로 인해 녹화를 시작할 수 없습니다: %1</translation>
     </message>
     <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>&apos;%1&apos; 파일은 덮어쓸수 없습니다. 다른이름으로 다시 시도하십시오.</translation>
+        <source>Could not overwrite file '%1'. Please try a different name.</source>
+        <translation>'%1' 파일은 덮어쓸수 없습니다. 다른이름으로 다시 시도하십시오.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -6777,16 +6772,16 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>실행가능한 %1 Media File (x86) (*.exe)</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>&apos;%1&apos; 파일은 녹화에 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
+        <source>File '%1' is used for recording already. Please enter another name.</source>
+        <translation>'%1' 파일은 녹화에 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>파일을 덮어씌울 수 없음</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>'%1' 파일은 다른 프로세서에 의해 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
@@ -6800,7 +6795,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>AVI (*.avi)</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Matroska (*.mkv)</source>
@@ -6831,16 +6826,16 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>다른이름으로 저장</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>&apos;%1&apos; 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>'%1' 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
     </message>
     <message>
         <source>Exporting Video</source>
         <translation>비디오 내보내기</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>&quot;%1&quot;로 내보내기...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>"%1"로 내보내기...</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
@@ -6852,7 +6847,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 Media File (*.nov)</source>
-        <translation>&apos;%1&apos; Media File (*.nov)</translation>
+        <translation>'%1' Media File (*.nov)</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
@@ -6943,7 +6938,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>선택된 포멧은 권장하지 않습니다.</translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the '.nov' or '.exe' format. Do you want to continue?</source>
         <translation>비디오 다운 스케일링을  위해 선택된 포멧을 권장하지 않습니다.NOV나 EXE파일로 내보내기 하기를 권장합니다. 진행 하겠습니까?</translation>
     </message>
     <message>
@@ -6956,7 +6951,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -7006,7 +7001,7 @@ If you would like to disable this feature you can do so in the System Settings d
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Merge</source>
@@ -7108,22 +7103,22 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchNavigator</name>
     <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <translation />
     </message>
     <message>
         <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>yyyy MMM dd</translation>
     </message>
     <message>
         <source>Live</source>
-        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <extracomment>Time slider's tooltip for position on live.</extracomment>
         <translation>라이브</translation>
     </message>
     <message>
@@ -7216,7 +7211,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
         <source>PNG Image (*.png)</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Save Screenshot As...</source>
@@ -7228,19 +7223,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>JPEG Image (*.jpg)</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Timestamp:</source>
         <translation>타임스템프:</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>&apos;%1&apos; 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>'%1' 파일은 이미 존재합니다. 덮어씌우시겠습니까?</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>&apos;%1&apos; 파일은 다른 프로세서에 의해 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>'%1' 파일은 다른 프로세서에 의해 사용 중입니다. 다른 이름을 입력하여 주세요.</translation>
     </message>
     <message>
         <source>Saving %1</source>
@@ -7279,7 +7274,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>스크린샷 저장 실패.</translation>
     </message>
     <message>
-        <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
+        <source>An error occurred while saving screenshot '%1'.</source>
         <translation>%1 스크린샷 저장중 에러 발생</translation>
     </message>
     <message>
@@ -7424,8 +7419,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>다른 사용자가 이 스크린을 제어하고 있습니다.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
+        <source>%1's Screen</source>
+        <comment>%1 means user's name</comment>
         <translation>%1의 화면</translation>
     </message>
     <message>
@@ -7483,7 +7478,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>StatisticsOverlayWidget</name>
     <message>
         <source>%1%</source>
-        <translation></translation>
+        <translation />
     </message>
 </context>
 </TS>

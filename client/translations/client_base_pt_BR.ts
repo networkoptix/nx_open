@@ -1996,7 +1996,7 @@ to view more bookmarks</source>
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Escaneando host... (%1)</translation>
     </message>
     <message>
         <source>Finishing searching...</source>
@@ -2913,7 +2913,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Todos usuários</translation>
     </message>
     <message>
         <source>%1 users</source>
@@ -3802,10 +3802,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid Paramaters</source>
-        <translation type="unfinished">Parâmetros inválidos</translation>
-    </message>
-    <message>
         <source>Connection already exists.</source>
         <translation type="unfinished">Conexão já existente</translation>
     </message>
@@ -3819,7 +3815,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Invalid Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Parâmetros inválidos</translation>
     </message>
 </context>
 <context>
@@ -4233,7 +4229,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ajustes Servidor...</translation>
     </message>
     <message>
         <source>Open Device</source>
@@ -4882,10 +4878,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4933,6 +4925,10 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7255,7 +7251,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Não foi possivel receber posição da câmera</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>

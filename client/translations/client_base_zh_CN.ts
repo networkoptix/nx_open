@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<?xml version='1.0' encoding='utf-8'?>
+<TS language="zh_CN" sourcelanguage="en" version="2.1">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -33,8 +32,8 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>Use '
+' to split message in two lines (required)</comment>
         <translation>时间轴缩放
 浏览更多书签</translation>
     </message>
@@ -1205,7 +1204,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -1705,12 +1704,12 @@ to view more bookmarks</source>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
-        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
+        <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
         <translation>在</translation>
     </message>
     <message>
         <source>to</source>
-        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
+        <extracomment>"to" is from the sentence "Send e-mail _to_:"</extracomment>
         <translation>到</translation>
     </message>
     <message>
@@ -1997,12 +1996,12 @@ to view more bookmarks</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
+        <source>%1 doesn't support two-way audio</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2259,15 +2258,15 @@ to view more bookmarks</source>
         <translation>注意</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other devices' recording durations.</source>
         <translation>警告!低码流值可减少设备录像时间.</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other cameras' recording durations.</source>
         <translation>警告!低码流值可减少摄像机录像时间.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity.</source>
         <translation>移动侦测录像被禁用.请进入移动侦测设置页面进行移动侦测区域设置和灵敏度.</translation>
     </message>
     <message>
@@ -2623,8 +2622,8 @@ to view more bookmarks</source>
         <translation>错误</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation>无法打开文件 &apos;%1&apos; 写入。</translation>
+        <source>Could not open file '%1' for writing.</source>
+        <translation>无法打开文件 '%1' 写入。</translation>
     </message>
     <message>
         <source>Downloading Database Backup</source>
@@ -2639,16 +2638,16 @@ to view more bookmarks</source>
         <translation>信息</translation>
     </message>
     <message>
-        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation>数据库成功备份到文件 &apos;%1&apos;。</translation>
+        <source>Database was successfully backed up into file '%1'.</source>
+        <translation>数据库成功备份到文件 '%1'。</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
         <translation>开启数据库备份...</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation>无法开启文件 &apos;%1&apos; 读取。</translation>
+        <source>Could not open file '%1' for reading.</source>
+        <translation>无法开启文件 '%1' 读取。</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -2663,16 +2662,16 @@ to view more bookmarks</source>
         <translation>数据库备份正上传到服务器。请稍候。</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation>数据库已成功从文件&apos;%1&apos;恢复，媒体服务器将重启。</translation>
+        <source>Database was successfully restored from file '%1'. Media server will be restarted.</source>
+        <translation>数据库已成功从文件'%1'恢复，媒体服务器将重启。</translation>
     </message>
     <message>
-        <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation>当从文件 &apos;%1&apos;恢复数据库时，发生错误。</translation>
+        <source>An error has occurred while restoring the database from file '%1'.</source>
+        <translation>当从文件 '%1'恢复数据库时，发生错误。</translation>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation>转存服务器数据库到 &apos;%1&apos;失败</translation>
+        <translation>转存服务器数据库到 '%1'失败</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -2686,7 +2685,7 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <source>Could not find audio encoder '%1'.</source>
         <translation type="unfinished">无法找到音频编码器%1.</translation>
     </message>
     <message>
@@ -2694,18 +2693,18 @@ to view more bookmarks</source>
         <translation type="unfinished">无法找使用视频编码器.</translation>
     </message>
     <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <source>Primary audio device isn't selected.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings</source>
         <translation>音频采集设备不支持44.1Khz和48Khz音频格式,请在屏幕录像设置中选择其他的音频设备或空白</translation>
     </message>
     <message>
@@ -2717,7 +2716,7 @@ to view more bookmarks</source>
         <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <source>Could not find audio encoder '%1'.</source>
         <translation>无法找到音频编码器%1.</translation>
     </message>
     <message>
@@ -2725,7 +2724,7 @@ to view more bookmarks</source>
         <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <source>Could not initialize audio device '%1'.</source>
         <translation>无法找使用视频编码器%1.</translation>
     </message>
     <message>
@@ -2740,7 +2739,7 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.</source>
         <translation>音频采集设备不支持44.1Khz和48Khz音频格式，请在屏幕录像设置中选择其他的音频设备或空白.</translation>
     </message>
     <message>
@@ -2748,8 +2747,8 @@ to view more bookmarks</source>
         <translation>无法找到视频编码器%1.</translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation>无法在文件夹&apos;%1&apos;中创建临时文件。请在屏幕录像设置中配置&apos;主媒体文件夹&apos;。</translation>
+        <source>Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.</source>
+        <translation>无法在文件夹'%1'中创建临时文件。请在屏幕录像设置中配置'主媒体文件夹'。</translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
@@ -2768,7 +2767,7 @@ to view more bookmarks</source>
         <translation>无法分配输出音频流.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <source>Could not find audio encoder '%1'.</source>
         <translation>无法找到音频编码器%1.</translation>
     </message>
     <message>
@@ -2776,7 +2775,7 @@ to view more bookmarks</source>
         <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <source>Could not initialize audio device '%1'.</source>
         <translation>无法找使用视频编码器%1.</translation>
     </message>
     <message>
@@ -2950,31 +2949,31 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%nms</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2982,7 +2981,7 @@ to view more bookmarks</source>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Never</source>
@@ -3046,7 +3045,7 @@ to view more bookmarks</source>
         <translation>信息</translation>
     </message>
     <message>
-        <source>Folder &apos;%1&apos; does not exist.</source>
+        <source>Folder '%1' does not exist.</source>
         <translation>文件夹 %1不存在.</translation>
     </message>
     <message>
@@ -3127,16 +3126,16 @@ to view more bookmarks</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>文件&apos;%1&apos;已经存在，是否覆盖?</translation>
+        <source>File '%1' already exists. Overwrite?</source>
+        <translation>文件'%1'已经存在，是否覆盖?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>无法覆盖文件</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>文件'%1'正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
 </context>
 <context>
@@ -3261,12 +3260,12 @@ to view more bookmarks</source>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>打开IO端口 &apos;%1&apos;失败</translation>
+        <source>Failed to turn on IO port '%1'</source>
+        <translation>打开IO端口 '%1'失败</translation>
     </message>
     <message>
-        <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>关闭IO端口 &apos;%1&apos;失败</translation>
+        <source>Failed to turn off IO port '%1'</source>
+        <translation>关闭IO端口 '%1'失败</translation>
     </message>
     <message>
         <source>IO port error</source>
@@ -3276,16 +3275,16 @@ to view more bookmarks</source>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>文件'%1'正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>导出至 &quot;%1&quot;...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>导出至 "%1"...</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
-        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+        <extracomment>"Could not export camera AXIS1334"</extracomment>
         <translation>无法导出设备%1.</translation>
     </message>
     <message>
@@ -3753,10 +3752,6 @@ to view more bookmarks</source>
         <translation>请确认是否删除以下连接: %1?</translation>
     </message>
     <message>
-        <source>Invalid Paramaters</source>
-        <translation>无效参数</translation>
-    </message>
-    <message>
         <source>Connection already exists.</source>
         <translation>连接已存在</translation>
     </message>
@@ -3851,8 +3846,8 @@ to view more bookmarks</source>
         <translation>实时</translation>
     </message>
     <message>
-        <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (轮巡 &quot;%2&quot; 已生效)</translation>
+        <source>%1 (Tour "%2" is active)</source>
+        <translation>%1 (轮巡 "%2" 已生效)</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -4011,7 +4006,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>无效计划</translation>
     </message>
     <message>
-        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
         <translation>子码流已禁用.移动侦测+LQ选项没有影响.请点击“是”设置录像类型改为“总是”，或“不”，重新启动子码流.</translation>
     </message>
 </context>
@@ -4097,7 +4092,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>新标题无法设定.</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;%1&apos;?</source>
+        <source>Are you sure you want to delete '%1'?</source>
         <translation>确认要删除%1?</translation>
     </message>
     <message>
@@ -4285,7 +4280,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4449,11 +4444,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>重新分配</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;.</source>
+        <source>This hotkey is used by preset "%1".</source>
         <translation>此热键用于预置 %1</translation>
     </message>
     <message>
-        <source>This hotkey is used by tour &quot;%1&quot;.</source>
+        <source>This hotkey is used by tour "%1".</source>
         <translation>此热键用于轮巡 %1</translation>
     </message>
 </context>
@@ -4670,7 +4665,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4821,10 +4816,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>导出书签...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>通过名称,标签或描述</translation>
     </message>
@@ -4869,6 +4860,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>
             <numerusform>&lt;%n I/O模块&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished">导出书签...</translation>
     </message>
 </context>
 <context>
@@ -5294,11 +5289,11 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
+' sequence</comment>
         <translation>可以在自定义文本使用Html标记
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5372,7 +5367,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>无效计划</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
         <translation>次码流在此摄像机被禁用。运动+ LQ选项没有影响。按“是”更改录像类型或“否”重新启用次码流。</translation>
     </message>
 </context>
@@ -5394,7 +5389,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>邮箱无效</translation>
     </message>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
+        <source>No preset found. Use 'Advanced' option.</source>
         <translation>无预置位信息,请使用“高级”选项.</translation>
     </message>
 </context>
@@ -5438,7 +5433,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Could not perform a test.</source>
@@ -5938,110 +5933,110 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>auto</source>
-        <comment>AM/PM usage based on user&apos;s system locale.</comment>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>AM/PM usage based on user's system locale.</comment>
+        <extracomment>Translate this into 'none' or 'forced' if you want to switch off automatic detection of Do not translate this string unless you know what you're doing.</extracomment>
         <translation>自动</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>毫秒</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>秒</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>分</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>时</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>日</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>月</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>年</translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying day caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying month caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying year caption in timeline's header</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
 </context>
@@ -6060,19 +6055,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6654,19 +6649,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <source>In the meantime please adjust your screen's resolution if needed for a better experience.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6696,8 +6691,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>请确认是否需要删除书签?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
-        <translation>请确认是否需要删除书签 &quot;%1&quot;?</translation>
+        <source>Are you sure you want to delete bookmark "%1"?</source>
+        <translation>请确认是否需要删除书签 "%1"?</translation>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
@@ -6760,8 +6755,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>由于以下错误无法开始录像:%1</translation>
     </message>
     <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>无法覆盖文件&apos;%1&apos;,请尝试另一个名称。</translation>
+        <source>Could not overwrite file '%1'. Please try a different name.</source>
+        <translation>无法覆盖文件'%1',请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -6825,8 +6820,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>导出视频</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>导出至 &quot;%1&quot;...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>导出至 "%1"...</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
@@ -6837,20 +6832,20 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>导出视窗为...</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>文件&apos;%1&apos;正在被录像使用，请尝试另一个名称。</translation>
+        <source>File '%1' is used for recording already. Please enter another name.</source>
+        <translation>文件'%1'正在被录像使用，请尝试另一个名称。</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>文件'%1'正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
     <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation>不推荐带音频的摄像机使用AVI格式，将存在不连续记录?点击&apos;是&apos;导出或&apos;否&apos;选择其他格式.是否继续?</translation>
+        <translation>不推荐带音频的摄像机使用AVI格式，将存在不连续记录?点击'是'导出或'否'选择其他格式.是否继续?</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>文件&apos;%1&apos;已经存在，是否需要覆盖?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>文件'%1'已经存在，是否需要覆盖?</translation>
     </message>
     <message>
         <source>%1 Media File (*.nov)</source>
@@ -6945,8 +6940,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>不推荐所选择的格式</translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
-        <translation>由于视频尺寸不对，所选择的格式不适用此摄像机,建议导出视频格式为 &apos;.nov&apos; or &apos;.exe&apos;,是否需要继续？</translation>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the '.nov' or '.exe' format. Do you want to continue?</source>
+        <translation>由于视频尺寸不对，所选择的格式不适用此摄像机,建议导出视频格式为 '.nov' or '.exe',是否需要继续？</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
@@ -6958,7 +6953,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -7112,22 +7107,22 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchNavigator</name>
     <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>mm:ss</translation>
     </message>
     <message>
         <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>yyyy MMM dd</translation>
     </message>
     <message>
         <source>Live</source>
-        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <extracomment>Time slider's tooltip for position on live.</extracomment>
         <translation>实时</translation>
     </message>
     <message>
@@ -7239,12 +7234,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>时间戳:</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>文件&apos;%1&apos;已经存在，要覆盖吗?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>文件'%1'已经存在，要覆盖吗?</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>文件&apos;%1&apos;正在被另一个程序使用，请尝试另一个名称。</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>文件'%1'正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Saving %1</source>
@@ -7283,8 +7278,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>无法保存截屏.</translation>
     </message>
     <message>
-        <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation>保存截图 &apos;%1&apos;时，发生错误.</translation>
+        <source>An error occurred while saving screenshot '%1'.</source>
+        <translation>保存截图 '%1'时，发生错误.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7428,9 +7423,9 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>当前屏幕正被其它用户控制.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1&apos;屏幕</translation>
+        <source>%1's Screen</source>
+        <comment>%1 means user's name</comment>
+        <translation>%1'屏幕</translation>
     </message>
     <message>
         <source>A control session is already running.</source>

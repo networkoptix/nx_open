@@ -2913,7 +2913,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">All Users</translation>
     </message>
     <message>
         <source>%1 users</source>
@@ -3802,10 +3802,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid Paramaters</source>
-        <translation type="unfinished">Invalid Paramaters</translation>
-    </message>
-    <message>
         <source>Connection already exists.</source>
         <translation type="unfinished">Connection already exists.</translation>
     </message>
@@ -3819,7 +3815,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Invalid Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Invalid Paramaters</translation>
     </message>
 </context>
 <context>
@@ -4364,23 +4360,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not get position from camera.</source>
-        <translation type="unfinished">Could not get position from camera.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
-        <translation type="unfinished">Could not set position for camera.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove Preset</source>
-        <translation type="unfinished">Remove Preset</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>PTZ configuration has not been saved.</source>
-        <translation type="unfinished">PTZ configuration has not been saved.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
-        <translation type="unfinished">Changes have not been saved. Would you like to save them?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
@@ -4881,10 +4877,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4932,6 +4924,10 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7254,7 +7250,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to get position from camera.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>

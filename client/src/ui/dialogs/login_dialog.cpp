@@ -449,13 +449,13 @@ void QnLoginDialog::at_saveButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Paramaters"), tr("Entered hostname is not valid."));
+        QMessageBox::warning(this, tr("Invalid Parameters"), tr("Entered hostname is not valid."));
         ui->hostnameLineEdit->setFocus();
         return;
     }
 
     if (url.host().length() == 0) {
-        QMessageBox::warning(this, tr("Invalid Paramaters"), tr("Host field cannot be empty."));
+        QMessageBox::warning(this, tr("Invalid Parameters"), tr("Host field cannot be empty."));
         ui->hostnameLineEdit->setFocus();
         return;
     }

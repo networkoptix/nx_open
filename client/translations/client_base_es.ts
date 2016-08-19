@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<?xml version='1.0' encoding='utf-8'?>
+<TS language="es" sourcelanguage="en" version="2.1">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -33,8 +32,8 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>Use '
+' to split message in two lines (required)</comment>
         <translation>Enfocar en la cronología
 para ver los marcadores</translation>
     </message>
@@ -303,7 +302,7 @@ para ver los marcadores</translation>
     <name>QnAbstractCameraAdvancedParamWidget</name>
     <message>
         <source>Read-Only</source>
-        <translatorcomment>Could be &apos;Read-Only&apos;</translatorcomment>
+        <translatorcomment>Could be 'Read-Only'</translatorcomment>
         <translation>Solo-Lectura</translation>
     </message>
 </context>
@@ -1214,7 +1213,7 @@ para ver los marcadores</translation>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -1713,7 +1712,7 @@ para ver los marcadores</translation>
         <source>Source and %n more cameras</source>
         <translation type="unfinished">
             <numerusform>Fuente y %n más cámaras</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message>
@@ -1725,12 +1724,12 @@ para ver los marcadores</translation>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
-        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
+        <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
         <translation>en</translation>
     </message>
     <message>
         <source>to</source>
-        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
+        <extracomment>"to" is from the sentence "Send e-mail _to_:"</extracomment>
         <translation>a</translation>
     </message>
     <message>
@@ -2020,13 +2019,13 @@ para ver los marcadores</translation>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
+        <source>%1 doesn't support two-way audio</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2290,15 +2289,15 @@ para ver los marcadores</translation>
         <translation>Advertencia</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other devices' recording durations.</source>
         <translation>¡ ADVERTENCIA! Alto valor mínimo podría disminuir la duración de la grabación de otros dispositivos.</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
+        <source>Warning! High minimum value could decrease other cameras' recording durations.</source>
         <translation>¡ ADVERTENCIA! Alto valor mínimo podría reducir las duraciones de grabación de otras cámaras.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity.</source>
         <translation>Grabación de movimiento está desactivado. Por favor visite la página de configuración de movimiento para configurar el área de movimiento de las cámaras y la sensibilidad.</translation>
     </message>
     <message>
@@ -2657,8 +2656,8 @@ para ver los marcadores</translation>
         <translation>Error</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation>No se pudo abrir el archivo &apos;%1&apos; para escritura.</translation>
+        <source>Could not open file '%1' for writing.</source>
+        <translation>No se pudo abrir el archivo '%1' para escritura.</translation>
     </message>
     <message>
         <source>Downloading Database Backup</source>
@@ -2673,16 +2672,16 @@ para ver los marcadores</translation>
         <translation>Información</translation>
     </message>
     <message>
-        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation>Base de datos con éxito fue respaldada en el archivo &apos;%1&apos;.</translation>
+        <source>Database was successfully backed up into file '%1'.</source>
+        <translation>Base de datos con éxito fue respaldada en el archivo '%1'.</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
         <translation>Abrir copia de base de datos...</translation>
     </message>
     <message>
-        <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation>No se pudo abrir el archivo &apos;%1&apos; para la lectura.</translation>
+        <source>Could not open file '%1' for reading.</source>
+        <translation>No se pudo abrir el archivo '%1' para la lectura.</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -2697,16 +2696,16 @@ para ver los marcadores</translation>
         <translation>Se sube al servidor la base de datos. Por favor, espere.</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation>Base de datos fue restaurado con éxito del archivo &apos;%1&apos;. Servidor de medios se reiniciará.</translation>
+        <source>Database was successfully restored from file '%1'. Media server will be restarted.</source>
+        <translation>Base de datos fue restaurado con éxito del archivo '%1'. Servidor de medios se reiniciará.</translation>
     </message>
     <message>
-        <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation>Se produjo un error mientras restaura la base de datos del archivo &apos;%1&apos;.</translation>
+        <source>An error has occurred while restoring the database from file '%1'.</source>
+        <translation>Se produjo un error mientras restaura la base de datos del archivo '%1'.</translation>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation>Error al descargar base de datos del servidor de &apos;%1&apos;.</translation>
+        <translation>Error al descargar base de datos del servidor de '%1'.</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -2720,27 +2719,27 @@ para ver los marcadores</translation>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">No se pudo encontrar codificador de audio &apos;%1&apos;.</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation type="unfinished">No se pudo encontrar codificador de audio '%1'.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation type="unfinished">No se pudo inicializar el codificador de audio.</translation>
     </message>
     <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <source>Primary audio device isn't selected.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>Formatos de audio de 44,1 khz y 48Khz no son compatibles con el aparato de captura de audio! Por favor, seleccione otro aparato de audio o &apos;ninguno&apos; valor en la configuración de grabación de pantalla</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings</source>
+        <translation>Formatos de audio de 44,1 khz y 48Khz no son compatibles con el aparato de captura de audio! Por favor, seleccione otro aparato de audio o 'ninguno' valor en la configuración de grabación de pantalla</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
@@ -2751,16 +2750,16 @@ para ver los marcadores</translation>
         <translation>No se pudo inicializar el codificador de vídeo.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>No se pudo encontrar codificador de audio &apos;%1&apos;.</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation>No se pudo encontrar codificador de audio '%1'.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>No se pudo inicializar el codificador de audio.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>No se pudo inicializar el aparato de audio &apos;%1&apos;.</translation>
+        <source>Could not initialize audio device '%1'.</source>
+        <translation>No se pudo inicializar el aparato de audio '%1'.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2774,16 +2773,16 @@ para ver los marcadores</translation>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation>Formatos de audio de 44,1 khz y 48Khz no son compatibles con el aparato de captura de audio! Por favor, seleccione otro aparato de audio o &apos;ninguno&apos; valor en la configuración de grabación de pantalla.</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.</source>
+        <translation>Formatos de audio de 44,1 khz y 48Khz no son compatibles con el aparato de captura de audio! Por favor, seleccione otro aparato de audio o 'ninguno' valor en la configuración de grabación de pantalla.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>No se pudo encontrar el codificador de vídeo %1.</translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation>No se pudo crear el archivo temporal en la carpeta &apos;%1&apos;. Por favor configure Carpeta &apos;principal de medios&apos; en configuración de grabación de pantalla.</translation>
+        <source>Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.</source>
+        <translation>No se pudo crear el archivo temporal en la carpeta '%1'. Por favor configure Carpeta 'principal de medios' en configuración de grabación de pantalla.</translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
@@ -2802,16 +2801,16 @@ para ver los marcadores</translation>
         <translation>No se pudo asignar salida al flujo de audio.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>No se pudo encontrar codificador de audio &apos;%1&apos;.</translation>
+        <source>Could not find audio encoder '%1'.</source>
+        <translation>No se pudo encontrar codificador de audio '%1'.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>No se pudo inicializar el codificador de audio.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>No se pudo inicializar el aparato de audio &apos;%1&apos;.</translation>
+        <source>Could not initialize audio device '%1'.</source>
+        <translation>No se pudo inicializar el aparato de audio '%1'.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2933,7 +2932,7 @@ para ver los marcadores</translation>
         <source>and %1 user(s) more...</source>
         <translation type="unfinished">
             <numerusform>y %1 usuario(s) más...</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -2988,36 +2987,36 @@ para ver los marcadores</translation>
     <message numerus="yes">
         <source>%nms</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform />
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -3093,8 +3092,8 @@ para ver los marcadores</translation>
         <translation>Seleccione carpeta...</translation>
     </message>
     <message>
-        <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation>No existe la carpeta &apos;%1&apos;.</translation>
+        <source>Folder '%1' does not exist.</source>
+        <translation>No existe la carpeta '%1'.</translation>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
@@ -3170,16 +3169,16 @@ para ver los marcadores</translation>
         <translation>Guardar como</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>Archivo &apos;%1&apos; ya existe. ¿Desea sobrescribirlo?</translation>
+        <source>File '%1' already exists. Overwrite?</source>
+        <translation>Archivo '%1' ya existe. ¿Desea sobrescribirlo?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>No se puede sobrescribir el archivo</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>El archivo &apos;%1&apos; es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>El archivo '%1' es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
     </message>
 </context>
 <context>
@@ -3304,12 +3303,12 @@ para ver los marcadores</translation>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>No se pudo activar puerto IO &apos;%1&apos;</translation>
+        <source>Failed to turn on IO port '%1'</source>
+        <translation>No se pudo activar puerto IO '%1'</translation>
     </message>
     <message>
-        <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>No se pudo apagar puerto IO &apos;%1&apos;</translation>
+        <source>Failed to turn off IO port '%1'</source>
+        <translation>No se pudo apagar puerto IO '%1'</translation>
     </message>
     <message>
         <source>IO port error</source>
@@ -3319,16 +3318,16 @@ para ver los marcadores</translation>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>El archivo &apos;%1&apos; es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
+        <source>File '%1' is used by another process. Please try another name.</source>
+        <translation>El archivo '%1' es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>Exportar a &quot;%1&quot;...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>Exportar a "%1"...</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
-        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+        <extracomment>"Could not export camera AXIS1334"</extracomment>
         <translation>No se pudo exportar el dispositivo %1.</translation>
     </message>
     <message>
@@ -3451,7 +3450,7 @@ para ver los marcadores</translation>
     </message>
     <message>
         <source>Import users</source>
-        <translation></translation>
+        <translation />
     </message>
     <message>
         <source>Error while loading users.</source>
@@ -3804,10 +3803,6 @@ para ver los marcadores</translation>
         <translation>¿Está seguro de que desea eliminar esta conexión: %1?</translation>
     </message>
     <message>
-        <source>Invalid Paramaters</source>
-        <translation>Parámetros no válidos</translation>
-    </message>
-    <message>
         <source>Connection already exists.</source>
         <translation>Conexión ya existe.</translation>
     </message>
@@ -3922,8 +3917,8 @@ para ver los marcadores</translation>
         <translation>EN VIVO</translation>
     </message>
     <message>
-        <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (Gira &quot;%2&quot; está activa)</translation>
+        <source>%1 (Tour "%2" is active)</source>
+        <translation>%1 (Gira "%2" está activa)</translation>
     </message>
     <message>
         <source>Zoom Window</source>
@@ -4063,8 +4058,8 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Horario inválido</translation>
     </message>
     <message>
-        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Segunda secuencia está desactivado en estas cámaras. Movimiento LQ opción no tiene ningún efecto.Pulse &quot;Sí&quot; para cambiar tipo de grabación que &quot;siempre&quot; o &quot;No&quot; para volver a habilitar segundo stream.</translation>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
+        <translation>Segunda secuencia está desactivado en estas cámaras. Movimiento LQ opción no tiene ningún efecto.Pulse "Sí" para cambiar tipo de grabación que "siempre" o "No" para volver a habilitar segundo stream.</translation>
     </message>
 </context>
 <context>
@@ -4150,8 +4145,8 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Nuevo título no se ha podido establecer.</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>¿Está seguro que desea eliminar &apos;%1&apos;?</translation>
+        <source>Are you sure you want to delete '%1'?</source>
+        <translation>¿Está seguro que desea eliminar '%1'?</translation>
     </message>
     <message>
         <source>Custom title:</source>
@@ -4338,7 +4333,7 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4505,12 +4500,12 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Reasignar</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset &quot;%1&quot;.</source>
-        <translation>Esta combinación de teclas es utilizado por preestablecido &quot;%1&quot;.</translation>
+        <source>This hotkey is used by preset "%1".</source>
+        <translation>Esta combinación de teclas es utilizado por preestablecido "%1".</translation>
     </message>
     <message>
-        <source>This hotkey is used by tour &quot;%1&quot;.</source>
-        <translation>Esta combinación de teclas es utilizado por gira &quot;%1&quot;.</translation>
+        <source>This hotkey is used by tour "%1".</source>
+        <translation>Esta combinación de teclas es utilizado por gira "%1".</translation>
     </message>
 </context>
 <context>
@@ -4734,7 +4729,7 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -4885,10 +4880,6 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>Exportar marcadores...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Marcadores de búsqueda por nombre, etiqueta o descripción</translation>
     </message>
@@ -4920,22 +4911,26 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>&lt;%n device(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n dispositivo(s)&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n cámara(s)&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n Módulo(s) de E/S&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished">Exportar marcadores...</translation>
     </message>
 </context>
 <context>
@@ -5367,11 +5362,11 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
+' sequence</comment>
         <translation>Podrían usar etiquetas HTML en texto personalizado:
- &lt;h4&gt;Encabezados (h1-h6)&lt;/h4&gt; También se podrían aplicar diferentes &lt;font color=&quot;red&quot;&gt; colores&lt;/font&gt; y &lt;font size=&quot;18&quot;&gt; tamaños&lt;/font&gt;. Texto podría ser &lt;s&gt;afectada por&lt;/s&gt;, &lt;u&gt;subrayado&lt;/u&gt;, &lt;b&gt;negrita&lt;/b&gt; o &lt;i&gt;cursiva&lt;/i&gt;</translation>
+ &lt;h4&gt;Encabezados (h1-h6)&lt;/h4&gt; También se podrían aplicar diferentes &lt;font color="red"&gt; colores&lt;/font&gt; y &lt;font size="18"&gt; tamaños&lt;/font&gt;. Texto podría ser &lt;s&gt;afectada por&lt;/s&gt;, &lt;u&gt;subrayado&lt;/u&gt;, &lt;b&gt;negrita&lt;/b&gt; o &lt;i&gt;cursiva&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5444,8 +5439,8 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Horario inválido</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Segunda corriente está deshabilitado en esta cámara. Opción de LQ de movimiento no tiene ningún efecto. Pulse &quot;Sí&quot; para cambiar el tipo de grabación para &quot;Siempre&quot; o &quot;No&quot; para volver a habilitar la segunda corriente.</translation>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
+        <translation>Segunda corriente está deshabilitado en esta cámara. Opción de LQ de movimiento no tiene ningún efecto. Pulse "Sí" para cambiar el tipo de grabación para "Siempre" o "No" para volver a habilitar la segunda corriente.</translation>
     </message>
 </context>
 <context>
@@ -5466,8 +5461,8 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Correo electrónico no es válido</translation>
     </message>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>No ajuste preestablecido encontrado. Utilice la opción &apos;Avanzada&apos;.</translation>
+        <source>No preset found. Use 'Advanced' option.</source>
+        <translation>No ajuste preestablecido encontrado. Utilice la opción 'Avanzada'.</translation>
     </message>
 </context>
 <context>
@@ -5696,14 +5691,14 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>%n Camera(s)</source>
         <translation type="unfinished">
             <numerusform>%n Cámara(s)</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
         <translation type="unfinished">
             <numerusform>%n Dispositivo(s)</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
     <message>
@@ -6012,110 +6007,110 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     </message>
     <message>
         <source>auto</source>
-        <comment>AM/PM usage based on user&apos;s system locale.</comment>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>AM/PM usage based on user's system locale.</comment>
+        <extracomment>Translate this into 'none' or 'forced' if you want to switch off automatic detection of Do not translate this string unless you know what you're doing.</extracomment>
         <translation>auto</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>s</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>m</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>h</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>d</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>M</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying day caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying month caption in timeline's header.</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying year caption in timeline's header</comment>
+        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
         <translation>yyyy</translation>
     </message>
 </context>
@@ -6134,19 +6129,19 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6750,19 +6745,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <source>In the meantime please adjust your screen's resolution if needed for a better experience.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -6792,8 +6787,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>¿Está seguro que desea eliminar este favorito?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
-        <translation>¿Está seguro que desea eliminar marcador &quot;%1&quot;?</translation>
+        <source>Are you sure you want to delete bookmark "%1"?</source>
+        <translation>¿Está seguro que desea eliminar marcador "%1"?</translation>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
@@ -6803,7 +6798,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Are you sure you want to delete these %n bookmarks?</source>
         <translation type="unfinished">
             <numerusform>¿Está seguro que desea eliminar estos marcadores de %n?</numerusform>
-            <numerusform></numerusform>
+            <numerusform />
         </translation>
     </message>
 </context>
@@ -6857,8 +6852,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>No se puede iniciar la grabación debido al siguiente error: %1</translation>
     </message>
     <message>
-        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
-        <translation>No se puede sobrescribir el archivo &apos;%1&apos;. Por favor, pruebe otro nombre.</translation>
+        <source>Could not overwrite file '%1'. Please try a different name.</source>
+        <translation>No se puede sobrescribir el archivo '%1'. Por favor, pruebe otro nombre.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -6876,16 +6871,16 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Archivos ejecutables %1 Media (x 86) (*.exe)</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation>Archivo &quot;%1&quot; se utilizando para la grabación. Introduzca otro nombre.</translation>
+        <source>File '%1' is used for recording already. Please enter another name.</source>
+        <translation>Archivo "%1" se utilizando para la grabación. Introduzca otro nombre.</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>No se puede sobrescribir el archivo</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>El archivo &apos;%1&apos; es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>El archivo '%1' es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
@@ -6931,16 +6926,16 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Guardar como</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>Archivo &apos;%1&apos; ya existe. ¿Desea sobrescribirlo?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>Archivo '%1' ya existe. ¿Desea sobrescribirlo?</translation>
     </message>
     <message>
         <source>Exporting Video</source>
         <translation>Exportando vídeo</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%1&quot;...</source>
-        <translation>Exportar a &quot;%1&quot;...</translation>
+        <source>Exporting to "%1"...</source>
+        <translation>Exportar a "%1"...</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
@@ -7043,8 +7038,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>No se recomienda el formato seleccionado</translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
-        <translation>No se recomienda el formato seleccionado para esta cámara debido a la reducción del video. Se recomienda exportar video seleccionado ya sea en el formato &apos;.nov&apos; o &apos;.exe&apos;. ¿Desea continuar?</translation>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the '.nov' or '.exe' format. Do you want to continue?</source>
+        <translation>No se recomienda el formato seleccionado para esta cámara debido a la reducción del video. Se recomienda exportar video seleccionado ya sea en el formato '.nov' o '.exe'. ¿Desea continuar?</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
@@ -7056,7 +7051,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -7214,22 +7209,22 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <name>QnWorkbenchNavigator</name>
     <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>mm:ss</translation>
     </message>
     <message>
         <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
         <translation>yyyy MMM dd</translation>
     </message>
     <message>
         <source>Live</source>
-        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <extracomment>Time slider's tooltip for position on live.</extracomment>
         <translation>EN VIVO</translation>
     </message>
     <message>
@@ -7345,12 +7340,12 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Marcas de tiempo:</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation>Archivo &apos;%1&apos; ya existe. ¿Desea sobrescribirlo?</translation>
+        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <translation>Archivo '%1' ya existe. ¿Desea sobrescribirlo?</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation>El archivo &apos;%1&apos; es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
+        <source>File '%1' is used by another process. Please enter another name.</source>
+        <translation>El archivo '%1' es utilizado por otro proceso. Por favor, pruebe otro nombre.</translation>
     </message>
     <message>
         <source>Saving %1</source>
@@ -7389,8 +7384,8 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>No se ha podido guardar captura de pantalla.</translation>
     </message>
     <message>
-        <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation>Error al guardar captura de pantalla &apos;%1&apos;.</translation>
+        <source>An error occurred while saving screenshot '%1'.</source>
+        <translation>Error al guardar captura de pantalla '%1'.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7536,9 +7531,9 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Otro usuario ya está controlando esta pantalla.</translation>
     </message>
     <message>
-        <source>%1&apos;s Screen</source>
-        <comment>%1 means user&apos;s name</comment>
-        <translation>%1&apos;s Pantalla</translation>
+        <source>%1's Screen</source>
+        <comment>%1 means user's name</comment>
+        <translation>%1's Pantalla</translation>
     </message>
     <message>
         <source>A control session is already running.</source>
