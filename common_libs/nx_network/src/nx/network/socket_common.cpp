@@ -61,7 +61,7 @@ bool HostAddress::operator==( const HostAddress& rhs ) const
     if (ipV6() && rhs.ipV6())
         return memcmp(m_ipV6.get_ptr(), rhs.m_ipV6.get_ptr(), sizeof(*m_ipV6)) == 0;
 
-    return true;
+    return false;
 }
 
 bool HostAddress::operator!=( const HostAddress& rhs ) const
