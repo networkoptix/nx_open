@@ -98,6 +98,34 @@
        </widget>
       </item>
       <item>
+       <widget class="QWidget" name="filter" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="filterLineEdit">
+           <property name="placeholderText">
+            <string>Filter</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QnTreeView" name="resourcesTreeView">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -112,7 +140,7 @@
          <enum>QAbstractItemView::DragOnly</enum>
         </property>
         <property name="selectionMode">
-         <enum>QAbstractItemView::NoSelection</enum>
+         <enum>QAbstractItemView::ExtendedSelection</enum>
         </property>
         <property name="autoExpandDelay">
          <number>500</number>
@@ -151,7 +179,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QnPanel" name="detailsWidget" native="true">
+    <widget class="QnResourceDetailsWidget" name="detailsWidget" native="true">
      <property name="minimumSize">
       <size>
        <width>192</width>
@@ -180,60 +208,6 @@
       <property name="bottomMargin">
        <number>16</number>
       </property>
-      <item>
-       <widget class="QnResourcePreviewWidget" name="previewWidget" native="true"/>
-      </item>
-      <item>
-       <widget class="QPlainTextEdit" name="namePlainText">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QAbstractScrollArea::AdjustToContents</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-        <property name="cursorWidth">
-         <number>0</number>
-        </property>
-        <property name="textInteractionFlags">
-         <set>Qt::NoTextInteraction</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="descriptionLabel">
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </widget>
    </item>
@@ -246,15 +220,9 @@
    <header location="global">ui/widgets/common/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>QnResourceDetailsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnResourcePreviewWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/resource_preview_widget.h</header>
+   <header location="global">ui/widgets/resource_details_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

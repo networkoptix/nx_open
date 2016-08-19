@@ -13,6 +13,7 @@
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
 #include <business/business_resource_validation.h>
+#include <business/business_types_comparator.h>
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
@@ -83,6 +84,7 @@ namespace QnBusiness {
      */
     QnBusinessActionParameters filterActionParams(QnBusiness::ActionType actionType, const QnBusinessActionParameters &params)
     {
+        Q_UNUSED(actionType);
         return params;
     }
 }
@@ -102,7 +104,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
     , m_actionTypesModel(new QStandardItemModel(this))
 {
 
-    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+    QnBusinessTypesComparator lexComparator;
+    for (QnBusiness::EventType eventType: lexComparator.lexSortedEvents())
+    {
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(eventType));
         item->setData(eventType);
 
@@ -111,7 +115,8 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
         m_eventTypesModel->appendRow(row);
     }
 
-    for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+    for (QnBusiness::ActionType actionType: lexComparator.lexSortedActions())
+    {
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
         item->setData(!QnBusiness::canBeInstant(actionType), ProlongedActionRole);

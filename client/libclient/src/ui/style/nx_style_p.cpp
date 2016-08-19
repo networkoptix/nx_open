@@ -123,7 +123,7 @@ void QnNxStylePrivate::drawSwitch(
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
     if (!enabled)
-        painter->setOpacity(painter->opacity() * 0.3);
+        painter->setOpacity(painter->opacity() * Hints::kDisabledItemOpacity);
 
     QSize switchSize = standalone ? Metrics::kStandaloneSwitchSize : Metrics::kButtonSwitchSize;
 

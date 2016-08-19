@@ -1,6 +1,6 @@
 #include "ptz_tour_spots_model.h"
 
-#include <common/common_globals.h>
+#include <client/client_globals.h>
 
 #include <core/ptz/ptz_preset.h>
 

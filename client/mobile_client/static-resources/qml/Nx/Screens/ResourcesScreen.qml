@@ -72,7 +72,7 @@ Page
     SearchToolBar
     {
         id: searchToolBar
-        parent: header
+        parent: toolBar
     }
 
     CamerasGrid
@@ -188,12 +188,6 @@ Page
                 font.pixelSize: 32
                 color: ColorTheme.base13
             }
-        }
-
-        onVisibleChanged:
-        {
-            if (!visible)
-                mainWindow.unlockScreenOrientation()
         }
     }
 

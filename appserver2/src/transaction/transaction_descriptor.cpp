@@ -5,6 +5,8 @@
 
 #include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource/camera_resource.h>
+#include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
 
@@ -538,7 +540,62 @@ struct ModifyCameraAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission);
+        if (accessData == Qn::kSystemAccess)
+            return true;
+
+        if (!resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission))
+            return false;
+
+        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnVirtualCameraResourceList cameras;
+
+        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return false;
+
+        licenseUsageHelper.propose(camera, param.scheduleEnabled);
+        if (licenseUsageHelper.isOverflowForCamera(camera))
+            return false;
+
+        return true;
+    }
+};
+
+struct ModifyCameraAttributesListAccess
+{
+    void operator()(const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
+    {
+        if (accessData == Qn::kSystemAccess)
+            return;
+
+        for (const auto& p : param)
+            if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
+
+        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnVirtualCameraResourceList cameras;
+
+        for (const auto& p : param)
+        {
+            auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
+            if (!camera)
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
+            cameras.push_back(camera);
+            licenseUsageHelper.propose(camera, p.scheduleEnabled);
+        }
+
+        for (const auto& camera : cameras)
+            if (licenseUsageHelper.isOverflowForCamera(camera))
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
     }
 };
 
@@ -565,6 +622,20 @@ struct ModifyServerAttributesAccess
     bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(accessData, param.serverID, Qn::SavePermission);
+    }
+};
+
+struct UserInputAccess
+{
+    template<typename Param>
+    bool operator()(const Qn::UserAccessData& accessData, const Param&)
+    {
+        if (hasSystemAccess(accessData))
+            return true;
+
+        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
+        return result;
     }
 };
 
@@ -595,6 +666,21 @@ struct AdminOnlyAccessOut
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
         return result;
+    }
+};
+
+struct RemoveUserGroupAccess
+{
+    bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
+    {
+        if (!AdminOnlyAccess()(accessData, param))
+            return false;
+
+        for (const auto& user: qnResPool->getResources<QnUserResource>())
+            if (user->userGroup() == param.id)
+                return false;
+
+        return true;
     }
 };
 

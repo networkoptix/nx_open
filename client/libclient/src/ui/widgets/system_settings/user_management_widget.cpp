@@ -37,14 +37,13 @@
 
 namespace {
 
-/* A delegate to draw "Edit" link at the right of the column: */
-class QnDrawEditLinkDelegate : public QStyledItemDelegate
+class QnUserListDelegate : public QStyledItemDelegate
 {
     typedef QStyledItemDelegate base_type;
     Q_DECLARE_TR_FUNCTIONS(QnUserManagementWidget)
 
 public:
-    explicit QnDrawEditLinkDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
+    explicit QnUserListDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
         base_type(parent),
         m_hoverTracker(hoverTracker),
         m_editIcon(qnSkin->icon("user_settings/user_edit.png"))
@@ -54,8 +53,17 @@ public:
 
     virtual void paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
     {
+        /* Determine item opacity based on user enabled state: */
+        QnScopedPainterOpacityRollback opacityRollback(painter);
+        if (!QnUserListModel::isInteractiveColumn(index.column()) &&
+            index.sibling(index.row(), QnUserListModel::EnabledColumn).data(Qt::CheckStateRole).toInt() != Qt::Checked)
+        {
+            painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+        }
+
         /* Determine if link should be drawn: */
-        bool drawLink = option.state.testFlag(QStyle::State_MouseOver) &&
+        bool drawLink = index.column() == QnUserListModel::UserRoleColumn &&
+                        option.state.testFlag(QStyle::State_MouseOver) &&
                         m_hoverTracker &&
                         !QnUserListModel::isInteractiveColumn(m_hoverTracker->hoveredIndex().column());
 
@@ -88,6 +96,8 @@ public:
         int newTextWidth = textRect.width() - linkWidth - style::Metrics::kStandardPadding;
         newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth, kTextFlags);
         style->drawControl(QStyle::CE_ItemViewItem, &newOption, painter, newOption.widget);
+
+        opacityRollback.rollback();
 
         /* Draw link icon: */
         QRect iconRect(textRect.right() - linkWidth + 1, option.rect.top(), iconSize.width(), lineHeight);
@@ -127,8 +137,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     ui->usersTable->setModel(m_sortModel);
     ui->usersTable->setHeader(m_header);
     ui->usersTable->setIconSize(QSize(36, 24));
+    ui->usersTable->setItemDelegate(new QnUserListDelegate(hoverTracker, this));
     ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn,  switchItemDelegate);
-    ui->usersTable->setItemDelegateForColumn(QnUserListModel::UserRoleColumn, new QnDrawEditLinkDelegate(hoverTracker, this));
 
     m_header->setVisible(true);
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);

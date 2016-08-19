@@ -28,7 +28,7 @@ angular.module('webadminApp')
             localPasswordConfirmation:'',
 
             remoteSystem: '',
-            remoteLogin: Config.defaultLogin,
+            remoteLogin: '',
             remotePassword:''
         };
         $scope.forms = {};

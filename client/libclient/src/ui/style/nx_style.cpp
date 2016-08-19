@@ -226,6 +226,12 @@ namespace
         return true;
     }
 
+    bool isNonEditableComboBox(const QWidget* widget)
+    {
+        auto comboBox = qobject_cast<const QComboBox*>(widget);
+        return comboBox && !comboBox->isEditable();
+    }
+
     QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
     {
         static const QnIndents kDefaultIndents(Metrics::kStandardPadding, Metrics::kStandardPadding);
@@ -265,7 +271,7 @@ namespace
 
                 auto checker = static_cast<const VisibilityChecker*>(view);
 
-                for (int column = index.column() - 1; column > 0; --column)
+                for (int column = index.column() - 1; column >= 0; --column)
                 {
                     if (!checker->isIndexHidden(index.sibling(index.row(), column)))
                     {
@@ -690,7 +696,7 @@ void QnNxStyle::drawPrimitive(
                 if (widget)
                 {
                     if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
-                        qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled))
+                        (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
                     {
                         /* Itemviews with kSuppressHoverPropery should suppress hover. */
                         /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
@@ -1634,7 +1640,7 @@ void QnNxStyle::drawControl(
                         rect.setBottom(textRect.bottom());
                         rect.setTop(rect.bottom());
                         focusRect.setLeft(rect.left() - kCompactTabFocusMargin);
-                        focusRect.setRight(rect.right() - kCompactTabFocusMargin);
+                        focusRect.setRight(rect.right() + kCompactTabFocusMargin);
                     }
                     else
                     {
@@ -1979,10 +1985,16 @@ void QnNxStyle::drawControl(
 
         case CE_PushButtonLabel:
         {
-            if (isCheckableButton(option))
+            if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
             {
+                bool checkable = isCheckableButton(option);
+                bool leftAligned = widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
+
+                /* If button is standard, break to standard drawing: */
+                if (!checkable && !leftAligned)
+                    break;
+
                 /* Calculate minimal label width: */
-                auto buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
                 int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
                 if (!buttonOption->icon.isNull())
                     minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
@@ -1995,10 +2007,14 @@ void QnNxStyle::drawControl(
                 base_type::drawControl(element, &newOpt, painter, widget);
 
                 /* Draw switch right-aligned: */
-                newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
-                newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
-                newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
-                drawSwitch(painter, &newOpt, widget);
+                if (checkable)
+                {
+                    newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
+                    newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                    newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
+                    drawSwitch(painter, &newOpt, widget);
+                }
+
                 return;
             }
 
@@ -2110,8 +2126,10 @@ QRect QnNxStyle::subControlRect(
                 {
                     case SC_ComboBoxArrow:
                     {
-                        rect = QRect(comboBox->rect.right() - comboBox->rect.height(), 0,
-                                     comboBox->rect.height(), comboBox->rect.height());
+                        rect = QRect(comboBox->rect.right() - comboBox->rect.height(),
+                                     comboBox->rect.top(),
+                                     comboBox->rect.height(),
+                                     comboBox->rect.height());
                         rect.adjust(1, 1, 0, -1);
                         break;
                     }
@@ -2657,7 +2675,7 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_TabBarTab:
         {
-            if (auto tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+            if (qstyleoption_cast<const QStyleOptionTab*>(option))
             {
                 TabShape shape = tabShape(widget);
 
@@ -2751,7 +2769,10 @@ int QnNxStyle::pixelMetric(
     switch (metric)
     {
         case PM_ButtonMargin:
-            return dp(16);
+        {
+            int margin = widget ? widget->property(Properties::kButtonMarginProperty).toInt() : 0;
+            return margin ? margin : dp(16);
+        }
 
         case PM_ButtonShiftVertical:
         case PM_ButtonShiftHorizontal:
@@ -2924,18 +2945,15 @@ int QnNxStyle::styleHint(
     return base_type::styleHint(sh, option, widget, shret);
 }
 
-QPixmap QnNxStyle::standardPixmap(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const
+QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const
 {
     switch (iconId)
     {
         case SP_LineEditClearButton:
-        {
-            const int kQLineEditButtonSize = 16;
-            return qnSkin->icon("theme/input_clear.png").pixmap(kQLineEditButtonSize, kQLineEditButtonSize);
-        }
+            return qnSkin->icon("theme/input_clear.png");
 
         default:
-            return base_type::standardPixmap(iconId, option, widget);
+            return base_type::standardIcon(iconId, option, widget);
     }
 }
 
@@ -2974,7 +2992,7 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
+    if (qobject_cast<QLineEdit*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
         {
@@ -3138,9 +3156,9 @@ void QnNxStyle::polish(QWidget *widget)
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QAbstractSlider*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
-        qobject_cast<QComboBox*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
-        qobject_cast<QLabel*>(widget))
+        qobject_cast<QLabel*>(widget) ||
+        isNonEditableComboBox(widget))
     {
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);
@@ -3262,6 +3280,8 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+            default:
+                break;
         }
     }
     /* Disabled QAbstractButton eats mouse wheel events.

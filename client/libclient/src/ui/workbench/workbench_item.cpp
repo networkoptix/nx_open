@@ -457,8 +457,8 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
         /* Avoiding unnecessary dataChanged calls */
         bool flip = value.toBool();
         bool localValue = m_dataByRole[Qn::ItemFlipRole].toBool();
-        if(localValue != value) {
-            m_dataByRole[Qn::ItemFlipRole] = value;
+        if(localValue != flip) {
+            m_dataByRole[Qn::ItemFlipRole] = flip;
             emit dataChanged(Qn::ItemFlipRole);
         }
         return true;

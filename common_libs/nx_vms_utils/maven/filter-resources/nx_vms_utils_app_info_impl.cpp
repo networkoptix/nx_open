@@ -14,3 +14,8 @@ QString AppInfo::nativeUriProtocolDescription()
 {
     return QStringLiteral("${display.product.name} Client Protocol");
 }
+
+QString AppInfo::iconFileName()
+{
+    return QStringLiteral("${installer.name}.desktop");
+}

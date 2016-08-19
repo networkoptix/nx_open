@@ -30,6 +30,12 @@ ApplicationWindow
         anchors.rightMargin: mainWindow.rightPadding
         anchors.bottomMargin: mainWindow.bottomPadding
         onCurrentItemChanged: sideNavigation.close()
+
+        function restoreActiveFocus()
+        {
+            if (activeFocusItem == Window.contentItem)
+                Workflow.focusCurrentScreen()
+        }
     }
 
     UiController {}
@@ -44,7 +50,6 @@ ApplicationWindow
 
         if (lastUsedUrl)
         {
-            lockScreenOrientation()
             Workflow.openResourcesScreen(getLastUsedSystemId())
             connectionManager.connectToServer(lastUsedUrl)
         }
@@ -99,13 +104,5 @@ ApplicationWindow
 
     Screen.onPrimaryOrientationChanged: updateNavigationBarPadding()
 
-    function lockScreenOrientation()
-    {
-        setScreenOrientation(Screen.orientation)
-    }
-
-    function unlockScreenOrientation()
-    {
-        setScreenOrientation(Qt.PrimaryOrientation)
-    }
+    onActiveFocusItemChanged: stackView.restoreActiveFocus()
 }

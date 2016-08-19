@@ -1,4 +1,4 @@
-/* This file is a modified version of Qt's QProgressDialog. 
+/* This file is a modified version of Qt's QProgressDialog.
  * Original copyright notice follows. */
 
 /****************************************************************************
@@ -61,7 +61,7 @@ class QnProgressDialogPrivate;
 /**
  * A progress dialog that does not call <tt>QApplication::processEvents</tt>
  * when its value changes as the progress dialog from Qt does.
- * 
+ *
  * This behavior is controlled via <tt>isEventProcessor</tt> property.
  */
 class QnProgressDialog : public QnDialog {

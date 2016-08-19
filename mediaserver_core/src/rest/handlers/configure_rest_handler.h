@@ -2,6 +2,7 @@
 #define CONFIGURE_REST_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
+#include <core/resource_management/user_access_data.h>
 
 struct ConfigureSystemData;
 class QnConfigureRestHandler : public QnJsonRestHandler {
@@ -11,7 +12,7 @@ public:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
     int execute(const ConfigureSystemData& data, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
-    int changePort(const QnUuid & userId, int port);
+    int changePort(const Qn::UserAccessData& accessRights, int port);
 };
 
 #endif // CONFIGURE_REST_HANDLER_H

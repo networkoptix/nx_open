@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/std/future.h>
 #include <nx/utils/timer_manager.h>
 
 
@@ -21,7 +22,7 @@ TEST(TimerManager, singleShot)
     TimerManager timerManager;
     timerManager.start();
 
-    std::promise<void> triggeredPromise;
+    nx::utils::promise<void> triggeredPromise;
     timerManager.addTimer(
         [&triggeredPromise](TimerId) { triggeredPromise.set_value(); },
         delay);

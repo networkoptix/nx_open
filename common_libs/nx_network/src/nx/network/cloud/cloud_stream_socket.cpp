@@ -18,12 +18,13 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-CloudStreamSocket::CloudStreamSocket()
+CloudStreamSocket::CloudStreamSocket(int ipVersion)
 :
     m_aioThreadBinder(SocketFactory::createDatagramSocket()),
     m_recvPromisePtr(nullptr),
     m_sendPromisePtr(nullptr),
-    m_terminated(false)
+    m_terminated(false),
+    m_ipVersion(ipVersion)
 {
     //TODO #ak user MUST be able to bind this object to any aio thread
     //getAioThread binds to an aio thread
@@ -127,6 +128,8 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
+    NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
+
     unsigned int sendTimeoutBak = 0;
     if (!getSendTimeout(&sendTimeoutBak))
         return false;
@@ -173,8 +176,22 @@ bool CloudStreamSocket::connect(
 
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
+    NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
+
     if (m_socketDelegate)
+    {
+        {
+            QnMutexLocker lk(&m_mutex);
+            if (m_terminated)
+            {
+                SystemError::setLastErrorCode(SystemError::interrupted);
+                return 0;
+            }
+        }
+
         return m_socketDelegate->recv(buffer, bufferLen, flags);
+    }
+
 
     SystemError::setLastErrorCode(SystemError::notConnected);
     return -1;
@@ -182,6 +199,8 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
+    NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
+
     if (m_socketDelegate)
         return m_socketDelegate->send(buffer, bufferLen);
 
@@ -374,7 +393,7 @@ bool CloudStreamSocket::startAsyncConnect(
     {
         case AddressType::direct:
             //using tcp connection
-            m_socketDelegate.reset(new TCPSocket(true));
+            m_socketDelegate.reset(new TCPSocket(true, m_ipVersion));
             setDelegate(m_socketDelegate.get());
             if (!m_socketDelegate->setNonBlockingMode(true))
                 return false;
@@ -396,6 +415,8 @@ bool CloudStreamSocket::startAsyncConnect(
             if (!getSendTimeout(&sendTimeoutMillis))
                 return false;
             auto sharedOperationGuard = m_asyncConnectGuard.sharedGuard();
+
+            // TODO: Need to pass m_ipVersion for IPv6 support
             SocketGlobals::outgoingTunnelPool().establishNewConnection(
                 dnsEntry,
                 std::chrono::milliseconds(sendTimeoutMillis),

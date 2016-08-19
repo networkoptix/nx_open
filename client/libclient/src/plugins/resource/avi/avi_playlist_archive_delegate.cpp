@@ -154,7 +154,7 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec, bool /*findIFrame*/)
         return -1; // error seeking
 
     m_startMksec = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
-    if ((quint64)m_startMksec != AV_NOPTS_VALUE)
+    if (m_startMksec != AV_NOPTS_VALUE)
         relativeMksec += m_startMksec;
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
@@ -174,7 +174,7 @@ qint64 QnAVIPlaylistArchiveDelegate::packetTimestamp(const AVPacket& packet)
     AVStream* stream = m_fileList[m_currentFileIndex]->m_formatContext->streams[packet.stream_index];
     static AVRational r = {1, 1000000};
     qint64 packetTime = av_rescale_q(packet.dts, stream->time_base, r);
-    quint64 st = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
+    qint64 st = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
     if (st != AV_NOPTS_VALUE)
         return packetTime - st + m_fileList[m_currentFileIndex]->m_offsetInMks;
     else

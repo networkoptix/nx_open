@@ -42,6 +42,12 @@ T fromBytes(const QByteArray& bytes, bool networkOrder = true)
     return d;
 }
 
+template <typename T>
+QByteArray rawBytes(const T& data)
+{
+    return QByteArray((char*)&data, sizeof(T));
+}
+
 } // namespace dsh
 
 #endif // DATA_STREAM_HELPERS_H

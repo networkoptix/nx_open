@@ -11,6 +11,7 @@ Page
     title: systemName ? systemName : qsTr("Connect to Server")
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
+    property alias systemId: systemHostsModel.systemId
     property string systemName
     property alias address: credentialsEditor.address
     property alias login: credentialsEditor.login
@@ -21,6 +22,11 @@ Page
     {
         id: d
         property bool connecting: false
+    }
+
+    QnSystemHostsModel
+    {
+        id: systemHostsModel
     }
 
     Column
@@ -36,6 +42,7 @@ Page
         SessionCredentialsEditor
         {
             id: credentialsEditor
+            hostsModel: systemHostsModel
             width: parent.availableWidth
             onAccepted: customConnectionScreen.connect()
         }

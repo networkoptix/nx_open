@@ -162,7 +162,7 @@ bool QnFfmpegAudioTranscoder::isOpened() const
 bool QnFfmpegAudioTranscoder::existMoreData() const
 {
     int encoderFrameSize = m_encoderCtx->frame_size * QnFfmpegHelper::audioSampleSize(m_encoderCtx);
-    return m_resampledData.size() >= encoderFrameSize;
+    return (int64_t)m_resampledData.size() >= (int64_t)encoderFrameSize;
 }
 
 int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
@@ -174,7 +174,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         return -3;
 
     if (media) {
-        if (qAbs(media->timestamp - m_lastTimestamp) > MAX_AUDIO_JITTER || (quint64)m_lastTimestamp == AV_NOPTS_VALUE)
+        if (qAbs(media->timestamp - m_lastTimestamp) > MAX_AUDIO_JITTER || m_lastTimestamp == AV_NOPTS_VALUE)
         {
             m_frameNum = 0;
             m_firstEncodedPts = media->timestamp;
@@ -259,7 +259,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
     int encoded = 0;
     // todo: ffmpeg-test
-    while (encoded == 0 && m_resampledData.size() >= encoderFrameSize)
+    while (encoded == 0 && (int64_t)m_resampledData.size() >= (int64_t)encoderFrameSize)
     {
         //encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_resampledData.data());
         AVPacket outputPacket;

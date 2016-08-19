@@ -49,7 +49,7 @@ namespace Qn
 
     static const QByteArray DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME = "X-no-video";
 
-    static const QByteArray HAVE_TRANSACTION_HEADER_HEADER_NAME = "X-have-transaction-header";
+    static const QByteArray URL_QUERY_AUTH_KEY_NAME = "auth";
 }
 
 #endif  //CUSTOM_HEADERS_H

@@ -26,7 +26,6 @@
 #include <finders/direct_systems_finder.h>
 #include <client/client_recent_connections_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
-#include <handlers/lite_client_handler.h>
 
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
@@ -72,9 +71,6 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
 
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
-
-    if (qnSettings->isLiteClientModeEnabled())
-        common->store<QnLiteClientHandler>(new QnLiteClientHandler());
 
     QnUserWatcher *userWatcher = new QnUserWatcher();
     common->store<QnUserWatcher>(userWatcher);

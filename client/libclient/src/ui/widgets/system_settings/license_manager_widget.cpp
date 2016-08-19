@@ -100,6 +100,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     ui->gridLicenses->setModel(sortModel);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::LicenseStatusColumn, QHeaderView::Interactive);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
@@ -395,7 +396,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
             Q_UNUSED(reqID);
             at_licensesReceived(licenseKey, errorCode, licensesToUpdate);
         };
-        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
+        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
             licensesToUpdate, this, addLisencesHandler);
     }
 

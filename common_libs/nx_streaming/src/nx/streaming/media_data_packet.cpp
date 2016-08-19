@@ -289,7 +289,7 @@ void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration )
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
-    if ((quint64)m_firstTimestamp == AV_NOPTS_VALUE)
+    if (m_firstTimestamp == AV_NOPTS_VALUE)
         m_firstTimestamp = timestamp;
     else
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);

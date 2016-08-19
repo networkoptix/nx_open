@@ -1,7 +1,5 @@
 #include "ffmpeg_initializer.h"
 
-#if !defined(DISABLE_FFMPEG)
-
 extern "C"
 {
     #include <libavformat/avformat.h>
@@ -47,17 +45,3 @@ QnFfmpegInitializer::~QnFfmpegInitializer()
 {
     av_lockmgr_register(nullptr);
 }
-
-#else // if defined(DISABLE_FFMPEG)
-
-QnFfmpegInitializer::QnFfmpegInitializer(QObject* parent) :
-    QObject(parent)
-{
-    Q_UNUSED(parent)
-}
-
-QnFfmpegInitializer::~QnFfmpegInitializer()
-{
-}
-
-#endif // defined(DISABLE_FFMPEG)

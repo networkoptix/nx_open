@@ -1,6 +1,6 @@
 #include "ptz_tour_list_item_delegate.h"
 
-#include <common/common_globals.h>
+#include <client/client_globals.h>
 
 QnPtzTourListItemDelegate::QnPtzTourListItemDelegate(QObject *parent) :
     QStyledItemDelegate(parent)

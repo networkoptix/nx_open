@@ -160,7 +160,7 @@ api::ResultCode CdbLauncher::addAccount(
     if (password->empty())
     {
         std::ostringstream ss;
-        ss << nx::utils::random::number(0);
+        ss << nx::utils::random::number();
         *password = ss.str();
     }
 
@@ -343,7 +343,7 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
 
     api::SystemRegistrationData sysRegData;
     std::ostringstream ss;
-    ss << "test_sys_" << nx::utils::random::number(0);
+    ss << "test_sys_" << nx::utils::random::number();
     sysRegData.name = ss.str();
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -612,6 +612,28 @@ api::ResultCode CdbLauncher::getCdbNonce(
             std::bind(
                 static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
                 connection->authProvider(),
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbLauncher::getCdbNonce(
+    const std::string& accountEmail,
+    const std::string& accountPassword,
+    const std::string& systemID,
+    api::NonceData* const nonceData)
+{
+    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+        (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
+
+    auto connection = connectionFactory()->createConnection(accountEmail, accountPassword);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *nonceData) =
+        makeSyncCall<api::ResultCode, api::NonceData>(
+            std::bind(
+                static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
+                connection->authProvider(),
+                systemID,
                 std::placeholders::_1));
     return resCode;
 }

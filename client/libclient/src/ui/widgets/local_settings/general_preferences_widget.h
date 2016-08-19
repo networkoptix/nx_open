@@ -4,16 +4,15 @@
 #include <QtWidgets/QWidget>
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class GeneralPreferencesWidget;
+class GeneralPreferencesWidget;
 }
 
-class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget
 {
     Q_OBJECT
-    typedef QnAbstractPreferencesWidget base_type;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
     explicit QnGeneralPreferencesWidget(QWidget *parent = 0);
@@ -23,18 +22,24 @@ public:
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
 
-    bool isRestartRequired() const;
 private slots:
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();
     void at_removeExtraMediaFolderButton_clicked();
     void at_extraMediaFoldersList_selectionChanged();
 
-    void at_browseLogsButton_clicked();
-    void at_clearCacheButton_clicked();
+private:
+    QString mainMediaFolder() const;
+    void setMainMediaFolder(const QString& value);
+
+    QStringList extraMediaFolders() const;
+    void setExtraMediaFolders(const QStringList& value);
+
+    quint64 userIdleTimeoutMs() const;
+    void setUserIdleTimeoutMs(quint64 value);
+
+    bool autoStart() const;
+    void setAutoStart(bool value);
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
-
-    bool m_oldDownmix;
-    bool m_oldDoubleBuffering;
 };

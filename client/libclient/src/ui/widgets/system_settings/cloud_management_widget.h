@@ -9,7 +9,7 @@ namespace Ui
     class CloudManagementWidget;
 }
 
-class QnCloudManagementWidget: public Connective<QnAbstractPreferencesWidget>, QnWorkbenchContextAware
+class QnCloudManagementWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;
@@ -21,6 +21,9 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
+
+private:
+    void unlinkFromCloud();
 
 private:
     QScopedPointer<Ui::CloudManagementWidget> ui;

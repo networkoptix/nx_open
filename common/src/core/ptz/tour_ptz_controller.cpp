@@ -11,7 +11,7 @@
 #include "tour_ptz_executor.h"
 #include "ptz_controller_pool.h"
 
-bool deserialize(const QString& value, QnPtzTourHash* target)
+bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
     return false;

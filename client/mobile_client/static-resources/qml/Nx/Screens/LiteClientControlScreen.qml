@@ -26,7 +26,9 @@ Page
 
             onCheckedChanged:
             {
-                if (!checked)
+                if (checked)
+                    liteClientController.startLiteClient()
+                else
                     liteClientController.stopLiteClient()
             }
         }
@@ -35,6 +37,8 @@ Page
     QtObject
     {
         id: d
+
+        property int activeItemIndex: 0
 
         property Item screenItem:
         {
@@ -45,12 +49,28 @@ Page
             }
             return screenLoader.item
         }
+
+        property string currentResourceId: (screenItem && screenItem.activeItem
+            ? screenItem.activeItem.resourceId : "")
     }
 
     QnLiteClientController
     {
         id: liteClientController
         serverId: clientId
+
+        onClientStartError:
+        {
+            Workflow.openInformationDialog(
+                qsTr("Cannot start client"),
+                qsTr("Please make sure that display is connected to Nx1."))
+        }
+
+        onClientStopError:
+        {
+            Workflow.openInformationDialog(qsTr("Cannot stop client"))
+        }
+
     }
 
     Column
@@ -77,6 +97,7 @@ Page
                 id: screenDecoration
                 anchors.fill: parent
                 z: -1
+                visible: liteClientController.serverOnline
             }
         }
 
@@ -98,7 +119,7 @@ Page
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 
-            text: d.screenItem ? d.screenItem.activeItem.resourceName : ""
+            text: d.screenItem && d.screenItem.activeItem ? d.screenItem.activeItem.resourceName : ""
         }
     }
 
@@ -118,35 +139,37 @@ Page
         {
             id: selector
 
-            onCurrentResourceIdChanged:
+            currentResourceId: d.currentResourceId
+            fourCamerasMode: (liteClientController.layoutHelper.displayMode
+               == QnLiteClientLayoutHelper.MultipleCameras)
+
+            onSingleCameraModeClicked:
             {
-                if (d.screenItem)
-                    d.screenItem.activeItem.resourceId = currentResourceId
+                liteClientController.layoutHelper.displayCell =
+                    Qt.point(d.screenItem.activeItem.layoutX, d.screenItem.activeItem.layoutY)
             }
 
-            Connections
+            onMultipleCmaerasModeClicked:
             {
-                target: d.screenItem
-                onActiveItemChanged: selector.updateResourceId()
-            }
-            Connections
-            {
-                target: d
-                onScreenItemChanged: selector.updateResourceId()
+                liteClientController.layoutHelper.displayCell = Qt.point(-1, -1)
             }
 
-            onFourCamerasModeChanged:
+            onCameraClicked:
             {
-                liteClientControlScreen.state =
-                    (fourCamerasMode ? "MultipleCameras" : "SingleCamera")
-            }
-
-            function updateResourceId()
-            {
-                if (!d.screenItem.activeItem)
+                if (!d.screenItem || !d.screenItem.activeItem)
                     return
 
-                selector.currentResourceId = d.screenItem.activeItem.resourceId
+                if (fourCamerasMode)
+                {
+                    liteClientController.layoutHelper.setCameraIdOnCell(
+                        d.screenItem.activeItem.layoutX,
+                        d.screenItem.activeItem.layoutY,
+                        resourceId)
+                }
+                else
+                {
+                    liteClientController.layoutHelper.singleCameraId = resourceId
+                }
             }
         }
     }
@@ -157,21 +180,96 @@ Page
 
         LaunchButton
         {
-
+            onButtonClicked: liteClientController.startLiteClient()
         }
+    }
+
+    Component
+    {
+        id: singleCameraLayoutComponent
+
+        SingleCameraLayout
+        {
+            activeItem.layoutHelper: liteClientController.layoutHelper
+        }
+    }
+
+    Component
+    {
+        id: multipleCamerasLayoutComponent
+
+        MultipleCamerasLayout
+        {
+            layoutHelper: liteClientController.layoutHelper
+            Component.onCompleted: activeItemIndex = d.activeItemIndex
+            onActiveItemIndexChanged: d.activeItemIndex = activeItemIndex
+        }
+    }
+
+    Component
+    {
+        id: serverOfflineDummyComponent
+        ServerOfflineDummy {}
+    }
+
+    Component
+    {
+        id: switchedOffDummyComponent
+        SwitchedOffDummy {}
+    }
+
+    Component
+    {
+        id: noDisplayDummyComponent
+        NoDisplayDummy {}
+    }
+
+    Component
+    {
+        id: startingDummyComponent
+        StartingDummy {}
+    }
+
+    Component
+    {
+        id: stoppingDummyComponent
+        StoppingDummy {}
     }
 
     state: "SwitchedOff"
     states: [
         State
         {
-            name: "SwitchedOff"
-            when: !liteClientController.clientOnline
+            name: "Offline"
+            when: !liteClientController.serverOnline
 
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/SwitchedOffDummy.qml"
+                sourceComponent: serverOfflineDummyComponent
+            }
+            PropertyChanges
+            {
+                target: bottomLoader
+                sourceComponent: undefined
+            }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: false
+                enabled: false
+            }
+        },
+        State
+        {
+            name: "SwitchedOff"
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Stopped
+
+            PropertyChanges
+            {
+                target: screenLoader
+                sourceComponent: switchedOffDummyComponent
             }
             PropertyChanges
             {
@@ -182,6 +280,7 @@ Page
             {
                 target: enabledSwitch
                 checked: false
+                enabled: true
             }
         },
         /*
@@ -191,7 +290,7 @@ Page
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/NoDisplayDummy.qml"
+                sourceComponent: noDisplayDummyComponent
             }
             PropertyChanges
             {
@@ -202,14 +301,61 @@ Page
         */
         State
         {
-            name: "SingleCamera"
-            when: liteClientController.clientOnline
-                && liteClientController.displayMode == QnLiteClientController.SingleCamera
+            name: "Starting"
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Starting
 
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/SingleCameraLayout.qml"
+                sourceComponent: startingDummyComponent
+            }
+            PropertyChanges
+            {
+                target: bottomLoader
+                sourceComponent: undefined
+            }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: true
+                enabled: false
+            }
+        },
+        State
+        {
+            name: "Stopping"
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Stopping
+
+            PropertyChanges
+            {
+                target: screenLoader
+                sourceComponent: stoppingDummyComponent
+            }
+            PropertyChanges
+            {
+                target: bottomLoader
+                sourceComponent: undefined
+            }
+            PropertyChanges
+            {
+                target: enabledSwitch
+                checked: false
+                enabled: false
+            }
+        },
+        State
+        {
+            name: "SingleCamera"
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Started
+                && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.SingleCamera
+
+            PropertyChanges
+            {
+                target: screenLoader
+                sourceComponent: singleCameraLayoutComponent
             }
             PropertyChanges
             {
@@ -220,18 +366,20 @@ Page
             {
                 target: enabledSwitch
                 checked: true
+                enabled: true
             }
         },
         State
         {
             name: "MultipleCameras"
-            when: liteClientController.clientOnline
-                && liteClientController.displayMode == QnLiteClientController.MultipleCameras
+            when: liteClientController.serverOnline
+                && liteClientController.clientState == QnLiteClientController.Started
+                && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.MultipleCameras
 
             PropertyChanges
             {
                 target: screenLoader
-                source: "private/LiteClientControlScreen/MultipleCamerasLayout.qml"
+                sourceComponent: multipleCamerasLayoutComponent
             }
             PropertyChanges
             {
@@ -242,6 +390,7 @@ Page
             {
                 target: enabledSwitch
                 checked: true
+                enabled: true
             }
         }
     ]

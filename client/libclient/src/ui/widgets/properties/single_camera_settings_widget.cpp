@@ -207,8 +207,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     connect(ui->fisheyeSettingsWidget, &QnFisheyeSettingsWidget::dataChanged,
         this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
-    connect(ui->imageControlWidget, &QnImageControlWidget::fisheyeChanged,
-        this, &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
     connect(ui->imageControlWidget, &QnImageControlWidget::changed,
         this, &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
@@ -446,7 +444,6 @@ void QnSingleCameraSettingsWidget::submitToResource()
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->imageControlWidget->isFisheye(); //this step is really not needed as 'enabled' flag was set by imageControlWidget
         m_camera->setDewarpingParams(dewarpingParams);
 
         setHasDbChanges(false);
@@ -505,13 +502,14 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     else
     {
         bool hasVideo = m_camera->hasVideo(0);
+        bool hasAudio = m_camera->isAudioSupported();
+
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
-
-        ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported() && !m_camera->isAudioForced());
+        ui->enableAudioCheckBox->setEnabled(hasAudio && !m_camera->isAudioForced());
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
 
@@ -521,7 +519,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->passwordEdit->setText(auth.password());
 
         bool dtsBased = m_camera->isDtsBased();
-        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased);
+        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo));
         setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly());
         setTabEnabledSafe(Qn::IOPortsSettingsTab, camera()->isIOModule());
@@ -584,8 +582,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
-
-    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
@@ -693,6 +689,8 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly)
 
     if (readOnly)
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, false);
+
+    //TODO: #vkutin #GDM Read-only for Fisheye tab
 
     m_readOnly = readOnly;
 }
@@ -1121,7 +1119,6 @@ void QnSingleCameraSettingsWidget::at_dbDataChanged()
     if (m_updating)
         return;
 
-    setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
     setHasDbChanges(true);
 }
 
@@ -1173,7 +1170,6 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
     {
         QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->imageControlWidget->isFisheye();
         mediaWidget->setDewarpingParams(dewarpingParams);
 
         QnWorkbenchItem *item = mediaWidget->item();

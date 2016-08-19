@@ -38,7 +38,7 @@ void TestOptions::applyLoadMode(Count& count)
     {
         case LoadMode::light: count = 1; break;
         case LoadMode::normal: break;
-        case LoadMode::stress: count *= 100;
+        case LoadMode::stress: count *= 100; break;
     }
 }
 

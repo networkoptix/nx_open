@@ -12,40 +12,56 @@ namespace Ui {
     class ResourceListDialog;
 }
 
-class QnResourceListDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+class QnResourceListDialog: public QnWorkbenchStateDependentButtonBoxDialog
+{
     Q_OBJECT;
+    using base_type = QnWorkbenchStateDependentButtonBoxDialog;
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
-    QnResourceListDialog(QWidget *parent = NULL);
+    QnResourceListDialog(QWidget* parent = nullptr);
     virtual ~QnResourceListDialog();
 
-    bool isReadOnly() const;
-    void setReadOnly(bool readOnly);
-
-    void setText(const QString &text);
+    void setText(const QString& text);
     QString text() const;
 
-    void setBottomText(const QString &bottomText);
+    void setBottomText(const QString& bottomText);
     QString bottomText() const;
 
     void setStandardButtons(QDialogButtonBox::StandardButtons standardButtons);
     QDialogButtonBox::StandardButtons standardButtons() const;
 
-    const QnResourceList &resources() const;
-    void setResources(const QnResourceList &resources);
+    const QnResourceList& resources() const;
+    void setResources(const QnResourceList& resources);
 
     void showIgnoreCheckbox();
     bool isIgnoreCheckboxChecked() const;
 
     using QnButtonBoxDialog::exec;
 
-    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
-    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
-    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
-    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
+    static QDialogButtonBox::StandardButton exec(QWidget* parent, const QnResourceList& resources,
+        const QString& title, const QString& text, const QString& bottomText,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        bool readOnly = true);
+
+    static QDialogButtonBox::StandardButton exec(QWidget* parent, const QnResourceList& resources,
+        const QString& title, const QString& text,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        bool readOnly = true);
+
+    static QDialogButtonBox::StandardButton exec(QWidget* parent, const QnResourceList& resources,
+        int helpTopicId, const QString& title, const QString& text, const QString& bottomText,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        bool readOnly = true);
+
+    static QDialogButtonBox::StandardButton exec(QWidget* parent, const QnResourceList& resources,
+        int helpTopicId, const QString& title, const QString& text,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        bool readOnly = true);
+
+protected:
+    virtual void setReadOnlyInternal() override;
 
 private:
     QScopedPointer<Ui::ResourceListDialog> ui;
-    QnResourceListModel *m_model;
+    QnResourceListModel* m_model;
 };

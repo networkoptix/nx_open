@@ -12,6 +12,7 @@
 #include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/concurrent.h>
 
 #include <QDateTime>
 
@@ -89,11 +90,13 @@ void DeviceSearcher::pleaseStop()
         it->first->terminate();     //this method blocks till event handler returns
     }
     m_httpClients.clear();
+    m_handlerGuard.reset();
 }
 
 void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& deviceType )
 {
-    QMutexLocker lk( &m_mutex );
+    const auto lock = m_handlerGuard->lock();
+    assert(lock);
 
     // check if handler is registred without deviceType
     const auto& allDev = m_handlers[ QString() ];
@@ -115,7 +118,8 @@ void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& dev
 
 void DeviceSearcher::unregisterHandler( SearchHandler* handler, const QString& deviceType )
 {
-    QMutexLocker lk( &m_mutex );
+    const auto lock = m_handlerGuard->lock();
+    assert(lock);
 
     // try to unregister for specified deviceType
     auto it = m_handlers.find( deviceType );
@@ -183,10 +187,8 @@ DeviceSearcher* DeviceSearcher::instance()
 
 void DeviceSearcher::onTimer( const quint64& /*timerID*/ )
 {
-    //sending discover packet(s)
     dispatchDiscoverPackets();
 
-    //adding new timer task
     QMutexLocker lk( &m_mutex );
     if( !m_terminated )
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
@@ -266,6 +268,8 @@ void DeviceSearcher::dispatchDiscoverPackets()
         if( !sock )
             continue;
 
+        const auto lock = m_handlerGuard->lock();
+        assert(lock);
         for( const auto& handler : m_handlers )
         {
             // undefined device type will trigger default discovery
@@ -395,7 +399,7 @@ void DeviceSearcher::processDeviceXml(
 
     QMutexLocker lk( &m_mutex );
     m_discoveredDevices.emplace( devInfo.deviceAddress, devInfoFull );
-    updateItemInCache( devInfoFull );
+    updateItemInCache( std::move(devInfoFull) );
 }
 
 QHostAddress DeviceSearcher::findBestIface( const HostAddress& host )
@@ -438,36 +442,39 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     return &it->second;
 }
 
-void DeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo )
+void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo info )
 {
-    UPNPDescriptionCacheItem& cacheItem = m_upnpDescCache[devInfo.uuid];
-    cacheItem.devInfo = devInfo.devInfo;
-    cacheItem.xmlDevInfo = devInfo.xmlDevInfo;
+    UPNPDescriptionCacheItem& cacheItem = m_upnpDescCache[info.uuid];
+    cacheItem.devInfo = info.devInfo;
+    cacheItem.xmlDevInfo = info.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 
-    const auto url = devInfo.descriptionUrl;
-    processPacket(devInfo.localInterfaceAddress, SocketAddress(url.host(), url.port()),
-                  devInfo.devInfo, devInfo.xmlDevInfo);
-}
+    QnConcurrent::run(
+        QThreadPool::globalInstance(),
+        [ this, info = std::move(info), guard = m_handlerGuard.sharedGuard() ]()
+        {
+            const auto lock = guard->lock();
+            if( !lock )
+                return;
 
+            const SocketAddress devAddress(
+                info.descriptionUrl.host(),
+                info.descriptionUrl.port() );
 
-bool DeviceSearcher::processPacket( const QHostAddress& localInterfaceAddress,
-                                        const SocketAddress& discoveredDevAddress,
-                                        const DeviceInfo& devInfo,
-                                        const QByteArray& xmlDevInfo )
-{
-    std::map< uint, SearchHandler* > sortedHandlers;
-    for( const auto handler : m_handlers[ QString() ] )
-        sortedHandlers[ handler.second ] = handler.first;
+            std::map< uint, SearchHandler* > sortedHandlers;
+            for( const auto& handler : m_handlers[ QString() ] )
+                sortedHandlers[ handler.second ] = handler.first;
 
-    for( const auto handler : m_handlers[ devInfo.deviceType ] )
-        sortedHandlers[ handler.second ] = handler.first;
+            for( const auto& handler : m_handlers[ info.devInfo.deviceType ] )
+                sortedHandlers[ handler.second ] = handler.first;
 
-    bool precessed = true;
-    for( const auto& handler : sortedHandlers )
-        precessed &= handler.second->processPacket(
-            localInterfaceAddress, discoveredDevAddress, devInfo, xmlDevInfo );
-    return precessed;
+            for( const auto& handler : sortedHandlers )
+            {
+                handler.second->processPacket(
+                    info.localInterfaceAddress, devAddress,
+                    info.devInfo, info.xmlDevInfo);
+            }
+        });
 }
 
 void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient )

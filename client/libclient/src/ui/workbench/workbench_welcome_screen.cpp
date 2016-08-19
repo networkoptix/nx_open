@@ -6,10 +6,13 @@
 #include <QtQml/QQmlContext>
 
 #include <common/common_module.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 
 #include <watchers/cloud_status_watcher.h>
-
 #include <utils/common/delayed.h>
+#include <utils/common/app_info.h>
+#include <utils/connection_diagnostics_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -22,6 +25,7 @@
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
+#include <ui/workbench/workbench_resource.h>
 
 namespace
 {
@@ -75,6 +79,14 @@ namespace
         NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
         return (style ? style->genericPalette() : QnGenericPalette());
     }
+
+
+    QnResourceList extractResources(const UrlsList& urls)
+    {
+        QMimeData data;
+        data.setUrls(urls);
+        return QnWorkbenchResource::deserializeResources(&data);
+    }
 }
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
@@ -100,7 +112,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
 
     //
     m_widget->installEventFilter(this);
-
+    qApp->installEventFilter(this); //< QTBUG-34414 workaround
     connect(action(QnActions::DisconnectAction), &QAction::triggered,
         this, &QnWorkbenchWelcomeScreen::showScreen);
 
@@ -213,6 +225,30 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
 
     m_receivingResources = value;
     emit globalPreloaderVisibleChanged();
+}
+
+QString QnWorkbenchWelcomeScreen::softwareVersion() const
+{
+    return QnAppInfo::applicationVersion();
+}
+
+QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
+{
+    return QnConnectionDiagnosticsHelper::minSupportedVersion().toString();
+}
+
+bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
+{
+    return !extractResources(urls).isEmpty();
+}
+
+void QnWorkbenchWelcomeScreen::makeDrop(const UrlsList& urls)
+{
+    const auto resources = extractResources(urls);
+    if (resources.isEmpty())
+        return;
+
+    menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources));
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(
@@ -365,14 +401,23 @@ void QnWorkbenchWelcomeScreen::showScreen()
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
 {
+    if (obj != m_widget)
+        return base_type::eventFilter(obj, event);
+
     switch(event->type())
     {
-    case QEvent::Resize:
-        if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
-            setPageSize(resizeEvent->size());
-        break;
+        case QEvent::Resize:
+            if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
+                setPageSize(resizeEvent->size());
+            break;
+#if defined(Q_OS_MACX)
+        case QEvent::WindowActivate:
+            m_widget->activateWindow(); //< QTBUG-34414 workaround
+            break;
+#endif
+        default:
+            break;
     }
-
 
     return base_type::eventFilter(obj, event);
 }

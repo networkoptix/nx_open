@@ -373,10 +373,10 @@ void QnUserSettingsWidget::setupInputFields()
     ui->passwordInputField->setPasswordIndicatorEnabled(true);
 
     connect(ui->passwordInputField, &QnInputField::textChanged, this, [this]()
-    {
-        if (!ui->confirmPasswordInputField->text().isEmpty())
-        ui->confirmPasswordInputField->validate();
-    });
+        {
+            if (!ui->confirmPasswordInputField->text().isEmpty())
+                ui->confirmPasswordInputField->validate();
+        });
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
         ui->confirmPasswordInputField, &QnInputField::validate);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rest/server/json_rest_handler.h>
+#include <core/resource_management/user_access_data.h>
 
 struct PasswordData;
 
@@ -31,5 +32,8 @@ private:
         const QnRequestParamList& params,
         const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
-    int execute(PasswordData passwordData, const QnUuid& userId, QnJsonRestResult& result);
+    int execute(
+        PasswordData passwordData,
+        const Qn::UserAccessData& accessRights,
+        QnJsonRestResult& result);
 };

@@ -31,9 +31,7 @@ CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
 # This is necessary because changed configuration options should take effect
 # immediately.
-if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
-  stop $COMPANY_NAME-mediaserver
-fi
+service $COMPANY_NAME-mediaserver stop || true
 
 # Default MS parameters
 PORT_DEFAULT="7001"
@@ -224,9 +222,9 @@ case "$1" in
         fi
 
         if [ '${arch}' != 'arm' ]
-        then 
+        then
             [ -n "$UPGRADING" ] && $DBSYNC
-        fi    
+        fi
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
@@ -238,14 +236,18 @@ case "$1" in
   ;;
 esac
 
-# Dirty huck to prevent conflict with apport
+# Dirty huck to prevent apport to catch our crash dumps
 echo manual > /etc/init/apport.override
-invoke-rc.d apport stop 2>/dev/null || true
+systemctl disable apport >/dev/null 2>&1 || true
+service apport stop >/dev/null 2>&1 || true
 
-if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
-    invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
+if [ $(which systemctl) ]; then
+    # Systemd has a recursion problem with forwarding init.d script
+    rm /etc/init.d/$COMPANY_NAME-mediaserver
+
+    # Systemd requires explicit enable for service to start it on boot
+    systemctl enable $COMPANY_NAME-mediaserver || exit $?
 fi
 
-update-rc.d -f $COMPANY_NAME-mediaserver remove >/dev/null || exit $?
+service $COMPANY_NAME-mediaserver start || exit $?
 
-exit 0

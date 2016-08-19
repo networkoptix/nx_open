@@ -22,6 +22,7 @@
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"
 #include "network/auth/abstract_user_data_provider.h"
+#include <core/resource_management/user_access_data.h>
 
 
 #define USE_USER_RESOURCE_PROVIDER
@@ -48,7 +49,7 @@ public:
         const nx_http::Request& request,
         nx_http::Response& response,
         bool isProxy = false,
-        QnUuid* authUserId = 0,
+        Qn::UserAccessData* accessRights = 0,
         AuthMethod::Value* usedAuthMethod = 0);
 
     QnAuthMethodRestrictionList* restrictionList();
@@ -60,7 +61,7 @@ public:
         \note pair<query key name, key value>. Returned key is only valid for \a path
     */
     QPair<QString, QString> createAuthenticationQueryItemForPath(
-        const QnUuid& authUserId,
+        const Qn::UserAccessData& accessRights,
         const QString& path,
         unsigned int periodMillis);
 
@@ -69,7 +70,7 @@ public:
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
-    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, Qn::UserAccessData* accessRights);
 
     /*!
     \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
@@ -78,7 +79,7 @@ public:
         const QByteArray& authRecord,
         const QByteArray& method,
         nx_http::Response& response,
-        QnUuid* authUserId = nullptr) const;
+        Qn::UserAccessData* accessRights = nullptr) const;
 
     bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
 
@@ -96,19 +97,21 @@ private:
     public:
         nx::utils::TimerManager::TimerGuard timeGuard;
         QString path;
-        QnUuid authUserId;
+        Qn::UserAccessData accessRights;
 
         TempAuthenticationKeyCtx() {}
         TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right )
         :
             timeGuard( std::move( right.timeGuard ) ),
-            path( std::move( right.path ) )
+            path( std::move( right.path ) ),
+            accessRights(right.accessRights)
         {
         }
         TempAuthenticationKeyCtx& operator=( TempAuthenticationKeyCtx&& right )
         {
             timeGuard = std::move( right.timeGuard );
             path = std::move( right.path );
+            accessRights = right.accessRights;
             return *this;
         }
 
@@ -143,12 +146,12 @@ private:
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
         bool isProxy,
-        QnUuid* authUserId);
+        Qn::UserAccessData* accessRights);
     Qn::AuthResult doBasicAuth(
         const QByteArray& method,
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
-        QnUuid* authUserId);
+        Qn::UserAccessData* accessRights);
 
     mutable QnMutex m_mutex;
 #ifndef USE_USER_RESOURCE_PROVIDER

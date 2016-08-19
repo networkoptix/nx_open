@@ -7,6 +7,7 @@
 #include <plugins/resource/test_camera/testcamera_resource_searcher.h>
 
 #include <plugins/resource/acti/acti_resource_searcher.h>
+#include <plugins/resource/adam/adam_resource_searcher.h>
 #include <plugins/resource/arecontvision/resource/av_resource_searcher.h>
 #include <plugins/resource/axis/axis_resource_searcher.h>
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
@@ -59,6 +60,10 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
     #endif
     #ifdef ENABLE_ISD
         m_searchers << new QnPlISDResourceSearcher();
+    #endif
+
+    #ifdef ENABLE_ADVANTECH
+        m_searchers << new QnAdamResourceSearcher();
     #endif
 
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)

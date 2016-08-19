@@ -238,7 +238,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::ServerIssuesAction), SIGNAL(triggered()), this, SLOT(at_serverIssuesAction_triggered()));
     connect(action(QnActions::OpenInFolderAction), SIGNAL(triggered()), this, SLOT(at_openInFolderAction_triggered()));
     connect(action(QnActions::DeleteFromDiskAction), SIGNAL(triggered()), this, SLOT(at_deleteFromDiskAction_triggered()));
-    connect(action(QnActions::RemoveLayoutItemAction), SIGNAL(triggered()), this, SLOT(at_removeLayoutItemAction_triggered()));
     connect(action(QnActions::RemoveFromServerAction), SIGNAL(triggered()), this, SLOT(at_removeFromServerAction_triggered()));
     connect(action(QnActions::RenameResourceAction), SIGNAL(triggered()), this, SLOT(at_renameAction_triggered()));
     connect(action(QnActions::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
@@ -282,6 +281,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::DelayedForcedExitAction), &QAction::triggered, this, [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+
+    connect(action(QnActions::HiDpiSupportMessageAction), &QAction::triggered,
+        this, &QnWorkbenchActionHandler::onHiDpiWarningMessageAction);
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -1100,22 +1102,25 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered()
         /* If target server is not provided, open the server we are currently connected to. */
         server = qnCommon->currentServer();
 
-    if (!server)
-        return;
+    // TODO: #akolesnikov #3.1 VMS-2806
+    #ifdef WEB_CLIENT_SUPPORTS_PROXY
+        openInBrowser(server, lit("/static/index.html"));
+    #else
+        QUrl url(server->getApiUrl());
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+            return;
 
-    QUrl url(server->getApiUrl());
-    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
-        return;
+        url.setUserName(QString());
+        url.setPassword(QString());
+        url.setScheme(lit("http"));
+        url.setPath(lit("/static/index.html"));
 
-    url.setUserName(QString());
-    url.setPassword(QString());
-    url.setScheme(lit("http"));
-    url.setPath(lit("/static/index.html"));
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-    QDesktopServices::openUrl(url);
+        url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+        if (url.host() != server->getApiUrl().host())
+            return;
 
-    //TODO: #akolesnikov #3.1 VMS-2806
-    //    sendServerRequest(server, lit("static/index.html"));
+        QDesktopServices::openUrl(url);
+    #endif
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1568,7 +1573,7 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered()
     if (!server)
         return;
 
-    sendServerRequest(server, lit("api/showLog?lines=1000"));
+    openInBrowser(server, lit("/api/showLog?lines=1000"));
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
@@ -1622,49 +1627,6 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
         return;
 
     QnFileProcessor::deleteLocalResources(resources.toList());
-}
-
-void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
-    QnLayoutItemIndexList items = menu()->currentParameters(sender()).layoutItems();
-
-    if (items.size() > 1) {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            QnActionParameterTypes::resources(items),
-            Qn::RemoveItems_Help,
-            tr("Remove Items"),
-            tr("Are you sure you want to remove these %n items from layout?", "", items.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
-            );
-        if (button != QDialogButtonBox::Yes)
-            return;
-    }
-
-    QList<QnUuid> orphanedUuids;
-    foreach(const QnLayoutItemIndex &index, items) {
-        if (index.layout()) {
-            index.layout()->removeItem(index.uuid());
-        }
-        else {
-            orphanedUuids.push_back(index.uuid());
-        }
-    }
-
-    /* If appserver is not running, we may get removal requests without layout resource. */
-    if (!orphanedUuids.isEmpty()) {
-        QList<QnWorkbenchLayout *> layouts;
-        layouts.push_front(workbench()->currentLayout());
-        foreach(const QnUuid &uuid, orphanedUuids) {
-            foreach(QnWorkbenchLayout *layout, layouts) {
-                if (QnWorkbenchItem *item = layout->item(uuid)) {
-                    qnDeleteLater(item);
-                    break;
-                }
-            }
-        }
-    }
-    if (workbench()->currentLayout()->items().isEmpty())
-        workbench()->currentLayout()->setCellAspectRatio(-1.0);
 }
 
 bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {
@@ -2205,6 +2167,24 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
         .arg(qApp->applicationDisplayName()));
 }
 
+void QnWorkbenchActionHandler::onHiDpiWarningMessageAction()
+{
+    static const bool kIsSupportLink = !QnAppInfo::supportLink().isEmpty();
+    static const auto kAddress = (kIsSupportLink
+        ? QnAppInfo::supportLink() : QnAppInfo::supportEmailAddress());
+    static const auto addressPrefix = (kIsSupportLink ? QString() : lit("mailto:"));
+    static const auto kSupportPortalLink = lit("<a href = \"%1%2\">%2</a>")
+        .arg(addressPrefix, kAddress);
+
+    static const auto kComment = "%1 Will be replaced by product name, %2 - by link to support portal";
+    static const auto kMessage =
+        tr("%1 is not optimized for HiDpi screens yet and might look wrong. "
+        "Please write to %2 if you have any problems.", kComment)
+        .arg(QnAppInfo::productNameLong(), kSupportPortalLink);
+
+    QnMessageBox::warning(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
+}
+
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 
     const QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
@@ -2275,68 +2255,79 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
 }
 
-void QnWorkbenchActionHandler::sendServerRequest(const QnMediaServerResourcePtr& server, const QString& path)
+void QnWorkbenchActionHandler::openInBrowser(
+    const QnMediaServerResourcePtr& server,
+    const QString& webPage)
 {
-    static const QString kNonceRequestPath(lit("/api/getNonce"));
-
     if (!server || !context()->user())
         return;
 
-    QUrl serverUrl(server->getApiUrl());
-    serverUrl.setPath(kNonceRequestPath);
+    QUrl serverUrl(server->getApiUrl().toString() + webPage);
+    QUrl proxyUrl = QnNetworkProxyFactory::instance()->urlToResource(serverUrl, server);
+    proxyUrl.setPath(lit("/api/getNonce"));
 
-    nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
-    auto reply = std::make_unique<QnAsyncHttpClientReply>(client, this);
-    connect(
-        reply.get(), &QnAsyncHttpClientReply::finished,
-        this, &QnWorkbenchActionHandler::at_serverRequest_nonceReceived);
+    if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
+    {
+        // No other requests to this proxy, so we have to get nonce by ourself.
+        auto reply = new QnAsyncHttpClientReply(nx_http::AsyncHttpClient::create(), this);
+        connect(
+            reply, &QnAsyncHttpClientReply::finished,
+            this, &QnWorkbenchActionHandler::at_nonceReceived);
 
-    // TODO: Think of preloader in case of user complains about delay
-    m_serverRequests.emplace(serverUrl, ServerRequest { server, path, std::move(reply) });
-    client->doGet(serverUrl);
+        // TODO: Think of preloader in case of user complains about delay.
+        reply->asyncHttpClient()->doGet(proxyUrl);
+    }
+
+    m_serverRequests.emplace(proxyUrl, ServerRequest{server, serverUrl});
 }
 
-void QnWorkbenchActionHandler::at_serverRequest_nonceReceived(QnAsyncHttpClientReply *reply)
+void QnWorkbenchActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
 {
-    const auto serverUrl = reply->url();
-    auto it = m_serverRequests.find(serverUrl);
-    if (it == m_serverRequests.end())
+    std::unique_ptr<QnAsyncHttpClientReply> replyGuard(reply);
+    const auto nonceUrl = reply->url();
+    auto range = m_serverRequests.equal_range(nonceUrl);
+    if (range.first == range.second)
         return;
 
-    auto request = std::move(it->second);
-    m_serverRequests.erase(it);
+    std::vector<ServerRequest> requests;
+    for (auto it = range.first; it != range.second; ++it)
+        requests.push_back(std::move(it->second));
+
+    m_serverRequests.erase(range.first, range.second);
 
     QnJsonRestResult result;
     NonceReply auth;
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Cannot open server log"),
+            tr("Cannot open server web page"),
             tr("Could not execute initial server query"));
 
         return;
     }
 
-    auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-    QUrl url(lit("http://%1/%2:%3:%4/%5")
-        .arg(gateway->endpoint().toString())
-        .arg(reply->url().scheme())
-        .arg(reply->url().host())
-        .arg(reply->url().port())
-        .arg(request.path)
-    );
+    for (const auto& request: requests)
+    {
+        const auto appserverUrl = QnAppServerConnectionFactory::url();
+        const auto authParam = createHttpQueryAuthParam(
+            appserverUrl.userName(), appserverUrl.password(),
+            auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
 
-    const auto appserverUrl = QnAppServerConnectionFactory::url();
-    const auto authParam = createHttpQueryAuthParam(
-        appserverUrl.userName(), appserverUrl.password(),
-        auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
+        QUrl targetUrl(request.url);
+        QUrlQuery urlQuery(targetUrl);
+        urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
+        targetUrl.setQuery(urlQuery);
 
-    QUrlQuery urlQuery(url);
-    urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
-    url.setQuery(urlQuery);
+        targetUrl = QnNetworkProxyFactory::instance()->urlToResource(targetUrl, request.server);
 
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, request.server);
-    QDesktopServices::openUrl(url);
+        auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
+        targetUrl = QUrl(lit("http://%1/%2:%3:%4%5?%6")
+            .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
+            .arg(targetUrl.host()).arg(targetUrl.port())
+            .arg(targetUrl.path()).arg(targetUrl.query()));
+
+        QDesktopServices::openUrl(targetUrl);
+    }
 }
 
 void QnWorkbenchActionHandler::deleteDialogs() {

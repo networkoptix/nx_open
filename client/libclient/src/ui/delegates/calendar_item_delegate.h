@@ -30,7 +30,6 @@ public:
         , const QnTimePeriod &localPeriod
         , const QnTimePeriodStorage &primaryPeriods
         , const QnTimePeriodStorage &secondaryPeriods
-        , bool isEnabled
         , bool isSelected) const;
 
     void paintCellText(QPainter *painter
@@ -38,7 +37,7 @@ public:
         , const QRect &rect
         , const QString &text
         , bool isEnabled) const;
-    
+
 private:
     QnCalendarColors m_colors;
 };

@@ -52,6 +52,12 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
+// Player will go invalid state if no data during timeout
+static const int kGotDataTimeoutMs = 1000 * 10;
+
+// Periodic tasks timer interval
+static const int kPeriodicTasksTimeoutMs = 1000;
+
 struct NxMediaFlagConfig: public nx::utils::FlagConfig
 {
     using nx::utils::FlagConfig::FlagConfig;
@@ -137,6 +143,9 @@ public:
     // Timer for delayed call to presentNextFrame().
     QTimer* execTimer;
 
+    // Timer for miscs periodic tasks
+    QTimer* miscTimer;
+
     // Last seek position. UTC time in msec.
     qint64 lastSeekTimeMs;
 
@@ -167,6 +176,9 @@ public:
 
     // Protects access to videoGeometry.
     mutable QMutex videoGeometryMutex;
+
+    // Interval since last time player got some data
+    QElapsedTimer gotDataTimer;
 
     void applyVideoQuality();
 
@@ -201,6 +213,8 @@ private:
 
     void doApplyVideoQuality(const QnVirtualCameraResourcePtr& camera,
         QSize highResolution, AVCodecID highCodec, QSize lowResolution, AVCodecID lowCodec);
+
+    void doPeriodicTasks();
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -216,6 +230,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     maxTextureSize(kDefaultMaxTextureSize),
     ptsTimerBaseMs(0),
     execTimer(new QTimer(this)),
+    miscTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
@@ -225,6 +240,9 @@ PlayerPrivate::PlayerPrivate(Player *parent):
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
+
+    connect(miscTimer, &QTimer::timeout, this, &PlayerPrivate::doPeriodicTasks);
+    miscTimer->start(kPeriodicTasksTimeoutMs);
 }
 
 void PlayerPrivate::setState(Player::State state)
@@ -232,10 +250,21 @@ void PlayerPrivate::setState(Player::State state)
     if (state == this->state)
         return;
 
+    gotDataTimer.restart();
     this->state = state;
 
     Q_Q(Player);
     emit q->playbackStateChanged();
+}
+
+void PlayerPrivate::doPeriodicTasks()
+{
+    Q_Q(Player);
+    if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
+    {
+        setMediaStatus(Player::MediaStatus::NoMedia);
+        q->stop();
+    }
 }
 
 void PlayerPrivate::setMediaStatus(Player::MediaStatus status)
@@ -381,6 +410,7 @@ void PlayerPrivate::presentNextFrame()
         return;
 
     setMediaStatus(Player::MediaStatus::Loaded);
+    gotDataTimer.restart();
 
     // Update video surface's pixel format if needed.
     if (videoSurface)
@@ -401,7 +431,11 @@ void PlayerPrivate::presentNextFrame()
         }
     }
 
-    if (videoSurface && videoSurface->isActive())
+    auto metadata = FrameMetadata::deserialize(videoFrameToRender);
+    bool isLivePacket = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
+    bool isPacketOK = (isLivePacket == liveMode);
+
+    if (videoSurface && videoSurface->isActive() && isPacketOK)
     {
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
@@ -409,14 +443,9 @@ void PlayerPrivate::presentNextFrame()
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
             dataConsumer->setDisplayedTimeUs(timeUs);
         }
+        setPosition(videoFrameToRender->startTime());
+        setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
     }
-
-    setPosition(videoFrameToRender->startTime());
-
-    auto metadata = FrameMetadata::deserialize(videoFrameToRender);
-    setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
-    setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
-
     videoFrameToRender.reset();
 
     // Calculate next time to render.
@@ -730,21 +759,13 @@ bool PlayerPrivate::createArchiveReader()
     if (!resource)
         return false;
 
-#ifdef ENABLE_ARCHIVE
     archiveReader.reset(new QnArchiveStreamReader(resource));
-#endif
 
     QnAbstractArchiveDelegate* archiveDelegate;
     if (isLocalFile)
-    {
-#ifdef ENABLE_ARCHIVE
         archiveDelegate = new QnAviArchiveDelegate();
-#endif
-    }
     else
-    {
         archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
-    }
 
     archiveReader->setArchiveDelegate(archiveDelegate);
     return true;
@@ -922,8 +943,14 @@ void Player::stop()
     if (d->archiveReader && d->dataConsumer)
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
 
+    if (d->dataConsumer)
+	    d->dataConsumer->pleaseStop();
+    if (d->archiveReader)
+	    d->archiveReader->pleaseStop();
+
     d->dataConsumer.reset();
     d->archiveReader.reset();
+    d->videoFrameToRender.reset();
     d->setState(State::Stopped);
 }
 
@@ -935,6 +962,8 @@ void Player::setSource(const QUrl& url)
 
     if (newUrl != d->url)
     {
+        const auto currentState = d->state;
+
         stop();
         d->url = newUrl;
 
@@ -942,17 +971,16 @@ void Player::setSource(const QUrl& url)
         d->isLocalFile = d->url.scheme() == lit("file");
         if (d->isLocalFile)
         {
-#ifdef ENABLE_ARCHIVE
             d->resource.reset(new QnAviResource(path));
             d->resource->setStatus(Qn::Online);
-#else
-            d->resource.reset();
-#endif
         }
         else
         {
             d->resource = qnResPool->getResourceById(QnUuid(path));
         }
+
+        if (d->resource && currentState == State::Playing)
+            play();
     }
 }
 

@@ -9,8 +9,8 @@ BusyIndicator
 
     property color color: Style.colors.mid;
 
-    implicitWidth: childrenRect.width;
-    implicitHeight: childrenRect.height;
+    implicitWidth: (children.length ? 30 : radiusByIndex(children.length));
+    implicitHeight: implicitWidth;
     contentItem: null;
 
     Repeater
@@ -21,7 +21,7 @@ BusyIndicator
             id: circleRectangle;
 
             anchors.centerIn: parent;
-            radius: 20 + index * 16;
+            radius: control.radiusByIndex(index)
             border.width: 2;
             border.color: control.color;
             color: "transparent";
@@ -64,6 +64,11 @@ BusyIndicator
                 }
             }
         }
+    }
+
+    function radiusByIndex(index)
+    {
+        return (20 + index * 16);
     }
 }
 

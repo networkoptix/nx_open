@@ -64,7 +64,7 @@ QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
     return m_unauthorizedPageBody;
 }
 
-bool QnUniversalRequestProcessor::authenticate(QnUuid* userId, bool *noAuth)
+bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights, bool *noAuth)
 {
     Q_D(QnUniversalRequestProcessor);
 
@@ -78,7 +78,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId, bool *noAuth)
         t.restart();
         AuthMethod::Value usedMethod = AuthMethod::noAuth;
         Qn::AuthResult authResult;
-        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, userId, &usedMethod)) != Qn::Auth_OK)
+        while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
             nx_http::insertOrReplaceHeader(
                 &d->response.headers,
@@ -166,8 +166,8 @@ void QnUniversalRequestProcessor::run()
             parseRequest();
 
             auto handler = d->owner->findHandler(d->protocol, d->request);
-            bool noAuth;
-            if (handler && !authenticate(&d->authUserId, &noAuth))
+            bool noAuth = false;
+            if (handler && !authenticate(&d->accessRights, &noAuth))
                 return;
 
             isKeepAlive = isConnectionCanBePersistent();

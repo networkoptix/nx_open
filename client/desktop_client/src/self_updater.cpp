@@ -11,9 +11,10 @@
 #include <client/client_startup_parameters.h>
 
 #include <nx/vms/utils/app_info.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/platform/protocol_handler.h>
+#include <nx/vms/utils/platform/protocol_handler.h>
+#include <nx/vms/utils/desktop_file_linux.h>
 
+#include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
 #include <utils/directory_backup.h>
@@ -21,6 +22,25 @@
 namespace {
 
 const int kUpdateLockTimeoutMs = 1000;
+
+typedef QSharedPointer<QnBaseDirectoryBackup> QnDirectoryBackupPtr;
+
+QString backupPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("/../../backup");
+#else
+    return lit("/backup");
+#endif
+}
+
+QString applauncherPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("/Contents/MacOS/");
+#endif
+    return QString();
+}
 
 }
 
@@ -58,16 +78,43 @@ bool SelfUpdater::registerUriHandler()
     binaryPath = qApp->applicationDirPath() + lit("/client");
 #endif
 
-    return nx::utils::registerSystemUriProtocolHandler(
+    return nx::vms::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
-        QnClientAppInfo::macOsBundleName(),
         QnAppInfo::productNameLong(),
+        QnClientAppInfo::macOsBundleName(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
 #else
     return true;
+#endif
+}
+
+QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString& to)
+{
+    const QStringList kTargetFileFilters =
+    {
+        QLatin1String("*.dll"),
+        QnClientAppInfo::launcherVersionFile(),
+        QnClientAppInfo::applauncherBinaryName()
+    };
+
+#if defined(Q_OS_MACX)
+    static const auto kFrameworkPostfix = lit("/../Frameworks/");
+    const auto filesBackup = QnDirectoryBackupPtr(
+        new QnDirectoryBackup(from, kTargetFileFilters, to));
+    const auto frameworkBackup = QnDirectoryBackupPtr(new QnDirectoryRecursiveBackup(
+        from + kFrameworkPostfix, to + kFrameworkPostfix));
+
+    const auto multipleBackup = new QnMultipleDirectoriesBackup();
+    const auto result = QnDirectoryBackupPtr(multipleBackup);
+    multipleBackup->addDirectoryBackup(filesBackup);
+    multipleBackup->addDirectoryBackup(frameworkBackup);
+    return result;
+#else
+    /* Move installed applaucher to backup folder. */
+    return QnDirectoryBackupPtr(new QnDirectoryBackup(from, kTargetFileFilters, to));
 #endif
 }
 
@@ -77,7 +124,8 @@ bool SelfUpdater::updateApplauncher()
 
     QString applauncherDirPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)
         + lit("/../applauncher/")
-        + QnAppInfo::customizationName();
+        + QnAppInfo::customizationName()
+        + applauncherPostfix();
 
     const QDir applauncherDir(applauncherDirPath);
     if (!QDir().mkpath(applauncherDirPath))
@@ -118,30 +166,27 @@ bool SelfUpdater::updateApplauncher()
         return false;
     }
 
-    const QStringList kTargetFileFilters =
+    const auto backupPath = applauncherDirPath + backupPostfix() + applauncherPostfix();
+    const auto backup = copyApplauncherInstance(applauncherDirPath, backupPath);
+    if (!backup->backup(QnDirectoryBackupBehavior::Move))
     {
-        QLatin1String("*.dll"),
-        QLatin1String("version"),
-        QnClientAppInfo::applauncherBinaryName()
-    };
-
-    /* Move installed applaucher to backup folder. */
-    const QString backupDirPath = applauncherDirPath + lit("/backup");
-    QnDirectoryBackup backup(applauncherDirPath, kTargetFileFilters, backupDirPath);
-    if (!backup.backup(QnDirectoryBackup::Behavior::Move))
-    {
-        NX_LOG(lit("Could not backup to %1.").arg(backupDirPath), cl_logERROR);
+        NX_LOG(lit("Could not backup to %1").arg(applauncherDirPath), cl_logERROR);
         return false;
     }
 
     /* Copy our applauncher with all libs to destination folder. */
-    QnDirectoryBackup updatedSource(qApp->applicationDirPath(), kTargetFileFilters, applauncherDirPath);
-    const bool updateSuccess = updatedSource.backup(); //TODO: #GDM may be rename class and its methods to something else?
+    auto updatedSource = copyApplauncherInstance(qApp->applicationDirPath(), applauncherDirPath);
+
+    //TODO: #GDM may be rename class and its methods to something else?
+    const bool updateSuccess = updatedSource->backup(QnDirectoryBackupBehavior::Copy);
     if (!updateSuccess)
     {
         NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
-        backup.restore();
+        backup->restore(QnDirectoryBackupBehavior::Copy);
     }
+
+    if (!updateApplauncherDesktopIcon())
+        return false;
 
     /* Run newest applauncher via our own minilauncher. */
     if (!runMinilaucher())
@@ -250,7 +295,7 @@ void SelfUpdater::launchWithAdminPermissions()
 {
 #if defined(Q_OS_WIN)
     /* Start another client instance with admin permissions if required. */
-    nx::utils::runAsAdministratorWithUAC(
+    nx::vms::utils::runAsAdministratorWithUAC(
         qApp->applicationFilePath(),
         QStringList()
         << QnStartupParameters::kSelfUpdateKey
@@ -395,6 +440,40 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
     return true;
 }
 
+bool SelfUpdater::updateApplauncherDesktopIcon()
+{
+#if defined(Q_OS_LINUX)
+    const auto appsLocation =
+        QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+    if (appsLocation.isEmpty())
+        return false;
+
+    const auto filePath = QDir(appsLocation).filePath(nx::vms::utils::AppInfo::iconFileName());
+
+    const auto homeLocation = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    if (homeLocation.isEmpty())
+        return false;
+
+    const auto applauncherBinaryPath =
+        QDir(homeLocation).absoluteFilePath(lit(".local/share/%1/applauncher/%2/bin/%3")
+            .arg(QnAppInfo::organizationName(),
+                QnAppInfo::customizationName(),
+                QnAppInfo::applauncherExecutableName()));
+
+    if (!QFile::exists(applauncherBinaryPath))
+        return false;
+
+    return nx::vms::utils::createDesktopFile(
+        filePath,
+        applauncherBinaryPath,
+        QnAppInfo::productNameLong(),
+        QnAppInfo::productNameLong() + lit(" Client"),
+        QnAppInfo::customizationName(),
+        nx::utils::SoftwareVersion(QnAppInfo::engineVersion()));
+#endif // defined(Q_OS_LINUX)
+    return true;
+}
+
 QStringList SelfUpdater::getClientInstallRoots() const
 {
     QStringList result;
@@ -410,6 +489,15 @@ QStringList SelfUpdater::getClientInstallRoots() const
 #if defined(Q_OS_LINUX)
         clientRoot = clientRoot + lit("/bin");
 #endif
+
+        QString clientBinary = clientRoot + L'/' + QnClientAppInfo::clientBinaryName();
+        if (!QFileInfo::exists(clientBinary))
+        {
+            NX_LOG(lit("Could not find client binary: %1").arg(clientBinary), cl_logINFO);
+            NX_LOG(lit("Skip client root: %1").arg(clientRoot), cl_logINFO);
+            continue;
+        }
+
         result << clientRoot;
     }
 

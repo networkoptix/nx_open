@@ -5,6 +5,7 @@
 
 class QnMainWindow;
 class QnWorkbenchContext;
+class QnWorkbenchAccessController;
 
 class QnAxClientWindow: public QObject, public Singleton<QnAxClientWindow> {
     Q_OBJECT

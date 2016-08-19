@@ -1,6 +1,7 @@
 #include <atomic>
 #include "server_rest_connection.h"
 
+#include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
@@ -33,17 +34,18 @@ namespace rest
 ServerConnection::ServerConnection(const QnUuid& serverId):
     m_serverId(serverId)
 {
+    auto httpPool = nx_http::ClientPool::instance();
+    Qn::directConnect(
+        httpPool, &nx_http::ClientPool::done,
+        this, &ServerConnection::onHttpClientDone);
 }
 
 ServerConnection::~ServerConnection()
 {
-    QMap<Handle, nx_http::AsyncHttpClientPtr> dataCopy;
-    {
-        QnMutexLocker lock(&m_mutex);
-        std::swap(dataCopy, m_runningRequests);
-    }
-    for (auto value: dataCopy)
-        value->terminate();
+    directDisconnectAll();
+    auto httpPool = nx_http::ClientPool::instance();
+    for (const auto& handle : m_runningRequests.keys())
+        httpPool->terminate(handle);
 }
 
 rest::Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread)
@@ -86,15 +88,23 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
         , kJsonContentType, data, callback, targetThread);
 }
 
-Handle ServerConnection::resetCloudSystemCredentials(
+Handle ServerConnection::detachSystemFromCloud(
+    const QString& resetAdminPassword,
     Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
-    CloudCredentialsData data;
-    data.reset = true;
+    PasswordData data;
+    if (!resetAdminPassword.isEmpty())
+    {
+        auto admin = qnResPool->getAdministrator();
+        NX_ASSERT(admin);
+        if (!admin)
+            return Handle();
+        data = PasswordData::calculateHashes(admin->getName(), resetAdminPassword);
+    }
 
     return executePost(
-        lit("/api/saveCloudSystemCredentials"),
+        lit("/api/detachFromCloud"),
         QnRequestParamList(),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         QJson::serialized(std::move(data)),
@@ -125,7 +135,7 @@ Handle ServerConnection::saveCloudSystemCredentials(
 
 Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
 {
-    return executeGet(lit("api/startLiteClient"), QnRequestParamList(), callback, targetThread);
+    return executeGet(lit("/api/startLiteClient"), QnRequestParamList(), callback, targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------
@@ -162,7 +172,7 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
 template <typename ResultType>
 Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
-    Request request = prepareRequest(HttpMethod::Get, prepareUrl(path, params));
+    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
     return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
 }
 
@@ -174,7 +184,7 @@ Handle ServerConnection::executePost(const QString& path,
                                            REST_CALLBACK(ResultType) callback,
                                            QThread* targetThread)
 {
-    Request request = prepareRequest(HttpMethod::Post, prepareUrl(path, params), contentType, messageBody);
+    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
     return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
 }
 
@@ -188,7 +198,7 @@ void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool succ
 }
 
 template <typename ResultType>
-Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
     if (callback)
         return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
@@ -206,7 +216,7 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Re
     return sendRequest(request);
 }
 
-Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread)
 {
     if (callback)
     {
@@ -226,7 +236,7 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QB
     return sendRequest(request);
 }
 
-Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread)
 {
     if (callback)
     {
@@ -247,26 +257,22 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Em
 
 void ServerConnection::cancelRequest(const Handle& requestId)
 {
-    nx_http::AsyncHttpClientPtr httpClient;
-    {
-        QnMutexLocker lock(&m_mutex);
-        auto itr = m_runningRequests.find(requestId);
-        if (itr != m_runningRequests.end()) {
-            httpClient = itr.value();
-            m_runningRequests.erase(itr);
-        }
-    }
-    if (httpClient)
-        httpClient->terminate();
+    nx_http::ClientPool::instance()->terminate(requestId);
+    QnMutexLocker lock(&m_mutex);
+    m_runningRequests.remove(requestId);
 }
 
-ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType, const nx_http::StringType& messageBody)
+nx_http::ClientPool::Request ServerConnection::prepareRequest(
+    nx_http::Method::ValueType method,
+    const QUrl& url,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody)
 {
     QnMediaServerResourcePtr server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
-        return Request();
+        return nx_http::ClientPool::Request();
 
-    Request request;
+    nx_http::ClientPool::Request request;
     request.method = method;
     request.url = server->getApiUrl();
     request.url.setPath(url.path());
@@ -288,7 +294,7 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
         // no route exists. proxy via nearest server
         auto nearestServer = qnCommon->currentServer();
         if (!nearestServer)
-            return Request();
+            return nx_http::ClientPool::Request();
         QUrl nearestUrl(server->getApiUrl());
         if (nearestServer->getId() == qnCommon->moduleGUID())
             request.url.setHost(lit("127.0.0.1"));
@@ -318,67 +324,41 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
     return request;
 }
 
-Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc callback)
+Handle ServerConnection::sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback)
 {
-    static std::atomic<Handle> requestNum;
-    Handle requestId = ++requestNum;
-
-    auto httpClientCaptured = nx_http::AsyncHttpClient::create();
-    httpClientCaptured->setResponseReadTimeoutMs( ResponseReadTimeoutMs );
-    httpClientCaptured->setSendTimeoutMs( TcpConnectTimeoutMs );
-    httpClientCaptured->addRequestHeaders(request.headers);
-    httpClientCaptured->setAuthType(request.authType);
-
-    auto requestCompletionFunc = [requestId, callback, this, httpClientCaptured]
-    ( nx_http::AsyncHttpClientPtr httpClient ) mutable
-    {
-        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
-        httpClientCaptured.reset();
-
-        QnMutexLocker lock(&m_mutex);
-        auto itr = m_runningRequests.find(requestId);
-        if (itr == m_runningRequests.end())
-            return; // request canceled
-
-        SystemError::ErrorCode systemError = SystemError::noError;
-        nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
-        nx_http::StringType contentType;
-        nx_http::BufferType messageBody;
-
-        if( httpClient->failed() ) {
-            systemError = SystemError::connectionReset;
-        }
-        else {
-            statusCode = (nx_http::StatusCode::Value) httpClient->response()->statusLine.statusCode;
-            contentType = httpClient->contentType();
-            messageBody = httpClient->fetchMessageBodyBuffer();
-        }
-        lock.unlock();
-        if (callback)
-            callback(requestId, systemError, statusCode, contentType, messageBody);
-        lock.relock();
-        m_runningRequests.remove(requestId); // free last reference to the object
-    };
-
-    connect(httpClientCaptured.get(), &nx_http::AsyncHttpClient::done, this, requestCompletionFunc, Qt::DirectConnection);
+    auto httpPool = nx_http::ClientPool::instance();
+    Handle requestId = httpPool->sendRequest(request);
 
     QnMutexLocker lock(&m_mutex);
-    if (request.method == HttpMethod::Get)
-    {
-        httpClientCaptured->doGet(request.url);
-    }
-    else if (request.method == HttpMethod::Post)
-    {
-        httpClientCaptured->doPost(request.url, request.contentType, request.messageBody);
-    }
-    else
-    {
-        disconnect(httpClientCaptured.get(), nullptr, this, nullptr);
-        return Handle();
-    }
-    m_runningRequests.insert(requestId, httpClientCaptured);
+    m_runningRequests.insert(requestId, callback);
     return requestId;
 }
 
+void ServerConnection::onHttpClientDone(int requestId, nx_http::AsyncHttpClientPtr httpClient)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_runningRequests.find(requestId);
+    if (itr == m_runningRequests.end())
+        return; // request canceled
+    HttpCompletionFunc callback = itr.value();
+    m_runningRequests.remove(requestId);
+
+    SystemError::ErrorCode systemError = SystemError::noError;
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+    nx_http::StringType contentType;
+    nx_http::BufferType messageBody;
+
+    if (httpClient->failed()) {
+        systemError = SystemError::connectionReset;
+    }
+    else {
+        statusCode = (nx_http::StatusCode::Value) httpClient->response()->statusLine.statusCode;
+        contentType = httpClient->contentType();
+        messageBody = httpClient->fetchMessageBodyBuffer();
+    }
+    lock.unlock();
+    if (callback)
+        callback(requestId, systemError, statusCode, contentType, messageBody);
+};
 
 } // namespace rest

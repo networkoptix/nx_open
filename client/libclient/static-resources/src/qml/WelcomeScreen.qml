@@ -40,6 +40,7 @@ Rectangle
 
         NxSearchEdit
         {
+            visible: (pageSwitcher.pagesCount > 1);
             visualParent: screenHolder;
 
             anchors.bottom: gridHolder.top;
@@ -153,7 +154,7 @@ Rectangle
 
                 model: QnQmlSortFilterProxyModel
                 {
-                    model: QnSystemsModel {}
+                    model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
                 }
@@ -225,6 +226,15 @@ Rectangle
             }
         }
 
+        EmptyTilesPlaceholder
+        {
+            id: emptyTilePreloader;
+
+            anchors.centerIn: parent;
+            foundServersCount: grid.count;
+            visible: foundServersCount == 0;
+        }
+
         NxButton
         {
             anchors.bottom: parent.bottom;
@@ -280,4 +290,28 @@ Rectangle
         visible: context.connectingToSystem.length;
     }
 
+    DropArea
+    {
+        anchors.fill: parent;
+        onDropped:
+        {
+            context.makeDrop(drop.urls);
+        }
+
+        onEntered:
+        {
+            drag.accepted = context.isAcceptableDrag(drag.urls);
+        }
+    }
+
+    NxLabel
+    {
+        x: 8;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 8;
+
+        text: context.softwareVersion;
+        standardColor: Style.darkerColor(Style.colors.windowText, 1);
+        font: Qt.font({ pixelSize: 11, weight: Font.Normal})
+    }
 }

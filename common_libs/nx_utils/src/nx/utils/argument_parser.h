@@ -16,8 +16,8 @@ namespace utils {
 class NX_UTILS_API ArgumentParser
 {
 public:
-    ArgumentParser(int argc = 0, char **argv = nullptr);
-    void parse(int argc, char **argv);
+    ArgumentParser(int argc = 0, const char* argv[] = nullptr);
+    void parse(int argc, const char* argv[]);
 
     bool read(const QString& name, QString* const value) const;
     bool read(const QString& name, int* const value) const;

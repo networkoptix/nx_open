@@ -137,7 +137,7 @@ QHash<int, QByteArray> QnLayoutsModelUnsorted::roleNames() const
 
 int QnLayoutsModelUnsorted::rowCount(const QModelIndex& parent) const
 {
-    Q_UNUSED(parent)
+    QN_UNUSED(parent);
     return m_itemsList.size();
 }
 
@@ -335,7 +335,7 @@ void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& res
 
 void QnLayoutsModelUnsorted::at_serverFlagsChanged(const QnResourcePtr& resource)
 {
-
+    QN_UNUSED(resource);
 }
 
 QnLayoutsModel::QnLayoutsModel(QObject* parent) :
@@ -348,14 +348,16 @@ QnLayoutsModel::QnLayoutsModel(QObject* parent) :
 
 bool QnLayoutsModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    const auto leftType = left.data(QnLayoutsModelUnsorted::ItemTypeRole).value<QnLayoutsModel::ItemType>();
-    const auto rightType = right.data(QnLayoutsModelUnsorted::ItemTypeRole).value<QnLayoutsModel::ItemType>();
+    const auto leftType = left.data(QnLayoutsModelUnsorted::ItemTypeRole).value<ItemType>();
+    const auto rightType = right.data(QnLayoutsModelUnsorted::ItemTypeRole).value<ItemType>();
 
     if (leftType != rightType)
         return leftType < rightType;
 
+    // TODO: #dklychkov: Investigate why "return true" leads to "bad comparator":
+    // debugging shows that in this case both leftType and rightType equal AllCameras.
     if (leftType == ItemType::AllCameras)
-        return true;
+        return false;
 
     if (leftType == ItemType::Layout)
     {

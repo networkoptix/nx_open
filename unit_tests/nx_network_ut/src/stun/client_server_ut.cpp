@@ -140,17 +140,17 @@ TEST_F(StunClientServerTest, RequestResponse)
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - t1);
 
-        ASSERT_EQ(result.first, SystemError::noError)
+        ASSERT_EQ(SystemError::noError, result.first)
             << "after: " << timePassed.count() << " ms";
 
         const auto& response = result.second;
-        ASSERT_EQ(response.header.messageClass, MessageClass::successResponse);
-        ASSERT_EQ(response.header.method, MethodType::bindingMethod);
+        ASSERT_EQ(MessageClass::successResponse, response.header.messageClass);
+        ASSERT_EQ(MethodType::bindingMethod, response.header.method);
 
         const auto addr = response.getAttribute<stun::attrs::XorMappedAddress>();
-        ASSERT_NE(addr, nullptr);
-        ASSERT_EQ(addr->family, stun::attrs::XorMappedAddress::IPV4);
-        ASSERT_EQ(addr->address.ipv4, HostAddress::localhost.ipv4());
+        ASSERT_NE(nullptr, addr);
+        ASSERT_EQ(stun::attrs::XorMappedAddress::IPV4, addr->family);
+        ASSERT_EQ(ntohl(HostAddress::localhost.ipV4()->s_addr), addr->address.ipv4);
     }
     {
         Message request(Header(MessageClass::request, 0xFFF /* unknown */));

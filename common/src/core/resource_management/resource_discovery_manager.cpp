@@ -175,7 +175,8 @@ void QnResourceDiscoveryManager::run()
     m_timer.reset( new QTimer() );
     m_timer->setSingleShot( true );
     QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate( this );
-    connect( m_timer.get(), SIGNAL(timeout()), &timoutDelegate, SLOT(onTimeout()) );
+    connect(m_timer, &QTimer::timeout,
+        &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onTimeout);
     m_timer->start( 0 );    //immediate execution
     m_state = InitialSearch;
 

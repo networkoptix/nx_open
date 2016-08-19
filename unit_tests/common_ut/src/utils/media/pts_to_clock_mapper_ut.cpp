@@ -15,23 +15,6 @@
 typedef uint64_t pts_type;
 typedef PtsToClockMapper::ts_type ts_type;
 
-TEST( PtsToClockMapper, test )
-{
-    uint32_t bits = 1;
-    uint32_t x = (1 << bits) - 1;
-
-    uint32_t bits1 = 30;
-    uint32_t bits30mask = (1 << bits1) - 1;
-
-    uint32_t pts1 = bits30mask - 100;
-    //uint32_t pts2 = 100;
-    uint32_t pts2 = bits30mask - 300;
-
-    uint32_t diff = (pts2 - pts1) & bits30mask;
-
-    uint32_t absDiff = std::min<uint32_t>( (pts2 - pts1) & bits30mask, (pts1 - pts2) & bits30mask );
-}
-
 TEST( PtsToClockMapper, general )
 {
     typedef PtsToClockMapper MapperType;
@@ -65,10 +48,10 @@ TEST( PtsToClockMapper, general )
             pts_type prevEffectivePts = 0;
             pts_type ptsDelta = 0;
 
-            ptsToClockMapper.updateTimeMapping( MIN_PTS, nx::utils::random::number(0) );
+            ptsToClockMapper.updateTimeMapping( MIN_PTS, nx::utils::random::number() );
 
             //for( pts_type pts = MIN_PTS; pts < MAX_PTS; pts += STEP_VALUE )
-            for( int i = 0; i < STEPS; ++i )
+            for( pts_type i = 0; i < STEPS; ++i )
             {
                 auto effectivePts = pts;
 

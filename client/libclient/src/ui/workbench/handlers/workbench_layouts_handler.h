@@ -3,7 +3,8 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx_ec/ec_api.h>
+#include <core/resource_management/resource_access_subject.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchStateDelegate;
@@ -21,9 +22,6 @@ public:
     void forcedUpdate();
 
 private:
-    ec2::AbstractECConnectionPtr connection2() const;
-
-    private slots:
     void at_newUserLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
@@ -36,6 +34,8 @@ private:
     void at_shareLayoutAction_triggered();
     void at_stopSharingLayoutAction_triggered();
     void at_openNewTabAction_triggered();
+    void at_removeLayoutItemAction_triggered();
+    void at_removeLayoutItemFromSceneAction_triggered();
 
     void at_workbench_layoutsChanged();
 
@@ -45,6 +45,10 @@ private:
     void saveLayout(const QnLayoutResourcePtr &layout);
 
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
+
+    void removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave);
+
+    void shareLayoutWith(const QnLayoutResourcePtr &layout, const QnResourceAccessSubject &subject);
 
     struct LayoutChange
     {
@@ -60,16 +64,14 @@ private:
      */
     bool confirmLayoutChange(const LayoutChange& change);
 
-    bool confirmSharedLayoutChange(const LayoutChange& change);
+    bool confirmChangeSharedLayout(const LayoutChange& change);
     bool confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts);
-    bool confirmLayoutChangeForUser(const QnUserResourcePtr& user, const LayoutChange& change);
-    bool confirmDeleteLayoutsForUser(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
-    bool confirmLayoutChangeForGroup(const QnUuid& groupId, const LayoutChange& change);
+    bool confirmChangeLocalLayout(const QnUserResourcePtr& user, const LayoutChange& change);
+    bool confirmDeleteLocalLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
+    bool confirmStopSharingLayouts(const QnResourceAccessSubject& subject, const QnLayoutResourceList& layouts);
 
-    bool confirmStopSharingLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
-
-    /** If user has custom access rights, he must be given direct access to cameras on changed layout. */
-    void grantAccessRightsForUser(const QnUserResourcePtr& user, const LayoutChange& change);
+    /** If user has custom access rights, he must be given direct access to cameras on changed local layout. */
+    void grantMissingAccessRights(const QnUserResourcePtr& user, const LayoutChange& change);
 
     /**
      * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.

@@ -2,14 +2,20 @@ import QtQuick 2.6
 
 Item
 {
+    id: selector
+
     property alias currentResourceId: camerasStripe.currentResourceId
-    property alias currentThumbnail: camerasStripe.currentThumbnail
-    property bool fourCamerasMode: false
+    property bool fourCamerasMode: true
+
+    signal singleCameraModeClicked()
+    signal multipleCmaerasModeClicked()
+    signal cameraClicked(string resourceId)
 
     CamerasStripe
     {
         id: camerasStripe
         width: parent.width
+        onCameraClicked: selector.cameraClicked(resourceId)
     }
 
     Row
@@ -24,22 +30,26 @@ Item
         {
             id: singleCameraModeButton
             image: lp("/images/screen_mode_1.png")
-            selectedImage: lp("/images/screen_mode_1_selected.png")
-            selected: true
-            onClicked: fourCamerasMode = false
+            checkedImage: lp("/images/screen_mode_1_selected.png")
+            checkable: true
+            autoExclusive: true
+            onClicked: singleCameraModeClicked()
         }
         ImageButton
         {
             id: fourCamerasModeButton
             image: lp("/images/screen_mode_4.png")
-            selectedImage: lp("/images/screen_mode_4_selected.png")
-            onClicked: fourCamerasMode = true
+            checkedImage: lp("/images/screen_mode_4_selected.png")
+            checkable: true
+            checked: true
+            autoExclusive: true
+            onClicked: multipleCmaerasModeClicked()
         }
     }
 
     onFourCamerasModeChanged:
     {
-        singleCameraModeButton.selected = !fourCamerasMode
-        fourCamerasModeButton.selected = fourCamerasMode
+        singleCameraModeButton.checked = !fourCamerasMode
+        fourCamerasModeButton.checked = fourCamerasMode
     }
 }

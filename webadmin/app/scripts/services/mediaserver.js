@@ -108,13 +108,14 @@ angular.module('webadminApp')
                 return $q.reject();
             },
             getNonce:function(login, url){
+                var proxy1 = proxy;
                 if(url){
                     if(url.indexOf("http:")==0 || url.indexOf("https:")==0){
                         url = url.substring(url.indexOf("//") + 2);
                     }
-                    proxy += '/proxy/https/' + url;
+                    proxy1 += '/proxy/https/' + url;
                 }
-                return $http.get(proxy + '/web/api/getNonce?userName=' + login);
+                return $http.get(proxy1 + '/web/api/getNonce?userName=' + login);
             },
             logout:function(){
                 $localStorage.$reset();
@@ -334,15 +335,23 @@ angular.module('webadminApp')
                     });
                 });
             },
-            pingSystem: function(url,login,password){
-                if(url.indexOf('http')!=0){
-                    url = 'http://' + url;
-                }
-                return wrapPost(proxy + '/web/api/pingSystem?' + $.param({
-                    password:password,
-                    login:login,
-                    url:url
-                }));
+            pingSystem: function(url, remoteLogin, remotePassword){
+                var self = this;
+                return self.getNonce(remoteLogin, url).then(function(data) {
+                    var realm = data.data.reply.realm;
+                    var nonce = data.data.reply.nonce;
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+
+                    if (url.indexOf('http') != 0) {
+                        url = 'http://' + url;
+                    }
+                    return wrapPost(proxy + '/web/api/pingSystem?' + $.param({
+                        getKey: getKey,
+                        postKey: postKey,
+                        url: url
+                    }));
+                });
             },
             restart: function() { return wrapPost(proxy + '/web/api/restart'); },
             getStorages: function(){ return wrapGet(proxy + '/web/api/storageSpace'); },

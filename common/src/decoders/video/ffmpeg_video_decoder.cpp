@@ -203,9 +203,8 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
-    if (m_passedContext) {
-        avcodec_copy_context(m_context, m_passedContext);
-    }
+    if (m_passedContext)
+        QnFfmpegHelper::copyAvCodecContex(m_context, m_passedContext);
 
     m_frameTypeExtractor = new FrameTypeExtractor(QnConstMediaContextPtr(new QnAvCodecMediaContext(m_context)));
 
@@ -274,9 +273,9 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     m_context = 0;
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
-    if (m_passedContext) {
-        avcodec_copy_context(m_context, m_passedContext);
-    }
+    if (m_passedContext)
+        QnFfmpegHelper::copyAvCodecContex(m_context, m_passedContext);
+    
     determineOptimalThreadType(data);
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
@@ -600,7 +599,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                     av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
                 }
                 // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
-                outFrame->pkt_dts = (quint64)m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
+                outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
             }
         }
 

@@ -12,6 +12,7 @@
 #include <api/resource_property_adaptor.h>
 #include <rest/helpers/permissions_helper.h>
 #include <core/resource_management/resource_pool.h>
+#include "system_settings_handler.h"
 
 namespace
 {
@@ -30,7 +31,7 @@ struct SetupLocalSystemData: public PasswordData
     }
 
     QString systemName;
-    QMap<QString, QString> systemSettings;
+    QHash<QString, QString> systemSettings;
 };
 
 #define SetupLocalSystemData_Fields PasswordData_Fields (systemName)(systemSettings)
@@ -43,7 +44,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupLocalSystemData(params)), owner->authUserId(), result);
+    return execute(std::move(SetupLocalSystemData(params)), owner, result);
 }
 
 int QnSetupLocalSystemRestHandler::executePost(
@@ -55,14 +56,17 @@ int QnSetupLocalSystemRestHandler::executePost(
 {
     Q_UNUSED(path);
     SetupLocalSystemData data = QJson::deserialized<SetupLocalSystemData>(body);
-    return execute(std::move(data), owner->authUserId(), result);
+    return execute(std::move(data), owner, result);
 }
 
-int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result)
+int QnSetupLocalSystemRestHandler::execute(
+    SetupLocalSystemData data,
+    const QnRestConnectionProcessor* owner,
+    QnJsonRestResult &result)
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
     if (!qnGlobalSettings->isNewSystem())
@@ -125,13 +129,8 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
         return nx_http::StatusCode::ok;
     }
 
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
-    for (QnAbstractResourcePropertyAdaptor* setting : settings)
-    {
-        auto paramIter = data.systemSettings.find(setting->key());
-        if (paramIter != data.systemSettings.end())
-            setting->setValue(paramIter.value());
-    }
+    QnSystemSettingsHandler subHandler;
+    subHandler.executeGet(QString(), data.systemSettings, result, owner);
 
     return nx_http::StatusCode::ok;
 }

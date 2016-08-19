@@ -187,7 +187,7 @@ void QnMServerResourceSearcher::updateSocketList()
     deleteSocketList();
     for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
-        UDPSocket* socket = new UDPSocket();
+        UDPSocket* socket = new UDPSocket(AF_INET);
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
         if (socket->bind(SocketAddress(iface.address.toString())))
@@ -201,7 +201,7 @@ void QnMServerResourceSearcher::updateSocketList()
         }
     }
 
-    m_receiveSocket.reset( new UDPSocket() );
+    m_receiveSocket.reset( new UDPSocket(AF_INET) );
     m_receiveSocket->setReuseAddrFlag(true);
     m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, DISCOVERY_PORT));
 

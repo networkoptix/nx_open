@@ -9,8 +9,8 @@ class QnBackupCamerasDialog: public QnResourceSelectionDialog {
 public:
     QnBackupCamerasDialog(QWidget* parent = nullptr);
 
-protected:
-    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+    bool backupNewCameras() const;
+    void setBackupNewCameras(bool value);
 
 private:
     void updateQualitiesForSelectedCameras(Qn::CameraBackupQualities qualities);

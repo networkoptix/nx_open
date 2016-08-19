@@ -468,7 +468,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
 
-    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),                                                  this,                           SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        &QnWorkbenchController::at_accessController_permissionsChanged);
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -482,15 +483,17 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return workbench()->mapper();
 }
 
-bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
+bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
 {
-    if (event->type() == QEvent::Close) {
-        if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
+    if (event->type() == QEvent::Close)
+    {
+        if (QnResourceWidget* widget = qobject_cast<QnResourceWidget*>(watched))
+        {
             /* Clicking on close button of a widget that is not selected should clear selection. */
-            if(!widget->isSelected())
+            if (!widget->isSelected())
                 display()->scene()->clearSelection();
 
-            menu()->trigger(QnActions::RemoveLayoutItemAction, widget);
+            menu()->trigger(QnActions::RemoveLayoutItemFromSceneAction, widget);
             event->ignore();
             return true;
         }
@@ -1533,7 +1536,8 @@ void QnWorkbenchController::at_workbench_currentLayoutChanged() {
     updateLayoutInstruments(layout->resource());
 }
 
-void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
+void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource)
+{
     QnWorkbenchLayout *layout = workbench()->currentLayout();
     if (!layout || !layout->resource() || layout->resource() != resource)
         return;

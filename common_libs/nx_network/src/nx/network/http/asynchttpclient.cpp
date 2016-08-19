@@ -56,7 +56,8 @@ namespace nx_http
         m_proxyAuthorizationTried(false),
         m_ha1RecalcTried(false),
         m_terminated(false),
-        m_totalBytesRead(0),
+        m_bytesRead(0),
+        m_totalRequests(0),
         m_contentEncodingUsed(true),
         m_sendTimeoutMs(DEFAULT_SEND_TIMEOUT),
         m_responseReadTimeoutMs(DEFAULT_RESPONSE_READ_TIMEOUT),
@@ -264,9 +265,9 @@ namespace nx_http
         return m_url;
     }
 
-    quint64 AsyncHttpClient::totalBytesRead() const
+    quint64 AsyncHttpClient::bytesRead() const
     {
-        return m_totalBytesRead;
+        return m_bytesRead;
     }
 
     void AsyncHttpClient::setUseCompression(bool toggleUseEntityEncoding)
@@ -653,7 +654,6 @@ namespace nx_http
     void AsyncHttpClient::initiateHttpMessageDelivery(const QUrl& url)
     {
         using namespace std::placeholders;
-
         bool canUseExistingConnection = false;
         if (m_httpStreamReader.message().type == nx_http::MessageType::response)
         {
@@ -669,13 +669,18 @@ namespace nx_http
             m_socket &&
             !m_connectionClosed &&
             canUseExistingConnection &&
-            (m_remoteEndpoint == remoteEndpoint);
+            (m_remoteEndpoint == remoteEndpoint) &&
+            m_lastSysErrorCode == SystemError::noError;
 
         if (!canUseExistingConnection)
         {
             m_httpStreamReader.resetState();
             m_awaitedMessageNumber = 0;
+            m_lastSysErrorCode = SystemError::noError;
+            m_totalRequests = 0;
         }
+        ++m_totalRequests;
+        m_bytesRead = 0;
 
         m_state = sInit;
 
@@ -690,7 +695,6 @@ namespace nx_http
 
                     serializeRequest();
                     m_state = sSendingRequest;
-
                     m_socket->sendAsync(
                         m_requestBuffer,
                         std::bind(
@@ -707,7 +711,7 @@ namespace nx_http
 
     void AsyncHttpClient::initiateTcpConnection()
     {
-        const SocketAddress remoteAddress = 
+        const SocketAddress remoteAddress =
             m_proxyEndpoint
             ? m_proxyEndpoint.get()
             : SocketAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
@@ -754,7 +758,7 @@ namespace nx_http
             return 0;
         }
 
-        m_totalBytesRead += bytesRead;
+        m_bytesRead += bytesRead;
 
         //TODO #ak m_httpStreamReader is allowed to process not all bytes in m_responseBuffer. MUST support this!
 
@@ -825,7 +829,8 @@ namespace nx_http
 
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
-        if (!m_userName.isEmpty())
+        if (!m_userName.isEmpty() &&
+            m_request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME) == m_request.headers.end())
         {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
@@ -874,6 +879,16 @@ namespace nx_http
 
     bool AsyncHttpClient::reconnectIfAppropriate()
     {
+        if ((m_state == sSendingRequest || m_state == sReceivingResponse) &&
+            m_bytesRead == 0 &&
+            m_totalRequests > 1)
+        {
+            //< Reconnect if TCP timeout for keep-alive connections
+            m_connectionClosed = true;
+            initiateHttpMessageDelivery(m_url);
+            return true;
+        }
+
         //TODO #ak we need reconnect and request entity from the point we stopped at
         return false;
     }

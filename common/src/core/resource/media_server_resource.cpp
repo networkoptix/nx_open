@@ -35,22 +35,10 @@ namespace {
     const QString protoVersionPropertyName = lit("protoVersion");
     const QString safeModePropertyName = lit("ecDbReadOnly");
     const QString kUrlScheme = lit("rtsp");
-    const QString kApiUrlScheme = lit("http");
 
-    quint16 portFromUrl(const QString &strUrl)
+    QString apiUrlScheme(bool sslAllowed)
     {
-        const QUrl url(strUrl);
-        return url.port(DEFAULT_APPSERVER_PORT);
-    }
-
-    QUrl urlFromSocketAddress(const SocketAddress& address, const QString& scheme = kApiUrlScheme)
-    {
-        QUrl url;
-        url.setScheme(scheme);
-        url.setHost(address.address.toString());
-        if (address.port)
-            url.setPort(address.port);
-        return url;
+        return sslAllowed ? lit("https") : lit("http");
     }
 }
 
@@ -265,7 +253,7 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
     return m_restConnection;
 }
 
-void QnMediaServerResource::setUrl(const QString& url) 
+void QnMediaServerResource::setUrl(const QString& url)
 {
     QnResource::setUrl(url);
 
@@ -283,7 +271,7 @@ void QnMediaServerResource::setUrl(const QString& url)
 
 QUrl QnMediaServerResource::getApiUrl() const
 {
-    return getPrimaryAddress().toUrl(kApiUrlScheme);
+    return getPrimaryAddress().toUrl(apiUrlScheme(isSslAllowed()));
 }
 
 QString QnMediaServerResource::getUrl() const
@@ -305,10 +293,32 @@ void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddres
 
         m_primaryAddress = primaryAddress;
         if (m_apiConnection)
-            m_apiConnection->setUrl(m_primaryAddress.toUrl(kApiUrlScheme));
+            m_apiConnection->setUrl(m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed)));
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
+}
+
+bool QnMediaServerResource::isSslAllowed() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_sslAllowed;
+}
+
+void QnMediaServerResource::setSslAllowed(bool sslAllowed)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (sslAllowed == m_sslAllowed)
+            return;
+
+        m_sslAllowed = sslAllowed;
+        if (m_apiConnection)
+            m_apiConnection->setUrl(m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed)));
+    }
+
+    emit primaryAddressChanged(toSharedPointer(this));
+    emit sslAllowedChanged(toSharedPointer(this));
 }
 
 SocketAddress QnMediaServerResource::getPrimaryAddress() const
@@ -508,20 +518,23 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
     moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.sslAllowed = false;
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     moduleInformation.name = getName();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
     if (hasProperty(safeModePropertyName))
-        moduleInformation.ecDbReadOnly = QnLexical::deserialized(getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
+    {
+        moduleInformation.ecDbReadOnly = QnLexical::deserialized(
+            getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
+    }
 
     QnMutexLocker lock( &m_mutex );
 
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
+    moduleInformation.sslAllowed = m_sslAllowed;
     moduleInformation.port = getPort();
     moduleInformation.id = getId();
     moduleInformation.serverFlags = getServerFlags();
@@ -541,9 +554,8 @@ void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInforma
     setNetAddrList(addressList);
 
     if (!addressList.isEmpty()) {
-        QString address = addressList.first().toString();
-        quint16 port = moduleInformation.port;
-        QString url = QString(lit("http://%1:%2")).arg(address).arg(port);
+        const SocketAddress address(addressList.first().toString(), moduleInformation.port);
+        const auto url = address.toUrl(apiUrlScheme(moduleInformation.sslAllowed)).toString();
         setUrl(url);
     }
     if (!moduleInformation.name.isEmpty())
@@ -551,6 +563,7 @@ void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInforma
     setVersion(moduleInformation.version);
     setSystemInfo(moduleInformation.systemInformation);
     setSystemName(moduleInformation.systemName);
+    setSslAllowed(moduleInformation.sslAllowed);
     setProperty(protoVersionPropertyName, QString::number(moduleInformation.protoVersion));
     setProperty(safeModePropertyName, QnLexical::serialized(moduleInformation.ecDbReadOnly));
 

@@ -1,42 +1,90 @@
 #pragma once
 
+
+enum class QnDirectoryBackupBehavior
+{
+    Copy,
+    Move
+};
+
 /**
- * Class for directory backup and restore.
- * Does not supports recursive structures. Only plain files list.
- */
-class QnDirectoryBackup
+* Base class for directory backup and restore.
+*/
+class QnBaseDirectoryBackup
 {
 public:
-    enum class Behavior
-    {
-        Copy,
-        Move
-    };
-
-    QnDirectoryBackup(const QString& originalDirectory, const QString& backupDirectory);
-    QnDirectoryBackup(const QString& originalDirectory, const QStringList& nameFilters, const QString& backupDirectory);
+    virtual ~QnBaseDirectoryBackup() = default;
 
     /** Backup contents of the source directory into backup directory. */
-    bool backup(Behavior behavior = Behavior::Copy) const;
+    virtual bool backup(QnDirectoryBackupBehavior behavior) const = 0;
 
     /** Restore contents from the backup directory. */
-    bool restore(Behavior behavior = Behavior::Copy) const;
+    virtual bool restore(QnDirectoryBackupBehavior behavior) const = 0;
 
-private:
-    enum class OverwritePolicy
-    {
-        Skip,       /*< Files with same names will not be overridden. */
-        CheckSize,  /*< Files with different size will be overridden.  */
-        CheckDate,  /*< Older files will be overridden. */
-        Forced      /*< All files will be overridden. */
-    };
+protected:
+    QnBaseDirectoryBackup(const QString& originalDirectory, const QStringList& nameFilters, const QString& backupDirectory);
 
-    QStringList calculateFilenames(const QString& originalDirectory, const QStringList& nameFilters) const;
-    bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory, OverwritePolicy overwritePolicy) const;
-    bool deleteFiles(const QString& targetDirectory) const;
+    const QString& originalDirectory() const;
+    const QString& backupDirectory() const;
+    const QStringList& filters() const;
 
 private:
     const QString m_originalDirectory;
     const QString m_backupDirectory;
-    const QStringList m_filenames;
+    const QStringList m_filters;
+};
+
+/**
+* Class for directory backup and restore.
+* Does not supports recursive structures. Only plain files list.
+*/
+class QnDirectoryBackup : public QnBaseDirectoryBackup
+{
+public:
+
+    QnDirectoryBackup(const QString& originalDirectory, const QString& backupDirectory);
+    QnDirectoryBackup(const QString& originalDirectory, const QStringList& nameFilters, const QString& backupDirectory);
+
+public: //< Overrides
+    bool backup(QnDirectoryBackupBehavior behavior) const override;
+    bool restore(QnDirectoryBackupBehavior behavior) const override;
+
+private:
+    const QStringList m_fileNames;
+};
+
+/**
+* Class for directory backup and restore.
+* Supports recursive structures.
+*/
+class QnDirectoryRecursiveBackup : public QnBaseDirectoryBackup
+{
+public:
+    QnDirectoryRecursiveBackup(const QString& originalDirectory, const QString& backupDirectory);
+
+    QnDirectoryRecursiveBackup(const QString& originalDirectory, const QStringList& nameFilters, const QString& backupDirectory);
+
+public: //< Overrides
+    bool backup(QnDirectoryBackupBehavior behavior) const override;
+    bool restore(QnDirectoryBackupBehavior behavior) const override;
+};
+
+/**
+* Class for multiple directories backup and restore.
+*/
+class QnMultipleDirectoriesBackup: public QnBaseDirectoryBackup
+{
+public:
+    QnMultipleDirectoriesBackup();
+
+    typedef QSharedPointer<QnBaseDirectoryBackup> SingleDirectoryBackupPtr;
+    void addDirectoryBackup(const SingleDirectoryBackupPtr& backup);
+
+public: //< Overrides
+    bool backup(QnDirectoryBackupBehavior behavior) const override;
+    bool restore(QnDirectoryBackupBehavior behavior) const override;
+
+private:
+    typedef QList<SingleDirectoryBackupPtr> BackupsList;
+    BackupsList m_backups;
 };

@@ -32,7 +32,6 @@ namespace {
 
 }
 
-
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
     m_pixmapDirty(true),
@@ -43,9 +42,9 @@ QnMaskedProxyWidget::~QnMaskedProxyWidget() {
     return;
 }
 
-void QnMaskedProxyWidget::paint(QPainter *painter, 
-    const QStyleOptionGraphicsItem *option, 
-    QWidget *outputWidget) 
+void QnMaskedProxyWidget::paint(QPainter *painter,
+    const QStyleOptionGraphicsItem *option,
+    QWidget *outputWidget)
 {
     Q_UNUSED(outputWidget);
 
@@ -65,7 +64,7 @@ void QnMaskedProxyWidget::paint(QPainter *painter,
     if (renderRect.isEmpty())
         return;
 
-    if(m_pixmapDirty && m_updatesEnabled) 
+    if(m_pixmapDirty && m_updatesEnabled)
     {
         const auto widgetRect = this->widget()->rect();
         const int ratio = painter->device()->devicePixelRatio();
@@ -88,7 +87,7 @@ bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
         if(event->type() == QEvent::UpdateRequest) {
             m_pixmapDirty = true;
             /*open(object)->processEvent(event);
-            
+
             qDebug() << QGraphicsItem::d_ptr->needsRepaint;
             return true;*/
         }

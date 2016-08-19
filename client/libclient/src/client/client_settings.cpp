@@ -23,9 +23,9 @@
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
-namespace {
-    const QString xorKey = lit("ItIsAGoodDayToDie");
-
+namespace
+{
+    const QString kEncodeXorKey = lit("ItIsAGoodDayToDie");
 } // anonymous namespace
 
 QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
@@ -100,13 +100,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         settings->endGroup();
         return result;
     }
-//     case UPDATE_FEED_URL:
-//         // TODO: #Elric need another way to handle this. Looks hacky.
-//         if(settings->format() == QSettings::IniFormat) {
-//             return base_type::readValueFromSettings(settings, id, defaultValue);
-//         } else {
-//             return defaultValue;
-//         }
     case LIGHT_MODE:
     {
         QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
@@ -115,7 +108,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         return baseValue;
     }
     case CLOUD_PASSWORD:
-        return nx::utils::xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
+        return nx::utils::xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), kEncodeXorKey);
 
     case SHOW_ONCE_MESSAGES:
     {
@@ -125,8 +118,18 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 
     case WORKBENCH_PANES:
     {
-        QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant()).value<QByteArray>();
-        return QVariant::fromValue(QJson::deserialized<QnPaneSettingsMap>(asJson, defaultValue.value<QnPaneSettingsMap>()));
+        QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+            .value<QString>().toUtf8();
+        return QVariant::fromValue(QJson::deserialized<QnPaneSettingsMap>(asJson,
+            defaultValue.value<QnPaneSettingsMap>()));
+    }
+
+    case BACKGROUND_IMAGE:
+    {
+        QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+            .value<QString>().toUtf8();
+        return QVariant::fromValue(QJson::deserialized<QnBackgroundImage>(asJson,
+            defaultValue.value<QnBackgroundImage>()));
     }
 
     default:
@@ -156,7 +159,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         break;
     }
     case CLOUD_PASSWORD:
-        base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(), xorKey));
+        base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(), kEncodeXorKey));
         break;
 
     case SHOW_ONCE_MESSAGES:
@@ -171,7 +174,14 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 
     case WORKBENCH_PANES:
     {
-        QByteArray asJson = QJson::serialized(value.value<QnPaneSettingsMap>());
+        QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnPaneSettingsMap>()));
+        base_type::writeValueToSettings(settings, id, asJson);
+        break;
+    }
+
+    case BACKGROUND_IMAGE:
+    {
+        QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnBackgroundImage>()));
         base_type::writeValueToSettings(settings, id, asJson);
         break;
     }

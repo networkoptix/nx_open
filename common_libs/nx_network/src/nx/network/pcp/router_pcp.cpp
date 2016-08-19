@@ -5,6 +5,8 @@
 #include <QElapsedTimer>
 #include <QDateTime>
 
+#include <utils/memory/data_stream_helpers.h>
+
 static const quint32 LIFETIME = 1 * 60 * 60;
 static const int RESPONCE_WAIT = 1000;
 static const int RESPONCE_BUFFER = 1024;
@@ -58,7 +60,7 @@ QByteArray Router::makeMapRequest(Mapping& mapping)
     header.version = VERSION;
     header.opcode = Opcode::MAP;
     header.lifeTime = LIFETIME;
-    header.clientIp = mapping.internal.address.ipv6();
+    header.clientIp = dsh::rawBytes(*mapping.internal.address.ipV6());
 
     MapMessage message;
     message.nonce = mapping.nonce;
@@ -91,8 +93,12 @@ bool Router::parseMapResponse(const QByteArray& response, Mapping& mapping)
     if (message.nonce != mapping.nonce) return false;
     if (message.internalPort != mapping.internal.port) return false;
 
+    in6_addr addr;
+    NX_CRITICAL(message.externalIp.size() == sizeof(addr));
+    std::memcpy(&addr, message.externalIp.data(), sizeof(addr));
+
     mapping.lifeTime = QDateTime::currentDateTime().toTime_t() + header.lifeTime;
-    mapping.external = SocketAddress(HostAddress(message.externalIp), message.externalPort);
+    mapping.external = SocketAddress(HostAddress(addr), message.externalPort);
     return true;
 }
 

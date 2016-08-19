@@ -12,7 +12,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>0</number>
+    <number>4</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -27,47 +27,27 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="filterFrame">
-     <layout class="QHBoxLayout" name="filterLayout">
+    <widget class="QWidget" name="filter" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
-       <number>3</number>
+       <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>3</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>3</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>3</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>3</number>
+       <number>0</number>
       </property>
-      <item>
-       <widget class="QToolButton" name="selectFilterButton">
-        <property name="toolTip">
-         <string>Filter</string>
-        </property>
-        <property name="arrowType">
-         <enum>Qt::DownArrow</enum>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QLineEdit" name="filterLineEdit">
         <property name="placeholderText">
          <string>Filter</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="clearFilterButton">
-        <property name="toolTip">
-         <string>Reset Filter</string>
-        </property>
-        <property name="text">
-         <string>X</string>
         </property>
        </widget>
       </item>

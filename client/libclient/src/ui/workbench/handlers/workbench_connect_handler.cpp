@@ -587,18 +587,18 @@ void QnWorkbenchConnectHandler::clearConnection()
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    QnResourceList resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
+    auto resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    for (const QnLayoutResourcePtr& layout : qnResPool->getResources<QnLayoutResource>())
+    for (const auto& layout : qnResPool->getResources<QnLayoutResource>())
     {
-        if (layout->hasFlags(Qn::local) || !layout->isFile())  //do not remove exported layouts
+        if (layout->hasFlags(Qn::local) && !layout->isFile())  //do not remove exported layouts
             resourcesToRemove.push_back(layout);
     }
 
     QVector<QnUuid> idList;
     idList.reserve(resourcesToRemove.size());
-    foreach(const QnResourcePtr& res, resourcesToRemove)
+    for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
     qnResPool->removeResources(resourcesToRemove);

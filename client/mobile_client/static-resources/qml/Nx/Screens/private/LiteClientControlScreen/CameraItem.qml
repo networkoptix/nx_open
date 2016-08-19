@@ -12,6 +12,7 @@ Rectangle
     property alias resourceId: resourceHelper.resourceId
     property alias status: resourceHelper.resourceStatus
     property alias resourceName: resourceHelper.resourceName
+    property QnLiteClientLayoutHelper layoutHelper: null
 
     property bool useDummyText: true
     property int layoutX: -1
@@ -115,5 +116,38 @@ Rectangle
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
+    }
+
+    Timer
+    {
+        id: refreshTimer
+
+        interval: 60 * 1000
+        repeat: true
+        running: connectionManager.connectionState == QnConnectionManager.Connected
+        triggeredOnStart: true
+
+        onTriggered: thumbnailCacheAccessor.refreshThumbnail()
+    }
+
+    Connections
+    {
+        target: layoutHelper
+        onCameraIdChanged:
+        {
+            if (layoutX == x && layoutY == y)
+                cameraItem.resourceId = resourceId
+        }
+    }
+
+    onLayoutHelperChanged: updateResourceId()
+    Component.onCompleted: updateResourceId()
+
+    function updateResourceId()
+    {
+        if (layoutX < 0 || layoutY < 0 || !layoutHelper)
+            return
+
+        resourceId = layoutHelper.cameraIdOnCell(layoutX, layoutY)
     }
 }

@@ -294,7 +294,7 @@ qint64 QnVideoStreamDisplay::nextReverseTime() const
 {
     for (int i = 0; i < m_reverseQueue.size(); ++i)
     {
-        if (quint64(m_reverseQueue[i]->pkt_dts) != AV_NOPTS_VALUE)
+        if (m_reverseQueue[i]->pkt_dts != AV_NOPTS_VALUE)
         {
             if (m_reverseQueue[i]->flags & AV_REVERSE_REORDERED)
                 return m_reverseQueue[i]->pkt_dts;

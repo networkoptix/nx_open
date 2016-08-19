@@ -26,6 +26,7 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include "connection_guard.h"
 
 #ifdef _DEBUG
 #include <common/common_module.h>
@@ -49,7 +50,6 @@ namespace ConnectionType
     const char* toString( Type val );
     Type fromString( const QnByteArrayConstRef& str );
 }
-
 
 class QnTransactionTransport
 :
@@ -103,6 +103,7 @@ public:
     //!Initializer for incoming connection
     QnTransactionTransport(
         const QnUuid& connectionGuid,
+        ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
         QSharedPointer<AbstractStreamSocket> socket,
@@ -267,10 +268,6 @@ public:
     //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
     void removeEventHandler( int eventHandlerID );
 
-    static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QnUuid& id, bool isOriginator);
-    static void connectDone(const QnUuid& id);
 
     void processExtraData();
     void startListening();
@@ -339,11 +336,6 @@ private:
     std::map<int, BeforeSendingChunkHandler> m_beforeSendingChunkHandlers;
     int m_prevGivenHandlerID;
 
-    static QSet<QnUuid> m_existConn;
-    typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
-    static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
-    static QnMutex m_staticMutex;
-
     QByteArray m_extraData;
     bool m_authByKey;
     QElapsedTimer m_lastReceiveTimer;
@@ -359,6 +351,7 @@ private:
     std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
+    ConnectionLockGuard m_connectionLockGuard;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranBaseUrl;

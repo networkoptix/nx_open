@@ -98,7 +98,10 @@ class QnBusyIndicatorWidget : public QWidget, public QnBusyIndicatorPainter
     Q_PROPERTY(unsigned int totalTimeMs     READ totalTimeMs)
 
 public:
-    explicit QnBusyIndicatorWidget(QWidget* parent = nullptr);
+    explicit QnBusyIndicatorWidget(
+        QWidget* parent = nullptr,
+        const QColor& indicatorColor = QPalette().color(QPalette::Foreground),
+        const QColor& borderColor = QPalette().color(QPalette::Foreground));
 
     virtual QSize minimumSizeHint() const override;
     virtual QSize sizeHint() const override;
@@ -109,6 +112,10 @@ protected:
     virtual void updateIndicator() override;
 
     QRect indicatorRect() const;
+
+private:
+    const QColor m_indicatorColor;
+    const QColor m_borderColor;
 };
 
 /*
@@ -133,7 +140,10 @@ class QnBusyIndicatorGraphicsWidget : public Animated<GraphicsWidget>, public Qn
     using base_type = Animated<GraphicsWidget>;
 
 public:
-    explicit QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0);
+    explicit QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent = nullptr,
+        Qt::WindowFlags windowFlags = 0,
+        const QColor& indicatorColor = QPalette().color(QPalette::Foreground),
+        const QColor& borderColor = QPalette().color(QPalette::Foreground));
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
@@ -143,4 +153,8 @@ protected:
     virtual void updateIndicator() override;
 
     QRectF indicatorRect() const;
+
+private:
+    const QColor m_indicatorColor;
+    const QColor m_borderColor;
 };

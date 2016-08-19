@@ -24,7 +24,7 @@ Item
 
     property real anchorX:
     {
-        if (!input)
+        if (!input || !input.cursorVisible)
             return 0
 
         var rect = input.positionToRectangle(input[anchor])

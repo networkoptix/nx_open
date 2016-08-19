@@ -1,7 +1,5 @@
 #pragma once
 
-#if !defined(DISABLE_FFMPEG)
-
 #include "core/resource/resource_fwd.h"
 
 extern "C"
@@ -51,6 +49,13 @@ public:
      * @param context Not null.
      */
     static AVCodecContext* createAvCodecContext(const AVCodecContext* context);
+
+    /**
+    * Copy the settings of the source AVCodecContext into the destination AVCodecContext.
+    * The resulting destination codec context will be unopened.
+    * @return AVERROR() on error (e.g. memory allocation error), 0 on success
+    */
+    static int copyAvCodecContex(AVCodecContext* dst, const AVCodecContext* src);
 
     /**
      * Close and deep-deallocate the context.
@@ -115,5 +120,3 @@ public:
 private:
     SwrContext* m_swr;
 };
-
-#endif // !defined(DISABLE_FFMPEG)

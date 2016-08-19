@@ -24,11 +24,8 @@ QnMutex QnPtzRestHandler::m_asyncExecMutex;
 
 namespace {
 
-bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCameraResourcePtr& camera, Qn::PtzCommand command)
+bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnVirtualCameraResourcePtr& camera, Qn::PtzCommand command)
 {
-    if (!userResource)
-        return false;
-
     switch (command)
     {
         case Qn::ContinuousMovePtzCommand:
@@ -41,8 +38,9 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
         case Qn::RunAuxilaryCommandPtzCommand:
         case Qn::ActivatePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::WritePtzPermission))
+            if (!qnResourceAccessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
                 return false;
+            return true;
         }
 
         case Qn::CreateTourPtzCommand:
@@ -51,11 +49,12 @@ bool checkUserAccess(const QnUserResourcePtr& userResource, const QnVirtualCamer
         case Qn::UpdatePresetPtzCommand:
         case Qn::RemovePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(userResource, camera, Qn::SavePermission) ||
-                !qnResourceAccessManager->hasPermission(userResource, camera, Qn::WritePtzPermission))
+            if (!qnResourceAccessManager->hasPermission(accessRights, camera, Qn::SavePermission) ||
+                !qnResourceAccessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
             {
                 return false;
             }
+            return true;
         }
 
         case Qn::GetDevicePositionPtzCommand:
@@ -177,8 +176,7 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
     if (!checkSequence(sequenceId, sequenceNumber))
         return CODE_OK;
 
-    QnUserResourcePtr userResource = qnResPool->getResourceById<QnUserResource>(processor->authUserId());
-    if (!checkUserAccess(userResource, camera, command))
+    if (!checkUserAccess(processor->accessRights(), camera, command))
         return nx_http::StatusCode::forbidden;
 
     switch (command)

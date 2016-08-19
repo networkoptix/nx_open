@@ -165,7 +165,7 @@ public:
 
         const int expectedStreamsCount =
             int(!lowResolution.isEmpty()) + int(!highResolution.isEmpty());
-        if (expectedStreamsCount != mediaStreams().streams.size())
+        if ((size_t)expectedStreamsCount != mediaStreams().streams.size())
         {
             LOG(lit("INTERNAL ERROR: Failed adding camera streams: expected %1, actual %2")
                 .arg(expectedStreamsCount).arg(mediaStreams().streams.size()));

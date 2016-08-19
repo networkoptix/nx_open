@@ -7,6 +7,7 @@ import shutil
 import sys
 import plistlib
 
+from itertools import chain
 from os.path import join
 
 
@@ -42,9 +43,9 @@ def set_permissions(path):
 	
 def prepare(binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
-    if os.path.exists(tbindir):
-        shutil.rmtree(tbindir)
-    os.mkdir(tbindir)
+#    if os.path.exists(tbindir):
+#        shutil.rmtree(tbindir)
+#    os.mkdir(tbindir)
 
     if os.path.exists(tlibdir):
         shutil.rmtree(tlibdir)
@@ -54,9 +55,17 @@ def prepare(binary, sbindir, tlibdir):
     tcontentsdir = os.path.dirname(tbindir)
     tresdir = join(tcontentsdir, 'Resources')
 
+    applauncher_binary = join(tbindir, 'applauncher-bin')
+    applauncher_script = join(tbindir, 'applauncher')
+
     shutil.copyfile(join(sbindir, 'desktop_client'), binary)
+    shutil.copyfile(join(sbindir, 'applauncher'), applauncher_binary)
+
     os.chmod(binary, 0755)
+    os.chmod(applauncher_binary, 0755)
+    os.chmod(applauncher_script, 0755)
     yield binary
+    yield applauncher_binary
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
     for subfolder in 'platforms', 'imageformats', 'audio':
@@ -67,9 +76,14 @@ def prepare(binary, sbindir, tlibdir):
             set_permissions(dep)
             yield dep
 
+    tqmldir = join(tcontentsdir, 'qml')
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
-    shutil.copytree(join(sbindir, 'qml'), join(tcontentsdir, 'qml'))
+    shutil.copytree(join(sbindir, 'qml'), tqmldir)
 
+    for root, dirs, files in os.walk(tqmldir):
+        for xfile in files:
+            if xfile.endswith('.dylib'):
+                yield join(root, xfile)
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
     libs = fnmatch.filter(os.listdir(libdir), 'lib*dylib*')
@@ -149,7 +163,10 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     for binary in prepare(client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver)
 
-    shutil.copytree(helpdir, "{app_path}/Contents/Resources/help".format(app_path=app_path))
+    resources_dir = "{app_path}/Contents/Resources".format(app_path=app_path)
+    help_dir = "{}/help".format(resources_dir)
+    shutil.copytree(helpdir, help_dir)
+    shutil.copy(join(bindir, 'launcher.version'), resources_dir)
 
 if __name__ == '__main__':
     _, appdir, bindir, libdir, helpdir, qtdir, qtver = sys.argv

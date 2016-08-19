@@ -6,6 +6,7 @@
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/semaphore.h>
 
 

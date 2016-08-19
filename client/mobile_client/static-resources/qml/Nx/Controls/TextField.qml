@@ -11,11 +11,15 @@ QnTextInput
 
     property bool showError: false
 
+    property bool mobileMode: Utils.isMobile()
+
     property color inactiveColor: showError ? ColorTheme.red_d1 : ColorTheme.base10
     property color activeColor: showError ? ColorTheme.red_main : ColorTheme.brand_main
     property color placeholderColor: ColorTheme.base10
     property color cursorColor: activeColor
     property bool selectionAllowed: true
+    scrollByMouse: mobileMode
+    selectByMouse: !mobileMode
     color: showError ? ColorTheme.red_main : ColorTheme.windowText
 
     leftPadding: 8
@@ -114,6 +118,9 @@ QnTextInput
 
         function showCursorHandle()
         {
+            if (!mobileMode)
+                return
+
             cursorHandle.opacity = 0.0
             cursorHandle.visible = true
             cursorHandle.opacity = 1.0
@@ -121,12 +128,18 @@ QnTextInput
 
         function hideCursorHandle()
         {
+            if (!mobileMode)
+                return
+
             cursorHandle.opacity = 0.0
             cursorHandle.visible = false
         }
 
         function updateSelectionHandles()
         {
+            if (!mobileMode)
+                return
+
             if (cursorHandle.pressed)
                 return
 
