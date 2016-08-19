@@ -7347,10 +7347,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to set position on camera.</source>
         <translation type="unfinished"></translation>
     </message>

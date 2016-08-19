@@ -7349,10 +7349,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation>Poczekaj aż kamera będzie online.</translation>
     </message>
     <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
-    </message>
-    <message>
         <source>Unable to get position from camera.</source>
         <translation>Nie udało się pobrać  pozycji z kamery</translation>
     </message>

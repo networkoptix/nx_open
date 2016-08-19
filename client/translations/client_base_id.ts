@@ -7135,10 +7135,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>

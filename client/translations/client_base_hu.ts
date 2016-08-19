@@ -1,5 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
-<TS language="hu" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="hu" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -32,8 +33,8 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use '
-' to split message in two lines (required)</comment>
+        <comment>Use &apos;
+&apos; to split message in two lines (required)</comment>
         <translation>Nagyítás az idővonalon
 több könyvjelző megjelenítéséhez</translation>
     </message>
@@ -276,7 +277,7 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>OpenGL renderer</source>
         <translatorcomment>OpenGL render</translatorcomment>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>OpenGL vendor</source>
@@ -1205,7 +1206,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1308,15 +1309,15 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnAuditLogModel</name>
     <message>
         <source>%1d </source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>%1h </source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>%1m </source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -1400,7 +1401,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>%1 - %2, </source>
-        <translation />
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -1426,7 +1427,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>IP</source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>Activity</source>
@@ -1705,12 +1706,12 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>to</source>
-        <extracomment>"to" is from the sentence "Send e-mail _to_:"</extracomment>
+        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
         <translation>to</translation>
     </message>
     <message>
         <source>at</source>
-        <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
+        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>at</translation>
     </message>
     <message>
@@ -1997,12 +1998,12 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%1 doesn't support two-way audio</source>
+        <source>%1 doesn&apos;t support two-way audio</source>
         <translation type="unfinished">
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2240,7 +2241,7 @@ több könyvjelző megjelenítéséhez</translation>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2259,15 +2260,15 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Figyelem</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices' recording durations.</source>
+        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
         <translation>Figyelem! A magas minimum érték csökkentheti más eszközök rögzítési időtartamát.</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other cameras' recording durations.</source>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
         <translation>Figyelem! A magas minimum érték csökkentheti más kamerák rögzítési időtartamát.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity.</source>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>Mozgásra rögzítés ki van kapcsolva. Kérem menjen a mozgás beállítás oldalra, hogybeállítsa a kamera mozgás érzékelési területét és érzékenységét.</translation>
     </message>
     <message>
@@ -2623,7 +2624,7 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Hiba</translation>
     </message>
     <message>
-        <source>Could not open file '%1' for writing.</source>
+        <source>Could not open file &apos;%1&apos; for writing.</source>
         <translation>%1 fájl megnyitása írásra sikertelen.</translation>
     </message>
     <message>
@@ -2639,16 +2640,16 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Információ</translation>
     </message>
     <message>
-        <source>Database was successfully backed up into file '%1'.</source>
-        <translation>Az aadatbázis mentése %1' fájlba sikeresen megtörtént.</translation>
+        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
+        <translation>Az aadatbázis mentése %1&apos; fájlba sikeresen megtörtént.</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
         <translation>Adatbázismentés megnyitása...</translation>
     </message>
     <message>
-        <source>Could not open file '%1' for reading.</source>
-        <translation>'%1' fájl megnyitása olvasásra sikertelen.</translation>
+        <source>Could not open file &apos;%1&apos; for reading.</source>
+        <translation>&apos;%1&apos; fájl megnyitása olvasásra sikertelen.</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -2663,12 +2664,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Adatbázis feltöltése a szerverre. Kérjük várjon.</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file '%1'. Media server will be restarted.</source>
-        <translation>Adatbázis helyreállítása '%1' fájlból sikeresen megtörtént. A Médiaszerver újraindul.</translation>
+        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
+        <translation>Adatbázis helyreállítása &apos;%1&apos; fájlból sikeresen megtörtént. A Médiaszerver újraindul.</translation>
     </message>
     <message>
-        <source>An error has occurred while restoring the database from file '%1'.</source>
-        <translation>Hiba történt az adatbázis '%1' fájlból történő helyereállítása során.</translation>
+        <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
+        <translation>Hiba történt az adatbázis &apos;%1&apos; fájlból történő helyereállítása során.</translation>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
@@ -2686,27 +2687,27 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder '%1'.</source>
-        <translation type="unfinished" />
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation type="unfinished">Audió encoder inicializálása sikertelen.</translation>
     </message>
     <message>
-        <source>Primary audio device isn't selected.</source>
-        <translation type="unfinished" />
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings</source>
-        <translation>44.1Khz és 48Khz audió formátumokat nem témogatja a hangrögzítő rendszer! Válasszon más audió eszközt vagy 'semmi' értéket a képernyő rögzítő beállításokban</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
+        <translation>44.1Khz és 48Khz audió formátumokat nem témogatja a hangrögzítő rendszer! Válasszon más audió eszközt vagy &apos;semmi&apos; értéket a képernyő rögzítő beállításokban</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
@@ -2717,16 +2718,16 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Videó encoder inicializálása sikertelen.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder '%1'.</source>
-        <translation>Nem található a(z) '%1' audió enkóder.</translation>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>Nem található a(z) &apos;%1&apos; audió enkóder.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Audió encoder inicializálása sikertelen.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device '%1'.</source>
-        <translation>A '%1' audió encoder inicializálása sikertelen.</translation>
+        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <translation>A &apos;%1&apos; audió encoder inicializálása sikertelen.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2740,16 +2741,16 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.</source>
-        <translation>44.1Khz és 48Khz audió formátumokat nem témogatja a hangrögzítő rendszer! Válasszon más audió eszközt vagy 'semmi' értéket a képernyő rögzítő beállításokban.</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
+        <translation>44.1Khz és 48Khz audió formátumokat nem témogatja a hangrögzítő rendszer! Válasszon más audió eszközt vagy &apos;semmi&apos; értéket a képernyő rögzítő beállításokban.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>Nem található a %1 videó encoder.</translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.</source>
-        <translation />
+        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
+        <translation></translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
@@ -2768,16 +2769,16 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Nem található kimeneti audió stream.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder '%1'.</source>
-        <translation>Nem található a '%1' audió enkóder.</translation>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>Nem található a &apos;%1&apos; audió enkóder.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Audió encoder inicializálása sikertelen.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device '%1'.</source>
-        <translation>A '%1' audió eszközr inicializálása sikertelen.</translation>
+        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <translation>A &apos;%1&apos; audió eszközr inicializálása sikertelen.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2950,31 +2951,31 @@ több könyvjelző megjelenítéséhez</translation>
     <message numerus="yes">
         <source>%nms</source>
         <translation type="unfinished">
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation type="unfinished">
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation type="unfinished">
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation type="unfinished">
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation type="unfinished">
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3054,8 +3055,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Információ</translation>
     </message>
     <message>
-        <source>Folder '%1' does not exist.</source>
-        <translation>'%1' mappa nem létezik.</translation>
+        <source>Folder &apos;%1&apos; does not exist.</source>
+        <translation>&apos;%1&apos; mappa nem létezik.</translation>
     </message>
     <message>
         <source>Folder has already been added.</source>
@@ -3127,16 +3128,16 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Mentés másként</translation>
     </message>
     <message>
-        <source>File '%1' already exists. Overwrite?</source>
-        <translation>'%1' fájl már létezik. Felülírja?</translation>
+        <source>File &apos;%1&apos; already exists. Overwrite?</source>
+        <translation>&apos;%1&apos; fájl már létezik. Felülírja?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>Nem lehet felülírni</translation>
     </message>
     <message>
-        <source>File '%1' is used by another process. Please try another name.</source>
-        <translation>'%1' fájlt más alkalmazás használja.Próbáljon meg más nevet.</translation>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation>&apos;%1&apos; fájlt más alkalmazás használja.Próbáljon meg más nevet.</translation>
     </message>
 </context>
 <context>
@@ -3261,12 +3262,12 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port '%1'</source>
-        <translation>Hiba a(z) '%1' IO port bekapcsolása közben</translation>
+        <source>Failed to turn on IO port &apos;%1&apos;</source>
+        <translation>Hiba a(z) &apos;%1&apos; IO port bekapcsolása közben</translation>
     </message>
     <message>
-        <source>Failed to turn off IO port '%1'</source>
-        <translation>Hiba a(z) '%1' IO port kikapcsolása közben</translation>
+        <source>Failed to turn off IO port &apos;%1&apos;</source>
+        <translation>Hiba a(z) &apos;%1&apos; IO port kikapcsolása közben</translation>
     </message>
     <message>
         <source>IO port error</source>
@@ -3276,16 +3277,16 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File '%1' is used by another process. Please try another name.</source>
-        <translation>'%1' fájlt más alkalmazás használja.Próbáljon meg más nevet.</translation>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation>&apos;%1&apos; fájlt más alkalmazás használja.Próbáljon meg más nevet.</translation>
     </message>
     <message>
-        <source>Exporting to "%1"...</source>
-        <translation>Exportálás "%1" fájlba...</translation>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation>Exportálás &quot;%1&quot; fájlba...</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
-        <extracomment>"Could not export camera AXIS1334"</extracomment>
+        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>%1 eszközt nem lehet exportálni.</translation>
     </message>
     <message>
@@ -3388,7 +3389,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>DN</source>
-        <translation />
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3867,7 +3868,7 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>ÉLŐ</translation>
     </message>
     <message>
-        <source>%1 (Tour "%2" is active)</source>
+        <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (túra %2 aktív)</translation>
     </message>
     <message>
@@ -3997,20 +3998,20 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>Invalid Schedule</source>
         <translation>Érvénytelen ütemzés</translation>
     </message>
     <message>
-        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
-        <translation>A másodlagos adatfolyam ki van kapcsolva ezeken a kamerákon. Mozgás + LQ opció nincs hatással. Kattintson az "Igen"-re a felvételi típus "Mindig"-re változtatásához, vagy a "Nem"-re a másodlagos adatfolyam újbóli engedélyezéséhez.</translation>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation>A másodlagos adatfolyam ki van kapcsolva ezeken a kamerákon. Mozgás + LQ opció nincs hatással. Kattintson az &quot;Igen&quot;-re a felvételi típus &quot;Mindig&quot;-re változtatásához, vagy a &quot;Nem&quot;-re a másodlagos adatfolyam újbóli engedélyezéséhez.</translation>
     </message>
 </context>
 <context>
@@ -4099,7 +4100,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Az új cím nem állítható be.</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete '%1'?</source>
+        <source>Are you sure you want to delete &apos;%1&apos;?</source>
         <translation>Biztos benne, hogy törli a(z) %1?</translation>
     </message>
     <message>
@@ -4283,7 +4284,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4447,11 +4448,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Újra hozzárendel</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset "%1".</source>
+        <source>This hotkey is used by preset &quot;%1&quot;.</source>
         <translation>Ezt a gyorsbillentyűt a(z) %1 preset használja.</translation>
     </message>
     <message>
-        <source>This hotkey is used by tour "%1".</source>
+        <source>This hotkey is used by tour &quot;%1&quot;.</source>
         <translation>Ezt a gyorsbillentyűt a(z) %1 túra használja.</translation>
     </message>
 </context>
@@ -4602,15 +4603,15 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>%1 Tb</source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>empty</source>
@@ -4668,7 +4669,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5292,11 +5293,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-        <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
-' sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
         <translation>Html címkék használhatók egyedi szövegben:
-&lt;h4&gt;Fejlécekben (h1-h6)&lt;/h4&gt;eltérő &lt;font color="red"&gt;szín&lt;/font&gt; és &lt;font size="18"&gt;méret&lt;/font&gt; használható. A szöveg lehet &lt;s&gt;beszúrva&lt;/s&gt;, &lt;u&gt;aláhúzva&lt;/u&gt;, &lt;b&gt;félkövér&lt;/b&gt; vagy &lt;i&gt;dőlt&lt;/i&gt;</translation>
+&lt;h4&gt;Fejlécekben (h1-h6)&lt;/h4&gt;eltérő &lt;font color=&quot;red&quot;&gt;szín&lt;/font&gt; és &lt;font size=&quot;18&quot;&gt;méret&lt;/font&gt; használható. A szöveg lehet &lt;s&gt;beszúrva&lt;/s&gt;, &lt;u&gt;aláhúzva&lt;/u&gt;, &lt;b&gt;félkövér&lt;/b&gt; vagy &lt;i&gt;dőlt&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5369,8 +5370,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Érvénytelen ütemezés</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
-        <translation>A második stream ki van kapcsolva a kamerában. Mozgás + alacsony felbontás nem fog működni. Válassza az "Igen"-t a folyamatos rögzítéshez, vagy a "Nem"-et a második stream aktiválásához.</translation>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation>A második stream ki van kapcsolva a kamerában. Mozgás + alacsony felbontás nem fog működni. Válassza az &quot;Igen&quot;-t a folyamatos rögzítéshez, vagy a &quot;Nem&quot;-et a második stream aktiválásához.</translation>
     </message>
 </context>
 <context>
@@ -5391,8 +5392,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Nem érvényes email</translation>
     </message>
     <message>
-        <source>No preset found. Use 'Advanced' option.</source>
-        <translation>Nem található preset. Használja a 'Haladó' opciót.</translation>
+        <source>No preset found. Use &apos;Advanced&apos; option.</source>
+        <translation>Nem található preset. Használja a &apos;Haladó&apos; opciót.</translation>
     </message>
 </context>
 <context>
@@ -5931,110 +5932,110 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnTimeSlider</name>
     <message>
         <source>auto</source>
-        <comment>AM/PM usage based on user's system locale.</comment>
-        <extracomment>Translate this into 'none' or 'forced' if you want to switch off automatic detection of Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>auto</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>s</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>m</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>h</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>d</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>M</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>YYYY</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline's header.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline's header.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline's header</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>yyyy</translation>
     </message>
     <message>
@@ -6057,19 +6058,19 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6154,7 +6155,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>LDAP</source>
-        <translation />
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6651,19 +6652,19 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In the meantime please adjust your screen's resolution if needed for a better experience.</source>
-        <translation type="unfinished" />
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6693,7 +6694,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Biztosan törli ezt a könyvjelzőt?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete bookmark "%1"?</source>
+        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
         <translation>Biztosan törli a(z) %1 könyvjelzőt?</translation>
     </message>
     <message>
@@ -6750,14 +6751,14 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>Unable to start recording due to the following error: %1</source>
         <translation>Nem lehet elindítani a rögzítést a következő hiba miatt: %1</translation>
     </message>
     <message>
-        <source>Could not overwrite file '%1'. Please try a different name.</source>
+        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
         <translation>Nem lehet felülírni a %1 fájlt. Kérem adjon meg egy másik nevet.</translation>
     </message>
     <message>
@@ -6776,7 +6777,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>%1 futtatható media fájl (x86) (*.exe)</translation>
     </message>
     <message>
-        <source>File '%1' is used for recording already. Please enter another name.</source>
+        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
         <translation>A %1 fájl már használatban van rögzítésre. Kérem adjon meg egy másik nevet.</translation>
     </message>
     <message>
@@ -6784,7 +6785,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Nem lehet felülírni a fájlt</translation>
     </message>
     <message>
-        <source>File '%1' is used by another process. Please enter another name.</source>
+        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
         <translation>A %1 fájlt már egy másik folyamat használja. Kérem adjon meg egy másik nevet.</translation>
     </message>
     <message>
@@ -6807,11 +6808,11 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message>
         <source>AVI (*.avi)</source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>Matroska (*.mkv)</source>
-        <translation />
+        <translation></translation>
     </message>
     <message>
         <source>Export Video As...</source>
@@ -6838,7 +6839,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Mentés másként</translation>
     </message>
     <message>
-        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation>A(z) %1 fájl már létezik. Szeretné felülírni?</translation>
     </message>
     <message>
@@ -6846,7 +6847,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Video exportálása</translation>
     </message>
     <message>
-        <source>Exporting to "%1"...</source>
+        <source>Exporting to &quot;%1&quot;...</source>
         <translation>Exportálás %1 fájlba...</translation>
     </message>
     <message>
@@ -6942,8 +6943,8 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>A kiválasztott formátum használata nem ajánlott</translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the '.nov' or '.exe' format. Do you want to continue?</source>
-        <translation>A kiválasztott formátum használata nem ajánlott ehhez a kamerához. Javasoljuk, hogy használjon '.nov' vagy '.exe' fromátumot. Szeretné folytatni?</translation>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
+        <translation>A kiválasztott formátum használata nem ajánlott ehhez a kamerához. Javasoljuk, hogy használjon &apos;.nov&apos; vagy &apos;.exe&apos; fromátumot. Szeretné folytatni?</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
@@ -6955,7 +6956,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7110,22 +7111,22 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnWorkbenchNavigator</name>
     <message>
         <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>yyyy MMM dd</translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>mm:ss</translation>
     </message>
     <message>
         <source>Live</source>
-        <extracomment>Time slider's tooltip for position on live.</extracomment>
+        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
         <translation>Élő</translation>
     </message>
     <message>
@@ -7146,10 +7147,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Kérem várjon míg a kamera elérhetővé válik.</translation>
-    </message>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation />
     </message>
     <message>
         <source>Unable to get position from camera.</source>
@@ -7237,11 +7234,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Mentés másként</translation>
     </message>
     <message>
-        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation>A(z) %1 fájl már létezik. Szeretné felülírni?</translation>
     </message>
     <message>
-        <source>File '%1' is used by another process. Please enter another name.</source>
+        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
         <translation>A %1 fájlt már egy másik folyamat használja. Kérem adjon meg egy másik nevet.</translation>
     </message>
     <message>
@@ -7281,8 +7278,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Nem lehet menteni a képernyőképet.</translation>
     </message>
     <message>
-        <source>An error occurred while saving screenshot '%1'.</source>
-        <translation>Hiba történt a '%1' screenshot mentése során.</translation>
+        <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
+        <translation>Hiba történt a &apos;%1&apos; screenshot mentése során.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7426,8 +7423,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         </translation>
     </message>
     <message>
-        <source>%1's Screen</source>
-        <comment>%1 means user's name</comment>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation>%1 képernyője</translation>
     </message>
     <message>

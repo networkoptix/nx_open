@@ -1,5 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
-<TS language="he" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="he" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -32,8 +33,8 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use '
-' to split message in two lines (required)</comment>
+        <comment>Use &apos;
+&apos; to split message in two lines (required)</comment>
         <translation>בצע זום על ציר הזמן
 לצפיה בסימניות נוספות</translation>
     </message>
@@ -372,7 +373,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
-        <translation>עבור למצב "שטח פנוי"</translation>
+        <translation>עבור למצב &quot;שטח פנוי&quot;</translation>
     </message>
     <message>
         <source>Help</source>
@@ -644,7 +645,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Switch to Video Wall mode...</source>
-        <translation>עבור למצב "קיר וידאו"...</translation>
+        <translation>עבור למצב &quot;קיר וידאו&quot;...</translation>
     </message>
     <message>
         <source>Save Current Matrix</source>
@@ -1214,7 +1215,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1713,7 +1714,7 @@ to view more bookmarks</source>
         <source>Source and %n more cameras</source>
         <translation type="unfinished">
             <numerusform>מקור ו %n מצלמות נוספות</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -1725,12 +1726,12 @@ to view more bookmarks</source>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>to</source>
-        <extracomment>"to" is from the sentence "Send e-mail _to_:"</extracomment>
+        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
         <translation>ל</translation>
     </message>
     <message>
         <source>at</source>
-        <extracomment>"at" is from the sentence "Display the text _at_ these cameras"</extracomment>
+        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>ב</translation>
     </message>
     <message>
@@ -1794,11 +1795,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Hide Advanced</source>
-        <translation>הסתר "מתקדם"</translation>
+        <translation>הסתר &quot;מתקדם&quot;</translation>
     </message>
     <message>
         <source>Show Advanced</source>
-        <translation>הצג "מתקדם"</translation>
+        <translation>הצג &quot;מתקדם&quot;</translation>
     </message>
     <message>
         <source>&amp;New...</source>
@@ -2020,13 +2021,13 @@ to view more bookmarks</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%1 doesn't support two-way audio</source>
+        <source>%1 doesn&apos;t support two-way audio</source>
         <translation type="unfinished">
-            <numerusform />
-            <numerusform />
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2290,15 +2291,15 @@ to view more bookmarks</source>
         <translation>אזהרה</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other devices' recording durations.</source>
+        <source>Warning! High minimum value could decrease other devices&apos; recording durations.</source>
         <translation>אזהרה! ערך מינימום גבוה יוריד את משך ההקלטה של ההתקנים האחרים.</translation>
     </message>
     <message>
-        <source>Warning! High minimum value could decrease other cameras' recording durations.</source>
+        <source>Warning! High minimum value could decrease other cameras&apos; recording durations.</source>
         <translation>אזהרה! ערך מינימום גבוה יוריד את משך ההקלטה של המצלמות האחרים.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity.</source>
+        <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>זיהוי תנועה אינו מאופשר. יש להגדיר את זיהוי התנועה והרגישות בהגדרות זיהוי התנועה של המצלמה.</translation>
     </message>
     <message>
@@ -2635,7 +2636,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-        <translation>האירוע יפעל אך ורק אם האירוע הכללי יענה על כל התנאים הנ"ל. אם שדה מילת מפתח ריק התנאי תמיד יתקיים. במידה ולא, התנאי יתקיים אם השדה של האירוע הכללי מכיל מילת מפתח כלשהי.</translation>
+        <translation>האירוע יפעל אך ורק אם האירוע הכללי יענה על כל התנאים הנ&quot;ל. אם שדה מילת מפתח ריק התנאי תמיד יתקיים. במידה ולא, התנאי יתקיים אם השדה של האירוע הכללי מכיל מילת מפתח כלשהי.</translation>
     </message>
 </context>
 <context>
@@ -2657,7 +2658,7 @@ to view more bookmarks</source>
         <translation>שגיאה</translation>
     </message>
     <message>
-        <source>Could not open file '%1' for writing.</source>
+        <source>Could not open file &apos;%1&apos; for writing.</source>
         <translation>לא ניתן לפתוח את הקובץ %1 לכתיבה.</translation>
     </message>
     <message>
@@ -2677,16 +2678,16 @@ to view more bookmarks</source>
         <translation>העתקת מסד נתוני השרת ל%1 נכשלה.</translation>
     </message>
     <message>
-        <source>Database was successfully backed up into file '%1'.</source>
-        <translation>מסד הנתונים גובה בהצלחה לתוך הקובץ '%1'.</translation>
+        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
+        <translation>מסד הנתונים גובה בהצלחה לתוך הקובץ &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Open Database Backup...</source>
         <translation>פתח גיבוי מסד נתונים...</translation>
     </message>
     <message>
-        <source>Could not open file '%1' for reading.</source>
-        <translation>לא ניתן לפתוח את קובץ '%1' לקריאה.</translation>
+        <source>Could not open file &apos;%1&apos; for reading.</source>
+        <translation>לא ניתן לפתוח את קובץ &apos;%1&apos; לקריאה.</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -2705,12 +2706,12 @@ to view more bookmarks</source>
         <translation>גבוי מסד הנתונים לשרת מתבצע, אנא המתן.</translation>
     </message>
     <message>
-        <source>Database was successfully restored from file '%1'. Media server will be restarted.</source>
-        <translation>מסד הנתונים שוחזר בהצלחה מקובץ '%1'. שרת המדיה יאותחל.</translation>
+        <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
+        <translation>מסד הנתונים שוחזר בהצלחה מקובץ &apos;%1&apos;. שרת המדיה יאותחל.</translation>
     </message>
     <message>
-        <source>An error has occurred while restoring the database from file '%1'.</source>
-        <translation>אירעה שגיאה במהלך שחזור מסד הנתונים מהקובץ '%1'.</translation>
+        <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
+        <translation>אירעה שגיאה במהלך שחזור מסד הנתונים מהקובץ &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>You need to connect to a server prior to backup start.</source>
@@ -2720,27 +2721,27 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder '%1'.</source>
-        <translation type="unfinished">מקודד האודיו '%1' לא נמצא.</translation>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished">מקודד האודיו &apos;%1&apos; לא נמצא.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation type="unfinished">לא ניתן להפעיל את מקודד האודיו.</translation>
     </message>
     <message>
-        <source>Primary audio device isn't selected.</source>
-        <translation type="unfinished" />
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings</source>
-        <translation>פורמטי האודיו 44.1Khz ו48Khz אינם נתמכים על ידי מכשיר קליטת השמע! אנא בחר במכשיר שמע אחר או בערך 'ללא' בהגדרות הקלטת המסך</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
+        <translation>פורמטי האודיו 44.1Khz ו48Khz אינם נתמכים על ידי מכשיר קליטת השמע! אנא בחר במכשיר שמע אחר או בערך &apos;ללא&apos; בהגדרות הקלטת המסך</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
@@ -2755,16 +2756,16 @@ to view more bookmarks</source>
         <translation>לא ניתן להפעיל את מקודד הוידאו.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder '%1'.</source>
-        <translation>מקודד האודיו '%1' לא נמצא.</translation>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>מקודד האודיו &apos;%1&apos; לא נמצא.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device '%1'.</source>
-        <translation>לא ניתן להפעיל את מכשיר השמע '%1'.</translation>
+        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <translation>לא ניתן להפעיל את מכשיר השמע &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2774,16 +2775,16 @@ to view more bookmarks</source>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.</source>
-        <translation>פורמטי האודיו 44.1Khz ו48Khz אינם נתמכים על ידי מכשיר קליטת השמע! אנא בחר במכשיר שמע אחר או בערך 'ללא' בהגדרות הקלטת המסך.</translation>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
+        <translation>פורמטי האודיו 44.1Khz ו48Khz אינם נתמכים על ידי מכשיר קליטת השמע! אנא בחר במכשיר שמע אחר או בערך &apos;ללא&apos; בהגדרות הקלטת המסך.</translation>
     </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>מקודד הוידאו %1 לא נמצא.</translation>
     </message>
     <message>
-        <source>Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.</source>
-        <translation>לא ניתן ליצור קובץ זמני בתיקיה '%1'. אנא הגדר את 'תיקיית מדיה ראשית' בהגדרות הקלטת המסך.</translation>
+        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
+        <translation>לא ניתן ליצור קובץ זמני בתיקיה &apos;%1&apos;. אנא הגדר את &apos;תיקיית מדיה ראשית&apos; בהגדרות הקלטת המסך.</translation>
     </message>
     <message>
         <source>Could not allocate output stream for video codec.</source>
@@ -2802,16 +2803,16 @@ to view more bookmarks</source>
         <translation>הקצאת זרם היציאה למקודד האודיו נכשלה.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder '%1'.</source>
-        <translation>מקודד האודיו '%1' לא נמצא.</translation>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>מקודד האודיו &apos;%1&apos; לא נמצא.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
     </message>
     <message>
-        <source>Could not initialize audio device '%1'.</source>
-        <translation>לא ניתן להפעיל את מכשיר השמע '%1'.</translation>
+        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <translation>לא ניתן להפעיל את מכשיר השמע &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -2933,7 +2934,7 @@ to view more bookmarks</source>
         <source>and %1 user(s) more...</source>
         <translation type="unfinished">
             <numerusform>ו %1 משתמשים נוספים...</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2988,36 +2989,36 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%nms</source>
         <translation type="unfinished">
-            <numerusform />
-            <numerusform />
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation type="unfinished">
-            <numerusform />
-            <numerusform />
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation type="unfinished">
-            <numerusform />
-            <numerusform />
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation type="unfinished">
-            <numerusform />
-            <numerusform />
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation type="unfinished">
-            <numerusform />
-            <numerusform />
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3105,8 +3106,8 @@ to view more bookmarks</source>
         <translation>מידע</translation>
     </message>
     <message>
-        <source>Folder '%1' does not exist.</source>
-        <translation>התיקיה '%1' לא 'קיימת.</translation>
+        <source>Folder &apos;%1&apos; does not exist.</source>
+        <translation>התיקיה &apos;%1&apos; לא &apos;קיימת.</translation>
     </message>
 </context>
 <context>
@@ -3170,16 +3171,16 @@ to view more bookmarks</source>
         <translation>שמור כ</translation>
     </message>
     <message>
-        <source>File '%1' already exists. Overwrite?</source>
-        <translation>הקובץ '%1' כבר קיים. האם ברצונך להחליף אותו?</translation>
+        <source>File &apos;%1&apos; already exists. Overwrite?</source>
+        <translation>הקובץ &apos;%1&apos; כבר קיים. האם ברצונך להחליף אותו?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
         <translation>לא ניתן להחליף את הקובץ</translation>
     </message>
     <message>
-        <source>File '%1' is used by another process. Please try another name.</source>
-        <translation>הקובץ '%1' נמצא בשימוש על ידי תהליך אחר. אנא נסה בשם אחר.</translation>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation>הקובץ &apos;%1&apos; נמצא בשימוש על ידי תהליך אחר. אנא נסה בשם אחר.</translation>
     </message>
 </context>
 <context>
@@ -3304,12 +3305,12 @@ to view more bookmarks</source>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port '%1'</source>
-        <translation>הפעלת יציאת הIO '%1' נכשלה</translation>
+        <source>Failed to turn on IO port &apos;%1&apos;</source>
+        <translation>הפעלת יציאת הIO &apos;%1&apos; נכשלה</translation>
     </message>
     <message>
-        <source>Failed to turn off IO port '%1'</source>
-        <translation>כבוי יציאת הIO '%1' נכשלה</translation>
+        <source>Failed to turn off IO port &apos;%1&apos;</source>
+        <translation>כבוי יציאת הIO &apos;%1&apos; נכשלה</translation>
     </message>
     <message>
         <source>IO port error</source>
@@ -3319,16 +3320,16 @@ to view more bookmarks</source>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File '%1' is used by another process. Please try another name.</source>
-        <translation>הקובץ '%1' נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation>הקובץ &apos;%1&apos; נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
     </message>
     <message>
-        <source>Exporting to "%1"...</source>
-        <translation>מייצא ל "%1"...</translation>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation>מייצא ל &quot;%1&quot;...</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
-        <extracomment>"Could not export camera AXIS1334"</extracomment>
+        <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>התקן %1 לא ניתן לייצוא.</translation>
     </message>
     <message>
@@ -3926,8 +3927,8 @@ to view more bookmarks</source>
         <translation>חי</translation>
     </message>
     <message>
-        <source>%1 (Tour "%2" is active)</source>
-        <translation>%1 (סיור "%2" פעיל)</translation>
+        <source>%1 (Tour &quot;%2&quot; is active)</source>
+        <translation>%1 (סיור &quot;%2&quot; פעיל)</translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -3993,10 +3994,10 @@ to view more bookmarks</source>
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
-        <translatorcomment>לתרגם "START"?</translatorcomment>
+        <translatorcomment>לתרגם &quot;START&quot;?</translatorcomment>
         <translation>אזהרה:  אתה עומד למזג מערכות בעלות רשיון START.
 כיוון שרק רשיון START 1 מורשה לכל מערכת, לאחר המיזוג יוותר לך רשיון START 1 בלבד.
-במידה ואתה מבין זאת וברצונך להמשיך, לחץ על "מזג" על מנת להמשיך.
+במידה ואתה מבין זאת וברצונך להמשיך, לחץ על &quot;מזג&quot; על מנת להמשיך.
 </translation>
     </message>
     <message>
@@ -4061,8 +4062,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>&lt;ערכים מרובים&gt;</translation>
     </message>
     <message>
-        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
-        <translation>הזרם המשני כבוי במצלמות אלו. אפשרות "תנועה +איכות נמוכה" לא תשנה דבר. לחץ על "כן" על מנת לשנות את סוג ההקלטה ל"תמיד" או על "לא" על מנת לחזור ולאפשר את הזרם המשני.</translation>
+        <source>Second stream is disabled on these cameras. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation>הזרם המשני כבוי במצלמות אלו. אפשרות &quot;תנועה +איכות נמוכה&quot; לא תשנה דבר. לחץ על &quot;כן&quot; על מנת לשנות את סוג ההקלטה ל&quot;תמיד&quot; או על &quot;לא&quot; על מנת לחזור ולאפשר את הזרם המשני.</translation>
     </message>
 </context>
 <context>
@@ -4168,8 +4169,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>אשר את מחיקת הקובץ</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete '%1'?</source>
-        <translation>האם אתה בטוח שברצונך למחוק את '%1'?</translation>
+        <source>Are you sure you want to delete &apos;%1&apos;?</source>
+        <translation>האם אתה בטוח שברצונך למחוק את &apos;%1&apos;?</translation>
     </message>
 </context>
 <context>
@@ -4336,7 +4337,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4495,12 +4496,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>ללא</translation>
     </message>
     <message>
-        <source>This hotkey is used by preset "%1".</source>
-        <translation>מקש קיצור זה נמצא בשימוש על ידי הפריסט "%1".</translation>
+        <source>This hotkey is used by preset &quot;%1&quot;.</source>
+        <translation>מקש קיצור זה נמצא בשימוש על ידי הפריסט &quot;%1&quot;.</translation>
     </message>
     <message>
-        <source>This hotkey is used by tour "%1".</source>
-        <translation>מקש קיצור זה נמצא בשימוש על ידי הסיור "%1".</translation>
+        <source>This hotkey is used by tour &quot;%1&quot;.</source>
+        <translation>מקש קיצור זה נמצא בשימוש על ידי הסיור &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Change hotkey</source>
@@ -4676,15 +4677,15 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Total %n devices</source>
         <translation>
-            <numerusform>סה"כ התקן אחד</numerusform>
-            <numerusform>סה"כ %n התקנים</numerusform>
+            <numerusform>סה&quot;כ התקן אחד</numerusform>
+            <numerusform>סה&quot;כ %n התקנים</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Total %n cameras</source>
         <translation>
-            <numerusform>סה"כ מצלמה אחת</numerusform>
-            <numerusform>סה"כ %n מצלמות</numerusform>
+            <numerusform>סה&quot;כ מצלמה אחת</numerusform>
+            <numerusform>סה&quot;כ %n מצלמות</numerusform>
         </translation>
     </message>
     <message>
@@ -4697,11 +4698,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Storage space occupied by devices</source>
-        <translation>מקום איחסון התפוס ע"י התקנים</translation>
+        <translation>מקום איחסון התפוס ע&quot;י התקנים</translation>
     </message>
     <message>
         <source>Storage space occupied by cameras</source>
-        <translation>מקום איחסון התפוס ע"י מצלמות</translation>
+        <translation>מקום איחסון התפוס ע&quot;י מצלמות</translation>
     </message>
     <message>
         <source>Device</source>
@@ -4722,8 +4723,8 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Total %n I/O modules</source>
         <translation>
-            <numerusform>סה"כ מודול קלט/פלט אחד</numerusform>
-            <numerusform>סה"כ %n מודולי קלט/פלט</numerusform>
+            <numerusform>סה&quot;כ מודול קלט/פלט אחד</numerusform>
+            <numerusform>סה&quot;כ %n מודולי קלט/פלט</numerusform>
         </translation>
     </message>
     <message>
@@ -4732,7 +4733,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4914,21 +4915,21 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;%n device(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n התקנים&gt;</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n מצלמות&gt;</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n מודולי קלט/פלט&gt;</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5365,11 +5366,11 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color="red"&gt;colors&lt;/font&gt; and &lt;font size="18"&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-        <comment>Do not translate tags (text between '&lt;' and '&gt;' symbols. Do not remove '
-' sequence</comment>
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
         <translation>ניתן להתשמש בתגי HTML עבור טקסט מותאם באופן אישי:
-&lt;h4&gt;כותרות (h1-h6)&lt;/h4&gt;וגם צבעים &lt;font color="red"&gt;שונים&lt;/font&gt; ו &lt;font size="18"&gt;גדלים&lt;/font&gt; יכולים להיות מוחלים. ניתן גם להשתמש ב &lt;s&gt;מחיקה&lt;/s&gt;, &lt;u&gt;קו תחתון&lt;/u&gt;, &lt;b&gt;הדגשה&lt;/b&gt; או &lt;i&gt;הטייה&lt;/i&gt;</translation>
+&lt;h4&gt;כותרות (h1-h6)&lt;/h4&gt;וגם צבעים &lt;font color=&quot;red&quot;&gt;שונים&lt;/font&gt; ו &lt;font size=&quot;18&quot;&gt;גדלים&lt;/font&gt; יכולים להיות מוחלים. ניתן גם להשתמש ב &lt;s&gt;מחיקה&lt;/s&gt;, &lt;u&gt;קו תחתון&lt;/u&gt;, &lt;b&gt;הדגשה&lt;/b&gt; או &lt;i&gt;הטייה&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5442,8 +5443,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>לוח הזמנים איננו תקין</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press "Yes" to change recording type to "Always" or "No" to re-enable second stream.</source>
-        <translation>תזרים הוידאו המשני אינו מאופשר במצלמה. לפונקציית Motion + LQ אין שום השפעה. לחץ על "כן" לשינוי אופן ההקלטה ל"קבועה" או "לא" להפעלה מחדש של תזרים הוידאו המשני.</translation>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation>תזרים הוידאו המשני אינו מאופשר במצלמה. לפונקציית Motion + LQ אין שום השפעה. לחץ על &quot;כן&quot; לשינוי אופן ההקלטה ל&quot;קבועה&quot; או &quot;לא&quot; להפעלה מחדש של תזרים הוידאו המשני.</translation>
     </message>
 </context>
 <context>
@@ -5464,8 +5465,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>כתובת הדואר אינה תקינה</translation>
     </message>
     <message>
-        <source>No preset found. Use 'Advanced' option.</source>
-        <translation>לא נמצא פריסט. השתמש באפשרות 'מתקדם'.</translation>
+        <source>No preset found. Use &apos;Advanced&apos; option.</source>
+        <translation>לא נמצא פריסט. השתמש באפשרות &apos;מתקדם&apos;.</translation>
     </message>
 </context>
 <context>
@@ -5694,14 +5695,14 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n Camera(s)</source>
         <translation type="unfinished">
             <numerusform>%n מצלמות</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
         <translation type="unfinished">
             <numerusform>%n התקנים</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6006,111 +6007,111 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTimeSlider</name>
     <message>
         <source>auto</source>
-        <comment>AM/PM usage based on user's system locale.</comment>
-        <extracomment>Translate this into 'none' or 'forced' if you want to switch off automatic detection of Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying minute caption in timeline's header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <comment>Format for displaying minute caption in timeline's header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>Format for displaying hour caption in timeline's header, without am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <comment>Format for displaying hour caption in timeline's header, with am/pm indicator.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <comment>Format for displaying day caption in timeline's header.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <comment>Format for displaying month caption in timeline's header.</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>yyyy</source>
-        <comment>Format for displaying year caption in timeline's header</comment>
-        <extracomment>Do not translate this string unless you know what you're doing.</extracomment>
-        <translation />
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>NO THUMBNAILS AVAILABLE</source>
@@ -6132,19 +6133,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6749,19 +6750,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In the meantime please adjust your screen's resolution if needed for a better experience.</source>
-        <translation type="unfinished" />
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6791,8 +6792,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>האם למחוק את הסימנייה הזו?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete bookmark "%1"?</source>
-        <translation>האם למחוק את סימנייה "%1"?</translation>
+        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
+        <translation>האם למחוק את סימנייה &quot;%1&quot;?</translation>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
@@ -6802,7 +6803,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Are you sure you want to delete these %n bookmarks?</source>
         <translation type="unfinished">
             <numerusform>האם למחוק את %n הסימניות?</numerusform>
-            <numerusform />
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -6856,8 +6857,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
-        <source>Could not overwrite file '%1'. Please try a different name.</source>
-        <translation>לא ניתן להחליף את הקובץ '%1'. אנא בחר בשם אחר.</translation>
+        <source>Could not overwrite file &apos;%1&apos;. Please try a different name.</source>
+        <translation>לא ניתן להחליף את הקובץ &apos;%1&apos;. אנא בחר בשם אחר.</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -6879,7 +6880,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>הקובץ נמצא בשימוש.</translation>
     </message>
     <message>
-        <source>File '%1' is used for recording already. Please enter another name.</source>
+        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
         <translation>בקובץ %1 כבר נעשה שימוש להקלטה. אנא בחר בשם אחר.</translation>
     </message>
     <message>
@@ -6887,8 +6888,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>לא ניתן להחליף את הקובץ</translation>
     </message>
     <message>
-        <source>File '%1' is used by another process. Please enter another name.</source>
-        <translation>הקובץ '%1' נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
+        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
+        <translation>הקובץ &apos;%1&apos; נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
@@ -6911,7 +6912,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
-        <translation>זה עשוי לדרוש יותר מג'יגה של מקום אחסון בכונן הקשיח, ובהתאמה למהירות החיבור שלה, התהליך עשוי לארוך מספר דקות.</translation>
+        <translation>זה עשוי לדרוש יותר מג&apos;יגה של מקום אחסון בכונן הקשיח, ובהתאמה למהירות החיבור שלה, התהליך עשוי לארוך מספר דקות.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
@@ -6974,7 +6975,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>אתה עומד לייצא וידאו עם פילטרים הדורשים המרה. התהליך עשוי לארוך זמן מה. האם ברצונך להמשיך?</translation>
     </message>
     <message>
-        <source>File '%1' already exists. Do you want to overwrite it?</source>
+        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation>הקובץ %1 כבר קיים. האם ברצונך להחליף אותו?</translation>
     </message>
     <message>
@@ -6982,8 +6983,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>מייצא וידאו</translation>
     </message>
     <message>
-        <source>Exporting to "%1"...</source>
-        <translation>מייצא ל"%1"...</translation>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation>מייצא ל&quot;%1&quot;...</translation>
     </message>
     <message>
         <source>Export Complete</source>
@@ -7042,8 +7043,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>הפורמט שנבחר אינו מומלץ</translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the '.nov' or '.exe' format. Do you want to continue?</source>
-        <translation>הפורמט שנבחר אינו מומלץ למצלמה זו בגלל הקטנת הודיאו. אנו ממליצים לייצא את הוידאו לפורמט '.NOV' או '.EXE'. האם אתה רוצה להמשיך?</translation>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
+        <translation>הפורמט שנבחר אינו מומלץ למצלמה זו בגלל הקטנת הודיאו. אנו ממליצים לייצא את הוידאו לפורמט &apos;.NOV&apos; או &apos;.EXE&apos;. האם אתה רוצה להמשיך?</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
@@ -7055,7 +7056,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7115,7 +7116,7 @@ If you understand this and would like to proceed please click Merge to continue.
 </source>
         <translation>אזהרה:  אתה עומד למזג מערכות בעלות רשיון START.
 כיוון שרק רשיון START 1 מורשה לכל מערכת, לאחר המיזוג יוותר לך רשיון START 1 בלבד.
-במידה ואתה מבין זאת וברצונך להמשיך, לחץ על "מזג" על מנת להמשיך.
+במידה ואתה מבין זאת וברצונך להמשיך, לחץ על &quot;מזג&quot; על מנת להמשיך.
 </translation>
     </message>
     <message>
@@ -7214,22 +7215,22 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnWorkbenchNavigator</name>
     <message>
         <source>yyyy MMM dd</source>
-        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.</extracomment>
-        <translation />
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <source>Live</source>
-        <extracomment>Time slider's tooltip for position on live.</extracomment>
+        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
         <translation>חי</translation>
     </message>
     <message>
@@ -7254,10 +7255,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>אנא המתן עד שהמצלמה תחזור להיות מקוונת.</translation>
-    </message>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
         <source>Unable to set position on camera.</source>
@@ -7365,16 +7362,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>שמור כ</translation>
     </message>
     <message>
-        <source>File '%1' already exists. Do you want to overwrite it?</source>
-        <translation>הקובץ '%1' כבר קיים. האם ברצונך להחליף אותו?</translation>
+        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
+        <translation>הקובץ &apos;%1&apos; כבר קיים. האם ברצונך להחליף אותו?</translation>
     </message>
     <message>
         <source>Could not overwrite file.</source>
         <translation>לא ניתן להחליף את הקובץ.</translation>
     </message>
     <message>
-        <source>File '%1' is used by another process. Please enter another name.</source>
-        <translation>הקובץ '%1' נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
+        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
+        <translation>הקובץ &apos;%1&apos; נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
     </message>
     <message>
         <source>Could not save screenshot.</source>
@@ -7389,8 +7386,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>שומר %1</translation>
     </message>
     <message>
-        <source>An error occurred while saving screenshot '%1'.</source>
-        <translation>התרחשה שגיאה בעת שמירת התמונה '%1'.</translation>
+        <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
+        <translation>התרחשה שגיאה בעת שמירת התמונה &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7498,8 +7495,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>הפעלת שליטה מרחוק בקיר הוידאו נכשלה.</translation>
     </message>
     <message>
-        <source>%1's Screen</source>
-        <comment>%1 means user's name</comment>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
         <translation>המסך של %1</translation>
     </message>
     <message>

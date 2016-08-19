@@ -7664,10 +7664,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
