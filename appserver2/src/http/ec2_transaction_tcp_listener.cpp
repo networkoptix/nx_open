@@ -150,12 +150,16 @@ void QnTransactionTcpProcessor::run()
         return;
     }
 
+
+    ConnectionLockGuard connectionLockGuard(remoteGuid, ConnectionLockGuard::Direction::Incoming);
+
     if (remotePeer.peerType == Qn::PT_Server)
     {
         // use two stage connect for server peers only, go to second stage for client immediately
 
         // 1-st stage
-        bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
+        bool lockOK = connectionLockGuard.tryAcquireConnecting();
+
         d->response.headers.emplace( "Content-Length", "0" );   //only declaring content-type
         sendResponse(
             lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
@@ -164,10 +168,9 @@ void QnTransactionTcpProcessor::run()
             return;
 
         // 2-nd stage
-        if (!readRequest()) {
-            QnTransactionTransport::connectingCanceled(remoteGuid, false);
+        if (!readRequest())
             return;
-        }
+
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
@@ -185,7 +188,6 @@ void QnTransactionTcpProcessor::run()
             (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) !=
                 QnCommonModule::instance()->localSystemName()) )
         {
-            QnTransactionTransport::connectingCanceled(remoteGuid, false);
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;
         }
@@ -227,11 +229,9 @@ void QnTransactionTcpProcessor::run()
     query = QUrlQuery(d->request.requestLine.url.query());
     
     bool fail = query.hasQueryItem("canceled");
-    ConnectionLockGuard connectionLockGuard;
     if (!fail)
     {
-        connectionLockGuard = QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
-        fail = !connectionLockGuard.acquired();
+        fail = !connectionLockGuard.tryAcquireConnected();
     }
 
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !isClient)
@@ -241,7 +241,6 @@ void QnTransactionTcpProcessor::run()
     //d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
-        QnTransactionTransport::connectingCanceled(remoteGuid, false);
         sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
     }
     else
@@ -295,8 +294,7 @@ void QnTransactionTcpProcessor::run()
             ttFinishCallback,
             access);
 
-        if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
-            QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
+        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming(connectionGuid);
     }
 }
 

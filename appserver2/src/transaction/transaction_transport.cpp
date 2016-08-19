@@ -80,50 +80,6 @@ namespace ConnectionType
     }
 }
 
-
-/************************************************************
-*   class QnTransactionTransport::ConnectionLockGuard
-*************************************************************/
-
-ConnectionLockGuard::ConnectionLockGuard()
-{
-}
-
-ConnectionLockGuard::ConnectionLockGuard(const QnUuid& peerGuid)
-:
-    m_peerGuid(peerGuid)
-{
-}
-
-ConnectionLockGuard::ConnectionLockGuard(ConnectionLockGuard&& rhs)
-{
-    m_peerGuid = std::move(rhs.m_peerGuid);
-    rhs.m_peerGuid = QnUuid();
-}
-
-ConnectionLockGuard& ConnectionLockGuard::operator=(ConnectionLockGuard&& rhs)
-{
-    if (this == &rhs)
-        return *this;
-    m_peerGuid = std::move(rhs.m_peerGuid);
-    rhs.m_peerGuid = QnUuid();
-    return *this;
-}
-
-ConnectionLockGuard::~ConnectionLockGuard()
-{
-    if (!m_peerGuid.isNull())
-        QnTransactionTransport::connectDone(m_peerGuid);
-}
-
-/** \a true if peer connection lock has been acquired */
-bool ConnectionLockGuard::acquired() const
-{
-    return !m_peerGuid.isNull();
-}
-
-
-
 static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
 //following value is for VERY slow networks and VERY large transactions (e.g., some large image)
@@ -131,10 +87,6 @@ static const int SOCKET_TIMEOUT = 1000 * 1000;
 static const std::chrono::minutes kSocketSendTimeout(23);
 const char* QnTransactionTransport::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
 const char* QnTransactionTransport::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
-
-QSet<QnUuid> QnTransactionTransport::m_existConn;
-QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
-QnMutex QnTransactionTransport::m_staticMutex;
 
 void QnTransactionTransport::default_initializer()
 {
@@ -627,65 +579,6 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     m_httpClient->doGet(url);
 }
 
-bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator)
-{
-    QnMutexLocker lock( &m_staticMutex );
-
-    NX_ASSERT(!remoteGuid.isNull());
-
-    bool isExist = m_existConn.contains(remoteGuid);
-    isExist |= isOriginator ?  m_connectingConn.value(remoteGuid).first : m_connectingConn.value(remoteGuid).second;
-    bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
-    bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
-    if (!fail) {
-        if (isOriginator)
-            m_connectingConn[remoteGuid].first = true;
-        else
-            m_connectingConn[remoteGuid].second = true;
-    }
-    return !fail;
-}
-
-void QnTransactionTransport::connectingCanceled(const QnUuid& remoteGuid, bool isOriginator)
-{
-    QnMutexLocker lock( &m_staticMutex );
-    connectingCanceledNoLock(remoteGuid, isOriginator);
-}
-
-void QnTransactionTransport::connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator)
-{
-    ConnectingInfoMap::iterator itr = m_connectingConn.find(remoteGuid);
-    if (itr != m_connectingConn.end()) {
-        if (isOriginator)
-            itr.value().first = false;
-        else
-            itr.value().second = false;
-        if (!itr.value().first && !itr.value().second)
-            m_connectingConn.erase(itr);
-    }
-}
-
-ConnectionLockGuard QnTransactionTransport::tryAcquireConnected(
-    const QnUuid& remoteGuid,
-    bool isOriginator)
-{
-    QnMutexLocker lock( &m_staticMutex );
-    bool isExist = m_existConn.contains(remoteGuid);
-    bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
-    bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
-    if (fail)
-        return ConnectionLockGuard();
-    
-    m_existConn << remoteGuid;
-    connectingCanceledNoLock(remoteGuid, isOriginator);
-    return ConnectionLockGuard(remoteGuid);
-}
-
-void QnTransactionTransport::connectDone(const QnUuid& id)
-{
-    QnMutexLocker lock( &m_staticMutex );
-    m_existConn.remove(id);
-}
 
 void QnTransactionTransport::repeatDoGet()
 {
@@ -699,8 +592,6 @@ void QnTransactionTransport::repeatDoGet()
 
 void QnTransactionTransport::cancelConnecting()
 {
-    if (getState() == ConnectingStage2)
-        QnTransactionTransport::connectingCanceled(m_remotePeer.id, true);
     NX_LOG(QnLog::EC2_TRAN_LOG,
         lit("%1 Connection to peer %2 canceled from state %3").
         arg(Q_FUNC_INFO).arg(m_remotePeer.id.toString()).arg(toString(getState())),
@@ -1282,6 +1173,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
 
+    if (m_connectionLockGuard.isNull())
+        m_connectionLockGuard = ConnectionLockGuard(m_remotePeer.id, ConnectionLockGuard::Direction::Outgoing);
+
     if( (statusCode/100) != (nx_http::StatusCode::ok/100) ) //checking that statusCode is 2xx
     {
         cancelConnecting();
@@ -1329,9 +1223,10 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
-    if (getState() == ConnectingStage1) {
-        bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
-        if (lockOK) {
+    if (getState() == ConnectingStage1)
+    {
+        if (m_connectionLockGuard.tryAcquireConnecting())
+        {
             setState(ConnectingStage2);
             NX_ASSERT( data.isEmpty() );
         }
@@ -1386,8 +1281,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         }
 
         m_httpClient.reset();
-        m_connectionLockGuard = QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true);
-        if (m_connectionLockGuard.acquired())
+        if (m_connectionLockGuard.tryAcquireConnected())
         {
             setExtraDataBuffer(data);
             m_peerRole = prOriginating;

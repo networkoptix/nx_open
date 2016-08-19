@@ -26,6 +26,7 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include "connection_guard.h"
 
 #ifdef _DEBUG
 #include <common/common_module.h>
@@ -49,30 +50,6 @@ namespace ConnectionType
     const char* toString( Type val );
     Type fromString( const QnByteArrayConstRef& str );
 }
-
-/** While this object is alive peer with guid \a peerGuid is considered 
-    connected and cannot establish another transaction connection.
-    Calls \a QnTransactionTransport::connectDone(m_peerGuid) in destructor
-*/
-class ConnectionLockGuard
-{
-public:
-    ConnectionLockGuard();
-    ConnectionLockGuard(const QnUuid& peerGuid);
-    ConnectionLockGuard(ConnectionLockGuard&&);
-    ConnectionLockGuard& operator=(ConnectionLockGuard&&);
-    ~ConnectionLockGuard();
-
-    /** \a true if peer connection lock has been acquired */
-    bool acquired() const;
-
-private:
-    QnUuid m_peerGuid;
-
-    ConnectionLockGuard(const ConnectionLockGuard&);
-    ConnectionLockGuard& operator=(const ConnectionLockGuard&);
-};
-
 
 class QnTransactionTransport
 :
@@ -291,10 +268,6 @@ public:
     //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
     void removeEventHandler( int eventHandlerID );
 
-    static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
-    static ConnectionLockGuard tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QnUuid& id, bool isOriginator);
-    static void connectDone(const QnUuid& id);
 
     void processExtraData();
     void startListening();
@@ -362,11 +335,6 @@ private:
     std::map<int, HttpChunkExtensonHandler> m_httpChunkExtensonHandlers;
     std::map<int, BeforeSendingChunkHandler> m_beforeSendingChunkHandlers;
     int m_prevGivenHandlerID;
-
-    static QSet<QnUuid> m_existConn;
-    typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
-    static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
-    static QnMutex m_staticMutex;
 
     QByteArray m_extraData;
     bool m_authByKey;
