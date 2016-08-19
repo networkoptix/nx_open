@@ -5,10 +5,14 @@
 
 #include <recording/time_period.h>
 
-#include "resource.h"
-#include "layout_item_data.h"
+#include <core/resource/resource.h>
+#include <core/resource/layout_item_data.h>
 
-class QnLayoutResource: public QnResource
+#include <utils/common/threadsafe_item_storage.h>
+
+
+class QnLayoutResource: public QnResource,
+    private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT
 
@@ -38,7 +42,7 @@ public:
 
     void removeItem(const QnUuid &itemUuid);
 
-    void updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item);
+    void updateItem(const QnLayoutItemData &item);
 
     float cellAspectRatio() const;
 
@@ -94,6 +98,7 @@ signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
+
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
@@ -102,18 +107,16 @@ signals:
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
+
 protected:
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void storedItemAdded(const QnLayoutItemData& item) override;
+    virtual void storedItemRemoved(const QnLayoutItemData& item) override;
+    virtual void storedItemChanged(const QnLayoutItemData& item) override;
+
+    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
 
 private:
-    void setItemsUnderLock(const QnLayoutItemDataMap &items);
-
-    void addItemUnderLock(const QnLayoutItemData &item);
-    void updateItemUnderLock(const QnUuid &itemUuid, const QnLayoutItemData &item);
-    void removeItemUnderLock(const QnUuid &itemUuid);
-
-private:
-    QnLayoutItemDataMap m_itemByUuid;
+    QScopedPointer<QnThreadsafeItemStorage<QnLayoutItemData> > m_items;
     float m_cellAspectRatio;
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;

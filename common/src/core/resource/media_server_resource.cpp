@@ -376,40 +376,28 @@ QnStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) 
    return QnStorageResourcePtr();
 }
 
-void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnMediaServerResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+{
+    /* Calculate primary address before the url is changed. */
     const SocketAddress oldPrimaryAddress = getPrimaryAddress();
 
-    QnResource::updateInner(other, modifiedFields);
+    base_type::updateInternal(other, notifiers);
 
     QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
-    if(localOther) {
+    if (localOther)
+    {
         if (m_version != localOther->m_version)
-            modifiedFields << "versionChanged";
+        {
+            m_version = localOther->m_version;
+            notifiers << [r = toSharedPointer(this)]{ emit r->versionChanged(r); };
+        }
 
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
-        m_version = localOther->m_version;
         m_systemInfo = localOther->m_systemInfo;
         m_systemName = localOther->m_systemName;
         m_authKey = localOther->m_authKey;
 
-        /*
-        QnAbstractStorageResourceList otherStorages = localOther->getStorages();
-
-        // Keep indices unchanged (Server does not provide this info).
-        for(const QnAbstractStorageResourcePtr &storage: m_storages)
-        {
-            for(const QnAbstractStorageResourcePtr &otherStorage: otherStorages)
-            {
-                if (otherStorage->getId() == storage->getId()) {
-                    otherStorage->setIndex(storage->getIndex());
-                    break;
-                }
-            }
-        }
-
-        setStorages(otherStorages);
-        */
     }
 
     const auto currentAddress = getPrimaryAddress();
@@ -418,7 +406,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         if (m_apiConnection)
             m_apiConnection->setUrl(getApiUrl());
         if (oldPrimaryAddress.port != currentAddress.port)
-            modifiedFields << "portChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->portChanged(r); };
     }
 }
 

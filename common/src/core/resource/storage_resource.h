@@ -6,14 +6,14 @@
 
 class QnAbstractMediaStreamDataProvider;
 
-class QnStorageResource 
-	: public QnAbstractStorageResource
+class QnStorageResource: public QnAbstractStorageResource
 {
     Q_OBJECT
 
     Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
 
+    using base_type = QnAbstractStorageResource;
 public:
     static const qint64 kNasStorageLimit;
 
@@ -60,7 +60,7 @@ public:
      */
     virtual float getAvarageWritingUsage() const;
 
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
 
     static QString toNativeDirPath(const QString &dirPath);
 

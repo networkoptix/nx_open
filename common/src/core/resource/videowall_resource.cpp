@@ -31,14 +31,13 @@ QnThreadsafeItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() con
     return m_matrices.data();
 }
 
-void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnVideoWallResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
 {
-    base_type::updateInner(other, modifiedFields);
+    base_type::updateInternal(other, notifiers);
 
     QnVideoWallResource* localOther = dynamic_cast<QnVideoWallResource*>(other.data());
     if (localOther)
     {
-
         // copy online status to the updated items
         auto newItems = localOther->items();
         for (const auto &item : m_items->getItems())
@@ -51,15 +50,17 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
                 newItems->updateItem(newItem);
             }
         }
-        m_items->setItemsUnderLock(newItems);
+        QnThreadsafeItemStorageNotifier<QnVideoWallItem>::
+            setItemsUnderLockInternal(m_items.data(), newItems);
+        QnThreadsafeItemStorageNotifier<QnVideoWallPcData>::
+            setItemsUnderLockInternal(m_pcs.data(), localOther->pcs());
+        QnThreadsafeItemStorageNotifier<QnVideoWallMatrix>::
+            setItemsUnderLockInternal(m_matrices.data(), localOther->matrices());
 
-
-        m_pcs->setItemsUnderLock(localOther->pcs());
-        m_matrices->setItemsUnderLock(localOther->matrices());
         if (m_autorun != localOther->m_autorun)
         {
             m_autorun = localOther->m_autorun;
-            modifiedFields << "autorunChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->autorunChanged(r); };
         }
     }
 }

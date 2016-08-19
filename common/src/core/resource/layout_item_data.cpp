@@ -1,23 +1,24 @@
 #include "layout_item_data.h"
 
 
-QnLayoutItemData::QnLayoutItemData() :
-      uuid()
-    , flags(0)
-    , combinedGeometry()
-    , zoomTargetUuid()
-    , zoomRect()
-    , rotation(0.0)
-    , displayInfo(false)
-    , contrastParams()
-    , dewarpingParams()
-    , dataByRole()
-{}
+QnLayoutItemData::QnLayoutItemData():
+    uuid(),
+    flags(0),
+    combinedGeometry(),
+    zoomTargetUuid(),
+    zoomRect(),
+    rotation(0.0),
+    displayInfo(false),
+    contrastParams(),
+    dewarpingParams(),
+    dataByRole()
+{
+}
 
-bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-    /* Checking all fields but dataByRole. */
+bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r)
+{
     return (
-           l.uuid == r.uuid
+        l.uuid == r.uuid
         && l.resource.id == r.resource.id
         && l.resource.uniqueId == r.resource.uniqueId
         && l.flags == r.flags
@@ -28,5 +29,6 @@ bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
         && l.displayInfo == r.displayInfo
         && l.contrastParams == r.contrastParams
         && l.dewarpingParams == r.dewarpingParams
+        && l.dataByRole == r.dataByRole
         );
 }

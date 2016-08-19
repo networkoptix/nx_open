@@ -304,9 +304,9 @@ void QnUserResource::setFullName(const QString& value)
     emit fullNameChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnUserResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
 {
-    base_type::updateInner(other, modifiedFields);
+    base_type::updateInternal(other, notifiers);
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if (localOther)
@@ -316,67 +316,68 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         if (m_password != localOther->m_password)
         {
             m_password = localOther->m_password;
-            modifiedFields << "passwordChanged";
+            notifiers << [r = toSharedPointer(this)]{emit r->passwordChanged(r);};
         }
 
         if (m_hash != localOther->m_hash)
         {
             m_hash = localOther->m_hash;
-            modifiedFields << "hashChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->hashChanged(r); };
         }
 
         if (m_digest != localOther->m_digest)
         {
             m_digest = localOther->m_digest;
-            modifiedFields << "digestChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->digestChanged(r); };
         }
 
         if (m_cryptSha512Hash != localOther->m_cryptSha512Hash)
         {
             m_cryptSha512Hash = localOther->m_cryptSha512Hash;
-            modifiedFields << "cryptSha512HashChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->cryptSha512HashChanged(r); };
         }
 
         if (m_permissions != localOther->m_permissions)
         {
             m_permissions = localOther->m_permissions;
-            modifiedFields << "permissionsChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
         }
 
         if (m_userGroup != localOther->m_userGroup)
         {
             m_userGroup = localOther->m_userGroup;
-            modifiedFields << "userGroupChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->userGroupChanged(r); };
         }
 
         if (m_isOwner != localOther->m_isOwner)
         {
+            NX_ASSERT(false, "'Owner' field should not be changed.");
             m_isOwner = localOther->m_isOwner;
-            modifiedFields << "permissionsChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
         }
 
         if (m_email != localOther->m_email)
         {
             m_email = localOther->m_email;
-            modifiedFields << "emailChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->emailChanged(r); };
         }
 
         if (m_fullName != localOther->m_fullName)
         {
             m_fullName = localOther->m_fullName;
-            modifiedFields << "fullNameChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->fullNameChanged(r); };
         }
 
 		if (m_realm != localOther->m_realm)
         {
             m_realm = localOther->m_realm;
-            modifiedFields << "realmChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->realmChanged(r); };
         }
 
         if (m_isEnabled != localOther->m_isEnabled)
         {
             m_isEnabled = localOther->m_isEnabled;
-            modifiedFields << "enabledChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->enabledChanged(r); };
         }
     }
 }

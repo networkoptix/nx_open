@@ -13,6 +13,11 @@ template <class T>
 class QnThreadsafeItemStorageNotifier
 {
 protected:
+    void setItemsUnderLockInternal(QnThreadsafeItemStorage<T>* target, QnThreadsafeItemStorage<T>* items)
+    {
+        target->setItemsUnderLock(items);
+    }
+protected:
     virtual void storedItemAdded(const T &item) = 0;
     virtual void storedItemRemoved(const T &item) = 0;
     virtual void storedItemChanged(const T &item) = 0;
@@ -28,6 +33,7 @@ private:
 template <class T>
 class QnThreadsafeItemStorage
 {
+    friend class QnThreadsafeItemStorageNotifier<T>;
 public:
     typedef QList<T> ItemList;
     typedef QHash<QnUuid, T> ItemMap;
@@ -50,11 +56,6 @@ public:
     {
         QnMutexLocker locker(m_mutex);
         setItemsUnderLock(items);
-    }
-
-    void setItemsUnderLock(QnThreadsafeItemStorage<T>* storage)
-    {
-        setItemsUnderLock(storage->m_itemByUuid);
     }
 
     ItemMap getItems() const
@@ -108,13 +109,19 @@ public:
     }
 
 private:
+    void setItemsUnderLock(QnThreadsafeItemStorage<T>* storage)
+    {
+        setItemsUnderLock(storage->m_itemByUuid);
+    }
+
     void setItemsUnderLock(const ItemMap &items)
     {
-        foreach(const T &item, m_itemByUuid)
+        /* Here we must copy the list. */
+        for (const T &item: m_itemByUuid.values())
             if (!items.contains(item.uuid))
                 removeItemUnderLock(item.uuid);
 
-        foreach(const T &item, items)
+        for (const T &item: items)
             if (m_itemByUuid.contains(item.uuid))
                 updateItemUnderLock(item);
             else
@@ -133,6 +140,7 @@ private:
 
         if (!m_notifier)
             return;
+
         m_mutex->unlock();
         m_notifier->storedItemAdded(item);
         m_mutex->lock();
@@ -170,6 +178,7 @@ private:
 
         if (!m_notifier)
             return;
+
         m_mutex->unlock();
         m_notifier->storedItemRemoved(item);
         m_mutex->lock();

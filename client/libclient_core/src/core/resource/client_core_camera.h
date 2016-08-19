@@ -23,5 +23,7 @@ public:
 
     virtual Qn::ResourceFlags flags() const override;
     virtual void setParentId(const QnUuid& parent) override;
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+
+protected:
+    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
 };

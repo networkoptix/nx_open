@@ -204,8 +204,8 @@ public:
     };
 
     virtual bool setProperty(
-		const QString &key, 
-		const QString &value, 
+		const QString &key,
+		const QString &value,
         PropertyOptions options = DEFAULT_OPTIONS);
 
     virtual bool setProperty(
@@ -269,7 +269,7 @@ public:
     static int commandProcQueueSize();
 #endif
 
-    void update(const QnResourcePtr& other, bool silenceMode = false);
+    void update(const QnResourcePtr& other);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
@@ -292,7 +292,8 @@ public:
     void getParamsPhysicalAsync(const QSet<QString> &ids);
     void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
 protected:
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
+    using UpdateNotifier = std::function<void(void)>;
+    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
@@ -318,7 +319,7 @@ private:
 
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
     bool emitDynamicSignal(const char *signal, void **arguments);
-    void afterUpdateInner(const QSet<QByteArray>& modifiedFields);
+
     void emitPropertyChanged(const QString& key);
     void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus);
 

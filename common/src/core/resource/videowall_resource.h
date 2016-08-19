@@ -49,7 +49,7 @@ signals:
     void autorunChanged(const QnResourcePtr &resource);
 
 protected:
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
 
     virtual void storedItemAdded(const QnVideoWallItem &item) override;
     virtual void storedItemRemoved(const QnVideoWallItem &item) override;

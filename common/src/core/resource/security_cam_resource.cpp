@@ -167,26 +167,31 @@ QnResourcePtr QnSecurityCamResource::toResourcePtr() {
 QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
 {
-    QnNetworkResource::updateInner(other, modifiedFields);
-    QnMediaResource::updateInner(other, modifiedFields);
+    base_type::updateInternal(other, notifiers);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
         if (other_casted->m_groupId != m_groupId)
-            modifiedFields << "groupIdChanged";
+        {
+            m_groupId = other_casted->m_groupId;
+            notifiers << [r = toSharedPointer(this)]{emit r->groupIdChanged(r);};
+        }
 
         if (other_casted->m_groupName != m_groupName)
-            modifiedFields << "groupNameChanged";
+        {
+            m_groupName = other_casted->m_groupName;
+            notifiers << [r = toSharedPointer(this)]{ emit r->groupNameChanged(r); };
+        }
 
         if (other_casted->m_statusFlags != m_statusFlags)
-            modifiedFields << "statusFlagsChanged";
+        {
+            m_statusFlags = other_casted->m_statusFlags;
+            notifiers << [r = toSharedPointer(this)]{ emit r->statusFlagsChanged(r); };
+        }
 
-        m_groupId = other_casted->m_groupId;
-        m_groupName = other_casted->m_groupName;
-        m_statusFlags = other_casted->m_statusFlags;
         m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
         m_vendor = other_casted->m_vendor;
