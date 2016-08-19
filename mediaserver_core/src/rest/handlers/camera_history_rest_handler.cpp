@@ -23,6 +23,7 @@ struct CandidateTimePeriod
     {}
     CandidateTimePeriod(): index(-1) {}
     bool isNull() const { return period.isNull(); }
+    operator bool() const { return !isNull();  }
 };
 
 CandidateTimePeriod findMinStartTimePeriod(
@@ -58,11 +59,8 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
     std::vector<int> scanPos(chunks.size());
 
     CandidateTimePeriod prevPeriod;
-    while (true)
+    while (auto candidate = findMinStartTimePeriod(scanPos, chunks))
     {
-        auto candidate = findMinStartTimePeriod(scanPos, chunks);
-        if (candidate.isNull())
-            break; //< finished
         if (prevPeriod.period.contains(candidate.period))
             continue; //< no time advance
         if (prevPeriod.serverId != candidate.serverId)
