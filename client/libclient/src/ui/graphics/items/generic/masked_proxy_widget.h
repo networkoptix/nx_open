@@ -14,7 +14,6 @@ class QnMaskedProxyWidget: public QGraphicsProxyWidget
     Q_PROPERTY(QRectF paintRect READ paintRect WRITE setPaintRect)
     Q_PROPERTY(QRectF paintGeometry READ paintGeometry WRITE setPaintGeometry)
     Q_PROPERTY(QSizeF paintSize READ paintSize WRITE setPaintSize)
-    Q_PROPERTY(bool opaqueDrag READ opaqueDrag WRITE setOpaqueDrag)
 
     using base_type = QGraphicsProxyWidget;
 
@@ -34,12 +33,6 @@ public:
     QRectF paintGeometry() const;
     void setPaintGeometry(const QRectF& paintGeometry);
 
-    /** Sometimes we may want drag-n-drop events to be handled by graphics scene instead of the
-      * proxied widget. Set opaqueDrag to true in this case.
-      */
-    bool opaqueDrag() const;
-    void setOpaqueDrag(bool value);
-
     bool isUpdatesEnabled() const;
 
     virtual bool event(QEvent* e) override;
@@ -54,15 +47,10 @@ public slots:
 
 protected:
     virtual bool eventFilter(QObject* object, QEvent* event) override;
-    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent* event) override;
-    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent* event) override;
-    virtual void dropEvent(QGraphicsSceneDragDropEvent* event) override;
 
 private:
     QRectF m_paintRect;
     bool m_pixmapDirty;
     bool m_updatesEnabled;
     QPixmap m_pixmap;
-    bool m_opaqueDrag;
 };

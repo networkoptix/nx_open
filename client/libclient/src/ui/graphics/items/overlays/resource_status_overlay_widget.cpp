@@ -19,8 +19,8 @@ const qreal kBaseOpacity = 0.75;
 QGraphicsProxyWidget* makeMaskedProxy(QWidget* source)
 {
     const auto result = new QnMaskedProxyWidget();
-    result->setOpaqueDrag(true);
     result->setWidget(source);
+    result->setAcceptDrops(false);
     return result;
 }
 
