@@ -49,7 +49,19 @@ bool HostAddress::isLocal() const
 
 bool HostAddress::operator==( const HostAddress& rhs ) const
 {
-    return toString() == rhs.toString();
+    if (isResolved() != rhs.isResolved())
+        return false;
+
+    if (!isResolved())
+        return toString() == rhs.toString();
+
+    if (ipV4() && rhs.ipV4())
+        return memcmp(m_ipV4.get_ptr(), rhs.m_ipV4.get_ptr(), sizeof(*m_ipV4)) == 0;
+
+    if (ipV6() && rhs.ipV6())
+        return memcmp(m_ipV6.get_ptr(), rhs.m_ipV6.get_ptr(), sizeof(*m_ipV6)) == 0;
+
+    return true;
 }
 
 bool HostAddress::operator!=( const HostAddress& rhs ) const
