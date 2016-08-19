@@ -5,11 +5,12 @@
 
 #include "mobile_client_camera.h"
 
-QnResourcePtr QnMobileClientCameraFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) {
+QnResourcePtr QnMobileClientCameraFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) 
+{
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
-        return QnResourcePtr();
+        return QnResourcePtr(new QnMobileClientCamera(resourceTypeId));
 
     if (resourceType->getName() == QLatin1String("Storage")) {
         return QnResourcePtr(new QnClientStorageResource());

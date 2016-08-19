@@ -141,7 +141,7 @@ void QnMdnsListener::updateSocketList()
     deleteSocketList();
     for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
-        std::unique_ptr<UDPSocket> sock( new UDPSocket() );
+        std::unique_ptr<UDPSocket> sock( new UDPSocket(AF_INET) );
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
         if( sock->bind( SocketAddress( iface.address.toString() ) ) )

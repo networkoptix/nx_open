@@ -232,6 +232,8 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
+#include <nx/network/socket.h>
+#include <rest/helpers/permissions_helper.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2308,7 +2310,8 @@ void MediaServerProcess::run()
 	addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
-    if (isNewServerInstance || systemName.isDefault())
+    if (!QnPermissionsHelper::isSafeMode() &&
+        (isNewServerInstance || systemName.isDefault()))
     {
         /* In case of error it will be instantly cleaned by the watcher. */
         qnGlobalSettings->resetCloudParams();
@@ -2821,6 +2824,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     QString engineVersion;
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
+    QString ipVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
@@ -2853,6 +2857,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("Enforces stream socket type (TCP, UDT)"), QString());
     commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
         lit("Enforces mediator address"), QString());
+    commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
+        lit("Force ip version"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
@@ -2888,6 +2894,10 @@ int MediaServerProcess::main(int argc, char* argv[])
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
+    if( ipVersion.isEmpty() )
+        ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
+
+    SocketFactory::setIpVersion( ipVersion );
     QnVideoService service( argc, argv );
 
     if (!engineVersion.isEmpty()) {

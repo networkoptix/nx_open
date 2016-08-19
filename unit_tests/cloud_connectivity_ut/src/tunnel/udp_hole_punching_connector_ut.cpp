@@ -135,7 +135,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
             return MediaServerEmulator::ActionToTake::proceedWithConnection;
         });
     server1->setConnectionAckResponseHandler(
-        [](hpm::api::ResultCode resultCode)
+        [](hpm::api::ResultCode /*resultCode*/)
             -> MediaServerEmulator::ActionToTake
         {
             return MediaServerEmulator::ActionToTake::proceedWithConnection;
@@ -151,8 +151,8 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
     connector.connect(
         connectTimeout,
         [&connectedPromise](
-            SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+            SystemError::ErrorCode /*errorCode*/,
+            std::unique_ptr<AbstractOutgoingTunnelConnection> /*connection*/)
         {
         });
 

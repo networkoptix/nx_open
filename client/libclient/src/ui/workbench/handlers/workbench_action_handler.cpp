@@ -282,6 +282,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
 
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
+    connect(action(QnActions::HiDpiSupportMessageAction), &QAction::triggered,
+        this, &QnWorkbenchActionHandler::onHiDpiWarningMessageAction);
+
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
@@ -1099,7 +1102,25 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered()
         /* If target server is not provided, open the server we are currently connected to. */
         server = qnCommon->currentServer();
 
-    openInBrowser(server, lit("/static/index.html"));
+    // TODO: #akolesnikov #3.1 VMS-2806
+    #ifdef WEB_CLIENT_SUPPORTS_PROXY
+        openInBrowser(server, lit("/static/index.html"));
+    #else
+        QUrl url(server->getApiUrl());
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+            return;
+
+        url.setUserName(QString());
+        url.setPassword(QString());
+        url.setScheme(lit("http"));
+        url.setPath(lit("/static/index.html"));
+
+        url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+        if (url.host() != server->getApiUrl().host())
+            return;
+
+        QDesktopServices::openUrl(url);
+    #endif
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -2144,6 +2165,24 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
         tr("This is a beta version of %1.")
         .arg(qApp->applicationDisplayName()));
+}
+
+void QnWorkbenchActionHandler::onHiDpiWarningMessageAction()
+{
+    static const bool kIsSupportLink = !QnAppInfo::supportLink().isEmpty();
+    static const auto kAddress = (kIsSupportLink
+        ? QnAppInfo::supportLink() : QnAppInfo::supportEmailAddress());
+    static const auto addressPrefix = (kIsSupportLink ? QString() : lit("mailto:"));
+    static const auto kSupportPortalLink = lit("<a href = \"%1%2\">%2</a>")
+        .arg(addressPrefix, kAddress);
+
+    static const auto kComment = "%1 Will be replaced by product name, %2 - by link to support portal";
+    static const auto kMessage =
+        tr("%1 is not optimized for HiDpi screens yet and might look wrong. "
+        "Please write to %2 if you have any problems.", kComment)
+        .arg(QnAppInfo::productNameLong(), kSupportPortalLink);
+
+    QnMessageBox::warning(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {

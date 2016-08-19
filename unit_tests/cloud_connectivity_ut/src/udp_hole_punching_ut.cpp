@@ -80,7 +80,7 @@ TEST_F(UdpHolePunching, simpleSync)
 
             return serverSocket;
         },
-        &std::make_unique<CloudStreamSocket>,
+        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
         SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_server->fullName()));
 }
@@ -97,7 +97,7 @@ TEST_F(UdpHolePunching, simpleAsync)
 
             return serverSocket;
         },
-        &std::make_unique<CloudStreamSocket>,
+        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
         SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_server->fullName()));
 }

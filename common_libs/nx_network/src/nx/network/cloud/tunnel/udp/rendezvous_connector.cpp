@@ -80,7 +80,7 @@ void RendezvousConnector::connect(
     post(   //just to simplify code (get rid of synchronization)
         [this, timeout, completionHandler = std::move(completionHandler)]() mutable
         {
-            auto udtConnection = std::make_unique<UdtStreamSocket>();
+            auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
             udtConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
             //moving system socket handler from m_mediatorUdpClient to m_udtConnection
             bool result = true;

@@ -14,11 +14,9 @@ BIN_DIR="$BASE_DIR/bin"
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
-# Automatically added by dh_installinit
-if [ -e "/etc/init/${deb.customization.company.name}-mediaserver.conf" ]; then
-	invoke-rc.d ${deb.customization.company.name}-mediaserver stop || exit $?
-fi
-# End automatically added section
+which systemctl && (systemctl disable $COMPANY_NAME-mediaserver || exit $?)
+
+service $COMPANY_NAME-mediaserver stop || exit $?
 
 if [ $1 = "remove" ]
 then

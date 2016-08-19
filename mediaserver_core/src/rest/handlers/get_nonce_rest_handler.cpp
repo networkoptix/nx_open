@@ -1,6 +1,7 @@
 #include "get_nonce_rest_handler.h"
 
 #include <QTimeZone>
+#include <QtCore/QJsonDocument>
 
 #include <network/authenticate_helper.h>
 #include <network/authutil.h>
@@ -10,10 +11,44 @@
 #include <utils/common/util.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <api/model/getnonce_reply.h>
+#include <nx/network/http/httpclient.h>
 
-int QnGetNonceRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+namespace {
+    bool isResponseOK(const nx_http::HttpClient& client)
+    {
+        if (!client.response())
+            return false;
+        return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
+    }
+
+    const int requestTimeoutMs = 10000;
+}
+
+int QnGetNonceRestHandler::executeGet(const QString& path, const QnRequestParams& params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
-    NonceReply reply;
+    if (params.contains("url"))
+    {
+        nx_http::HttpClient client;
+        client.setResponseReadTimeoutMs(requestTimeoutMs);
+        client.setSendTimeoutMs(requestTimeoutMs);
+        client.setMessageBodyReadTimeoutMs(requestTimeoutMs);
+
+        QUrl requestUrl(params.value("url"));
+        requestUrl.setPath(path);
+
+        if (!client.doGet(requestUrl) || !isResponseOK(client))
+        {
+            result.setError(QnRestResult::CantProcessRequest, "Destination server unreachable");
+            return nx_http::StatusCode::ok;
+        }
+
+        QByteArray data = client.fetchMessageBodyBuffer();
+        result = QJson::deserialized<QnJsonRestResult>(data);
+        return nx_http::StatusCode::ok;
+    }
+
+    QnGetNonceReply reply;
     reply.nonce = QnAuthHelper::instance()->generateNonce();
     reply.realm = QnAppInfo::realm();
 
@@ -30,5 +65,5 @@ int QnGetNonceRestHandler::executeGet(const QString &, const QnRequestParams & p
     }
 
     result.setReply(reply);
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }

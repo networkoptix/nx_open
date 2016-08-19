@@ -1,24 +1,25 @@
 #ifdef ENABLE_ONVIF
 
-#include "onvif_stream_reader.h"
-
 #include <QtCore/QTextStream>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
 #include <nx/utils/log/log.h>
-
-#include "utils/common/sleep.h"
-#include "utils/common/synctime.h"
-#include "utils/media/nalUnits.h"
-#include "network/tcp_connection_priv.h"
-
+#include "onvif_stream_reader.h"
 #include "onvif/soapMediaBindingProxy.h"
-
 #include "onvif_resource.h"
+
+#include "nx/utils/log/log.h"
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <nx/network/http/httptypes.h>
+#include <utils/media/nalUnits.h>
+#include <utils/common/app_info.h>
+#include <network/tcp_connection_priv.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <utils/common/app_info.h>
+#include <core/resource/resource_data_structures.h>
+#include <core/resource/param.h>
 #include <core/resource_management/resource_properties.h>
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 300;
@@ -76,6 +77,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
     }
 
     preStreamConfigureHook();
+    executePreConfigurationRequests();
 
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl( &streamUrl, isCameraControlRequired, params );
@@ -288,6 +290,42 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
 #endif
 }
 
+bool QnOnvifStreamReader::executePreConfigurationRequests()
+{
+    auto resData = qnCommon->dataPool()->data(m_onvifRes);
+
+    auto requests = resData.value<QnHttpConfigureRequestList>(
+        Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
+
+    if (requests.empty())
+        return true;
+
+    CLSimpleHTTPClient http(
+        m_onvifRes->getHostAddress(),
+        QUrl(m_onvifRes->getUrl()).port(nx_http::DEFAULT_HTTP_PORT),
+        3000, //<  TODO: #dmishin move to constant
+        m_onvifRes->getAuth());
+
+    CLHttpStatus status;
+    for (const auto& request: requests)
+    {
+        if (request.method == lit("GET"))
+        {
+            qDebug() << request.templateString;
+            status = http.doGET(request.templateString);
+        }
+        else if (request.method == lit("POST"))
+            status = http.doPOST(request.templateString, request.body);
+        else
+            return false;
+
+        if (status != CL_HTTP_SUCCESS && !request.isAllowedToFail)
+            return false;
+    }
+
+    return true;
+}
+
 void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const
 {
 
@@ -336,7 +374,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
         }
 
         encoder.RateControl->BitrateLimit = m_onvifRes
-            ->suggestBitrateKbps(quality, resolution, encoder.RateControl->FrameRateLimit);
+            ->suggestBitrateKbps(quality, resolution, encoder.RateControl->FrameRateLimit, getRole());
     }
 
 

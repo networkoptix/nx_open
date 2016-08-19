@@ -169,6 +169,8 @@ public:
      */
     static const bool kResolveOnMediator = false;
 
+    DnsResolver& dnsResolver() { return m_dnsResolver; }
+
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {

@@ -1,15 +1,17 @@
 #include "json_aggregator_rest_handler.h"
 
-#include <network/tcp_connection_priv.h>
+#include <common/common_module.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include "rest/server/rest_connection_processor.h"
-#include "http/custom_headers.h"
-#include "common/common_module.h"
-#include "network/tcp_listener.h"
+#include <rest/server/rest_connection_processor.h>
+
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_listener.h>
+#include <nx/network/http/httpclient.h>
+#include <http/custom_headers.h>
+
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/network/http/httpclient.h>
 #include <core/resource_management/resource_pool.h>
 
 bool QnJsonAggregatorRestHandler::executeCommad(

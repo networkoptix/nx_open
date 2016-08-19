@@ -47,6 +47,7 @@
 #include "model/upload_update_reply.h"
 #include "http/custom_headers.h"
 #include "model/recording_stats_reply.h"
+#include <api/model/getnonce_reply.h>
 #include "common/common_module.h"
 
 namespace {
@@ -96,6 +97,7 @@ namespace {
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
         (PingSystemObject,         "pingSystem")
+        (GetNonceObject,           "getNonce")
         (RecordingStatsObject,     "recStats")
         (AuditLogObject,           "auditLog")
         (MergeSystemsObject,       "mergeSystems")
@@ -271,6 +273,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PingSystemObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
+    case GetNonceObject:
+        processJsonReply<QnGetNonceReply>(this, response, handle);
+        break;
     case RecordingStatsObject:
         processJsonReply<QnRecordingStatsReply>(this, response, handle);
         break;
@@ -315,19 +320,23 @@ QnMediaServerConnection::QnMediaServerConnection(const QnMediaServerResourcePtr&
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)
 {
-    setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
-
-    QnUuid guid = mserver->getOriginalGuid();
-
-    QnRequestParamList queryParameters;
-	queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
-    setExtraQueryParameters(std::move(queryParameters));
-
     nx_http::HttpHeaders extraHeaders;
-	extraHeaders.emplace(
-        Qn::SERVER_GUID_HEADER_NAME,
-        guid.isNull() ? mserver->getId().toByteArray() : guid.toByteArray());
+
+    if (mserver)
+    {
+        setUrl(mserver->getApiUrl());
+
+        QnUuid guid = mserver->getOriginalGuid();
+
+        QnRequestParamList queryParameters;
+        queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
+        setExtraQueryParameters(std::move(queryParameters));
+
+        extraHeaders.emplace(
+            Qn::SERVER_GUID_HEADER_NAME,
+            guid.isNull() ? mserver->getId().toByteArray() : guid.toByteArray());
+    }
 
     if (!videowallGuid.isNull())
         extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());
@@ -815,12 +824,21 @@ int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &sys
     return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
 }
 
-int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot) {
+int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString& getKey, QObject *target, const char *slot)
+{
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("password", password);
+    params << QnRequestParam("getKey", getKey);
 
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+}
+
+int QnMediaServerConnection::getNonceAsync(const QUrl &url, QObject *target, const char *slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("url", url.toString());
+
+    return sendAsyncGetRequest(GetNonceObject, params, QN_STRINGIZE_TYPE(QnGetNonceReply), target, slot);
 }
 
 int QnMediaServerConnection::getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot) {
@@ -837,11 +855,11 @@ int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTime
     return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
-int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
+int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &getKey, const QString& postKey, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("password", password);
-    params << QnRequestParam("currentPassword", currentPassword);
+    params << QnRequestParam("getKey", getKey);
+    params << QnRequestParam("postKey", postKey);
     params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));
     params << QnRequestParam("oneServer", oneServer ? lit("true") : lit("false"));
     params << QnRequestParam("ignoreIncompatible", ignoreIncompatible ? lit("true") : lit("false"));

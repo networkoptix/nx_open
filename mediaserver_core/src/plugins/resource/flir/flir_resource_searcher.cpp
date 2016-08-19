@@ -7,8 +7,8 @@
 
 QnFlirResourceSearcher::QnFlirResourceSearcher()
 {
-    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"));
-    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"));
+    m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
+    m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
 }
 QnFlirResourceSearcher::~QnFlirResourceSearcher()
 {

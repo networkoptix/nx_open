@@ -210,6 +210,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     QString message;
     switch (errorCode)
     {
+        case QnCloudStatusWatcher::NoError:
+            break;
         case QnCloudStatusWatcher::InvalidCredentials:
         {
             showCredentialsError(true);

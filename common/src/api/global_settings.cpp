@@ -89,6 +89,11 @@ namespace
     const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
     const int kProxyConnectTimeoutDefault = 5;
 
+    const QString kMaxRecorderQueueSizeBytesName(lit("maxRecordQueueSizeBytes"));
+    const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 42;
+    const QString kMaxRecorderQueueSizePacketsName(lit("maxRecordQueueSizeElements"));
+    const int kMaxRecorderQueueSizePacketsDefault = 1000;
+
     const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
     const int kTakeCameraOwnershipWithoutLockDefault = false;
 }
@@ -301,6 +306,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kArecontRtspEnabledDefault,
         this);
 
+    m_maxRecorderQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxRecorderQueueSizeBytesName,
+        kMaxRecorderQueueSizeBytesDefault,
+        this);
+
+    m_maxRecorderQueueSizePackets = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxRecorderQueueSizePacketsName,
+        kMaxRecorderQueueSizePacketsDefault,
+        this);
+
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
@@ -321,6 +336,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_upnpPortMappingEnabledAdaptor
         << m_newSystemAdaptor
         << m_arecontRtspEnabledAdaptor
+        << m_maxRecorderQueueSizeBytes
+        << m_maxRecorderQueueSizePackets
         ;
 
     return result;
@@ -792,6 +809,16 @@ bool QnGlobalSettings::arecontRtspEnabled() const
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
     m_arecontRtspEnabledAdaptor->setValue(newVal);
+}
+
+int QnGlobalSettings::maxRecorderQueueSizeBytes() const
+{
+    return m_maxRecorderQueueSizeBytes->value();
+}
+
+int QnGlobalSettings::maxRecorderQueueSizePackets() const
+{
+    return m_maxRecorderQueueSizePackets->value();
 }
 
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const

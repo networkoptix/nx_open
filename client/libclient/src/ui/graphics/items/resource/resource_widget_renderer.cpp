@@ -225,7 +225,9 @@ void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value
 bool QnResourceWidgetRenderer::isEnabled(int channelNumber) const
 {
     QnMutexLocker lk( &m_mutex );
-    return channelNumber < m_renderingEnabled.size() ? m_renderingEnabled[channelNumber] : false;
+    return ((size_t)channelNumber < m_renderingEnabled.size())
+        ? m_renderingEnabled[channelNumber]
+        : false;
 }
 
 void QnResourceWidgetRenderer::setEnabled(int channelNumber, bool enabled)
@@ -379,7 +381,7 @@ QSize QnResourceWidgetRenderer::getMostFrequentChannelSourceSize() const
     std::map<int, int> widthFrequencyMap;
     std::map<int, int> heightFrequentMap;
 
-    for (int channelNum = 0; channelNum < channelCount; channelNum++)
+    for (size_t channelNum = 0; channelNum < channelCount; channelNum++)
     {
         if (!m_channelSourceSize[channelNum].isEmpty())
         {

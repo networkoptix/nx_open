@@ -150,12 +150,16 @@ void QnTransactionTcpProcessor::run()
         return;
     }
 
+
+    ConnectionLockGuard connectionLockGuard(remoteGuid, ConnectionLockGuard::Direction::Incoming);
+
     if (remotePeer.peerType == Qn::PT_Server)
     {
         // use two stage connect for server peers only, go to second stage for client immediately
 
         // 1-st stage
-        bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
+        bool lockOK = connectionLockGuard.tryAcquireConnecting();
+
         d->response.headers.emplace( "Content-Length", "0" );   //only declaring content-type
         sendResponse(
             lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
@@ -164,10 +168,9 @@ void QnTransactionTcpProcessor::run()
             return;
 
         // 2-nd stage
-        if (!readRequest()) {
-            QnTransactionTransport::connectingCanceled(remoteGuid, false);
+        if (!readRequest())
             return;
-        }
+
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
@@ -224,7 +227,12 @@ void QnTransactionTcpProcessor::run()
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());
-    bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
+    
+    bool fail = query.hasQueryItem("canceled");
+    if (!fail)
+    {
+        fail = !connectionLockGuard.tryAcquireConnected();
+    }
 
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !isClient)
         fail = true; // accept only allowed peers
@@ -233,7 +241,6 @@ void QnTransactionTcpProcessor::run()
     //d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
-        QnTransactionTransport::connectingCanceled(remoteGuid, false);
         sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
     }
     else
@@ -254,7 +261,7 @@ void QnTransactionTcpProcessor::run()
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
         // By default all peers have read permissions on all resources
-        auto access = Qn::UserAccessData(d->accessRights);
+        auto access = d->accessRights;
         if (remotePeer.peerType == Qn::PT_Server)
         {
             // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
@@ -277,6 +284,7 @@ void QnTransactionTcpProcessor::run()
 
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
+            std::move(connectionLockGuard),
             std::move(d->socket),
             requestedConnectionType,
             remotePeer,
@@ -286,8 +294,7 @@ void QnTransactionTcpProcessor::run()
             ttFinishCallback,
             access);
 
-        if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
-            QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
+        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming(connectionGuid);
     }
 }
 

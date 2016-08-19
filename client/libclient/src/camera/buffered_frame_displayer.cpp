@@ -90,14 +90,14 @@ void QnBufferedFrameDisplayer::run()
         {
             frame = m_queue.front();
 
-            if ((quint64)m_expectedTime == AV_NOPTS_VALUE) {
+            if (m_expectedTime == AV_NOPTS_VALUE) {
                 m_alignedTimer.restart();
                 m_expectedTime = frame->pkt_dts;
             }
 
             QnMutexLocker syncLock( &m_sync );
             qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
-            qint64 currentTime = (quint64)m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
+            qint64 currentTime = m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
                 
             //cl_log.log("djitter:", qAbs(expectedTime - currentTime), cl_logALWAYS);
             // align to grid

@@ -137,7 +137,7 @@ QHash<int, QByteArray> QnLayoutsModelUnsorted::roleNames() const
 
 int QnLayoutsModelUnsorted::rowCount(const QModelIndex& parent) const
 {
-    Q_UNUSED(parent)
+    QN_UNUSED(parent);
     return m_itemsList.size();
 }
 
@@ -335,7 +335,7 @@ void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& res
 
 void QnLayoutsModelUnsorted::at_serverFlagsChanged(const QnResourcePtr& resource)
 {
-    Q_UNUSED(resource);
+    QN_UNUSED(resource);
 }
 
 QnLayoutsModel::QnLayoutsModel(QObject* parent) :

@@ -13,13 +13,13 @@ namespace nx {
 namespace utils {
 
 inline int runTest(
-    int argc, char **argv,
+    int argc, const char* argv[],
     std::function<void(const ArgumentParser& args)> extraInit = nullptr)
 {
     #ifdef USE_GMOCK
-        ::testing::InitGoogleMock(&argc, argv);
+        ::testing::InitGoogleMock(&argc, (char**)argv);
     #else
-        ::testing::InitGoogleTest(&argc, argv);
+        ::testing::InitGoogleTest(&argc, (char**)argv);
     #endif
 
     ArgumentParser args(argc, argv);
@@ -36,6 +36,13 @@ inline int runTest(
 
     const int result = RUN_ALL_TESTS();
     return result;
+}
+
+inline int runTest(
+    int argc, char* argv[],
+    std::function<void(const ArgumentParser& args)> extraInit = nullptr)
+{
+    return runTest(argc, (const char**)argv, std::move(extraInit));
 }
 
 } // namespace utils

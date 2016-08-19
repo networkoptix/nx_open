@@ -3,13 +3,13 @@
 namespace nx {
 namespace utils {
 
-ArgumentParser::ArgumentParser(int argc, char **argv)
+ArgumentParser::ArgumentParser(int argc, const char* argv[])
 {
     if (argc && argv)
         parse(argc, argv);
 }
 
-void ArgumentParser::parse(int argc, char **argv)
+void ArgumentParser::parse(int argc, const char* argv[])
 {
     std::multimap<QString, QString>::iterator curParamIter = m_args.end();
 

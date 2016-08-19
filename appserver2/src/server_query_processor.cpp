@@ -5,6 +5,14 @@ namespace ec2
 {
 QnMutex detail::ServerQueryProcessor::m_updateDataMutex;
 
+void detail::ServerQueryProcessor::setAuditData(
+    ECConnectionAuditManager* auditManager,
+    const QnAuthSession& authSession)
+{
+    m_auditManager = auditManager;
+    m_authSession = authSession;
+}
+
 ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
     const QnUuid& id,
     ApiCommand::Value command,
@@ -16,9 +24,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
     if (errorCode != ErrorCode::ok)
         return errorCode;
 
-    connection
-        ->notificationManager()
-        ->triggerNotification(removeObjAttrTran);
+    triggerNotification(connection, removeObjAttrTran);
 
     return ErrorCode::ok;
 }
@@ -45,9 +51,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
         QnTransaction<ApiResourceParamWithRefData> removeParamTran(
             ApiCommand::Value::removeResourceParam,
             param);
-        connection
-            ->notificationManager()
-            ->triggerNotification(removeParamTran);
+        triggerNotification(connection, removeParamTran);
     }
 
     return errorCode;

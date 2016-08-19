@@ -468,7 +468,7 @@ bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourceP
     if (isCameraHistoryValid(camera))
         return true;
 
-    StartResult result = updateCameraHistoryAsync(camera, [this, camera] (bool success)
+    StartResult result = updateCameraHistoryAsync(camera, [this, camera] (bool /*success*/)
     {
         QnMutexLocker lock(&m_syncLoadMutex);
         m_syncRunningRequests.remove(camera->getId());

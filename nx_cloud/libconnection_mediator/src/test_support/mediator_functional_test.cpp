@@ -108,10 +108,10 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 {
     AbstractCloudDataProviderFactory::setFactoryFunc(
         [cloudDataProvider](
-            const std::string& address,
-            const std::string& user,
-            const std::string& password,
-            std::chrono::milliseconds updateInterval)
+            const std::string& /*address*/,
+            const std::string& /*user*/,
+            const std::string& /*password*/,
+            std::chrono::milliseconds /*updateInterval*/)
     {
         return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
     });

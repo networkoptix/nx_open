@@ -2,6 +2,7 @@
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <memory> // for auto_ptr
+#include <atomic>
 
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
@@ -153,7 +154,7 @@ private:
     QnManualCameraInfoMap m_manualCameraMap;
 
     bool m_server;
-    volatile bool m_ready;
+    std::atomic<bool> m_ready;
 
     QList<QHostAddress> m_allLocalAddresses;
 
