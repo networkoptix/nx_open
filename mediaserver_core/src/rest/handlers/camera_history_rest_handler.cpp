@@ -33,13 +33,12 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
     auto findMinStartTimePeriod = [&scanPos, &chunks, &candidateTimePeriods]
     {
         qint64 minTime = INT64_MAX;
-        qint64 minFoundTime = INT64_MAX;
         candidateTimePeriods.clear();
         for (int i = 0; i < scanPos.size(); ++i)
         {
             for (int j = scanPos[i]; j < chunks[i].periods.size(); ++j)
             {
-                if (chunks[i].periods[j].startTimeMs > minFoundTime)
+                if (chunks[i].periods[j].startTimeMs > minTime)
                     break;
                 bool found = false;
                 if (chunks[i].periods[j].startTimeMs < minTime)
@@ -54,7 +53,6 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
                 }
                 if (found)
                 {
-                    minFoundTime = chunks[i].periods[j].startTimeMs;
                     candidateTimePeriods.push_back(CandidateTimePeriod(chunks[i].guid, chunks[i].periods[j], i));
                     break;
                 }
