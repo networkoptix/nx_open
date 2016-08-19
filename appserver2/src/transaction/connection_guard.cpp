@@ -91,7 +91,8 @@ bool ConnectionLockGuard::tryAcquireConnected()
         return false;
 
     m_connectedList << m_peerGuid;
-    removeFromConnectingListNoLock();
+    if (m_state == State::Connecting)
+        removeFromConnectingListNoLock();
     m_state = State::Connected;
     return true;
 }
