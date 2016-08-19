@@ -1,6 +1,9 @@
 #include <QUrlQuery>
 #include <QWaitCondition>
 
+#include <vector>
+#include <algorithm>
+
 #include <api/helpers/chunks_request_data.h>
 
 #include "camera_history_rest_handler.h"
@@ -11,44 +14,65 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
     ec2::ApiCameraHistoryItemDataList result;
     std::vector<int> scanPos;
     scanPos.resize(chunks.size());
-    qint64 currentTime = 0;
-    int prevIndex = -1;
-    while(1)
-    {
-        int index = -1;
-        qint64 minNextTime = INT64_MAX;
-        int nextIndex = -1;
-        for (int i = 0; i < scanPos.size(); ++i)
-        {
-            int& pos = scanPos[i];
-            const QnTimePeriodList& periods = chunks[i].periods;
-            for (;pos < periods.size() && periods[pos].endTimeMs() <= currentTime; pos++);
-            if (pos < periods.size()) {
-                if (periods[pos].contains(currentTime)) {
-                    index = i; // exact match
-                    break;
+
+    struct CandidateTimePeriod {
+        QnUuid serverId;
+        QnTimePeriod period;
+        int index;
+        CandidateTimePeriod(const QnUuid& serverId, const QnTimePeriod& period, int index)
+            : serverId(serverId),
+              period(period),
+              index(index)
+        {}
+        CandidateTimePeriod() : index(-1) {}
+        bool isNull() const { return period.isNull(); }
+    };
+    std::vector<CandidateTimePeriod> candidateTimePeriods;
+    
+    auto findMinStartTimePeriod = [&scanPos, &chunks, &candidateTimePeriods] {
+        qint64 minTime = INT64_MAX;
+        candidateTimePeriods.clear();
+        for (int i = 0; i < scanPos.size(); ++i) {
+            for (int j = scanPos[i]; j < chunks[i].periods.size(); ++j) {
+                bool found = false;
+                if (chunks[i].periods[j].startTimeMs < minTime) {
+                    candidateTimePeriods.clear();
+                    minTime = chunks[i].periods[j].startTimeMs;
+                    found = true;
                 }
-                else if (periods[pos].startTimeMs < minNextTime) {
-                    minNextTime = periods[pos].startTimeMs;
-                    nextIndex = i;
+                else if (chunks[i].periods[j].startTimeMs == minTime) {
+                    found = true;
+                }
+                if (found) {
+                    candidateTimePeriods.push_back(CandidateTimePeriod(chunks[i].guid, chunks[i].periods[j], i));
+                    break;
                 }
             }
         }
-        if (index == -1) {
-            index = nextIndex; // data hole. get next min time after hole
-            currentTime = minNextTime;
-        }
-        if (index == -1)
-            break; // end of data reached
+    };
 
-        const QnTimePeriod& curPeriod = chunks[index].periods[scanPos[index]];
-        scanPos[index]++;
-        if (index == prevIndex)
-            continue; // ignore same server (no changes)
+    CandidateTimePeriod prevPeriod;
+    while (true) {
+        findMinStartTimePeriod();
+        if (candidateTimePeriods.empty())
+            break;
+        std::sort(candidateTimePeriods.begin(), candidateTimePeriods.end(), [](const CandidateTimePeriod& p1, const CandidateTimePeriod& p2) {
+            return p1.period.durationMs > p2.period.durationMs;
+        });
+        const auto& candidate = candidateTimePeriods[0];
 
-        result.push_back(ec2::ApiCameraHistoryItemData(chunks[index].guid, currentTime));
-        currentTime = curPeriod.endTimeMs();
-        prevIndex = index;
+        bool candidateLastsLongerThenPrev = !prevPeriod.period.contains(candidate.period);
+        bool candidateSuccessfull = prevPeriod.isNull() || 
+                                    (prevPeriod.serverId != candidate.serverId && candidateLastsLongerThenPrev);
+
+        if (prevPeriod.isNull() || candidateSuccessfull) 
+            result.push_back(ec2::ApiCameraHistoryItemData(candidate.serverId, candidate.period.startTimeMs));
+
+        if (candidateLastsLongerThenPrev)
+            prevPeriod = candidate;
+
+        for (auto& p: candidateTimePeriods)
+            ++scanPos[p.index];
     }
 
     return result;
