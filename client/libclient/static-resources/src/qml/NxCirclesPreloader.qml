@@ -9,12 +9,14 @@ BusyIndicator
 
     property color color: Style.colors.mid;
 
-    implicitWidth: (children.length ? 30 : radiusByIndex(children.length) * 2);
+    implicitWidth: (repeater.count > 0 ? radiusByIndex(repeater.count - 1) * 2 : 30);
     implicitHeight: implicitWidth;
     contentItem: null;
 
     Repeater
     {
+        id: repeater;
+
         model: 3;
         delegate: NxCircle
         {
