@@ -34,6 +34,9 @@ public:
     QRectF paintGeometry() const;
     void setPaintGeometry(const QRectF &paintGeometry);
 
+    /** Sometimes we may want drag-n-drop events to be handled by graphics scene instead of the
+      * proxied widget. Set opaqueDrag to true in this case.
+      */
     bool opaqueDrag() const;
     void setOpaqueDrag(bool value);
 

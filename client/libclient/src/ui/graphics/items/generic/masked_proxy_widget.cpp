@@ -176,6 +176,13 @@ bool QnMaskedProxyWidget::opaqueDrag() const
 void QnMaskedProxyWidget::setOpaqueDrag(bool value)
 {
     m_opaqueDrag = value;
+
+    /*
+    Normally, QGraphicsProxyWidget handles all mouse events, so if ::acceptDrops() is true, all
+    drag-n-drop handling goes to the proxied widget. Otherwise, drag-n-drop is simply disabled.
+    When we set ::opaqueDrag() to true, we pass these events to the graphics scene, and in this
+    case we should not handle drag-n-drop in this class (by default).
+    */
     setAcceptDrops(!value);
 }
 
