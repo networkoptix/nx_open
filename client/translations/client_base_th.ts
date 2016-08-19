@@ -528,18 +528,6 @@ to view more bookmarks</source>
         <translation>การคืนค่าลง</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>แสดงข้อความ</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>แสดงรุ่นไม่ตรงกันข้อความ</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>แสดงเวอร์ชันเบต้าข้อความคำเตือน</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>เปิดในเบราว์เซอร์ ...</translation>
     </message>
@@ -1215,6 +1203,10 @@ to view more bookmarks</source>
         <source>Add Bookmark...</source>
         <translation>เพิ่มบุ๊กมา ...</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1675,14 +1667,6 @@ to view more bookmarks</source>
         <translation>ผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>เลือกเสียง</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>ป้อนข้อความ</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;อุปกรณ์ อื่น ๆ&gt;</translation>
     </message>
@@ -2007,6 +1991,19 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation>ใช้การเปลี่ยนแปลง ...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2687,6 +2684,25 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished">ไม่พบ encoder เสียง &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished">ไม่สามารถเริ่มต้น encoder เสียง.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2876,9 +2892,11 @@ to view more bookmarks</source>
             <numerusform>%1 (%n เวลา)</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation>และ %1 ผู้ใช้งาน(s) เพิ่ม...</translation>
+        <translation type="unfinished">
+            <numerusform>และ %1 ผู้ใช้งาน(s) เพิ่ม...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2909,6 +2927,55 @@ to view more bookmarks</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>การตั้งค่าตารางเวลาเข้ากันได้กับอุปกรณ์บางอย่าง.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%nms</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%ns</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nm</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nh</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nd</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3301,10 +3368,6 @@ to view more bookmarks</source>
         <translation>ไม่สามารถดำเนินการทดสอบ.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>ไม่มีเซิร์ฟเวอร์ของคุณที่มีการเชื่อมต่อกับอินเทอร์เน็ต.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>หมดเวลา</translation>
     </message>
@@ -3353,10 +3416,6 @@ to view more bookmarks</source>
     <message>
         <source>No new users found.</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>ไม่มีเซิร์ฟเวอร์ของคุณที่มีการเชื่อมต่อกับอินเทอร์เน็ต.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -4225,6 +4284,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>การตั้งค่าไม่สามารถบันทึกได้ กรุณาติดต่อผู้ดูแลระบบของคุณ.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4605,6 +4668,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Archived duration in calendar days since the first recording</source>
         <translation>ระยะเวลาในการเก็บไว้ในปฏิทินวันนับตั้งแต่บันทึกเสียงครั้งแรก</translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5369,12 +5436,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>สำเร็จ</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>ไม่สามารถดำเนินการทดสอบ ไม่มีเซิร์ฟเวอร์ของคุณมีการเชื่อมต่อกับอินเทอร์เน็ต.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>พารามิเตอร์ระบุไม่ถูกต้อง ไม่สามารถดำเนินการทดสอบ.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished">ไม่สามารถดำเนินการทดสอบ.</translation>
     </message>
 </context>
 <context>
@@ -5413,10 +5480,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Loading...</source>
         <translation>กำลังโหลด ...</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>ไม่มีวิดีโอสตรีม</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -5991,6 +6054,25 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Select file...</source>
         <translation>เลือกไฟล์...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6570,6 +6652,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>อุปกรณ์ที่มีอยู่แล้วในความคืบหน้า คุณคุณแน่ใจว่าต้องการที่จะยกเลิกกระบวนการปัจจุบันหรือไม่?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6857,6 +6955,10 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>คุณกำลังจะส่งออกวิดีโอหลายที่มีความยาวรวมเกิน 30 นาที.</translation>
+    </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

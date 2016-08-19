@@ -517,18 +517,6 @@ para ver los marcadores</translation>
         <translation>Restaurar</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>Mostrar mensaje</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>Mostrar Mensaje Versión no Coincide </translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>Mostrar Versión Beta Mensaje de Advertencia</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>Abra en el explorador ...</translation>
     </message>
@@ -1224,6 +1212,10 @@ para ver los marcadores</translation>
         <source>Add Bookmark...</source>
         <translation>Añadir marcador...</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1694,14 +1686,6 @@ para ver los marcadores</translation>
         <translation>todos los usuarios</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>Seleccione un sonido</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>Introduzca el texto</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;Cualquier Dispositivo&gt;</translation>
     </message>
@@ -2030,6 +2014,20 @@ para ver los marcadores</translation>
     <message>
         <source>Applying changes...</source>
         <translation>Aplicando los cambios...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2720,6 +2718,25 @@ para ver los marcadores</translation>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished">No se pudo encontrar codificador de audio &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished">No se pudo inicializar el codificador de audio.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2912,9 +2929,12 @@ para ver los marcadores</translation>
             <numerusform>%1 (%n veces)</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation>y %1 usuario(s) más...</translation>
+        <translation type="unfinished">
+            <numerusform>y %1 usuario(s) más...</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2945,6 +2965,60 @@ para ver los marcadores</translation>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>Los ajustes del horario no son compatibles con algunos dispositivos.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished">seg</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation type="unfinished">min</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation type="unfinished">hrs</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished">dias</translation>
+    </message>
+    <message numerus="yes">
+        <source>%nms</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%ns</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nm</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nh</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nd</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3338,10 +3412,6 @@ para ver los marcadores</translation>
         <translation>No se pudo realizar una prueba.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Ninguno de sus servidores están conectados a la Red.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>Tiempo agotado</translation>
     </message>
@@ -3390,10 +3460,6 @@ para ver los marcadores</translation>
     <message>
         <source>No new users found.</source>
         <translation>No hay nuevos usuarios encontrados.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Ninguno de sus servidores están conectados a la Red.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -4270,6 +4336,10 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>No se pueden guardar configuración. Póngase en contacto con el administrador del sistema.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4661,6 +4731,10 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <message>
         <source>Archived duration in calendar days since the first recording</source>
         <translation>Duración archivado en días calendario desde la primera grabación</translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5435,12 +5509,12 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>­Éxito</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>No se pudo realizar una prueba. Ninguno de sus servidores están conectado a la Red.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>Los parámetros proporcionados no son válidos. No se pudo realizar una prueba.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished">No se pudo realizar una prueba.</translation>
     </message>
 </context>
 <context>
@@ -5479,10 +5553,6 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <message>
         <source>Activate analog license to remove this message</source>
         <translation>Activar licencia analógica para eliminar este mensaje</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>No hay flujo de video</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -6058,6 +6128,25 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <message>
         <source>Select file...</source>
         <translation>Seleccione el archivo...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6659,6 +6748,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>La adición del dispositivo está ya en el progreso. ¿Está seguro que quiere anular el proceso corriente?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6948,6 +7053,10 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>Estás a punto de exportar varios videos con una longitud total superior a 30 minutos.</translation>
+    </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
