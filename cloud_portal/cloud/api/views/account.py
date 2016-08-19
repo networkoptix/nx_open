@@ -39,6 +39,7 @@ def login(request):
         request.session.set_expiry(0)
 
     django.contrib.auth.login(request, user)
+    request.session['login'] = request.data['email']
     request.session['password'] = request.data['password']
     # TODO: This is awful security hole! But I can't remove it now, because I need password for future requests
 
@@ -50,6 +51,8 @@ def login(request):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def logout(request):
+    request.session.pop('login', None)
+    request.session.pop('password', None)
     django.contrib.auth.logout(request)
     return api_success()
 
@@ -71,7 +74,7 @@ def index(request):
                                       ErrorCodes.wrong_parameters,
                                       error_data=serializer.errors)
 
-        Account.update(request.user.email, request.session['password'], request.data['first_name'],
+        Account.update(request.session['login'], request.session['password'], request.data['first_name'],
                        request.data['last_name'])
         # if not success:
         #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -83,7 +86,7 @@ def index(request):
 @permission_classes((IsAuthenticated,))
 @handle_exceptions
 def auth_key(request):
-    data = Account.create_temporary_credentials(request.user.email, request.session['password'], 'short')
+    data = Account.create_temporary_credentials(request.session['login'], request.session['password'], 'short')
 
     key = base64.b64encode(data['login'] + ':' + data['password'])
     return api_success({'auth_key': key})

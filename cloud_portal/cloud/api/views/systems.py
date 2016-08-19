@@ -9,7 +9,7 @@ from api.helpers.exceptions import handle_exceptions, api_success, require_param
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def system(request, system_id):
-    data = cloud_api.System.get(request.user.email, request.session['password'], system_id)
+    data = cloud_api.System.get(request.session['login'], request.session['password'], system_id)
     return api_success(data['systems'])
 
 
@@ -17,7 +17,7 @@ def system(request, system_id):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def list_systems(request):
-    data = cloud_api.System.list(request.user.email, request.session['password'])
+    data = cloud_api.System.list(request.session['login'], request.session['password'])
     return api_success(data['systems'])
 
 
@@ -27,13 +27,13 @@ def list_systems(request):
 def sharing(request, system_id):
     if request.method == 'GET':
         # get authorized user here
-        data = cloud_api.System.users(request.user.email, request.session['password'], system_id)
+        data = cloud_api.System.users(request.session['login'], request.session['password'], system_id)
         return api_success(data['sharing'])
 
     elif request.method == 'POST':
         require_params(request, ('user_email', 'role'))
         # 2. share or change sharing
-        data = cloud_api.System.share(request.user.email, request.session['password'], system_id,
+        data = cloud_api.System.share(request.session['login'], request.session['password'], system_id,
                                       request.data['user_email'],
                                       request.data['role'])
 
@@ -44,7 +44,7 @@ def sharing(request, system_id):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def get_nonce(request, system_id):
-    data = cloud_api.System.get_nonce(request.user.email, request.session['password'], system_id)
+    data = cloud_api.System.get_nonce(request.session['login'], request.session['password'], system_id)
     return api_success(data)
 
 
@@ -52,7 +52,7 @@ def get_nonce(request, system_id):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def access_roles(request, system_id):
-    data = cloud_api.System.access_roles(request.user.email, request.session['password'], system_id)
+    data = cloud_api.System.access_roles(request.session['login'], request.session['password'], system_id)
     return api_success(data['accessRoles'])
 
 
@@ -77,7 +77,7 @@ def disconnect(request):
 def connect(request):
     require_params(request, ('name',))
     if request.user.is_authenticated():
-        data = cloud_api.System.bind(request.user.email, request.session['password'], request.data['system_id'])
+        data = cloud_api.System.bind(request.session['login'], request.session['password'], request.data['system_id'])
         return api_success(data)
 
     require_params(request, ('email', 'password'))
