@@ -75,9 +75,12 @@ public:
                 QStringList tmp = path.split('/');
                 while (!tmp.isEmpty() && tmp.last().isEmpty())
                     tmp.pop_back();
-                QString commandStr = tmp.last();
+                QString commandStr;
                 if (!tmp.isEmpty())
+                {
+                    commandStr = tmp.last();
                     tran.command = ApiCommand::fromString(commandStr);
+                }
 
                 if (tran.command == ApiCommand::NotDefined)
                 {
