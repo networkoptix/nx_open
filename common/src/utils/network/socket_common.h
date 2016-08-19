@@ -41,19 +41,24 @@ public:
     HostAddress& operator=( const HostAddress& rhs );
     HostAddress& operator=( HostAddress&& rhs );
 
+    /**
+     * WARNING: There is a logical bug in here:
+     *  "!(a > b) && !(a < b)" does not mean "a == b"
+     */
     bool operator==( const HostAddress& right ) const;
     bool operator<( const HostAddress& right ) const;
 
     /** Domain name or IP v4 (if can be converted) or IP v6 */
-    QString toString() const;
+    const QString& toString() const;
 
     /** IP v4 if address is v4 or v6 which can be converted to v4 */
-    boost::optional<in_addr> ipV4() const;
+    const boost::optional<in_addr>& ipV4() const;
 
     /** IP v6 if address is v6 or v4 converted to v6 */
-    boost::optional<in6_addr> ipV6() const;
+    const boost::optional<in6_addr>& ipV6() const;
 
     bool isLocal() const;
+    bool isResolved() const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
