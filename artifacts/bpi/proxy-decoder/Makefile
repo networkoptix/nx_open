@@ -4,7 +4,7 @@ SRC = nx/utils/flag_config.cpp nx/utils/debug_utils.cpp \
 	proxy_decoder_impl.cpp proxy_decoder_stub.cpp
 CXXFLAGS ?= -Wall -Wno-sign-compare -Wfatal-errors -O3 -std=c++11
 LDFLAGS ?= -fvisibility=hidden
-LIBS = -L/opt/ffmpeg/lib -lavcodec -lavfilter -lavformat -lavutil -lavdevice -lswscale \
+LIBS = -L/opt/networkoptix/lib -lavcodec -lavfilter -lavformat -lavutil -lavdevice -lswscale \
 	-lvdpau -lcedrus -lpixman-1
 CXX ?= g++
 
