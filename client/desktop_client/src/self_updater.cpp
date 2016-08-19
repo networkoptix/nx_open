@@ -71,7 +71,6 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
 
 bool SelfUpdater::registerUriHandler()
 {
-#if defined(Q_OS_WIN) || defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     QString binaryPath = qApp->applicationFilePath();
 
 #if defined(Q_OS_LINUX)
@@ -86,9 +85,6 @@ bool SelfUpdater::registerUriHandler()
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
-#else
-    return true;
-#endif
 }
 
 QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString& to)
