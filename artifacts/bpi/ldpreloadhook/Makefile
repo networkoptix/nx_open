@@ -1,6 +1,6 @@
 TARGET = ldpreloadhook.so
 
-MODULEDIR=/opt/networkoptix/lite_client/lib
+MODULEDIR=/opt/networkoptix/lib
 
 .PHONY: clean all build install uninstall
 

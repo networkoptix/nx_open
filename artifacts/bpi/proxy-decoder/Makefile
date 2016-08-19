@@ -15,7 +15,7 @@ LIB_LDFLAGS = -shared -Wl,-soname,$(TARGET)
 OBJ = $(addsuffix .o,$(basename $(SRC)))
 DEP = $(addsuffix .d,$(basename $(SRC)))
 
-MODULEDIR=/opt/networkoptix/lite_client/lib
+MODULEDIR=/opt/networkoptix/lib
 CONF_DEFINES = -DNX_UTILS_API= -DPROXY_DECODER_API='__attribute__ ((visibility ("default")))' -fvisibility=hidden
 
 .PHONY: clean all build install uninstall
