@@ -108,13 +108,14 @@ angular.module('webadminApp')
                 return $q.reject();
             },
             getNonce:function(login, url){
+                var proxy1 = proxy;
                 if(url){
                     if(url.indexOf("http:")==0 || url.indexOf("https:")==0){
                         url = url.substring(url.indexOf("//") + 2);
                     }
-                    proxy += '/proxy/https/' + url;
+                    proxy1 += '/proxy/https/' + url;
                 }
-                return $http.get(proxy + '/web/api/getNonce?userName=' + login);
+                return $http.get(proxy1 + '/web/api/getNonce?userName=' + login);
             },
             logout:function(){
                 $localStorage.$reset();
