@@ -9,61 +9,68 @@
 #include "camera_history_rest_handler.h"
 #include "core/resource/camera_resource.h"
 
+namespace {
+
+struct CandidateTimePeriod
+{
+    QnUuid serverId;
+    QnTimePeriod period;
+    int index;
+    CandidateTimePeriod(const QnUuid& serverId, const QnTimePeriod& period, int index)
+        : serverId(serverId),
+        period(period),
+        index(index)
+    {}
+    CandidateTimePeriod() : index(-1) {}
+    bool isNull() const { return period.isNull(); }
+};
+
+std::vector<CandidateTimePeriod> findMinStartTimePeriod(
+    const std::vector<int>& scanPos,
+    const MultiServerPeriodDataList& chunks)
+{
+    std::vector<CandidateTimePeriod> result;
+    qint64 minTime = INT64_MAX;
+
+    for (int i = 0; i < scanPos.size(); ++i)
+    {
+        for (int j = scanPos[i]; j < chunks[i].periods.size(); ++j)
+        {
+            if (chunks[i].periods[j].startTimeMs > minTime)
+                break;
+            bool found = false;
+            if (chunks[i].periods[j].startTimeMs < minTime)
+            {
+                result.clear();
+                minTime = chunks[i].periods[j].startTimeMs;
+                found = true;
+            }
+            else if (chunks[i].periods[j].startTimeMs == minTime)
+            {
+                found = true;
+            }
+            if (found)
+            {
+                result.push_back(CandidateTimePeriod(chunks[i].guid, chunks[i].periods[j], i));
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+} // namespace
+
 ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
 {
     ec2::ApiCameraHistoryItemDataList result;
     std::vector<int> scanPos;
     scanPos.resize(chunks.size());
 
-    struct CandidateTimePeriod
-    {
-        QnUuid serverId;
-        QnTimePeriod period;
-        int index;
-        CandidateTimePeriod(const QnUuid& serverId, const QnTimePeriod& period, int index)
-            : serverId(serverId),
-            period(period),
-            index(index)
-        {}
-        CandidateTimePeriod() : index(-1) {}
-        bool isNull() const { return period.isNull(); }
-    };
-    std::vector<CandidateTimePeriod> candidateTimePeriods;
-
-    auto findMinStartTimePeriod = [&scanPos, &chunks, &candidateTimePeriods]
-    {
-        qint64 minTime = INT64_MAX;
-        candidateTimePeriods.clear();
-        for (int i = 0; i < scanPos.size(); ++i)
-        {
-            for (int j = scanPos[i]; j < chunks[i].periods.size(); ++j)
-            {
-                if (chunks[i].periods[j].startTimeMs > minTime)
-                    break;
-                bool found = false;
-                if (chunks[i].periods[j].startTimeMs < minTime)
-                {
-                    candidateTimePeriods.clear();
-                    minTime = chunks[i].periods[j].startTimeMs;
-                    found = true;
-                }
-                else if (chunks[i].periods[j].startTimeMs == minTime)
-                {
-                    found = true;
-                }
-                if (found)
-                {
-                    candidateTimePeriods.push_back(CandidateTimePeriod(chunks[i].guid, chunks[i].periods[j], i));
-                    break;
-                }
-            }
-        }
-    };
-
     CandidateTimePeriod prevPeriod;
     while (true)
     {
-        findMinStartTimePeriod();
+        auto candidateTimePeriods = findMinStartTimePeriod(scanPos, chunks);
         if (candidateTimePeriods.empty())
             break;
         std::sort(candidateTimePeriods.begin(), candidateTimePeriods.end(), [](const CandidateTimePeriod& p1, const CandidateTimePeriod& p2)
