@@ -99,8 +99,8 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     const auto overlay = new QnStatusOverlayWidget(this);
     m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay);
 
-    connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this
-        , [this, overlay, controller = m_statusOverlayController]()
+    connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
+        [this, overlay, controller = m_statusOverlayController]()
         {
             const auto value = (controller->statusOverlay() == Qn::EmptyOverlay ? 0.0 : 1.0);
             opacityAnimator(overlay)->animateTo(value);

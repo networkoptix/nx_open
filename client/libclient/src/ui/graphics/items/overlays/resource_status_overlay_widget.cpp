@@ -9,6 +9,7 @@
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/transform_listener_instrument.h>
+#include <utils/math/color_transformations.h>
 
 namespace {
 
@@ -33,55 +34,39 @@ void setupButton(QPushButton& button)
     static const auto kButtonName = lit("itemStateExtraActionButton");
     button.setObjectName(kButtonName);
 
-    static const auto kStyleSheetTemplate = lit("   \
-        QPushButton#%1                              \
-        {                                           \
-            color: %2;                              \
-            background-color: %4;                   \
-            border-style: solid;                    \
-            border-radius: 2px;                     \
-            font: 500 13px;                         \
-            padding-left: 16px;                     \
-            padding-right: 16px;                    \
-            min-height: 32px;                       \
-        }                                           \
-        QPushButton#%1:hover                        \
-        {                                           \
-            color: %3;                              \
-            background-color: %5;                   \
-        }                                           \
-        QPushButton#%1:pressed                      \
-        {                                           \
-            color: %2;                              \
-            background-color: %6;                   \
-        }");
-
-    static const auto withAlpha =
-        [](QColor color, qreal alpha)
-        {
-            color.setAlphaF(alpha);
-            return color;
-        };
-
-    static const auto colorToString =
-        [](const QColor& color)
-        {
-            static const auto kTemplate = lit("rgba(%1, %2, %3, %4)");
-            return kTemplate.arg(color.red()).
-                arg(color.green()).
-                arg(color.blue()).
-                arg(color.alpha());
-        };
+    static const auto kStyleSheetTemplate = lit(
+        "QPushButton#%1"
+        "{"
+        "    color: %2;"
+        "    background-color: %4;"
+        "    border-style: solid;"
+        "    border-radius: 2px;"
+        "    font: 500 13px;"
+        "    padding-left: 16px;"
+        "    padding-right: 16px;"
+        "    min-height: 32px;"
+        "}"
+        "QPushButton#%1:hover"
+        "{"
+        "    color: %3;"
+        "    background-color: %5;"
+        "}"
+        "QPushButton#%1:pressed"
+        "{"
+        "    color: %2;"
+        "    background-color: %6;"
+        "}"
+        );
 
     static const auto kBaseColor = QColor(qnNxStyle->mainColor(
         QnNxStyle::Colors::kContrast).darker(4));
 
-    static const auto kTextColor = colorToString(withAlpha(kBaseColor, 0.5 / kBaseOpacity));
-    static const auto kHoveredTextColor = colorToString(withAlpha(kBaseColor, 0.7 / kBaseOpacity));
+    static const auto kTextColor = toTransparent(kBaseColor, 0.5 / kBaseOpacity).name(QColor::HexArgb);
+    static const auto kHoveredTextColor = toTransparent(kBaseColor, 0.7 / kBaseOpacity).name(QColor::HexArgb);
 
-    static const auto kBackground = colorToString(withAlpha(kBaseColor, 0.1 / kBaseOpacity));
-    static const auto kHovered = colorToString(withAlpha(kBaseColor, 0.15 / kBaseOpacity));
-    static const auto kPressed = colorToString(withAlpha(kBaseColor, 0.1 / kBaseOpacity));
+    static const auto kBackground = toTransparent(kBaseColor, 0.1 / kBaseOpacity).name(QColor::HexArgb);
+    static const auto kHovered = toTransparent(kBaseColor, 0.15 / kBaseOpacity).name(QColor::HexArgb);
+    static const auto kPressed = toTransparent(kBaseColor, 0.1 / kBaseOpacity).name(QColor::HexArgb);
 
     const auto kStyleSheet = kStyleSheetTemplate.arg(kButtonName,
         kTextColor, kHoveredTextColor, kBackground, kHovered, kPressed);

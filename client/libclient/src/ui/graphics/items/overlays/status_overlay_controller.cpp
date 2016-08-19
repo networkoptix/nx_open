@@ -57,7 +57,7 @@ bool isButtonVisible(Qn::ResourceStatusOverlay overlay,
 
 QnStatusOverlayController::QnStatusOverlayController(
     const QnResourcePtr& resource,
-    QnStatusOverlayWidget* widget)
+    const StatusOverlayWidgetPtr& widget)
     :
     m_widget(widget),
     m_buttonTexts(getButtonCaptions(resource)),
@@ -67,6 +67,10 @@ QnStatusOverlayController::QnStatusOverlayController(
 
     m_isErrorOverlay(isErrorOverlayCheck(m_statusOverlay))
 {
+    NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
+    if (!m_widget)
+        return;
+
     connect(this, &QnStatusOverlayController::statusOverlayChanged,
         this, &QnStatusOverlayController::onStatusOverlayChanged);
     connect(this, &QnStatusOverlayController::currentButtonChanged,
@@ -105,6 +109,10 @@ void QnStatusOverlayController::updateVisibleItems()
 
 void QnStatusOverlayController::updateWidgetItems()
 {
+    NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
+    if (!m_widget)
+        return;
+
     auto items = visibleItems();
     m_widget->setVisibleControls(items);
     m_widget->setIconOverlayPixmap(qnSkin->pixmap(statusIcon(statusOverlay())));
@@ -112,6 +120,10 @@ void QnStatusOverlayController::updateWidgetItems()
 
 void QnStatusOverlayController::onStatusOverlayChanged()
 {
+    NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
+    if (!m_widget)
+        return;
+
     m_widget->setCaption(captionText(m_statusOverlay));
     m_widget->setDescription(descriptionText(m_statusOverlay));
 

@@ -19,6 +19,7 @@ class QnStatusOverlayController: public QObject
         NOTIFY currentButtonChanged)
     Q_PROPERTY(bool isErrorOverlay READ isErrorOverlay NOTIFY isErrorOverlayChanged)
 
+    typedef QPointer<QnStatusOverlayWidget> StatusOverlayWidgetPtr;
 public:
     enum class Button
     {
@@ -30,7 +31,7 @@ public:
     };
 
     QnStatusOverlayController(const QnResourcePtr& resource,
-        QnStatusOverlayWidget* widget);
+        const StatusOverlayWidgetPtr& widget);
 
     virtual ~QnStatusOverlayController() = default;
 
@@ -80,7 +81,7 @@ private:
     static IntStringHash getButtonCaptions(const QnResourcePtr& resource);
 
 private:
-    QnStatusOverlayWidget* const m_widget;
+    const StatusOverlayWidgetPtr m_widget;
     const IntStringHash m_buttonTexts;
 
     QnStatusOverlayWidget::Controls m_visibleItems;
