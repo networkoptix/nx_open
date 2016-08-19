@@ -1,5 +1,4 @@
-#ifndef THREADSAFE_ITEM_STORAGE_H
-#define THREADSAFE_ITEM_STORAGE_H
+#pragma once
 
 #include <nx/utils/thread/mutex.h>
 
@@ -11,7 +10,8 @@ template <class T> class QnThreadsafeItemStorage;
  * @brief The QnThreadsafeItemStorageNotifier class       Notification interface for the QnThreadsafeItemStorage class.
  */
 template <class T>
-class QnThreadsafeItemStorageNotifier {
+class QnThreadsafeItemStorageNotifier
+{
 protected:
     virtual void storedItemAdded(const T &item) = 0;
     virtual void storedItemRemoved(const T &item) = 0;
@@ -26,68 +26,81 @@ private:
  *                                                        Item class T should have "uuid" field and it must be unique.
  */
 template <class T>
-class QnThreadsafeItemStorage {
+class QnThreadsafeItemStorage
+{
 public:
     typedef QList<T> ItemList;
     typedef QHash<QnUuid, T> ItemMap;
 
-    QnThreadsafeItemStorage(QnMutex *mutex, QnThreadsafeItemStorageNotifier<T>* notifier): 
+    QnThreadsafeItemStorage(QnMutex *mutex, QnThreadsafeItemStorageNotifier<T>* notifier):
         m_mutex(mutex),
         m_notifier(notifier)
-    {}
+    {
+    }
 
-    void setItems(const ItemList &items) { 
+    void setItems(const ItemList &items)
+    {
         ItemMap map;
         foreach(const T &item, items)
             map[item.uuid] = item;
         setItems(map);
     }
 
-    void setItems(const ItemMap &items) {
-        QnMutexLocker locker( m_mutex );
+    void setItems(const ItemMap &items)
+    {
+        QnMutexLocker locker(m_mutex);
         setItemsUnderLock(items);
     }
 
-    void setItemsUnderLock(QnThreadsafeItemStorage<T>* storage) {
+    void setItemsUnderLock(QnThreadsafeItemStorage<T>* storage)
+    {
         setItemsUnderLock(storage->m_itemByUuid);
     }
 
-    ItemMap getItems() const { 
-        QnMutexLocker locker( m_mutex );
-        return m_itemByUuid; 
+    ItemMap getItems() const
+    {
+        QnMutexLocker locker(m_mutex);
+        return m_itemByUuid;
     }
 
-    T getItem(const QnUuid &uuid) const {
-        QnMutexLocker locker( m_mutex );
+    T getItem(const QnUuid &uuid) const
+    {
+        QnMutexLocker locker(m_mutex);
         return m_itemByUuid.value(uuid);
     }
 
-    bool hasItem(const QnUuid &uuid) const {
-        QnMutexLocker locker( m_mutex );
+    bool hasItem(const QnUuid &uuid) const
+    {
+        QnMutexLocker locker(m_mutex);
         return m_itemByUuid.contains(uuid);
     }
 
-    void addItem(const T &item) {
-        QnMutexLocker locker( m_mutex );
+    void addItem(const T &item)
+    {
+        QnMutexLocker locker(m_mutex);
         addItemUnderLock(item);
     }
 
-    void removeItem(const T &item) {
+    void removeItem(const T &item)
+    {
         removeItem(item.uuid);
     }
 
-    void removeItem(const QnUuid &uuid) {
-        QnMutexLocker locker( m_mutex );
+    void removeItem(const QnUuid &uuid)
+    {
+        QnMutexLocker locker(m_mutex);
         removeItemUnderLock(uuid);
     }
 
-    void updateItem(const T &item) {
-        QnMutexLocker locker( m_mutex );
+    void updateItem(const T &item)
+    {
+        QnMutexLocker locker(m_mutex);
         updateItemUnderLock(item);
     }
 
-    void addOrUpdateItem(const T &item) {
-        QnMutexLocker locker( m_mutex );
+    void addOrUpdateItem(const T &item)
+    {
+        QnMutexLocker locker(m_mutex);
         if (m_itemByUuid.contains(item.uuid))
             updateItemUnderLock(item);
         else
@@ -95,9 +108,10 @@ public:
     }
 
 private:
-    void setItemsUnderLock(const ItemMap &items) {
+    void setItemsUnderLock(const ItemMap &items)
+    {
         foreach(const T &item, m_itemByUuid)
-            if(!items.contains(item.uuid))
+            if (!items.contains(item.uuid))
                 removeItemUnderLock(item.uuid);
 
         foreach(const T &item, items)
@@ -107,8 +121,10 @@ private:
                 addItemUnderLock(item);
     }
 
-    void addItemUnderLock(const T &item) {
-        if(m_itemByUuid.contains(item.uuid)) {
+    void addItemUnderLock(const T &item)
+    {
+        if (m_itemByUuid.contains(item.uuid))
+        {
             qnWarning("Item with UUID %1 is already present.", item.uuid.toString());
             return;
         }
@@ -122,14 +138,16 @@ private:
         m_mutex->lock();
     }
 
-    void updateItemUnderLock(const T &item) {
+    void updateItemUnderLock(const T &item)
+    {
         typename ItemMap::iterator pos = m_itemByUuid.find(item.uuid);
-        if(pos == m_itemByUuid.end()) {
+        if (pos == m_itemByUuid.end())
+        {
             qnWarning("There is no item with UUID %1.", item.uuid.toString());
             return;
         }
 
-        if(*pos == item)
+        if (*pos == item)
             return;
 
         *pos = item;
@@ -141,9 +159,10 @@ private:
         m_mutex->lock();
     }
 
-    void removeItemUnderLock(const QnUuid &uuid) {
+    void removeItemUnderLock(const QnUuid &uuid)
+    {
         typename ItemMap::iterator pos = m_itemByUuid.find(uuid);
-        if(pos == m_itemByUuid.end())
+        if (pos == m_itemByUuid.end())
             return;
 
         T item = *pos;
@@ -161,5 +180,3 @@ private:
     QnMutex* m_mutex;
     QnThreadsafeItemStorageNotifier<T> *m_notifier;
 };
-
-#endif // THREADSAFE_ITEM_STORAGE_H

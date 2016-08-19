@@ -1,6 +1,6 @@
 #include "videowall_resource.h"
 
-QnVideoWallResource::QnVideoWallResource() :
+QnVideoWallResource::QnVideoWallResource():
     base_type(),
     m_autorun(false),
     m_items(new QnThreadsafeItemStorage<QnVideoWallItem>(&m_mutex, this)),
@@ -11,32 +11,40 @@ QnVideoWallResource::QnVideoWallResource() :
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kVideoWallTypeId));
 }
 
-Qn::ResourceStatus QnVideoWallResource::getStatus() const {
+Qn::ResourceStatus QnVideoWallResource::getStatus() const
+{
     return Qn::Online;
 }
 
-QnThreadsafeItemStorage<QnVideoWallItem> * QnVideoWallResource::items() const {
+QnThreadsafeItemStorage<QnVideoWallItem> * QnVideoWallResource::items() const
+{
     return m_items.data();
 }
 
-QnThreadsafeItemStorage<QnVideoWallPcData> * QnVideoWallResource::pcs() const {
+QnThreadsafeItemStorage<QnVideoWallPcData> * QnVideoWallResource::pcs() const
+{
     return m_pcs.data();
 }
 
-QnThreadsafeItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() const {
+QnThreadsafeItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() const
+{
     return m_matrices.data();
 }
 
-void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+{
     base_type::updateInner(other, modifiedFields);
 
     QnVideoWallResource* localOther = dynamic_cast<QnVideoWallResource*>(other.data());
-    if(localOther) {
+    if (localOther)
+    {
 
         // copy online status to the updated items
         auto newItems = localOther->items();
-        for(const auto &item: m_items->getItems()) {
-            if(newItems->hasItem(item.uuid)) {
+        for (const auto &item : m_items->getItems())
+        {
+            if (newItems->hasItem(item.uuid))
+            {
                 QnVideoWallItem newItem = newItems->getItem(item.uuid);
                 newItem.runtimeStatus.online = item.runtimeStatus.online;
                 newItem.runtimeStatus.controlledBy = item.runtimeStatus.controlledBy;
@@ -48,21 +56,24 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
 
         m_pcs->setItemsUnderLock(localOther->pcs());
         m_matrices->setItemsUnderLock(localOther->matrices());
-        if (m_autorun != localOther->m_autorun) {
+        if (m_autorun != localOther->m_autorun)
+        {
             m_autorun = localOther->m_autorun;
             modifiedFields << "autorunChanged";
         }
     }
 }
 
-bool QnVideoWallResource::isAutorun() const {
-    QnMutexLocker locker( &m_mutex );
+bool QnVideoWallResource::isAutorun() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_autorun;
 }
 
-void QnVideoWallResource::setAutorun(bool value) {
+void QnVideoWallResource::setAutorun(bool value)
+{
     {
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (m_autorun == value)
             return;
         m_autorun = value;
@@ -70,16 +81,19 @@ void QnVideoWallResource::setAutorun(bool value) {
     emit autorunChanged(::toSharedPointer(this));
 }
 
-void QnVideoWallResource::storedItemAdded(const QnVideoWallItem &item) {
+void QnVideoWallResource::storedItemAdded(const QnVideoWallItem &item)
+{
     emit itemAdded(::toSharedPointer(this), item);
 }
 
-void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
+void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item)
+{
     emit itemRemoved(::toSharedPointer(this), item);
 
     // removing item from the matrices and removing empty matrices (if any)
     QnVideoWallMatrixMap matrices = m_matrices->getItems();
-    for (QnVideoWallMatrix matrix: matrices) {
+    for (QnVideoWallMatrix matrix : matrices)
+    {
         if (!matrix.layoutByItem.contains(item.uuid))
             continue;
         matrix.layoutByItem.remove(item.uuid);
@@ -90,7 +104,7 @@ void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
     }
 
     QnUuid pcUuid = item.pcUuid;
-    for(const QnVideoWallItem &item: m_items->getItems())
+    for (const QnVideoWallItem &item : m_items->getItems())
         if (item.pcUuid == pcUuid)
             return;
 
@@ -98,37 +112,46 @@ void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
     m_pcs->removeItem(pcUuid);
 }
 
-void QnVideoWallResource::storedItemChanged(const QnVideoWallItem &item) {
+void QnVideoWallResource::storedItemChanged(const QnVideoWallItem &item)
+{
     emit itemChanged(::toSharedPointer(this), item);
 }
 
-void QnVideoWallResource::storedItemAdded(const QnVideoWallPcData &item) {
+void QnVideoWallResource::storedItemAdded(const QnVideoWallPcData &item)
+{
     emit pcAdded(::toSharedPointer(this), item);
 }
 
-void QnVideoWallResource::storedItemRemoved(const QnVideoWallPcData &item) {
+void QnVideoWallResource::storedItemRemoved(const QnVideoWallPcData &item)
+{
     emit pcRemoved(::toSharedPointer(this), item);
 }
 
-void QnVideoWallResource::storedItemChanged(const QnVideoWallPcData &item) {
+void QnVideoWallResource::storedItemChanged(const QnVideoWallPcData &item)
+{
     emit pcChanged(::toSharedPointer(this), item);
 }
 
-void QnVideoWallResource::storedItemAdded(const QnVideoWallMatrix &item) {
+void QnVideoWallResource::storedItemAdded(const QnVideoWallMatrix &item)
+{
     emit matrixAdded(::toSharedPointer(this), item);
 }
 
-void QnVideoWallResource::storedItemRemoved(const QnVideoWallMatrix &item) {
+void QnVideoWallResource::storedItemRemoved(const QnVideoWallMatrix &item)
+{
     emit matrixRemoved(::toSharedPointer(this), item);
 }
 
-void QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix &item) {
+void QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix &item)
+{
     emit matrixChanged(::toSharedPointer(this), item);
 }
 
-QList<QnUuid> QnVideoWallResource::onlineItems() const {
+QList<QnUuid> QnVideoWallResource::onlineItems() const
+{
     QList<QnUuid> result;
-    for (const QnVideoWallItem &item: m_items->getItems()) {
+    for (const QnVideoWallItem &item : m_items->getItems())
+    {
         if (!item.runtimeStatus.online)
             continue;
         result << item.uuid;

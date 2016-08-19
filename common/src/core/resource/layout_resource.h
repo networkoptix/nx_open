@@ -1,5 +1,4 @@
-#ifndef QN_LAYOUT_RESOURCE_H
-#define QN_LAYOUT_RESOURCE_H
+#pragma once
 
 #include <QtCore/QRectF>
 #include <nx/utils/uuid.h>
@@ -9,7 +8,8 @@
 #include "resource.h"
 #include "layout_item_data.h"
 
-class QnLayoutResource: public QnResource {
+class QnLayoutResource: public QnResource
+{
     Q_OBJECT
 
     typedef QnResource base_type;
@@ -126,6 +126,3 @@ private:
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);
 Q_DECLARE_METATYPE(QnLayoutResourceList);
-
-#endif // QN_LAYOUT_RESOURCE_H
-

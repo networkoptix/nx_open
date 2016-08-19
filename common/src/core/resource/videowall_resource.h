@@ -1,5 +1,4 @@
-#ifndef VIDEOWALL_RESOURCE_H
-#define VIDEOWALL_RESOURCE_H
+#pragma once
 
 #include <QtCore/QRectF>
 #include <nx/utils/uuid.h>
@@ -8,9 +7,10 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
+
 #include <utils/common/threadsafe_item_storage.h>
 
-class QnVideoWallResource : public QnResource,
+class QnVideoWallResource: public QnResource,
     private QnThreadsafeItemStorageNotifier<QnVideoWallItem>,
     private QnThreadsafeItemStorageNotifier<QnVideoWallPcData>,
     private QnThreadsafeItemStorageNotifier<QnVideoWallMatrix>
@@ -47,6 +47,7 @@ signals:
     void matrixChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
 
     void autorunChanged(const QnResourcePtr &resource);
+
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
@@ -71,5 +72,3 @@ private:
 
 Q_DECLARE_METATYPE(QnVideoWallResourcePtr)
 Q_DECLARE_METATYPE(QnVideoWallResourceList)
-
-#endif // VIDEOWALL_RESOURCE_H

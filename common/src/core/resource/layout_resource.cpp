@@ -1,4 +1,3 @@
-
 #include "layout_resource.h"
 
 #include <list>
@@ -27,13 +26,15 @@ QString QnLayoutResource::getUniqueId() const
     return base_type::getUniqueId();
 }
 
-Qn::ResourceStatus QnLayoutResource::getStatus() const {
+Qn::ResourceStatus QnLayoutResource::getStatus() const
+{
     return Qn::Online;
 }
 
 
-QnLayoutResourcePtr QnLayoutResource::clone() const {
-    QnMutexLocker locker( &m_mutex );
+QnLayoutResourcePtr QnLayoutResource::clone() const
+{
+    QnMutexLocker locker(&m_mutex);
 
     QnLayoutResourcePtr result(new QnLayoutResource());
     result->setId(QnUuid::createUuid());
@@ -47,12 +48,13 @@ QnLayoutResourcePtr QnLayoutResource::clone() const {
 
     QnLayoutItemDataList items = m_itemByUuid.values();
     QHash<QnUuid, QnUuid> newUuidByOldUuid;
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++)
+    {
         QnUuid newUuid = QnUuid::createUuid();
         newUuidByOldUuid[items[i].uuid] = newUuid;
         items[i].uuid = newUuid;
     }
-    for(int i = 0; i < items.size(); i++)
+    for (int i = 0; i < items.size(); i++)
         items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
     result->setItems(items);
 
@@ -69,32 +71,39 @@ QString QnLayoutResource::toSearchString() const
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
 {
     QnLayoutItemDataMap map;
-    for(const QnLayoutItemData &item: items)
+    for (const QnLayoutItemData &item : items)
         map[item.uuid] = item;
     setItems(map);
 }
 
-void QnLayoutResource::setItems(const QnLayoutItemDataMap &items) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::setItems(const QnLayoutItemDataMap &items)
+{
+    QnMutexLocker locker(&m_mutex);
     setItemsUnderLock(items);
 }
 
-void QnLayoutResource::setItemsUnderLock(const QnLayoutItemDataMap &items) {
+void QnLayoutResource::setItemsUnderLock(const QnLayoutItemDataMap &items)
+{
     foreach(const QnLayoutItemData &item, m_itemByUuid)
-        if(!items.contains(item.uuid))
+        if (!items.contains(item.uuid))
             removeItemUnderLock(item.uuid);
 
-    foreach(const QnLayoutItemData &item, items) {
-        if(m_itemByUuid.contains(item.uuid)) {
+    foreach(const QnLayoutItemData &item, items)
+    {
+        if (m_itemByUuid.contains(item.uuid))
+        {
             updateItemUnderLock(item.uuid, item);
-        } else {
+        }
+        else
+        {
             addItemUnderLock(item);
         }
     }
 }
 
-QnLayoutItemDataMap QnLayoutResource::getItems() const {
-    QnMutexLocker locker( &m_mutex );
+QnLayoutItemDataMap QnLayoutResource::getItems() const
+{
+    QnMutexLocker locker(&m_mutex);
 
     return m_itemByUuid;
 }
@@ -114,7 +123,7 @@ void QnLayoutResource::setUrl(const QString& value)
     if (!oldValue.isEmpty() && oldValue != newValue)
     {
         // Local layout renamed
-        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr)
+        for (QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr)
         {
             QnLayoutItemData& item = itr.value();
             item.resource.uniqueId = QnLayoutFileStorageResource::updateNovParent(value, item.resource.uniqueId);
@@ -122,17 +131,20 @@ void QnLayoutResource::setUrl(const QString& value)
     }
 }
 
-QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const {
-    QnMutexLocker locker( &m_mutex );
+QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const
+{
+    QnMutexLocker locker(&m_mutex);
 
     return m_itemByUuid.value(itemUuid);
 }
 
-void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+{
     base_type::updateInner(other, modifiedFields);
 
     QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
-    if(localOther) {
+    if (localOther)
+    {
         setItemsUnderLock(localOther->m_itemByUuid);
         m_cellAspectRatio = localOther->m_cellAspectRatio;
         m_cellSpacing = localOther->m_cellSpacing;
@@ -143,27 +155,33 @@ void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&
     }
 }
 
-void QnLayoutResource::addItem(const QnLayoutItemData &item) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::addItem(const QnLayoutItemData &item)
+{
+    QnMutexLocker locker(&m_mutex);
     addItemUnderLock(item);
 }
 
-void QnLayoutResource::removeItem(const QnLayoutItemData &item) {
+void QnLayoutResource::removeItem(const QnLayoutItemData &item)
+{
     removeItem(item.uuid);
 }
 
-void QnLayoutResource::removeItem(const QnUuid &itemUuid) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::removeItem(const QnUuid &itemUuid)
+{
+    QnMutexLocker locker(&m_mutex);
     removeItemUnderLock(itemUuid);
 }
 
-void QnLayoutResource::updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item)
+{
+    QnMutexLocker locker(&m_mutex);
     updateItemUnderLock(itemUuid, item);
 }
 
-void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
-    if(m_itemByUuid.contains(item.uuid)) {
+void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item)
+{
+    if (m_itemByUuid.contains(item.uuid))
+    {
         qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
         return;
     }
@@ -175,16 +193,20 @@ void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
     m_mutex.lock();
 }
 
-void QnLayoutResource::updateItemUnderLock(const QnUuid &itemUuid, const QnLayoutItemData &item) {
+void QnLayoutResource::updateItemUnderLock(const QnUuid &itemUuid, const QnLayoutItemData &item)
+{
     QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-    if(pos == m_itemByUuid.end()) {
+    if (pos == m_itemByUuid.end())
+    {
         qnWarning("There is no item with UUID %1 in this layout.", itemUuid.toString());
         return;
     }
 
-    if(*pos == item) {
+    if (*pos == item)
+    {
         QHash<int, QVariant>::const_iterator i = item.dataByRole.constBegin();
-        while (i != item.dataByRole.constEnd()) {
+        while (i != item.dataByRole.constEnd())
+        {
             pos->dataByRole[i.key()] = i.value();
             ++i;
         }
@@ -198,20 +220,21 @@ void QnLayoutResource::updateItemUnderLock(const QnUuid &itemUuid, const QnLayou
     m_mutex.lock();
 }
 
-void QnLayoutResource::removeItemUnderLock(const QnUuid &itemUuid) {
+void QnLayoutResource::removeItemUnderLock(const QnUuid &itemUuid)
+{
     QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-    if(pos == m_itemByUuid.end())
+    if (pos == m_itemByUuid.end())
         return;
 
     std::list<QnLayoutItemData> removedItems;
 
     //removing associated zoom items
-    for( auto it = m_itemByUuid.begin(); it != m_itemByUuid.end(); )
+    for (auto it = m_itemByUuid.begin(); it != m_itemByUuid.end(); )
     {
-        if( it->zoomTargetUuid == itemUuid )
+        if (it->zoomTargetUuid == itemUuid)
         {
-            removedItems.push_front( *it );
-            it = m_itemByUuid.erase( it );
+            removedItems.push_front(*it);
+            it = m_itemByUuid.erase(it);
         }
         else
         {
@@ -219,11 +242,11 @@ void QnLayoutResource::removeItemUnderLock(const QnUuid &itemUuid) {
         }
     }
 
-    removedItems.push_back( *pos );
+    removedItems.push_back(*pos);
     m_itemByUuid.erase(pos);
 
     m_mutex.unlock();
-    for( auto item: removedItems )
+    for (auto item : removedItems)
         emit itemRemoved(::toSharedPointer(this), item);
     m_mutex.lock();
 }
@@ -238,20 +261,23 @@ void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
     m_localRange = value;
 }
 
-void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole)
+{
+    QnMutexLocker locker(&m_mutex);
 
     m_dataByRole = dataByRole;
 }
 
-void QnLayoutResource::setData(int role, const QVariant &value) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::setData(int role, const QVariant &value)
+{
+    QnMutexLocker locker(&m_mutex);
 
     m_dataByRole[role] = value;
 }
 
-QHash<int, QVariant> QnLayoutResource::data() const {
-    QnMutexLocker locker( &m_mutex );
+QHash<int, QVariant> QnLayoutResource::data() const
+{
+    QnMutexLocker locker(&m_mutex);
 
     return m_dataByRole;
 }
@@ -259,54 +285,62 @@ QHash<int, QVariant> QnLayoutResource::data() const {
 /********* Properties getters and setters **********/
 
 /********* Cell aspect ratio propert **********/
-float QnLayoutResource::cellAspectRatio() const {
-    QnMutexLocker locker( &m_mutex );
+float QnLayoutResource::cellAspectRatio() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_cellAspectRatio;
 }
 
-void QnLayoutResource::setCellAspectRatio(float cellAspectRatio) {
+void QnLayoutResource::setCellAspectRatio(float cellAspectRatio)
+{
     {
-        QnMutexLocker locker( &m_mutex );
-        if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
+        QnMutexLocker locker(&m_mutex);
+        if (qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
             return;
         m_cellAspectRatio = cellAspectRatio;
     }
     emit cellAspectRatioChanged(::toSharedPointer(this));
 }
 
-bool QnLayoutResource::hasCellAspectRatio() const {
+bool QnLayoutResource::hasCellAspectRatio() const
+{
     return cellAspectRatio() > 0.0;
 }
 
 /********* Cell spacing property **********/
-QSizeF QnLayoutResource::cellSpacing() const {
-    QnMutexLocker locker( &m_mutex );
+QSizeF QnLayoutResource::cellSpacing() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_cellSpacing;
 }
 
-void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
+void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing)
+{
     {
-        QnMutexLocker locker( &m_mutex );
-        if(qFuzzyEquals(m_cellSpacing, cellSpacing))
+        QnMutexLocker locker(&m_mutex);
+        if (qFuzzyEquals(m_cellSpacing, cellSpacing))
             return;
         m_cellSpacing = cellSpacing;
     }
     emit cellSpacingChanged(::toSharedPointer(this));
 }
 
-void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
+void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing)
+{
     setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
 }
 
 /********* Background size property **********/
-QSize QnLayoutResource::backgroundSize() const {
-    QnMutexLocker locker( &m_mutex );
+QSize QnLayoutResource::backgroundSize() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_backgroundSize;
 }
 
-void QnLayoutResource::setBackgroundSize(QSize size) {
+void QnLayoutResource::setBackgroundSize(QSize size)
+{
     {
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (m_backgroundSize == size)
             return;
         m_backgroundSize = size;
@@ -315,14 +349,16 @@ void QnLayoutResource::setBackgroundSize(QSize size) {
 }
 
 /********* Background image id property **********/
-QString QnLayoutResource::backgroundImageFilename() const {
-    QnMutexLocker locker( &m_mutex );
+QString QnLayoutResource::backgroundImageFilename() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_backgroundImageFilename;
 }
 
-void QnLayoutResource::setBackgroundImageFilename(const QString &filename) {
+void QnLayoutResource::setBackgroundImageFilename(const QString &filename)
+{
     {
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (m_backgroundImageFilename == filename)
             return;
         m_backgroundImageFilename = filename;
@@ -331,15 +367,17 @@ void QnLayoutResource::setBackgroundImageFilename(const QString &filename) {
 }
 
 /********* Background opacity property **********/
-qreal QnLayoutResource::backgroundOpacity() const {
-    QnMutexLocker locker( &m_mutex );
+qreal QnLayoutResource::backgroundOpacity() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_backgroundOpacity;
 }
 
-void QnLayoutResource::setBackgroundOpacity(qreal value) {
+void QnLayoutResource::setBackgroundOpacity(qreal value)
+{
     {
         qreal bound = qBound<qreal>(0.0, value, 1.0);
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (qFuzzyCompare(m_backgroundOpacity, bound))
             return;
         m_backgroundOpacity = bound;
@@ -348,14 +386,16 @@ void QnLayoutResource::setBackgroundOpacity(qreal value) {
 }
 
 /********* Locked property **********/
-bool QnLayoutResource::locked() const {
-    QnMutexLocker locker( &m_mutex );
+bool QnLayoutResource::locked() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_locked;
 }
 
-void QnLayoutResource::setLocked(bool value) {
+void QnLayoutResource::setLocked(bool value)
+{
     {
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (m_locked == value)
             return;
         m_locked = value;
