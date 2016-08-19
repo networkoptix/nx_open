@@ -117,22 +117,22 @@ QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const
     return m_items->getItem(itemUuid);
 }
 
-void QnLayoutResource::storedItemAdded(const QnLayoutItemData& item)
+Qn::Notifier QnLayoutResource::storedItemAdded(const QnLayoutItemData& item)
 {
-    emit itemAdded(::toSharedPointer(this), item);
+    return [r = toSharedPointer(this), item]{ emit r->itemAdded(r, item); };
 }
 
-void QnLayoutResource::storedItemRemoved(const QnLayoutItemData& item)
+Qn::Notifier QnLayoutResource::storedItemRemoved(const QnLayoutItemData& item)
 {
-    emit itemRemoved(::toSharedPointer(this), item);
+    return [r = toSharedPointer(this), item]{ emit r->itemRemoved(r, item); };
 }
 
-void QnLayoutResource::storedItemChanged(const QnLayoutItemData& item)
+Qn::Notifier QnLayoutResource::storedItemChanged(const QnLayoutItemData& item)
 {
-    emit itemChanged(::toSharedPointer(this), item);
+    return [r = toSharedPointer(this), item]{ emit r->itemChanged(r, item); };
 }
 
-void QnLayoutResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnLayoutResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     base_type::updateInternal(other, notifiers);
 
@@ -175,7 +175,7 @@ void QnLayoutResource::updateInternal(const QnResourcePtr &other, QList<UpdateNo
             notifiers << [r = toSharedPointer(this)]{ emit r->lockedChanged(r); };
         }
 
-        setItemsUnderLockInternal(m_items.data(), localOther->m_items.data());
+        setItemsUnderLockInternal(m_items.data(), localOther->m_items.data(), notifiers);
     }
 }
 

@@ -109,11 +109,11 @@ signals:
     void lockedChanged(const QnLayoutResourcePtr &resource);
 
 protected:
-    virtual void storedItemAdded(const QnLayoutItemData& item) override;
-    virtual void storedItemRemoved(const QnLayoutItemData& item) override;
-    virtual void storedItemChanged(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemRemoved(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemChanged(const QnLayoutItemData& item) override;
 
-    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 private:
     QScopedPointer<QnThreadsafeItemStorage<QnLayoutItemData> > m_items;

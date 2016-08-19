@@ -60,7 +60,7 @@ public:
      */
     virtual float getAvarageWritingUsage() const;
 
-    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
     static QString toNativeDirPath(const QString &dirPath);
 

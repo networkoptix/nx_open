@@ -25,5 +25,5 @@ public:
     virtual void setParentId(const QnUuid& parent) override;
 
 protected:
-    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 };

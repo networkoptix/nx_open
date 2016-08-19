@@ -217,7 +217,7 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
     return m_networkTimeout;
 }
 
-void QnNetworkResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnNetworkResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     base_type::updateInternal(other, notifiers);
     QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);

@@ -134,7 +134,7 @@ float QnStorageResource::getAvarageWritingUsage() const
     return 0.0;
 }
 
-void QnStorageResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     NX_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
 

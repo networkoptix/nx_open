@@ -50,7 +50,7 @@ public:
     void setActive(bool value);
 
 protected:
-    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 signals:
     void freeSpaceChanged(const QnResourcePtr &storage);

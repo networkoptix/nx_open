@@ -12,7 +12,9 @@
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
 #include <nx/fusion/model_functions_fwd.h>
+
 #include <utils/common/id.h>
+#include <utils/common/functional.h>
 
 #include <core/ptz/ptz_fwd.h>
 
@@ -292,8 +294,7 @@ public:
     void getParamsPhysicalAsync(const QSet<QString> &ids);
     void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
 protected:
-    using UpdateNotifier = std::function<void(void)>;
-    virtual void updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers);
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);

@@ -37,7 +37,7 @@ QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaSer
 QnClientStorageResource::~QnClientStorageResource()
 {}
 
-void QnClientStorageResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnClientStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     base_type::updateInternal(other, notifiers);
 

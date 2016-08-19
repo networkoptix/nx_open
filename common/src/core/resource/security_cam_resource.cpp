@@ -167,7 +167,7 @@ QnResourcePtr QnSecurityCamResource::toResourcePtr() {
 QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     base_type::updateInternal(other, notifiers);
 

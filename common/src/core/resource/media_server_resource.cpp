@@ -376,7 +376,7 @@ QnStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) 
    return QnStorageResourcePtr();
 }
 
-void QnMediaServerResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     /* Calculate primary address before the url is changed. */
     const SocketAddress oldPrimaryAddress = getPrimaryAddress();

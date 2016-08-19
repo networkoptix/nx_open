@@ -240,7 +240,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     // unique id MUST be the same
     NX_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId());
@@ -295,7 +295,7 @@ void QnResource::update(const QnResourcePtr& other)
             consumer->beforeUpdate();
     }
 
-    QList<UpdateNotifier> notifiers;
+    Qn::NotifierList notifiers;
     {
         QnMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
         if (m1 > m2)
@@ -305,7 +305,7 @@ void QnResource::update(const QnResourcePtr& other)
         updateInternal(other, notifiers);
     }
 
-    for (UpdateNotifier notifier : notifiers)
+    for (auto notifier : notifiers)
         notifier();
 
     {

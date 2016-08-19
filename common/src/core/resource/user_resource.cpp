@@ -304,7 +304,7 @@ void QnUserResource::setFullName(const QString& value)
     emit fullNameChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::updateInternal(const QnResourcePtr &other, QList<UpdateNotifier>& notifiers)
+void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     base_type::updateInternal(other, notifiers);
 
