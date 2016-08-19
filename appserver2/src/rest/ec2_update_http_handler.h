@@ -77,6 +77,11 @@ public:
                     tmp.pop_back();
                 if (!tmp.isEmpty())
                     tran.command = ApiCommand::fromString(tmp.last());
+
+                // todo: temporary fix. Revert this check after merge with x_VMS-3408_cloud_sync
+                if (tran.command == ApiCommand::restoreDatabase)
+                    tran.isLocal = true;
+
                 break;
             }
             case Qn::UbjsonFormat:
