@@ -16,21 +16,21 @@ struct CandidateTimePeriod
     QnUuid serverId;
     QnTimePeriod period;
     int index;
-    CandidateTimePeriod(const QnUuid& serverId, const QnTimePeriod& period, int index)
-        : serverId(serverId),
+    CandidateTimePeriod(const QnUuid& serverId, const QnTimePeriod& period, int index):
+        serverId(serverId),
         period(period),
         index(index)
     {}
-    CandidateTimePeriod() : index(-1) {}
+    CandidateTimePeriod(): index(-1) {}
     bool isNull() const { return period.isNull(); }
 };
 
-std::vector<CandidateTimePeriod> findMinStartTimePeriod(
-    const std::vector<int>& scanPos,
+CandidateTimePeriod findMinStartTimePeriod(
+    std::vector<int>& scanPos,
     const MultiServerPeriodDataList& chunks)
 {
-    std::vector<CandidateTimePeriod> result;
-    qint64 minTime = INT64_MAX;
+    CandidateTimePeriod result;
+    qint64 minTime = std::numeric_limits<qint64>::max();
 
     for (int i = 0; i < scanPos.size(); ++i)
     {
@@ -38,14 +38,15 @@ std::vector<CandidateTimePeriod> findMinStartTimePeriod(
             continue; //< no periods left
 
         const auto& period = chunks[i].periods[scanPos[i]];
-        if (period.startTimeMs <= minTime)
+        if (period.startTimeMs < minTime ||
+           (period.startTimeMs == minTime && period.endTimeMs() > result.period.endTimeMs()))
         {
-            if (period.startTimeMs < minTime)
-                result.clear();
+            result = CandidateTimePeriod(chunks[i].guid, period, i);
             minTime = period.startTimeMs;
-            result.push_back(CandidateTimePeriod(chunks[i].guid, period, i));
         }
     }
+    if (!result.isNull())
+        ++scanPos[result.index];
     return result;
 }
 
@@ -54,33 +55,19 @@ std::vector<CandidateTimePeriod> findMinStartTimePeriod(
 ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
 {
     ec2::ApiCameraHistoryItemDataList result;
-    std::vector<int> scanPos;
-    scanPos.resize(chunks.size());
+    std::vector<int> scanPos(chunks.size());
 
     CandidateTimePeriod prevPeriod;
     while (true)
     {
-        auto candidateTimePeriods = findMinStartTimePeriod(scanPos, chunks);
-        if (candidateTimePeriods.empty())
-            break;
-        std::sort(candidateTimePeriods.begin(), candidateTimePeriods.end(), [](const CandidateTimePeriod& p1, const CandidateTimePeriod& p2)
-        {
-            return p1.period.durationMs > p2.period.durationMs;
-        });
-        const auto& candidate = candidateTimePeriods[0];
-
-        bool candidateLastsLongerThenPrev = !prevPeriod.period.contains(candidate.period);
-        bool candidateSuccessfull = prevPeriod.isNull() ||
-            (prevPeriod.serverId != candidate.serverId && candidateLastsLongerThenPrev);
-
-        if (prevPeriod.isNull() || candidateSuccessfull)
+        auto candidate = findMinStartTimePeriod(scanPos, chunks);
+        if (candidate.isNull())
+            break; //< finished
+        if (prevPeriod.period.contains(candidate.period))
+            continue; //< no time advance
+        if (prevPeriod.serverId != candidate.serverId)
             result.push_back(ec2::ApiCameraHistoryItemData(candidate.serverId, candidate.period.startTimeMs));
-
-        if (candidateLastsLongerThenPrev)
-            prevPeriod = candidate;
-
-        for (auto& p : candidateTimePeriods)
-            ++scanPos[p.index];
+        prevPeriod = candidate;
     }
 
     return result;
