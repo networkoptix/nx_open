@@ -15,35 +15,46 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
     std::vector<int> scanPos;
     scanPos.resize(chunks.size());
 
-    struct CandidateTimePeriod {
+    struct CandidateTimePeriod
+    {
         QnUuid serverId;
         QnTimePeriod period;
         int index;
         CandidateTimePeriod(const QnUuid& serverId, const QnTimePeriod& period, int index)
             : serverId(serverId),
-              period(period),
-              index(index)
+            period(period),
+            index(index)
         {}
         CandidateTimePeriod() : index(-1) {}
         bool isNull() const { return period.isNull(); }
     };
     std::vector<CandidateTimePeriod> candidateTimePeriods;
-    
-    auto findMinStartTimePeriod = [&scanPos, &chunks, &candidateTimePeriods] {
+
+    auto findMinStartTimePeriod = [&scanPos, &chunks, &candidateTimePeriods]
+    {
         qint64 minTime = INT64_MAX;
+        qint64 minFoundTime = INT64_MAX;
         candidateTimePeriods.clear();
-        for (int i = 0; i < scanPos.size(); ++i) {
-            for (int j = scanPos[i]; j < chunks[i].periods.size(); ++j) {
+        for (int i = 0; i < scanPos.size(); ++i)
+        {
+            for (int j = scanPos[i]; j < chunks[i].periods.size(); ++j)
+            {
+                if (chunks[i].periods[j].startTimeMs > minFoundTime)
+                    break;
                 bool found = false;
-                if (chunks[i].periods[j].startTimeMs < minTime) {
+                if (chunks[i].periods[j].startTimeMs < minTime)
+                {
                     candidateTimePeriods.clear();
                     minTime = chunks[i].periods[j].startTimeMs;
                     found = true;
                 }
-                else if (chunks[i].periods[j].startTimeMs == minTime) {
+                else if (chunks[i].periods[j].startTimeMs == minTime)
+                {
                     found = true;
                 }
-                if (found) {
+                if (found)
+                {
+                    minFoundTime = chunks[i].periods[j].startTimeMs;
                     candidateTimePeriods.push_back(CandidateTimePeriod(chunks[i].guid, chunks[i].periods[j], i));
                     break;
                 }
@@ -52,26 +63,28 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
     };
 
     CandidateTimePeriod prevPeriod;
-    while (true) {
+    while (true)
+    {
         findMinStartTimePeriod();
         if (candidateTimePeriods.empty())
             break;
-        std::sort(candidateTimePeriods.begin(), candidateTimePeriods.end(), [](const CandidateTimePeriod& p1, const CandidateTimePeriod& p2) {
+        std::sort(candidateTimePeriods.begin(), candidateTimePeriods.end(), [](const CandidateTimePeriod& p1, const CandidateTimePeriod& p2)
+        {
             return p1.period.durationMs > p2.period.durationMs;
         });
         const auto& candidate = candidateTimePeriods[0];
 
         bool candidateLastsLongerThenPrev = !prevPeriod.period.contains(candidate.period);
-        bool candidateSuccessfull = prevPeriod.isNull() || 
-                                    (prevPeriod.serverId != candidate.serverId && candidateLastsLongerThenPrev);
+        bool candidateSuccessfull = prevPeriod.isNull() ||
+            (prevPeriod.serverId != candidate.serverId && candidateLastsLongerThenPrev);
 
-        if (prevPeriod.isNull() || candidateSuccessfull) 
+        if (prevPeriod.isNull() || candidateSuccessfull)
             result.push_back(ec2::ApiCameraHistoryItemData(candidate.serverId, candidate.period.startTimeMs));
 
         if (candidateLastsLongerThenPrev)
             prevPeriod = candidate;
 
-        for (auto& p: candidateTimePeriods)
+        for (auto& p : candidateTimePeriods)
             ++scanPos[p.index];
     }
 
@@ -85,7 +98,7 @@ int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestP
         return nx_http::StatusCode::badRequest;
 
     ec2::ApiCameraHistoryDataList outputData;
-    for (const auto& camera: request.resList)
+    for (const auto& camera : request.resList)
     {
         QnChunksRequestData updatedRequest = request;
         updatedRequest.resList.clear();
