@@ -53,11 +53,11 @@
 			</td>
 			{{/sourceIcon}}
 			<td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">
-				<b class="ellipsis" style="text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;max-width: 130px">{{source}}</b> <span class="ellipsis" style="text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;max-width: 130px">({{sourceIp}})</span>
+				<b>{{source}}</b> ({{sourceIp}})
 			</td>
 			{{#aggregated}}
 				<td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{reason}}</td>
-				<td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px"><span class="ellipsis" style="text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;max-width: 130px">{{timestampDate}}</span> <b class="ellipsis" style="text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;max-width: 130px">{{timestampTime}}</b></td>
+				<td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{timestampDate}} <b>{{timestampTime}}</b></td>
 			{{/aggregated}}
 		</tr>
 {{/aggregated}}
