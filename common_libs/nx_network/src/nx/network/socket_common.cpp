@@ -66,7 +66,7 @@ bool HostAddress::operator==( const HostAddress& rhs ) const
 
 bool HostAddress::operator!=( const HostAddress& rhs ) const
 {
-    return toString() != rhs.toString();
+    return !(*this == rhs);
 }
 
 bool HostAddress::operator<( const HostAddress& rhs ) const

@@ -57,6 +57,10 @@ public:
     bool isResolved() const;
     bool isLocal() const;
 
+    /**
+     * WARNING: There is a logical bug in here:
+     *  "!(a > b) && !(a < b)" does not mean "a == b"
+     */
     bool operator==(const HostAddress& right) const;
     bool operator!=(const HostAddress& right) const;
     bool operator<(const HostAddress& right) const;
