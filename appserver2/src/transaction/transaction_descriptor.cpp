@@ -856,15 +856,14 @@ detail::TransactionDescriptorBase *getTransactionDescriptorByValue(ApiCommand::V
     auto it = detail::transactionDescriptors.get<0>().find(v);
     bool isEnd = it == detail::transactionDescriptors.get<0>().end();
     NX_ASSERT(!isEnd, "ApiCommand::Value not found");
-    return (*it).get();
+    return isEnd ? nullptr : (*it).get();
 }
 
-detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString &s)
+detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString& s)
 {
     auto it = detail::transactionDescriptors.get<1>().find(s);
     bool isEnd = it == detail::transactionDescriptors.get<1>().end();
-    NX_ASSERT(!isEnd, "ApiCommand name not found");
-    return (*it).get();
+    return isEnd ? nullptr : (*it).get();
 }
 
 } // namespace ec2
