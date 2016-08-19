@@ -68,7 +68,7 @@ bool ConnectionLockGuard::tryAcquireConnecting()
             m_connectingList[m_peerGuid].first = true;
         else
             m_connectingList[m_peerGuid].second = true;
-        m_state == State::Connecting;
+        m_state = State::Connecting;
     }
     return !fail;
 }
