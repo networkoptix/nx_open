@@ -93,16 +93,6 @@ public:
         return m_container.end();
     }
 
-    //void erase(const iterator& pos)
-    //{
-    //    m_container.erase(pos);
-    //}
-
-    //iterator find(const key_type& key)
-    //{
-    //    return m_container.upper_bound(key);
-    //}
-
     const_iterator find(const KeyType& valueToFind) const
     {
         const auto it = m_container.lower_bound(Range(valueToFind, valueToFind));
