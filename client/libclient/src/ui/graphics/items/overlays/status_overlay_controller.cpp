@@ -57,8 +57,10 @@ bool isButtonVisible(Qn::ResourceStatusOverlay overlay,
 
 QnStatusOverlayController::QnStatusOverlayController(
     const QnResourcePtr& resource,
-    const StatusOverlayWidgetPtr& widget)
+    const StatusOverlayWidgetPtr& widget,
+    QObject* parent)
     :
+    base_type(parent),
     m_widget(widget),
     m_buttonTexts(getButtonCaptions(resource)),
     m_visibleItems( QnStatusOverlayWidget::Control::kNoControl),
