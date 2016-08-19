@@ -55,6 +55,7 @@ int main(int argc, const char* argv[])
 
     std::cerr<<"error. Unknown mode"<<std::endl;
     printHelp();
+    return 1;
 }
 
 //--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
