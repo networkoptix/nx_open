@@ -34,26 +34,16 @@ std::vector<CandidateTimePeriod> findMinStartTimePeriod(
 
     for (int i = 0; i < scanPos.size(); ++i)
     {
-        for (int j = scanPos[i]; j < chunks[i].periods.size(); ++j)
+        if (scanPos[i] >= chunks[i].periods.size())
+            continue; //< no periods left
+
+        const auto& period = chunks[i].periods[scanPos[i]];
+        if (period.startTimeMs <= minTime)
         {
-            if (chunks[i].periods[j].startTimeMs > minTime)
-                break;
-            bool found = false;
-            if (chunks[i].periods[j].startTimeMs < minTime)
-            {
+            if (period.startTimeMs < minTime)
                 result.clear();
-                minTime = chunks[i].periods[j].startTimeMs;
-                found = true;
-            }
-            else if (chunks[i].periods[j].startTimeMs == minTime)
-            {
-                found = true;
-            }
-            if (found)
-            {
-                result.push_back(CandidateTimePeriod(chunks[i].guid, chunks[i].periods[j], i));
-                break;
-            }
+            minTime = period.startTimeMs;
+            result.push_back(CandidateTimePeriod(chunks[i].guid, period, i));
         }
     }
     return result;
