@@ -8,8 +8,8 @@
 #define EXPAND(x) x
 
 #define SPC2(a, b) \
-    (((a) && ((a)->##b)) ?    \
-        ((a)->##b) : nullptr) \
+    (((a) && ((a)->b)) ?    \
+        ((a)->b) : nullptr) \
 
 #define SPC3(a, b, c) \
     SPC2(SPC2(a, b), c)
@@ -26,10 +26,10 @@
     EXPAND( \
         EXPAND(SAFE_POINTER_CHAIN_SPECIALIZATION(__VA_ARGS__, SPC5, SPC4, SPC3, SPC2))(__VA_ARGS__))
 
-#define CPC2(a, b) (a)->##b
-#define CPC3(a, b, c) (a)->##b->##c
-#define CPC4(a, b, c, d) (a)->##b->##c->##d
-#define CPC5(a, b, c, d, e) (a)->##b->##c->##d->##e
+#define CPC2(a, b) (a)->b
+#define CPC3(a, b, c) (a)->b->c
+#define CPC4(a, b, c, d) (a)->b->c->d
+#define CPC5(a, b, c, d, e) (a)->b->c->d->e
 
 #define CONCAT_TO_POINTER_CHAIN_SPECIALIZATION(_1, _2, _3, _4, _5, NAME, ...) NAME
 

@@ -45,6 +45,12 @@ QnMessageBox::QnMessageBox(Icon icon, int helpTopicId, const QString &title, con
     setHelpTopic(this, helpTopicId);
 }
 
+QnMessageBox::StandardButton QnMessageBox::showNoIconDialog(QWidget *parent, const QString &title, const QString &text,
+    StandardButtons buttons, StandardButton defaultButton)
+{
+    return showNewMessageBox(parent, NoIcon, -1, title, text, buttons, defaultButton);
+}
+
 QnMessageBox::StandardButton QnMessageBox::information(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
     return showNewMessageBox(parent, Information, helpTopicId, title, text, buttons, defaultButton);
 }
