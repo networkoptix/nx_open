@@ -164,6 +164,9 @@ QnIOPortDataList QnAdamResource::mergeIOPortData(
 
 void QnAdamResource::setPortDefaultStates()
 {
+    if (!m_ioManager)
+        return;
+
     auto ports = QJson::deserialized<QnIOPortDataList>(
         getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
 
