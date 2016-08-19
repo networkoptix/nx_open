@@ -112,7 +112,7 @@ angular.module('webadminApp')
                                 return;
                             }
                         }
-                        dialogs.alert(L.join.mergeSucceed).then(function () {
+                        dialogs.alert(L.join.mergeSucceed).finally(function () {
                             window.location.reload();
                         });
                     });
