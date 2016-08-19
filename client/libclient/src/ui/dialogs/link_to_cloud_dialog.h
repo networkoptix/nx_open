@@ -17,7 +17,7 @@ class QnLinkToCloudDialog : public QnWorkbenchStateDependentButtonBoxDialog
     typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
-    explicit QnLinkToCloudDialog(QWidget *parent = 0);
+    explicit QnLinkToCloudDialog(QWidget* parent = nullptr);
     ~QnLinkToCloudDialog();
 
     void accept() override;

@@ -50,6 +50,29 @@ namespace ConnectionType
     Type fromString( const QnByteArrayConstRef& str );
 }
 
+/** While this object is alive peer with guid \a peerGuid is considered 
+    connected and cannot establish another transaction connection.
+    Calls \a QnTransactionTransport::connectDone(m_peerGuid) in destructor
+*/
+class ConnectionLockGuard
+{
+public:
+    ConnectionLockGuard();
+    ConnectionLockGuard(const QnUuid& peerGuid);
+    ConnectionLockGuard(ConnectionLockGuard&&);
+    ConnectionLockGuard& operator=(ConnectionLockGuard&&);
+    ~ConnectionLockGuard();
+
+    /** \a true if peer connection lock has been acquired */
+    bool acquired() const;
+
+private:
+    QnUuid m_peerGuid;
+
+    ConnectionLockGuard(const ConnectionLockGuard&);
+    ConnectionLockGuard& operator=(const ConnectionLockGuard&);
+};
+
 
 class QnTransactionTransport
 :
@@ -103,6 +126,7 @@ public:
     //!Initializer for incoming connection
     QnTransactionTransport(
         const QnUuid& connectionGuid,
+        ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
         QSharedPointer<AbstractStreamSocket> socket,
@@ -268,7 +292,7 @@ public:
     void removeEventHandler( int eventHandlerID );
 
     static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
+    static ConnectionLockGuard tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
     static void connectingCanceled(const QnUuid& id, bool isOriginator);
     static void connectDone(const QnUuid& id);
 
@@ -359,6 +383,7 @@ private:
     std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
+    ConnectionLockGuard m_connectionLockGuard;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranBaseUrl;

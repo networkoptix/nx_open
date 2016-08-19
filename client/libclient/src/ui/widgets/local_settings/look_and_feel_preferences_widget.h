@@ -42,7 +42,7 @@ private:
 
     Qn::TimeMode m_oldTimeMode;
 
-    QnClientBackground m_oldBackground;
+    QnBackgroundImage m_oldBackground;
 };
 
 #endif // LOOK_AND_FEEL_PREFERENCES_WIDGET_H

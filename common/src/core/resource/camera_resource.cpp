@@ -77,8 +77,10 @@ float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality,
     return qMax(192.0, result);
 }
 
-int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
+    QN_UNUSED(role);
+
     auto result = rawSuggestBitrateKbps(quality, resolution, fps);
 
     if (bitratePerGopType() != Qn::BPG_None)

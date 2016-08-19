@@ -218,12 +218,19 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
+    bool isLocalInCloud = !qnCommon->moduleInformation().cloudSystemId.isEmpty();
+    bool isRemoteInCloud = !remoteModuleInformation.cloudSystemId.isEmpty();
+    if (isLocalInCloud && isRemoteInCloud)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge because both systems are bound to the cloud")
+            .arg(data.url), cl_logDEBUG1);
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("BOTH_SYSTEM_BOUND_TO_CLOUD"));
+        return nx_http::StatusCode::ok;
+    }
+
     bool canMerge = true;
     if (remoteModuleInformation.cloudSystemId != qnCommon->moduleInformation().cloudSystemId)
     {
-        bool isLocalInCloud = !qnCommon->moduleInformation().cloudSystemId.isEmpty();
-        bool isRemoteInCloud = !remoteModuleInformation.cloudSystemId.isEmpty();
-
         if (data.takeRemoteSettings && isLocalInCloud)
             canMerge = false;
         else if (!data.takeRemoteSettings && isRemoteInCloud)

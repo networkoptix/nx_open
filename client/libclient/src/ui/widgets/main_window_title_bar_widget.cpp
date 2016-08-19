@@ -15,60 +15,59 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_resource.h>
 
-namespace
+namespace {
+const int kTitleBarHeight = 24;
+const int kVLineWidth = 1;
+const QSize kControlButtonSize(40 - kVLineWidth, kTitleBarHeight);
+const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
+
+QToolButton* newActionButton(
+    QAction* action,
+    int helpTopicId = Qn::Empty_Help,
+    bool popup = false,
+    const QSize& fixedSize = QSize())
 {
-    const int kTitleBarHeight = 24;
-    const int kVLineWidth = 1;
-    const QSize kControlButtonSize(40 - kVLineWidth, kTitleBarHeight);
-    const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
+    QnToolButton* button = new QnToolButton();
 
-    QToolButton* newActionButton(
-            QAction *action,
-            int helpTopicId = Qn::Empty_Help,
-            bool popup = false,
-            const QSize& fixedSize = QSize())
+    button->setDefaultAction(action);
+    button->setFocusPolicy(Qt::NoFocus);
+    button->adjustIconSize();
+    button->setFixedSize(fixedSize.isEmpty() ? button->iconSize() : fixedSize);
+
+    if (popup)
     {
-        QnToolButton* button = new QnToolButton();
-
-        button->setDefaultAction(action);
-        button->setFocusPolicy(Qt::NoFocus);
-        button->adjustIconSize();
-        button->setFixedSize(fixedSize.isEmpty() ? button->iconSize() : fixedSize);
-
-        if (popup)
+        button->setPopupMode(QToolButton::InstantPopup);
+        QObject::connect(button, &QnToolButton::justPressed, [action]()
         {
-            button->setPopupMode(QToolButton::InstantPopup);
-            QObject::connect(button, &QnToolButton::justPressed, [action]()
-            {
-                action->trigger();
-            });
-        }
-
-        if (helpTopicId != Qn::Empty_Help)
-            setHelpTopic(button, helpTopicId);
-
-        return button;
+            action->trigger();
+        });
     }
 
-    QToolButton* newActionButton(
-            QAction* action,
-            bool popup,
-            const QSize& fixedSize = QSize())
-    {
-        return newActionButton(action, Qn::Empty_Help, popup, fixedSize);
-    }
+    if (helpTopicId != Qn::Empty_Help)
+        setHelpTopic(button, helpTopicId);
 
-    QFrame* newVLine()
-    {
-        QFrame* line = new QFrame();
-        line->setFrameShape(QFrame::VLine);
-        line->setFrameShadow(QFrame::Plain);
-        line->setFixedWidth(1);
-        return line;
-    }
+    return button;
 }
 
-class QnMainWindowTitleBarWidgetPrivate : public QObject
+QToolButton* newActionButton(
+    QAction* action,
+    bool popup,
+    const QSize& fixedSize = QSize())
+{
+    return newActionButton(action, Qn::Empty_Help, popup, fixedSize);
+}
+
+QFrame* newVLine()
+{
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Plain);
+    line->setFixedWidth(1);
+    return line;
+}
+}
+
+class QnMainWindowTitleBarWidgetPrivate: public QObject
 {
     QnMainWindowTitleBarWidget* q_ptr;
     Q_DECLARE_PUBLIC(QnMainWindowTitleBarWidget)
@@ -108,8 +107,8 @@ void QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick()
 }
 
 QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
-        QWidget* parent,
-        QnWorkbenchContext* context)
+    QWidget* parent,
+    QnWorkbenchContext* context)
     : base_type(parent)
     , QnWorkbenchContextAware(parent, context)
     , d_ptr(new QnMainWindowTitleBarWidgetPrivate(this))
@@ -123,18 +122,18 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     setAcceptDrops(true);
 
     d->mainMenuButton = newActionButton(
-            action(QnActions::MainMenuAction),
-            Qn::MainWindow_TitleBar_MainMenu_Help,
-            true);
+        action(QnActions::MainMenuAction),
+        Qn::MainWindow_TitleBar_MainMenu_Help,
+        true);
 
     d->tabBar = new QnLayoutTabBar(this);
     d->tabBar->setFixedHeight(kTitleBarHeight);
-    connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested,  d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
+    connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested, d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
     connect(d->tabBar, &QnLayoutTabBar::closeRequested,
-            this, [this](QnWorkbenchLayout* layout)
+        this, [this](QnWorkbenchLayout* layout)
     {
         menu()->trigger(QnActions::CloseLayoutAction,
-                        QnWorkbenchLayoutList() << layout);
+            QnWorkbenchLayoutList() << layout);
     });
 
     d->cloudPanel = new QnCloudStatusPanel(this);
@@ -163,24 +162,24 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(d->cloudPanel);
     layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
-            action(QnActions::OpenLoginDialogAction),
-            Qn::Login_Help, false, kControlButtonSize));
+        action(QnActions::OpenLoginDialogAction),
+        Qn::Login_Help, false, kControlButtonSize));
     layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
-            action(QnActions::WhatsThisAction),
-            Qn::MainWindow_ContextHelp_Help, false, kControlButtonSize));
+        action(QnActions::WhatsThisAction),
+        Qn::MainWindow_ContextHelp_Help, false, kControlButtonSize));
     layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
-            action(QnActions::MinimizeAction),
-            false, kControlButtonSize));
+        action(QnActions::MinimizeAction),
+        false, kControlButtonSize));
     layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
-            action(QnActions::EffectiveMaximizeAction),
-            Qn::MainWindow_Fullscreen_Help, false, kControlButtonSize));
+        action(QnActions::EffectiveMaximizeAction),
+        Qn::MainWindow_Fullscreen_Help, false, kControlButtonSize));
     layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
-            action(QnActions::ExitAction),
-            false, kControlButtonSize));
+        action(QnActions::ExitAction),
+        false, kControlButtonSize));
 }
 
 QnMainWindowTitleBarWidget::~QnMainWindowTitleBarWidget()

@@ -25,9 +25,9 @@ struct SocketContext
 
 void onBytesRead(
     SocketContext* ctx,
-    SystemError::ErrorCode errorCode,
-    SocketAddress sourceEndpoint,
-    size_t bytesRead)
+    SystemError::ErrorCode /*errorCode*/,
+    SocketAddress /*sourceEndpoint*/,
+    size_t /*bytesRead*/)
 {
     ctx->readPromise.set_value();
 }

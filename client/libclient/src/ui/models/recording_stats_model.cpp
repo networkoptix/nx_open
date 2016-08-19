@@ -277,17 +277,19 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
 {
     if (m_isHeaderTextBlocked)
         return QVariant();
+
     if (orientation != Qt::Horizontal || section >= ColumnCount)
         return base_type::headerData(section, orientation, role);
 
-    if (role == Qt::DisplayRole) {
-        switch(section) {
-        case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
-        case BytesColumn:      return tr("Space");
-        case DurationColumn:   return tr("Calendar Days");
-        case BitrateColumn:    return tr("Bitrate");
-        default:
-            break;
+    if (role == Qt::DisplayRole)
+    {
+        switch(section)
+        {
+            case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
+            case BytesColumn:      return tr("Space");
+            case DurationColumn:   return tr("Calendar Days");
+            case BitrateColumn:    return tr("Bitrate for");
+            default:               break;
         }
     }
     //else if (role == Qt::TextAlignmentRole)

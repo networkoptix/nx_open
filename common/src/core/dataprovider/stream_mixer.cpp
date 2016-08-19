@@ -150,7 +150,7 @@ void QnStreamMixer::unmapSourceAudioChannel(
 
 bool QnStreamMixer::canAcceptData() const
 {
-    return m_queue.size() < kDataQueueSize;
+    return m_queue.size() < (int)kDataQueueSize;
 }
 
 void QnStreamMixer::putData(const QnAbstractDataPacketPtr &data)
@@ -171,7 +171,9 @@ bool QnStreamMixer::needConfigureProvider() const
     return m_user->needConfigureProvider();
 }
 
-void QnStreamMixer::proxyOpenStream(bool isCameraControlRequired, const QnLiveStreamParams& params)
+void QnStreamMixer::proxyOpenStream(
+    bool /*isCameraControlRequired*/,
+    const QnLiveStreamParams& /*params*/)
 {
     qDebug() << "Proxy opening stream" << m_sourceMap.size();
 
@@ -269,8 +271,6 @@ void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
         else
             return;
 
-        auto count = channelMap->count(originalChannel);
-        auto size = channelMap->size();
         if (channelMap->count(originalChannel))
         {
             auto mapping = channelMap->at(originalChannel);

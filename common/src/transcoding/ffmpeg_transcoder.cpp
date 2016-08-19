@@ -113,6 +113,7 @@ int workaround_av_write_trailer(AVFormatContext *s)
     /*
     for(;;){
         AVPacket pkt;
+        av_init_packet(&pkt);
         ret= interleave_packet(s, &pkt, NULL, 1);
         if(ret<0) //FIXME cleanup needed for ret<0 ?
             goto fail;
@@ -360,7 +361,7 @@ bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
 int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
 {
     Q_UNUSED(result)
-    if ((quint64)m_baseTime == AV_NOPTS_VALUE)
+    if (m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - m_startTimeOffset;
 
     if (m_audioCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)

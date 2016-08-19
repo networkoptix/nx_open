@@ -17,8 +17,59 @@
     
     "version": "1.0",
     "data": [
-
-
+        {
+            "keys": [
+                "Sony|SNC-VM772R"
+            ],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders": [
+                    "video_encoder_config1,video_encoder_config3"
+                ]
+            },
+            "preStreamConfigureRequests": [
+                {
+                    "templateString": "/command/camera.cgi?ImageCodec2=off",
+                    "method": "GET",
+                    "isAllowedToFail": true,
+                    "body":""
+                },
+                {
+                    "templateString": "/command/camera.cgi?ImageCodec3=h264",
+                    "method": "GET",
+                    "isAllowedToFail": false,
+                    "body": ""
+                }
+            ],
+            "highStreamAvailableBitrates": ["16000"],
+            "lowStreamAvailableBitrates": ["2000"]
+        },
+        {
+            "keys": [
+                "Dlink|DCS-7010L"
+            ],
+            "highStreamBitrateBounds": {
+                "min": 4096,
+                "max": 16384
+            },
+            "lowStreamBitrateBounds": {
+                "min": 4096,
+                "max": 16384
+            }
+        },
+        {
+            "keys": [
+                "Dlink|DCS-6010L"
+            ],
+            "highStreamBitrateBounds": {
+                "min": 0,
+                "max": 2048
+            },
+            "lowStreamBitrateBounds": {
+                "min": 0,
+                "max": 2048
+            }
+        },
         {
             "keys": [
                 "ActiveCam|*"
@@ -36,6 +87,42 @@
                 }
             ]
         },
+		{
+			"keys": [
+				"Advantech|ADAM-6050"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 12,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 6
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6051"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 14,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 2
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6052"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 8,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 8
+		},
+		{
+			"keys": [
+				"Advantech|ADAM-6060","Advantech|ADAM-6066"
+			],
+			"adamStartInputCoil": 0,
+			"adamInputCount": 6,
+			"adamStartOutputCoil": 16,
+			"adamOutputCount": 6
+		},
         {
             "keys": [
                 "FLIR|AX8"
@@ -130,6 +217,12 @@
             ]
         },
         {
+            "keys":[
+                "FLIR Systems|FC-*", "FLIR|FC-*"
+            ],
+            "forceSingleStream": true
+        },
+        {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
@@ -200,9 +293,32 @@
                 "DW|*"
             ],
             "bitratePerGOP": true,
-            "defaultCredentials" : "admin:admin"
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "admin"
+                },
+                {
+                    "user": "root",
+                    "password": "admin"
+                }
+            ]
         },
-
+        {
+            "keys": [
+                "Axis|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "root",
+                    "password": "root"
+                },
+                {
+                    "user": "root",
+                    "password": "pass"
+                }
+            ]
+        },
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
@@ -1322,14 +1438,20 @@
 				"ACTI|A41", "ACTI|A81"
 			],
 			"forceONVIF": true,
-			"defaultCredentials" : "admin:123456"
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "123456"
+                }
+            ]
 		},
 		{
 			"keys": [
 				"DW|*|A*"
 			],
 			"showUrl": true,
-			"urlLocalePath": "cgi-bin/index.cgi"
+			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
+            "desiredH264Profile": "High"
 		}
     ]
 }

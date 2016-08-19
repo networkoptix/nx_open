@@ -3,6 +3,8 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKit/QWebHistory>
 
+#include <ui/widgets/common/web_page.h>
+
 namespace
 {
     enum ProgressValues
@@ -37,6 +39,8 @@ QnWebView::QnWebView(const QUrl &url
     setRenderHints(0);
     settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
     settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true);
+
+    setPage(new QnWebPage(this));
 
     connect(page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
         this, [](QNetworkReply* reply, const QList<QSslError> &){ reply->ignoreSslErrors();} );

@@ -51,8 +51,7 @@ void QnMessageBoxPrivate::init()
     Q_Q(QnMessageBox);
 
     connect(q->ui->buttonBox, &QDialogButtonBox::clicked, this,
-            [this](QAbstractButton *button) { clickedButton = button; }
-    );
+        [this](QAbstractButton *button) { clickedButton = button; });
 
     q->ui->checkBox->hide();
     q->ui->secondaryLine->hide();
@@ -62,6 +61,8 @@ void QnMessageBoxPrivate::init()
     font.setPixelSize(font.pixelSize() + 2);
     q->ui->mainLabel->setFont(font);
     q->ui->mainLabel->setForegroundRole(QPalette::Light);
+
+    q->setResizeToContentsMode(Qt::Vertical);
 
     detectEscapeButton();
     detectDefaultButton();
@@ -222,8 +223,6 @@ QnMessageBox::QnMessageBox(
     setText(text);
     setStandardButtons(buttons);
     setIcon(icon);
-
-    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnMessageBox::~QnMessageBox()

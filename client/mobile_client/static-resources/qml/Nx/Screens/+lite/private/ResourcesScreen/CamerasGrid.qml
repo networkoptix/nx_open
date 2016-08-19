@@ -72,7 +72,8 @@ Item
             layoutX: index % grid.columns
             layoutY: Math.floor(index / grid.columns)
 
-            onClicked: gridLayoutHelper.displayCell = Qt.point(layoutX, layoutY)
+            onClicked: grid.currentIndex = index
+            onDoubleClicked: gridLayoutHelper.displayCell = Qt.point(layoutX, layoutY)
             onNextCameraRequested:
             {
                 gridLayoutHelper.setCameraIdOnCell(

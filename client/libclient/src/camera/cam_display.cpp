@@ -308,7 +308,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
         //bool isPrebuffer = media->flags & QnAbstractMediaData::MediaFlags_FCZ;
         if (m_speed < 1.0 || m_singleShotMode)
             return;
-        if ((quint64)m_firstAfterJumpTime == AV_NOPTS_VALUE) {
+        if (m_firstAfterJumpTime == AV_NOPTS_VALUE) {
             m_firstAfterJumpTime = media->timestamp;
             m_receivedInterval = 0;
             m_afterJumpTimer.restart();
@@ -530,7 +530,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         {
             qint64 displayedTime = getCurrentTime();
             //bool isSingleShot = vd->flags & QnAbstractMediaData::MediaFlags_SingleShot;
-            if (speed != 0  && (quint64)displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed &&
+            if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
                 NX_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
@@ -595,7 +595,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 realSleepTime = m_delay.addQuant(needToSleep);
         }
         //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
-        if ((quint64)realSleepTime != AV_NOPTS_VALUE && !m_buffering)
+        if (realSleepTime != AV_NOPTS_VALUE && !m_buffering)
             hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
@@ -708,7 +708,7 @@ bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed
     if (m_extTimeSrc && m_extTimeSrc->isEnabled())
     {
         qint64 displayedTime = getCurrentTime();
-        if (speed != 0  && (quint64)displayedTime != AV_NOPTS_VALUE)
+        if (speed != 0  && displayedTime != AV_NOPTS_VALUE)
         {
             bool firstWait = true;
             QTime sleepTimer;
@@ -1793,10 +1793,10 @@ qint64 QnCamDisplay::getDisplayedMin() const
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
     {
         qint64 val = m_display[i]->getTimestampOfNextFrameToRender();
-        if ((quint64)val == AV_NOPTS_VALUE)
+        if (val == AV_NOPTS_VALUE)
             continue;
 
-        if ((quint64)rez == AV_NOPTS_VALUE)
+        if (rez == AV_NOPTS_VALUE)
             rez = val;
         else
             rez = qMin(rez, val);
@@ -1826,7 +1826,7 @@ qint64 QnCamDisplay::getMinReverseTime() const
     qint64 rez = m_nextReverseTime[0];
     for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i)
     {
-        if ((quint64)m_nextReverseTime[i] != AV_NOPTS_VALUE && m_nextReverseTime[i] < rez)
+        if (m_nextReverseTime[i] != AV_NOPTS_VALUE && m_nextReverseTime[i] < rez)
             rez = m_nextReverseTime[i];
     }
     return rez;
@@ -1850,7 +1850,7 @@ qint64 QnCamDisplay::getNextTime() const
 
     qint64 lastTime = m_display[0]->getTimestampOfNextFrameToRender();
 
-    if ((quint64)rez != AV_NOPTS_VALUE)
+    if (rez != AV_NOPTS_VALUE)
         return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
     else
         return lastTime;

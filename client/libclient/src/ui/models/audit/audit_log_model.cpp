@@ -461,6 +461,8 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
             }
             return result;
         }
+        default:
+            break;
         }
     }
 

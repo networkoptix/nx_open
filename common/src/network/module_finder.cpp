@@ -21,19 +21,9 @@ namespace
     const int kCheckInterval = 3000;
     const int kNoticeableConflictCount = 5;
 
-    bool isLocalAddress(const HostAddress &address)
-    {
-        if (address.toString().isNull())
-            return false;
-
-        quint8 hi = address.ipv4() >> 24;
-
-        return address == HostAddress::localhost || hi == 10 || hi == 192 || hi == 172;
-    }
-
     bool isBetterAddress(const HostAddress &address, const HostAddress &other)
     {
-        return !isLocalAddress(other) && isLocalAddress(address);
+        return !other.isLocal() && address.isLocal();
     }
 
     QUrl addressToUrl(const HostAddress &address, int port = -1)
@@ -59,7 +49,7 @@ namespace
                 continue;
             }
 
-            if (isLocalAddress(address.address))
+            if (address.address.isLocal())
                 return address;
 
             if (result.port == 0)
@@ -259,6 +249,9 @@ ec2::ApiDiscoveredServerDataList QnModuleFinder::discoveredServers() const
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const
 {
+    if (moduleId == qnCommon->moduleGUID())
+        return qnCommon->moduleInformation();
+
     QnMutexLocker lk(&m_itemsMutex);
     return m_moduleItemById.value(moduleId).moduleInformation;
 }

@@ -22,7 +22,7 @@ void Sender::send(std::shared_ptr<QByteArray> request)
         buffer,
         [this, request = std::move(request)](SystemError::ErrorCode result, size_t size)
         {
-            if (result != SystemError::noError || size != request->size())
+            if (result != SystemError::noError || size != (size_t)request->size())
             {
                 NX_LOG(lm("PCP Send (size=%1) error: %2")
                     .arg(size).arg(SystemError::toString(result)), cl_logDEBUG1);

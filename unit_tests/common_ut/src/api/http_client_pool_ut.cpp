@@ -84,7 +84,7 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     QObject::connect(
         httpPool.get(), &nx_http::ClientPool::done,
         httpPool.get(),
-        [&](int handle, nx_http::AsyncHttpClientPtr client)
+        [&](int /*handle*/, nx_http::AsyncHttpClientPtr client)
     {
         ASSERT_FALSE(client->failed());
         ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);

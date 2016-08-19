@@ -72,7 +72,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
+    addParserParam(commandLineParser, &result.exportedMode,         "--exported");
     addParserParam(commandLineParser, &result.selfUpdateMode,       kSelfUpdateKey);
+    addParserParam(commandLineParser, &result.ipVersion,            "--ip-version");
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
@@ -100,8 +102,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
 
     if (!strCustomUri.isEmpty())
     {
-        result.customUri = nx::vms::utils::SystemUri(strCustomUri);
-        result.customUri.setProtocol(nx::vms::utils::SystemUri::Protocol::Native);     /*< Restore protocol part that was cut out. */
+        /* Restore protocol part that was cut out. */
+        QString fixedUri = lit("%1://%2").arg(nx::vms::utils::AppInfo::nativeUriProtocol()).arg(strCustomUri);
+        result.customUri = nx::vms::utils::SystemUri(fixedUri);
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
@@ -109,31 +112,32 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     return result;
 }
 
-QnStartupParameters::QnStartupParameters()
-    : screen(kInvalidScreen)
+QnStartupParameters::QnStartupParameters():
+    screen(kInvalidScreen),
 
-    , allowMultipleClientInstances(false)
-    , skipMediaFolderScan(false)
-    , ignoreVersionMismatch(false)
-    , vsyncDisabled(false)
-    , clientUpdateDisabled(false)
-    , softwareYuv(false)
-    , forceLocalSettings(false)
-    , fullScreenDisabled(kDefaultNoFullScreen)
-    , showFullInfo(false)
-    , selfUpdateMode(false)
+    allowMultipleClientInstances(false),
+    skipMediaFolderScan(false),
+    ignoreVersionMismatch(false),
+    vsyncDisabled(false),
+    clientUpdateDisabled(false),
+    softwareYuv(false),
+    forceLocalSettings(false),
+    fullScreenDisabled(kDefaultNoFullScreen),
+    showFullInfo(false),
+    exportedMode(false),
+    selfUpdateMode(false),
 
-    , devModeKey()
-    , authenticationString()
-    , delayedDrop()
-    , instantDrop()
-    , logLevel()
-    , ec2TranLogLevel()
-    , dynamicTranslationPath()
-    , lightMode()
-    , videoWallGuid()
-    , videoWallItemGuid()
-    , engineVersion()
-    , dynamicCustomizationPath()
+    devModeKey(),
+    authenticationString(),
+    delayedDrop(),
+    instantDrop(),
+    logLevel(),
+    ec2TranLogLevel(),
+    dynamicTranslationPath(),
+    lightMode(),
+    videoWallGuid(),
+    videoWallItemGuid(),
+    engineVersion(),
+    dynamicCustomizationPath()
 {
 }

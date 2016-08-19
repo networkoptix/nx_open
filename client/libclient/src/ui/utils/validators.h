@@ -20,7 +20,7 @@ namespace Qn
     using TextValidateFunction = std::function<ValidationResult (const QString&)>;
     using TextAccessorFunction = std::function<QString(void)>;
 
-    TextValidateFunction defaultEmailValidator();
+    TextValidateFunction defaultEmailValidator(bool allowEmpty = true);
     TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage);
     TextValidateFunction defaultPasswordValidator(bool allowEmpty, const QString& emptyPasswordMessage = QString());
     TextValidateFunction defaultConfirmationValidator(TextAccessorFunction primaryText, const QString& errorMessage);

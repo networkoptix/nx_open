@@ -2,7 +2,7 @@
 
 #include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/resource/security_cam_resource.h>
-#include <nx/network/system_socket.h>
+#include <nx/network/socket.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 #include <nx/network/http/asynchttpclient.h>
 

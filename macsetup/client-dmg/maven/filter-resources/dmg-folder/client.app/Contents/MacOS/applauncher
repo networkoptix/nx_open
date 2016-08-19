@@ -16,6 +16,4 @@ else
     fi
 fi
 
-export DYLD_LIBRARY_PATH="$APPLAUNCHER_DIR/../Frameworks"
-export DYLD_FRAMEWORK_PATH="$APPLAUNCHER_DIR/../Frameworks"
 "$APPLAUNCHER_DIR/applauncher-bin" $@

@@ -24,7 +24,7 @@ QnArecontRtspStreamReader::~QnArecontRtspStreamReader()
 }
 
 CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
-    bool isCameraControlRequired,
+    bool /*isCameraControlRequired*/,
     const QnLiveStreamParams& params)
 {
     if (isStreamOpened())

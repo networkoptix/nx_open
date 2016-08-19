@@ -199,7 +199,7 @@ bool QnAxisAudioTransmitter::startTransmission()
     m_timer.restart();
     QnMutexLocker lock(&m_mutex);
     while (m_state == TransmitterState::WaitingForConnection &&
-           m_timer.elapsed() < kTransmissionTimeout && !m_needStop)
+           m_timer.elapsed() < (qint64)kTransmissionTimeout && !m_needStop)
     {
         auto waitDuration = kTransmissionTimeout - m_timer.elapsed();
         if (waitDuration <= 0)

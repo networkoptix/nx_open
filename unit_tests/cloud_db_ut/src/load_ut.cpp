@@ -47,7 +47,7 @@ TEST_F(CdbLoadTest, DISABLED_manyConnections)
     {
         auto& connection = connections[i];
 
-        connection = std::make_unique<nx::network::TCPSocket>();
+        connection = std::make_unique<nx::network::TCPSocket>(false, AF_INET);
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         ASSERT_TRUE(connection->setSendTimeout(sendTimeoutMs));
         connection->connectAsync(endpoint(), onConnectDone);

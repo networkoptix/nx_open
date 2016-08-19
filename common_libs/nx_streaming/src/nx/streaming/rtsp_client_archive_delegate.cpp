@@ -422,11 +422,11 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     qint64 timeMs = AV_NOPTS_VALUE;
     if (result && result->timestamp >= 0)
         timeMs = result->timestamp/1000; // do not switch server if AV_NOPTS_VALUE and any other invalid packet timings
-    bool outOfRange = (quint64)timeMs != AV_NOPTS_VALUE && ((m_rtspSession->getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
+    bool outOfRange = timeMs != AV_NOPTS_VALUE && ((m_rtspSession->getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
                       (m_rtspSession->getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs));
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
-        if ((quint64)m_lastSeekTime == AV_NOPTS_VALUE)
+        if (m_lastSeekTime == AV_NOPTS_VALUE)
             m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
         QnMediaServerResourcePtr newServer = getNextMediaServerFromTime(m_camera, m_lastSeekTime/1000);
         if (newServer) {
