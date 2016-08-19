@@ -267,6 +267,7 @@ namespace nx_http
         static const StringType HEAD;
         static const StringType POST;
         static const StringType PUT;
+        static const StringType OPTIONS;
     };
 
     //!Represents string like HTTP/1.1, RTSP/1.0

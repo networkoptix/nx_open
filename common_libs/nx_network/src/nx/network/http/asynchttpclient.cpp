@@ -67,7 +67,8 @@ namespace nx_http
         m_lastSysErrorCode(SystemError::noError),
         m_requestSequence(0),
         m_forcedEof(false),
-        m_precalculatedAuthorizationDisabled(false)
+        m_precalculatedAuthorizationDisabled(false),
+        m_connectionHeader("keep-alive")
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -216,6 +217,17 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    void AsyncHttpClient::doOptions(const QUrl& url)
+    {
+        NX_ASSERT(url.isValid());
+
+        resetDataBeforeNewRequest();
+        m_url = url;
+        m_url.setPath(QLatin1String("*"));
+        composeRequest(nx_http::Method::OPTIONS);
+        initiateHttpMessageDelivery(url);
+    }
+
     const nx_http::Request& AsyncHttpClient::request() const
     {
         return m_request;
@@ -313,6 +325,11 @@ namespace nx_http
     void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
         m_proxyEndpoint = proxyEndpoint;
+    }
+
+    void AsyncHttpClient::setConnectionHeader(const StringType& value)
+    {
+        m_connectionHeader = value;
     }
 
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -813,7 +830,7 @@ namespace nx_http
                 //    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
             }
             //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
-            m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
+            m_request.headers.insert(std::make_pair("Connection", m_connectionHeader));
             m_request.headers.insert(std::make_pair("Host", m_url.host().toLatin1()));
         }
 

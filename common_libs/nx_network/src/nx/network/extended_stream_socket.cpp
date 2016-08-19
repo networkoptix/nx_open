@@ -43,6 +43,9 @@ void ExtendedStreamSocket::waitForRecvData(
 
 void ExtendedStreamSocket::injectRecvData(Buffer buffer, Inject injectType)
 {
+    NX_LOGX(lm("injectRecvData size=%1, injectType=%2")
+        .arg(buffer.size()).arg(static_cast<int>(injectType)), cl_logDEBUG2);
+
     switch (injectType)
     {
         case Inject::only:
