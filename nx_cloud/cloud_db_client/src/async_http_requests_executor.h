@@ -30,7 +30,7 @@ namespace cl {
 
 /** Executes HTTP requests asynchronously.
     On object destruction all not yet completed requests are cancelled
-*/ 
+*/
 class AsyncRequestsExecutor
 {
 public:
@@ -67,6 +67,15 @@ public:
         m_password = QString::fromStdString(password);
     }
 
+    void setProxyCredentials(
+        const std::string& login,
+        const std::string& password)
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_proxyUsername = QString::fromStdString(login);
+        m_proxyPassword = QString::fromStdString(password);
+    }
+
 protected:
     //!asynchronously fetches url and executes request
     template<typename InputData, typename HandlerFunc, typename ErrHandlerFunc>
@@ -80,10 +89,14 @@ protected:
 
         QString username;
         QString password;
+        QString proxyUsername;
+        QString proxyPassword;
         {
             QnMutexLocker lk(&m_mutex);
             username = m_username;
             password = m_password;
+            proxyUsername = m_proxyUsername;
+            proxyPassword = m_proxyPassword;
         }
 
         m_cdbEndPointFetcher->get(
@@ -147,6 +160,8 @@ private:
     mutable QnMutex m_mutex;
     QString m_username;
     QString m_password;
+    QString m_proxyUsername;
+    QString m_proxyPassword;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
     std::unique_ptr<
         network::cloud::CloudModuleEndPointFetcher::ScopedOperation
@@ -195,7 +210,7 @@ private:
             nx_http::FusionDataHttpClient<void, void>>(std::move(url)),
             std::move(completionHandler));
     }
-    
+
     template<typename HttpClientType, typename ... OutputData>
     void execute(
         std::unique_ptr<HttpClientType> client,
@@ -230,7 +245,7 @@ private:
                         OutputData()...);
 
                 api::ResultCode resultCode = api::ResultCode::ok;
-                const auto resultCodeStrIter = 
+                const auto resultCodeStrIter =
                     response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
                 if (resultCodeStrIter != response->headers.end())
                 {

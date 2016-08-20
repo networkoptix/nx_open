@@ -25,16 +25,10 @@ public:
 
     //!Implementation of \a api::ConnectionFactory::connect
     virtual void connect(
-        const std::string& login,
-        const std::string& password,
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) override;
     //!Implementation of \a api::ConnectionFactory::createConnection
-    virtual std::unique_ptr<api::Connection> createConnection(
-        const std::string& login,
-        const std::string& password) override;
-    virtual std::unique_ptr<api::EventConnection> createEventConnection(
-        const std::string& login,
-        const std::string& password) override;
+    virtual std::unique_ptr<api::Connection> createConnection() override;
+    virtual std::unique_ptr<api::EventConnection> createEventConnection() override;
     //!Implementation of \a api::ConnectionFactory::createConnection
     virtual std::string toString(api::ResultCode resultCode) const override;
 

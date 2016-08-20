@@ -14,17 +14,14 @@ namespace cdb {
 namespace cl {
 
 Connection::Connection(
-    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
-    const std::string& login,
-    const std::string& password)
-:
+    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher)
+    :
     AsyncRequestsExecutor(endPointFetcher)
 {
     m_accountManager = std::make_unique<AccountManager>(endPointFetcher);
     m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
     m_authProvider = std::make_unique<AuthProvider>(endPointFetcher);
 
-    setCredentials(login, password);
 }
 
 api::AccountManager* Connection::accountManager()
@@ -49,6 +46,15 @@ void Connection::setCredentials(
     m_accountManager->setCredentials(login, password);
     m_systemManager->setCredentials(login, password);
     m_authProvider->setCredentials(login, password);
+}
+
+void Connection::setProxyCredentials(
+    const std::string& login,
+    const std::string& password)
+{
+    m_accountManager->setProxyCredentials(login, password);
+    m_systemManager->setProxyCredentials(login, password);
+    m_authProvider->setProxyCredentials(login, password);
 }
 
 void Connection::ping(

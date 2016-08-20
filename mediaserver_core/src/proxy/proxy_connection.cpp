@@ -201,8 +201,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     nx_http::header::DigestAuthorization originalAuthHeader;
     if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
         return false;
-    if (originalAuthHeader.authScheme != nx_http::header::AuthScheme::digest ||
-        originalAuthHeader.digest->params["realm"] != QnAppInfo::realm().toUtf8())
+    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
     {
         return true; //< no need to update, it is non server proxy request
     }

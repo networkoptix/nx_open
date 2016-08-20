@@ -36,10 +36,8 @@ class EventConnection
 {
 public:
     EventConnection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
-        std::string login,
-        std::string password);
-    virtual ~EventConnection();
+        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
+        virtual ~EventConnection();
 
     virtual void start(
         api::SystemEventHandlers eventHandlers,
@@ -57,8 +55,10 @@ private:
 
     std::unique_ptr<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>
         m_cdbEndPointFetcher;
-    const std::string m_login;
-    const std::string m_password;
+    std::string m_login;
+    std::string m_password;
+    std::string m_proxyLogin;
+    std::string m_proxyPassword;
     nx_http::AsyncHttpClientPtr m_httpClient;
     api::SystemEventHandlers m_eventHandlers;
     std::function<void(api::ResultCode)> m_connectCompletionHandler;
@@ -72,6 +72,9 @@ private:
         SocketAddress endpoint);
     void initiateConnection();
     void connectionAttemptHasFailed(api::ResultCode result);
+
+    virtual void setCredentials(const std::string& login, const std::string& password) override;
+    virtual void setProxyCredentials(const std::string& login, const std::string& password) override;
 
 private slots:
     void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);

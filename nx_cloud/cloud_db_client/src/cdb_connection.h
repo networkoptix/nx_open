@@ -31,9 +31,7 @@ class Connection
 {
 public:
     Connection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
-        const std::string& login,
-        const std::string& password);
+        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
 
     //!Implemetation of api::Connection::getAccountManager
     virtual api::AccountManager* accountManager() override;
@@ -46,6 +44,12 @@ public:
     virtual void setCredentials(
         const std::string& login,
         const std::string& password) override;
+
+    //!Implemetation of api::Connection::setProxyCredentials
+    virtual void setProxyCredentials(
+        const std::string& login,
+        const std::string& password) override;
+
     //!Implemetation of api::Connection::ping
     virtual void ping(
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;
