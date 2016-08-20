@@ -50,6 +50,8 @@ public:
         const std::string& login,
         const std::string& password) override;
 
+    virtual void setProxyVia(const SocketAddress& proxyEndpoint) override;
+
     //!Implemetation of api::Connection::ping
     virtual void ping(
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;

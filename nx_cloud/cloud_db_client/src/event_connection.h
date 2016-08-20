@@ -55,10 +55,7 @@ private:
 
     std::unique_ptr<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>
         m_cdbEndPointFetcher;
-    std::string m_login;
-    std::string m_password;
-    std::string m_proxyLogin;
-    std::string m_proxyPassword;
+    nx_http::AuthInfo m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;
     api::SystemEventHandlers m_eventHandlers;
     std::function<void(api::ResultCode)> m_connectCompletionHandler;
@@ -75,6 +72,7 @@ private:
 
     virtual void setCredentials(const std::string& login, const std::string& password) override;
     virtual void setProxyCredentials(const std::string& login, const std::string& password) override;
+    virtual void setProxyVia(const SocketAddress& proxyEndpoint) override;
 
 private slots:
     void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);

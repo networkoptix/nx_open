@@ -31,6 +31,7 @@ namespace nx_http
         QString password;
         QString proxyUsername;
         QString proxyPassword;
+        SocketAddress proxyEndpoint;
     };
 
 

@@ -38,14 +38,19 @@ EventConnection::EventConnection(
 
 void EventConnection::setCredentials(const std::string& login, const std::string& password)
 {
-    m_login = login;
-    m_password = password;
+    m_auth.username = QString::fromStdString(login);
+    m_auth.password = QString::fromStdString(password);
 }
 
 void EventConnection::setProxyCredentials(const std::string& login, const std::string& password)
 {
-    m_proxyLogin = login;
-    m_proxyPassword = password;
+    m_auth.proxyUsername = QString::fromStdString(login);
+    m_auth.proxyPassword = QString::fromStdString(password);
+}
+
+void EventConnection::setProxyVia(const SocketAddress& proxyEndpoint)
+{
+    m_auth.proxyEndpoint = proxyEndpoint;
 }
 
 EventConnection::~EventConnection()
@@ -115,10 +120,7 @@ void EventConnection::initiateConnection()
     url.setHost(m_cdbEndpoint.address.toString());
     url.setPort(m_cdbEndpoint.port);
     url.setPath(url.path() + kSubscribeToSystemEventsPath);
-    url.setUserName(QString::fromStdString(m_login));
-    url.setPassword(QString::fromStdString(m_password));
-    m_httpClient->setProxyUserName(QString::fromStdString(m_proxyLogin));
-    m_httpClient->setProxyUserPassword(QString::fromStdString(m_proxyPassword));
+    m_httpClient->setAuth(m_auth);
     m_httpClient->doGet(url);
 }
 

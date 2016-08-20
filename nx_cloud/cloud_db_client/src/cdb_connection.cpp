@@ -57,6 +57,13 @@ void Connection::setProxyCredentials(
     m_authProvider->setProxyCredentials(login, password);
 }
 
+void Connection::setProxyVia(const SocketAddress& proxyEndpoint)
+{
+    m_accountManager->setProxyVia(proxyEndpoint);
+    m_systemManager->setProxyVia(proxyEndpoint);
+    m_authProvider->setProxyVia(proxyEndpoint);
+}
+
 void Connection::ping(
     std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler)
 {

@@ -52,6 +52,7 @@ public:
 
     bool cleanupCloudDataInLocalDB();
 
+    void setProxyVia(const SocketAddress& proxyEndpoint);
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
     void connectedToCloud();
@@ -60,6 +61,7 @@ signals:
 private:
     QString m_cloudSystemID;
     QString m_cloudAuthKey;
+    SocketAddress m_proxyAddress;
     mutable QnMutex m_mutex;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,

@@ -2120,6 +2120,9 @@ void MediaServerProcess::run()
             server,
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
             qnCommon->moduleInformation().sslAllowed);
+        cloudConnectionManager.setProxyVia(
+            SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+
 
         QList<SocketAddress> serverAddresses;
         const auto port = server->getPort();

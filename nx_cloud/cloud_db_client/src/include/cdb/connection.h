@@ -16,6 +16,7 @@
 #include "module_info.h"
 #include "result_code.h"
 #include "system_manager.h"
+#include <nx/network/socket_common.h>
 
 
 namespace nx {
@@ -55,6 +56,7 @@ public:
     virtual void setProxyCredentials(
         const std::string& login,
         const std::string& password) = 0;
+    virtual void setProxyVia(const SocketAddress& proxyEndpoint) = 0;
 };
 
 class Connection: public BaseConnection

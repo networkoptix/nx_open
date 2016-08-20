@@ -76,6 +76,12 @@ public:
         m_auth.proxyPassword = QString::fromStdString(password);
     }
 
+    void setProxyVia(const SocketAddress& proxyEndpoint)
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_auth.proxyEndpoint = proxyEndpoint;
+    }
+
 protected:
     //!asynchronously fetches url and executes request
     template<typename InputData, typename HandlerFunc, typename ErrHandlerFunc>
@@ -88,6 +94,7 @@ protected:
         //TODO #ak introduce generic implementation with variadic templates available
 
         nx_http::AuthInfo auth;
+        SocketAddress proxyEndpoint;
         {
             QnMutexLocker lk(&m_mutex);
             auth = m_auth;

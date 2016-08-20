@@ -54,6 +54,11 @@ CloudConnectionManager::~CloudConnectionManager()
         stopMonitoringCloudEvents();
 }
 
+void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
+{
+    m_proxyAddress = proxyEndpoint;
+}
+
 boost::optional<nx::hpm::api::SystemCredentials>
     CloudConnectionManager::getSystemCredentials() const
 {
@@ -91,6 +96,7 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     auto result = m_cdbConnectionFactory->createConnection();
     result->setCredentials(cloudSystemID.toStdString(), cloudAuthKey.toStdString());
     result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+    result->setProxyVia(m_proxyAddress);
     return result;
 }
 
@@ -197,6 +203,7 @@ void CloudConnectionManager::monitorForCloudEvents()
     m_eventConnection = m_cdbConnectionFactory->createEventConnection();
     m_eventConnection->setCredentials(m_cloudSystemID.toStdString(), m_cloudAuthKey.toStdString());
     m_eventConnection->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+    m_eventConnection->setProxyVia(m_proxyAddress);
 
     m_eventConnectionRetryTimer = std::make_unique<nx::network::RetryTimer>(
         nx::network::RetryPolicy(
