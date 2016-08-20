@@ -63,8 +63,8 @@ public:
         const std::string& password)
     {
         QnMutexLocker lk(&m_mutex);
-        m_username = QString::fromStdString(login);
-        m_password = QString::fromStdString(password);
+        m_auth.username = QString::fromStdString(login);
+        m_auth.password = QString::fromStdString(password);
     }
 
     void setProxyCredentials(
@@ -72,8 +72,8 @@ public:
         const std::string& password)
     {
         QnMutexLocker lk(&m_mutex);
-        m_proxyUsername = QString::fromStdString(login);
-        m_proxyPassword = QString::fromStdString(password);
+        m_auth.proxyUsername = QString::fromStdString(login);
+        m_auth.proxyPassword = QString::fromStdString(password);
     }
 
 protected:
@@ -87,20 +87,14 @@ protected:
     {
         //TODO #ak introduce generic implementation with variadic templates available
 
-        QString username;
-        QString password;
-        QString proxyUsername;
-        QString proxyPassword;
+        nx_http::AuthInfo auth;
         {
             QnMutexLocker lk(&m_mutex);
-            username = m_username;
-            password = m_password;
-            proxyUsername = m_proxyUsername;
-            proxyPassword = m_proxyPassword;
+            auth = m_auth;
         }
 
         m_cdbEndPointFetcher->get(
-            [this, username, password, path, input, handler, errHandler](
+            [this, auth, path, input, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable
             {
@@ -112,10 +106,9 @@ protected:
                 url.setHost(endpoint.address.toString());
                 url.setPort(endpoint.port);
                 url.setPath(url.path() + path);
-                url.setUserName(username);
-                url.setPassword(password);
                 execute(
                     std::move(url),
+                    std::move(auth),
                     input,
                     std::move(handler));
             });
@@ -127,16 +120,14 @@ protected:
         HandlerFunc handler,
         ErrHandlerFunc errHandler)
     {
-        QString username;
-        QString password;
+        nx_http::AuthInfo auth;
         {
             QnMutexLocker lk(&m_mutex);
-            username = m_username;
-            password = m_password;
+            auth = m_auth;
         }
 
         m_cdbEndPointFetcher->get(
-            [this, username, password, path, handler, errHandler](
+            [this, auth, path, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable
             {
@@ -148,20 +139,16 @@ protected:
                 url.setHost(endpoint.address.toString());
                 url.setPort(endpoint.port);
                 url.setPath(url.path() + path);
-                url.setUserName(username);
-                url.setPassword(password);
                 execute(
                     std::move(url),
+                    std::move(auth),
                     std::move(handler));
             });
     }
 
 private:
     mutable QnMutex m_mutex;
-    QString m_username;
-    QString m_password;
-    QString m_proxyUsername;
-    QString m_proxyPassword;
+    nx_http::AuthInfo m_auth;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
     std::unique_ptr<
         network::cloud::CloudModuleEndPointFetcher::ScopedOperation
@@ -173,41 +160,45 @@ private:
     template<typename InputData, typename OutputData>
     void execute(
         QUrl url,
+        nx_http::AuthInfo auth,
         const InputData& input,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
     {
         execute(std::make_unique<
-            nx_http::FusionDataHttpClient<InputData, OutputData>>(std::move(url), input),
+            nx_http::FusionDataHttpClient<InputData, OutputData>>(std::move(url), std::move(auth), input),
             std::move(completionHandler));
     }
 
     template<typename InputData>
     void execute(
         QUrl url,
+        nx_http::AuthInfo auth,
         const InputData& input,
         std::function<void(api::ResultCode)> completionHandler)
     {
         execute(std::make_unique<
-            nx_http::FusionDataHttpClient<InputData, void>>(std::move(url), input),
+            nx_http::FusionDataHttpClient<InputData, void>>(std::move(url), std::move(auth), input),
             std::move(completionHandler));
     }
 
     template<typename OutputData>
     void execute(
         QUrl url,
+        nx_http::AuthInfo auth,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
     {
         execute(std::make_unique<
-            nx_http::FusionDataHttpClient<void, OutputData>>(std::move(url)),
+            nx_http::FusionDataHttpClient<void, OutputData>>(std::move(url), std::move(auth)),
             std::move(completionHandler));
     }
 
     void execute(
         QUrl url,
+        nx_http::AuthInfo auth,
         std::function<void(api::ResultCode)> completionHandler)
     {
         execute(std::make_unique<
-            nx_http::FusionDataHttpClient<void, void>>(std::move(url)),
+            nx_http::FusionDataHttpClient<void, void>>(std::move(url), std::move(auth)),
             std::move(completionHandler));
     }
 

@@ -322,6 +322,14 @@ namespace nx_http
         m_proxyUserPassword = userPassword;
     }
 
+    void AsyncHttpClient::setAuth(const AuthInfo& auth)
+    {
+        setUserName(auth.username);
+        setUserPassword(auth.password);
+        setProxyUserName(auth.proxyUsername);
+        setProxyUserPassword(auth.proxyPassword);
+    }
+
     void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
         m_proxyEndpoint = proxyEndpoint;
