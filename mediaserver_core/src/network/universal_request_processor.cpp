@@ -251,7 +251,12 @@ bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
 
 bool QnUniversalRequestProcessor::needStandardProxy(const nx_http::Request& request)
 {
-    return request.requestLine.url.path().startsWith("/cdb") || isProxyForCamera(request);
+    return isCloudRequest(request) || isProxyForCamera(request);
+}
+
+bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request)
+{
+    return request.requestLine.url.path().startsWith("/cdb");
 }
 
 bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& request)

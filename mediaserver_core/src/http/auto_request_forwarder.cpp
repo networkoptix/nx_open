@@ -20,6 +20,7 @@
 #include <nx/streaming/rtsp_client.h>
 
 #include "streaming/streaming_params.h"
+#include <network/universal_request_processor.h>
 
 
 static const qint64 USEC_PER_MS = 1000;
@@ -46,6 +47,25 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         request->headers.find( Qn::CAMERA_GUID_HEADER_NAME ) != request->headers.end() )
     {
         //CAMERA_GUID_HEADER_NAME already present
+        return;
+    }
+
+    if (QnUniversalRequestProcessor::isCloudRequest(*request))
+    {
+        auto servers = qnResPool->getResources<QnMediaServerResource>().filtered(
+            [](const QnMediaServerResourcePtr server)
+            {
+                return server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+            });
+        if (!servers.isEmpty())
+        {
+            if (addProxyToRequest(request, servers.front()))
+            {
+                NX_LOG(lit("auto_forward. Forwarding request %1 to server %2").
+                    arg(request->requestLine.url.path()).
+                    arg(servers.front()->getId().toString()), cl_logDEBUG2);
+            }
+        }
         return;
     }
 
@@ -79,18 +99,28 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
                 }
             }
         }
-        if( !serverRes )
-            return; //no current server?
-        if( serverRes->getId() == qnCommon->moduleGUID() )
-            return; //target server is this one
-        NX_LOG(lit("auto_forward. Forwarding request %1 (resource %2, timestamp %3) to server %4").
-            arg(request->requestLine.url.path()).arg(cameraRes->getId().toString()).
-            arg(timestampMs == -1 ? QString::fromLatin1("live") : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate)).
-            arg(serverRes->getId().toString()), cl_logDEBUG2);
-        request->headers.emplace(
-            Qn::SERVER_GUID_HEADER_NAME,
-            serverRes->getId().toByteArray() );
+        if (addProxyToRequest(request, serverRes))
+        {
+            NX_LOG(lit("auto_forward. Forwarding request %1 (resource %2, timestamp %3) to server %4").
+                arg(request->requestLine.url.path()).arg(cameraRes->getId().toString()).
+                arg(timestampMs == -1 ? QString::fromLatin1("live") : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate)).
+                arg(serverRes->getId().toString()), cl_logDEBUG2);
+        }
     }
+}
+
+bool QnAutoRequestForwarder::addProxyToRequest(
+    nx_http::Request* const request,
+    const QnMediaServerResourcePtr& serverRes)
+{
+    if (!serverRes)
+        return false;
+    if (serverRes->getId() == qnCommon->moduleGUID())
+        return false; //target server is this one
+    request->headers.emplace(
+        Qn::SERVER_GUID_HEADER_NAME,
+        serverRes->getId().toByteArray());
+    return true;
 }
 
 void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
