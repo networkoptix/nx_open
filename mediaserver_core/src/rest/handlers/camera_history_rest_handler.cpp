@@ -2,7 +2,6 @@
 #include <QWaitCondition>
 
 #include <vector>
-#include <algorithm>
 
 #include <api/helpers/chunks_request_data.h>
 
@@ -11,43 +10,33 @@
 
 namespace {
 
-struct CandidateTimePeriod
+struct TimePeriodEx: public QnTimePeriod
 {
-    QnUuid serverId;
-    QnTimePeriod period;
     int index;
-    CandidateTimePeriod(const QnUuid& serverId, const QnTimePeriod& period, int index):
-        serverId(serverId),
-        period(period),
-        index(index)
-    {}
-    CandidateTimePeriod(): index(-1) {}
-    bool isNull() const { return period.isNull(); }
-    operator bool() const { return !isNull();  }
+
+    TimePeriodEx(const QnTimePeriod& period, int index): QnTimePeriod(period), index(index) {}
+    TimePeriodEx(): index(-1) {}
+    operator bool() const { return !isNull(); }
 };
 
-CandidateTimePeriod findMinStartTimePeriod(
-    std::vector<int>& scanPos,
+TimePeriodEx findMinStartTimePeriod(
+    const std::vector<int>& scanPos,
     const MultiServerPeriodDataList& chunks)
 {
-    CandidateTimePeriod result;
-    qint64 minTime = std::numeric_limits<qint64>::max();
-
+    TimePeriodEx result;
     for (int i = 0; i < scanPos.size(); ++i)
     {
         if (scanPos[i] >= chunks[i].periods.size())
             continue; //< no periods left
 
         const auto& period = chunks[i].periods[scanPos[i]];
-        if (period.startTimeMs < minTime ||
-           (period.startTimeMs == minTime && period.endTimeMs() > result.period.endTimeMs()))
+        if (result.isNull() ||
+            period.startTimeMs < result.startTimeMs ||
+           (period.startTimeMs == result.startTimeMs && period.endTimeMs() > result.endTimeMs()))
         {
-            result = CandidateTimePeriod(chunks[i].guid, period, i);
-            minTime = period.startTimeMs;
+            result = TimePeriodEx(period, i);
         }
     }
-    if (!result.isNull())
-        ++scanPos[result.index];
     return result;
 }
 
@@ -57,28 +46,33 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
 {
     ec2::ApiCameraHistoryItemDataList result;
     std::vector<int> scanPos(chunks.size());
+    TimePeriodEx prevPeriod;
 
-    CandidateTimePeriod prevPeriod;
-    while (auto candidate = findMinStartTimePeriod(scanPos, chunks))
+    while (auto period = findMinStartTimePeriod(scanPos, chunks))
     {
-        if (prevPeriod.period.contains(candidate.period))
+        ++scanPos[period.index];
+        if (prevPeriod.contains(period))
             continue; //< no time advance
-        if (prevPeriod.serverId != candidate.serverId)
-            result.push_back(ec2::ApiCameraHistoryItemData(candidate.serverId, candidate.period.startTimeMs));
-        prevPeriod = candidate;
+        if (prevPeriod.index != period.index)
+            result.push_back(ec2::ApiCameraHistoryItemData(chunks[period.index].guid, period.startTimeMs));
+        prevPeriod = period;
     }
-
     return result;
 }
 
-int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor* owner)
+int QnCameraHistoryRestHandler::executeGet(
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     QnChunksRequestData request = QnChunksRequestData::fromParams(params);
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
 
     ec2::ApiCameraHistoryDataList outputData;
-    for (const auto& camera : request.resList)
+    for (const auto& camera: request.resList)
     {
         QnChunksRequestData updatedRequest = request;
         updatedRequest.resList.clear();
