@@ -1,5 +1,13 @@
+
+#ifdef _WIN32
+#include <Winsock2.h>
+typedef ULONG in_addr_t;
+#endif
+
 #include <gtest/gtest.h>
+
 #include <nx/network/socket_common.h>
+
 
 void testHostAddress(
     HostAddress host,
@@ -45,7 +53,10 @@ void testHostAddress(
 
     if (ipv4)
     {
-        in_addr addr = { *ipv4 };
+        in_addr addr;
+
+        memset(&addr, 0, sizeof(addr));
+        addr.s_addr = *ipv4;
         testHostAddress(addr, ipv4, ipv6, string4);
     }
 
