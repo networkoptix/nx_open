@@ -101,6 +101,7 @@ protected:
         }
 
         m_cdbEndPointFetcher->get(
+            auth,
             [this, auth, path, input, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable
@@ -134,6 +135,7 @@ protected:
         }
 
         m_cdbEndPointFetcher->get(
+            auth,
             [this, auth, path, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable

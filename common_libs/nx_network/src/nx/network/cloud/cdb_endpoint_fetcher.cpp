@@ -218,6 +218,11 @@ CloudModuleEndPointFetcher::ScopedOperation::~ScopedOperation()
 
 void CloudModuleEndPointFetcher::ScopedOperation::get(Handler handler)
 {
+    get(nx_http::AuthInfo(), std::move(handler));
+}
+
+void CloudModuleEndPointFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Handler handler)
+{
     auto sharedGuard = m_guard.sharedGuard();
     m_fetcher->get(
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](

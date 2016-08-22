@@ -70,6 +70,7 @@ public:
         ScopedOperation(CloudModuleEndPointFetcher* fetcher);
         ~ScopedOperation();
 
+        void get(nx_http::AuthInfo auth, Handler handler);
         void get(Handler handler);
 
     private:
