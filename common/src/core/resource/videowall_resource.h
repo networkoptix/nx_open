@@ -34,17 +34,17 @@ public:
 
     virtual Qn::ResourceStatus getStatus() const override;
 signals:
-    Qn::Notifier itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
-    Qn::Notifier itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
-    Qn::Notifier itemChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
+    void itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
+    void itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
+    void itemChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
 
-    Qn::Notifier pcAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
-    Qn::Notifier pcRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
-    Qn::Notifier pcChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
+    void pcAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
+    void pcRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
+    void pcChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
 
-    Qn::Notifier matrixAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
-    Qn::Notifier matrixRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
-    Qn::Notifier matrixChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
+    void matrixAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
+    void matrixRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
+    void matrixChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
 
     void autorunChanged(const QnResourcePtr &resource);
 
