@@ -685,7 +685,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
     QnActionParameters params(resList);
     if (resList.isEmpty())
     {
-        QnMessageBox::information(this, tr("Information"), tr("This resources are already removed from the system"));
+        QnMessageBox::information(this, tr("Information"), tr("These resources are already removed from the system"));
         return;
     }
 
