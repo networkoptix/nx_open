@@ -561,7 +561,7 @@ namespace nx_http
             {
                 if (!m_proxyAuthorizationTried && (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
                 {
-                    if (resendRequestWithAuthorization(*response))
+                    if (resendRequestWithAuthorization(*response, true))
                         return;
                 }
             }
@@ -967,12 +967,12 @@ namespace nx_http
             header::DigestAuthorization digestAuthorizationHeader;
             if (!calcDigestResponse(
                     m_request.requestLine.method,
-                    m_userName.toUtf8(),
+                    userName.toUtf8(),
                     m_authType != authDigestWithPasswordHash
-                        ? m_userPassword.toUtf8()
+                        ? userPassword.toUtf8()
                         : boost::optional<nx_http::BufferType>(),
                     m_authType == authDigestWithPasswordHash
-                        ? m_userPassword.toLatin1()
+                        ? userPassword.toLatin1()
                         : boost::optional<nx_http::BufferType>(),
                     m_url.path().toUtf8(),
                     wwwAuthenticateHeader,
