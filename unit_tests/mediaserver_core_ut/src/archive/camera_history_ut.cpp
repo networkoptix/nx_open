@@ -57,6 +57,32 @@ TEST(CameraHistory, BuildHistoryData)
         ASSERT_EQ(result[0].serverGuid, server2Data.guid);
         ASSERT_EQ(result[0].timestampMs, 1470709151655);
     }
+    
+    {
+        // s1:                 |----|      |--------- this chunk is being recorded
+        // s2: |---------| |-------------| |--------|
+        MultiServerPeriodDataList chunkPeriods;
+        MultiServerPeriodData server1Data;
+        server1Data.guid = QnUuid::createUuid();
+        server1Data.periods.push_back(QnTimePeriod(1470885319635, 963520));
+        server1Data.periods.push_back(QnTimePeriod(1471229169513, -1));
+
+        MultiServerPeriodData server2Data;
+        server2Data.guid = QnUuid::createUuid();
+        server2Data.periods.push_back(QnTimePeriod(1470709151655, 171992961));
+        server2Data.periods.push_back(QnTimePeriod(1470885319122, 343823623));
+        server2Data.periods.push_back(QnTimePeriod(1471229169513, 5485460));
+
+        chunkPeriods.push_back(server1Data);
+        chunkPeriods.push_back(server2Data);
+
+        auto result = BuildHistoryDataAccess::buildHistoryData(&handler, chunkPeriods);
+        ASSERT_EQ(result.size(), 2);
+        ASSERT_EQ(result[0].serverGuid, server2Data.guid);
+        ASSERT_EQ(result[0].timestampMs, 1470709151655);
+        ASSERT_EQ(result[1].serverGuid, server1Data.guid);
+        ASSERT_EQ(result[1].timestampMs, 1471229169513);
+    }
 
     {
         // s1:                 |----|
