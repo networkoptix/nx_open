@@ -15,6 +15,12 @@
 
 #include <utils/common/app_info.h>
 
+#define DEBUG_CLIENT_MESSAGE_PROCESSOR
+#ifdef DEBUG_CLIENT_MESSAGE_PROCESSOR
+#define TRACE(...) qDebug() << "QnClientMessageProcessor: " << __VA_ARGS__;
+#else
+#define TRACE(...)
+#endif
 
 QnClientMessageProcessor::QnClientMessageProcessor()
     :
@@ -56,6 +62,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection)
     {
+        TRACE("Connection established to " << connection->connectionInfo().ecsGuid);
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
         //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     }
@@ -230,6 +237,8 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     setConnectionState(QnConnectionState::Ready);
+    TRACE("Received initial notification while connected to " << qnCommon->remoteGUID().toString());
+    NX_EXPECT(qnCommon->currentServer());
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();

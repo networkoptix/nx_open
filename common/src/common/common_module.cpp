@@ -127,7 +127,8 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
 }
 
-void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
+void QnCommonModule::setRemoteGUID(const QnUuid &guid)
+{
     {
         QnMutexLocker lock( &m_mutex );
         if (m_remoteUuid == guid)
