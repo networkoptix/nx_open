@@ -44,7 +44,7 @@ CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
 
 void CloudModuleEndPointFetcher::stopWhileInAioThread()
 {
-    //we do not need mutex here since noone uses object anymore 
+    //we do not need mutex here since noone uses object anymore
     //    and internal events are delivered in same aio thread
     m_httpClient.reset();
     m_endpointSelector.reset();
@@ -57,8 +57,13 @@ void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
 }
 
 //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
-void CloudModuleEndPointFetcher::get(
-    nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)> handler)
+void CloudModuleEndPointFetcher::get(Handler handler)
+{
+    get(nx_http::AuthInfo(), std::move(handler));
+}
+
+//!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
+void CloudModuleEndPointFetcher::get(nx_http::AuthInfo auth, Handler handler)
 {
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
@@ -79,12 +84,13 @@ void CloudModuleEndPointFetcher::get(
     NX_ASSERT(!m_httpClient);
     //if requested url is unknown, fetching description xml
     m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient->setAuth(auth);
     m_httpClient->bindToAioThread(getAioThread());
     QObject::connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client){
-            onHttpClientDone(std::move(client));
-        },
+        m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client) {
+        onHttpClientDone(std::move(client));
+    },
         Qt::DirectConnection);
     m_requestIsRunning = true;
     m_httpClient->doGet(QUrl(nx::network::AppInfo::cloudModulesXmlUrl()));
@@ -210,8 +216,7 @@ CloudModuleEndPointFetcher::ScopedOperation::~ScopedOperation()
 {
 }
 
-void CloudModuleEndPointFetcher::ScopedOperation::get(
-    nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)> handler)
+void CloudModuleEndPointFetcher::ScopedOperation::get(Handler handler)
 {
     auto sharedGuard = m_guard.sharedGuard();
     m_fetcher->get(

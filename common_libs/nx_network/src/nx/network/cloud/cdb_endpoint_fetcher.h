@@ -59,15 +59,18 @@ class NX_NETWORK_API CloudModuleEndPointFetcher
     public aio::BasicPollable
 {
 public:
-    /** Helper class to be used if \a CloudModuleEndPointFetcher user can die before 
+    /** Helper class to be used if \a CloudModuleEndPointFetcher user can die before
         \a CloudModuleEndPointFetcher instance. */
+
+    typedef nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)> Handler;
+
     class NX_NETWORK_API ScopedOperation
     {
     public:
         ScopedOperation(CloudModuleEndPointFetcher* fetcher);
         ~ScopedOperation();
 
-        void get(nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)> handler);
+        void get(Handler handler);
 
     private:
         CloudModuleEndPointFetcher* const m_fetcher;
@@ -84,7 +87,8 @@ public:
     //!Specify endpoint explicitely
     void setEndpoint(SocketAddress endpoint);
     //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
-    void get(nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, SocketAddress)> handler);
+    void get(nx_http::AuthInfo auth, Handler handler);
+    void get(Handler handler);
 
 private:
     mutable QnMutex m_mutex;
