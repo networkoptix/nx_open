@@ -22,41 +22,49 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     m_started(false),
     m_counter(0)
 {
-    NX_ASSERT(!resource.isNull());
+    NX_ASSERT(resource);
 
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
 
     m_dataProvider = resource->createDataProvider(Qn::CR_Default);
 
-    if(m_dataProvider != NULL) {
+    if (m_dataProvider != NULL)
+    {
         m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider);
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
 
-        if(m_mediaProvider != NULL) {
+        if (m_mediaProvider != NULL)
+        {
             /* Camera will free media provider in its destructor. */
             m_camera = new QnClientVideoCamera(m_mediaResource, m_mediaProvider);
 
-            connect(this,                           SIGNAL(destroyed()),    m_camera,       SLOT(beforeStopDisplay()));
+            connect(this, &QObject::destroyed, m_camera, &QnClientVideoCamera::beforeStopDisplay);
 
             m_counter = new QnCounter(1);
-            connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     m_counter,      SLOT(decrement()));
-            if (m_mediaProvider->hasThread()) {
-                connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,      SLOT(decrement()));
+            connect(m_camera->getCamDisplay(), &QnCamDisplay::finished, m_counter, &QnCounter::decrement);
+            if (m_mediaProvider->hasThread())
+            {
+                connect(m_camera->getStreamreader(), &QnAbstractMediaStreamDataProvider::finished,
+                    m_counter, &QnCounter::decrement);
                 m_counter->increment();
             }
 
-            connect(m_counter,                      SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
-            connect(m_counter,                      SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
-        } else {
-            m_camera = NULL;
+            connect(m_counter, &QnCounter::reachedZero, m_counter, &QObject::deleteLater);
+            connect(m_counter, &QnCounter::reachedZero, m_camera, &QObject::deleteLater);
+        }
+        else
+        {
+            m_camera = nullptr;
 
-            connect(this,           SIGNAL(destroyed()),    m_dataProvider, SLOT(pleaseStop()));
-            connect(m_dataProvider, SIGNAL(finished()),     m_dataProvider, SLOT(deleteLater()));
+            connect(this, &QObject::destroyed, m_dataProvider,
+                &QnAbstractStreamDataProvider::pleaseStop);
+            connect(m_dataProvider, &QnAbstractStreamDataProvider::finished,
+                m_dataProvider, &QObject::deleteLater);
         }
     }
 }
 
-QnResourceDisplay::~QnResourceDisplay() 
+QnResourceDisplay::~QnResourceDisplay()
 {
     if (m_camera && !m_camera->isDisplayStarted())
     {
@@ -111,7 +119,7 @@ void QnResourceDisplay::beforeDisconnectFromResource() {
 
 void QnResourceDisplay::disconnectFromResource() {
     if(!m_dataProvider)
-        return; 
+        return;
 
     if(m_mediaProvider && m_camera)
         m_mediaProvider->removeDataProcessor(m_camera->getCamDisplay());
