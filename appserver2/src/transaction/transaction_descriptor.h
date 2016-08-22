@@ -192,7 +192,7 @@ struct TransactionDescriptor : TransactionDescriptorBase
         CheckReadPermissionFunc&& checkReadPermissionFunc,
         FilterBySavePermissionFunc&& filterBySavePermissionFunc,
         FilterByReadPermissionFunc&& filterByReadPermissionFunc,
-        CheckRemoteAccessFunc&& checkRemotePeerAccessFunc
+        CheckRemoteAccessFunc&& checkRemotePeerAccessFunc,
         GetTransactionTypeFunc&& getTransactionTypeFunc)
         :
         TransactionDescriptorBase(value, isPersistent, isSystem, name),

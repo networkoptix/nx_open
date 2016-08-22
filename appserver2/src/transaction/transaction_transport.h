@@ -14,6 +14,7 @@ public:
     /** Initializer for incoming connection */
     QnTransactionTransport(
         const QnUuid& connectionGuid,
+        ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
         QSharedPointer<AbstractStreamSocket> socket,

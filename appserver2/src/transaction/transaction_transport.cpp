@@ -4,15 +4,16 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "database/db_manager.h"
-#include <core/resource_management/resource_pool.h>
 
 
 namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
     const QnUuid& connectionGuid,
+    ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
     QSharedPointer<AbstractStreamSocket> socket,
@@ -23,6 +24,7 @@ QnTransactionTransport::QnTransactionTransport(
 :
     QnTransactionTransportBase(
         connectionGuid,
+        std::move(connectionLockGuard),
         localPeer,
         remotePeer,
         std::move(socket),

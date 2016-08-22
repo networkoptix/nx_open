@@ -27,6 +27,8 @@
 
 #include <utils/common/id.h>
 
+#include "connection_guard.h"
+
 
 namespace ec2
 {
@@ -99,6 +101,7 @@ public:
     //!Initializer for incoming connection
     QnTransactionTransportBase(
         const QnUuid& connectionGuid,
+        ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
         QSharedPointer<AbstractCommunicatingSocket> socket,
@@ -233,11 +236,6 @@ public:
     //!Remove event handler, installed by \a QnTransactionTransportBase::setHttpChunkExtensonHandler or \a QnTransactionTransportBase::setBeforeSendingChunkHandler
     void removeEventHandler( int eventHandlerID );
 
-    static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QnUuid& id, bool isOriginator);
-    static void connectDone(const QnUuid& id);
-
     void processExtraData();
     void startListening();
     bool isHttpKeepAliveTimeout() const;
@@ -357,11 +355,6 @@ private:
     std::map<int, BeforeSendingChunkHandler> m_beforeSendingChunkHandlers;
     int m_prevGivenHandlerID;
 
-    static QSet<QnUuid> m_existConn;
-    typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
-    static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
-    static QnMutex m_staticMutex;
-
     QByteArray m_extraData;
     bool m_authByKey;
     QElapsedTimer m_lastReceiveTimer;
@@ -377,6 +370,7 @@ private:
     std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
+    ConnectionLockGuard m_connectionLockGuard;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranBaseUrl;

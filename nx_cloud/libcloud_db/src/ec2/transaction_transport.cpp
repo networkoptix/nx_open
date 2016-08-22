@@ -30,6 +30,9 @@ TransactionTransport::TransactionTransport(
 :
     ::ec2::QnTransactionTransportBase(
         QnUuid::fromStringSafe(connectionId),
+        ::ec2::ConnectionLockGuard(
+            remotePeer.id,
+            ::ec2::ConnectionLockGuard::Direction::Incoming),
         localPeer,
         remotePeer,
         socket,
