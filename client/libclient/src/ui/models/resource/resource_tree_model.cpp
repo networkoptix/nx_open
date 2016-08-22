@@ -739,6 +739,7 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
 
     if (auto user = qnResPool->getResourceById(id).dynamicCast<QnUserResource>())
     {
+        TRACE("Updating placeholder nodes for user " << user->getName());
         parentNode = ensureResourceNode(user);
         check = [user, visibleToUser](Qn::NodeType nodeType)
             {
@@ -752,6 +753,7 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
         if (role.isNull())
             return;
 
+        TRACE("Updating placeholder nodes for role " << role.name);
         parentNode = ensureRoleNode(id);
         check = [role, visibleToRole](Qn::NodeType nodeType)
             {
@@ -766,12 +768,21 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
     {
         Qn::NodeType nodeType = node->type();
         if (!placeholders.contains(nodeType))
+        {
+            TRACE("Ignore node " << node->m_displayName << "(" << nodeType <<")");
             continue;
+        }
 
         if (check(nodeType))
+        {
+            TRACE("Update node " << node->m_displayName << "(" << nodeType <<")");
             node->update();
+        }
         else
+        {
+            TRACE("Remove node " << node->m_displayName << "(" << nodeType <<")");
             removeNode(node);
+        }
         placeholders.removeOne(nodeType);
     }
 
@@ -783,6 +794,11 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
             auto node = ensurePlaceholderNode(id, nodeType);
             node->setParent(parentNode);
             node->update();
+            TRACE("Add missing node " << node->m_displayName << "(" << nodeType <<")");
+        }
+        else
+        {
+            TRACE("Skip missing placeholder " << "(" << nodeType <<")");
         }
     }
 }
@@ -1129,6 +1145,15 @@ void QnResourceTreeModel::updateRoleNodes()
         updateAccessibleResourcesForRole(id);
     }
     cleanupGroupNodes(Qn::RecorderNode);
+}
+
+void QnResourceTreeModel::updateUserSubNodes(const QnUserResourcePtr& user)
+{
+    updatePlaceholderNodesForUserOrRole(user->getId());
+    updateSharedLayoutNodesForUser(user);
+    updateAccessibleResourcesForUser(user);
+    if (user->role() == Qn::UserRole::CustomUserGroup)
+        updateRoleNodes();
 }
 
 Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
@@ -1563,13 +1588,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     }
 
     if (user)
-    {
-        updatePlaceholderNodesForUserOrRole(user->getId());
-        updateSharedLayoutNodesForUser(user);
-        updateAccessibleResourcesForUser(user);
-        if (user->role() == Qn::UserRole::CustomUserGroup)
-            updateRoleNodes();
-    }
+        updateUserSubNodes(user);
 }
 
 void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resource)
@@ -1616,6 +1635,9 @@ void QnResourceTreeModel::rebuildTree()
         updateNodeParent(node);
         node->update();
     }
+
+    for (const auto& user: qnResPool->getResources<QnUserResource>())
+        updateUserSubNodes(user);
 
     updateRoleNodes();
 }
