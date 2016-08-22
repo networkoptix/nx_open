@@ -31,6 +31,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <update/media_server_update_tool.h>
+#include <update/low_free_space_warning.h>
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/app_info.h>
@@ -122,9 +123,14 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     initLinkButtons();
     initBuildSelectionButtons();
 
-    connect(m_updateTool,       &QnMediaServerUpdateTool::stageChanged,             this,           &QnServerUpdatesWidget::at_tool_stageChanged);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::stageProgressChanged,     this,           &QnServerUpdatesWidget::at_tool_stageProgressChanged);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this,           &QnServerUpdatesWidget::at_updateFinished);
+    connect(m_updateTool, &QnMediaServerUpdateTool::stageChanged,
+        this, &QnServerUpdatesWidget::at_tool_stageChanged);
+    connect(m_updateTool, &QnMediaServerUpdateTool::stageProgressChanged,
+        this, &QnServerUpdatesWidget::at_tool_stageProgressChanged);
+    connect(m_updateTool, &QnMediaServerUpdateTool::updateFinished,
+        this, &QnServerUpdatesWidget::at_updateFinished);
+    connect(m_updateTool, &QnMediaServerUpdateTool::lowFreeSpaceWarning,
+        this, &QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning, Qt::DirectConnection);
 
     setWarningStyle(ui->dayWarningLabel);
     ui->dayWarningLabel->setText(tr("Caution: Applying system updates at the end of the week is not recommended."));
@@ -727,6 +733,29 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     }
     ui->updateProgessBar->setValue(value);
     ui->updateProgessBar->setFormat(status.arg(value));
+}
+
+void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning* lowFreeSpaceWarning)
+{
+    const auto failedServers =
+        qnResPool->getResources<QnMediaServerResource>(lowFreeSpaceWarning->failedPeers);
+
+    QScopedPointer<QnMessageBox> dialog(new QnMessageBox(
+        QnMessageBox::Warning, -1, tr("Warning"),
+        tr("Not enough free space at %n servers:", "", failedServers.size())
+            + lit("\n") + serverNamesString(failedServers)
+            + lit("\n") + tr("Do you want to continue?"),
+        QDialogButtonBox::Cancel,
+        this));
+    dialog->addButton(tr("Force pushing updates"), QDialogButtonBox::AcceptRole);
+    dialog->setDefaultButton(QDialogButtonBox::Cancel);
+
+    const auto result = dialog->exec();
+
+    lowFreeSpaceWarning->ignore = true;
+
+    if (result == QDialogButtonBox::Cancel)
+        m_updateTool->cancelUpdate();
 }
 
 QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList &servers) {

@@ -14,6 +14,7 @@ class QnCheckForUpdatesPeerTask;
 class QnUploadUpdatesPeerTask;
 class QnInstallUpdatesPeerTask;
 class QnRestUpdatePeerTask;
+struct QnLowFreeSpaceWarning;
 
 class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
@@ -55,6 +56,8 @@ signals:
 
     void checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void updateFinished(QnUpdateResult result);
+
+    void lowFreeSpaceWarning(QnLowFreeSpaceWarning* lowFreeSpaceWarning);
 
 private:
     void startUpdate(const QnUpdateTarget &target);

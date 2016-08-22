@@ -16,6 +16,7 @@
 #include <update/task/check_free_space_peer_task.h>
 #include <update/task/upload_updates_peer_task.h>
 #include <update/task/install_updates_peer_task.h>
+#include <update/low_free_space_warning.h>
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/sleep.h>
@@ -435,16 +436,18 @@ void QnUpdateProcess::at_checkFreeSpaceTask_finished(
 {
     if (errorCode != 0)
     {
-        setAllPeersStage(QnPeerUpdateStage::Init);
-        m_failedPeerIds = failedPeers;
-        finishUpdate(QnUpdateResult::UploadingFailed_NoFreeSpace);
-        return;
-    }
+        auto warning = new QnLowFreeSpaceWarning;
+        warning->failedPeers = failedPeers;
 
-    if (m_targetPeerIds.isEmpty())
-    {
-        finishUpdate(QnUpdateResult::Successful);
-        return;
+        emit lowFreeSpaceWarning(warning);
+
+        if (!warning->ignore)
+        {
+            setAllPeersStage(QnPeerUpdateStage::Init);
+            m_failedPeerIds = failedPeers;
+            finishUpdate(QnUpdateResult::UploadingFailed_NoFreeSpace);
+            return;
+        }
     }
 
     prepareToUpload();

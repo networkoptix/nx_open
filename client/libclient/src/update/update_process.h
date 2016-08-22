@@ -39,6 +39,7 @@ class QnNetworkPeerTask;
 class QnDownloadUpdatesPeerTask;
 class QnCheckForUpdatesPeerTask;
 struct QnPeerRuntimeInfo;
+struct QnLowFreeSpaceWarning;
 
 class QnUpdateProcess: public QnLongRunnable {
     Q_OBJECT
@@ -62,6 +63,9 @@ signals:
     void targetsChanged(const QSet<QnUuid> &targets);
 
     void updateFinished(const QnUpdateResult &result);
+
+    void lowFreeSpaceWarning(QnLowFreeSpaceWarning* lowFreeSpaceWarning);
+
 private:
     void setStage(QnFullUpdateStage stage);
 
