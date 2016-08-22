@@ -478,7 +478,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         else
             avPkt.dts = dts;
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
-        if (video && (quint64)video->pts != AV_NOPTS_VALUE)
+        if (video && video->pts != AV_NOPTS_VALUE)
             avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
         else
             avPkt.pts = avPkt.dts;
@@ -744,7 +744,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     m_videoTranscoder->setQuality(Qn::QualityHighest);
                     m_videoTranscoder->open(vd); // reopen again for new size
 
-                    avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
+                    QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
                 else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->getWidth() > 0)
                 {
@@ -758,9 +758,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     decoder.decode(vd, &outFrame);
                     if (m_role == Role_FileExport)
                     {
-                        avcodec_copy_context(videoStream->codec, decoder.getContext());
+                        QnFfmpegHelper::copyAvCodecContex(videoStream->codec, decoder.getContext());
                     }
-                    else {
+                    else
+                    {
                         videoCodecCtx->width = decoder.getWidth();
                         videoCodecCtx->height = decoder.getHeight();
                     }
@@ -823,11 +824,12 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     if (srcAudioCodec == AV_CODEC_ID_MP3 && audioStream->codec->channels == 1)
                         audioStream->codec->block_align = 0;
                 }
-                else {
+                else
+                {
                     // transcode audio
                     m_audioTranscoder = new QnFfmpegAudioTranscoder(m_dstAudioCodec);
                     m_audioTranscoder->open(mediaContext);
-                    avcodec_copy_context(audioStream->codec, m_audioTranscoder->getCodecContext());
+                    QnFfmpegHelper::copyAvCodecContex(audioStream->codec, m_audioTranscoder->getCodecContext());    
                 }
                 audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
                 audioStream->first_dts = 0;

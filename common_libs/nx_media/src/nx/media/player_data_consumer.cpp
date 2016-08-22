@@ -49,7 +49,7 @@ PlayerDataConsumer::~PlayerDataConsumer()
 void PlayerDataConsumer::pleaseStop()
 {
     base_type::pleaseStop();
-    QnMutexLocker lock(&m_queueMutex);
+    QnMutexLocker lock(&m_decoderMutex);
     if (m_videoDecoder)
         m_videoDecoder->pleaseStop();
     if (m_audioDecoder)
@@ -103,7 +103,7 @@ const AudioOutput* PlayerDataConsumer::audioOutput() const
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
     {
-        QnMutexLocker lock(&m_queueMutex);
+        QnMutexLocker lock(&m_decoderMutex);
         if (!m_videoDecoder)
         {
             m_videoDecoder.reset(new SeamlessVideoDecoder());
@@ -297,7 +297,7 @@ void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/)
 
 void PlayerDataConsumer::endOfRun()
 {
-    QnMutexLocker lock(&m_queueMutex);
+    QnMutexLocker lock(&m_decoderMutex);
     m_videoDecoder.reset();
     m_audioDecoder.reset();
 }

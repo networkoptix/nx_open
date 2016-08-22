@@ -62,7 +62,7 @@ private:
     int m_writeTime;
     mutable QnMutex m_timingsMutex;
 private:
-    void putData(FileBlockInfo* fb);
+    bool putData(FileBlockInfo* fb);
     FileBlockInfo* popData();
 };
 

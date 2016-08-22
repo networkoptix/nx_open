@@ -88,7 +88,7 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 {
     QnMutexLocker lk(&m_mutex);
 
-    auto tcpServerSocket = std::make_unique<nx::network::TCPServerSocket>();
+    auto tcpServerSocket =  SocketFactory::createStreamServerSocket();
     if (!tcpServerSocket->setReuseAddrFlag(true) ||
         !tcpServerSocket->bind(localAddress) ||
         !tcpServerSocket->listen())
@@ -145,7 +145,7 @@ void QnUniversalTcpListener::onCloudBindingStatusChanged(
     QnMutexLocker lk(&m_mutex);
 
     const bool isBound = static_cast<bool>(cloudCredentials);
-    const bool newCredentialsAreTheSame = 
+    const bool newCredentialsAreTheSame =
         cloudCredentials
         ? (m_cloudCredentials == *cloudCredentials)
         : false;

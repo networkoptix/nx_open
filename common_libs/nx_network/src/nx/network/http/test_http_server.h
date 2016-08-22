@@ -54,6 +54,9 @@ public:
         const QString& filePath,
         const nx_http::StringType& mimeType);
 
+    // used for test purpose
+    void setForceConnectionClose(bool value);
+
 private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;

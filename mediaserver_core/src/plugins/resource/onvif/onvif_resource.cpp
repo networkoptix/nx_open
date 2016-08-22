@@ -47,9 +47,30 @@
 
 #include <nx/fusion/model_functions.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+#include <core/resource/resource_data_structures.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
+
+namespace 
+{
+    const QString kBaselineH264Profile("Baseline");
+    const QString kMainH264Profile("Main");
+    const QString kExtendedH264Profile("Extended");
+    const QString kHighH264Profile("High");
+
+    onvifXsd__H264Profile fromStringToH264Profile(const QString& str)
+    {
+        if (str == kMainH264Profile)
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__Main;
+        else if (str == kExtendedH264Profile)
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__Extended;
+        else if (str == kHighH264Profile)
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__High;
+        else
+            return onvifXsd__H264Profile::onvifXsd__H264Profile__Baseline;
+    };
+}
 
 
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
@@ -89,21 +110,6 @@ StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
-
-struct StrictBitrateInfo {
-    const char* model;
-    int minBitrate;
-    int maxBitrate;
-};
-
-// TODO: #Elric #VASILENKO move out to JSON
-// Strict bitrate range for specified cameras
-StrictBitrateInfo strictBitrateList[] =
-{
-    { "DCS-7010L", 4096, 1024*16 },
-    { "DCS-6010L", 0, 1024*2 }
-};
-
 
 //width > height is prefered
 static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -688,19 +694,56 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
-    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps));
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps), role);
 }
 
-int QnPlOnvifResource::strictBitrate(int bitrate) const
+int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
 {
-    for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(strictBitrateList[0]); ++i)
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
+    QString availableBitratesParamName;
+    QString bitrateBoundsParamName;
+    
+    quint64 bestBitrate = bitrate;
+
+    if (role == Qn::CR_LiveVideo)
     {
-        if (getModel() == QLatin1String(strictBitrateList[i].model))
-            return qMin(strictBitrateList[i].maxBitrate, qMax(strictBitrateList[i].minBitrate, bitrate));
+        bitrateBoundsParamName = Qn::HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME;
+        availableBitratesParamName = Qn::HIGH_STREAM_AVAILABLE_BITRATES_PARAM_NAME;
+    }   
+    else if (role == Qn::CR_SecondaryLiveVideo) 
+    {
+        bitrateBoundsParamName = Qn::LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME;
+        availableBitratesParamName = Qn::LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME;
     }
-    return bitrate;
+
+    if (!bitrateBoundsParamName.isEmpty())
+    {
+        auto bounds = resData.value<QnBounds>(bitrateBoundsParamName, QnBounds());
+        if (!bounds.isNull())
+            bestBitrate = qMin(bounds.max, qMax(bounds.min, bestBitrate));
+    }
+
+    if (availableBitratesParamName.isEmpty())
+        return bestBitrate;
+
+    auto availableBitrates = resData.value<QnBitrateList>(availableBitratesParamName, QnBitrateList());
+
+    quint64 bestDiff = std::numeric_limits<quint64>::max();
+    for (const auto& bitrateOption: availableBitrates)
+    {
+        auto diff = qMax<quint64>(bitrateOption, bitrate) - qMin<quint64>(bitrateOption, bitrate);
+
+        if (diff < bestDiff)
+        {
+            bestDiff = diff;
+            bestBitrate = bitrateOption;
+        }
+    }
+
+    return bestBitrate;
 }
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
@@ -1566,8 +1609,14 @@ bool QnPlOnvifResource::setRelayOutputState(
 
 int QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal)
 {
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
+    auto desiredH264Profile = resData.value<QString>(Qn::DESIRED_H264_PROFILE_PARAM_NAME);
+
     if (videoOptionsLocal.h264Profiles.isEmpty())
         return -1;
+    else if (!desiredH264Profile.isEmpty())
+        return fromStringToH264Profile(desiredH264Profile);
     else
         return (int) videoOptionsLocal.h264Profiles[0];
 }
@@ -1975,15 +2024,36 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
 {
     QnMutexLocker lock( &m_mutex );
 
-    bool dualStreaming = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
+    bool forceSingleStream = resData.value<bool>(Qn::FORCE_SINGLE_STREAM_PARAM_NAME, false);
+
+    bool dualStreaming = 
+        !forceSingleStream 
+        && m_secondaryResolution != EMPTY_RESOLUTION_PAIR 
+        && !m_secondaryVideoEncoderId.isEmpty();
+
     if (dualStreaming) 
     {
-        NX_LOG(QString(lit("ONVIF debug: enable dualstreaming for camera %1")).arg(getHostAddress()), cl_logDEBUG1);
+        NX_LOG(
+            lit("ONVIF debug: enable dualstreaming for camera %1")
+                .arg(getHostAddress()), 
+            cl_logDEBUG1);
     }
     else 
     {
-        QString reason = m_secondaryResolution == EMPTY_RESOLUTION_PAIR ? QLatin1String("no secondary resolution") : QLatin1String("no secondary encoder");
-        NX_LOG(QString(lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")).arg(getHostAddress()).arg(reason), cl_logDEBUG1);
+        QString reason = 
+            forceSingleStream ? 
+                lit("single stream mode is forced by driver") : 
+            m_secondaryResolution == EMPTY_RESOLUTION_PAIR ? 
+                lit("no secondary resolution") : 
+                QLatin1String("no secondary encoder");
+
+        NX_LOG(
+            lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")
+                .arg(getHostAddress())
+                .arg(reason), 
+            cl_logDEBUG1);
     }
 
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0);
@@ -2410,7 +2480,15 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
     VideoSrcOptionsResp response;
 
     int soapRes = soapWrapper.getVideoSourceConfigurationOptions(request, response);
-    if (soapRes != SOAP_OK || !response.Options) {
+
+    bool isValid = response.Options 
+        && response.Options->BoundsRange 
+        && response.Options->BoundsRange->XRange 
+        && response.Options->BoundsRange->YRange 
+        && response.Options->BoundsRange->WidthRange 
+        && response.Options->BoundsRange->HeightRange;
+
+    if (soapRes != SOAP_OK || !isValid) {
 #ifdef PL_ONVIF_DEBUG
         qWarning() << "QnPlOnvifResource::fetchAndSetVideoSourceOptions: can't receive data from camera (or data is empty) (URL: "
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()

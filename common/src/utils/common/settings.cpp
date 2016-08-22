@@ -30,7 +30,7 @@ QnSettings::QnSettings(
 {
 }
 
-void QnSettings::parseArgs(int argc, char **argv)
+void QnSettings::parseArgs(int argc, const char* argv[])
 {
     m_args.parse(argc, argv);
 }

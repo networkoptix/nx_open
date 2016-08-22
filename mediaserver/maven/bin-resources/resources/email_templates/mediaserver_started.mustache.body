@@ -1,4 +1,4 @@
-<h1>{{event}}{{#source}}: <b>{{source}}</b>{{/source}}</h1>
+<h1>Server {{#source}}<b>{{source}}</b> {{/source}}started</h1>
 
 
 <div class="date">

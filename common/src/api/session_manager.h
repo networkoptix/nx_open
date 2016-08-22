@@ -15,6 +15,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include "utils/common/request_param.h"
+#include <utils/common/safe_direct_connection.h>
 
 
 struct AsyncRequestInfo
@@ -38,7 +39,8 @@ struct AsyncRequestInfo
 Q_DECLARE_METATYPE(AsyncRequestInfo);
 
 // TODO: #Elric separate into two objects, one object per thread.
-class QnSessionManager: public QObject {
+class QnSessionManager: public QObject, public Qn::EnableSafeDirectConnection
+{
     Q_OBJECT
 
 public:
@@ -103,7 +105,7 @@ private:
         AsyncRequestInfo requestInfo);
 
 private slots:
-    void onHttpClientDone(nx_http::AsyncHttpClientPtr clientPtr);
+    void onHttpClientDone(int requestId, nx_http::AsyncHttpClientPtr clientPtr);
 
 signals:
     void aboutToBeStopped();
@@ -112,10 +114,9 @@ signals:
 
 private:
     mutable QnMutex m_mutex;
-    static QAtomicInt s_handle;
 
     QScopedPointer<QThread> m_thread;
-    std::map<nx_http::AsyncHttpClientPtr, AsyncRequestInfo> m_requestInProgress;
+    std::map<int, AsyncRequestInfo> m_requestInProgress;
 };
 
 #endif // __SESSION_MANAGER_H__

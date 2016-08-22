@@ -9,22 +9,7 @@
 #include <api/resource_property_adaptor.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
-
-
-class QnSystemSettingsReply
-{
-public:
-    //map<name, value>
-    std::map<QString, QString> settings;
-};
-
-#define QnSystemSettingsReply_Fields (settings)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnSystemSettingsReply),
-    (json),
-    _Fields)
-
+#include <api/model/system_settings_reply.h>
 
 int QnSystemSettingsHandler::executeGet(
     const QString& /*path*/,
@@ -46,7 +31,7 @@ int QnSystemSettingsHandler::executeGet(
             setting->setSerializedValue(paramIter.value());
             dirty = true;
         }
-        reply.settings.emplace(setting->key(), setting->serializedValue());
+        reply.settings.insert(setting->key(), setting->serializedValue());
     }
     if (dirty)
         QnGlobalSettings::instance()->synchronizeNow();

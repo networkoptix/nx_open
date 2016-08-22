@@ -283,17 +283,24 @@ QRegion QnSecurityCamResource::getMotionMask(int channel) const {
 
 QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    return (*userAttributesLock)->motionRegions[channel];
+    const auto& regions = (*userAttributesLock)->motionRegions;
+    if (regions.size() > channel)
+        return regions[channel];
+    else
+        return QnMotionRegion();
 }
 
-void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int channel) {
+void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, int channel)
+{
     Qn::MotionType motionType = Qn::MT_Default;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-
-        if ((*userAttributesLock)->motionRegions[channel] == mask)
+        auto& regions = (*userAttributesLock)->motionRegions;
+        while (regions.size() < channel)
+            regions << QnMotionRegion();
+        if (regions[channel] == mask)
             return;
-        (*userAttributesLock)->motionRegions[channel] = mask;
+        regions[channel] = mask;
         motionType = (*userAttributesLock)->motionType;
     }
 

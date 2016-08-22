@@ -26,6 +26,7 @@
 #include <api/model/upload_update_reply.h>
 #include <api/model/update_information_reply.h>
 #include <api/model/backup_status_reply.h>
+#include <api/model/getnonce_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource_fwd.h>
@@ -98,9 +99,10 @@
 #include "health/system_health.h"
 #include <utils/common/credentials.h>
 #include <core/dataprovider/stream_mixer.h>
+#include <core/resource/resource_data_structures.h>
 
 namespace {
-    volatile bool qn_commonMetaTypes_initialized = false;
+    bool qn_commonMetaTypes_initialized = false;
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
@@ -256,6 +258,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();
 
     qRegisterMetaType<QnModuleInformation>();
+    qRegisterMetaType<QnGetNonceReply>();
     qRegisterMetaType<QnModuleInformationWithAddresses>();
     qRegisterMetaType<QList<QnModuleInformation>>();
     qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
@@ -350,6 +353,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QMap<QString, QString>>>();
 
     qRegisterMetaType<QList<QnCredentials>>();
+    qRegisterMetaType<QnHttpConfigureRequestList>();
+    qRegisterMetaType<QnBitrateList>();
+    qRegisterMetaType<QnBounds>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
@@ -366,6 +372,9 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
+    QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
+    QnJsonSerializer::registerSerializer<QnBitrateList>();
+    QnJsonSerializer::registerSerializer<QnBounds>();
 
     qn_commonMetaTypes_initialized = true;
 }

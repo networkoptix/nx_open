@@ -38,10 +38,10 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     const QnResourcePtr                 &dev,
     QnServer::ChunksCatalog             catalog,
     QnAbstractMediaStreamDataProvider*  mediaProvider
-) :
+):
     QnStreamRecorder(dev),
-    m_maxRecordQueueSizeBytes( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_BYTES, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES ).toULongLong() ),
-    m_maxRecordQueueSizeElements( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_ELEMENTS, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_ELEMENTS ).toULongLong() ),
+    m_maxRecordQueueSizeBytes(qnGlobalSettings->maxRecorderQueueSizeBytes()),
+    m_maxRecordQueueSizeElements(qnGlobalSettings->maxRecorderQueueSizePackets()),
     m_scheduleMutex(QnMutex::Recursive),
     m_catalog(catalog),
     m_mediaProvider(mediaProvider),

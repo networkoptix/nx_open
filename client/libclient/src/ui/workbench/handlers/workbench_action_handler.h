@@ -215,6 +215,8 @@ protected:
 
     void at_versionMismatchMessageAction_triggered();
 
+    void onHiDpiWarningMessageAction();
+
     void at_betaVersionMessageAction_triggered();
 
     void at_queueAppRestartAction_triggered();

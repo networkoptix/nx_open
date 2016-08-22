@@ -206,6 +206,8 @@ QSize QnAuditItemDelegate::descriptionSizeHint(const QStyleOptionViewItem& optio
                 result.setHeight(result.height() + (smallFontMetrics.height() + kDetailLineVerticalMargin * 2) * QnAuditLogModel::getCameras(record).size());
             }
             break;
+        default:
+            break;
         }
     }
 
@@ -293,6 +295,9 @@ bool QnAuditItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, 
                 {
                     switch (m_mouseCapture)
                     {
+                    case kNotCaptured:
+                        break;
+
                     case kCapturedByDescription:
                         /* Click on description outside its button: */
                         emit descriptionClicked(index);
@@ -312,6 +317,10 @@ bool QnAuditItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, 
                 /* Skip default handling to avoid selection change: */
                 return true;
             }
+            break;
+
+
+        default:
             break;
         }
     }
@@ -381,6 +390,9 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
             paintUserActivity(style, painter, option, index);
             paintFocusRect(style, painter, option);
             return;
+
+        default:
+            break;
         }
     }
 
@@ -536,7 +548,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
             /* Draw archive marker: */
             if (record->isPlaybackType())
             {
-                bool recordExists = index < archiveData.size() && archiveData[index] == '1';
+                bool recordExists = (size_t)index < archiveData.size() && archiveData[index] == '1';
                 QnScopedPainterBrushRollback brushRollback(painter, recordExists ? painter->pen().color() : QColor(Qt::transparent));
                 painter->drawEllipse(markerCenter, markerRadius, markerRadius);
                 index++;

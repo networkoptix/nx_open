@@ -51,6 +51,8 @@ private:
     int m_frameIndex;
     //QTime m_timer;
     int m_currentFrameNum;
+    static QnMutex m_instanceMutex;
+    static int m_aeroInstanceCounter;
 };
 
 #endif

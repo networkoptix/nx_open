@@ -13,7 +13,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
 :
     m_state(SystemError::noError),
     m_controlConnection(std::move(controlConnection)),
-    m_serverSocket(new UdtStreamServerSocket)
+    m_serverSocket(new UdtStreamServerSocket(AF_INET))
 {
     m_controlConnection->setErrorHandler(
         [this](SystemError::ErrorCode code)

@@ -696,7 +696,7 @@ void QnNxStyle::drawPrimitive(
                 if (widget)
                 {
                     if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
-                        qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled))
+                        (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
                     {
                         /* Itemviews with kSuppressHoverPropery should suppress hover. */
                         /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
@@ -2675,7 +2675,7 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_TabBarTab:
         {
-            if (auto tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+            if (qstyleoption_cast<const QStyleOptionTab*>(option))
             {
                 TabShape shape = tabShape(widget);
 
@@ -2992,7 +2992,7 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
+    if (qobject_cast<QLineEdit*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
         {
@@ -3280,6 +3280,8 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+            default:
+                break;
         }
     }
     /* Disabled QAbstractButton eats mouse wheel events.
