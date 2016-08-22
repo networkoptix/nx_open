@@ -35,8 +35,8 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_accessController.reset(new QnWorkbenchAccessController());
         m_module.reset(new QnClientModule());
+        m_accessController.reset(new QnWorkbenchAccessController());
         m_skin.reset(new QnSkin());
         m_context.reset(new QnWorkbenchContext(m_accessController.data()));
         QObject::connect(m_context.data(), &QnWorkbenchContext::userChanged, m_accessController.data(), &QnWorkbenchAccessController::setUser);
@@ -130,19 +130,6 @@ TEST_F(QnWorkbenchAccessControllerTest, init)
     m_context->setUserName(userName1);
 
     ASSERT_EQ(user, m_context->user());
-}
-
-/** Test for safe mode. Check if the user cannot save layout created with external permissions. */
-TEST_F(QnWorkbenchAccessControllerTest, safeCannotSaveExternalPermissionsLayout)
-{
-    loginAs(Qn::GlobalAdminPermission);
-    qnCommon->setReadOnly(true);
-
-    auto layout = createLayout(0);
-    layout->setData(Qn::LayoutPermissionsRole, Qn::ReadWriteSavePermission);
-    qnResPool->addResource(layout);
-
-    checkForbiddenPermissions(layout, Qn::SavePermission);
 }
 
 /************************************************************************/
@@ -275,6 +262,8 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 
     auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
+    Qn::Permissions actual = m_context->accessController()->permissions(layout);
+    qDebug() << "actual permissions" << QnLexical::serialized(actual);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission;
