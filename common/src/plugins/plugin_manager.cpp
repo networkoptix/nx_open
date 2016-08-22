@@ -151,7 +151,7 @@ bool PluginManager::loadNxPlugin(
         NX_LOG( lit("Failed to load %1: %2").arg(fullFilePath).arg(lib.errorString()), cl_logERROR );
         return false;
     }
-    
+
     nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
     if( entryProc == NULL )
     {
