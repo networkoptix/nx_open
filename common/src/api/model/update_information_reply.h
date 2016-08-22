@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -7,19 +8,9 @@
 
 struct QnUpdateFreeSpaceReply
 {
-    QnUuid serverId;
-    qint64 freeSpace = 0;
-
-    QnUpdateFreeSpaceReply() {}
-
-    QnUpdateFreeSpaceReply(const QnUuid& serverId, qint64 freeSpace):
-        serverId(serverId),
-        freeSpace(freeSpace)
-    {}
+    QHash<QnUuid, qint64> freeSpaceByServerId;
 };
 
-using QnMultiServerUpdateFreeSpaceReply = QList<QnUpdateFreeSpaceReply>;
+#define QnUpdateFreeSpaceReply_Fields (freeSpaceByServerId)
 
-#define QnUpdateFreeSpaceReply_Fields (serverId)(freeSpace)
-
-QN_FUSION_DECLARE_FUNCTIONS(QnUpdateFreeSpaceReply, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnUpdateFreeSpaceReply, (ubjson)(xml)(json)(csv_record)(metatype))

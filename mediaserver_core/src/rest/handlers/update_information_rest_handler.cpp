@@ -39,48 +39,40 @@ qint64 freeSpaceForUpdate()
     return getDiskFreeSpace(updatesDir);
 }
 
-nx_http::StatusCode::Value loadFreeSpaceRemotely(
+void loadFreeSpaceRemotely(
     const QString& path,
-    QnMultiServerUpdateFreeSpaceReply& outputReply,
+    QnUpdateFreeSpaceReply& outputReply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
     const auto moduleGuid = qnCommon->moduleGUID();
 
     for (const auto server: qnResPool->getAllServers(Qn::Online))
     {
-        if (server->getId() == moduleGuid)
+        const auto serverId = server->getId();
+        if (serverId == moduleGuid)
             continue;
 
-        auto resultCode = nx_http::StatusCode::notFound;
-
-        const auto completionFunc = [&outputReply, &resultCode, context]
+        const auto completionFunc = [&outputReply, context, &serverId]
             (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType body)
             {
                 Q_UNUSED(osErrorCode)
 
-                const auto httpCode = static_cast<nx_http::StatusCode::Value>(statusCode);
-                if (httpCode != nx_http::StatusCode::ok)
-                {
-                    resultCode = httpCode;
-                    context->requestProcessed();
-                    return;
-                }
+                qint64 freeSpace = -1;
 
-                QnMultiServerUpdateFreeSpaceReply reply;
-                bool success = false;
-                reply = QJson::deserialized(body, reply, &success);
-                if (!success)
+                const auto httpCode = static_cast<nx_http::StatusCode::Value>(statusCode);
+                if (httpCode == nx_http::StatusCode::ok)
                 {
-                    resultCode = nx_http::StatusCode::notFound;
-                    context->requestProcessed();
-                    return;
+                    QnUpdateFreeSpaceReply reply;
+                    bool success = false;
+                    reply = QJson::deserialized(body, reply, &success);
+                    if (success)
+                        freeSpace = reply.freeSpaceByServerId.value(serverId, -1);
                 }
 
                 const auto updateOutputDataCallback =
-                    [&reply, &outputReply, &resultCode, context, httpCode]()
+                    [freeSpace, &outputReply, context, httpCode, &serverId]()
                     {
-                        outputReply.append(reply);
-                        resultCode = httpCode;
+                        outputReply.freeSpaceByServerId[serverId] = freeSpace;
                         context->requestProcessed();
                     };
 
@@ -90,27 +82,23 @@ nx_http::StatusCode::Value loadFreeSpaceRemotely(
         const QUrl apiUrl = getServerApiUrl(path, server, context);
         runMultiserverDownloadRequest(apiUrl, server, completionFunc, context);
         context->waitForDone();
-
-        if (resultCode != nx_http::StatusCode::ok)
-            return resultCode;
     }
-
-    return nx_http::StatusCode::ok;
 }
 
 } // namespace
 
 int QnUpdateInformationRestHandler::executeGet(
     const QString& path,
-    const QnRequestParams& params,
-    QnJsonRestResult& result,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
     Q_UNUSED(path)
 
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
-        QnMultiServerUpdateFreeSpaceReply freeSpaceResult;
+        QnUpdateFreeSpaceReply freeSpaceResult;
 
         auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
         QnMultiserverRequestContext<QnEmptyRequestData> context(
@@ -118,18 +106,12 @@ int QnUpdateInformationRestHandler::executeGet(
 
         const auto moduleGuid = qnCommon->moduleGUID();
 
-        freeSpaceResult.append(QnUpdateFreeSpaceReply(moduleGuid, freeSpaceForUpdate()));
-        auto resultCode = nx_http::StatusCode::ok;
+        freeSpaceResult.freeSpaceByServerId[moduleGuid] = freeSpaceForUpdate();
 
         if (!request.isLocal)
-            resultCode = loadFreeSpaceRemotely(path, freeSpaceResult, &context);
+            loadFreeSpaceRemotely(path, freeSpaceResult, &context);
 
-        if (resultCode == nx_http::StatusCode::ok)
-            result.setReply(freeSpaceResult);
-        else
-            result.setError(QnRestResult::CantProcessRequest);
-
-        return resultCode;
+        QnFusionRestHandlerDetail::serialize(freeSpaceResult, result, contentType, request.format);
     }
 
     return nx_http::StatusCode::ok;

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <rest/server/fusion_rest_handler.h>
 
-class QnUpdateInformationRestHandler: public QnJsonRestHandler
+class QnUpdateInformationRestHandler: public QnFusionRestHandler
 {
 public:
     virtual int executeGet(
         const QString& path,
-        const QnRequestParams& params,
-        QnJsonRestResult& result,
+        const QnRequestParamList& params,
+        QByteArray& result,
+        QByteArray& contentType,
         const QnRestConnectionProcessor*processor) override;
 };
