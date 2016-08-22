@@ -246,7 +246,7 @@ bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
             return true;
     }
 
-    return isProxyForCamera(request);
+    return needStandardProxy(request);
 }
 
 bool QnUniversalRequestProcessor::needStandardProxy(const nx_http::Request& request)
