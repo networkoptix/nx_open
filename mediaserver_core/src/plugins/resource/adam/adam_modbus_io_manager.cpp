@@ -13,7 +13,7 @@ using namespace nx_io_managment;
 
 namespace
 {
-    const unsigned int kInputPollingIntervalMs = 200;
+    const unsigned int kInputPollingIntervalMs = 50;
     const unsigned int kDefaultFirstInputCoilAddress = 0;
     const unsigned int kDefaultFirstOutputCoilAddress = 16;
 
@@ -39,7 +39,6 @@ QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
 QnAdamModbusIOManager::~QnAdamModbusIOManager()
 {
     stopIOMonitoring();
-    m_client.terminate();
 }
 
 bool QnAdamModbusIOManager::startIOMonitoring()
@@ -195,7 +194,7 @@ void QnAdamModbusIOManager::setNetworkIssueCallback(NetworkIssueCallback callbac
 void QnAdamModbusIOManager::terminate()
 {
     stopIOMonitoring();
-    m_client.terminate();
+    m_client.pleaseStopSync();
 }
 
 quint32 QnAdamModbusIOManager::getPortCoil(const QString& ioPortId, bool& success) const
@@ -270,7 +269,7 @@ void QnAdamModbusIOManager::fetchAllPortStates()
         m_client.readCoilsAsync(startCoil, lastCoil - startCoil);
 }
 
-void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::ModbusResponse& response)
+void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::ModbusMessage& response)
 {
     if (!m_monitoringIsInProgress)
         return;
@@ -407,7 +406,7 @@ nx_io_managment::IOPortState QnAdamModbusIOManager::getPortDefaultStateUnsafe(co
     return kPortDefaultState;
 }
 
-void QnAdamModbusIOManager::routeMonitoringFlow(nx_modbus::ModbusResponse response)
+void QnAdamModbusIOManager::routeMonitoringFlow(nx_modbus::ModbusMessage response)
 {
     if (!m_monitoringIsInProgress)
         return;
@@ -421,6 +420,8 @@ void QnAdamModbusIOManager::routeMonitoringFlow(nx_modbus::ModbusResponse respon
 void QnAdamModbusIOManager::handleMonitoringError()
 {
     auto error = m_client.getLastErrorString();
+
+    qDebug() << "Error occured << " << error;
 
     NX_LOG(error, cl_logDEBUG2);
 

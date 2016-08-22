@@ -1,90 +1,95 @@
 #pragma once
+
 #include "modbus.h"
+#include "modbus_message_parser.h"
+#include "modbus_message_serializer.h"
+
 #include <nx/network/system_socket.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/connection_server/base_stream_protocol_connection.h>
+
+
+using namespace nx::network;
+
+using ModbusProtocolConnection = 
+    nx_api::BaseStreamProtocolConnectionEmbeddable<
+        nx_modbus::ModbusMessage,
+        nx_modbus::ModbusMessageParser,
+        nx_modbus::ModbusMessageSerializer>;
 
 namespace nx_modbus
 {
 
-class QnModbusAsyncClient: public QObject
+class QnModbusAsyncClient: 
+    public QObject,
+    public StreamConnectionHolder<ModbusProtocolConnection>,
+    public aio::BasicPollable
 {
     Q_OBJECT
 
     enum class ModbusClientState
     {
-        ready,
-        sendingMessage,
-        readingHeader,
-        readingData
+        disconnected,
+        connecting,
+        connected
     };
 
 public:
     QnModbusAsyncClient();
     QnModbusAsyncClient(const SocketAddress& endpoint);
 
+    QnModbusAsyncClient(const QnModbusAsyncClient& other) = delete;
+    QnModbusAsyncClient &operator=(const QnModbusAsyncClient& other) = delete;
+
     ~QnModbusAsyncClient();
 
     void setEndpoint(const SocketAddress& endpoint);
 
-    void doModbusRequestAsync(const ModbusRequest& request);
+    void doModbusRequestAsync(const ModbusMessage& request);
 
-    void readDiscreteInputsAsync();
+    quint16 readDiscreteInputsAsync(quint16 startRegister, quint16 registerCount);
 
-    void readCoilsAsync(quint16 startCoil, quint16 coilNumber);
-    void writeCoilsAsync();
+    quint16 readCoilsAsync(quint16 startCoil, quint16 coilNumber);
+    quint16 writeCoilsAsync(quint16 startCoilAddress, const QByteArray& data);
 
-    void readInputRegistersAsync();
+    quint16 readInputRegistersAsync(quint16 startRegister, quint16 registerCount);
 
-    void readHoldingRegistersAsync(quint32 startRegister, quint32 registerCount);
-    void writeHoldingRegistersAsync(quint32 startRegister, const QByteArray& data);
+    quint16 readHoldingRegistersAsync(quint32 startRegister, quint32 registerCount);
+    quint16 writeHoldingRegistersAsync(quint32 startRegister, const QByteArray& data);
 
     QString getLastErrorString() const;
 
-    void terminate();
+    // Impl of StreamConnectionHolder::closeConnection
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        ConnectionType* connection) override;
+    
+    // Impl of BasicPollable::stopWhileInAioThread
+    virtual void stopWhileInAioThread() override;
 
 signals:
-    void done(ModbusResponse response);
+    void done(ModbusMessage response);
     void error();
 
 private:
-    bool initSocket();
-    void readAsync(quint64 currentRequestSequenceNum);
-    void asyncSendDone(
-        AbstractSocket* sock, 
-        quint64 currentRequestSequenceNum, 
-        SystemError::ErrorCode errorCode, 
-        size_t bytesWritten);
+    void openConnection();
+    void onConnectionDone(SystemError::ErrorCode errorCode);
 
-    void onSomeBytesReadAsync(
-        AbstractSocket* sock, 
-        quint64 currentRequestSequenceNum,
-        SystemError::ErrorCode errorCode, 
-        size_t bytesRead);
+    void sendPendingMessage();
+    void onMessage(ModbusMessage message);
+    void onError(SystemError::ErrorCode errorCode, QString& errorStr);
 
-    void processState(quint64 currentRequestSequenceNum);
-    void processHeader(quint64 currentRequestSequenceNum);
-    void processData(quint64 currentRequestSequenceNum);
-
-    ModbusMBAPHeader buildHeader(const ModbusRequest& request);
-
-    void emitError(const QString& errorStr);
+    ModbusMBAPHeader buildHeader(const ModbusMessage& request);
 
 private:
-    quint16 m_requestTransactionId;
-    quint16 m_requestFunctionCode;
-    quint16 m_responseLength;
-
-    QString m_lastErrorString;
-
-    SocketAddress m_endpoint;
-
     ModbusClientState m_state;
-    QByteArray m_recvBuffer;
-    QByteArray m_sendBuffer;
-    mutable QnMutex m_mutex;
-    quint64 m_requestSequenceNum;
-    std::shared_ptr<AbstractStreamSocket> m_socket;
-    bool m_terminated;
-    bool m_connected;
+    std::unique_ptr<ModbusProtocolConnection> m_modbusConnection;
+    quint16 m_requestSequenceNumber;
+    ModbusMessage m_pendingMessage;
+    bool m_hasPendingMessage;
+    SocketAddress m_endpoint;
+    QString m_lastErrorString;
+    mutable QnMutex m_mutex; 
 };
 
 }

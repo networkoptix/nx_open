@@ -26,7 +26,7 @@ public:
     ModbusResponse doModbusRequest(const ModbusRequest&, bool* outStatus);
 
     // Discrete input is 1-bit read only field.
-    ModbusResponse readDiscreteInputs();
+    ModbusResponse readDiscreteInputs(quint16 startAddress, quint16 inputCount, bool* outStatus);
 
     // Coil is 1-bit read/write field.
     ModbusResponse readCoils(quint16 startCoilAddress, quint16 coilCount, bool* outStatus);
