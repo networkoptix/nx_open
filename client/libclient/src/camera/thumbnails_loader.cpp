@@ -376,7 +376,7 @@ void QnThumbnailsLoader::run()
     connect(this, &QnThumbnailsLoader::processingRequested, m_helper,
         &QnThumbnailsLoaderHelper::process, Qt::QueuedConnection);
     connect(m_helper, &QnThumbnailsLoaderHelper::thumbnailLoaded, this,
-        QnThumbnailsLoader::addThumbnail);
+        &QnThumbnailsLoader::addThumbnail);
 
     if (!m_processingStack.empty())
         emit processingRequested();
