@@ -3,11 +3,10 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/layout_resource.h"
-#include "core/resource_management/resource_discovery_manager.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_discovery_manager.h>
 
 #include <nx_ec/ec_api.h>
 
@@ -162,12 +161,6 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
         if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
             layout->requestStore();
     }
-
-    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-    {
-        if (user->isOwner())
-            qnCommon->updateModuleInformation();
-    }
 }
 
 void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data)
@@ -240,6 +233,4 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();
-
-    qnCommon->updateModuleInformation();
 }
