@@ -369,132 +369,55 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
     }
 }
 
-bool QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
+void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
 {
     QVariant localValue = qnResourceRuntimeDataManager->layoutItemData(m_uuid, role);
     switch (role)
     {
         case Qn::ResourceUidRole:
-            if (value.toString() == resourceUid())
-            {
-                return true;
-            }
-            else
-            {
-                qnWarning("Changing resource unique id of a workbench item is not supported.");
-                return false;
-            }
+            NX_ASSERT(value.toString() == resourceUid());
+            break;
         case Qn::ItemUuidRole:
-            if (value.value<QnUuid>() == uuid())
-            {
-                return true;
-            }
-            else
-            {
-                qnWarning("Changing UUID of a workbench item is not supported.");
-                return false;
-            }
+            NX_ASSERT(value.value<QnUuid>() == uuid());
             break;
         case Qn::ItemGeometryRole:
-            if (value.canConvert<QRect>())
-            {
-                return setGeometry(value.toRect());
-            }
-            else
-            {
-                qnWarning("Provided geometry value '%1' is not convertible to QRect.", value);
-                return false;
-            }
+            NX_ASSERT(value.canConvert<QRect>());
+            setGeometry(value.toRect());
+            break;
         case Qn::ItemGeometryDeltaRole:
-            if (value.canConvert<QRectF>())
-            {
-                return setGeometryDelta(value.toRectF());
-            }
-            else
-            {
-                qnWarning("Provided geometry delta value '%1' is not convertible to QRectF.", value);
-                return false;
-            }
+            NX_ASSERT(value.canConvert<QRectF>());
+            setGeometryDelta(value.toRectF());
+            break;
         case Qn::ItemCombinedGeometryRole:
-            if (value.canConvert<QRectF>())
-            {
-                return setCombinedGeometry(value.toRectF());
-            }
-            else
-            {
-                qnWarning("Provided combined geometry value '%1' is not convertible to QRectF.", value);
-                return false;
-            }
+            NX_ASSERT(value.canConvert<QRectF>());
+            setCombinedGeometry(value.toRectF());
+            break;
         case Qn::ItemZoomRectRole:
-        {
-            if (value.canConvert<QRectF>())
-            {
-                setZoomRect(value.toRectF());
-                return true;
-            }
-            else
-            {
-                qnWarning("Provided zoom rect value '%1' is not convertible to QRectF.", value);
-                return false;
-            }
-        }
-
+            NX_ASSERT(value.canConvert<QRectF>());
+            setZoomRect(value.toRectF());
+            break;
         case Qn::ItemImageEnhancementRole:
-        {
-            if (value.canConvert<ImageCorrectionParams>())
-            {
-                setImageEnhancement(value.value<ImageCorrectionParams>());
-                return true;
-            }
-            else
-            {
-                qnWarning("Provided image enhancment params is not convertible.", value);
-                return false;
-            }
-        }
-
+            NX_ASSERT(value.canConvert<ImageCorrectionParams>());
+            setImageEnhancement(value.value<ImageCorrectionParams>());
+            break;
         case Qn::ItemImageDewarpingRole:
-        {
-            if (value.canConvert<QnItemDewarpingParams>())
-            {
-                setDewarpingParams(value.value<QnItemDewarpingParams>());
-                return true;
-            }
-            else
-            {
-                qnWarning("Provided dewarping params is not convertible.", value);
-                return false;
-            }
-        }
-
+            NX_ASSERT(value.canConvert<QnItemDewarpingParams>());
+            setDewarpingParams(value.value<QnItemDewarpingParams>());
+            break;
         case Qn::ItemFlagsRole:
         {
             bool ok;
             int flags = value.toInt(&ok);
-            if (ok)
-            {
-                return setFlags(static_cast<Qn::ItemFlags>(flags));
-            }
-            else
-            {
-                qnWarning("Provided flags value '%1' is not convertible to int.", value);
-                return false;
-            }
+            NX_ASSERT(ok);
+            setFlags(static_cast<Qn::ItemFlags>(flags));
         }
         case Qn::ItemRotationRole:
         {
             bool ok;
             qreal rotation = value.toReal(&ok);
-            if (ok)
-            {
-                setRotation(rotation);
-                return true;
-            }
-            else
-            {
-                qnWarning("Provided rotation value '%1' must be convertible to qreal.", value);
-                return false;
-            }
+            NX_ASSERT(ok);
+            setRotation(rotation);
+            break;
         }
         case Qn::ItemFlipRole:
         {
@@ -505,14 +428,16 @@ bool QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
                 qnResourceRuntimeDataManager->setLayoutItemData(m_uuid, role, flip);
                 emit dataChanged(Qn::ItemFlipRole);
             }
-            return true;
+            break;
         }
         default:
-            if (localValue != value)
-            {
-                qnResourceRuntimeDataManager->setLayoutItemData(m_uuid, role, value);
-                emit dataChanged(role);
-            }
-            return true;
+        {
+            if (localValue == value)
+                return;
+
+            qnResourceRuntimeDataManager->setLayoutItemData(m_uuid, role, value);
+            emit dataChanged(role);
+            break;
+        }
     }
 }

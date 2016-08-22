@@ -305,17 +305,16 @@ public:
     }
 
     template<class T>
-    bool setData(Qn::ItemDataRole role, const T &value)
+    void setData(Qn::ItemDataRole role, const T &value)
     {
-        return setData(role, QVariant::fromValue<T>(value));
+        setData(role, QVariant::fromValue<T>(value));
     }
 
     /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
-     * \returns                         Whether the data was successfully set.
      */
-    bool setData(Qn::ItemDataRole role, const QVariant &value);
+    void setData(Qn::ItemDataRole role, const QVariant &value);
 
 signals:
     void geometryChanged();
