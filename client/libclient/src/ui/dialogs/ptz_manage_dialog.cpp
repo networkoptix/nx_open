@@ -558,7 +558,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                         this
                     );
-                    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+                    messageBox.setDefaultButton(QDialogButtonBox::Ok);
                     messageBox.setCheckBoxText(tr("Do not show again."));
 
                     int result = messageBox.exec();

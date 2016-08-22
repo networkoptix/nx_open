@@ -1211,7 +1211,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         question,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.setInformativeText(information);
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
     messageBox.addCustomWidget(new QnResourceListView(resources));
