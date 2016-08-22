@@ -3,6 +3,7 @@
 #include <api/model/password_data.h>
 
 #include <utils/common/synctime.h>
+#include <nx/network/http/auth_tools.h>
 
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
@@ -126,10 +127,9 @@ void QnUserResource::generateHash()
 bool QnUserResource::checkLocalUserPassword(const QString &password)
 {
     QnMutexLocker locker(&m_mutex);
-    auto hashes = PasswordData::calculateHashes(m_name, password);
 
     if (!m_digest.isEmpty())
-        return hashes.passwordDigest == m_digest;
+        return nx_http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
 
     //hash is obsolete. Cannot remove it to maintain update from version < 2.3
     //hash becomes empty after changing user's realm
