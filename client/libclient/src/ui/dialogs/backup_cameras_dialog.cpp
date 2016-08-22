@@ -1,6 +1,5 @@
 #include "backup_cameras_dialog.h"
 
-#include <api/global_settings.h>
 #include <api/model/backup_status_reply.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -133,8 +132,6 @@ namespace {
         }
 
     private:
-
-
         bool checkFrame(QWidget* parent)
         {
             NX_ASSERT(parent && parent->layout(), Q_FUNC_INFO, "Invalid delegate frame");
@@ -145,36 +142,30 @@ namespace {
         }
 
     private:
-        QCheckBox *m_backupNewCamerasCheckBox;
-        QLabel *m_warningLabel;
+        QCheckBox* m_backupNewCamerasCheckBox;
+        QLabel* m_warningLabel;
     };
 }
 
-
-QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent /*= nullptr*/)
-    : base_type(parent)
+QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
+    base_type(parent)
 {
     const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Select Devices to Backup..."),
-        tr("Select Cameras to Backup...")
-        );
+        tr("Select Cameras to Backup..."));
 
     setWindowTitle(title);
     setMinimumWidth(dialogMinimumWidth);
 
-    bool backupNewCameras = qnGlobalSettings->backupNewCamerasByDefault();
-
-    auto dialogDelegate = new BackupCamerasDialogDelegate(this);
-    dialogDelegate->setBackupNewCameras(backupNewCameras);
-    setDelegate(dialogDelegate);
+    setDelegate(new BackupCamerasDialogDelegate(this));
 }
 
-void QnBackupCamerasDialog::buttonBoxClicked( QDialogButtonBox::StandardButton button )
+bool QnBackupCamerasDialog::backupNewCameras() const
 {
-    if (button != QDialogButtonBox::Ok)
-        return;
+    return static_cast<const BackupCamerasDialogDelegate*>(delegate())->backupNewCameras();
+}
 
-    const auto dialogDelegate = dynamic_cast<BackupCamerasDialogDelegate*>(this->delegate());
-    qnGlobalSettings->setBackupNewCamerasByDefault(dialogDelegate->backupNewCameras());
-    qnGlobalSettings->synchronizeNow();
+void QnBackupCamerasDialog::setBackupNewCameras(bool value)
+{
+    static_cast<BackupCamerasDialogDelegate*>(delegate())->setBackupNewCameras(value);
 }

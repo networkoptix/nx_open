@@ -19,6 +19,7 @@ Control
     property bool active: false
 
     signal clicked()
+    signal doubleClicked()
     signal activityDetected()
     signal nextCameraRequested()
     signal previousCameraRequested()
@@ -74,7 +75,13 @@ Control
             anchors.fill: parent
 
             opacity: 0.0
-            Behavior on opacity { NumberAnimation { duration: 200 } }
+            NumberAnimation on opacity
+            {
+                id: controlsFadeOutAnimation
+                duration: 1000
+                to: 0.0
+            }
+
             z: 5
 
             border.color: ColorTheme.brand_main
@@ -249,6 +256,7 @@ Control
         id: mouseArea
         anchors.fill: parent
         onClicked: cameraItem.clicked()
+        onDoubleClicked: cameraItem.doubleClicked()
         hoverEnabled: true
 
         onWheel:
@@ -278,7 +286,7 @@ Control
         interval: 3000
         onTriggered:
         {
-            controls.opacity = 0.0
+            controlsFadeOutAnimation.start()
         }
     }
 
@@ -307,7 +315,10 @@ Control
     function showControls()
     {
         if (active)
+        {
+            controlsFadeOutAnimation.stop()
             controls.opacity = 1.0
+        }
         fadeOutTimer.restart()
     }
 
@@ -338,7 +349,7 @@ Control
         }
         else if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter)
         {
-            clicked()
+            doubleClicked()
             event.accepted = true
         }
     }

@@ -31,14 +31,14 @@ TEST(CloudModuleEndPointFetcher, common)
                 nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint)
             {
-                endpointPromise.set_value(resCode);
                 cdbEndpoint = endpoint;
+                endpointPromise.set_value(resCode);
             });
         const auto result = endpointFuture.get();
         endPointFetcher.pleaseStopSync();
         if (result == nx_http::StatusCode::serviceUnavailable)
             continue;   //sometimes server reports 503
-        ASSERT_EQ(result, nx_http::StatusCode::ok);
+        ASSERT_EQ(nx_http::StatusCode::ok, result);
         return;
     }
     ASSERT_TRUE(false);

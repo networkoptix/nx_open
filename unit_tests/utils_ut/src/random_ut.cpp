@@ -11,7 +11,7 @@ namespace test {
 template<typename Type>
 void testContainer(const std::map<Type, size_t>& container)
 {
-    // OK
+    static_cast<void>(container);
 }
 
 template<typename Type, typename Expect, typename ... Expects>

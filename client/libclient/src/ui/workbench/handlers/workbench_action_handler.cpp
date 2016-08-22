@@ -238,7 +238,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::ServerIssuesAction), SIGNAL(triggered()), this, SLOT(at_serverIssuesAction_triggered()));
     connect(action(QnActions::OpenInFolderAction), SIGNAL(triggered()), this, SLOT(at_openInFolderAction_triggered()));
     connect(action(QnActions::DeleteFromDiskAction), SIGNAL(triggered()), this, SLOT(at_deleteFromDiskAction_triggered()));
-    connect(action(QnActions::RemoveLayoutItemAction), SIGNAL(triggered()), this, SLOT(at_removeLayoutItemAction_triggered()));
     connect(action(QnActions::RemoveFromServerAction), SIGNAL(triggered()), this, SLOT(at_removeFromServerAction_triggered()));
     connect(action(QnActions::RenameResourceAction), SIGNAL(triggered()), this, SLOT(at_renameAction_triggered()));
     connect(action(QnActions::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
@@ -282,6 +281,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::DelayedForcedExitAction), &QAction::triggered, this, [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+
+    connect(action(QnActions::HiDpiSupportMessageAction), &QAction::triggered,
+        this, &QnWorkbenchActionHandler::onHiDpiWarningMessageAction);
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -1627,49 +1629,6 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
     QnFileProcessor::deleteLocalResources(resources.toList());
 }
 
-void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
-    QnLayoutItemIndexList items = menu()->currentParameters(sender()).layoutItems();
-
-    if (items.size() > 1) {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            QnActionParameterTypes::resources(items),
-            Qn::RemoveItems_Help,
-            tr("Remove Items"),
-            tr("Are you sure you want to remove these %n items from layout?", "", items.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
-            );
-        if (button != QDialogButtonBox::Yes)
-            return;
-    }
-
-    QList<QnUuid> orphanedUuids;
-    foreach(const QnLayoutItemIndex &index, items) {
-        if (index.layout()) {
-            index.layout()->removeItem(index.uuid());
-        }
-        else {
-            orphanedUuids.push_back(index.uuid());
-        }
-    }
-
-    /* If appserver is not running, we may get removal requests without layout resource. */
-    if (!orphanedUuids.isEmpty()) {
-        QList<QnWorkbenchLayout *> layouts;
-        layouts.push_front(workbench()->currentLayout());
-        foreach(const QnUuid &uuid, orphanedUuids) {
-            foreach(QnWorkbenchLayout *layout, layouts) {
-                if (QnWorkbenchItem *item = layout->item(uuid)) {
-                    qnDeleteLater(item);
-                    break;
-                }
-            }
-        }
-    }
-    if (workbench()->currentLayout()->items().isEmpty())
-        workbench()->currentLayout()->setCellAspectRatio(-1.0);
-}
-
 bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {
     /* Only users and videowall should be checked. Layouts are checked separately, servers and cameras can have the same name. */
     Qn::ResourceFlags checkedFlags = resource->flags() & (Qn::user | Qn::videowall);
@@ -2206,6 +2165,24 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
         tr("This is a beta version of %1.")
         .arg(qApp->applicationDisplayName()));
+}
+
+void QnWorkbenchActionHandler::onHiDpiWarningMessageAction()
+{
+    static const bool kIsSupportLink = !QnAppInfo::supportLink().isEmpty();
+    static const auto kAddress = (kIsSupportLink
+        ? QnAppInfo::supportLink() : QnAppInfo::supportEmailAddress());
+    static const auto addressPrefix = (kIsSupportLink ? QString() : lit("mailto:"));
+    static const auto kSupportPortalLink = lit("<a href = \"%1%2\">%2</a>")
+        .arg(addressPrefix, kAddress);
+
+    static const auto kComment = "%1 Will be replaced by product name, %2 - by link to support portal";
+    static const auto kMessage =
+        tr("%1 is not optimized for HiDpi screens yet and might look wrong. "
+        "Please write to %2 if you have any problems.", kComment)
+        .arg(QnAppInfo::productNameLong(), kSupportPortalLink);
+
+    QnMessageBox::warning(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {

@@ -22,7 +22,6 @@ public:
     void forcedUpdate();
 
 private:
-    private slots:
     void at_newUserLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
@@ -35,6 +34,8 @@ private:
     void at_shareLayoutAction_triggered();
     void at_stopSharingLayoutAction_triggered();
     void at_openNewTabAction_triggered();
+    void at_removeLayoutItemAction_triggered();
+    void at_removeLayoutItemFromSceneAction_triggered();
 
     void at_workbench_layoutsChanged();
 
@@ -44,6 +45,10 @@ private:
     void saveLayout(const QnLayoutResourcePtr &layout);
 
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
+
+    void removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave);
+
+    void shareLayoutWith(const QnLayoutResourcePtr &layout, const QnResourceAccessSubject &subject);
 
     struct LayoutChange
     {

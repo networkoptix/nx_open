@@ -643,13 +643,16 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false);
 
     factory(QnActions::DisconnectAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Logout")).
         autoRepeat(false).
+        shortcut(lit("Ctrl+Shift+D")).
         condition(new QnLoggedInCondition(this));
 
     factory(QnActions::ResourcesModeAction).
         flags(Qn::Main).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Browse Local Files")).
         toggledText(tr("Show Welcome Screen")).
         condition(new QnBrowseLocalFilesCondition(this));
@@ -902,6 +905,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         text(tr("Show Beta Version Warning Message"));
+
+    factory(QnActions::HiDpiSupportMessageAction).
+        flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Show HiDpi Support Warning Message"));
 
     factory(QnActions::AllowStatisticsReportMessageAction).
         flags(Qn::NoTarget).
@@ -1439,7 +1447,15 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(QnActions::RemoveLayoutItemAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
+        text(tr("Remove from Layout")).
+        shortcut(lit("Del")).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
+        autoRepeat(false).
+        condition(new QnLayoutItemRemovalActionCondition(this));
+
+    factory(QnActions::RemoveLayoutItemFromSceneAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
         text(tr("Remove from Layout")).
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).

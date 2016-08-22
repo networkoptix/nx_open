@@ -2,6 +2,8 @@
 
 #include <api/model/password_data.h>
 
+#include <nx/network/http/auth_tools.h>
+
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_properties.h>
 
@@ -136,10 +138,9 @@ void QnUserResource::generateHash()
 bool QnUserResource::checkLocalUserPassword(const QString &password)
 {
     QnMutexLocker locker(&m_mutex);
-    auto hashes = PasswordData::calculateHashes(m_name, password);
 
     if (!m_digest.isEmpty())
-        return hashes.passwordDigest == m_digest;
+        return nx_http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
 
     //hash is obsolete. Cannot remove it to maintain update from version < 2.3
     //hash becomes empty after changing user's realm

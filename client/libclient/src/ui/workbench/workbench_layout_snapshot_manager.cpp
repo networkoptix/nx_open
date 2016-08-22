@@ -156,7 +156,8 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
             setFlags(layout, 0); /* Not local, not being saved, not changed. */
         }
 
-        callback(success, layout);
+        if (callback)
+            callback(success, layout);
     });
     return reqID > 0;
 }

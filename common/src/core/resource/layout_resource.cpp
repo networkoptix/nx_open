@@ -59,7 +59,15 @@ QnLayoutResourcePtr QnLayoutResource::clone() const {
     return result;
 }
 
-void QnLayoutResource::setItems(const QnLayoutItemDataList& items) {
+QString QnLayoutResource::toSearchString() const
+{
+    if (isFile())
+        return getName() + L' ' + getUrl();
+    return getName();
+}
+
+void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
+{
     QnLayoutItemDataMap map;
     for(const QnLayoutItemData &item: items)
         map[item.uuid] = item;

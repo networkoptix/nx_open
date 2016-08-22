@@ -86,6 +86,7 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
+#include <nx/network/socket.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -234,6 +235,7 @@
 #include <server/server_globals.h>
 #include <media_server/master_server_status_watcher.h>
 #include <media_server/connect_to_cloud_watcher.h>
+#include <rest/helpers/permissions_helper.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -690,13 +692,14 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
 void setServerNameAndUrls(
     QnMediaServerResourcePtr server,
-    const QString& myAddress, int port, bool isSslAllowed)
+    const SocketAddress& address,
+    bool sslAllowed)
 {
     if (server->getName().isEmpty())
         server->setName(QString("Server ") + getMacFromPrimaryIF());
 
-    const auto apiSheme = isSslAllowed ? QString("https") : QString("https");
-    server->setUrl(QString("rtsp://%1:%2").arg(myAddress).arg(port));
+    server->setSslAllowed(sslAllowed);
+    server->setPrimaryAddress(address);
 }
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
@@ -1076,9 +1079,7 @@ void MediaServerProcess::updateAddressesList()
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
-        setServerNameAndUrls(
-            m_mediaServer, newAddress.address.toString(), newAddress.port,
-            qnCommon->moduleInformation().sslAllowed);
+        setServerNameAndUrls(m_mediaServer, newAddress, qnCommon->moduleInformation().sslAllowed);
     }
 
     ec2::ApiMediaServerData server;
@@ -2122,8 +2123,8 @@ void MediaServerProcess::run()
             isModified = true;
 
         setServerNameAndUrls(
-            server, defaultLocalAddress(appserverHost),
-            m_universalTcpListener->getPort(),
+            server,
+            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
             qnCommon->moduleInformation().sslAllowed);
 
         QList<SocketAddress> serverAddresses;
@@ -2309,7 +2310,8 @@ void MediaServerProcess::run()
 	addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
-    if (isNewServerInstance || systemName.isDefault())
+    if (!QnPermissionsHelper::isSafeMode() &&
+        (isNewServerInstance || systemName.isDefault()))
     {
         /* In case of error it will be instantly cleaned by the watcher. */
         qnGlobalSettings->resetCloudParams();
@@ -2822,6 +2824,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     QString engineVersion;
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
+    QString ipVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
@@ -2854,6 +2857,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("Enforces stream socket type (TCP, UDT)"), QString());
     commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
         lit("Enforces mediator address"), QString());
+    commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
+        lit("Force ip version"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
@@ -2889,6 +2894,10 @@ int MediaServerProcess::main(int argc, char* argv[])
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
+    if( ipVersion.isEmpty() )
+        ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
+
+    SocketFactory::setIpVersion( ipVersion );
     QnVideoService service( argc, argv );
 
     if (!engineVersion.isEmpty()) {

@@ -222,9 +222,11 @@ TEST( Socket, HostNameResolve1 )
     while( !done )
         cond.wait( lk );
 
-    QString ipStr = HostAddress( resolvedAddress.inAddr() ).toString();
-
+    QString ipStr = resolvedAddress.toString();
+    static_cast<void>( ipStr );
     ASSERT_TRUE( connectErrorCode == SystemError::noError );
+
+    connection->pleaseStopSync();
 }
 
 TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
@@ -267,13 +269,14 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
         lk.lock();
     }
 
-    QString ipStr = HostAddress( resolvedAddress.inAddr() ).toString();
+    QString ipStr = resolvedAddress.toString();
+    static_cast<void>( ipStr );
     ASSERT_TRUE( m_connections.empty() );
 }
 
 TEST( Socket, HostNameResolve3 )
 {
-    nx::DnsResolver dnsResolver;
+    nx::network::DnsResolver dnsResolver;
 
     {
         HostAddress resolvedAddress;
@@ -281,7 +284,9 @@ TEST( Socket, HostNameResolve3 )
             dnsResolver.resolveAddressSync(
                 QLatin1String("ya.ru"),
                 &resolvedAddress) );
-        EXPECT_TRUE(resolvedAddress.ipv4() != 0);
+
+        EXPECT_TRUE((bool)resolvedAddress.ipV4());
+        EXPECT_NE(resolvedAddress.ipV4()->s_addr, 0);
     }
 
     {

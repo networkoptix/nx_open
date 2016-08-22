@@ -31,7 +31,7 @@ class NX_NETWORK_API CloudStreamSocket
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
 public:
-    CloudStreamSocket();
+    CloudStreamSocket(int ipVersion);
     virtual ~CloudStreamSocket();
 
     //!Implementation of AbstractSocket::*
@@ -112,6 +112,7 @@ private:
 
     QnMutex m_mutex;
     bool m_terminated;
+    const int m_ipVersion;
 };
 
 } // namespace cloud

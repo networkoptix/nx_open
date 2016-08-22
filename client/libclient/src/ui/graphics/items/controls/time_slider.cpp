@@ -2161,6 +2161,9 @@ bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
         case QEvent::GraphicsSceneMouseMove:
             dragProcessor()->mouseMoveEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event));
             return true;
+
+        default:
+            break;
         }
     }
 
@@ -3117,6 +3120,8 @@ void QnTimeSlider::changeEvent(QEvent* event)
     case QEvent::FontChange:
     case QEvent::PaletteChange:
         updatePixmapCache(); // - to update when standard palette is customized (not at the same moment as setColors)
+        break;
+    default:
         break;
     }
 }

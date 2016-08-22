@@ -293,6 +293,7 @@ namespace nx_http
     const StringType Method::HEAD( "HEAD" );
     const StringType Method::POST( "POST" );
     const StringType Method::PUT( "PUT" );
+    const StringType Method::OPTIONS( "OPTIONS" );
 
     //namespace Version
     //{

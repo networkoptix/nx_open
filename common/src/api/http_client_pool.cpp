@@ -19,7 +19,7 @@ namespace nx_http {
 static ClientPool* staticInstance;
 
 ClientPool::ClientPool(QObject *parent):
-    QObject(),
+    QObject(parent),
     m_maxPoolSize(kDefaultPoolSize),
     m_requestId(0)
 {

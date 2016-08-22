@@ -388,7 +388,7 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return QHostAddress(d->socket->getForeignAddress().address.ipv4());
+    return QHostAddress(d->socket->getForeignAddress().toString());
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)

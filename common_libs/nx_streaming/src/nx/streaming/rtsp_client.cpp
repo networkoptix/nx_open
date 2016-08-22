@@ -623,7 +623,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
 
 
-    if ((quint64)startTime != AV_NOPTS_VALUE)
+    if (startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
 
     m_SessionId.clear();
@@ -841,7 +841,7 @@ nx_http::Request QnRtspClient::createDescribeRequest()
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Accept", "application/sdp" ) );
-    if( (quint64)m_openedTime != AV_NOPTS_VALUE )
+    if( m_openedTime != AV_NOPTS_VALUE )
         addRangeHeader( &request, m_openedTime, AV_NOPTS_VALUE );
     addAdditionAttrs( &request );
     return request;

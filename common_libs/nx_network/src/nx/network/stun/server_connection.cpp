@@ -101,7 +101,7 @@ void ServerConnection::processBindingRequest( Message message )
         bindingMethod, std::move(message.header.transactionId)));
 
     response.newAttribute< stun::attrs::XorMappedAddress >(
-        m_peerAddress.port, m_peerAddress.address.ipv4());
+        m_peerAddress.port, ntohl(m_peerAddress.address.ipV4()->s_addr));
 
     sendMessage(std::move(response), nullptr);
 }

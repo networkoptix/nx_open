@@ -158,7 +158,7 @@ const CloudConnect& Settings::cloudConnect() const
 void Settings::load( int argc, char **argv )
 {
     m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, argv);
+    m_settings.parseArgs(argc, (const char**)argv);
 
     loadConfiguration();
 }

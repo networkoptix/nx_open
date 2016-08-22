@@ -28,12 +28,16 @@ namespace Qn
     {
     }
 
-    TextValidateFunction defaultEmailValidator()
+    TextValidateFunction defaultEmailValidator(bool allowEmpty)
     {
-        return [](const QString& text)
+        return [allowEmpty](const QString& text)
         {
-            if (!text.trimmed().isEmpty() && !QnEmailAddress::isValid(text))
+            if (!allowEmpty && text.trimmed().isEmpty())
+                return Qn::ValidationResult(QnValidatorStrings::tr("E-Mail cannot be empty."));
+
+            if (!QnEmailAddress::isValid(text)) /* isValid() trims it before checking. */
                 return Qn::ValidationResult(QnValidatorStrings::tr("E-Mail is not valid."));
+
             return kValidResult;
         };
     }

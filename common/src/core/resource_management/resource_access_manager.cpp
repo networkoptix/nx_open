@@ -334,6 +334,7 @@ bool QnResourceAccessManager::hasGlobalPermission(
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
+
     auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
     if (!user)
         return false;
@@ -341,7 +342,7 @@ bool QnResourceAccessManager::hasGlobalPermission(
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
-    const QnResourceAccessSubject& subject, 
+    const QnResourceAccessSubject& subject,
     Qn::GlobalPermission requiredPermission) const
 {
     if (requiredPermission == Qn::NoGlobalPermissions)
@@ -389,15 +390,21 @@ bool QnResourceAccessManager::hasPermission(
 bool QnResourceAccessManager::hasPermission(
     const Qn::UserAccessData& accessRights,
     const QnResourcePtr& mediaResource,
-    Qn::Permission permissions) const
+    Qn::Permission permission) const
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
+    if (accessRights.access == Qn::UserAccessData::Access::ReadAllResources &&
+        permission == Qn::ReadPermission)
+    {
+        return true;
+    }
 
     auto userResource = qnResPool->getResourceById(accessRights.userId).dynamicCast<QnUserResource>();
     if (!userResource)
         return false;
-    return hasPermission(userResource, mediaResource, permissions);
+
+    return hasPermission(userResource, mediaResource, permission);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const
@@ -974,7 +981,7 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
     auto hasItemsChange = [items = videoWallResource->items()->getItems(), update]
     {
         /* Quick check */
-        if (items.size() != update.items.size())
+        if ((size_t)items.size() != update.items.size())
             return true;
 
         for (auto updated : update.items)

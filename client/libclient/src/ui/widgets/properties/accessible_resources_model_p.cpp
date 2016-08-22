@@ -2,6 +2,8 @@
 
 #include <set>
 
+#include <client/client_globals.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/utils/string.h>
@@ -13,7 +15,7 @@ namespace {
 
     const int kMaxResourcesInTooltip = 10;
 
-} // anonimous namespace
+} // anonymous namespace
 
 
 QnAccessibleResourcesModel::QnAccessibleResourcesModel(QObject* parent) :

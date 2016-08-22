@@ -11,6 +11,8 @@ struct QnApplauncherAppInfo
 
 #if defined(Q_OS_MACX)
     static QString productName();
+
+    static QString bundleName();
 #endif
 
 };

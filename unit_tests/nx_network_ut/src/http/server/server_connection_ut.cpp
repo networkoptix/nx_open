@@ -53,7 +53,7 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
         stree::ResourceContainer /*authInfo*/,
-        nx_http::Request request,
+        nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::HttpRequestProcessedHandler completionHandler )
     {
@@ -243,7 +243,7 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
 
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    nx::network::TCPSocket sock;
+    nx::network::TCPSocket sock(false, AF_INET);
     ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
     ASSERT_EQ(sizeof(testData) - 1, sock.send(testData, sizeof(testData)-1));
 }

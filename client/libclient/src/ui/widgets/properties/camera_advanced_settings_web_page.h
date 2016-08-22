@@ -1,28 +1,23 @@
-/**********************************************************
-* 1 sep 2014
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
-#define CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
+#include <core/resource/resource_fwd.h>
 
-#include <QtWebKitWidgets/QWebPage>
-#include "core/resource/resource_fwd.h"
+#include <ui/widgets/common/web_page.h>
 
 class QnCustomCookieJar;
 
-class CameraAdvancedSettingsWebPage
-:
-    public QWebPage
+class CameraAdvancedSettingsWebPage: public QnWebPage
 {
+    using base_type = QnWebPage;
 public:
-    CameraAdvancedSettingsWebPage( QObject* parent = 0 );
-    void setCamera(QnResourcePtr camRes);
+    CameraAdvancedSettingsWebPage(QObject* parent = 0);
+
+    QnVirtualCameraResourcePtr camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
+
 protected:
     //!Implementation of QWebPage::userAgentForUrl
-    virtual QString	userAgentForUrl( const QUrl& url ) const override;
+    virtual QString	userAgentForUrl(const QUrl& url) const override;
 private:
     QnCustomCookieJar* m_cookieJar;
 };
-
-#endif  //CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H

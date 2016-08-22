@@ -50,7 +50,6 @@ ApplicationWindow
 
         if (lastUsedUrl)
         {
-            lockScreenOrientation()
             Workflow.openResourcesScreen(getLastUsedSystemId())
             connectionManager.connectToServer(lastUsedUrl)
         }
@@ -106,14 +105,4 @@ ApplicationWindow
     Screen.onPrimaryOrientationChanged: updateNavigationBarPadding()
 
     onActiveFocusItemChanged: stackView.restoreActiveFocus()
-
-    function lockScreenOrientation()
-    {
-        setScreenOrientation(Screen.orientation)
-    }
-
-    function unlockScreenOrientation()
-    {
-        setScreenOrientation(Qt.PrimaryOrientation)
-    }
 }

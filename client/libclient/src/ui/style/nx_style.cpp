@@ -696,7 +696,7 @@ void QnNxStyle::drawPrimitive(
                 if (widget)
                 {
                     if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
-                        qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled))
+                        (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
                     {
                         /* Itemviews with kSuppressHoverPropery should suppress hover. */
                         /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
@@ -1640,7 +1640,7 @@ void QnNxStyle::drawControl(
                         rect.setBottom(textRect.bottom());
                         rect.setTop(rect.bottom());
                         focusRect.setLeft(rect.left() - kCompactTabFocusMargin);
-                        focusRect.setRight(rect.right() - kCompactTabFocusMargin);
+                        focusRect.setRight(rect.right() + kCompactTabFocusMargin);
                     }
                     else
                     {
@@ -1985,10 +1985,16 @@ void QnNxStyle::drawControl(
 
         case CE_PushButtonLabel:
         {
-            if (isCheckableButton(option))
+            if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
             {
+                bool checkable = isCheckableButton(option);
+                bool leftAligned = widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
+
+                /* If button is standard, break to standard drawing: */
+                if (!checkable && !leftAligned)
+                    break;
+
                 /* Calculate minimal label width: */
-                auto buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
                 int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
                 if (!buttonOption->icon.isNull())
                     minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
@@ -2001,10 +2007,14 @@ void QnNxStyle::drawControl(
                 base_type::drawControl(element, &newOpt, painter, widget);
 
                 /* Draw switch right-aligned: */
-                newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
-                newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
-                newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
-                drawSwitch(painter, &newOpt, widget);
+                if (checkable)
+                {
+                    newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
+                    newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                    newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
+                    drawSwitch(painter, &newOpt, widget);
+                }
+
                 return;
             }
 
@@ -2665,7 +2675,7 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_TabBarTab:
         {
-            if (auto tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+            if (qstyleoption_cast<const QStyleOptionTab*>(option))
             {
                 TabShape shape = tabShape(widget);
 
@@ -2759,7 +2769,10 @@ int QnNxStyle::pixelMetric(
     switch (metric)
     {
         case PM_ButtonMargin:
-            return dp(16);
+        {
+            int margin = widget ? widget->property(Properties::kButtonMarginProperty).toInt() : 0;
+            return margin ? margin : dp(16);
+        }
 
         case PM_ButtonShiftVertical:
         case PM_ButtonShiftHorizontal:
@@ -2979,7 +2992,7 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
+    if (qobject_cast<QLineEdit*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
         {
@@ -3267,6 +3280,8 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+            default:
+                break;
         }
     }
     /* Disabled QAbstractButton eats mouse wheel events.

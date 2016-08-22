@@ -4,19 +4,20 @@
 
 namespace Ui {
     class StorageRebuildWidget;
-}
+} // namespace Ui
 
 struct QnStorageScanData;
 
-class QnStorageRebuildWidget: public QWidget {
+class QnStorageRebuildWidget : public QWidget
+{
     Q_OBJECT
+    using base_type = QWidget;
 
-    typedef QWidget base_type;  
 public:
-    QnStorageRebuildWidget(QWidget *parent = nullptr);
+    QnStorageRebuildWidget(QWidget* parent = nullptr);
     virtual ~QnStorageRebuildWidget();
 
-    void loadData(const QnStorageScanData &data);
+    void loadData(const QnStorageScanData &data, bool isBackup);
 
 signals:
     void cancelRequested();

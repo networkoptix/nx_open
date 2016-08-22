@@ -22,6 +22,8 @@ public:
 
     QnLayoutResourcePtr clone() const;
 
+    virtual QString toSearchString() const override;
+
     void setItems(const QnLayoutItemDataList &items);
 
     void setItems(const QnLayoutItemDataMap &items);

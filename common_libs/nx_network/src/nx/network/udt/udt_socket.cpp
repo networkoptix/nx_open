@@ -40,7 +40,13 @@ namespace detail {
 void AddressFrom( const SocketAddress& local_addr , sockaddr_in* out ) {
     memset(out, 0, sizeof(*out));    // Zero out address structure
     out->sin_family = AF_INET;       // Internet address
-    out->sin_addr = local_addr.address.inAddr();
+
+    // TODO: add support for IPv6
+    if (auto ip = local_addr.address.ipV4())
+        out->sin_addr = *ip;
+    else
+        out->sin_addr.s_addr = 0;
+
     out->sin_port = htons(local_addr.port);
 }
 
@@ -513,13 +519,16 @@ template class UdtSocket<AbstractStreamServerSocket>;
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
-UdtStreamSocket::UdtStreamSocket()
+UdtStreamSocket::UdtStreamSocket(int ipVersion)
 :
     m_aioHelper(
         new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/)),
     m_noDelay(false)
 {
     open();
+
+    // TODO: Add support for IPv6
+    static_cast<void>(ipVersion);
 }
 
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state)
@@ -760,11 +769,14 @@ void UdtStreamSocket::registerTimer(
 // =====================================================================
 // UdtStreamServerSocket implementation
 // =====================================================================
-UdtStreamServerSocket::UdtStreamServerSocket()
+UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion)
 :
     m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
 {
     open();
+
+    // TODO: Add support for IPv6
+    static_cast<void>(ipVersion);
 }
 
 UdtStreamServerSocket::~UdtStreamServerSocket()

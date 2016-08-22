@@ -166,7 +166,19 @@ struct TransactionDescriptor : TransactionDescriptorBase
     CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc;
     GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc;
 
-    template<typename GetHashF, typename SaveF, typename SaveSerializedF, typename CreateTranF, typename TriggerNotificationF>
+    template<
+		typename GetHashF,
+		typename SaveF,
+		typename SaveSerializedF,
+		typename CreateTranF,
+		typename TriggerNotificationF,
+		typename CheckSavePermissionFunc,
+		typename CheckReadPermissionFunc,
+		typename FilterBySavePermissionFunc,
+		typename FilterByReadPermissionFunc,
+		typename CheckRemoteAccessFunc,
+        typename GetTransactionTypeFunc
+	>
     TransactionDescriptor(ApiCommand::Value value,
         bool isPersistent,
         bool isSystem,
@@ -176,12 +188,12 @@ struct TransactionDescriptor : TransactionDescriptorBase
         SaveSerializedF&& saveSerializedFunc,
         CreateTranF&& createTransactionFromAbstractTransactionFunc,
         TriggerNotificationF&& triggerNotificationFunc,
-        CheckSavePermissionFuncType<ParamType> checkSavePermissionFunc,
-        CheckReadPermissionFuncType<ParamType> checkReadPermissionFunc,
-        FilterBySavePermissionFuncType<ParamType> filterBySavePermissionFunc,
-        FilterByReadPermissionFuncType<ParamType> filterByReadPermissionFunc,
-        CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc,
-        GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc)
+        CheckSavePermissionFunc&& checkSavePermissionFunc,
+        CheckReadPermissionFunc&& checkReadPermissionFunc,
+        FilterBySavePermissionFunc&& filterBySavePermissionFunc,
+        FilterByReadPermissionFunc&& filterByReadPermissionFunc,
+        CheckRemoteAccessFunc&& checkRemotePeerAccessFunc
+        GetTransactionTypeFunc&& getTransactionTypeFunc)
         :
         TransactionDescriptorBase(value, isPersistent, isSystem, name),
         getHashFunc(std::forward<GetHashF>(getHashFunc)),
@@ -189,12 +201,12 @@ struct TransactionDescriptor : TransactionDescriptorBase
         saveSerializedFunc(std::forward<SaveSerializedF>(saveSerializedFunc)),
         createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
         triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc)),
-        checkSavePermissionFunc(checkSavePermissionFunc),
-        checkReadPermissionFunc(checkReadPermissionFunc),
-        filterBySavePermissionFunc(filterBySavePermissionFunc),
-        filterByReadPermissionFunc(filterByReadPermissionFunc),
-        checkRemotePeerAccessFunc(checkRemotePeerAccessFunc),
-        getTransactionTypeFunc(getTransactionTypeFunc)
+        checkSavePermissionFunc(std::forward<CheckSavePermissionFunc>(checkSavePermissionFunc)),
+        checkReadPermissionFunc(std::forward<CheckReadPermissionFunc>(checkReadPermissionFunc)),
+        filterBySavePermissionFunc(std::forward<FilterBySavePermissionFunc>(filterBySavePermissionFunc)),
+        filterByReadPermissionFunc(std::forward<FilterByReadPermissionFunc>(filterByReadPermissionFunc)),
+        checkRemotePeerAccessFunc(std::forward<CheckRemoteAccessFunc>(checkRemotePeerAccessFunc)),
+        getTransactionTypeFunc(std::forward<GetTransactionTypeFunc>(getTransactionTypeFunc))
     {
     }
 };

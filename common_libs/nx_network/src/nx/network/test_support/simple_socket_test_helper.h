@@ -953,6 +953,8 @@ typedef nx::network::test::StopType StopType;
     Type(Name, SimpleMultiConnect) \
         { nx::network::test::socketMultiConnect(mkServer, mkClient); } \
 
+#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP
+
 #define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
@@ -961,7 +963,7 @@ typedef nx::network::test::StopType StopType;
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
 
-#define NX_NETWORK_BOTH_SOCKETS_TEST_CASE(Type, Name, mkServer, mkClient) \
+#define NX_NETWORK_BOTH_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
     NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \

@@ -26,6 +26,10 @@ public:
 
     using QTreeView::edit;
 
+    /** Sometimes we need to disable default selection behavior by space key and handle it manually. */
+    bool ignoreDefaultSpace() const;
+    void setIgnoreDefaultSpace(bool value);
+
 signals:
     /**
      * This signal is emitted whenever the user presses enter on one of the
@@ -58,6 +62,8 @@ private:
 
     /* Flag that an element is edited right now. Workaround for Qt bug: state() is not always Editing. */
     bool m_editorOpen;
+
+    bool m_ignoreDefaultSpace;
 };
 
 

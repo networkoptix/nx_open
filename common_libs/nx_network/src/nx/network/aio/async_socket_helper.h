@@ -55,7 +55,7 @@ public:
 
         nx::network::SocketGlobals::aioService().dispatch( m_socket, std::move(handler) );
     }
-    
+
     //!This call stops async I/O on socket and it can never be resumed!
     void terminateAsyncIO()
     {
@@ -102,7 +102,7 @@ public:
     virtual ~AsyncSocketImplHelper()
     {
         //synchronization may be required here in case if recv handler and send/connect handler called simultaneously in different aio threads,
-        //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing 
+        //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing
         //async I/O and wait for completion. That is, wait for eventTriggered to return.
         //So, socket can only be removed from handler called in aio thread. So, eventTriggered is down the stack if m_*TerminatedFlag is not nullptr
 
@@ -253,7 +253,7 @@ public:
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
-        //this NX_ASSERT is not critical but is a signal of possible 
+        //this assert is not critical but is a signal of possible 
             //ineffective memory usage in calling code
         NX_ASSERT( buf->capacity() > buf->size() );
 

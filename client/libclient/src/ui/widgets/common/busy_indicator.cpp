@@ -337,10 +337,10 @@ void QnBusyIndicatorPainter::tick(int deltaMs)
 */
 
 QnBusyIndicatorWidget::QnBusyIndicatorWidget(
-    QWidget* parent,
-    const QColor& indicatorColor,
-    const QColor& borderColor)
-    :
+        QWidget* parent,
+        const QColor& indicatorColor,
+        const QColor& borderColor) :
+
     QWidget(parent),
     m_indicatorColor(indicatorColor),
     m_borderColor(borderColor)
@@ -383,7 +383,7 @@ void QnBusyIndicatorWidget::indicatorSizeChanged()
 
 void QnBusyIndicatorWidget::updateIndicator()
 {
-    update(indicatorRect());
+    update(indicatorRect().adjusted(-1, -1, 1, 1));
 }
 
 QRect QnBusyIndicatorWidget::indicatorRect() const
@@ -395,11 +395,12 @@ QRect QnBusyIndicatorWidget::indicatorRect() const
 * QnBusyIndicatorGraphicsWidget
 */
 
-QnBusyIndicatorGraphicsWidget::QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent,
-    Qt::WindowFlags windowFlags,
-    const QColor& indicatorColor,
-    const QColor& borderColor)
-    :
+QnBusyIndicatorGraphicsWidget::QnBusyIndicatorGraphicsWidget(
+        QGraphicsItem* parent,
+        Qt::WindowFlags windowFlags,
+        const QColor& indicatorColor,
+        const QColor& borderColor) :
+
     base_type(parent, windowFlags),
     m_indicatorColor(indicatorColor),
     m_borderColor(borderColor)
@@ -448,7 +449,7 @@ void QnBusyIndicatorGraphicsWidget::indicatorSizeChanged()
 
 void QnBusyIndicatorGraphicsWidget::updateIndicator()
 {
-    update(indicatorRect());
+    update(indicatorRect().adjusted(-0.5, -0.5, 0.5, 0.5));
 }
 
 QRectF QnBusyIndicatorGraphicsWidget::indicatorRect() const

@@ -57,6 +57,7 @@ private:
     bool isMinilaucherUpdated(const QString& installRoot) const;
     bool runMinilaucher() const;
     bool updateMinilauncherInDir(const QString& installRoot);
+    bool updateApplauncherDesktopIcon();
 
     /** Get all paths where client might be installed. */
     QStringList getClientInstallRoots() const;

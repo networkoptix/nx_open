@@ -96,6 +96,8 @@ public:
 
         QString commandStr = path.split('/', QString::SkipEmptyParts).last();
         auto command = ApiCommand::fromString(commandStr);
+        if (tran.command == ApiCommand::NotDefined)
+            return nx_http::StatusCode::notFound;
 
         if (!success)
         {

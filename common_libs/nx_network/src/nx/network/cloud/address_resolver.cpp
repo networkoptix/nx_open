@@ -432,13 +432,12 @@ void AddressResolver::dnsResolve(
         [this, info, needMediator](
             SystemError::ErrorCode code, const HostAddress& host)
         {
-            const HostAddress hostAddress(host.inAddr());
             std::vector<Guard> guards;
 
             QnMutexLocker lk(&m_mutex);
             std::vector<AddressEntry> entries;
             if(code == SystemError::noError)
-                entries.push_back(AddressEntry(AddressType::direct, hostAddress));
+                entries.push_back(AddressEntry(AddressType::direct, host));
 
             NX_LOGX(lm("Address %1 is resolved by DNS to %2")
                 .str(info->first).container(entries), cl_logDEBUG2);

@@ -135,41 +135,25 @@ inline bool deserialize(const QString& value, QnPtzHotkeyHash* target)
 
 
 // -------------------------------------------------------------------------- //
-// QnClientBackground
+// QnBackgroundImage
 // -------------------------------------------------------------------------- //
 /**
  * Set of options how to display client background.
  */
-struct QnClientBackground
+struct QnBackgroundImage
 {
-    QnClientBackground():
-        animationEnabled(true),
-        animationMode(Qn::DefaultAnimation),
-        animationCustomColor(QColor(0, 0, 255, 51)),
-        animationPeriodSec(120),
-        imageEnabled(false),
-        imageMode(Qn::StretchImage),
-        imageOpacity(0.5)
-    {}
+    QnBackgroundImage();
 
-    //TODO: #GDM cleanup animation fields. Main problem is in the settings migrating. Image settings will be lost.
-    bool animationEnabled;
-    Qn::BackgroundAnimationMode animationMode;
-    QColor animationCustomColor;
-    int animationPeriodSec;
+    bool enabled;
+    QString name;
+    QString originalName;
+    Qn::ImageBehaviour mode;
+    qreal opacity;
 
-    bool imageEnabled;
-    QString imageName;
-    QString imageOriginalName;
-    Qn::ImageBehaviour imageMode;
-    qreal imageOpacity;
-
-    qreal actualImageOpacity() const {
-        return imageEnabled ? imageOpacity : 0.0;
-    }
+    qreal actualImageOpacity() const;
 };
-#define QnClientBackground_Fields (animationEnabled)(animationMode)(animationCustomColor)(animationPeriodSec)(imageEnabled)(imageName)(imageOriginalName)(imageMode)(imageOpacity)
+#define QnBackgroundImage_Fields (enabled)(name)(originalName)(mode)(opacity)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnClientBackground, (datastream)(metatype));
+QN_FUSION_DECLARE_FUNCTIONS(QnBackgroundImage, (json)(metatype));
 
 #endif // QN_CLIENT_MODEL_TYPES_H

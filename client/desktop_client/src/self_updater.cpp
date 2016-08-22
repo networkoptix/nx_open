@@ -11,9 +11,10 @@
 #include <client/client_startup_parameters.h>
 
 #include <nx/vms/utils/app_info.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/platform/protocol_handler.h>
+#include <nx/vms/utils/platform/protocol_handler.h>
+#include <nx/vms/utils/desktop_file_linux.h>
 
+#include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
 #include <utils/directory_backup.h>
@@ -21,6 +22,25 @@
 namespace {
 
 const int kUpdateLockTimeoutMs = 1000;
+
+typedef QSharedPointer<QnBaseDirectoryBackup> QnDirectoryBackupPtr;
+
+QString backupPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("/../../backup");
+#else
+    return lit("/backup");
+#endif
+}
+
+QString applauncherPostfix()
+{
+#if defined(Q_OS_MACX)
+    return lit("/Contents/MacOS/");
+#endif
+    return QString();
+}
 
 }
 
@@ -58,7 +78,7 @@ bool SelfUpdater::registerUriHandler()
     binaryPath = qApp->applicationDirPath() + lit("/client");
 #endif
 
-    return nx::utils::registerSystemUriProtocolHandler(
+    return nx::vms::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
         QnAppInfo::productNameLong(),
@@ -71,24 +91,6 @@ bool SelfUpdater::registerUriHandler()
 #endif
 }
 
-QString backupPostfix()
-{
-#if defined(Q_OS_MACX)
-    return lit("/../../backup");
-#else
-    return lit("/backup");
-#endif
-}
-
-QString applauncherPostfix()
-{
-#if defined(Q_OS_MACX)
-    return lit("/Contents/MacOS/");
-#endif
-    return QString();
-}
-
-typedef QSharedPointer<QnBaseDirectoryBackup> QnDirectoryBackupPtr;
 QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString& to)
 {
     const QStringList kTargetFileFilters =
@@ -182,6 +184,9 @@ bool SelfUpdater::updateApplauncher()
         NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
         backup->restore(QnDirectoryBackupBehavior::Copy);
     }
+
+    if (!updateApplauncherDesktopIcon())
+        return false;
 
     /* Run newest applauncher via our own minilauncher. */
     if (!runMinilaucher())
@@ -290,7 +295,7 @@ void SelfUpdater::launchWithAdminPermissions()
 {
 #if defined(Q_OS_WIN)
     /* Start another client instance with admin permissions if required. */
-    nx::utils::runAsAdministratorWithUAC(
+    nx::vms::utils::runAsAdministratorWithUAC(
         qApp->applicationFilePath(),
         QStringList()
         << QnStartupParameters::kSelfUpdateKey
@@ -432,6 +437,40 @@ bool SelfUpdater::updateMinilauncherInDir(const QString& installRoot)
     NX_LOG(lit("Minilauncher updated successfully"), cl_logINFO);
     NX_EXPECT(isMinilaucherUpdated(installRoot));
 
+    return true;
+}
+
+bool SelfUpdater::updateApplauncherDesktopIcon()
+{
+#if defined(Q_OS_LINUX)
+    const auto appsLocation =
+        QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
+    if (appsLocation.isEmpty())
+        return false;
+
+    const auto filePath = QDir(appsLocation).filePath(nx::vms::utils::AppInfo::iconFileName());
+
+    const auto homeLocation = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    if (homeLocation.isEmpty())
+        return false;
+
+    const auto applauncherBinaryPath =
+        QDir(homeLocation).absoluteFilePath(lit(".local/share/%1/applauncher/%2/bin/%3")
+            .arg(QnAppInfo::organizationName(),
+                QnAppInfo::customizationName(),
+                QnAppInfo::applauncherExecutableName()));
+
+    if (!QFile::exists(applauncherBinaryPath))
+        return false;
+
+    return nx::vms::utils::createDesktopFile(
+        filePath,
+        applauncherBinaryPath,
+        QnAppInfo::productNameLong(),
+        QnAppInfo::productNameLong() + lit(" Client"),
+        QnAppInfo::customizationName(),
+        nx::utils::SoftwareVersion(QnAppInfo::engineVersion()));
+#endif // defined(Q_OS_LINUX)
     return true;
 }
 
