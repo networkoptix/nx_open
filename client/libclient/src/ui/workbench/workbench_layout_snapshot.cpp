@@ -9,8 +9,8 @@ QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot()
     cellAspectRatio(-1.0),
     cellSpacing(-1.0),
     backgroundSize(),
-    backgroundOpacity(),
     backgroundImageFilename(),
+    backgroundOpacity(),
     locked(false)
 {
 }
