@@ -82,8 +82,12 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
 }
 
 Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const {
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-        return Qn::GlobalViewerPermissions;
+    /* PTZ here is intended - for SpaceX, see VMS-2208 */
+    if (qnRuntime->isVideoWallMode())
+        return Qn::GlobalLiveViewerPermissions | Qn::GlobalViewArchivePermission | Qn::GlobalPtzControlPermission;
+
+    if (qnRuntime->isActiveXMode())
+        return Qn::GlobalLiveViewerPermissions | Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission | Qn::GlobalPtzControlPermission;
 
     Qn::Permissions result(0);
 
