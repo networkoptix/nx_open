@@ -515,3 +515,21 @@ span.danger{
 .UserDefinedEvent .UserDefinedEvent{
   display:block;
 }
+
+.system-info{
+  background-color: $gray-lighter;
+
+  td{
+    vertical-align: top;
+    &:first-child{
+      white-space:nowrap;
+    }
+  }
+
+  .table-spacer td{
+    &,td {
+      max-height: 8px;
+      line-height: 8px;
+    }
+  }
+}
