@@ -247,8 +247,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     PtzInstrument *ptzInstrument = new PtzInstrument(this);
     ZoomWindowInstrument *zoomWindowInstrument = new ZoomWindowInstrument(this);
 
-    gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
-    gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
+    gridAdjustmentInstrument->setSpeed(0.25 / 360.0);
+    gridAdjustmentInstrument->setMaxSpacing( 0.15);
 
     m_motionSelectionInstrument->setBrush(subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
     m_motionSelectionInstrument->setPen(subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));

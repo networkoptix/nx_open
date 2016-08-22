@@ -2280,15 +2280,10 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
 
     fitInView();
 
-    QSizeF spacing = workbench()->mapper()->spacing();
-    if (qFuzzyIsNull(spacing.width()) || qFuzzyIsNull(spacing.height()))
-    {
+    if (qFuzzyIsNull(workbench()->mapper()->spacing()))
         m_frameOpacityAnimator->animateTo(0.0);
-    }
     else
-    {
         m_frameOpacityAnimator->animateTo(1.0);
-    }
 }
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)

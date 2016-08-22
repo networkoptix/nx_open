@@ -11,7 +11,7 @@ QnLayoutResource::QnLayoutResource():
     base_type(),
     m_items(new QnThreadsafeItemStorage<QnLayoutItemData>(&m_mutex, this)),
     m_cellAspectRatio(-1.0),
-    m_cellSpacing(-1.0, -1.0),
+    m_cellSpacing(-1.0),
     m_backgroundSize(1, 1),
     m_backgroundOpacity(0.7),
     m_locked(false)
@@ -256,26 +256,22 @@ bool QnLayoutResource::hasCellAspectRatio() const
 }
 
 /********* Cell spacing property **********/
-QSizeF QnLayoutResource::cellSpacing() const
+qreal QnLayoutResource::cellSpacing() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_cellSpacing;
 }
 
-void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing)
+void QnLayoutResource::setCellSpacing(qreal spacing)
 {
     {
         QnMutexLocker locker(&m_mutex);
-        if (qFuzzyEquals(m_cellSpacing, cellSpacing))
+        if(qFuzzyEquals(m_cellSpacing, spacing))
             return;
-        m_cellSpacing = cellSpacing;
+
+        m_cellSpacing = spacing;
     }
     emit cellSpacingChanged(::toSharedPointer(this));
-}
-
-void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing)
-{
-    setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
 }
 
 /********* Background size property **********/

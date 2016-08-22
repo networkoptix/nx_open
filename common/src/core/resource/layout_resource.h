@@ -50,11 +50,9 @@ public:
 
     bool hasCellAspectRatio() const;
 
-    QSizeF cellSpacing() const;
+    qreal cellSpacing() const;
 
-    void setCellSpacing(const QSizeF &cellSpacing);
-
-    void setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing);
+    void setCellSpacing(qreal spacing);
 
     void setData(const QHash<int, QVariant> &dataByRole);
 
@@ -118,7 +116,7 @@ protected:
 private:
     QScopedPointer<QnThreadsafeItemStorage<QnLayoutItemData> > m_items;
     float m_cellAspectRatio;
-    QSizeF m_cellSpacing;
+    qreal m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
     QSize m_backgroundSize;

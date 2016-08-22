@@ -589,8 +589,9 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     submitDelayedDrops();
 }
 
-void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
-    qreal value = workbench()->currentLayout()->cellSpacing().width();
+void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged()
+{
+    qreal value = workbench()->currentLayout()->cellSpacing();
 
     if (qFuzzyCompare(0.0, value))
         action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
@@ -1820,22 +1821,22 @@ void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.0);
     action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.1, 0.1));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.1);
     action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.2, 0.2));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.2);
     action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.3);
     action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
 }
 
@@ -1927,9 +1928,11 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
     int minHeight = qMax(brect.height(), qnGlobals->layoutBackgroundMinSize().height());
 
     qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    if (layout->hasCellAspectRatio()) {
-        qreal cellWidth = 1.0 + layout->cellSpacing().width();
-        qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
+    if (layout->hasCellAspectRatio())
+    {
+        const auto spacing = layout->cellSpacing();
+        qreal cellWidth = 1.0 + spacing;
+        qreal cellHeight = 1.0 / layout->cellAspectRatio() + spacing;
         cellAspectRatio = cellWidth / cellHeight;
     }
 

@@ -223,9 +223,11 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     }
     ui->lockedCheckBox->setChecked(layout->locked());
 
-    if (layout->hasCellAspectRatio()) {
-        qreal cellWidth = 1.0 + layout->cellSpacing().width();
-        qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
+    if (layout->hasCellAspectRatio())
+    {
+        const auto spacing = layout->cellSpacing();
+        qreal cellWidth = 1.0 + spacing;
+        qreal cellHeight = 1.0 / layout->cellAspectRatio() + spacing;
         d->cellAspectRatio = cellWidth / cellHeight;
     }
 

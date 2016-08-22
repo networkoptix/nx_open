@@ -283,7 +283,7 @@ public:
     {
         addFlags(Qn::local);
         setName(videowall->getName());
-        setCellSpacing(0.1, 0.1);
+        setCellSpacing(0.1);
         setCellAspectRatio(defaultReviewAR);
         setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
         setData(Qn::VideoWallResourceRole, qVariantFromValue(videowall));
@@ -465,7 +465,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
     if (items.isEmpty())
         return;
 
-    layout->setCellSpacing(QSizeF(0.0, 0.0));
+    layout->setCellSpacing(0.0);
 
     auto reset = [this](const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout)
     {
@@ -765,7 +765,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             {
                 case Qn::LayoutCellSpacingRole:
                 {
-                    QSizeF data = QJson::deserialized<QSizeF>(value);
+                    auto data = QJson::deserialized<qreal>(value);
                     workbench()->currentLayout()->setData(role, data);
                     break;
                 }
@@ -1320,7 +1320,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
                 desiredAspectRatio = ar;
         }
 
-        layout->setCellSpacing(0, 0);
+        layout->setCellSpacing(0);
         layout->setCellAspectRatio(desiredAspectRatio);
 
         /* Calculate size of the resulting matrix. */

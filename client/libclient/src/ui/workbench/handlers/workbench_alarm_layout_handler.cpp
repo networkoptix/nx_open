@@ -54,7 +54,7 @@ namespace {
             setId(QnUuid::createUuid());
             addFlags(Qn::local);
             setName(tr("Alarms"));
-            setCellSpacing(0.1, 0.1);
+            setCellSpacing(0.1);
             setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));
         }
     };
