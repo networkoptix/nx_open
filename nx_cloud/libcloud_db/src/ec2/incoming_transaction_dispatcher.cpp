@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "transaction_dispatcher.h"
+#include "incoming_transaction_dispatcher.h"
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
@@ -18,7 +18,7 @@ namespace ec2 {
 
 using namespace ::ec2;
 
-TransactionDispatcher::TransactionDispatcher(
+IncomingTransactionDispatcher::IncomingTransactionDispatcher(
     TransactionLog* const transactionLog,
     nx::db::AsyncSqlQueryExecutor* const dbManager)
 :
@@ -27,7 +27,7 @@ TransactionDispatcher::TransactionDispatcher(
 {
 }
 
-void TransactionDispatcher::dispatchTransaction(
+void IncomingTransactionDispatcher::dispatchTransaction(
     TransactionTransportHeader transportHeader,
     Qn::SerializationFormat tranFormat,
     const QByteArray& serializedTransaction,

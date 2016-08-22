@@ -20,10 +20,12 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/data/api_peer_data.h>
+#include <nx_ec/data/api_tran_state_data.h>
 
 #include <utils/common/counter.h>
 
 #include "access_control/auth_types.h"
+#include "transaction_processor.h"
 #include "transaction_transport_header.h"
 
 
@@ -42,7 +44,8 @@ class Settings;
 
 namespace ec2 {
 
-class TransactionDispatcher;
+class IncomingTransactionDispatcher;
+class TransactionLog;
 class TransactionTransport;
 class TransactionTransportHeader;
 
@@ -52,7 +55,8 @@ class ConnectionManager
 public:
     ConnectionManager(
         const conf::Settings& settings,
-        TransactionDispatcher* const transactionDispatcher);
+        TransactionLog* const transactionLog,
+        IncomingTransactionDispatcher* const transactionDispatcher);
     virtual ~ConnectionManager();
 
     /** mediaserver calls this method to open 2-way transaction exchange channel */
@@ -69,6 +73,52 @@ public:
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::HttpRequestProcessedHandler completionHandler);
+
+    /** dispatches transaction to the right peers */
+    template<class T>
+    void dispatchTransaction(
+        const nx::String& systemId,
+        ::ec2::QnTransaction<T> transaction,
+        TransactionTransportHeader transportHeader)
+    {
+        QnMutexLocker lk(&m_mutex);
+        const auto& connectionBySystemIdAndPeerIdIndex =
+            m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+
+        std::size_t connectionCount = 0;
+        std::array<TransactionTransport*, 7> connectionsToSendTo;
+        auto connectionIt = connectionBySystemIdAndPeerIdIndex
+            .lower_bound(std::make_pair(systemId, nx::String()));
+        for ( ;
+              connectionIt != connectionBySystemIdAndPeerIdIndex.end()
+                  && connectionIt->systemIdAndPeerId.first == systemId;
+             ++connectionIt)
+        {
+            if (connectionIt->systemIdAndPeerId.second == transaction.peerID)
+                continue;
+
+            connectionsToSendTo[connectionCount++] = connectionIt->connection;
+            if (connectionCount < connectionsToSendTo.size())
+                continue;
+
+            for (auto& connection: connectionsToSendTo)
+                connection->sendTransaction(transaction, transportHeader);
+            connectionCount = 0;
+        }
+
+        if (connectionCount == 1)
+        {
+            //minor optimization
+            connectionsToSendTo[0]->sendTransaction(
+                std::move(transaction),
+                std::move(transportHeader));
+        }
+        else
+        {
+            for (auto& connection : connectionsToSendTo)
+                connection->sendTransaction(transaction, transportHeader);
+        }
+    }
 
 private:
     struct ConnectionContext
@@ -99,7 +149,8 @@ private:
     constexpr static const int kConnectionBySystemIdAndPeerIdIndex = 1;
 
     const conf::Settings& m_settings;
-    TransactionDispatcher* const m_transactionDispatcher;
+    TransactionLog* const m_transactionLog;
+    IncomingTransactionDispatcher* const m_transactionDispatcher;
     const ::ec2::ApiPeerData m_localPeerData;
     ConnectionDict m_connections;
     std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
@@ -122,6 +173,21 @@ private:
         const nx_http::Request& request,
         ::ec2::ApiPeerData* const remotePeer,
         nx::String* const contentEncoding);
+    void processSyncRequest(
+        const nx::String& systemId,
+        const TransactionTransportHeader& transportHeader,
+        ::ec2::ApiSyncRequestData data,
+        TransactionProcessedHandler handler);
+    void processSyncResponse(
+        const nx::String& systemId,
+        const TransactionTransportHeader& transportHeader,
+        ::ec2::QnTranStateResponse data,
+        TransactionProcessedHandler handler);
+    void processSyncDone(
+        const nx::String& systemId,
+        const TransactionTransportHeader& transportHeader,
+        ::ec2::ApiTranSyncDoneData data,
+        TransactionProcessedHandler handler);
 };
 
 }   // namespace ec2

@@ -178,8 +178,10 @@ public:
         sendTransactionImpl(transaction, header);
     }
 
-    bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
-                                   const QnTransactionTransportHeader& _header);
+    bool sendSerializedTransaction(
+        Qn::SerializationFormat srcFormat,
+        const QByteArray& serializedTran,
+        const QnTransactionTransportHeader& _header);
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
     void close();
@@ -258,9 +260,6 @@ public:
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
-protected:
-    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) = 0;
-
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
@@ -270,7 +269,9 @@ signals:
     void remotePeerUnauthorized(const QnUuid& id);
     void peerIdDiscovered(const QUrl& url, const QnUuid& id);
 
-private:
+protected:
+    virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) = 0;
+
     template<class T>
     void sendTransactionImpl(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header)
     {
@@ -306,12 +307,13 @@ private:
                 addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
                 break;
             default:
-                qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
+                qWarning() << "Client has requested data in an unsupported format" << m_remotePeer.dataFormat;
                 addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
                 break;
         }
     }
 
+private:
     struct DataToSend
     {
         QByteArray sourceData;

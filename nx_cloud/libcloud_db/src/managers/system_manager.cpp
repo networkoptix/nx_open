@@ -20,7 +20,7 @@
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "account_manager.h"
-#include "ec2/transaction_dispatcher.h"
+#include "ec2/incoming_transaction_dispatcher.h"
 #include "event_manager.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
@@ -35,7 +35,7 @@ SystemManager::SystemManager(
     const AccountManager& accountManager,
     const EventManager& eventManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
-    ec2::TransactionDispatcher* const transactionDispatcher) throw(std::runtime_error)
+    ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error)
 :
     m_settings(settings),
     m_timerManager(timerManager),

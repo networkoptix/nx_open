@@ -35,7 +35,8 @@
 #include "db/structure_update_statements.h"
 #include "ec2/connection_manager.h"
 #include "ec2/control_message_processor.h"
-#include "ec2/transaction_dispatcher.h"
+#include "ec2/incoming_transaction_dispatcher.h"
+#include "ec2/outgoing_transaction_dispatcher.h"
 #include "ec2/transaction_log.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
@@ -190,12 +191,14 @@ int CloudDBProcess::exec()
         EventManager eventManager(settings);
         m_eventManager = &eventManager;
 
-        ec2::TransactionLog transactionLog;
-        ec2::TransactionDispatcher transactionDispatcher(&transactionLog, &dbManager);
-        ec2::ConnectionManager ec2ConnectionManager(settings, &transactionDispatcher);
-        ec2::ControlMessageProcessor controlTransactionProcessor(
+        ec2::TransactionLog transactionLog(&dbManager);
+        ec2::IncomingTransactionDispatcher transactionDispatcher(&transactionLog, &dbManager);
+        ec2::ConnectionManager ec2ConnectionManager(
+            settings,
             &transactionLog,
             &transactionDispatcher);
+        //ec2::OutgoingTransactionDispatcher ec2OutgoingTransactionDispatcher(&ec2ConnectionManager);
+        //transactionLog.setNewTransactionsHandler(&ec2OutgoingTransactionDispatcher);
 
         SystemManager systemManager(
             settings,

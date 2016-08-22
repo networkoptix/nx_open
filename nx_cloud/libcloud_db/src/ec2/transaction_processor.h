@@ -131,53 +131,114 @@ private:
         TransactionProcessedHandler handler)
     {
         using namespace std::placeholders;
-        m_dbManager->executeUpdate<TransactionContext, api::ResultCode>(
+
+        m_transactionLog->startDbTransaction(
+            transportHeader.systemId,
             std::bind(
-                &TransactionProcessor::processTransactionInDbConnectionThread,
-                this, _1, _2, _3),
-            TransactionContext{ std::move(transportHeader), std::move(transaction) },
+                &TransactionProcessor::processTransactionInDbConnectionThread, this,
+                _1,
+                _2,
+                TransactionContext{ std::move(transportHeader), std::move(transaction) }),
             [this, handler = std::move(handler)](
-                nx::db::DBResult dbResult,
-                TransactionContext transactionContext,
-                api::ResultCode resultCode) mutable
+                nx::db::DBResult dbResult) mutable
             {
-                dbProcessingCompleted(
-                    dbResult,
-                    std::move(transactionContext),
-                    resultCode,
-                    std::move(handler));
+                dbProcessingCompleted(dbResult, std::move(handler));
             });
+
+
+
+        //m_dbManager->executeUpdate<TransactionContext, api::ResultCode>(
+        //    std::bind(
+        //        &TransactionProcessor::processTransactionInDbConnectionThread,
+        //        this, _1, _2, _3),
+        //    TransactionContext{ std::move(transportHeader), std::move(transaction) },
+        //    [this, handler = std::move(handler)](
+        //        nx::db::DBResult dbResult,
+        //        TransactionContext transactionContext,
+        //        api::ResultCode resultCode) mutable
+        //    {
+        //        dbProcessingCompleted(
+        //            dbResult,
+        //            std::move(transactionContext),
+        //            resultCode,
+        //            std::move(handler));
+        //    });
     }
 
     nx::db::DBResult processTransactionInDbConnectionThread(
+        api::ResultCode resultCode,
         QSqlDatabase* connection,
-        const TransactionContext& transactionContext,
-        api::ResultCode* const resultCode)
+        const TransactionContext& transactionContext)
     {
-        //DB transaction is created down the stack
-
-        if (!m_transactionLog->checkIfNeededAndSaveToLog(
-                connection,
-                transactionContext.transportHeader.systemId,
-                transactionContext.transaction))
+        if (resultCode != api::ResultCode::ok)
         {
-            *resultCode = api::ResultCode::ok;
-            return nx::db::DBResult::ok;    //transaction skipped by transaction log
+            NX_LOGX(lm("Error getting Db connection for transaction %1 received from (%2, %3). "
+                "ec2 transaction log returned %4")
+                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
+                .arg(transactionContext.transportHeader.systemId)
+                .str(transactionContext.transportHeader.endpoint)
+                .arg(api::toString(resultCode)),
+                cl_logWARNING);
+            return nx::db::DBResult::ioError;
         }
 
-        return m_processTranFunc(
+        //DB transaction is created down the stack
+
+        auto dbResultCode =
+            m_transactionLog->checkIfNeededAndSaveToLog(
+                connection,
+                transactionContext.transportHeader.systemId,
+                transactionContext.transaction,
+                transactionContext.transportHeader);
+
+        if (dbResultCode == nx::db::DBResult::cancelled)
+        {
+            NX_LOGX(lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
+                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
+                .arg(transactionContext.transportHeader.systemId)
+                .str(transactionContext.transportHeader.endpoint),
+                cl_logDEBUG1);
+            return dbResultCode;
+        }
+        else if (dbResultCode != nx::db::DBResult::ok)
+        {
+            NX_LOGX(lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
+                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
+                .arg(transactionContext.transportHeader.systemId)
+                .str(transactionContext.transportHeader.endpoint)
+                .arg(connection->lastError().text()),
+                cl_logWARNING);
+            return dbResultCode;
+        }
+
+        dbResultCode = m_processTranFunc(
             connection,
             transactionContext.transportHeader.systemId,
-            transactionContext.transaction.params);
+            std::move(transactionContext.transaction.params));
+        if (dbResultCode != nx::db::DBResult::ok)
+        {
+            NX_LOGX(lm("Error processing transaction %1 received from (%2, %3). %4")
+                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
+                .arg(transactionContext.transportHeader.systemId)
+                .str(transactionContext.transportHeader.endpoint)
+                .arg(connection->lastError().text()),
+                cl_logWARNING);
+        }
+        return dbResultCode;
     }
 
     void dbProcessingCompleted(
-        nx::db::DBResult /*dbResult*/,
-        TransactionContext /*transactionContext*/,
-        api::ResultCode resultCode,
+        nx::db::DBResult dbResult,
         TransactionProcessedHandler completionHandler)
     {
-        completionHandler(resultCode);
+        switch (dbResult)
+        {
+            case nx::db::DBResult::ok:
+            case nx::db::DBResult::cancelled:
+                return completionHandler(api::ResultCode::ok);
+            default:
+                return completionHandler(api::ResultCode::dbError);
+        }
     }
 };
 

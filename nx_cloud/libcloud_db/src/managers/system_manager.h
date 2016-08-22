@@ -6,8 +6,6 @@
 #ifndef cloud_db_system_manager_h
 #define cloud_db_system_manager_h
 
-#define BOOST_BIND_NO_PLACEHOLDERS
-
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -47,7 +45,7 @@ class AccountManager;
 class EventManager;
 
 namespace ec2 {
-class TransactionDispatcher;
+class IncomingTransactionDispatcher;
 }   // namespace ec2 
 
 /*!
@@ -70,7 +68,7 @@ public:
         const AccountManager& accountManager,
         const EventManager& eventManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
-        ec2::TransactionDispatcher* const transactionDispatcher) throw(std::runtime_error);
+        ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -195,7 +193,7 @@ private:
     const AccountManager& m_accountManager;
     const EventManager& m_eventManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
-    ec2::TransactionDispatcher* const m_transactionDispatcher;
+    ec2::IncomingTransactionDispatcher* const m_transactionDispatcher;
     //!map<id, system>
     SystemsDict m_systems;
     mutable QnMutex m_mutex;

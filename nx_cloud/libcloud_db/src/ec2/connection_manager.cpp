@@ -7,13 +7,14 @@
 
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx_ec/data/api_peer_data.h>
+#include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
 
 #include <http/custom_headers.h>
 
 #include "access_control/authorization_manager.h"
 #include "stree/cdb_ns.h"
-#include "transaction_dispatcher.h"
+#include "incoming_transaction_dispatcher.h"
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
 
@@ -26,12 +27,25 @@ static const QnUuid kCdbGuid("{A1D368E4-3D01-4B18-8642-898272D7CDA9}");
 
 ConnectionManager::ConnectionManager(
     const conf::Settings& settings,
-    TransactionDispatcher* const transactionDispatcher)
+    TransactionLog* const transactionLog,
+    IncomingTransactionDispatcher* const transactionDispatcher)
 :
     m_settings(settings),
+    m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
     m_localPeerData(kCdbGuid, QnUuid::createUuid(), Qn::PT_CloudServer, Qn::UbjsonFormat)
 {
+    using namespace std::placeholders;
+
+    m_transactionDispatcher->registerSpecialTransactionHandler
+        <::ec2::ApiCommand::tranSyncRequest, ::ec2::ApiSyncRequestData>(
+            std::bind(&ConnectionManager::processSyncRequest, this, _1, _2, _3, _4));
+    m_transactionDispatcher->registerSpecialTransactionHandler
+        <::ec2::ApiCommand::tranSyncResponse, ::ec2::QnTranStateResponse>(
+            std::bind(&ConnectionManager::processSyncResponse, this, _1, _2, _3, _4));
+    m_transactionDispatcher->registerSpecialTransactionHandler
+        <::ec2::ApiCommand::tranSyncDone, ::ec2::ApiTranSyncDoneData>(
+            std::bind(&ConnectionManager::processSyncDone, this, _1, _2, _3, _4));
 }
 
 ConnectionManager::~ConnectionManager()
@@ -80,6 +94,7 @@ void ConnectionManager::createTransactionConnection(
         {
             const nx::String systemIdLocal(systemId.c_str());
             auto newTransport = std::make_unique<TransactionTransport>(
+                m_transactionLog,
                 systemIdLocal,
                 connectionId,
                 m_localPeerData,
@@ -286,6 +301,42 @@ void ConnectionManager::fetchDataFromConnectRequest(
     }
 
     *remotePeer = ::ec2::ApiPeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+}
+
+void ConnectionManager::processSyncRequest(
+    const nx::String& systemId,
+    const TransactionTransportHeader& transportHeader,
+    ::ec2::ApiSyncRequestData data,
+    TransactionProcessedHandler handler)
+{
+    QnMutexLocker lk(&m_mutex);
+    const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
+    auto connectionIter = connectionByIdIndex.find(transportHeader.connectionId);
+    NX_ASSERT(connectionIter != connectionByIdIndex.end());
+    lk.unlock();
+
+    connectionIter->connection->processSyncRequest(
+        transportHeader,
+        std::move(data),
+        std::move(handler));
+}
+
+void ConnectionManager::processSyncResponse(
+    const nx::String& systemId,
+    const TransactionTransportHeader& transportHeader,
+    ::ec2::QnTranStateResponse data,
+    TransactionProcessedHandler handler)
+{
+    //TODO #ak
+}
+
+void ConnectionManager::processSyncDone(
+    const nx::String& systemId,
+    const TransactionTransportHeader& transportHeader,
+    ::ec2::ApiTranSyncDoneData data,
+    TransactionProcessedHandler handler)
+{
+    //TODO #ak
 }
 
 }   // namespace ec2

@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include "transaction_dispatcher.h"
+#include "incoming_transaction_dispatcher.h"
 
 
 namespace nx {
@@ -16,7 +16,7 @@ namespace ec2 {
 
 ControlMessageProcessor::ControlMessageProcessor(
     TransactionLog* const transactionLog,
-    TransactionDispatcher* const transactionDispatcher)
+    IncomingTransactionDispatcher* const transactionDispatcher)
 :
     m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher)
@@ -32,9 +32,6 @@ ControlMessageProcessor::ControlMessageProcessor(
     m_transactionDispatcher->registerTransactionHandler
         <::ec2::ApiCommand::tranSyncDone, ::ec2::ApiTranSyncDoneData>(
             std::bind(&ControlMessageProcessor::processSyncDone, this, _1, _2, _3));
-    m_transactionDispatcher->registerTransactionHandler
-        <::ec2::ApiCommand::peerAliveInfo, ::ec2::ApiPeerAliveData>(
-            std::bind(&ControlMessageProcessor::processPeerAliveData, this, _1, _2, _3));
 }
 
 nx::db::DBResult ControlMessageProcessor::processSyncRequest(
@@ -59,15 +56,6 @@ nx::db::DBResult ControlMessageProcessor::processSyncDone(
     QSqlDatabase* dbConnection,
     const nx::String& systemId,
     ::ec2::ApiTranSyncDoneData data)
-{
-    //TODO
-    return nx::db::DBResult::statementError;
-}
-
-nx::db::DBResult ControlMessageProcessor::processPeerAliveData(
-    QSqlDatabase* dbConnection,
-    const nx::String& systemId,
-    ::ec2::ApiPeerAliveData data)
 {
     //TODO
     return nx::db::DBResult::statementError;

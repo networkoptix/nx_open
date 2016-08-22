@@ -24,11 +24,11 @@ namespace ec2 {
 
 class TransactionLog;
 
-/** Dispaches transaction to a corresponding processor. */
-class TransactionDispatcher
+/** Dispaches transaction received from remote peer to a corresponding processor. */
+class IncomingTransactionDispatcher
 {
 public:
-    TransactionDispatcher(
+    IncomingTransactionDispatcher(
         TransactionLog* const transactionLog,
         nx::db::AsyncSqlQueryExecutor* const dbManager);
 
@@ -41,6 +41,7 @@ public:
         const QByteArray& data,
         TransactionProcessedHandler completionHandler);
 
+    /** register processor function by command type */
     template<int TransactionCommandValue, typename TransactionDataType>
     void registerTransactionHandler(
         typename TransactionProcessor<
@@ -54,6 +55,18 @@ public:
                     m_transactionLog,
                     m_dbManager,
                     std::move(processTranFunc)));
+    }
+
+    /** register processor function that will do everything itself */
+    template<int TransactionCommandValue, typename TransactionDataType>
+    void registerSpecialTransactionHandler(
+        nx::utils::MoveOnlyFunc<void(
+            const nx::String& /*systemId*/,
+            const TransactionTransportHeader& /*transportHeader*/,
+            TransactionDataType /*data*/,
+            TransactionProcessedHandler /*handler*/)> /*processTranFunc*/)
+    {
+        //TODO #ak
     }
 
 private:

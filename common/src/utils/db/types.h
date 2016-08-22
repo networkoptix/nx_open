@@ -20,7 +20,8 @@ enum class DBResult
     ok,
     statementError,
     ioError,
-    notFound
+    notFound,
+    cancelled,
 };
 
 
