@@ -670,6 +670,7 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
     case QnFullUpdateStage::Download:
     case QnFullUpdateStage::Client:
     case QnFullUpdateStage::Incompatible:
+    case QnFullUpdateStage::CheckFreeSpace:
     case QnFullUpdateStage::Push:
         cancellable = true;
         break;
