@@ -48,7 +48,7 @@ public:
         imageSize(1, 1),
         imageAspectRatio(1),
         imageOpacity(0.7),
-        imageMode(Qn::StretchImage),
+        imageMode(Qn::ImageBehaviour::Stretch),
         isDefaultBackground(true),
         imageIsLocal(true),
         connected(false),
@@ -109,12 +109,14 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent, QnWorkbenchCon
     connect(this->context()->instance<QnAppServerImageCache>(), &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
     connect(qnCommon,   &QnCommonModule::remoteIdChanged,   this, &QnGridBackgroundItem::updateConnectedState);
 
-    connect(qnSettings->notifier(QnClientSettings::BACKGROUND), &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
+    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE),
+        &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
 
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 
     updateConnectedState();
+    updateDefaultBackground();
 }
 
 QnGridBackgroundItem::~QnGridBackgroundItem() {
@@ -134,11 +136,11 @@ void QnGridBackgroundItem::updateDefaultBackground() {
     if (!d->isDefaultBackground)
         return;
 
-    QnClientBackground background = qnSettings->background();
+    QnBackgroundImage background = qnSettings->backgroundImage();
     bool hasChanges = false;
 
-    if (d->imageFilename != background.imageName) {
-        d->imageFilename = background.imageName;
+    if (d->imageFilename != background.name) {
+        d->imageFilename = background.name;
         d->imageStatus = ImageStatus::None;
 #ifdef NATIVE_PAINT_BACKGROUND
         m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
@@ -151,8 +153,8 @@ void QnGridBackgroundItem::updateDefaultBackground() {
         d->imageOpacity = background.actualImageOpacity();
         hasChanges = true;
     }
-    if (d->imageMode != background.imageMode) {
-        d->imageMode = background.imageMode;
+    if (d->imageMode != background.mode) {
+        d->imageMode = background.mode;
         hasChanges = true;
     }
 
@@ -214,10 +216,10 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
     bool isDefaultBackground = layout->backgroundImageFilename().isEmpty();
     bool isExportedLayout = layout->isFile();
 
-    QnClientBackground background = qnSettings->background();
+    QnBackgroundImage background = qnSettings->backgroundImage();
 
     QString filename = isDefaultBackground
-        ? background.imageName
+        ? background.name
         : layout->backgroundImageFilename();
 
     QSize imageSize = isDefaultBackground
@@ -228,7 +230,7 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
         ? background.actualImageOpacity()
         : qBound(0.0, layout->backgroundOpacity(), 1.0);
 
-    Qn::ImageBehaviour imageMode = background.imageMode;
+    Qn::ImageBehaviour imageMode = background.mode;
 
     bool hasChanges =
             (d->isDefaultBackground != isDefaultBackground) ||
@@ -413,10 +415,10 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     QRectF targetRect = d->rect;
     if (d->isDefaultBackground) {
         switch (d->imageMode) {
-        case Qn::FitImage:
+        case Qn::ImageBehaviour::Fit:
             targetRect = QnGeometry::expanded(d->imageAspectRatio, display()->viewportGeometry(), Qt::KeepAspectRatio, Qt::AlignCenter);
             break;
-        case Qn::CropImage:
+        case Qn::ImageBehaviour::Crop:
             targetRect = QnGeometry::expanded(d->imageAspectRatio, display()->viewportGeometry(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
             break;
         default:
@@ -429,7 +431,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     if( !m_imgAsFrame )
         return;
 
-    if( !m_imgUploader.get() )
+    if(!m_imgUploader)
     {
         m_imgUploader.reset( new DecodedPictureToOpenGLUploader(QGLContext::currentContext()) );
         m_renderer.reset( new QnGLRenderer(QGLContext::currentContext(), *m_imgUploader) );

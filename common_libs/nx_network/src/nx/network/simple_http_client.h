@@ -16,6 +16,7 @@ enum CLHttpStatus
     CL_HTTP_REDIRECT = 302,
     CL_HTTP_BAD_REQUEST = 400,
     CL_HTTP_AUTH_REQUIRED = 401,
+    CL_HTTP_FORBIDDEN = 403,
     CL_HTTP_NOT_FOUND = 404,
     CL_HTTP_NOT_ALLOWED = 405,
     CL_HTTP_SERVICEUNAVAILABLE = 503,
@@ -132,16 +133,16 @@ private:
 */
 QByteArray NX_NETWORK_API downloadFile(
 	CLHttpStatus& status, const QString& fileName,
-	const QString& host, int port, 
-	unsigned int timeout, const QAuthenticator& auth, 
+	const QString& host, int port,
+	unsigned int timeout, const QAuthenticator& auth,
 	int capacity = 2000);
 
 /*!
     \param timeout Timeout in milliseconds to be used as socket's read and write timeout
 */
 bool NX_NETWORK_API uploadFile(
-	const QString& fileName, const QString&  content, 
-	const QHostAddress& host, int port, 
+	const QString& fileName, const QString&  content,
+	const QHostAddress& host, int port,
 	unsigned int timeout, const QAuthenticator& auth);
 
 

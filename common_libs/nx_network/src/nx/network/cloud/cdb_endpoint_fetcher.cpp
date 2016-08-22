@@ -8,9 +8,13 @@
 #include <QtCore/QBuffer>
 
 #include <nx/network/app_info.h>
-
 #include <nx/utils/log/log.h>
+
+#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <plugins/videodecoder/stree/stree_manager.h>
+#include <utils/common/app_info.h>
 #include <utils/common/guard.h>
+#include <utils/common/software_version.h>
 
 #include "cloud_modules_xml_sax_handler.h"
 
@@ -20,13 +24,17 @@ namespace network {
 namespace cloud {
 
 CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
-    QString moduleName,
+    const QString& moduleName,
     std::unique_ptr<AbstractEndpointSelector> endpointSelector)
 :
-    m_moduleName(std::move(moduleName)),
+    m_moduleAttrName(m_nameset.findResourceByName(moduleName).id),
     m_endpointSelector(std::move(endpointSelector)),
     m_requestIsRunning(false)
 {
+    NX_ASSERT(
+        m_moduleAttrName != stree::INVALID_RES_ID,
+        Q_FUNC_INFO,
+        lit("Given bad cloud module name %1").arg(moduleName));
 }
 
 CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
@@ -101,53 +109,66 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
                 client->response()->statusLine.statusCode),
             SocketAddress());
 
-    std::vector<SocketAddress> endpoints;
-    if (!parseCloudXml(client->fetchMessageBodyBuffer(), &endpoints) ||
-        endpoints.empty())
-    {
+    QByteArray xmlData = client->fetchMessageBodyBuffer();
+    QBuffer xmlDataSource(&xmlData);
+    std::unique_ptr<stree::AbstractNode> stree =
+        stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
+    if (!stree)
         return signalWaitingHandlers(
             &lk,
             nx_http::StatusCode::serviceUnavailable,
             SocketAddress());
-    }
 
-    using namespace std::placeholders;
-    //selecting "best" endpoint
-    m_endpointSelector->selectBestEndpont(
-        m_moduleName,
-        std::move(endpoints),
-        [this](
-            nx_http::StatusCode::Value result,
-            SocketAddress selectedEndpoint)
-        {
-            post(std::bind(
-                &CloudModuleEndPointFetcher::endpointSelected, this,
-                result, std::move(selectedEndpoint)));
-        });
+    //selecting endpoint
+    SocketAddress moduleEndpoint;
+    if (!findModuleEndpoint(*stree, m_moduleAttrName, &moduleEndpoint))
+        return signalWaitingHandlers(
+            &lk,
+            nx_http::StatusCode::notFound,
+            SocketAddress());
+
+    endpointSelected(&lk, nx_http::StatusCode::ok, moduleEndpoint);
 }
 
-bool CloudModuleEndPointFetcher::parseCloudXml(
-    QByteArray xmlData,
-    std::vector<SocketAddress>* const endpoints)
+bool CloudModuleEndPointFetcher::findModuleEndpoint(
+    const stree::AbstractNode& treeRoot,
+    const int moduleAttrName,
+    SocketAddress* const moduleEndpoint)
 {
-    CloudModulesXmlHandler xmlHandler;
+    stree::ResourceContainer inputData;
+    const QnSoftwareVersion productVersion(QnAppInfo::applicationVersion());
+    inputData.put(
+        CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
+        productVersion.major());
+    inputData.put(
+        CloudInstanceSelectionAttributeNameset::vmsVersionMinor,
+        productVersion.minor());
+    inputData.put(
+        CloudInstanceSelectionAttributeNameset::vmsVersionBugfix,
+        productVersion.bugfix());
+    inputData.put(
+        CloudInstanceSelectionAttributeNameset::vmsVersionBuild,
+        productVersion.build());
+    inputData.put(
+        CloudInstanceSelectionAttributeNameset::vmsVersionFull,
+        QnAppInfo::applicationVersion());
+    inputData.put(
+        CloudInstanceSelectionAttributeNameset::vmsBeta,
+        QnAppInfo::beta() ? "true" : "false");
+    inputData.put(
+        CloudInstanceSelectionAttributeNameset::vmsCustomization,
+        QnAppInfo::customizationName());
 
-    QXmlSimpleReader reader;
-    reader.setContentHandler(&xmlHandler);
-    reader.setErrorHandler(&xmlHandler);
+    stree::ResourceContainer outputData;
+    treeRoot.get(stree::MultiSourceResourceReader(inputData, outputData), &outputData);
 
-    QBuffer xmlBuffer(&xmlData);
-    QXmlInputSource input(&xmlBuffer);
-    if (!reader.parse(&input))
+    QString foundEndpointStr;
+    if (outputData.get(moduleAttrName, &foundEndpointStr))
     {
-        NX_LOG(lit("Failed to parse cloud_modules.xml from %1. %2")
-               .arg(nx::network::AppInfo::cloudModulesXmlUrl()).arg(xmlHandler.errorString()),
-               cl_logERROR);
-        return false;
+        *moduleEndpoint = SocketAddress(foundEndpointStr);
+        return true;
     }
-
-    *endpoints = xmlHandler.moduleUrls(m_moduleName);
-    return true;
+    return false;
 }
 
 void CloudModuleEndPointFetcher::signalWaitingHandlers(
@@ -165,17 +186,16 @@ void CloudModuleEndPointFetcher::signalWaitingHandlers(
 }
 
 void CloudModuleEndPointFetcher::endpointSelected(
+    QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value result,
     SocketAddress selectedEndpoint)
 {
-    QnMutexLocker lk(&m_mutex);
-
     if (result != nx_http::StatusCode::ok)
-        return signalWaitingHandlers(&lk, result, std::move(selectedEndpoint));
+        return signalWaitingHandlers(lk, result, std::move(selectedEndpoint));
 
     NX_ASSERT(!m_endpoint);
     m_endpoint = selectedEndpoint;
-    signalWaitingHandlers(&lk, result, selectedEndpoint);
+    signalWaitingHandlers(lk, result, selectedEndpoint);
 }
 
 
@@ -201,6 +221,26 @@ void CloudModuleEndPointFetcher::ScopedOperation::get(
             if (auto lock = sharedGuard->lock())
                 handler(statusCode, result);
         });
+}
+
+
+////////////////////////////////////////////////////////////
+//// class CloudInstanceSelectionAttributeNameset
+////////////////////////////////////////////////////////////
+
+CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
+{
+    registerResource(cloudInstanceName, "cloud.instance.name", QVariant::String);
+    registerResource(vmsVersionMajor, "vms.version.major", QVariant::Int);
+    registerResource(vmsVersionMinor, "vms.version.minor", QVariant::Int);
+    registerResource(vmsVersionBugfix, "vms.version.bugfix", QVariant::Int);
+    registerResource(vmsVersionBuild, "vms.version.build", QVariant::Int);
+    registerResource(vmsVersionFull, "vms.version.full", QVariant::String);
+    registerResource(vmsBeta, "vms.beta", QVariant::String);
+    registerResource(vmsCustomization, "vms.customization", QVariant::String);
+    registerResource(cdbEndpoint, "cdb", QVariant::String);
+    registerResource(hpmEndpoint, "hpm", QVariant::String);
+    registerResource(notificationModuleEndpoint, "notification_module", QVariant::String);
 }
 
 } // namespace cloud

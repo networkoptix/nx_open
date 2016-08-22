@@ -420,6 +420,7 @@ int QnFileStorageResource::mountTmpDrive() const
 #else
 bool QnFileStorageResource::updatePermissions() const
 {
+    NX_LOG(lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()), cl_logDEBUG2);
     if (getUrl().startsWith("smb://"))
     {
         QString userName = QUrl(getUrl()).userName().isEmpty() ?
@@ -454,11 +455,20 @@ bool QnFileStorageResource::updatePermissions() const
         {   // That means that user has alreay used this network resource
             // with different credentials set.
             // If so we can attempt to just use this resource as local one.
+            NX_LOG(lit("%1 Mounting remote drive %2 SESSION_CREDENTIAL_CONFLICT error. It may work though.")
+                    .arg(Q_FUNC_INFO)
+                    .arg(getUrl()), cl_logDEBUG1);
             return true;
         }
 
         if (errCode != NO_ERROR)
+        {
+            NX_LOG(lit("%1 Mounting remote drive %2 error %3.")
+                    .arg(Q_FUNC_INFO)
+                    .arg(getUrl())
+                    .arg(errCode), cl_logWARNING);
             return false;
+        }
     }
     return true;
 }

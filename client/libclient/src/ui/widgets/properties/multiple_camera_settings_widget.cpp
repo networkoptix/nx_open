@@ -302,6 +302,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             const bool audioSupported = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioSupported(); });
             const bool audioForced = any_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->isAudioForced(); });
             const bool isMotionAvailable = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasMotion(); });
+            const bool recordingSupported= all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->hasVideo(0) || camera->isAudioSupported(); });
 
             const bool audioEnabled = m_cameras.front()->isAudioEnabled();
             const bool sameAudioEnabled = all_of(m_cameras, [audioEnabled](const QnVirtualCameraResourcePtr &camera)
@@ -311,7 +312,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
 
             ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
             ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
-            setTabEnabledSafe(Qn::RecordingSettingsTab, !isDtsBased);
+            setTabEnabledSafe(Qn::RecordingSettingsTab, !isDtsBased && recordingSupported);
             setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
             QnCheckbox::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
 

@@ -4,6 +4,13 @@
 #ifdef __linux__
 #include <malloc.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/resource.h>
 #endif
 
 #include <QtCore/QBasicTimer>
@@ -183,6 +190,67 @@ qreal QnGlobalMonitor::totalRamUsage() {
     return d->totalRamUsage;
 }
 
+#if defined (Q_OS_LINUX)
+void logOpenedHandleCount()
+{
+	int fdCount = 0;
+	char buf[64];
+	struct dirent *dp;
+
+	snprintf(buf, 64, "/proc/%i/fd/", getpid());
+
+	DIR *dir = opendir(buf);
+	while ((dp = readdir(dir)) != NULL)
+		fdCount++;
+	closedir(dir);
+	NX_LOG(lit("    Opened: %1").arg(fdCount), cl_logWARNING);
+}
+#elif defined (Q_OS_WIN)
+void logOpenedHandleCount()
+{
+	DWORD typeChar = 0;
+	DWORD typeDisk = 0;
+	DWORD typePipe = 0;
+	DWORD typeRemote = 0;
+	DWORD typeUnknown = 0;
+	DWORD handlesCount = 0;
+
+	GetProcessHandleCount(GetCurrentProcess(), &handlesCount);
+	handlesCount *= 4;
+	for (DWORD handle = 0x4; handle < handlesCount; handle += 4)
+	{
+		switch (GetFileType((HANDLE)handle))
+		{
+			case FILE_TYPE_CHAR:
+				typeChar++;
+				break;
+			case FILE_TYPE_DISK:
+				typeDisk++;
+				break;
+			case FILE_TYPE_PIPE:
+				typePipe++;
+				break;
+			case FILE_TYPE_REMOTE:
+				typeRemote++;
+				break;
+			case FILE_TYPE_UNKNOWN:
+				if (GetLastError() == NO_ERROR) typeUnknown++;
+				break;
+		}
+	}
+
+	NX_LOG(lit("    Disk files: %1").arg(typeDisk), cl_logWARNING);
+	NX_LOG(lit("    Sockets, pipes: %1").arg(typePipe), cl_logWARNING);
+	NX_LOG(lit("    Character devices: %1").arg(typeChar), cl_logWARNING);
+	NX_LOG(lit("    Unknown: %1").arg(typeUnknown), cl_logWARNING);
+}
+#else
+void logOpenedHandleCount()
+{
+	NX_LOG(lit("    Not implemented for this platform"), cl_logWARNING);
+}
+#endif
+
 QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     Q_D(QnGlobalMonitor);
     QnMutexLocker locker( &d->mutex );
@@ -196,6 +264,8 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
         NX_LOG(lit("MONITORING. HDD usage:"), cl_logWARNING);
         for( const HddLoad& hddLoad : d->totalHddLoad )
             NX_LOG(lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2), cl_logWARNING);
+        NX_LOG(lit("MONITORING. File handles:"), cl_logWARNING);
+		logOpenedHandleCount();
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
 
 #ifdef __linux__

@@ -5,7 +5,7 @@
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 class QnServerSettingsWidget;
-class QnRecordingStatisticsWidget;
+class QnStorageAnalyticsWidget;
 class QnStorageConfigWidget;
 
 namespace Ui {
@@ -48,7 +48,7 @@ private:
     QnMediaServerResourcePtr m_server;
 
     QnServerSettingsWidget* m_generalPage;
-    QnRecordingStatisticsWidget* m_statisticsPage;
+    QnStorageAnalyticsWidget* m_statisticsPage;
     QnStorageConfigWidget* m_storagesPage;
     QPushButton* m_webPageButton;
 };

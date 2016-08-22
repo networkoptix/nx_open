@@ -136,7 +136,7 @@ public:
         PC_UUID,
 
         /** Full set of background options. */
-        BACKGROUND,
+        BACKGROUND_IMAGE,
 
         /** A list of the urls that were discovered by QnDirectModuleFinder. */
         KNOWN_SERVER_URLS,
@@ -240,7 +240,7 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::ShowOnceMessages,        showOnceMessages,       setShowOnceMessages,        SHOW_ONCE_MESSAGES,         0)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
-        QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())
+        QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))

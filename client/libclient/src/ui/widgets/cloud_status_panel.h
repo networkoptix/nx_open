@@ -5,13 +5,13 @@
 
 class QnCloudStatusPanelPrivate;
 
-class QnCloudStatusPanel : public QnToolButton, QnWorkbenchContextAware
+class QnCloudStatusPanel: public QnToolButton, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QnToolButton base_type;
+    using base_type = QnToolButton;
 
 public:
-    explicit QnCloudStatusPanel(QWidget *parent = nullptr);
+    explicit QnCloudStatusPanel(QWidget* parent = nullptr);
     ~QnCloudStatusPanel();
 
 private:

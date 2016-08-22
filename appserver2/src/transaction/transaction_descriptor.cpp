@@ -563,32 +563,39 @@ struct ModifyCameraAttributesAccess
 
 struct ModifyCameraAttributesListAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesDataList& param)
+    void operator()(const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
     {
         if (accessData == Qn::kSystemAccess)
-            return true;
+            return;
 
-        for (const auto& p: param)
+        for (const auto& p : param)
             if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
-                return false;
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
 
         QnCamLicenseUsageHelper licenseUsageHelper;
         QnVirtualCameraResourceList cameras;
 
-        for (const auto& p: param)
+        for (const auto& p : param)
         {
             auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
             if (!camera)
-                return false;
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
             cameras.push_back(camera);
             licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }
 
-        for (const auto& camera: cameras)
+        for (const auto& camera : cameras)
             if (licenseUsageHelper.isOverflowForCamera(camera))
-                return false;
-
-        return true;
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
     }
 };
 
@@ -849,15 +856,14 @@ detail::TransactionDescriptorBase *getTransactionDescriptorByValue(ApiCommand::V
     auto it = detail::transactionDescriptors.get<0>().find(v);
     bool isEnd = it == detail::transactionDescriptors.get<0>().end();
     NX_ASSERT(!isEnd, "ApiCommand::Value not found");
-    return (*it).get();
+    return isEnd ? nullptr : (*it).get();
 }
 
-detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString &s)
+detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString& s)
 {
     auto it = detail::transactionDescriptors.get<1>().find(s);
     bool isEnd = it == detail::transactionDescriptors.get<1>().end();
-    NX_ASSERT(!isEnd, "ApiCommand name not found");
-    return (*it).get();
+    return isEnd ? nullptr : (*it).get();
 }
 
 } // namespace ec2

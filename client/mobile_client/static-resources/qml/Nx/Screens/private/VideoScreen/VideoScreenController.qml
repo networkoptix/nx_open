@@ -90,6 +90,12 @@ Object
             mediaPlayer.stop()
     }
 
-    Component.onCompleted: mediaPlayer.playLive()
+    Component.onCompleted:
+    {
+        if (cameraOffline || cameraUnauthorized)
+            return
+
+        mediaPlayer.playLive()
+    }
     Component.onDestruction: setKeepScreenOn(false)
 }

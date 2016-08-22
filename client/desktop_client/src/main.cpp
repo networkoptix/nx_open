@@ -85,8 +85,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     QnClientModule client(startupParams);
 
     /* Running updater after QApplication and NX_LOG are initialized. */
-    if (qnRuntime->isDesktopMode())
+    if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
     {
+        /* All functionality is in the constructor. */
         nx::vms::client::SelfUpdater updater(startupParams);
     }
 
@@ -118,16 +119,20 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen && startupParams.screen < desktop->screenCount();
     if (customScreen)
     {
-        /* We must handle all 'WindowScreenChange' events _before_ we changing screen. */
-        qApp->processEvents();
+        const auto windowHandle = mainWindow->windowHandle();
+        if (windowHandle && (desktop->screenCount() > 0))
+        {
+            /* We must handle all 'WindowScreenChange' events _before_ we changing screen. */
+            qApp->processEvents();
 
-        /* Set target screen for fullscreen mode. */
-        mainWindow->windowHandle()->setScreen(QGuiApplication::screens().value(startupParams.screen, 0));
+            /* Set target screen for fullscreen mode. */
+            windowHandle->setScreen(QGuiApplication::screens().value(startupParams.screen, 0));
 
-        /* Set target position for the window when we set fullscreen off. */
-        QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-        QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
-        mainWindow->move(targetPosition);
+            /* Set target position for the window when we set fullscreen off. */
+            QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
+            QPoint targetPosition = desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta;
+            mainWindow->move(targetPosition);
+        }
     }
     mainWindow->show();
     if (customScreen)

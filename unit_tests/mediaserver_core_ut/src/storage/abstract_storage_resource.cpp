@@ -203,14 +203,14 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
                 << fileName.toStdString() 
                 << std::endl;
 
-            ASSERT_TRUE(ioDevice->write(dummyData, dummyDataLen) == dummyDataLen);
+            ASSERT_EQ(ioDevice->write(dummyData, dummyDataLen), (int)dummyDataLen);
         }
 
         // check if newly created files exist and their sizes are correct
         for (const auto &fname : fileNames)
         {   
             ASSERT_TRUE(storage->isFileExists(fname));
-            ASSERT_TRUE(storage->getFileSize(fname) == dummyDataLen);
+            ASSERT_EQ(storage->getFileSize(fname), (int)dummyDataLen);
         }
 
         // remove all
@@ -268,7 +268,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
             << fileName.toStdString() 
             << std::endl;
 
-        ASSERT_TRUE(ioDevice->write(dummyData, dummyDataLen) == dummyDataLen);
+        ASSERT_EQ(ioDevice->write(dummyData, dummyDataLen), (int)dummyDataLen);
         ioDevice.reset();
         ASSERT_TRUE(storage->renameFile(fileName, newFileName));
         ASSERT_TRUE(storage->removeFile(newFileName));

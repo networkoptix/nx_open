@@ -268,6 +268,8 @@ void QnCameraAdvancedSettingsWidget::initWebView()
         this, &QnCameraAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection);
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
         this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
+
+    
 }
 
 void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator)

@@ -21,7 +21,7 @@ class OutgoingTunnelConnectionTest
 public:
     OutgoingTunnelConnectionTest()
     :
-        m_serverSocket(std::make_unique<UdtStreamServerSocket>()),
+        m_serverSocket(std::make_unique<UdtStreamServerSocket>(AF_INET)),
         m_first(true)
     {
     }
@@ -169,7 +169,7 @@ TEST_F(OutgoingTunnelConnectionTest, common)
 
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
-    auto udtConnection = std::make_unique<UdtStreamSocket>();
+    auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
     const auto localAddress = udtConnection->getLocalAddress();
 
@@ -211,7 +211,7 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
 
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
-    auto udtConnection = std::make_unique<UdtStreamSocket>();
+    auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
 
     OutgoingTunnelConnection tunnelConnection(
@@ -265,7 +265,7 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
 
     for (int i = 0; i < loopLength; ++i)
     {
-        auto udtConnection = std::make_unique<UdtStreamSocket>();
+        auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(udtConnection->connect(serverEndpoint()))
             << SystemError::getLastOSErrorText().toStdString();
 
@@ -304,7 +304,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
         });
 
     const auto serverAddress = serverEndpoint();
-    auto udtConnection = std::make_unique<UdtStreamSocket>();
+    auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
     ASSERT_TRUE(udtConnection->connect(serverAddress, 3000))
         << SystemError::getLastOSErrorText().toStdString();
 

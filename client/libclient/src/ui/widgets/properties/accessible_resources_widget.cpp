@@ -21,6 +21,7 @@
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -44,6 +45,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     m_controlsVisible(filter == QnResourceAccessFilter::MediaFilter), /*< Show 'All' checkbox only for cameras. */
     m_resourcesModel(new QnResourceListModel(this)),
     m_controlsModel(new QnResourceListModel(this)),
+    m_sortFilterModel(new QnResourceListSortedModel(this)),
     m_accessibleResourcesModel(new QnAccessibleResourcesModel(this))
 {
     ui->setupUi(this);
@@ -59,11 +61,10 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     initControlsModel();
     initResourcesModel();
+    initSortFilterModel();
 
-    auto sortModel = new QnResourceListSortedModel(this);
-    sortModel->setSourceModel(m_resourcesModel);
-    sortModel->sort(QnAccessibleResourcesModel::NameColumn);
-    m_accessibleResourcesModel->setSourceModel(sortModel);
+
+    m_accessibleResourcesModel->setSourceModel(m_sortFilterModel);
 
     m_accessibleResourcesModel->setIndirectAccessFunction(
         [this]() -> QnIndirectAccessProviders
@@ -132,56 +133,61 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
-    {
-        const QnIndents kIndents(1, 0);
-        treeView->setItemDelegate(itemDelegate);
-        treeView->header()->setStretchLastSection(false);
-        treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        treeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kIndents));
-    };
+        {
+            const QnIndents kIndents(1, 0);
+            treeView->setItemDelegate(itemDelegate);
+            treeView->header()->setStretchLastSection(false);
+            treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+            treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+            treeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kIndents));
+            treeView->setIgnoreDefaultSpace(true);
+        };
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
 
     ui->resourcesTreeView->setMouseTracking(true);
 
     auto toggleCheckbox = [this](const QModelIndex& index)
-    {
-        QnTreeView* tree = static_cast<QnTreeView*>(sender());
-        QAbstractItemModel* model = tree->model();
-        int column = (tree == ui->controlsTreeView)
-            ? static_cast<int>(QnResourceListModel::CheckColumn)
-            : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
-        QModelIndex checkboxIdx = index.sibling(index.row(), column);
-        int newCheckValue = checkboxIdx.data(Qt::CheckStateRole).toInt() != Qt::Checked ? Qt::Checked : Qt::Unchecked;
-        model->setData(checkboxIdx, newCheckValue, Qt::CheckStateRole);
-    };
+        {
+            auto tree = static_cast<QnTreeView*>(sender());
+            bool controlsView = tree == ui->controlsTreeView;
+
+            if (!controlsView && qApp->keyboardModifiers())
+                return;
+
+            QAbstractItemModel* model = tree->model();
+            int column = (controlsView)
+                ? static_cast<int>(QnResourceListModel::CheckColumn)
+                : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
+            QModelIndex checkboxIdx = index.sibling(index.row(), column);
+            int newCheckValue = checkboxIdx.data(Qt::CheckStateRole).toInt() != Qt::Checked ? Qt::Checked : Qt::Unchecked;
+            model->setData(checkboxIdx, newCheckValue, Qt::CheckStateRole);
+        };
 
     connect(ui->resourcesTreeView, &QnTreeView::clicked, this, toggleCheckbox);
     connect(ui->controlsTreeView, &QnTreeView::clicked, this, toggleCheckbox);
 
     auto batchToggleCheckboxes = [this](const QModelIndex& index)
-    {
-        QnTreeView* tree = static_cast<QnTreeView*>(sender());
-        QAbstractItemModel* model = tree->model();
-        int column = (tree == ui->controlsTreeView)
-            ? static_cast<int>(QnResourceListModel::CheckColumn)
-            : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
-        QModelIndex checkboxIdx = index.sibling(index.row(), column);
-        QModelIndexList selectedRows = tree->selectionModel()->selectedRows(column);
-        selectedRows << checkboxIdx;
-
-        /* If any of selected rows were unchecked check all, otherwise uncheck all: */
-        bool wasUnchecked = boost::algorithm::any_of(selectedRows, [this](const QModelIndex& index)
         {
-            return index.data(Qt::CheckStateRole).toInt() != Qt::Checked;
-        });
+            Q_UNUSED(index);
+            QnTreeView* tree = static_cast<QnTreeView*>(sender());
+            QAbstractItemModel* model = tree->model();
+            int column = (tree == ui->controlsTreeView)
+                ? static_cast<int>(QnResourceListModel::CheckColumn)
+                : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
+            QModelIndexList selectedRows = tree->selectionModel()->selectedRows(column);
 
-        int newCheckValue = wasUnchecked ? Qt::Checked : Qt::Unchecked;
+            /* If any of selected rows were unchecked check all, otherwise uncheck all: */
+            bool wasUnchecked = boost::algorithm::any_of(selectedRows, [this](const QModelIndex& index)
+            {
+                return index.data(Qt::CheckStateRole).toInt() != Qt::Checked;
+            });
 
-        for (QModelIndex index : selectedRows)
-            model->setData(index, newCheckValue, Qt::CheckStateRole);
-    };
+            int newCheckValue = wasUnchecked ? Qt::Checked : Qt::Unchecked;
+
+            for (QModelIndex index : selectedRows)
+                model->setData(index, newCheckValue, Qt::CheckStateRole);
+        };
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
     connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
@@ -213,6 +219,8 @@ bool QnAccessibleResourcesWidget::hasChanges() const
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
+    refreshModel();
+
     if (m_controlsVisible)
     {
         QSet<QnUuid> checkedControls;
@@ -315,6 +323,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
 
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         ui->resourcesTreeView->setEnabled(!checked);
+        ui->filter->setEnabled(!checked);
         emit controlsChanged(checked);
         emit hasChangesChanged();
     };
@@ -378,39 +387,23 @@ void QnAccessibleResourcesWidget::initResourcesModel()
     m_resourcesModel->setUserCheckable(false);
     m_resourcesModel->setStatusIgnored(true);
 
-    auto handleResourceAdded = [this](const QnResourcePtr& resource)
-    {
-        if (!resourcePassFilter(resource))
-            return;
-
-        if (m_resourcesModel->resources().contains(resource))
-            return;
-
-        m_resourcesModel->addResource(resource);
-    };
-
-    auto refreshModel = [this, handleResourceAdded]()
-    {
-        m_resourcesModel->setResources(QnResourceList());
-        for (const QnResourcePtr& resource : qnResPool->getResources())
-            handleResourceAdded(resource);
-    };
-
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, handleResourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnAccessibleResourcesWidget::handleResourceAdded);
 
     if (m_filter == QnResourceAccessFilter::LayoutsFilter)
     {
-        connect(qnResPool, &QnResourcePool::resourceAdded, this, [this, handleResourceAdded](const QnResourcePtr& resource)
+        connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr& resource)
         {
             if (!resource.dynamicCast<QnLayoutResource>())
                 return;
 
             /* Looks like hack as we have no dynamic filter model and must maintain list manually.
              * Really the only scenario we should handle is when the layout becomes remote (after it is saved). */
-            connect(resource.data(), &QnResource::flagsChanged, this, handleResourceAdded);
+            connect(resource.data(), &QnResource::flagsChanged, this,
+                &QnAccessibleResourcesWidget::handleResourceAdded);
         });
     }
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, refreshModel](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
     {
         disconnect(resource.data(), nullptr, this, nullptr);
         m_resourcesModel->removeResource(resource);
@@ -418,7 +411,8 @@ void QnAccessibleResourcesWidget::initResourcesModel()
             refreshModel();
     });
 
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, refreshModel);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+        &QnAccessibleResourcesWidget::refreshModel);
     refreshModel();
 
     connect(m_resourcesModel, &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
@@ -430,6 +424,32 @@ void QnAccessibleResourcesWidget::initResourcesModel()
             emit hasChangesChanged();
         }
     });
+}
+
+void QnAccessibleResourcesWidget::initSortFilterModel()
+{
+    auto updateFilter = [this]
+    {
+        QString textFilter = ui->filterLineEdit->text();
+
+        /* Don't allow empty filters. */
+        if (!textFilter.isEmpty() && textFilter.trimmed().isEmpty())
+            ui->filterLineEdit->clear(); /*< Will call into this slot again. */
+        else
+            m_sortFilterModel->setFilterFixedString(textFilter);
+    };
+
+    m_sortFilterModel->setSourceModel(m_resourcesModel);
+    m_sortFilterModel->sort(QnResourceListModel::NameColumn);
+    m_sortFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_sortFilterModel->setFilterRole(Qn::ResourceSearchStringRole);
+    m_sortFilterModel->setFilterKeyColumn(QnResourceListModel::NameColumn);
+    m_sortFilterModel->setDynamicSortFilter(true);
+
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+    ui->filterLineEdit->setClearButtonEnabled(true);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, this, updateFilter);
+    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this, updateFilter);
 }
 
 void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
@@ -450,6 +470,24 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     ui->detailsWidget->setTargetResource(camera ? camera->getId() : QnUuid());
     ui->detailsWidget->layout()->activate();
+}
+
+void QnAccessibleResourcesWidget::handleResourceAdded(const QnResourcePtr& resource)
+{
+    if (!resourcePassFilter(resource))
+        return;
+
+    if (m_resourcesModel->resources().contains(resource))
+        return;
+
+    m_resourcesModel->addResource(resource);
+}
+
+void QnAccessibleResourcesWidget::refreshModel()
+{
+    m_resourcesModel->setResources(QnResourceList());
+    for (const QnResourcePtr& resource : qnResPool->getResources())
+        handleResourceAdded(resource);
 }
 
 void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* event)

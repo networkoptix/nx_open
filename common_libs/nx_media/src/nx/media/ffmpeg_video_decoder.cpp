@@ -58,7 +58,7 @@ public:
     }
 
     virtual int map(
-        QAbstractVideoBuffer::MapMode mode,
+        QAbstractVideoBuffer::MapMode /*mode*/,
         int* numBytes,
         int linesize[4],
         uchar* data[4]) override

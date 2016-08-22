@@ -131,7 +131,7 @@ void ApplauncherProcess::processRequest(
     }
 }
 
-void ApplauncherProcess::launchMostRecentClient()
+void ApplauncherProcess::launchNewestClient()
 {
     QnSoftwareVersion versionToLaunch;
     if (!getVersionToLaunch(&versionToLaunch))
@@ -153,7 +153,8 @@ void ApplauncherProcess::launchMostRecentClient()
 
 int ApplauncherProcess::run()
 {
-    if (!m_taskServer.listen(launcherPipeName))
+    const bool clientIsRunAlready = !m_taskServer.listen(launcherPipeName);
+    if (clientIsRunAlready)
     {
         if (m_mode == Mode::Quit)
         {
@@ -161,15 +162,9 @@ int ApplauncherProcess::run()
             return addTaskToThePipe(applauncher::api::QuitTask().serialize());
         }
 
-        if (m_mode == Mode::Default)
-        {
-            //another instance already running?
-#ifdef Q_OS_WIN
-            launchMostRecentClient();
-#else
-            sendTaskToRunningLauncherInstance();
-#endif
-        }
+        if (m_mode == Mode::Default) //< another instance already running?
+            launchNewestClient();
+
         return 0;
     }
 
@@ -178,7 +173,7 @@ int ApplauncherProcess::run()
         return 0;
 
     if (m_mode == Mode::Default)
-        launchMostRecentClient();
+        launchNewestClient();
 
     std::unique_lock<std::mutex> lk(m_mutex);
     m_cond.wait(lk, [this]() { return m_terminated; });
@@ -595,7 +590,8 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
     }
 
     //stopping process if needed
-    nx::killProcessByPid(task.processID);
+    SystemError::ErrorCode code = nx::killProcessByPid(task.processID);
+    code = 0;
 }
 
 void ApplauncherProcess::onInstallationDone(InstallationProcess* installationProcess)

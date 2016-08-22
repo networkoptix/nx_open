@@ -502,13 +502,14 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     else
     {
         bool hasVideo = m_camera->hasVideo(0);
+        bool hasAudio = m_camera->isAudioSupported();
+
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
-
-        ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported() && !m_camera->isAudioForced());
+        ui->enableAudioCheckBox->setEnabled(hasAudio && !m_camera->isAudioForced());
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
 
@@ -518,7 +519,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->passwordEdit->setText(auth.password());
 
         bool dtsBased = m_camera->isDtsBased();
-        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased);
+        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo));
         setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly());
         setTabEnabledSafe(Qn::IOPortsSettingsTab, camera()->isIOModule());

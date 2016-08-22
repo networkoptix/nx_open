@@ -18,12 +18,13 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-CloudStreamSocket::CloudStreamSocket()
+CloudStreamSocket::CloudStreamSocket(int ipVersion)
 :
     m_aioThreadBinder(SocketFactory::createDatagramSocket()),
     m_recvPromisePtr(nullptr),
     m_sendPromisePtr(nullptr),
-    m_terminated(false)
+    m_terminated(false),
+    m_ipVersion(ipVersion)
 {
     //TODO #ak user MUST be able to bind this object to any aio thread
     //getAioThread binds to an aio thread
@@ -392,7 +393,7 @@ bool CloudStreamSocket::startAsyncConnect(
     {
         case AddressType::direct:
             //using tcp connection
-            m_socketDelegate.reset(new TCPSocket(true));
+            m_socketDelegate.reset(new TCPSocket(true, m_ipVersion));
             setDelegate(m_socketDelegate.get());
             if (!m_socketDelegate->setNonBlockingMode(true))
                 return false;
@@ -414,6 +415,8 @@ bool CloudStreamSocket::startAsyncConnect(
             if (!getSendTimeout(&sendTimeoutMillis))
                 return false;
             auto sharedOperationGuard = m_asyncConnectGuard.sharedGuard();
+
+            // TODO: Need to pass m_ipVersion for IPv6 support
             SocketGlobals::outgoingTunnelPool().establishNewConnection(
                 dnsEntry,
                 std::chrono::milliseconds(sendTimeoutMillis),

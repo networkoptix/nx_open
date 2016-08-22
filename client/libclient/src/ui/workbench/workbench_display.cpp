@@ -216,18 +216,23 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_focusListenerInstrument, &FocusListenerInstrument::focusItemChanged, this, [this]()
     {
         bool isWebView = scene() && dynamic_cast<QnWebView*>(scene()->focusItem());
-        action(QnActions::JumpToLiveAction)->setEnabled(!isWebView);    // L
-        action(QnActions::ToggleMuteAction)->setEnabled(!isWebView);    // M
-        action(QnActions::ToggleSyncAction)->setEnabled(!isWebView);    // S
-        action(QnActions::JumpToEndAction)->setEnabled(!isWebView);     // X
-        action(QnActions::JumpToStartAction)->setEnabled(!isWebView);   // Z
-        action(QnActions::PlayPauseAction)->setEnabled(!isWebView);     // Space
 
-        /* "Delete" button */
-        action(QnActions::DeleteVideowallMatrixAction)->setEnabled(!isWebView);
-        action(QnActions::RemoveLayoutItemAction)->setEnabled(!isWebView);
-        action(QnActions::RemoveFromServerAction)->setEnabled(!isWebView);
-        action(QnActions::StopSharingLayoutAction)->setEnabled(!isWebView);
+        for (auto actionId : {
+            QnActions::JumpToLiveAction, //< L
+            QnActions::ToggleMuteAction, //< M
+            QnActions::ToggleSyncAction, //< S
+            QnActions::JumpToEndAction,  //< X
+            QnActions::JumpToStartAction,//< Z
+            QnActions::PlayPauseAction,  //< Space
+
+            /* "Delete" button */
+            QnActions::DeleteVideowallMatrixAction,
+            QnActions::RemoveLayoutItemAction,
+            QnActions::RemoveLayoutItemFromSceneAction,
+            QnActions::RemoveFromServerAction,
+            QnActions::StopSharingLayoutAction
+        })
+            action(actionId)->setEnabled(!isWebView);
     });
 
     /* Create curtain animator. */
@@ -1923,7 +1928,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
         if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         {
             qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
-            if ((quint64)timeUSec != AV_NOPTS_VALUE)
+            if (timeUSec != AV_NOPTS_VALUE)
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());

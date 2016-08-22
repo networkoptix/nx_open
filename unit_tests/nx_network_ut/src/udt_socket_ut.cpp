@@ -62,14 +62,14 @@ public:
             [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
                 -> std::unique_ptr<AbstractStreamSocket>
             {
-                return std::make_unique<UdtStreamSocket>();
+                return std::make_unique<UdtStreamSocket>(AF_INET);
             });
 
         setCreateStreamServerSocketFunc(
             [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
                 -> std::unique_ptr<AbstractStreamServerSocket>
             {
-                return std::make_unique<UdtStreamServerSocket>();
+                return std::make_unique<UdtStreamServerSocket>(AF_INET);
             });
     }
 
@@ -126,7 +126,8 @@ void onAcceptedConnection(
 
 TEST_F(SocketUdt, cancelConnect)
 {
-    UdtStreamServerSocket serverSocket;
+    UdtStreamServerSocket serverSocket(AF_INET);
+    ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
     ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
     serverSocket.listen();
     using namespace std::placeholders;
@@ -145,7 +146,7 @@ TEST_F(SocketUdt, cancelConnect)
 
     for (int i = 0; i < 100; ++i)
     {
-        UdtStreamSocket sock;
+        UdtStreamSocket sock(AF_INET);
         std::atomic<bool> handlerCalled(false);
         ASSERT_TRUE(sock.setNonBlockingMode(true));
         sock.connectAsync(
@@ -182,15 +183,15 @@ TEST(SocketUdt_UdtPollSet, general)
 }
 #endif
 
-NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST_F, SocketUdt,
-    &std::make_unique<UdtStreamServerSocket>,
-    &std::make_unique<UdtStreamSocket>)
+    [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
+    [](){ return std::make_unique<UdtStreamSocket>(AF_INET); })
 
 static std::unique_ptr<UdtStreamSocket> rendezvousUdtSocket(
     std::chrono::milliseconds connectTimeout)
 {
-    auto socket = std::make_unique<UdtStreamSocket>();
+    auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
     EXPECT_TRUE(socket->setRendezvous(true));
     EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
     EXPECT_TRUE(socket->setNonBlockingMode(true));
@@ -362,7 +363,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
 
     for (int i = 0; i < loopLength; ++i)
     {
-        UdtStreamServerSocket serverSocket;
+        UdtStreamServerSocket serverSocket(AF_INET);
         ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(serverSocket.listen());
         ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
@@ -378,7 +379,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
 
         //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        UdtStreamSocket clientSock;
+        UdtStreamSocket clientSock(AF_INET);
         ASSERT_TRUE(clientSock.connect(serverSocket.getLocalAddress()));
 
         auto future = socketAcceptedPromise.get_future();
@@ -399,8 +400,7 @@ TEST_F(SocketUdt, /*DISABLED_*/allDataReadAfterFin)
 
     for (int i = 0; i < 2; ++i)
     {
-        UdtStreamServerSocket server;
-        //TCPServerSocket server;
+        UdtStreamServerSocket server(AF_INET);
         ASSERT_TRUE(server.setNonBlockingMode(true));
         ASSERT_TRUE(server.bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(server.listen());
@@ -420,8 +420,7 @@ TEST_F(SocketUdt, /*DISABLED_*/allDataReadAfterFin)
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        auto clientSock = std::make_shared<UdtStreamSocket>();
-        //auto clientSock = std::make_unique<TCPSocket>();
+        auto clientSock = std::make_shared<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(clientSock->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_NE(server.getLocalAddress(), clientSock->getLocalAddress());
 

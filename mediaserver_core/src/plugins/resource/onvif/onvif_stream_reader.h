@@ -88,6 +88,9 @@ private:
     void updateVideoEncoderParams(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
 
     void printProfile(const Profile& profile, bool isPrimary) const;
+
+    bool executePreConfigurationRequests();
+
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;

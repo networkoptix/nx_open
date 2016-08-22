@@ -599,7 +599,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                     av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
                 }
                 // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
-                outFrame->pkt_dts = (quint64)m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
+                outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
             }
         }
 

@@ -33,7 +33,7 @@ public:
     virtual ~QnWorkbenchLayoutSnapshotManager();
 
     typedef std::function<void(bool, const QnLayoutResourcePtr &)>  SaveLayoutResultFunction;
-    bool save(const QnLayoutResourcePtr &resource, SaveLayoutResultFunction callback);
+    bool save(const QnLayoutResourcePtr &resource, SaveLayoutResultFunction callback = SaveLayoutResultFunction());
 
     QnWorkbenchLayoutSnapshot snapshot(const QnLayoutResourcePtr &layout) const;
 

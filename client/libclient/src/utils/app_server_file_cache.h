@@ -50,7 +50,7 @@ public:
         fileSystemError,
         sizeLimitExceeded,
         invalidOperation
-        
+
     };
 
 protected:

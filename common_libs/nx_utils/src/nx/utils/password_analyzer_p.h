@@ -74,7 +74,7 @@ namespace
 
     CharCategoryLookup::Category CharCategoryLookup::operator[] (short index) const
     {
-        return (index >= 0 && index < m_table.size()) ? m_table[index] : Invalid;
+        return (index >= 0 && (size_t)index < m_table.size()) ? m_table[index] : Invalid;
     }
 
     CommonPasswordsDictionary::CommonPasswordsDictionary(const QString& dictionaryPath)

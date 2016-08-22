@@ -110,7 +110,7 @@ Qn::PtzCommand QnAbstractPtzController::spaceCommand(Qn::PtzCommand command, Qn:
     }
 }
 
-bool deserialize(const QString& value, QnPtzObject* target)
+bool deserialize(const QString& /*value*/, QnPtzObject* /*target*/)
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
     return false;

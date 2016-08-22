@@ -17,5 +17,8 @@ public:
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
 
-    int execute(SetupRemoveSystemData data, const Qn::UserAccessData& accessRights, QnJsonRestResult &result);
+    int execute(
+        SetupRemoveSystemData data,
+        const QnRestConnectionProcessor* owner,
+        QnJsonRestResult &result);
 };

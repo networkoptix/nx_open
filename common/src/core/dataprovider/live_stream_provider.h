@@ -19,7 +19,7 @@
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
-static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
+static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 //#define DESIRED_SECOND_STREAM_FPS (7)
 //#define MIN_SECOND_STREAM_FPS (2)
 

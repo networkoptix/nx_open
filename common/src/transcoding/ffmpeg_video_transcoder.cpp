@@ -196,7 +196,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     static AVRational r = {1, 1000000};
     decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
-    if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
+    if (m_firstEncodedPts == AV_NOPTS_VALUE)
         m_firstEncodedPts = decodedFrame->pts;
 
     if( !result )

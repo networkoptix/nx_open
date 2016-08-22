@@ -33,7 +33,6 @@ void QnAbstractDataConsumer::endOfRun()
 void QnAbstractDataConsumer::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
-    m_dataQueue.wakeAll();
 }
 
 void QnAbstractDataConsumer::run()

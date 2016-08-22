@@ -67,7 +67,11 @@ public:
             {
                 if (m_connectionShouldWorkFine)
                 {
-                    handler(SystemError::noError, std::make_unique<TCPSocket>(), !m_singleShot);
+                    handler(
+                        SystemError::noError,
+                        std::make_unique<TCPSocket>(false, AF_INET),
+                        !m_singleShot);
+
                     if (m_singleShot)
                         m_connectionShouldWorkFine = false;
                 }
@@ -508,13 +512,12 @@ TEST_F(OutgoingTunnelTest, cancellation)
 
 TEST_F(OutgoingTunnelTest, connectTimeout)
 {
-    const bool connectorWillSucceed = true;
-    const bool singleShotConnection = false;
     const bool connectionWillSucceedValues[1] = { true };
     const auto connectorTimeout = std::chrono::seconds(7);
     const int connectionsToCreate = 70;
 
     for (int i = 0; i < 5; ++i)
+    {
         for (const bool connectionWillSucceed : connectionWillSucceedValues)
         {
             nx::utils::promise<void> doConnectEvent;
@@ -581,16 +584,12 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
                 #endif
             }
         }
+    }
 }
 
 /** testing that tunnel passes correct connect timeout to tunnel connection */
 TEST_F(OutgoingTunnelTest, connectTimeout2)
 {
-    const bool connectorWillSucceed = true;
-    const bool singleShotConnection = false;
-    const bool connectionWillSucceedValues[1] = { true };
-    //const auto connectorTimeout = std::chrono::seconds(3);
-
     AddressEntry addressEntry("nx_test.com:12345");
     OutgoingTunnel tunnel(std::move(addressEntry));
 

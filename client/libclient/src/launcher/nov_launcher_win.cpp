@@ -1,149 +1,161 @@
 #include "nov_launcher_win.h"
+
+#include <client/client_app_info.h>
+
 #include "utils/common/util.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
-static const int IO_BUFFER_SIZE = 1024*1024;
+namespace {
+
+static const int IO_BUFFER_SIZE = 1024 * 1024;
+
+//TODO: #GDM #low move out to common place with launcher.exe
 static const qint64 MAGIC = 0x73a0b934820d4055ll;
 
-QString getFullFileName(const QString& folder, const QString& fileName)
-{
-    if (folder.isEmpty())
-        return fileName;
-
-    QString value = folder;
-    for (int i = 0; i < value.length(); ++i)
-    {
-        if (value[i] == L'\\')
-            value[i] = L'/';
-    }
-    if (value[value.length()-1] != L'/' && value[value.length()-1] != L'\\')
-        value += L'/';
-    value += fileName;
-
-    return value;
-}
-
-int QnNovLauncher::appendFile(QFile& dstFile, const QString& srcFileName)
+bool appendFile(QFile& dstFile, const QString& srcFileName)
 {
     QFile srcFile(srcFileName);
     char* buffer = new char[IO_BUFFER_SIZE];
-    try 
+    try
     {
         if (!srcFile.open(QIODevice::ReadOnly))
-            return -2;
+            return false;
 
-        int readed = srcFile.read(buffer, IO_BUFFER_SIZE);
-        while (readed > 0)
+        int read = srcFile.read(buffer, IO_BUFFER_SIZE);
+        while (read > 0)
         {
-            if (dstFile.write(buffer, readed) != readed)
+            if (dstFile.write(buffer, read) != read)
             {
                 srcFile.close();
-                delete [] buffer;
-                return -2;
+                delete[] buffer;
+                return false;
             }
 
-            readed = srcFile.read(buffer, IO_BUFFER_SIZE);
+            read = srcFile.read(buffer, IO_BUFFER_SIZE);
         }
         srcFile.close();
-        delete [] buffer;
-        return 0;
+        delete[] buffer;
+        return true;
     }
-    catch(...) {
-        delete [] buffer;
-        return -2;
+    catch (...)
+    {
+        delete[] buffer;
+        return false;
     }
 }
 
-int QnNovLauncher::writeIndex(QFile& dstFile, const QVector<qint64>& filePosList, QVector<QString>& fileNameList)
+bool writeIndex(QFile& dstFile, const QVector<qint64>& filePosList, QVector<QString>& fileNameList)
 {
     qint64 indexStartPos = dstFile.pos();
     for (int i = 1; i < filePosList.size(); ++i)
     {
-        dstFile.write((const char*) &filePosList[i-1], sizeof(qint64)); // no marsahling is required because of platform depending executable file
+        // no marshaling is required because of platform depending executable file
+        dstFile.write((const char*)&filePosList[i - 1], sizeof(qint64));
         int strLen = fileNameList[i].length();
-        dstFile.write((const char*) &strLen, sizeof(int));
-        dstFile.write((const char*) fileNameList[i].data(), strLen*sizeof(wchar_t));
+        dstFile.write((const char*)&strLen, sizeof(int));
+        dstFile.write((const char*)fileNameList[i].data(), strLen * sizeof(wchar_t));
     }
 
-    //dstFile.write((const char*) &MAGIC, sizeof(qint64)); // nov file posf
-    //dstFile.write((const char*) &filePosList[filePosList.size()-2], sizeof(qint64)); // nov file start
-    dstFile.write((const char*) &indexStartPos, sizeof(qint64));
+    dstFile.write((const char*)&indexStartPos, sizeof(qint64));
 
-    return 0;
+    return true;
 }
 
-void QnNovLauncher::getSrcFileList(QVector<QString>& result, const QString& srcDataFolder, const QString& root)
+void populateFileListRecursive(QSet<QString>& result, const QDir& dir,
+    const QStringList& nameFilters = QStringList())
 {
-    QDir dir(srcDataFolder);
-    QFileInfoList list = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
-    for (int i = 0; i < list.size(); ++i)
+    QFileInfoList files = dir.entryInfoList(nameFilters, QDir::NoDotAndDotDot | QDir::Files);
+    for (auto info : files)
+        result << info.absoluteFilePath();
+
+    QFileInfoList subDirs = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
+    for (auto info : subDirs)
+        populateFileListRecursive(result, info.absoluteFilePath(), nameFilters);
+}
+
+/* Returns set of absolute file paths. */
+QSet<QString> calculateFileList(const QDir& sourceRoot)
+{
+    static const QStringList kNameFilters{lit("*.exe"), lit("*.dll")};
+    static const QStringList kExtraDirs{lit("vox"), lit("fonts"), lit("qml")};
+    static const QStringList kIgnoredFiles{
+#ifdef _DEBUG
+        lit("mediaserver.exe"),
+#endif
+        QnClientAppInfo::applauncherBinaryName(),
+        QnClientAppInfo::minilauncherBinaryName()
+    };
+
+    QSet<QString> sourceFiles;
+    populateFileListRecursive(sourceFiles, sourceRoot, kNameFilters);
+    for (const auto& extraDir : kExtraDirs)
     {
-        QString name = list[i].fileName();
-        if (list[i].isDir())
-            getSrcFileList(result, getFullFileName(srcDataFolder, name), closeDirPath(getFullFileName(root, name)));
-        else 
-            result.push_back(root + name);
+        QDir d(sourceRoot.absoluteFilePath(extraDir));
+        populateFileListRecursive(sourceFiles, d);
     }
+
+    for (const auto& ignored : kIgnoredFiles)
+        sourceFiles.remove(sourceRoot.absoluteFilePath(ignored));
+
+    return sourceFiles;
 }
 
-int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& novFileName)
+}
+
+QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& novFileName)
 {
-    QSet<QString> allowedFileExt;
-    allowedFileExt << QLatin1String(".exe");
-    allowedFileExt << QLatin1String(".dll");
+    static const QString kLauncherFile(lit(":/launcher.exe"));
 
+    QDir sourceRoot = qApp->applicationDirPath();
 
-    QString srcDataFolder = QFileInfo(qApp->arguments()[0]).path();
-    QString launcherFile(QLatin1String(":/launcher.exe"));
+    /* List of client binaries. */
+    auto sourceFiles = calculateFileList(sourceRoot);
 
     QVector<qint64> filePosList;
     QVector<QString> fileNameList;
-    QVector<QString> srcMediaFiles;
-    getSrcFileList(srcMediaFiles, srcDataFolder, QString());
 
     QFile dstFile(dstName);
     if (!dstFile.open(QIODevice::WriteOnly))
-        return -1;
+        return ErrorCode::NoTargetFileAccess;
 
-    if (appendFile(dstFile, launcherFile) != 0)
-        return -2;
+    if (!appendFile(dstFile, kLauncherFile))
+        return ErrorCode::WriteFileError;
+
     filePosList.push_back(dstFile.pos());
-    fileNameList.push_back(launcherFile);
+    fileNameList.push_back(kLauncherFile);
 
-    for (int i= 0; i < srcMediaFiles.size(); ++i)
+    for (const auto& absolutePath : sourceFiles)
     {
-        if (allowedFileExt.contains(srcMediaFiles[i].right(4).toLower()))
-        {
-            if (appendFile(dstFile, getFullFileName(srcDataFolder, srcMediaFiles[i])) == 0)
-            {
-                filePosList.push_back(dstFile.pos());
-                fileNameList.push_back(srcMediaFiles[i]);
-            }
-            else
-                return -2;
-        }
+        const QString relativePath = sourceRoot.relativeFilePath(absolutePath);
+        if (!appendFile(dstFile, absolutePath))
+            return ErrorCode::WriteFileError;
+
+        filePosList.push_back(dstFile.pos());
+        fileNameList.push_back(relativePath);
     }
 
     filePosList.push_back(dstFile.pos());
     fileNameList.push_back(novFileName);
 
-    if (writeIndex(dstFile, filePosList, fileNameList) != 0)
-        return -4;
+    if (!writeIndex(dstFile, filePosList, fileNameList))
+        return ErrorCode::WriteIndexError;
 
     qint64 novPos = dstFile.pos();
-    if (novFileName.isEmpty()) {
+    if (novFileName.isEmpty())
+    {
         QnLayoutFileStorageResource::QnLayoutFileIndex idex;
-        dstFile.write((const char*) &idex, sizeof(idex)); // nov file start
+        dstFile.write((const char*)&idex, sizeof(idex)); // nov file start
     }
-    else {
-        if (appendFile(dstFile, novFileName) != 0)
-            return -3;
+    else
+    {
+        if (!appendFile(dstFile, novFileName))
+            return ErrorCode::WriteMediaError;
     }
 
-    dstFile.write((const char*) &novPos, sizeof(qint64)); // nov file start
-    dstFile.write((const char*) &MAGIC, sizeof(qint64)); // magic
+    dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
+    dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
 
     dstFile.close();
 
-    return 0;
+    return ErrorCode::Ok;
 }

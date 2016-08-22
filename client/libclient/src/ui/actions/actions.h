@@ -164,6 +164,10 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
          */
         BetaVersionMessageAction,
 
+        /**
+         * Displays HiDpi screens support warning dialog.
+         */
+        HiDpiSupportMessageAction,
 
         /**
          * Displays dialog asking about statistics reporting.
@@ -792,6 +796,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
          * Removes item(s) from layout(s).
          */
         RemoveLayoutItemAction,
+        RemoveLayoutItemFromSceneAction,
 
         /**
          * Removes a resource from Server.

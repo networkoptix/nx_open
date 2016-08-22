@@ -12,6 +12,10 @@ class QnCFRefHolder
 public:
     typedef const typename std::remove_pointer<CFRefType>::type* const_cf_ref;
 
+    explicit QnCFRefHolder(CFRefType ref);
+
+    ~QnCFRefHolder();
+
     CFRefType ref();
 
     const CFRefType ref() const;
@@ -20,10 +24,6 @@ protected:
     QnCFRefHolder();
 
     QnCFRefHolder(const QnCFRefHolder& other);
-
-    explicit QnCFRefHolder(CFRefType ref);
-
-    ~QnCFRefHolder();
 
     QnCFRefHolder& operator=(const QnCFRefHolder& other);
 

@@ -121,6 +121,7 @@ PageBase
     MouseArea
     {
         anchors.fill: parent
+        onDoubleClicked: Workflow.popCurrentScreen()
         onWheel:
         {
             if (wheel.angleDelta.y > 0)

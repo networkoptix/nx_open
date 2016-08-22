@@ -21,8 +21,8 @@ namespace cloud {
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     TEST, CloudStreamSocketTcp,
-    &std::make_unique<TCPServerSocket>,
-    &std::make_unique<CloudStreamSocket>)
+    []() { return std::make_unique<TCPServerSocket>(AF_INET); },
+    []() { return std::make_unique<CloudStreamSocket>(AF_INET); });
 
 class CloudStreamSocketTest
 :
@@ -73,7 +73,7 @@ TEST_F(CloudStreamSocketTest, simple)
     for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
-        CloudStreamSocket cloudSocket;
+        CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(SocketAddress(tempHostName), 0));
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
@@ -83,7 +83,7 @@ TEST_F(CloudStreamSocketTest, simple)
 
     // also try to connect just by system name
     {
-        CloudStreamSocket cloudSocket;
+        CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), 0));
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
@@ -109,7 +109,7 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
             SocketFactory::NatTraversalType /*natTraversalRequired*/) ->
                 std::unique_ptr< AbstractStreamSocket >
         {
-            return std::make_unique<CloudStreamSocket>();
+            return std::make_unique<CloudStreamSocket>(AF_INET);
         });
 
     //starting local tcp server
@@ -153,7 +153,7 @@ const auto createServerSocketFunc =
 const auto createClientSocketFunc =
     []() -> std::unique_ptr<CloudStreamSocket>
     {
-        return std::make_unique<CloudStreamSocket>();
+        return std::make_unique<CloudStreamSocket>(AF_INET);
     };
 
 TEST_F(CloudStreamSocketTest, simple_socket_test)
@@ -266,7 +266,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
-        CloudStreamSocket cloudSocket;
+        CloudStreamSocket cloudSocket(AF_INET);
         cloudSocket.connectAsync(
             SocketAddress(tempHostName),
             [](SystemError::ErrorCode /*code*/){});
@@ -277,7 +277,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
-        CloudStreamSocket cloudSocket;
+        CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(
             SocketAddress(tempHostName),
             std::chrono::milliseconds(1000).count()));
@@ -293,7 +293,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
-        CloudStreamSocket cloudSocket;
+        CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(
             SocketAddress(tempHostName),
             std::chrono::milliseconds(1000).count()));
@@ -328,7 +328,7 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
     for (int i = 0; i < kTestRuns; ++i)
     {
-        auto sock = std::make_unique<CloudStreamSocket>();
+        auto sock = std::make_unique<CloudStreamSocket>(AF_INET);
 
         enum class SocketState {init, connected, closed};
         std::atomic<SocketState> socketState(SocketState::init);

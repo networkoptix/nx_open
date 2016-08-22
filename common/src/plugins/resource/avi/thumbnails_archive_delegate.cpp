@@ -121,7 +121,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             break;
         if (result->dataType == QnAbstractMediaData::VIDEO &&
             result->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey) &&
-            result->channelNumber == m_nextChannelNum)
+            (int)result->channelNumber == m_nextChannelNum)
         {
             m_nextChannelNum = (m_nextChannelNum + 1) % m_channelCount;
             break;

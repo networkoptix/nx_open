@@ -189,12 +189,6 @@ Page
                 color: ColorTheme.base13
             }
         }
-
-        onVisibleChanged:
-        {
-            if (!visible)
-                mainWindow.unlockScreenOrientation()
-        }
     }
 
     Connections

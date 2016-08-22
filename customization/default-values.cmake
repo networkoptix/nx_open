@@ -35,9 +35,7 @@ set (display.mobile.name "${display.product.name} Mobile")
 # if true, you can use --customization <path> to specify customization
 # Note: config json files should be there
 
-set (default.skin "DarkSkin")
-set (background.cycle "120")
-set (uri.protocol "vms")
+set (uri.protocol "nx-vms")
 
 set (nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
 set (short.company.name "${company.name}")

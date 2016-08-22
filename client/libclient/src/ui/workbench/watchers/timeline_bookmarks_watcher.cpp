@@ -33,8 +33,6 @@ namespace
         enum { kTimlineWindowShiftSize = kTimelineMinWindowChangeMs * 3};
 
         auto filter = query->filter();
-        const auto newWindow = helpers::extendTimeWindow(startTimeMs, endTimeMs
-            , kTimlineWindowShiftSize, kTimlineWindowShiftSize);
         const bool shouldChange = helpers::isTimeWindowChanged(startTimeMs, endTimeMs
             , filter.startTimeMs, filter.endTimeMs, kTimelineMinWindowChangeMs);
 

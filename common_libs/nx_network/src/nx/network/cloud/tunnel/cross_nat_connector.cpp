@@ -110,8 +110,8 @@ void CrossNatConnector::replaceOriginatingHostAddress(const QString& address)
 }
 
 void CrossNatConnector::messageReceived(
-    SocketAddress sourceAddress,
-    stun::Message msg)
+    SocketAddress /*sourceAddress*/,
+    stun::Message /*msg*/)
 {
     //here we can receive response to connect result report. We just don't need it
 }

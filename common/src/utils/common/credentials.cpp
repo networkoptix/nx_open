@@ -11,4 +11,4 @@ QAuthenticator QnCredentials::toAuthenticator() const
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnCredentials), (json)(ubjson)(xml)(csv_record), _Fields)
+    (QnCredentials), (eq)(json)(ubjson)(xml)(csv_record), _Fields)

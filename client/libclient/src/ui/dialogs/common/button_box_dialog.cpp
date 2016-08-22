@@ -5,10 +5,12 @@
 #include <utils/common/warnings.h>
 #include <ui/style/custom_style.h>
 
-QnButtonBoxDialog::QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags): 
-    base_type(parent, windowFlags), 
-    m_clickedButton(QDialogButtonBox::NoButton)
-{}
+QnButtonBoxDialog::QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
+    m_clickedButton(QDialogButtonBox::NoButton),
+    m_readOnly(false)
+{
+}
 
 QnButtonBoxDialog::~QnButtonBoxDialog() {
     return;
@@ -80,4 +82,27 @@ void QnButtonBoxDialog::at_buttonBox_clicked(QAbstractButton *button) {
 void QnButtonBoxDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
     //do nothing
     Q_UNUSED(button);
+}
+
+bool QnButtonBoxDialog::isReadOnly() const
+{
+    return m_readOnly;
+}
+
+void QnButtonBoxDialog::setReadOnly(bool readOnly)
+{
+    if (m_readOnly == readOnly)
+        return;
+
+    m_readOnly = readOnly;
+    setReadOnlyInternal();
+}
+
+void QnButtonBoxDialog::setReadOnlyInternal()
+{
+    if (!m_buttonBox || !m_readOnly)
+        return;
+
+    if (auto button = m_buttonBox->button(QDialogButtonBox::Ok))
+        button->setFocus();
 }

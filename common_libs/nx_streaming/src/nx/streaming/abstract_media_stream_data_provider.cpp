@@ -213,7 +213,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
         {
             resetTimeCheck();
         }
-        else if ((quint64)m_lastMediaTime[channel] != AV_NOPTS_VALUE)
+        else if (m_lastMediaTime[channel] != AV_NOPTS_VALUE)
         {
             qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
             // if timeDiff < -N it may be time correction or dayling time change

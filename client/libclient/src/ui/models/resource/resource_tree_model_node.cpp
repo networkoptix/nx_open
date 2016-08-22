@@ -1,6 +1,5 @@
 #include "resource_tree_model_node.h"
 
-//#include <common/common_meta_types.h>
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -68,8 +67,6 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     NX_ASSERT(model != NULL);
     m_editable.checked = false;
 }
-
-
 
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, QnUuid())
@@ -705,7 +702,7 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
         if (column == Qn::NameColumn)
-            return m_displayName + (m_modified ? QLatin1String("*") : QString());
+            return m_displayName + (m_modified ? L'*' : QChar());
         break;
     case Qt::ToolTipRole:
         return m_displayName;

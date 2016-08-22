@@ -13,6 +13,7 @@
  */
 class QnButtonBoxDialog: public Connective<QnDialog> {
     Q_OBJECT;
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
     typedef Connective<QnDialog> base_type;
 
 public:
@@ -22,6 +23,9 @@ public:
     QDialogButtonBox::StandardButton clickedButton() const {
         return m_clickedButton;
     }
+
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
 
 protected:
     QDialogButtonBox* buttonBox() const;
@@ -33,12 +37,15 @@ protected:
 
     virtual void initializeButtonBox();
 
+    virtual void setReadOnlyInternal();
+
 private:
     Q_SLOT void at_buttonBox_clicked(QAbstractButton *button);
 
 private:
     QDialogButtonBox::StandardButton m_clickedButton;
     QPointer<QDialogButtonBox> m_buttonBox;
+    bool m_readOnly;
 };
 
 #endif // QN_BUTTON_BOX_DIALOG_H

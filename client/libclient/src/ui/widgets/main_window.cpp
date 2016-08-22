@@ -271,8 +271,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::CloseLayoutAction));
     addAction(action(QnActions::MainMenuAction));
     addAction(action(QnActions::OpenLoginDialogAction));
+    addAction(action(QnActions::DisconnectAction));
     addAction(action(QnActions::OpenInFolderAction));
     addAction(action(QnActions::RemoveLayoutItemAction));
+    addAction(action(QnActions::RemoveLayoutItemFromSceneAction));
     addAction(action(QnActions::RemoveFromServerAction));
     addAction(action(QnActions::StopSharingLayoutAction));
     addAction(action(QnActions::DeleteVideoWallItemAction));
