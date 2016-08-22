@@ -6,6 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <ui/common/geometry.h>
 
@@ -59,8 +60,6 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setImageEnhancement(data.contrastParams);
     setDewarpingParams(data.dewarpingParams);
     setDisplayInfo(data.displayInfo);
-
-    m_dataByRole = data.dataByRole; // TODO: #Elric
 }
 
 QnWorkbenchItem::~QnWorkbenchItem()
@@ -86,27 +85,17 @@ QnLayoutItemData QnWorkbenchItem::data() const
     data.dewarpingParams = dewarpingParams();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.displayInfo = displayInfo();
-    data.dataByRole = m_dataByRole;
 
     return data;
 }
 
 bool QnWorkbenchItem::update(const QnLayoutItemData &data)
 {
-    if (data.uuid != uuid())
-        qnWarning("Updating item '%1' from data with different uuid (%2 != %3).", resourceUid(), data.uuid.toString(), uuid().toString());
-
 #ifdef _DEBUG
+    NX_ASSERT(data.uuid == uuid());
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid());
     QnUuid localId = resource ? resource->getId() : QnUuid();
-    if (data.resource.id != localId && data.resource.uniqueId != m_resourceUid)
-        qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).",
-            resourceUid(),
-            localId.toString(),
-            data.resource.id.toString(),
-            data.resource.uniqueId,
-            m_resourceUid
-        );
+    NX_ASSERT(data.resource.id == localId || data.resource.uniqueId == m_resourceUid);
 #endif
 
     bool result = true;
@@ -121,25 +110,16 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data)
     setDisplayInfo(data.displayInfo);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
-    m_dataByRole = data.dataByRole; // TODO
-
     return result;
 }
 
 void QnWorkbenchItem::submit(QnLayoutItemData &data) const
 {
-    if (data.uuid != uuid())
-        qnWarning("Submitting item '%1' to a data with different uuid (%2 != %3).", resourceUid(), data.uuid, uuid());
-
 #ifdef _DEBUG
-    QnUuid localId = qnResPool->getResourceByUniqueId(resourceUid())->getId();
-    if (data.resource.id != localId && data.resource.uniqueId != m_resourceUid)
-        qnWarning("Submitting item '%1' to a data with different ids (%2 != %3 and %4 != %5).",
-            resourceUid(),
-            localId.toString(),
-            data.resource.id.toString(),
-            data.resource.uniqueId,
-            m_resourceUid);
+    NX_ASSERT(data.uuid == uuid());
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid());
+    QnUuid localId = resource ? resource->getId() : QnUuid();
+    NX_ASSERT(data.resource.id == localId || data.resource.uniqueId == m_resourceUid);
 #endif
 
     data.flags = flags();
@@ -150,7 +130,6 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.combinedGeometry = combinedGeometry();
     data.displayInfo = displayInfo();
-    data.dataByRole = m_dataByRole;
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry)
@@ -361,7 +340,7 @@ void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition)
     setFlag(Qn::PendingGeometryAdjustment, true);
 }
 
-QVariant QnWorkbenchItem::data(int role) const
+QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
 {
     switch (role)
     {
@@ -386,12 +365,13 @@ QVariant QnWorkbenchItem::data(int role) const
         case Qn::ItemRotationRole:
             return rotation();
         default:
-            return m_dataByRole.value(role);
+            return qnResourceRuntimeDataManager->layoutItemData(m_uuid, role);
     }
 }
 
-bool QnWorkbenchItem::setData(int role, const QVariant &value)
+bool QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
 {
+    QVariant localValue = qnResourceRuntimeDataManager->layoutItemData(m_uuid, role);
     switch (role)
     {
         case Qn::ResourceUidRole:
@@ -520,19 +500,17 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value)
         {
             /* Avoiding unnecessary dataChanged calls */
             bool flip = value.toBool();
-            bool localValue = m_dataByRole[Qn::ItemFlipRole].toBool();
-            if (localValue != flip)
+            if (localValue.toBool() != flip)
             {
-                m_dataByRole[Qn::ItemFlipRole] = flip;
+                qnResourceRuntimeDataManager->setLayoutItemData(m_uuid, role, flip);
                 emit dataChanged(Qn::ItemFlipRole);
             }
             return true;
         }
         default:
-            QVariant &localValue = m_dataByRole[role];
             if (localValue != value)
             {
-                localValue = value;
+                qnResourceRuntimeDataManager->setLayoutItemData(m_uuid, role, value);
                 emit dataChanged(role);
             }
             return true;

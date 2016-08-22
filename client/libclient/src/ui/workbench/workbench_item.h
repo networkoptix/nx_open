@@ -283,7 +283,7 @@ public:
      * \param role                      Role to get data for.
      * \returns                         Data for the given role.
      */
-    QVariant data(int role) const;
+    QVariant data(Qn::ItemDataRole role) const;
 
     /**
      * \param role                      Role to get data for.
@@ -291,7 +291,7 @@ public:
      * \returns                         Data for the given role.
      */
     template<class T>
-    T data(int role, const T &defaultValue = T())
+    T data(Qn::ItemDataRole role, const T &defaultValue = T())
     {
         QVariant result = data(role);
         if (result.canConvert<T>())
@@ -305,7 +305,7 @@ public:
     }
 
     template<class T>
-    bool setData(int role, const T &value)
+    bool setData(Qn::ItemDataRole role, const T &value)
     {
         return setData(role, QVariant::fromValue<T>(value));
     }
@@ -315,7 +315,7 @@ public:
      * \param value                     New value for the given data role.
      * \returns                         Whether the data was successfully set.
      */
-    bool setData(int role, const QVariant &value);
+    bool setData(Qn::ItemDataRole role, const QVariant &value);
 
 signals:
     void geometryChanged();
@@ -327,7 +327,7 @@ signals:
     void zoomTargetItemChanged();
     void rotationChanged();
     void displayInfoChanged();
-    void dataChanged(int role);
+    void dataChanged(Qn::ItemDataRole role);
 
 protected:
     void setGeometryInternal(const QRect &geometry);
@@ -369,9 +369,6 @@ private:
 
     /** Should the info be always displayed on the item. */
     bool m_displayInfo;
-
-    /** User data by role. */
-    QHash<int, QVariant> m_dataByRole;
 };
 
 #endif // QN_WORKBENCH_ITEM_H

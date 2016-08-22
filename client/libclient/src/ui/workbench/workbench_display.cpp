@@ -1070,12 +1070,12 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     m_scene->addItem(widget);
 
-    connect(item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
-    connect(item, SIGNAL(geometryDeltaChanged()), this, SLOT(at_item_geometryDeltaChanged()));
-    connect(item, SIGNAL(rotationChanged()), this, SLOT(at_item_rotationChanged()));
-    connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)), this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
-    connect(item, SIGNAL(zoomRectChanged()), this, SLOT(at_item_zoomRectChanged()));
-    connect(item, SIGNAL(dataChanged(int)), this, SLOT(at_item_dataChanged(int)));
+    connect(item, &QnWorkbenchItem::geometryChanged, this, &QnWorkbenchDisplay::at_item_geometryChanged);
+    connect(item, &QnWorkbenchItem::geometryDeltaChanged, this, &QnWorkbenchDisplay::at_item_geometryDeltaChanged);
+    connect(item, &QnWorkbenchItem::rotationChanged, this, &QnWorkbenchDisplay::at_item_rotationChanged);
+    connect(item, &QnWorkbenchItem::flagChanged, this, &QnWorkbenchDisplay::at_item_flagChanged);
+    connect(item, &QnWorkbenchItem::zoomRectChanged, this, &QnWorkbenchDisplay::at_item_zoomRectChanged);
+    connect(item, &QnWorkbenchItem::dataChanged, this, &QnWorkbenchDisplay::at_item_dataChanged);
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
@@ -2143,7 +2143,7 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
 
 }
 
-void QnWorkbenchDisplay::at_item_dataChanged(int role)
+void QnWorkbenchDisplay::at_item_dataChanged(Qn::ItemDataRole role)
 {
     if (role == Qn::ItemFlipRole)
         synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), false);

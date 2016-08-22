@@ -1,6 +1,5 @@
 #include "layout_item_data.h"
 
-
 QnLayoutItemData::QnLayoutItemData():
     uuid(),
     flags(0),
@@ -10,8 +9,7 @@ QnLayoutItemData::QnLayoutItemData():
     rotation(0.0),
     displayInfo(false),
     contrastParams(),
-    dewarpingParams(),
-    dataByRole()
+    dewarpingParams()
 {
 }
 
@@ -29,6 +27,5 @@ bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r)
         && l.displayInfo == r.displayInfo
         && l.contrastParams == r.contrastParams
         && l.dewarpingParams == r.dewarpingParams
-        && l.dataByRole == r.dataByRole
         );
 }

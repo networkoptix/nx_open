@@ -15,6 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
@@ -653,7 +654,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.uniqueId = resource->getUniqueId();
-        item.dataByRole[Qn::ItemTimeRole] = period.startTimeMs;
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, period.startTimeMs);
 
         QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
         if (!forcedRotation.isEmpty())
