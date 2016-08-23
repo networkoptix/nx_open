@@ -161,7 +161,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_lightMode(0),
     m_frontZ(0.0),
     m_frameOpacity(1.0),
-    m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
     m_normalMarginFlags(0),
     m_inChangeLayout(false),
@@ -208,7 +207,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     //queueing connection because some OS make resize call before move widget to correct postion while expanding it to fullscreen --gdm
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(fitInView()), Qt::QueuedConnection);
 
-    connect(m_beforePaintInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(updateFrameWidths()));
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()), this, SLOT(at_widgetActivityInstrument_activityStopped()));
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()), this, SLOT(at_widgetActivityInstrument_activityStarted()));
 
@@ -526,7 +524,6 @@ void QnWorkbenchDisplay::initSceneView()
     setLayer(m_gridItem.data(), Qn::BackLayer);
     opacityAnimator(m_gridItem.data())->setTimeLimit(300);
     m_gridItem.data()->setOpacity(0.0);
-    m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
     if (canShowLayoutBackground())
@@ -820,7 +817,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
                 oldWidget->setLocalActive(false);
             if (newWidget)
                 newWidget->setLocalActive(true);
-            m_frameWidthsDirty = true;
             break;
         }
         case Qn::CentralRole:
@@ -1050,7 +1046,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);
-    widget->setFrameWidth(qnGlobals->defaultFrameWidth());
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -1832,16 +1827,6 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
     synchronizeGeometry(item, animate);
 }
 
-void QnWorkbenchDisplay::updateFrameWidths()
-{
-    if (!m_frameWidthsDirty)
-        return;
-
-    foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive()
-            ? qnGlobals->selectedFrameWidth()
-            : qnGlobals->defaultFrameWidth());
-}
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
@@ -2231,8 +2216,6 @@ void QnWorkbenchDisplay::at_scene_selectionChanged()
 {
     if (m_instrumentManager->scene() == NULL)
         return; /* Do nothing if scene is being destroyed. */
-
-    m_frameWidthsDirty = true;
 
     /* Update single selected item. */
     QList<QGraphicsItem *> selection = m_scene->selectedItems();
