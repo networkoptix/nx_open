@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/camera_resource.h>
+#include <core/resource/camera_resource_stub.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -62,6 +62,12 @@ protected:
             layout->setParentId(m_currentUser->getId());
 
         return layout;
+    }
+
+    QnVirtualCameraResourcePtr createCamera()
+    {
+        QnVirtualCameraResourcePtr camera(new QnCameraResourceStub());
+        return camera;
     }
 
     void logout()
@@ -235,7 +241,7 @@ TEST_F(QnResourceAccessManagerTest, checkLockedLayoutAsViewerSafeMode)
 }
 
 /************************************************************************/
-/* Checking non-own remote layouts                                                     */
+/* Checking non-own remote layouts                                      */
 /************************************************************************/
 /** Check permissions for another viewer's layout when the user is logged in as viewer. */
 TEST_F(QnResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
@@ -296,7 +302,7 @@ TEST_F(QnResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
 }
 
 /************************************************************************/
-/* Checking shared layouts                                                             */
+/* Checking shared layouts                                              */
 /************************************************************************/
 /** Check permissions for shared layout when the user is logged in as viewer. */
 TEST_F(QnResourceAccessManagerTest, checkSharedLayoutAsViewer)
@@ -333,7 +339,7 @@ TEST_F(QnResourceAccessManagerTest, checkSharedLayoutAsAdmin)
 }
 
 /************************************************************************/
-/* Checking user access rights                                                         */
+/* Checking user access rights                                          */
 /************************************************************************/
 
 /** Check user can edit himself (but cannot rename, remove and change access rights). */
@@ -346,4 +352,25 @@ TEST_F(QnResourceAccessManagerTest, checkUsedEditHimself)
     desired &= ~forbidden;
 
     checkPermissions(m_currentUser, desired, forbidden);
+}
+
+
+/************************************************************************/
+/* Checking cameras access rights                                       */
+/************************************************************************/
+
+/** Check owner can remove non-owned desktop camera, but cannot view it. */
+TEST_F(QnResourceAccessManagerTest, checkDesktopCameraRemove)
+{
+    loginAsOwner();
+
+    auto camera = createCamera();
+    camera->addFlags(Qn::desktop_camera);
+    qnResPool->addResource(camera);
+
+    Qn::Permissions desired = Qn::RemovePermission;
+    Qn::Permissions forbidden = Qn::ReadPermission;
+    desired &= ~forbidden;
+
+    checkPermissions(camera, desired, forbidden);
 }
