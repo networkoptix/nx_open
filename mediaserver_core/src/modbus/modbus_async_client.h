@@ -82,7 +82,19 @@ private:
     void onMessage(ModbusMessage message);
     void onError(SystemError::ErrorCode errorCode, const QString& errorStr);
 
-    ModbusMBAPHeader buildHeader(const ModbusMessage& request);
+    void addHeader(ModbusMessage* request);
+
+    ModbusMessage buildReadRequest(
+        quint8 functionCode,
+        quint16 startAddress,
+        quint16 count);
+
+    ModbusMessage buildWriteMultipleRequest(
+        quint8 functionCode,
+        quint16 startAddress,
+        quint16 unitCount,
+        quint8 byteCount,
+        const QByteArray& data);
 
 private:
     ModbusClientState m_state;

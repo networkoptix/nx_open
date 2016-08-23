@@ -13,7 +13,7 @@ using namespace nx_io_managment;
 
 namespace
 {
-    const unsigned int kInputPollingIntervalMs = 50;
+    const unsigned int kInputPollingIntervalMs = 300;
     const unsigned int kDefaultFirstInputCoilAddress = 0;
     const unsigned int kDefaultFirstOutputCoilAddress = 16;
 
@@ -30,6 +30,7 @@ namespace
 
 QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
     m_resource(resource),
+    m_monitoringIsInProgress(false),
     m_ioPortInfoFetched(false),
     m_networkFaultsCounter(0)
 {

@@ -34,6 +34,14 @@ QString exceptionDescriptionByCode(quint8 exceptionCode)
     }
 }
 
+ModbusMBAPHeader::ModbusMBAPHeader():
+    transactionId(0),
+    protocolId(0),
+    length(sizeof(decltype(ModbusMBAPHeader::unitId))),
+    unitId(0)
+{
+}
+
 QByteArray ModbusMBAPHeader::encode(const ModbusMBAPHeader& header)
 {
     QByteArray encoded;
@@ -61,6 +69,12 @@ ModbusMBAPHeader ModbusMBAPHeader::decode(const QByteArray& header)
         >> decoded.unitId;
 
     return decoded;
+}
+
+ModbusMessage::ModbusMessage():
+    header(ModbusMBAPHeader()),
+    functionCode(0)
+{
 }
 
 QByteArray ModbusRequest::encode(const ModbusRequest &request)
@@ -123,7 +137,6 @@ ModbusIdResponseData ModbusIdResponseData::decode(const QByteArray& response)
     NX_ASSERT(false, "ModbusIdResponseData::decode is not implemented");
     return ModbusIdResponseData();
 }
-
 
 bool ModbusMessage::isException() const
 {

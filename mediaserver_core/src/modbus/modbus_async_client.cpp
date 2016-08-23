@@ -170,12 +170,14 @@ void QnModbusAsyncClient::readDiscreteInputsAsync(
     quint16 startRegister,
     quint16 registerCount,
     quint16* outTransactionId)
-{
-    QN_UNUSED(startRegister);
-    QN_UNUSED(registerCount);
-    QN_UNUSED(outTransactionId);
+{ 
+    auto message = buildReadRequest(
+        FunctionCode::kReadDiscreteInputs,
+        startRegister,
+        registerCount);
 
-    NX_ASSERT(false, "QnModbusAsyncClient::readDiscreteInputsAsync is not implemented");
+    *outTransactionId = message.header.transactionId;
+    doModbusRequestAsync(std::move(message));
 }
 
 void QnModbusAsyncClient::readCoilsAsync(
@@ -183,33 +185,27 @@ void QnModbusAsyncClient::readCoilsAsync(
     quint16 coilNumber,
     quint16* outTransactionId)
 {
-    ModbusMessage message;
-
-    message.functionCode = FunctionCode::kReadCoils;
-
-    QByteArray data;
-    QDataStream stream(&data, QIODevice::WriteOnly);
-    stream.setByteOrder(QDataStream::BigEndian);
-
-    stream << startCoil << coilNumber;
-
-    message.data = data;
-    message.header = buildHeader(message);
-
+    auto message = buildReadRequest(FunctionCode::kReadCoils, startCoil, coilNumber);
     *outTransactionId = message.header.transactionId;
     doModbusRequestAsync(std::move(message));
 }
 
 void QnModbusAsyncClient::writeCoilsAsync(
-    quint16 startCoilAddress,
+    quint16 startCoil,
     const QByteArray& data,
     quint16* outTransactionId)
 {
-    QN_UNUSED(startCoilAddress);
-    QN_UNUSED(data);
-    QN_UNUSED(outTransactionId);
 
-    NX_ASSERT(false, "QnModbusAsyncClient::writeCoilsAsync is not implemented");
+    auto message = buildWriteMultipleRequest(
+        FunctionCode::kReadWriteMultipleRegisters,
+        startCoil,
+        data.size() * 2,
+        data.size(),
+        data
+    );
+
+    *outTransactionId = message.header.transactionId;
+    doModbusRequestAsync(std::move(message));
 }
 
 void QnModbusAsyncClient::readInputRegistersAsync(
@@ -217,11 +213,13 @@ void QnModbusAsyncClient::readInputRegistersAsync(
     quint16 registerCount,
     quint16* outTransactionId)
 {
-    QN_UNUSED(startRegister);
-    QN_UNUSED(registerCount);
-    QN_UNUSED(outTransactionId);
+    auto message = buildReadRequest(
+        FunctionCode::kReadInputRegisters,
+        startRegister,
+        registerCount);
 
-    NX_ASSERT(false, "QnModbusAsyncClient::readInputRegisterAsync is not implemented");
+    *outTransactionId = message.header.transactionId;
+    doModbusRequestAsync(std::move(message));
 }
 
 
@@ -230,11 +228,13 @@ void QnModbusAsyncClient::readHoldingRegistersAsync(
     quint32 registerCount,
     quint16* outTransactionId)
 {
-    QN_UNUSED(startRegister);
-    QN_UNUSED(registerCount);
-    QN_UNUSED(outTransactionId);
+    auto message = buildReadRequest(
+        FunctionCode::kReadHoldingRegisters,
+        startRegister,
+        registerCount);
 
-    NX_ASSERT(false, "QnModbusAsyncClient::readHoldingRegistersAsync is not implemented");
+    *outTransactionId = message.header.transactionId;
+    doModbusRequestAsync(std::move(message));
 }
 
 void QnModbusAsyncClient::writeHoldingRegistersAsync(
@@ -242,14 +242,19 @@ void QnModbusAsyncClient::writeHoldingRegistersAsync(
     const QByteArray& data,
     quint16* outTransactionId)
 {
-    QN_UNUSED(startRegister);
-    QN_UNUSED(data);
-    QN_UNUSED(outTransactionId);
+    auto message  = buildWriteMultipleRequest(
+        FunctionCode::kReadWriteMultipleRegisters,
+        startRegister,
+        data.size() / 2,
+        data.size(),
+        data
+    );
 
-    NX_ASSERT(false, "QnModbusAsyncClient::writeHoldingRegistersAsync is not implemented");
+    *outTransactionId = message.header.transactionId;
+    doModbusRequestAsync(std::move(message));
 }
 
-ModbusMBAPHeader QnModbusAsyncClient::buildHeader(const ModbusMessage& request)
+void QnModbusAsyncClient::addHeader(ModbusMessage* message)
 {
     ModbusMBAPHeader header;
 
@@ -257,10 +262,55 @@ ModbusMBAPHeader QnModbusAsyncClient::buildHeader(const ModbusMessage& request)
     header.protocolId = 0x00;
     header.unitId = 0x01;
     header.length = sizeof(header.unitId)
-        + sizeof(request.functionCode)
-        + request.data.size();
+        + sizeof(decltype(ModbusMessage::functionCode))
+        + message->data.size();
 
-    return header;
+    message->header = header;
+}
+
+ModbusMessage QnModbusAsyncClient::buildReadRequest(quint8 functionCode, quint16 startAddress, quint16 count)
+{
+    ModbusMessage message;
+    message.functionCode = functionCode;
+
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    stream << startAddress << count;
+
+    message.data = std::move(data);
+    addHeader(&message);
+
+    return message;
+}
+
+ModbusMessage QnModbusAsyncClient::buildWriteMultipleRequest(
+    quint8 functionCode,
+    quint16 startAddress,
+    quint16 unitCount,
+    quint8 byteCount,
+    const QByteArray& data)
+{
+    ModbusMessage message;
+
+    message.functionCode = functionCode;
+
+    QByteArray messageData;
+    QDataStream stream(&messageData, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    stream
+        << startAddress
+        << unitCount
+        << byteCount;
+
+    messageData.append(data);
+    message.data = std::move(messageData);
+
+    addHeader(&message);
+
+    return message;
 }
 
 QString QnModbusAsyncClient::getLastErrorString() const

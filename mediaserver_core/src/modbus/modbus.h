@@ -66,6 +66,8 @@ struct ModbusMBAPHeader
     quint16 length;
     quint8 unitId;
 
+    ModbusMBAPHeader();
+
     static QByteArray encode(const ModbusMBAPHeader& header);
     static ModbusMBAPHeader decode(const QByteArray& header);
     static const size_t size =
@@ -82,6 +84,8 @@ struct ModbusMessage
     ModbusMBAPHeader header;
     quint8 functionCode;
     QByteArray data;
+
+    ModbusMessage();
 
     bool isException() const;
     QString getExceptionString() const;
