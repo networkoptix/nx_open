@@ -98,7 +98,7 @@ public:
 
                     default:
                         std::cout << ostr.str();
-                        std::cerr.flush();
+                        std::cout.flush();
                         break;
                 }
             }
