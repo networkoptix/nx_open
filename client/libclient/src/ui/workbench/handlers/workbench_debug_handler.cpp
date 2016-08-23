@@ -16,6 +16,10 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workaround/qtbug_workaround.h>
 
+//#ifdef _DEBUG
+#define DEBUG_ACTIONS
+//#endif
+
 // -------------------------------------------------------------------------- //
 // QnDebugControlDialog
 // -------------------------------------------------------------------------- //
@@ -88,7 +92,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-#ifdef _DEBUG
+#ifdef DEBUG_ACTIONS
     connect(action(QnActions::DebugControlPanelAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
     connect(action(QnActions::DebugIncrementCounterAction), &QAction::triggered, this,
@@ -121,8 +125,6 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered()
     // the palette widget code might still be required
     Q_UNUSED(showPalette);
 }
-
-#include <ui/dialogs/setup_wizard_dialog.h>
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {
