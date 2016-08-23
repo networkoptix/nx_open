@@ -108,7 +108,7 @@ void QnCameraMotionMaskWidget::init()
 void QnCameraMotionMaskWidget::createWorkbenchLayout()
 {
     auto workbenchLayout = new QnWorkbenchLayout(this);
-    workbenchLayout->setCellSpacing(QSizeF(0, 0));
+    workbenchLayout->setCellSpacing(0);
     m_context->workbench()->setCurrentLayout(workbenchLayout);
 }
 

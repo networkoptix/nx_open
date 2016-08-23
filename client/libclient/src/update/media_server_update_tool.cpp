@@ -13,6 +13,7 @@
 #include <common/common_module.h>
 #include <utils/update/update_utils.h>
 #include <update/task/check_update_peer_task.h>
+#include <update/low_free_space_warning.h>
 
 #include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
@@ -36,8 +37,6 @@ namespace {
     }
 
 } // anonymous namespace
-
-// TODO: #dklychkov Split this class to a set of QnNetworkPeerTask
 
 QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent),
@@ -253,43 +252,65 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target, std:
 }
 
 
-void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
+void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
+{
     if (m_updateProcess)
         return;
 
     QSet<QnUuid> incompatibleTargets;
     bool clearTargetsWhenFinished = false;
 
-    if (m_targets.isEmpty()) {
+    if (m_targets.isEmpty())
+    {
         clearTargetsWhenFinished = true;
         setTargets(target.targets, defaultEnableClientUpdates);
-        for (const QnUuid &id: target.targets) {
-            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+
+        for (const auto& id: target.targets)
+        {
+            const auto server = qnResPool->getIncompatibleResourceById(id)
+                .dynamicCast<QnMediaServerResource>();
             if (!server)
                 continue;
-            QnUuid realId = server->getOriginalGuid();
+
+            const auto realId = server->getOriginalGuid();
             if (realId.isNull())
                 continue;
+
             incompatibleTargets.insert(realId);
             qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
         }
     }
 
     m_updateProcess = new QnUpdateProcess(target);
-    connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
-    connect(m_updateProcess, &QnUpdateProcess::progressChanged,                 this, &QnMediaServerUpdateTool::setStageProgress);
-    connect(m_updateProcess, &QnUpdateProcess::peerStageChanged,                this, &QnMediaServerUpdateTool::setPeerStage);
-    connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,        this, &QnMediaServerUpdateTool::setPeerStageProgress);
-    connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
-    connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
-    connect(m_updateProcess, &QThread::finished, this, [this, incompatibleTargets, clearTargetsWhenFinished]() {
-        m_updateProcess->deleteLater();
-        m_updateProcess = nullptr;
-        for (const QnUuid &id: incompatibleTargets)
-            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(id, false);
-        if (clearTargetsWhenFinished)
-            setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
-    });
+    connect(m_updateProcess, &QnUpdateProcess::stageChanged,
+        this, &QnMediaServerUpdateTool::setStage);
+    connect(m_updateProcess, &QnUpdateProcess::progressChanged,
+        this, &QnMediaServerUpdateTool::setStageProgress);
+    connect(m_updateProcess, &QnUpdateProcess::peerStageChanged,
+        this, &QnMediaServerUpdateTool::setPeerStage);
+    connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,
+        this, &QnMediaServerUpdateTool::setPeerStageProgress);
+    connect(m_updateProcess, &QnUpdateProcess::updateFinished,
+        this, &QnMediaServerUpdateTool::finishUpdate);
+    connect(m_updateProcess, &QnUpdateProcess::targetsChanged,
+        this, &QnMediaServerUpdateTool::targetsChanged);
+    connect(m_updateProcess, &QnUpdateProcess::lowFreeSpaceWarning,
+        this, &QnMediaServerUpdateTool::lowFreeSpaceWarning, Qt::BlockingQueuedConnection);
+
+    connect(m_updateProcess, &QThread::finished, this,
+        [this, incompatibleTargets, clearTargetsWhenFinished]()
+        {
+            const auto watcher = qnDesktopClientMessageProcessor->incompatibleServerWatcher();
+
+            m_updateProcess->deleteLater();
+            m_updateProcess = nullptr;
+
+            for (const auto& id: incompatibleTargets)
+                watcher->keepServer(id, false);
+
+            if (clearTargetsWhenFinished)
+                setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
+        });
 
     m_updateProcess->start();
 }

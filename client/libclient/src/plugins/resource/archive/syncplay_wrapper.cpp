@@ -72,7 +72,7 @@ public:
     int bufferingCnt;
     QElapsedTimer timer;
     double speed;
-    
+
     bool enabled;
     qint64 bufferingTime;
     bool paused;
@@ -265,13 +265,16 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
 
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     //reader->setEnabled(d->enabled);
-    
+
     reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
     reader->setCycleMode(false);
 
-    connect(reader, SIGNAL(beforeJump(qint64)), this, SLOT(onBeforeJump(qint64)), Qt::DirectConnection);
-    connect(reader, SIGNAL(jumpOccured(qint64)), this, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
-    connect(reader, SIGNAL(jumpCanceled(qint64)), this, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
+    connect(reader, &QnAbstractArchiveStreamReader::beforeJump, this,
+        &QnArchiveSyncPlayWrapper::onBeforeJump, Qt::DirectConnection);
+    connect(reader, &QnAbstractArchiveStreamReader::jumpOccured, this,
+        &QnArchiveSyncPlayWrapper::onJumpOccured, Qt::DirectConnection);
+    connect(reader, &QnAbstractArchiveStreamReader::jumpCanceled, this,
+        &QnArchiveSyncPlayWrapper::onJumpCanceled, Qt::DirectConnection);
 
     if (d->enabled && currentTime != DATETIME_NOW && currentTime != qint64(AV_NOPTS_VALUE)) {
         reader->jumpToPreviousFrame(currentTime);
@@ -283,10 +286,6 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
     if (d->enabled) {
         reader->setNavDelegate(this);
     }
-
-    //connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
-    //connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
-    //connect(reader, SIGNAL(streamResumed()), this, SLOT(onStreamResumed()), Qt::DirectConnection);
 }
 
 void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/)
@@ -319,7 +318,7 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
     else {
         qint64 et = expectedTime();
         int sign = d->speed >= 0 ? 1 : -1;
-        if (d->speed != 0 && value != 0 && sign*(et - displayedTime) > SYNC_EPS) 
+        if (d->speed != 0 && value != 0 && sign*(et - displayedTime) > SYNC_EPS)
             reinitTime(displayedTime);
     }
 }
@@ -411,7 +410,7 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
         if (d->lastJumpTime != DATETIME_NOW)
             d->lastJumpTime = getDisplayedTimeInternal();
     }
-        
+
     //qDebug() << "reinitTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString("hh:mm:ss.zzz");
 
     d->timer.restart();
@@ -442,10 +441,10 @@ qint64 QnArchiveSyncPlayWrapper::minTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QnMutexLocker lock( &d->timeMutex );
-    
+
     qint64 result = INT64_MAX;
     bool found = false;
-    foreach(const ReaderInfo& info, d->readers) 
+    foreach(const ReaderInfo& info, d->readers)
     {
         qint64 startTime = info.oldDelegate->startTime();
         if(startTime != qint64(AV_NOPTS_VALUE)) {
@@ -463,7 +462,7 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
 
     qint64 result = 0;
     bool found = false;
-    foreach(const ReaderInfo& info, d->readers) 
+    foreach(const ReaderInfo& info, d->readers)
     {
         qint64 endTime = info.oldDelegate->endTime();
         if(endTime != qint64(AV_NOPTS_VALUE)) {
@@ -647,7 +646,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
             return d->lastJumpTime;
         }
     }
-    
+
 
     qint64 usecTimer = getUsecTimer();
     if (usecTimer - d->gotCacheTime < 1000ll)
@@ -688,9 +687,9 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     qint64 displayedTime =  getDisplayedTimeInternal();
     if (displayedTime == qint64(AV_NOPTS_VALUE) || displayedTime == DATETIME_NOW)
         return displayedTime;
-    if (d->speed >= 0) 
+    if (d->speed >= 0)
         return qMin(expectTime, displayedTime + SYNC_EPS);
-    else 
+    else
         return qMax(expectTime, displayedTime - SYNC_EPS);
 }
 
@@ -699,7 +698,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReaderInternal(QnAbstractArchiveS
     Q_D(QnArchiveSyncPlayWrapper);
     for (int i = 0; i < d->readers.size(); ++i)
     {
-        if (d->readers[i].reader == reader) 
+        if (d->readers[i].reader == reader)
         {
             if (reader->isEnabled() && value)
             {
@@ -747,9 +746,9 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
         if (!reader->isSingleShotMode())
         {
             reader->setNavDelegate(0);
-            // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic 
+            // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic
             if (!reader->isPaused())
-                reader->pause(); 
+                reader->pause();
             if (d->enabled && isSyncReader)
                 reader->setNavDelegate(this);
             //if (reader.buffering)
@@ -788,7 +787,7 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
     d->enabled = true;
     d->speed = currentSpeed;
     bool isPaused = (currentSpeed == 0);
-    foreach(const ReaderInfo& info, d->readers) 
+    foreach(const ReaderInfo& info, d->readers)
     {
         if (info.reader->isEnabled())
         {
@@ -826,9 +825,9 @@ qreal QnArchiveSyncPlayWrapper::getSpeed() const {
 void QnArchiveSyncPlayWrapper::setLiveModeEnabled(bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    d->liveModeEnabled = value;    
+    d->liveModeEnabled = value;
 }
-    
+
 void QnArchiveSyncPlayWrapper::jumpToLive()
 {
     jumpTo(DATETIME_NOW, 0);

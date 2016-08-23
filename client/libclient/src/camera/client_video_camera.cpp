@@ -323,21 +323,24 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     m_exportRecorder->start();
 }
 
-void QnClientVideoCamera::stopExport() {
-    if (m_exportReader) {
+void QnClientVideoCamera::stopExport()
+{
+    if (m_exportReader)
+    {
         if (m_exportRecorder)
             m_exportReader->removeDataProcessor(m_exportRecorder);
         m_exportReader->pleaseStop();  // it will be deleted in finished() signal handle
     }
-    if (m_exportRecorder) {
+    if (m_exportRecorder)
+    {
         // clean signature flag; in other case file will be recreated on writing finish
         //TODO: #vasilenko get rid of this magic
         m_exportRecorder->setNeedCalcSignature(false);
 
-        connect(m_exportRecorder, SIGNAL(finished()), this, SIGNAL(exportStopped()));
+        connect(m_exportRecorder, &QnStreamRecorder::finished, this, &QnClientVideoCamera::exportStopped);
         m_exportRecorder->pleaseStop(); // it will be deleted in finished() signal handle
     }
-    QnMutexLocker lock( &m_exportMutex );
+    QnMutexLocker lock(&m_exportMutex);
     m_exportReader.clear();
     m_exportRecorder.clear();
 }

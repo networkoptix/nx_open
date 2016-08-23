@@ -551,31 +551,24 @@ bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr
 
     /* Calculate removed cameras that are still directly accessible. */
     auto accessible = QnResourceAccessProvider::sharedResources(user);
-    QnResourceList stillAccessible;
-    for (const QnResourcePtr& resource : change.removed)
-    {
-        QnUuid id = resource->getId();
-        if (accessible.contains(id))
-            stillAccessible << resource;
-    }
 
     auto inaccessible = [user](const QnResourcePtr& resource)
-    {
-        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
-            return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
+        {
+            if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
+                return !qnResourceAccessManager->hasPermission(user, resource, Qn::ReadPermission);
 
-        /* Silently ignoring servers. */
-        return false;
-    };
+            /* Silently ignoring servers. */
+            return false;
+        };
     QnResourceList toShare = change.added.filtered(inaccessible); //TODO: #GDM code duplication
 
     switch (user->role())
     {
         case Qn::UserRole::CustomPermissions:
-            return QnLayoutsHandlerMessages::changeUserLocalLayout(mainWindow(), stillAccessible);
+            return QnLayoutsHandlerMessages::changeUserLocalLayout(mainWindow(), change.removed);
         case Qn::UserRole::CustomUserGroup:
             return QnLayoutsHandlerMessages::addToRoleLocalLayout(mainWindow(), toShare)
-                && QnLayoutsHandlerMessages::removeFromRoleLocalLayout(mainWindow(), stillAccessible);
+                && QnLayoutsHandlerMessages::removeFromRoleLocalLayout(mainWindow(), change.removed);
         default:
             break;
     }

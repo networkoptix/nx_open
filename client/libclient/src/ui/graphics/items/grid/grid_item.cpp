@@ -34,8 +34,8 @@ QnGridItem::QnGridItem(QGraphicsItem *parent):
     setStateColor(Disallowed, QColor(255, 0, 0, 64));
 
     setAcceptedMouseButtons(0);
-    
-    /* Don't disable this item here. When disabled, it starts accepting wheel events 
+
+    /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
 
@@ -113,7 +113,7 @@ void QnGridItem::setCellState(const QPoint &cell, int cellState) {
     if(data.item == NULL) {
         data.item = newHighlightItem();
 
-        qreal d =  m_lineWidth / 2; 
+        qreal d =  m_lineWidth / 2;
         data.item->setRect(QnGeometry::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
         setItemCell(data.item, cell);
     }
@@ -135,8 +135,8 @@ void QnGridItem::setCellState(const QSet<QPoint> &cells, int cellState) {
 }
 
 void QnGridItem::setCellState(const QRect &cells, int cellState) {
-    for (int r = cells.top(); r <= cells.bottom(); r++) 
-        for (int c = cells.left(); c <= cells.right(); c++) 
+    for (int r = cells.top(); r <= cells.bottom(); r++)
+        for (int c = cells.left(); c <= cells.right(); c++)
             setCellState(QPoint(c, r), cellState);
 }
 
@@ -169,7 +169,7 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     /* Draw! */
     QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.grid, m_lineWidth));
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QnGeometry::toPoint(mapper()->spacing()) / 2;
+    QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QPointF(mapper()->spacing() / 2, mapper()->spacing() / 2);
     QPointF delta = QnGeometry::toPoint(mapper()->step());
 
     /* Vertical lines. */

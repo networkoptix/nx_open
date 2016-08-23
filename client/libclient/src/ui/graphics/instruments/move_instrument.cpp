@@ -5,13 +5,12 @@
 #include <QtWidgets/QApplication>
 
 namespace {
-    struct NonProxyLeftClickableItem: public std::unary_function<QGraphicsItem *, bool>
+
+const auto isNonProxyLeftClickableItem =
+    [](QGraphicsItem *item)
     {
-        bool operator()(QGraphicsItem *item) const
-        {
-            return ((item->acceptedMouseButtons() & Qt::LeftButton) &&
-                !dynamic_cast<QGraphicsProxyWidget*>(item));
-        }
+        return ((item->acceptedMouseButtons() & Qt::LeftButton) &&
+            !dynamic_cast<QGraphicsProxyWidget*>(item));
     };
 
 } // anonymous namespace
@@ -45,7 +44,7 @@ bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
         return false;
 
     /* Find the item to drag. */
-    QGraphicsItem *draggedItem = item(view, event->pos(), NonProxyLeftClickableItem());
+    QGraphicsItem *draggedItem = item(view, event->pos(), isNonProxyLeftClickableItem);
     if (draggedItem == NULL || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable) || !satisfiesItemConditions(draggedItem))
         return false;
     m_draggedItem = draggedItem;

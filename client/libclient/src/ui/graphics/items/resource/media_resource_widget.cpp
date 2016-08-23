@@ -318,15 +318,21 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         connect(controller, &QnStatusOverlayController::buttonClicked, this,
             [this]()
             {
-                const auto button = statusOverlayController()->currentButton();
-                if (button == QnStatusOverlayController::Button::kDiagnostics)
-                    processDiagnosticsRequest();
-                else if (button == QnStatusOverlayController::Button::kIoEnable)
-                    processIoEnableRequest();
-                else if (button == QnStatusOverlayController::Button::kSettings)
-                    processSettingsRequest();
-                else
-                    processMoreLicensesRequest();
+                switch (statusOverlayController()->currentButton())
+                {
+                    case QnStatusOverlayController::Button::kDiagnostics:
+                        processDiagnosticsRequest();
+                        break;
+                    case QnStatusOverlayController::Button::kIoEnable:
+                        processIoEnableRequest();
+                        break;
+                    case QnStatusOverlayController::Button::kSettings:
+                        processSettingsRequest();
+                        break;
+                    default:
+                        processMoreLicensesRequest();
+                        break;
+                }
             });
 
         updateOverlayButton(calculateStatusOverlay());

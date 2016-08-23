@@ -99,8 +99,8 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     const auto overlay = new QnStatusOverlayWidget(this);
     m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay);
 
-    connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this
-        , [this, overlay, controller = m_statusOverlayController]()
+    connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
+        [this, overlay, controller = m_statusOverlayController]()
         {
             const auto value = (controller->statusOverlay() == Qn::EmptyOverlay ? 0.0 : 1.0);
             opacityAnimator(overlay)->animateTo(value);
@@ -239,8 +239,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             return;
         }
 
-        qreal xspace = m_layout->cellSpacing().width() * 0.5;
-        qreal yspace = m_layout->cellSpacing().height() * 0.5;
+        qreal space = m_layout->cellSpacing() * 0.5;
 
         qreal cellAspectRatio = m_layout->hasCellAspectRatio()
             ? m_layout->cellAspectRatio()
@@ -273,10 +272,10 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
                 continue;
 
             // cell bounds
-            qreal x1 = (itemRect.left() - bounding.left() + xspace) * xscale + xoffset;
-            qreal y1 = (itemRect.top() - bounding.top() + yspace) * yscale + yoffset;
-            qreal w1 = (itemRect.width() - xspace*2) * xscale;
-            qreal h1 = (itemRect.height() - yspace*2) * yscale;
+            qreal x1 = (itemRect.left() - bounding.left() + space) * xscale + xoffset;
+            qreal y1 = (itemRect.top() - bounding.top() + space) * yscale + yoffset;
+            qreal w1 = (itemRect.width() - space*2) * xscale;
+            qreal h1 = (itemRect.height() - space*2) * yscale;
 
             if (!paintItem(painter, QRectF(x1, y1, w1, h1), data))
                 allItemsAreLoaded = false;

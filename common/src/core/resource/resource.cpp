@@ -230,11 +230,6 @@ QnResourcePtr QnResource::toSharedPointer() const
     return QnFromThisToShared<QnResource>::toSharedPointer();
 }
 
-void QnResource::afterUpdateInner(const QSet<QByteArray>& modifiedFields)
-{
-    emitModificationSignals(modifiedFields);
-}
-
 bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
 {
     QByteArray theSignal = QMetaObject::normalizedSignature(signal);
@@ -245,9 +240,10 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
-    NX_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+    // unique id MUST be the same
+    NX_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId());
 
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
@@ -257,29 +253,29 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     if (m_url != other->m_url)
     {
         m_url = other->m_url;
-        modifiedFields << "urlChanged";
+        notifiers << [r = toSharedPointer(this)]{ emit r->urlChanged(r); };
     }
 
     if (m_flags != other->m_flags)
     {
         m_flags = other->m_flags;
-        modifiedFields << "flagsChanged";
+        notifiers << [r = toSharedPointer(this)]{ emit r->flagsChanged(r); };
     }
 
     if (m_name != other->m_name)
     {
         m_name = other->m_name;
-        modifiedFields << "nameChanged";
+        notifiers << [r = toSharedPointer(this)]{emit r->nameChanged(r);};
     }
 
     if (m_parentId != other->m_parentId)
     {
         m_parentId = other->m_parentId;
-        modifiedFields << "parentIdChanged";
+        notifiers << [r = toSharedPointer(this)]{ emit r->parentIdChanged(r);};
         if (m_initialized)
         {
             m_initialized = false;
-            modifiedFields << "initializedChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->initializedChanged(r); };
         }
     }
 
@@ -291,32 +287,26 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     }
 }
 
-void QnResource::update(const QnResourcePtr& other, bool silenceMode)
+void QnResource::update(const QnResourcePtr& other)
 {
-    /*
-    NX_ASSERT(other->metaObject()->className() == this->metaObject()->className(),
-        Q_FUNC_INFO,
-        "Trying to update " + QByteArray(this->metaObject()->className()) + " with " + QByteArray(other->metaObject()->className()));
-    */
     {
         QnMutexLocker locker(&m_consumersMtx);
         for (QnResourceConsumer *consumer : m_consumers)
             consumer->beforeUpdate();
     }
 
-    QSet<QByteArray> modifiedFields;
+    Qn::NotifierList notifiers;
     {
         QnMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
         if (m1 > m2)
             std::swap(m1, m2);  //to maintain mutex lock order
         QnMutexLocker mutexLocker1(m1);
         QnMutexLocker mutexLocker2(m2);
-        updateInner(other, modifiedFields);
+        updateInternal(other, notifiers);
     }
 
-    silenceMode |= other->hasFlags(Qn::foreigner);
-    //setStatus(other->m_status, silenceMode);
-    afterUpdateInner(modifiedFields);
+    for (auto notifier : notifiers)
+        notifier();
 
     {
         QnMutexLocker lk(&m_mutex);

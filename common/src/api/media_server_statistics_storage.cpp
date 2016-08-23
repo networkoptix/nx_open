@@ -36,7 +36,7 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnUuid &ser
     m_uptimeMs(0),
     m_timer(new QTimer())
 {
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(m_timer, &QTimer::timeout, this, &QnMediaServerStatisticsStorage::update);
     m_timer->start(m_updatePeriod);
 }
 
@@ -124,7 +124,7 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
 
     m_uptimeMs = reply.uptimeMs;
 
-    for(const QnStatisticsDataItem &nextData: reply.statistics) 
+    for(const QnStatisticsDataItem &nextData: reply.statistics)
     {
 
         if (m_flagsFilter.contains(nextData.deviceType) &&

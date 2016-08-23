@@ -182,12 +182,14 @@ td.number{
     width:0;
 }
 
-.ellipsis{
+table.description td:first-child{
     text-overflow: ellipsis;
     overflow: hidden;
-    display: inline-block;
     white-space: nowrap;
-    max-width: 130px;
+    max-width: 200px;
+}
+table.description td:last-child{
+    white-space: nowrap;
 }
 
 .margin-top{
