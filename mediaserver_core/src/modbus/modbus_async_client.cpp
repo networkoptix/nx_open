@@ -158,12 +158,11 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusMessage &message)
         });
 }
 
-void QnModbusAsyncClient::onError(SystemError::ErrorCode errorCode, QString& errorStr)
+void QnModbusAsyncClient::onError(SystemError::ErrorCode errorCode, const QString& errorStr)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        m_lastErrorString = errorStr.append(
-            lit(" Error code: %1").arg(errorCode));
+        m_lastErrorString = errorStr + lit(" Error code: %1").arg(errorCode);
     }
 
     emit error();

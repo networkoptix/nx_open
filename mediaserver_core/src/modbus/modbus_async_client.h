@@ -77,7 +77,7 @@ private:
 
     void sendPendingMessage();
     void onMessage(ModbusMessage message);
-    void onError(SystemError::ErrorCode errorCode, QString& errorStr);
+    void onError(SystemError::ErrorCode errorCode, const QString& errorStr);
 
     ModbusMBAPHeader buildHeader(const ModbusMessage& request);
 
