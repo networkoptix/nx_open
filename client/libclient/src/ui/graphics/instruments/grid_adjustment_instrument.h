@@ -12,21 +12,13 @@ public:
 
     virtual ~GridAdjustmentInstrument();
 
-    const QSizeF &speed() const {
-        return m_speed;
-    }
+    qreal speed() const;
 
-    void setSpeed(const QSizeF &speed) {
-        m_speed = speed;
-    }
+    void setSpeed(qreal speed);
 
-    const QSizeF &maxSpacing() const {
-        return m_maxSpacing;
-    }
+    qreal maxSpacing() const;
 
-    void setMaxSpacing(const QSizeF &maxSpacing) {
-        m_maxSpacing = maxSpacing;
-    }
+    void setMaxSpacing(qreal maxSpacing);
 
 protected:
     virtual bool wheelEvent(QWidget *viewport, QWheelEvent *event) override;
@@ -38,8 +30,8 @@ private:
 private:
     QPointer<QWidget> m_currentViewport;
     QPointer<QnWorkbench> m_workbench;
-    QSizeF m_speed;
-    QSizeF m_maxSpacing;
+    qreal m_speed;
+    qreal m_maxSpacing;
 };
 
 

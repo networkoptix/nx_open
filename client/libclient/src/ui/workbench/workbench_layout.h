@@ -246,17 +246,15 @@ public:
 
     /**
      * \returns                         Spacing between cells of this layout,
-     *                                  relative to cell width.
+     *                                  relative to cell size.
      */
-    const QSizeF &cellSpacing() const {
-        return m_cellSpacing;
-    }
+    const qreal cellSpacing() const;
 
     /**
      * \param cellSpacing               New spacing between cells for this layout,
-     *                                  relative to cell width.
+     *                                  relative to cell size.
      */
-    void setCellSpacing(const QSizeF &cellSpacing);
+    void setCellSpacing(qreal spacing);
 
     /**
      * \returns                         Lock state of this layout.
@@ -417,7 +415,7 @@ private:
     float m_cellAspectRatio;
 
     /** Spacing between cells, relative to cell width. */
-    QSizeF m_cellSpacing;
+    qreal m_cellSpacing;
 
     /** Lock status of the layout. */
     bool m_locked;

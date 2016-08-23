@@ -139,6 +139,5 @@ private:
 
     QnUserResourcePtr m_user;
     Qn::GlobalPermissions m_globalPermissions;
-    bool m_readOnlyMode;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };

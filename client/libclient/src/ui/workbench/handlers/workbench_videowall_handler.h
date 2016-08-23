@@ -87,6 +87,7 @@ private:
 
     /** Returns id of the running client that is currently controlling provided layout. */
     QnUuid getLayoutController(const QnUuid &layoutId);
+
 private slots:
 
     void at_newVideoWallAction_triggered();
@@ -142,7 +143,7 @@ private slots:
     void at_workbenchLayout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     void at_workbenchLayout_dataChanged(int role);
 
-    void at_workbenchLayoutItem_dataChanged(int role);
+    void at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role);
 
     void at_navigator_positionChanged();
     void at_navigator_speedChanged();

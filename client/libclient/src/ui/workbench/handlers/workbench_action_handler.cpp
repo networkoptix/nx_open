@@ -41,6 +41,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
@@ -356,25 +357,27 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
 
-    if (!qFuzzyIsNull(params.rotation)) {
+    if (!qFuzzyIsNull(params.rotation))
+    {
         data.rotation = params.rotation;
     }
-    else {
+    else
+    {
         QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
         if (!forcedRotation.isEmpty())
             data.rotation = forcedRotation.toInt();
     }
     data.contrastParams = params.contrastParams;
     data.dewarpingParams = params.dewarpingParams;
-    data.dataByRole[Qn::ItemTimeRole] = params.time;
+
+    qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, params.time);
     if (params.frameDistinctionColor.isValid())
-        data.dataByRole[Qn::ItemFrameDistinctionColorRole] = params.frameDistinctionColor;
-    if (params.usePosition) {
+        qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+
+    if (params.usePosition)
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
-    }
-    else {
+    else
         data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5)); /* The fact that any position is OK is encoded into an invalid rect. */
-    }
     layout->addItem(data);
 }
 
@@ -586,8 +589,9 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     submitDelayedDrops();
 }
 
-void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
-    qreal value = workbench()->currentLayout()->cellSpacing().width();
+void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged()
+{
+    qreal value = workbench()->currentLayout()->cellSpacing();
 
     if (qFuzzyCompare(0.0, value))
         action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
@@ -1208,7 +1212,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         question,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.setInformativeText(information);
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
     messageBox.addCustomWidget(new QnResourceListView(resources));
@@ -1464,12 +1468,13 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation = widget->item()->rotation();
-        item.dataByRole[Qn::ItemPausedRole] = true;
-        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(localPeriod);
-        item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
-        item.dataByRole[Qn::ItemTimeRole] = localTime;
-        item.dataByRole[Qn::ItemAspectRatioRole] = desiredItemAspectRatio;  // set aspect ratio to make thumbnails load in all cases, see #2619
-        item.dataByRole[Qn::TimePeriodsRole] = QVariant::fromValue<QnTimePeriodList>(localPeriods);
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderSelectionRole, localPeriod);
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderWindowRole, period);
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, localTime);
+        // set aspect ratio to make thumbnails load in all cases, see #2619
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemAspectRatioRole, desiredItemAspectRatio);
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::TimePeriodsRole, localPeriods);
 
         layout->addItem(item);
 
@@ -1816,22 +1821,22 @@ void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.0);
     action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.1, 0.1));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.1);
     action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.2, 0.2));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.2);
     action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
+    workbench()->currentLayout()->resource()->setCellSpacing(0.3);
     action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
 }
 
@@ -1923,9 +1928,11 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
     int minHeight = qMax(brect.height(), qnGlobals->layoutBackgroundMinSize().height());
 
     qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    if (layout->hasCellAspectRatio()) {
-        qreal cellWidth = 1.0 + layout->cellSpacing().width();
-        qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
+    if (layout->hasCellAspectRatio())
+    {
+        const auto spacing = layout->cellSpacing();
+        qreal cellWidth = 1.0 + spacing;
+        qreal cellHeight = 1.0 / layout->cellAspectRatio() + spacing;
         cellAspectRatio = cellWidth / cellHeight;
     }
 

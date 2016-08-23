@@ -252,6 +252,7 @@ QPushButton *QnMessageBox::addButton(
     Q_D(QnMessageBox);
 
     QPushButton *addedButton = ui->buttonBox->addButton(text, role);
+    d->customButtons.append(addedButton);
 
     if (!d->escapeButton)
         d->detectEscapeButton();
@@ -267,6 +268,7 @@ QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
     Q_D(QnMessageBox);
 
     QPushButton *addedButton = ui->buttonBox->addButton(button);
+    d->customButtons.append(addedButton);
 
     if (!d->escapeButton)
         d->detectEscapeButton();

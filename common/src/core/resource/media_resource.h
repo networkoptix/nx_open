@@ -67,9 +67,9 @@ public:
     static QString motionStreamKey();
 
     static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
+
 protected:
     void initMediaResource();
-    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;

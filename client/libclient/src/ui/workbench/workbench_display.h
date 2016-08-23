@@ -381,7 +381,7 @@ protected slots:
     void at_item_geometryDeltaChanged();
     void at_item_zoomRectChanged();
     void at_item_rotationChanged();
-    void at_item_dataChanged(int role);
+    void at_item_dataChanged(Qn::ItemDataRole role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
     void at_widgetActivityInstrument_activityStopped();

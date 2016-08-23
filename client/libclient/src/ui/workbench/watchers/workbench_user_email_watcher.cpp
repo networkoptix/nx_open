@@ -7,42 +7,51 @@
 
 #include <ui/workbench/workbench_context.h>
 
-QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
+QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
-        at_resourcePool_resourceAdded(resource);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchUserEmailWatcher::forceCheckAll);
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+        at_resourcePool_resourceAdded(user);
+
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &QnWorkbenchUserEmailWatcher::forceCheckAll);
 }
 
-QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher() {
-    while(!m_emailValidByUser.empty())
+QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher()
+{
+    while (!m_emailValidByUser.empty())
         at_resourcePool_resourceRemoved(m_emailValidByUser.keys().back());
 }
 
-void QnWorkbenchUserEmailWatcher::forceCheck(const QnUserResourcePtr &user) {
+void QnWorkbenchUserEmailWatcher::forceCheck(const QnUserResourcePtr &user)
+{
     if (!context()->user())
         return;
 
     emit userEmailValidityChanged(user, m_emailValidByUser.value(user, isUserEmailValid(user)));
 }
 
-void QnWorkbenchUserEmailWatcher::forceCheckAll() {
+void QnWorkbenchUserEmailWatcher::forceCheckAll()
+{
     if (!context()->user())
         return;
 
     QHash<QnUserResourcePtr, bool>::const_iterator iter = m_emailValidByUser.constBegin();
-    while (iter != m_emailValidByUser.constEnd()) {
+    while (iter != m_emailValidByUser.constEnd())
+    {
         emit userEmailValidityChanged(iter.key(), iter.value());
         ++iter;
     }
 }
 
-bool QnWorkbenchUserEmailWatcher::isUserEmailValid(const QnUserResourcePtr &user) const {
+bool QnWorkbenchUserEmailWatcher::isUserEmailValid(const QnUserResourcePtr &user) const
+{
     NX_ASSERT(user, Q_FUNC_INFO, "User must exist here");
     if (!user)
         return true;
@@ -52,26 +61,29 @@ bool QnWorkbenchUserEmailWatcher::isUserEmailValid(const QnUserResourcePtr &user
 }
 
 
-void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
+{
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user)
+    if (!user)
         return;
 
-    auto safeCheck = [this](const QnResourcePtr &resource) {
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (!user)
-            return;
-        checkUser(user);
-    };
+    auto safeCheck = [this](const QnResourcePtr &resource)
+        {
+            QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+            if (!user)
+                return;
+            checkUser(user);
+        };
 
     connect(user, &QnUserResource::emailChanged, this, safeCheck);
     connect(user, &QnUserResource::enabledChanged, this, safeCheck);
     checkUser(user);
 }
 
-void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
+{
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user)
+    if (!user)
         return;
 
     disconnect(user.data(), NULL, this, NULL);
@@ -82,7 +94,8 @@ void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved(const QnResour
     m_emailValidByUser.remove(user);
 }
 
-void QnWorkbenchUserEmailWatcher::checkUser(const QnUserResourcePtr &user) {
+void QnWorkbenchUserEmailWatcher::checkUser(const QnUserResourcePtr &user)
+{
     bool valid = isUserEmailValid(user);
     if (m_emailValidByUser.contains(user) && m_emailValidByUser[user] == valid)
         return;

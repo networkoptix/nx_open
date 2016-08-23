@@ -13,18 +13,20 @@ Qn::FixedRotation fixedRotationFromDegrees(qreal degrees){
     return static_cast<Qn::FixedRotation>(qFloor(result / 90) * 90);
 }
 
-QnFixedRotationTransform::QnFixedRotationTransform(QObject *parent): 
-    base_type(parent) 
+QnFixedRotationTransform::QnFixedRotationTransform(QObject *parent):
+    base_type(parent)
 {
-    connect(this, SIGNAL(angleChanged()), this, SLOT(updateOrigin()));
+    connect(this, &QGraphicsRotation::angleChanged, this, &QnFixedRotationTransform::updateOrigin);
 }
-    
+
 QGraphicsWidget *QnFixedRotationTransform::target() {
     return m_target.data();
 }
 
-void QnFixedRotationTransform::setTarget(QGraphicsWidget *target) {
-    if(m_target) {
+void QnFixedRotationTransform::setTarget(QGraphicsWidget *target)
+{
+    if (m_target)
+    {
         disconnect(m_target.data(), NULL, this, NULL);
 
         QList<QGraphicsTransform *> transformations = m_target.data()->transformations();
@@ -34,8 +36,9 @@ void QnFixedRotationTransform::setTarget(QGraphicsWidget *target) {
 
     m_target = target;
 
-    if(m_target) {
-        connect(m_target.data(), SIGNAL(geometryChanged()), this, SLOT(updateOrigin()));
+    if (m_target)
+    {
+        connect(target, &QGraphicsWidget::geometryChanged, this, &QnFixedRotationTransform::updateOrigin);
 
         QList<QGraphicsTransform *> transformations = m_target.data()->transformations();
         transformations.push_back(this);

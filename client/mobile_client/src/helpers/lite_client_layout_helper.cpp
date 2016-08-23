@@ -218,7 +218,7 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& ca
             QnLayoutItemData item = *it;
             item.resource.id = id;
             item.resource.uniqueId = camera->getUniqueId();
-            d->layout->updateItem(it->uuid, item);
+            d->layout->updateItem(item);
         }
     }
 

@@ -20,7 +20,7 @@
 
 
 QnNetworkResource::QnNetworkResource():
-    QnResource(),
+    base_type(),
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
@@ -217,14 +217,12 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
     return m_networkTimeout;
 }
 
-void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnNetworkResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
-    QnMutexLocker mutexLocker( &m_mutex );
-    QnResource::updateInner(other, modifiedFields);
+    base_type::updateInternal(other, notifiers);
     QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
     if (other_casted)
     {
-        //m_auth = other_casted->m_auth;    //auth moved to resource properties
         m_macAddress = other_casted->m_macAddress;
     }
 }
