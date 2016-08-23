@@ -428,7 +428,7 @@ struct ModifyResourceAccess
                 .arg(getTransactionDescriptorByParam<Param>()->getName())
                 .arg(!(bool)userResource)
                 .arg(!(bool)target),
-                cl_logDEBUG1);
+                cl_logWARNING);
 
         return result;
     }
@@ -544,18 +544,27 @@ struct ModifyCameraAttributesAccess
             return true;
 
         if (!resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission))
+        {
+            qWarning() << "save ApiCameraAttributesData forbidden because no save permissions. id=" << param.cameraID;
             return false;
+        }
 
         QnCamLicenseUsageHelper licenseUsageHelper;
         QnVirtualCameraResourceList cameras;
 
         auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
         if (!camera)
+        {
+            qWarning() << "save ApiCameraAttributesData forbidden because camera object is not exists. id=" << param.cameraID;
             return false;
+        }
 
         licenseUsageHelper.propose(camera, param.scheduleEnabled);
         if (licenseUsageHelper.isOverflowForCamera(camera))
+        {
+            qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraID;
             return false;
+        }
 
         return true;
     }
@@ -674,11 +683,19 @@ struct RemoveUserGroupAccess
     bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
     {
         if (!AdminOnlyAccess()(accessData, param))
+        {
+            qWarning() << "Remove user group forbidden because user has no admin access";
             return false;
+        }
 
-        for (const auto& user: qnResPool->getResources<QnUserResource>())
+        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        {
             if (user->userGroup() == param.id)
+            {
+                qWarning() << "Remove user group forbidden because group is still using by user " << user->getName();
                 return false;
+            }
+        }
 
         return true;
     }
@@ -697,7 +714,7 @@ struct ControlVideowallAccess
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");
             NX_LOG(lit("Access check for ApiVideoWallControlMessageData failed for user %1")
                 .arg(userName),
-                cl_logDEBUG1);
+                cl_logWARNING);
         }
         return result;
     }
@@ -777,7 +794,7 @@ struct ModifyListAccess
                 .arg(paramContainer.size() - tmpContainer.size())
                 .arg(paramContainer.size())
                 .arg(getTransactionDescriptorByParam<ParamContainer>()->getName()),
-                cl_logDEBUG1);
+                cl_logWARNING);
             return false;
         }
         return true;
