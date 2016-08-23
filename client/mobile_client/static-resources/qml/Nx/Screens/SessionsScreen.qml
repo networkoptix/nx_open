@@ -95,25 +95,6 @@ Page
         displayMarginBeginning: 16
         displayMarginEnd: 16 + mainWindow.bottomPadding
 
-        footer: Item
-        {
-            width: parent.width
-            height: customConnectionButton.y + customConnectionButton.height
-
-            Button
-            {
-                id: customConnectionButton
-
-                text: qsTr("Connect to Another Server")
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: getDeviceIsPhone() ? parent.availableWidth : implicitWidth
-                y: 10
-
-                onClicked: Workflow.openNewSessionScreen()
-            }
-        }
-
         focus: true
 
         Keys.onPressed:
@@ -124,6 +105,32 @@ Page
                 Workflow.openNewSessionScreen()
                 event.accepted = true
             }
+        }
+    }
+
+    footer: Rectangle
+    {
+        implicitHeight: customConnectionButton.implicitHeight + 16
+        color: ColorTheme.windowBackground
+
+        Rectangle
+        {
+            width: parent.width
+            height: 1
+            anchors.top: parent.top
+            color: ColorTheme.base4
+        }
+
+        Button
+        {
+            id: customConnectionButton
+
+            text: qsTr("Connect to Another Server")
+
+            anchors.centerIn: parent
+            width: getDeviceIsPhone() ? parent.width - 16 : implicitWidth
+
+            onClicked: Workflow.openNewSessionScreen()
         }
     }
 
