@@ -2,7 +2,9 @@
 #include <QtCore/QIODevice>
 #include <QtCore/QDataStream>
 
-namespace nx_modbus
+namespace nx
+{
+namespace modbus
 {
 
 QString exceptionDescriptionByCode(quint8 exceptionCode)
@@ -169,4 +171,6 @@ void ModbusMessage::clear()
     data.clear();
 }
 
-}
+} //< Closing namespace modbus
+
+} //< Closing namespace nx

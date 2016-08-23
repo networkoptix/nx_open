@@ -3,7 +3,9 @@
 #include <qglobal.h>
 #include <nx/network/buffer.h>
 
-namespace nx_modbus
+namespace nx
+{
+namespace modbus
 {
 
 const quint16 kDefaultModbusPort = 502;
@@ -144,4 +146,6 @@ struct ModbusIdResponseData
     static ModbusIdResponseData decode(const QByteArray& response);
 };
 
-}
+} //< Closing namespace modbus.
+
+} //< Closing namespace nx.

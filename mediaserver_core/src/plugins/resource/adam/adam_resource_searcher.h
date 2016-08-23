@@ -43,12 +43,12 @@ public:
 
 private:
     QString generatePhysicalId(const QString& url) const;
-    QByteArray executeAsciiCommand(nx_modbus::QnModbusClient& client, const QString& command);
-    QString getAdamModuleName(nx_modbus::QnModbusClient& client);
-    QString getAdamModuleFirmware(nx_modbus::QnModbusClient& client);
+    QByteArray executeAsciiCommand(nx::modbus::QnModbusClient& client, const QString& command);
+    QString getAdamModuleName(nx::modbus::QnModbusClient& client);
+    QString getAdamModuleFirmware(nx::modbus::QnModbusClient& client);
 
 private:
-    std::shared_ptr<nx_modbus::QnModbusClient> m_modbusClient;
+    std::shared_ptr<nx::modbus::QnModbusClient> m_modbusClient;
 };
 
 #endif //< ENABLE_ADVANTECH

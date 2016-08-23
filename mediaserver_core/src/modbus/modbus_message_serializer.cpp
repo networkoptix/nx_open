@@ -1,6 +1,9 @@
 #include "modbus_message_serializer.h"
 
-namespace nx_modbus
+namespace nx
+{
+
+namespace modbus
 {
 
 ModbusMessageSerializer::ModbusMessageSerializer():
@@ -24,7 +27,7 @@ nx_api::SerializerState::Type ModbusMessageSerializer::serialize(nx::Buffer* con
     return nx_api::SerializerState::done;
 }
 
-nx::Buffer nx_modbus::ModbusMessageSerializer::serialized(const ModbusMessage& message)
+nx::Buffer ModbusMessageSerializer::serialized(const ModbusMessage& message)
 {
     return message.encode();
 }
@@ -52,4 +55,6 @@ nx_api::SerializerState::Type ModbusMessageSerializer::serializeData(nx::Buffer*
     return nx_api::SerializerState::done;
 }
 
-}
+} //< Closing namespace modbus
+
+} //< Closing namespace nx

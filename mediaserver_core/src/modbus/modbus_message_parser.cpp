@@ -1,6 +1,8 @@
 #include "modbus_message_parser.h"
 
-namespace nx_modbus
+namespace nx
+{
+namespace modbus
 {
 
 ModbusMessageParser::ModbusMessageParser() :
@@ -84,4 +86,6 @@ ModbusMessageParser::State ModbusMessageParser::parseData(const nx::Buffer& buff
     return m_state;
 }
 
-}
+} //< Closing namespace modbus
+
+} //< Closing namespace nx

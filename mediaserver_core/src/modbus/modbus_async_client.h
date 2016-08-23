@@ -8,17 +8,18 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 
+namespace nx
+{
+namespace modbus
+{
+
+using ModbusProtocolConnection =
+    nx_api::BaseStreamProtocolConnectionEmbeddable<
+        ModbusMessage,
+        ModbusMessageParser,
+        ModbusMessageSerializer>;
 
 using namespace nx::network;
-
-using ModbusProtocolConnection = 
-    nx_api::BaseStreamProtocolConnectionEmbeddable<
-        nx_modbus::ModbusMessage,
-        nx_modbus::ModbusMessageParser,
-        nx_modbus::ModbusMessageSerializer>;
-
-namespace nx_modbus
-{
 
 class QnModbusAsyncClient: 
     public QObject,
@@ -45,17 +46,17 @@ public:
 
     void setEndpoint(const SocketAddress& endpoint);
 
-    void doModbusRequestAsync(const ModbusMessage& request);
+    void doModbusRequestAsync(ModbusMessage request);
 
-    quint16 readDiscreteInputsAsync(quint16 startRegister, quint16 registerCount);
+    void readDiscreteInputsAsync(quint16 startRegister, quint16 registerCount, quint16* outTransactionId);
 
-    quint16 readCoilsAsync(quint16 startCoil, quint16 coilNumber);
-    quint16 writeCoilsAsync(quint16 startCoilAddress, const QByteArray& data);
+    void readCoilsAsync(quint16 startCoil, quint16 coilNumber, quint16* outTransactionId);
+    void writeCoilsAsync(quint16 startCoilAddress, const QByteArray& data, quint16* outTransactionId);
 
-    quint16 readInputRegistersAsync(quint16 startRegister, quint16 registerCount);
+    void readInputRegistersAsync(quint16 startRegister, quint16 registerCount, quint16* outTransactionId);
 
-    quint16 readHoldingRegistersAsync(quint32 startRegister, quint32 registerCount);
-    quint16 writeHoldingRegistersAsync(quint32 startRegister, const QByteArray& data);
+    void readHoldingRegistersAsync(quint32 startRegister, quint32 registerCount, quint16* outTransactionId);
+    void writeHoldingRegistersAsync(quint32 startRegister, const QByteArray& data, quint16* outTransactionId);
 
     QString getLastErrorString() const;
 
@@ -68,6 +69,8 @@ public:
     virtual void stopWhileInAioThread() override;
 
 signals:
+    // Only Qt::DirectConnection can be used to connect to these signals
+    // Otherwise, client can be in an unidentified state upon signal delivery
     void done(ModbusMessage response);
     void error();
 
@@ -92,6 +95,8 @@ private:
     mutable QnMutex m_mutex; 
 };
 
-}
+} //< close namespace modbus
+
+} //< close namespace nx
 
 

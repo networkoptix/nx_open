@@ -4,8 +4,12 @@
 
 #include <nx/network/connection_server/base_protocol_message_types.h>
 
-namespace nx_modbus
+namespace nx
 {
+
+namespace modbus
+{
+
 class ModbusMessageSerializer
 {
 
@@ -27,4 +31,7 @@ private:
     const ModbusMessage* m_message;
     bool m_initialized;
 };
-}
+
+} //< Closing namespace modbus
+
+} //< Closing namespace nx
