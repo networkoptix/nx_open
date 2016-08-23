@@ -134,6 +134,30 @@ Page
         }
     }
 
+    DummyMessage
+    {
+        id: dummyMessage
+
+        anchors.fill: parent
+        anchors.topMargin: -16
+        anchors.bottomMargin: -24
+        title: qsTr("No servers found")
+        description: qsTr(
+             "Check your network connection or press \"%1\" button "
+                 + "to enter a known server address.").arg(customConnectionButton.text)
+        visible: false
+
+        Timer
+        {
+            interval: 1000
+            running: true
+            onTriggered:
+            {
+                dummyMessage.visible = Qt.binding(function() { return sessionsList.count == 0 })
+            }
+        }
+    }
+
     function openConnectionWarningDialog(systemName)
     {
         var message = systemName ?
