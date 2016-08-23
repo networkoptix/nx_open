@@ -436,12 +436,12 @@ void QnUpdateProcess::at_checkFreeSpaceTask_finished(
 {
     if (errorCode != 0)
     {
-        auto warning = new QnLowFreeSpaceWarning;
-        warning->failedPeers = failedPeers;
+        QnLowFreeSpaceWarning warning;
+        warning.failedPeers = failedPeers;
 
         emit lowFreeSpaceWarning(warning);
 
-        if (!warning->ignore)
+        if (!warning.ignore)
         {
             setAllPeersStage(QnPeerUpdateStage::Init);
             m_failedPeerIds = failedPeers;

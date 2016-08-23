@@ -45,7 +45,7 @@ private slots:
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
     void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
-    void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning* lowFreeSpaceWarning);
+    void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
 
 private:
     void initSourceMenu();
