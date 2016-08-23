@@ -22,7 +22,6 @@
 		<PROJECT_NAME>consolebuildtest</PROJECT_NAME>
 
         <VALID_ARCHS>armv7 armv7s arm64</VALID_ARCHS>
-        <DEVELOPER_NAME>${ios.sign.identity}</DEVELOPER_NAME>
         <PROVISIONING_PROFILE>../customization/${customization}/ios-client/testing.mobileprovision</PROVISIONING_PROFILE>
         <MAVEN_MINIMUM_IOS_VERSION>${ios.minimum_os_version}</MAVEN_MINIMUM_IOS_VERSION>
 

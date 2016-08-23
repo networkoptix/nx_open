@@ -1,11 +1,13 @@
 #ifndef DEFAULT_REF_COUNTER_H
 #define DEFAULT_REF_COUNTER_H
 
+#include <typeinfo>
+#include "object_counter.h"
 #include <plugins/plugin_tools.h>
 
-#include "object_counter.h"
+extern Logger logger;
 
-namespace nxpl
+namespace ite
 {
     inline bool operator == ( const nxpl::NX_GUID& id1, const nxpl::NX_GUID& id2 )
     {
@@ -16,18 +18,29 @@ namespace nxpl
         }
         return true;
     }
-}
 
-#define DEF_REF_COUNTER \
-    public: \
-        virtual unsigned int addRef() override; \
-        virtual unsigned int releaseRef() override; \
-        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override; \
-    private: \
+    template <typename T>
+    class DefaultRefCounter : public T
+    {
+    public:
+        virtual unsigned int addRef() override { return m_refManager.addRef(); }
+        virtual unsigned int releaseRef() override
+        {
+            int refCount = m_refManager.releaseRef();
+            return refCount;
+        }
+
+    protected:
         nxpt::CommonRefManager m_refManager;
 
-#define DEFAULT_REF_COUNTER(ClassName) \
-    unsigned int ClassName::addRef() { return m_refManager.addRef(); } \
-    unsigned int ClassName::releaseRef() { return m_refManager.releaseRef(); }
+        DefaultRefCounter()
+        :   m_refManager(static_cast<T*>(this))
+        {}
+
+        DefaultRefCounter(nxpt::CommonRefManager * refManager)
+        :   m_refManager(refManager)
+        {}
+    };
+}
 
 #endif //DEFAULT_REF_COUNTER_H

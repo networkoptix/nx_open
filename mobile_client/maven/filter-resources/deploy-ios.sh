@@ -13,7 +13,14 @@ else
     IPA_SUFFIX="debug"
 fi
 
+if [ -f "${provisioning_profile}" ]
+then
+    XCRUN_PROVISION_ARGS="--embed ${provisioning_profile}"
+else
+    XCRUN_PROVISION_ARGS=
+fi
+
 /usr/bin/xcrun -sdk "${TARGET_SDK}" PackageApplication \
     -v "${libdir}/bin/${build.configuration}/${project.artifactId}.app" \
     -o "${project.build.directory}/revamped-${installer.name}-${project.version.name}.${project.version.code}-$IPA_SUFFIX.ipa" \
-    --embed "${provisioning_profile}"
+    ${XCRUN_PROVISION_ARGS}

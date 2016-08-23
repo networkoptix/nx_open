@@ -69,7 +69,19 @@ HostAddress& HostAddress::operator=( HostAddress&& rhs )
 
 bool HostAddress::operator==( const HostAddress& rhs ) const
 {
-    return toString() == rhs.toString();
+    if (isResolved() != rhs.isResolved())
+        return false;
+
+    if (!isResolved())
+        return toString() == rhs.toString();
+
+    if (ipV4() && rhs.ipV4())
+        return memcmp(m_ipV4.get_ptr(), rhs.m_ipV4.get_ptr(), sizeof(*m_ipV4)) == 0;
+
+    if (ipV6() && rhs.ipV6())
+        return memcmp(m_ipV6.get_ptr(), rhs.m_ipV6.get_ptr(), sizeof(*m_ipV6)) == 0;
+
+    return false;
 }
 
 bool HostAddress::operator<( const HostAddress& rhs ) const
@@ -79,7 +91,7 @@ bool HostAddress::operator<( const HostAddress& rhs ) const
 
 static const QString kIpVersionConvertPart = QLatin1String("::ffff:");
 
-QString HostAddress::toString() const
+const QString& HostAddress::toString() const
 {
     if (m_string)
         return *m_string;
@@ -120,7 +132,7 @@ QString HostAddress::toString() const
     return *m_string;
 }
 
-boost::optional<in_addr> HostAddress::ipV4() const
+const boost::optional<in_addr>& HostAddress::ipV4() const
 {
     if (m_ipV4)
         return m_ipV4;
@@ -155,7 +167,7 @@ boost::optional<in_addr> HostAddress::ipV4() const
     return m_ipV4;
 }
 
-boost::optional<in6_addr> HostAddress::ipV6() const
+const boost::optional<in6_addr>& HostAddress::ipV6() const
 {
     if (m_ipV6)
         return m_ipV6;
@@ -196,6 +208,11 @@ bool HostAddress::isLocal() const
         || string.startsWith(QLatin1String("192.168")) // IPv4 private
         || string.startsWith(QLatin1String("fd00::")) // IPv6 private
         || string.startsWith(QLatin1String("fe80::")); // IPv6 link-local
+}
+
+bool HostAddress::isResolved() const
+{
+    return ipV4() || ipV6();
 }
 
 boost::optional<QString> HostAddress::ipToString(const in_addr& addr)

@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <mutex>
+#include <stdexcept>
+#include "object_counter.h"
 
 extern "C"
 {
@@ -14,6 +16,8 @@ extern "C"
 }
 
 #include "rc_command.h"
+
+extern Logger logger;
 
 namespace ite
 {
@@ -39,7 +43,7 @@ namespace ite
     };
 
     ///
-    class DtvException
+    class DtvException : public std::exception
     {
     public:
         /// @warning static strings only
@@ -48,7 +52,7 @@ namespace ite
             m_code(code)
         {}
 
-        const char * what() const { return m_msg; }
+        virtual const char * what() const noexcept override { return m_msg; }
         unsigned code() const { return m_code; }
 
     private:
@@ -118,47 +122,65 @@ namespace ite
         //
 
         It930x(uint16_t rxID)
-        :   m_rxID(rxID)
+            : m_rxID(rxID),
+              m_opened(false)
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
 
             m_handle = DTV_DeviceOpen(ENDEAVOUR, rxID);
+            ITE_LOG() << FMT("DTV_DeviceOpen for Rx %d returned %d", m_rxID, m_handle);
             if (m_handle < 0)
                 throw DtvException("DTV_DeviceOpen", rxID);
+            m_opened = true;
         }
 
         ~It930x()
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
 
+            if (!m_opened)
+                return;
+
             m_devStream.reset();
             DTV_DeviceClose(m_handle);
         }
 
         // both in KHz
-        void lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
+        bool lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
-
-            if (m_devStream)
-                throw DtvException("It930x.lockFrequency()", 0);
-
-            unsigned ret = DTV_AcquireChannel(m_handle, frequency, bandwidth);
-            if (ret)
-                throw DtvException("DTV_AcquireChannel", ret);
-
             Bool isLocked = False;
-            ret = DTV_IsLocked(m_handle, &isLocked);
-            if (ret)
-                throw DtvException("DTV_IsLocked", ret);
+
+            try
+            {
+                if (m_devStream)
+                    throw DtvException("It930x.lockFrequency() DevStream is NOT null", 0);
+
+                unsigned ret = DTV_AcquireChannel(m_handle, frequency, bandwidth);
+                if (ret)
+                    throw DtvException("It930x.lockFrequency() DTV_AcquireChannel failed", ret);
+
+                ret = DTV_IsLocked(m_handle, &isLocked);
+                if (ret)
+                    throw DtvException("It930x.lockFrequency() DTV_IsLocked failed", ret);
+
+            }
+            catch (const std::exception& e)
+            {
+                printf("It930x.lockFrequency() exception: %s\n", e.what());
+                return false;
+            }
+
+            if (!isLocked)
+                return false;
 
             m_devStream.reset( new It930Stream(this) );
+            return true;
         }
 
         void unlockFrequency()
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
-
             m_devStream.reset();
         }
 #if 0
@@ -176,7 +198,13 @@ namespace ite
             DTVStatistic statisic;
             unsigned ret = DTV_GetStatistic(m_handle, &statisic);
             if (ret)
-                throw DtvException("DTV_GetStatistic", ret);
+            {
+                printf("DTV_GetStatistic failed: %d\n", ret);
+                quality = 0;
+                strength = 0;
+                presented = false;
+                return;
+            }
 
             quality = statisic.signalQuality;
             strength = statisic.signalStrength;
@@ -193,7 +221,10 @@ namespace ite
             DemodDriverInfo driverInfo;
             int ret = DTV_GetDriverInformation(m_handle, &driverInfo);
             if (ret)
-                throw DtvException("DTV_GetDriverInformation", ret);
+            {
+                printf("DTV_GetDriverInformation failed %d\n", ret);
+                return;//throw DtvException("DTV_GetDriverInformation", ret);
+            }
 
             strncpy(info.driverVersion, (const char *)driverInfo.DriverVersion, 16);
             strncpy(info.APIVersion,    (const char *)driverInfo.APIVersion, 32);
@@ -207,11 +238,21 @@ namespace ite
         {
 #if 0
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
-
+            printf("[Rx] Resetting\n");
             Byte value = 1; // some magic value from sample
             int ret = DTV_RX_Reset(m_handle, &value);
-            if (ret)
-                throw DtvException("DTV_RX_Reset", ret);
+            try
+            {
+                if (ret)
+                {
+                    printf("[Rx] Reset failed\n");
+                    throw DtvException("DTV_RX_Reset", ret);
+                }
+                else
+                    printf("[Rx] Reset success\n");
+            }
+            catch(...)
+            {}
 #endif
         }
 
@@ -236,10 +277,11 @@ namespace ite
         bool hasStream() const { return m_devStream.get(); }
 
     private:
-        static std::mutex m_rcMutex;
+        mutable std::mutex m_rcMutex;
         int m_handle;
         uint16_t m_rxID;
         std::unique_ptr<It930Stream> m_devStream;
+        bool m_opened;
 
 #if 0
         void getDeviceID() const
