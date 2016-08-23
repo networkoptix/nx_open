@@ -308,10 +308,6 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     deleteDialogs();
 }
 
-ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
-    return QnAppServerConnectionFactory::getConnection2();
-}
-
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
     if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
