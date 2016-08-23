@@ -217,7 +217,7 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
     for (const QnMediaResourcePtr &resource: m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(resource);
+        auto loader = context()->instance<QnCameraDataManager>()->loader(resource);
         if (!loader)
             continue;
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);

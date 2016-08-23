@@ -30,8 +30,9 @@ class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
 class QnThumbnailsLoader;
-class QnCameraDataManager;
 class QnCachingCameraDataLoader;
+typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
+class QnCameraDataManager;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
@@ -213,7 +214,7 @@ protected slots:
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
-    QnCachingCameraDataLoader* loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
+    QnCachingCameraDataLoaderPtr loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
