@@ -799,7 +799,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (status != 0)
     {
-        QString question = QnDeviceDependentStrings::getNameFromSet(
+        const auto question = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
                 tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
@@ -838,7 +838,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (!errorResources.empty())
     {
-        QString question = QnDeviceDependentStrings::getNameFromSet(
+        const auto question = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
                 tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
@@ -1180,22 +1180,14 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
     });
 
-    QString question;
-    if (cameras.size() == resources.size())
-    {
-        question = QnDeviceDependentStrings::getNameFromSet(
+    const auto question = (cameras.size() == resources.size())
+        ? QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Do you really want to delete the following %n devices?", "", cameras.size()),
                 tr("Do you really want to delete the following %n cameras?", "", cameras.size()),
                 tr("Do you really want to delete the following %n I/O modules?", "", cameras.size())
-                ),
-            cameras
-            );
-    }
-    else
-    {
-        question = tr("Do you really want to delete the following %n items?", "", resources.size());
-    }
+            ), cameras)
+        : tr("Do you really want to delete the following %n items?", "", resources.size());
 
     QString information;
     if (!onlineAutoDiscoveredCameras.isEmpty())

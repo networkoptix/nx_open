@@ -194,7 +194,7 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
     {
         auto unsavedCameras = m_settingsWidget->cameras();
 
-        const QString question = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        const auto question = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
             tr("Apply changes to the following %n devices?", "", unsavedCameras.size()),
             tr("Apply changes to the following %n cameras?", "", unsavedCameras.size()),
             tr("Apply changes to the following %n I/O modules?", "", unsavedCameras.size())
