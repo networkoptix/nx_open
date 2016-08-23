@@ -588,6 +588,10 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         ErrorCode getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database);
+
+        template<typename F>
+        ErrorCode cleanupAccessRightsAfterAction(F action, const QnUuid& resourceId);
+
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
