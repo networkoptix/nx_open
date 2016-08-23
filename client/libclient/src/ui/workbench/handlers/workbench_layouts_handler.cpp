@@ -23,7 +23,6 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/layout_name_dialog.h>
-#include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/messages/layouts_handler_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -370,18 +369,23 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
 void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave)
 {
-
     if (items.size() > 1)
     {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            QnActionParameterTypes::resources(items),
+        const auto question = tr("Are you sure you want to remove these %n items from layout?",
+            "", items.size());
+
+        QnMessageBox messageBox(
+            QnMessageBox::Warning,
             Qn::RemoveItems_Help,
             tr("Remove Items"),
-            tr("Are you sure you want to remove these %n items from layout?", "", items.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
-        );
-        if (button != QDialogButtonBox::Yes)
+            tr("Confirm items removing"),
+            QDialogButtonBox::Yes | QDialogButtonBox::No,
+            mainWindow());
+        messageBox.setDefaultButton(QDialogButtonBox::Yes);
+        messageBox.setInformativeText(question);
+        messageBox.addCustomWidget(new QnResourceListView(QnActionParameterTypes::resources(items)));
+        auto result = messageBox.exec();
+        if (result != QDialogButtonBox::Yes)
             return;
     }
 
@@ -1103,15 +1107,21 @@ void QnWorkbenchLayoutsHandler::at_layout_saved(bool success, const QnLayoutReso
     if (!layout->hasFlags(Qn::local) || QnWorkbenchLayout::instance(layout))
         return;
 
-    int button = QnResourceListDialog::exec(
-        mainWindow(),
-        QnResourceList() << layout,
+    const auto question = tr("Could not save the following layout to Server. Do you want to restore it?");
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
         tr("Error"),
-        tr("Could not save the following %n layout(s) to Server.", "", 1),
-        tr("Do you want to restore these %n layout(s)?", "", 1),
-        QDialogButtonBox::Yes | QDialogButtonBox::No
-    );
-    if (button == QDialogButtonBox::Yes)
+        tr("Cannot save layout"),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox.setInformativeText(question);
+    messageBox.addCustomWidget(new QnResourceListView(QnResourceList() << layout));
+    auto result = messageBox.exec();
+
+    if (result == QDialogButtonBox::Yes)
     {
         workbench()->addLayout(new QnWorkbenchLayout(layout, this));
         workbench()->setCurrentLayout(workbench()->layouts().back());

@@ -14,10 +14,9 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
 
-#include <ui/dialogs/resource_list_dialog.h>
-
+#include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_settings_widget.h>
-
+#include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
@@ -181,33 +180,49 @@ void QnCameraSettingsDialog::updateReadOnly()
     m_settingsWidget->setReadOnly(!permissions.testFlag(Qn::WritePermission));
 }
 
-void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &cameras, bool force /* = false*/) {
+void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
+{
 
     bool askConfirmation =
-           !force
+        !force
         &&  isVisible()
-        &&  m_settingsWidget->cameras() != cameras
+        && m_settingsWidget->cameras() != cameras
         && !m_settingsWidget->cameras().isEmpty()
-        &&  (m_settingsWidget->hasDbChanges());
+        && (m_settingsWidget->hasDbChanges());
 
-    if (askConfirmation) {
+    if (askConfirmation)
+    {
         auto unsavedCameras = m_settingsWidget->cameras();
 
-        const QString askMessage = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
-            tr("Apply changes to the following %n devices?",     "", unsavedCameras.size()),
-            tr("Apply changes to the following %n cameras?",     "", unsavedCameras.size()),
+        const auto question = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+            tr("Apply changes to the following %n devices?", "", unsavedCameras.size()),
+            tr("Apply changes to the following %n cameras?", "", unsavedCameras.size()),
             tr("Apply changes to the following %n I/O modules?", "", unsavedCameras.size())
-            ), unsavedCameras);
+        ), unsavedCameras);
 
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            this,
-            unsavedCameras,
+        QnMessageBox messageBox(
+            QnMessageBox::Warning,
+            Qn::Empty_Help,
             tr("Changes are not saved"),
-            askMessage,
-            QDialogButtonBox::Yes | QDialogButtonBox::No
-            );
-        if(button == QDialogButtonBox::Yes)
-            submitToResources();
+            tr("Changes are not saved"),
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+            mainWindow());
+        messageBox.setDefaultButton(QDialogButtonBox::Yes);
+        messageBox.setInformativeText(question);
+        messageBox.addCustomWidget(new QnResourceListView(unsavedCameras));
+        auto result = messageBox.exec();
+        switch (result)
+        {
+            case QDialogButtonBox::Yes:
+                submitToResources();
+                break;
+            case QDialogButtonBox::No:
+                break;
+            default:
+                /* Cancel changes. */
+                return;
+        }
+
     }
 
     m_settingsWidget->setCameras(cameras);
