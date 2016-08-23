@@ -1,67 +1,14 @@
-/**********************************************************
-* Oct 5, 2015
-* akolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef NX_LOG_MESSAGE_H
-#define NX_LOG_MESSAGE_H
-
-#include <chrono>
 #include <memory>
 #include <string>
 #include <type_traits>
 
 #include <QtCore/QByteArray>
-#include <QtCore/QString>
 #include <QtCore/QStringList>
+
+#include <nx/utils/log/to_string.h>
 #include <nx/utils/uuid.h>
-
-template<typename T>
-QString toStringSfinae(const T& t, decltype(&T::toString))
-{
-    return t.toString();
-}
-
-template<typename T>
-QString toStringSfinae(const T& t, ...)
-{
-    return QString(QLatin1String("%1")).arg(t);
-}
-
-template<typename T>
-QString toString(const T&t)
-{
-    return toStringSfinae(t, 0);
-}
-
-template<typename First, typename Second>
-QString toString(
-    const std::pair<First, Second>& pair,
-    const QString& prefix = QString::fromLatin1("( "),
-    const QString& suffix = QString::fromLatin1(" )"),
-    const QString& delimiter = QString::fromLatin1(": "))
-{
-    return QString::fromLatin1("%1%2%3%4%5").arg(prefix)
-        .arg(toString(pair.first)).arg(delimiter)
-        .arg(toString(pair.second)).arg(suffix);
-}
-
-template<typename Container>
-QString containerString(const Container& container,
-    const QString& delimiter = QString::fromLatin1(", "),
-    const QString& prefix = QString::fromLatin1("{ "),
-    const QString& suffix = QString::fromLatin1(" }"),
-    const QString& empty = QString::fromLatin1("none"))
-{
-    if (container.begin() == container.end())
-        return empty;
-
-    QStringList strings;
-    for (const auto& item : container)
-        strings << toString(item);
-
-    return QString::fromLatin1("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
-}
 
 //!Adds some useful overloads to \a QString
 class NX_UTILS_API QnLogMessage
@@ -109,10 +56,7 @@ public:
         int fieldWidth = 0,
         QChar fillChar = QLatin1Char(' '))
     {
-        if (a)
-            return arg(a.get(), fieldWidth, fillChar);
-        else
-            return arg("boost::none", fieldWidth, fillChar);
+        return arg(toString(a), fieldWidth, fillChar);
     }
 
     //!Prints integer value
@@ -165,6 +109,18 @@ public:
         return arg(a);
     }
 
+    template<typename T, typename ... Args>
+    QnLogMessage strs(const T& a, Args ... args)
+    {
+        return strs(a).strs(std::forward<Args>(args) ...);
+    }
+
+    template<typename T>
+    QnLogMessage strs(const T& a)
+    {
+        return str(a);
+    }
+
     operator QString() const;
 
     std::string toStdString() const { return m_str.toStdString(); }
@@ -175,5 +131,3 @@ private:
 
 //!short name for \a QnLogMessage
 typedef QnLogMessage lm;
-
-#endif  //NX_LOG_MESSAGE_H
