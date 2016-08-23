@@ -37,16 +37,12 @@ protected:
     {
         m_module.reset(new QnClientModule());
         m_accessController.reset(new QnWorkbenchAccessController());
-        m_skin.reset(new QnSkin());
-        m_context.reset(new QnWorkbenchContext(m_accessController.data()));
-        QObject::connect(m_context.data(), &QnWorkbenchContext::userChanged, m_accessController.data(), &QnWorkbenchAccessController::setUser);
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
-        m_context.clear();
-        m_skin.clear();
+        m_currentUser.clear();
         m_module.clear();
         m_accessController.clear();
     }
@@ -57,6 +53,7 @@ protected:
         user->setId(QnUuid::createUuid());
         user->setName(name);
         user->setRawPermissions(globalPermissions);
+        user->addFlags(Qn::remote);
         qnResPool->addResource(user);
 
         return user;
@@ -71,8 +68,8 @@ protected:
 
         if (!parentId.isNull())
             layout->setParentId(parentId);
-        else if (m_context->user())
-            layout->setParentId(m_context->user()->getId());
+        else if (m_currentUser)
+            layout->setParentId(m_currentUser->getId());
 
         return layout;
     }
@@ -80,8 +77,8 @@ protected:
     void logout()
     {
         qnResPool->removeResources(qnResPool->getResourcesWithFlag(Qn::remote));
-        m_context->setUserName(QString());
-        ASSERT_TRUE(m_context->user().isNull());
+        m_currentUser.clear();
+        m_accessController->setUser(m_currentUser);
     }
 
     void loginAsOwner()
@@ -89,8 +86,8 @@ protected:
         logout();
         auto user = addUser(userName1, Qn::NoGlobalPermissions);
         user->setOwner(true);
-        m_context->setUserName(userName1);
-        ASSERT_EQ(m_context->user(), user);
+        m_currentUser = user;
+        m_accessController->setUser(m_currentUser);
     }
 
     void loginAs(Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
@@ -98,39 +95,28 @@ protected:
         logout();
         auto user = addUser(userName1, globalPermissions, userType);
         ASSERT_FALSE(user->isOwner());
-        m_context->setUserName(userName1);
-        ASSERT_EQ(m_context->user(), user);
+        m_currentUser = user;
+        m_accessController->setUser(m_currentUser);
     }
 
     void checkPermissions(const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const
     {
-        Qn::Permissions actual = m_context->accessController()->permissions(resource);
+        Qn::Permissions actual = m_accessController->permissions(resource);
         ASSERT_EQ(desired, actual);
         ASSERT_EQ(forbidden & actual, 0);
     }
 
     void checkForbiddenPermissions(const QnResourcePtr &resource, Qn::Permissions forbidden) const
     {
-        Qn::Permissions actual = m_context->accessController()->permissions(resource);
+        Qn::Permissions actual = m_accessController->permissions(resource);
         ASSERT_EQ(forbidden & actual, 0);
     }
 
     // Declares the variables your tests want to use.
     QSharedPointer<QnClientModule> m_module;
-    QSharedPointer<QnSkin> m_skin;
-    QSharedPointer<QnWorkbenchContext> m_context;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
+    QnUserResourcePtr m_currentUser;
 };
-
-
-/** Initial test. Check if current user is set correctly. */
-TEST_F(QnWorkbenchAccessControllerTest, init)
-{
-    auto user = addUser(userName1, Qn::GlobalAdminPermission);
-    m_context->setUserName(userName1);
-
-    ASSERT_EQ(user, m_context->user());
-}
 
 /************************************************************************/
 /* Checking exported layouts                                            */
@@ -196,8 +182,6 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
     auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
 
-    ASSERT_TRUE(m_context->user().isNull());
-
     /* Local layouts can be edited when we are not logged id. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     /* But their name is fixed, and them cannot be saved to server, removed or has their settings edited. */
@@ -262,8 +246,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 
     auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
-    Qn::Permissions actual = m_context->accessController()->permissions(layout);
-    qDebug() << "actual permissions" << QnLexical::serialized(actual);
+    Qn::Permissions actual = m_accessController->permissions(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission;
@@ -522,4 +505,20 @@ TEST_F(QnWorkbenchAccessControllerTest, checkSharedLayoutAsAdmin)
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = 0;
     checkPermissions(layout, desired, forbidden);
+}
+
+/************************************************************************/
+/* Checking user access rights                                          */
+/************************************************************************/
+
+/** Check user can edit himself (but cannot rename, remove and change access rights). */
+TEST_F(QnWorkbenchAccessControllerTest, checkUsedEditHimself)
+{
+    loginAsOwner();
+
+    Qn::Permissions desired = Qn::FullUserPermissions;
+    Qn::Permissions forbidden = Qn::WriteNamePermission | Qn::RemovePermission | Qn::WriteAccessRightsPermission;
+    desired &= ~forbidden;
+
+    checkPermissions(m_currentUser, desired, forbidden);
 }
