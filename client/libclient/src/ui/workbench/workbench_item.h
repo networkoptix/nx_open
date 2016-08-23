@@ -18,11 +18,12 @@ class QnWorkbenchLayout;
 /**
  * Layout item. Video, image, server, or anything else.
  */
-class QnWorkbenchItem : public QObject {
+class QnWorkbenchItem: public QObject
+{
     Q_OBJECT
-    Q_PROPERTY(QString resourceUid READ resourceUid);
-    Q_PROPERTY(QnUuid uuid READ uuid);
-    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation);
+    Q_PROPERTY(QString resourceUid READ resourceUid)
+    Q_PROPERTY(QnUuid uuid READ uuid)
+    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
 
 public:
     /**
@@ -71,28 +72,32 @@ public:
     /**
      * \returns                         Layout that this item belongs to, if any.
      */
-    QnWorkbenchLayout *layout() const {
+    QnWorkbenchLayout *layout() const
+    {
         return m_layout;
     }
 
     /**
      * \returns                         Unique identifier of the resource associated with this item.
      */
-    const QString &resourceUid() const {
+    const QString &resourceUid() const
+    {
         return m_resourceUid;
     }
 
     /**
      * \returns                         Universally unique identifier of this item.
      */
-    const QnUuid &uuid() const {
+    const QnUuid &uuid() const
+    {
         return m_uuid;
     }
 
     /**
      * \returns                         Geometry of this item, in grid coordinates.
      */
-    const QRect &geometry() const {
+    const QRect &geometry() const
+    {
         return m_geometry;
     }
 
@@ -115,7 +120,8 @@ public:
     /**
      * \returns                         Geometry delta of this item, in grid coordinates.
      */
-    const QRectF &geometryDelta() const {
+    const QRectF &geometryDelta() const
+    {
         return m_geometryDelta;
     }
 
@@ -142,7 +148,8 @@ public:
     /**
      * \returns                         Flags of this item.
      */
-    Qn::ItemFlags flags() const {
+    Qn::ItemFlags flags() const
+    {
         return m_flags;
     }
 
@@ -159,7 +166,8 @@ public:
      * \param flag                      Flag to check.
      * \returns                         Whether given flag is set.
      */
-    bool hasFlag(Qn::ItemFlag flag) const {
+    bool hasFlag(Qn::ItemFlag flag) const
+    {
         return m_flags & flag;
     }
 
@@ -176,7 +184,8 @@ public:
     /**
      * \returns                         Whether this item is pinned.
      */
-    bool isPinned() const {
+    bool isPinned() const
+    {
         return hasFlag(Qn::Pinned);
     }
 
@@ -184,7 +193,8 @@ public:
      * \param pinned                    New pinned state for this item.
      * \returns                         Whether the pinned state was successfully set.
      */
-    bool setPinned(bool pinned) {
+    bool setPinned(bool pinned)
+    {
         return setFlag(Qn::Pinned, pinned);
     }
 
@@ -193,14 +203,16 @@ public:
      *
      * \returns                         Whether the pinned state was successfully changed.
      */
-    bool togglePinned() {
+    bool togglePinned()
+    {
         return setPinned(!isPinned());
     }
 
     /**
      * \returns                         Zoom rect of this item, in item-relative coordinates.
      */
-    const QRectF &zoomRect() const {
+    const QRectF &zoomRect() const
+    {
         return m_zoomRect;
     }
 
@@ -223,11 +235,13 @@ public:
     void setDewarpingParams(const QnItemDewarpingParams& params);
 
 
-    const ImageCorrectionParams &imageEnhancement() const {
+    const ImageCorrectionParams &imageEnhancement() const
+    {
         return m_imageEnhancement;
     }
 
-    const QnItemDewarpingParams &dewarpingParams() const {
+    const QnItemDewarpingParams &dewarpingParams() const
+    {
         return m_itemDewarpingParams;
     }
 
@@ -236,7 +250,8 @@ public:
     /**
      * \returns                         Rotation angle of this item, in degrees.
      */
-    qreal rotation() const {
+    qreal rotation() const
+    {
         return m_rotation;
     }
 
@@ -268,7 +283,7 @@ public:
      * \param role                      Role to get data for.
      * \returns                         Data for the given role.
      */
-    QVariant data(int role) const;
+    QVariant data(Qn::ItemDataRole role) const;
 
     /**
      * \param role                      Role to get data for.
@@ -276,26 +291,30 @@ public:
      * \returns                         Data for the given role.
      */
     template<class T>
-    T data(int role, const T &defaultValue = T()) {
+    T data(Qn::ItemDataRole role, const T &defaultValue = T())
+    {
         QVariant result = data(role);
-        if(result.canConvert<T>()) {
+        if (result.canConvert<T>())
+        {
             return result.value<T>();
-        } else {
+        }
+        else
+        {
             return defaultValue;
         }
     }
 
     template<class T>
-    bool setData(int role, const T &value) {
-        return setData(role, QVariant::fromValue<T>(value));
+    void setData(Qn::ItemDataRole role, const T &value)
+    {
+        setData(role, QVariant::fromValue<T>(value));
     }
 
     /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
-     * \returns                         Whether the data was successfully set.
      */
-    bool setData(int role, const QVariant &value);
+    void setData(Qn::ItemDataRole role, const QVariant &value);
 
 signals:
     void geometryChanged();
@@ -307,7 +326,7 @@ signals:
     void zoomTargetItemChanged();
     void rotationChanged();
     void displayInfoChanged();
-    void dataChanged(int role);
+    void dataChanged(Qn::ItemDataRole role);
 
 protected:
     void setGeometryInternal(const QRect &geometry);
@@ -349,9 +368,6 @@ private:
 
     /** Should the info be always displayed on the item. */
     bool m_displayInfo;
-
-    /** User data by role. */
-    QHash<int, QVariant> m_dataByRole;
 };
 
 #endif // QN_WORKBENCH_ITEM_H

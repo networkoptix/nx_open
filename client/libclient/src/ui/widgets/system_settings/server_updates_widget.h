@@ -17,6 +17,7 @@
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
+struct QnLowFreeSpaceWarning;
 
 class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -44,6 +45,7 @@ private slots:
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
     void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
+    void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning* lowFreeSpaceWarning);
 
 private:
     void initSourceMenu();

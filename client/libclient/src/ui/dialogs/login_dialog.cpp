@@ -545,8 +545,8 @@ void QnLoginDialog::at_saveButton_clicked() {
     const auto systemName = gatherSystemName(url);
     if (systemName.isEmpty())
     {
-        const auto button = QnMessageBox::warning(this, tr("Cannot connect to the server"),
-            tr("Can not connect to server with specified credentials. Do you want to save this connection?"),
+        const auto button = QnMessageBox::warning(this, tr("Can't connect to the server"),
+            tr("Can't connect to server with specified credentials. Do you want to save this connection?"),
             QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::No);
 
         if (button != QDialogButtonBox::Yes)

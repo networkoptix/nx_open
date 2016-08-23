@@ -43,7 +43,7 @@ QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *
     if(resource.isNull()) {
         qnNullWarning(resource);
         return;
-    } else if(!resource->property(layoutSynchronizerPropertyName).isNull()) { 
+    } else if(!resource->property(layoutSynchronizerPropertyName).isNull()) {
         qnWarning("Given resource '%1' already has an associated layout synchronizer.", resource->getName());
         return;
     }
@@ -187,7 +187,7 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
             continue;
         }
 
-        m_resource->updateItem(item->uuid(), item->data());
+        m_resource->updateItem(item->data());
     }
 
     m_pendingItems.clear();
@@ -240,7 +240,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutResour
     QnWorkbenchItem *item = m_layout->item(itemData.uuid);
     if(item == NULL) {
         /* We can get here in the following situation:
-         * 
+         *
          * Item was removed from layout, then it was removed from resource.
          * Resource was in another thread, so we have received removal event
          * outside the update guard. In this case there is nothing to do and we
@@ -263,14 +263,14 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutResour
     QnWorkbenchItem *item = m_layout->item(itemData.uuid);
     if(item == NULL) {
         /* We can get here in the following situation:
-         * 
+         *
          * An item is added to the layout resource, and its geometry is adjusted.
-         * Resource is synchronized with the layout, and a new layout item is 
+         * Resource is synchronized with the layout, and a new layout item is
          * created. However, due to limit on the number of layout items, it
          * is deleted right away.
-         * 
+         *
          * Because of resource and layout residing in different threads,
-         * item change signal may get received when the layout item is 
+         * item change signal may get received when the layout item is
          * already destroyed. So, simply leaving is perfectly fine here. */
         return;
     }

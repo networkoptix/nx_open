@@ -36,7 +36,7 @@ void VariantAnimator::setSpeed(qreal speed) {
     bool running = isRunning();
     if(running)
         pause();
-    
+
     m_speed = speed;
     invalidateDuration();
 
@@ -91,19 +91,24 @@ void VariantAnimator::setTargetObject(QObject *target) {
     setTargetObjectInternal(target);
 }
 
-void VariantAnimator::at_target_destroyed() {
-    setTargetObjectInternal(NULL);
+void VariantAnimator::at_target_destroyed()
+{
+    setTargetObjectInternal(nullptr);
 }
 
-void VariantAnimator::setTargetObjectInternal(QObject *target) {
-    if(m_target != NULL)
-        disconnect(m_target, NULL, this, NULL);
+void VariantAnimator::setTargetObjectInternal(QObject *target)
+{
+    if (m_target)
+        disconnect(m_target, nullptr, this, nullptr);
 
     m_target = target;
 
-    if(m_target != NULL) {
-        connect(m_target, SIGNAL(destroyed()), this, SLOT(at_target_destroyed()));
-    } else {
+    if (m_target)
+    {
+        connect(m_target, &QObject::destroyed, this, &VariantAnimator::at_target_destroyed);
+    }
+    else
+    {
         stop();
     }
 
@@ -185,8 +190,8 @@ void VariantAnimator::updateCurrentTime(int currentTime) {
     }
 
     updateCurrentValue(interpolated(
-        internalStartValue(), 
-        internalTargetValue(), 
+        internalStartValue(),
+        internalTargetValue(),
         easingCurveValue(easingCurveProgress(currentTime))
     ));
 
@@ -229,7 +234,7 @@ void VariantAnimator::updateState(State newState) {
         if(currentTime() < duration()) {
             m_easingCurveCorrection = this->easingCurveProgress(currentTime());
 
-            /* Floating point error may accumulate here, resulting in correction 
+            /* Floating point error may accumulate here, resulting in correction
              * values dangerously close to 1.0. We don't allow that. */
             m_easingCurveCorrection = qMin(m_easingCurveCorrection, 0.99);
         }

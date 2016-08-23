@@ -706,17 +706,18 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        ReadEmailPermission             = ReadPermission,
-        WriteEmailPermission            = WritePasswordPermission,
-        WriteFullNamePermission         = WritePasswordPermission,
-        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
-                                            WritePasswordPermission | WriteAccessRightsPermission,
+        WriteEmailPermission            = 0x0800,
+        WriteFullNamePermission         = 0x1000,
+        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission
+                                            | RemovePermission | WritePasswordPermission
+                                            | WriteAccessRightsPermission
+                                            | WriteFullNamePermission | WriteEmailPermission,
 
         /* Media-specific permissions. */
-        ExportPermission                = 0x1000,   /**< Permission to export video parts. */
+        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
-        WritePtzPermission              = 0x2000,   /**< Permission to use camera's PTZ controls. */
+        WritePtzPermission              = 0x4000,   /**< Permission to use camera's PTZ controls. */
 
         /* Mode-specific permissions. */
         VideoWallLayoutPermissions      = ModifyLayoutPermission,

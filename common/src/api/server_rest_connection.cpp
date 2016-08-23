@@ -3,6 +3,7 @@
 
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
+#include <api/model/update_information_reply.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
@@ -136,6 +137,19 @@ Handle ServerConnection::saveCloudSystemCredentials(
 Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
 {
     return executeGet(lit("/api/startLiteClient"), QnRequestParamList(), callback, targetThread);
+}
+
+Handle ServerConnection::getFreeSpaceForUpdateFiles(
+    bool wholeSystem,
+    Result<QnUpdateFreeSpaceReply>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    if (!wholeSystem)
+        params.insert(lit("local"), lit("true"));
+
+    return executeGet(
+        lit("/ec2/updateInformation/freeSpaceForUpdateFiles"), params, callback, targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------

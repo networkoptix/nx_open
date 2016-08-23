@@ -172,7 +172,7 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         addLayout(layout);
 
     qreal oldCellAspectRatio = 0.0, newCellAspectRatio = 0.0;
-    QSizeF oldCellSpacing, newCellSpacing;
+    qreal oldCellSpacing, newCellSpacing;
 
 
     emit currentLayoutAboutToBeChanged();

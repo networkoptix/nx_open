@@ -53,9 +53,9 @@
 			</td>
             {{/sourceIcon}}
             <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">
-                <b class="ellipsis" style="text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;max-width: 130px">{{source}}</b> <span class="ellipsis" style="text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;max-width: 130px">({{sourceIp}})</span>
+                <b>{{source}}</b> ({{sourceIp}})
             </td>
-            <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">
+            <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;white-space: nowrap">
                 {{#aggregated}}
                     {{{timestamp}}}
                 {{/aggregated}}

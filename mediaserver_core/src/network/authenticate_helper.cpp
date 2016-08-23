@@ -660,24 +660,30 @@ void QnAuthHelper::addAuthHeader(
     bool isDigest)
 {
     QString realm;
-    if (userResource) {
+    if (userResource)
+    {
         if (userResource->isLdap())
             QnLdapManager::instance()->realm(&realm);
         else
             realm = userResource->getRealm();
     }
     else
+    {
         realm = QnAppInfo::realm();
+    }
 
-    const QString auth(
+    const QString auth =
         isDigest
         ? lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
-        : lit("Basic realm=\"%1\""));
+            .arg(realm)
+            .arg(QLatin1String(m_nonceProvider->generateNonce()))
+        : lit("Basic realm=\"%1\"").arg(realm);
+
     //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
     const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx_http::insertOrReplaceHeader(&response.headers, nx_http::HttpHeader(
         headerName,
-        auth.arg(realm).arg(QLatin1String(m_nonceProvider->generateNonce())).toLatin1()));
+        auth.toLatin1()));
 }
 
 QByteArray QnAuthHelper::generateNonce(NonceProvider provider) const

@@ -34,6 +34,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
@@ -244,6 +245,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     QnCommonModule *common = new QnCommonModule(this);
 
+    common->store<QnResourceRuntimeDataManager>(new QnResourceRuntimeDataManager());
     common->store<QnTranslationManager>(translationManager.release());
     common->store<QnClientCoreSettings>(new QnClientCoreSettings());
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());

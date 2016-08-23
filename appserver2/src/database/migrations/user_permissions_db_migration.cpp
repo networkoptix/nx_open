@@ -7,6 +7,10 @@
 
 #include <common/common_globals.h>
 
+#include <nx/fusion/model_functions.h>
+
+#include <nx/utils/log/log.h>
+
 #include <utils/db/db_helper.h>
 
 namespace ec2
@@ -36,6 +40,41 @@ namespace ec2
         Q_DECLARE_FLAGS(GlobalPermissionsV25, GlobalPermissionV25)
         Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissionsV25)
 
+        QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(GlobalPermissionV25,
+            (GlobalPermissionV25::V25OwnerPermission, "v25_owner")
+            (GlobalPermissionV25::V25AdminPermission, "v25_admin")
+            (GlobalPermissionV25::V25EditLayoutsPermission, "v25_editLayouts")
+            (GlobalPermissionV25::V25EditServersPermissions, "v25_editServers")
+            (GlobalPermissionV25::V25ViewLivePermission, "v25_viewLive")
+            (GlobalPermissionV25::V25ViewArchivePermission, "v25_viewArchive")
+            (GlobalPermissionV25::V25ExportPermission, "v25_export")
+            (GlobalPermissionV25::V25EditCamerasPermission, "v25_editCameras")
+            (GlobalPermissionV25::V25PtzControlPermission, "v25_ptzControl")
+            (GlobalPermissionV25::V25EditVideoWallPermission, "v25_editVideowall")
+            (GlobalPermissionV25::V20EditUsersPermission, "v20_editUsers")
+            (GlobalPermissionV25::V20EditCamerasPermission, "v20_editCameras")
+            (GlobalPermissionV25::V20ViewExportArchivePermission, "v20_viewArchive")
+            (GlobalPermissionV25::V20PanicPermission, "v20_panic")
+            );
+
+        QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(GlobalPermissionsV25,
+            (GlobalPermissionV25::V25OwnerPermission, "v25_owner")
+            (GlobalPermissionV25::V25AdminPermission, "v25_admin")
+            (GlobalPermissionV25::V25EditLayoutsPermission, "v25_editLayouts")
+            (GlobalPermissionV25::V25EditServersPermissions, "v25_editServers")
+            (GlobalPermissionV25::V25ViewLivePermission, "v25_viewLive")
+            (GlobalPermissionV25::V25ViewArchivePermission, "v25_viewArchive")
+            (GlobalPermissionV25::V25ExportPermission, "v25_export")
+            (GlobalPermissionV25::V25EditCamerasPermission, "v25_editCameras")
+            (GlobalPermissionV25::V25PtzControlPermission, "v25_ptzControl")
+            (GlobalPermissionV25::V25EditVideoWallPermission, "v25_editVideowall")
+            (GlobalPermissionV25::V20EditUsersPermission, "v20_editUsers")
+            (GlobalPermissionV25::V20EditCamerasPermission, "v20_editCameras")
+            (GlobalPermissionV25::V20ViewExportArchivePermission, "v20_viewArchive")
+            (GlobalPermissionV25::V20PanicPermission, "v20_panic")
+        );
+
+        QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((GlobalPermissionV25)(GlobalPermissionsV25), (lexical))
 
         struct UserPermissionsRemapData
         {
@@ -92,6 +131,11 @@ namespace ec2
 
             if (v25permissions.testFlag(V25EditVideoWallPermission))
                 result |= Qn::GlobalControlVideoWallPermission;
+
+            QString logMessage = lit("Migrating User Permissions: %1 -> %2")
+                .arg(QnLexical::serialized(v25permissions)).arg(QnLexical::serialized(result));
+            qDebug() << logMessage;
+            NX_LOG(logMessage, cl_logINFO);
 
             return result;
         }

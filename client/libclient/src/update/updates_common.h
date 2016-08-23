@@ -81,6 +81,7 @@ enum class QnFullUpdateStage {
     Check,              /**< Check for updates. */
     Download,           /**< Download update packages. */
     Client,             /**< Install client update. */
+    CheckFreeSpace,     /**< Check free space for update files on servers. */
     Push,               /**< Push update packages. */
     Incompatible,       /**< Install updates to the incompatible servers. */
     Servers,            /**< Install updates to the normal servers. */

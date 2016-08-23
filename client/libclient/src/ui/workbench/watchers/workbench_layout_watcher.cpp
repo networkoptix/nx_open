@@ -41,7 +41,7 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
         {
             data.resource.id = resource->getId();
             data.resource.uniqueId = resource->getUniqueId();
-            layout->updateItem(data.uuid, data);
+            layout->updateItem(data);
         }
         else
         {

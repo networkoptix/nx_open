@@ -71,7 +71,6 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
 
 bool SelfUpdater::registerUriHandler()
 {
-#if defined(Q_OS_WIN) || defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     QString binaryPath = qApp->applicationFilePath();
 
 #if defined(Q_OS_LINUX)
@@ -86,9 +85,6 @@ bool SelfUpdater::registerUriHandler()
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
-#else
-    return true;
-#endif
 }
 
 QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString& to)
@@ -450,12 +446,12 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
 
     const auto filePath = QDir(appsLocation).filePath(nx::vms::utils::AppInfo::iconFileName());
 
-    const auto homeLocation = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    if (homeLocation.isEmpty())
+    const auto dataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    if (dataLocation.isEmpty())
         return false;
 
     const auto applauncherBinaryPath =
-        QDir(homeLocation).absoluteFilePath(lit(".local/share/%1/applauncher/%2/bin/%3")
+        QDir(dataLocation).absoluteFilePath(lit("%1/applauncher/%2/bin/%3")
             .arg(QnAppInfo::organizationName(),
                 QnAppInfo::customizationName(),
                 QnAppInfo::applauncherExecutableName()));
@@ -467,7 +463,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
         filePath,
         applauncherBinaryPath,
         QnAppInfo::productNameLong(),
-        QnAppInfo::productNameLong() + lit(" Client"),
+        QnClientAppInfo::applicationDisplayName(),
         QnAppInfo::customizationName(),
         nx::utils::SoftwareVersion(QnAppInfo::engineVersion()));
 #endif // defined(Q_OS_LINUX)

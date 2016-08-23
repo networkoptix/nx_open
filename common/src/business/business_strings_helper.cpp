@@ -482,8 +482,6 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
                 disabledCameras
             );
 
-        for (const auto &camera: disabledCameras)
-            result += L'\n' + QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
         break;
     }
     default:

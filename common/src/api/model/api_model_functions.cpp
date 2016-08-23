@@ -16,6 +16,7 @@
 #include "camera_list_reply.h"
 #include "configure_reply.h"
 #include "upload_update_reply.h"
+#include "update_information_reply.h"
 #include "rebuild_archive_reply.h"
 #include "api_ioport_data.h"
 #include "audit/audit_record.h"
@@ -41,6 +42,7 @@
     (QnCameraListReply)\
     (QnConfigureReply) \
     (QnUploadUpdateReply)\
+    (QnUpdateFreeSpaceReply)\
     (QnRecordingStatsData)\
     (QnCamRecordingStatsData)\
 
