@@ -108,7 +108,6 @@ public:
         ConnectionType::Type connectionType,
         const nx_http::Request& request,
         const QByteArray& contentEncoding,
-        const Qn::UserAccessData &userAccessData,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
@@ -122,69 +121,6 @@ public:
 
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
     int keepAliveProbeCount() const;
-
-    template<class T>
-    void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
-    {
-        if (remotePeer().peerType == Qn::PT_CloudServer &&
-            transaction.transactionType != TransactionType::Cloud)
-        {
-            return;
-        }
-
-        auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
-        if (remoteAccess == RemotePeerAccess::Forbidden)
-        {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
-                   .arg(transaction.toString())
-                   .arg(remotePeer().id.toString()),
-                cl_logDEBUG1);
-            return;
-        }
-        sendTransactionImpl(transaction, header);
-    }
-
-    template<template<typename, typename> class Cont, typename Param, typename A>
-    void sendTransaction(const QnTransaction<Cont<Param,A>>& transaction, const QnTransactionTransportHeader& header)
-    {
-        if (remotePeer().peerType == Qn::PT_CloudServer &&
-            transaction.transactionType != TransactionType::Cloud)
-        {
-            return;
-        }
-
-        auto td = ec2::getTransactionDescriptorByTransaction(transaction);
-        auto remoteAccess = td->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
-
-        if (remoteAccess == RemotePeerAccess::Forbidden)
-        {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
-                   .arg(transaction.toString())
-                   .arg(remotePeer().id.toString()),
-                cl_logDEBUG1);
-            return;
-        }
-        else if (remoteAccess == RemotePeerAccess::Partial)
-        {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check PARTIALLY failed while sending transaction %1 to peer %2")
-                   .arg(transaction.toString())
-                   .arg(remotePeer().id.toString()),
-                cl_logDEBUG1);
-
-            Cont<Param,A> filteredParams = transaction.params;
-            td->filterByReadPermissionFunc(m_userAccessData, filteredParams);
-            auto newTransaction = transaction;
-            newTransaction.params = filteredParams;
-
-            sendTransactionImpl(newTransaction, header);
-        }
-        sendTransactionImpl(transaction, header);
-    }
-
-    bool sendSerializedTransaction(
-        Qn::SerializationFormat srcFormat,
-        const QByteArray& serializedTran,
-        const QnTransactionTransportHeader& _header);
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
     void close();
@@ -207,12 +143,11 @@ public:
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
     const ec2::ApiPeerData& localPeer() const;
+    const ec2::ApiPeerData& remotePeer() const;
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
 
     nx_http::AuthInfoCache::AuthorizationCacheItem authData() const;
-
-    ApiPeerData remotePeer() const { return m_remotePeer; }
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -254,7 +189,6 @@ public:
         const QByteArray& requestBuf );
     //!Transport level logic should use this method to report connection problem
     void connectionFailure();
-    Qn::UserAccessData getUserAccessData() const { return m_userAccessData; }
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
@@ -310,6 +244,9 @@ protected:
                 break;
         }
     }
+
+    /** Post serialized data to the send queue */
+    void addData(QByteArray data);
 
 private:
     struct DataToSend
@@ -387,7 +324,6 @@ private:
     std::chrono::milliseconds m_tcpKeepAliveTimeout;
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
-    Qn::UserAccessData m_userAccessData;
 
 private:
     QnTransactionTransportBase(
@@ -399,7 +335,6 @@ private:
     void sendHttpKeepAlive( quint64 taskID );
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(QByteArray data);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();

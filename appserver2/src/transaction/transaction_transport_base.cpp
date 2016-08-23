@@ -114,7 +114,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
-    m_userAccessData = Qn::kSystemAccess;
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
@@ -126,7 +125,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     ConnectionType::Type connectionType,
     const nx_http::Request& request,
     const QByteArray& contentEncoding,
-    const Qn::UserAccessData& userAccessData,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
@@ -141,7 +139,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connectionType = connectionType;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
-    m_userAccessData = userAccessData;
     m_connectionLockGuard = std::move(connectionLockGuard);
 
     using namespace std::chrono;
@@ -400,6 +397,11 @@ void QnTransactionTransportBase::setStateNoLock(State state)
 const ec2::ApiPeerData& QnTransactionTransportBase::localPeer() const
 {
     return m_localPeer;
+}
+
+const ec2::ApiPeerData& QnTransactionTransportBase::remotePeer() const
+{
+    return m_remotePeer;
 }
 
 QUrl QnTransactionTransportBase::remoteAddr() const
@@ -1340,55 +1342,6 @@ void QnTransactionTransportBase::setExtraDataBuffer(const QByteArray& data)
     QnMutexLocker lk( &m_mutex );
     NX_ASSERT(m_extraData.isEmpty());
     m_extraData = data;
-}
-
-bool QnTransactionTransportBase::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
-                                                       const QnTransactionTransportHeader& _header)
-{
-    if (srcFormat != m_remotePeer.dataFormat)
-        return false;
-
-    /* Check if remote peer has rights to receive transaction */
-	if (m_userAccessData.userId != Qn::kSystemAccess.userId)
-	{
-		NX_LOG(
-			QnLog::EC2_TRAN_LOG,
-			lit("Permission check failed while sending SERIALIZED transaction to peer %1")
-				.arg(remotePeer().id.toString()),
-			cl_logDEBUG1);
-		return false;
-	}
-
-    QnTransactionTransportHeader header(_header);
-    NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
-    header.fillSequence();
-    switch (m_remotePeer.dataFormat) {
-    case Qn::JsonFormat:
-        addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran, header) + QByteArray("\r\n"));
-        break;
-    //case Qn::BnsFormat:
-    //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
-        break;
-    case Qn::UbjsonFormat: {
-
-        if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1 )
-        {
-            QnAbstractTransaction abtractTran;
-            QnUbjsonReader<QByteArray> stream(&serializedTran);
-            QnUbjson::deserialize(&stream, &abtractTran);
-            NX_LOG( QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
-        }
-
-        addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
-        break;
-    }
-    default:
-        qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
-        addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
-        break;
-    }
-
-    return true;
 }
 
 void QnTransactionTransportBase::setRemoteIdentityTime(qint64 time)

@@ -31,9 +31,9 @@ QnTransactionTransport::QnTransactionTransport(
         connectionType,
         request,
         contentEncoding,
-        userAccessData,
         QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount())
+        QnGlobalSettings::instance()->keepAliveProbeCount()),
+    m_userAccessData(userAccessData)
 {
 }
 
@@ -42,7 +42,8 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData& localPeer)
     QnTransactionTransportBase(
         localPeer,
         QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount())
+        QnGlobalSettings::instance()->keepAliveProbeCount()),
+    m_userAccessData(Qn::kSystemAccess)
 {
 }
 
@@ -82,6 +83,58 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
             httpClient->setUserPassword(url.password());
         }
     }
+}
+
+bool QnTransactionTransport::sendSerializedTransaction(
+    Qn::SerializationFormat srcFormat,
+    const QByteArray& serializedTran,
+    const QnTransactionTransportHeader& _header)
+{
+    if (srcFormat != remotePeer().dataFormat)
+        return false;
+
+    /* Check if remote peer has rights to receive transaction */
+    if (m_userAccessData.userId != Qn::kSystemAccess.userId)
+    {
+        NX_LOG(
+            QnLog::EC2_TRAN_LOG,
+            lit("Permission check failed while sending SERIALIZED transaction to peer %1")
+            .arg(remotePeer().id.toString()),
+            cl_logDEBUG1);
+        return false;
+    }
+
+    QnTransactionTransportHeader header(_header);
+    NX_ASSERT(header.processedPeers.contains(localPeer().id));
+    header.fillSequence();
+    switch (remotePeer().dataFormat)
+    {
+        case Qn::JsonFormat:
+            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran, header) + QByteArray("\r\n"));
+            break;
+            //case Qn::BnsFormat:
+            //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+            break;
+        case Qn::UbjsonFormat: {
+
+            if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1)
+            {
+                QnAbstractTransaction abtractTran;
+                QnUbjsonReader<QByteArray> stream(&serializedTran);
+                QnUbjson::deserialize(&stream, &abtractTran);
+                NX_LOG(QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
+            }
+
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+            break;
+        }
+        default:
+            qWarning() << "Client has requested data in the unsupported format" << remotePeer().dataFormat;
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+            break;
+    }
+
+    return true;
 }
 
 }   // namespace ec2

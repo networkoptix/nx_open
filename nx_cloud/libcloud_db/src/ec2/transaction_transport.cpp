@@ -39,7 +39,6 @@ TransactionTransport::TransactionTransport(
         ::ec2::ConnectionType::incoming,
         request,
         contentEncoding,
-        Qn::kSystemAccess,
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
