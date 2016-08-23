@@ -8,6 +8,7 @@ namespace cloud {
 namespace tcp {
 
 static const String kUpgrade = "Upgrade";
+static const String kConnection = "Connection";
 static const String kNxRc = "NXRC/1.0";
 static const String kNxRcHostName = "Nxrc-Host-Name";
 static const String kNxRcPoolSize = "Nxrc-Pool-Size";

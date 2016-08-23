@@ -2,9 +2,9 @@
 
 #include <thread>
 
-#include <nx/utils/std/future.h>
-#include <nx/utils/log/log.h>
 #include <nx/network/cloud/tunnel/tcp/reverse_connector.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/future.h>
 
 namespace nx {
 namespace network {
@@ -15,7 +15,7 @@ namespace test {
 static std::vector<Buffer> kRequestLines
 {
     "OPTIONS * HTTP/1.1",
-    "Host: 0.0.0.0",
+    "Host: 127.0.0.1",
     "Upgrade: NXRC/1.0",
     "Connection: Upgrade",
     "Nxrc-Host-Name: client",
@@ -77,13 +77,13 @@ TEST(TcpReverseConnector, General)
     auto connector = std::make_unique<ReverseConnector>("client", "server");
     utils::promise<void> connectorDone;
     connector->connect(
-        serverAddress.get_future().get(),
+        SocketAddress(HostAddress::localhost, serverAddress.get_future().get().port),
         [&connector, &connectorDone](SystemError::ErrorCode code)
         {
             auto buffer = std::make_shared<Buffer>();
             buffer->reserve(100);
             ASSERT_EQ(code, SystemError::noError);
-            ASSERT_EQ(connector->getPoolSize(), 5);
+            ASSERT_EQ(connector->getPoolSize(), boost::make_optional<size_t>(5));
             ASSERT_EQ(connector->getKeepAliveOptions(), KeepAliveOptions(1, 2, 3));
 
             std::shared_ptr<AbstractStreamSocket> socket(connector->takeSocket().release());

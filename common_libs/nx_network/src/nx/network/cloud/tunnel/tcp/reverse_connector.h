@@ -1,8 +1,6 @@
 #pragma once
 
-#include "reverse_common.h"
-
-#include <nx/network/extended_stream_socket.h>
+#include <nx/network/buffered_stream_socket.h>
 #include <nx/network/http/asynchttpclient.h>
 
 namespace nx {
@@ -22,8 +20,8 @@ public:
     typedef std::function<void(SystemError::ErrorCode)> ConnectHandler;
     void connect(const SocketAddress& endpoint, ConnectHandler handler);
 
-    std::unique_ptr<ExtendedStreamSocket> takeSocket();
-    size_t getPoolSize() const;
+    std::unique_ptr<BufferedStreamSocket> takeSocket();
+    boost::optional<size_t> getPoolSize() const;
     boost::optional<KeepAliveOptions> getKeepAliveOptions() const;
 
 private:

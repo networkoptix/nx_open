@@ -384,8 +384,8 @@ struct NX_NETWORK_API KeepAliveOptions
     KeepAliveOptions(int timeSec = 0, int intervalSec = 0, int probeCount = 0);
     bool operator==(const KeepAliveOptions& rhs) const;
 
-    static boost::optional<KeepAliveOptions> fromString(const QString& string);
     QString toString() const;
+    static boost::optional<KeepAliveOptions> fromString(const QString& string);
 };
 
 //!Interface for connection-orientied sockets

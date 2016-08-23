@@ -110,26 +110,27 @@ bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
         && probeCount == rhs.probeCount;
 }
 
+QString KeepAliveOptions::toString() const
+{
+    // TODO: Use JSON serrialization instead?
+    return lm("{ %1, %2, %3 }").arg(timeSec).arg(intervalSec).arg(probeCount);
+}
+
 boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
 {
-    // TODO: use JSON serrialization?
-    if (!string.startsWith(QLatin1String("{ ")) || !string.endsWith(QLatin1String(" }")))
-        return boost::none;
+    QStringRef stringRef(&string);
+    if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
+        stringRef = stringRef.mid(1, stringRef.length() - 2);
 
-    const auto split = string.midRef(2, string.length() - 4).split(QLatin1String(", "));
+    const auto split = stringRef.split(QLatin1String(","));
     if (split.size() != 3)
         return boost::none;
 
     KeepAliveOptions options;
-    options.timeSec = split[0].toInt();
-    options.intervalSec = split[1].toInt();
-    options.probeCount = split[2].toInt();
+    options.timeSec = split[0].trimmed().toInt();
+    options.intervalSec = split[1].trimmed().toInt();
+    options.probeCount = split[2].trimmed().toInt();
     return options;
-}
-
-QString KeepAliveOptions::toString() const
-{
-    return lm("{ %1, %2, %3 }").arg(timeSec).arg(intervalSec).arg(probeCount);
 }
 
 bool AbstractDatagramSocket::setDestAddr(
