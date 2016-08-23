@@ -241,6 +241,8 @@
  <tabstops>
   <tabstop>stayLoggedInChackBox</tabstop>
   <tabstop>loginButton</tabstop>
+  <tabstop>restorePasswordLabel</tabstop>
+  <tabstop>createAccountLabel</tabstop>
  </tabstops>
  <resources/>
  <connections/>
