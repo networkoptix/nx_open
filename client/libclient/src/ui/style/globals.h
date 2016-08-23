@@ -136,7 +136,7 @@ private:
         QN_DECLARE_R_PROPERTY(qreal,    zoomFrameWidth,                 ZOOM_FRAME_WIDTH,                       50.0)
 
         QN_DECLARE_R_PROPERTY(float,    defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO,       16.0f / 9.0f)
-        QN_DECLARE_R_PROPERTY(QSizeF,   defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING,            QSizeF(0.1, 0.1))
+        QN_DECLARE_R_PROPERTY(qreal,    defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING,            0.05)
 
         QN_DECLARE_R_PROPERTY(QColor,   mrsColor,                       MRS_COLOR,                              QColor(200, 0, 0))
 

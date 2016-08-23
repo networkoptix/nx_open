@@ -78,7 +78,8 @@ QnThumbnailsLoader::QnThumbnailsLoader(const QnMediaResourcePtr &resource, QnThu
     if (!supportedResource(resource))
         return;
 
-    connect(this, SIGNAL(updateProcessingLater()), this, SLOT(updateProcessing()), Qt::QueuedConnection);
+    connect(this, &QnThumbnailsLoader::updateProcessingLater, this,
+        &QnThumbnailsLoader::updateProcessing, Qt::QueuedConnection);
 
     start();
 }
@@ -367,14 +368,17 @@ void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 end
         emit processingRequested();
 }
 
-void QnThumbnailsLoader::run() {
+void QnThumbnailsLoader::run()
+{
     NX_ASSERT(QThread::currentThread() == this); /* This function is supposed to be run from thumbnail rendering thread only. */
 
     m_helper = new QnThumbnailsLoaderHelper(this);
-    connect(this, SIGNAL(processingRequested()), m_helper, SLOT(process()), Qt::QueuedConnection);
-    connect(m_helper, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
+    connect(this, &QnThumbnailsLoader::processingRequested, m_helper,
+        &QnThumbnailsLoaderHelper::process, Qt::QueuedConnection);
+    connect(m_helper, &QnThumbnailsLoaderHelper::thumbnailLoaded, this,
+        &QnThumbnailsLoader::addThumbnail);
 
-    if(!m_processingStack.empty())
+    if (!m_processingStack.empty())
         emit processingRequested();
 
     base_type::run();

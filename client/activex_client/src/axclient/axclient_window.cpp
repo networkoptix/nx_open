@@ -220,7 +220,6 @@ void QnAxClientWindow::createMainWindow() {
 
     m_accessController.reset(new QnWorkbenchAccessController());
     m_context.reset(new QnWorkbenchContext(m_accessController.data()));
-    QObject::connect(m_context.data(), &QnWorkbenchContext::userChanged, m_accessController.data(), &QnWorkbenchAccessController::setUser);
 
     //TODO: #GDM is it really needed here?
     QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;

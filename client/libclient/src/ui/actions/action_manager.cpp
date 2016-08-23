@@ -1688,28 +1688,28 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("None")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.0);
+            checked(qnGlobals->defaultLayoutCellSpacing() == 0.0);
 
         factory(QnActions::SetCurrentLayoutItemSpacing10Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Small")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.1);
+            checked(qnGlobals->defaultLayoutCellSpacing() == 0.1);
 
         factory(QnActions::SetCurrentLayoutItemSpacing20Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Medium")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.2);
+            checked(qnGlobals->defaultLayoutCellSpacing() == 0.2);
 
         factory(QnActions::SetCurrentLayoutItemSpacing30Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Large")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.3);
+            checked(qnGlobals->defaultLayoutCellSpacing() == 0.3);
         factory.endGroup();
 
     } factory.endSubMenu();

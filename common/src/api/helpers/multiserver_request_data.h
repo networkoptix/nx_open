@@ -6,8 +6,8 @@
 
 struct QnMultiserverRequestData
 {
-    template <typename T>
-    static T fromParams(const QnRequestParamList& params)
+    template<typename T, typename Params>
+    static T fromParams(const Params& params)
     {
         T request;
         request.loadFromParams(params);
@@ -17,6 +17,7 @@ struct QnMultiserverRequestData
     explicit QnMultiserverRequestData(const QnRequestParamList& params);
 
     virtual void loadFromParams(const QnRequestParamList& params);
+    virtual void loadFromParams(const QnRequestParams& params);
     virtual QnRequestParamList toParams() const;
     virtual QUrlQuery toUrlQuery() const;
     virtual bool isValid() const;

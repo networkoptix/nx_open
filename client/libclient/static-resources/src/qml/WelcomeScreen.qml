@@ -254,7 +254,7 @@ Rectangle
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no internet access. Some cloud features could be unavailable.");
+            textControl.text: qsTr("You have no Internet access. Some cloud features could be unavailable.");
         }
     }
 

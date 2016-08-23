@@ -250,7 +250,15 @@ ModbusResponse QnModbusClient::writeSingleHoldingRegister(
     return response;
 }
 
-ModbusResponse nx_modbus::QnModbusClient::readCoils(
+ModbusResponse QnModbusClient::readDiscreteInputs(quint16 startAddress, quint16 inputCount, bool* outStatus)
+{
+    NX_ASSERT(false, "QnModbusClient::readDiscreteInputs not implemented.");
+
+    *outStatus = false; 
+    return ModbusResponse();
+}
+
+ModbusResponse QnModbusClient::readCoils(
     quint16 startCoilAddress,
     quint16 coilCount,
     bool* outStatus)
@@ -268,4 +276,20 @@ ModbusResponse nx_modbus::QnModbusClient::readCoils(
     request.header = buildHeader(request);
 
     return doModbusRequest(request, outStatus);
+}
+
+ModbusResponse QnModbusClient::writeCoils(quint16 startCoilAddress, const QByteArray& data, bool *outStatus)
+{
+    NX_ASSERT(false, "QnModbusClient::writeCoils not implemented.");
+
+    *outStatus = false;
+    return ModbusResponse();
+}
+
+ModbusResponse QnModbusClient::readInputRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus)
+{
+    NX_ASSERT(false, "QnModbusClient::readInputRegisters not implemented.");
+
+    *outStatus = false;
+    return ModbusResponse();
 }

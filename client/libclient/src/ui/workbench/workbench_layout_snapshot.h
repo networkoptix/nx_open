@@ -8,16 +8,17 @@
 #include <core/resource/layout_item_data.h>
 
 //TODO: #GDM replace with ec2::ApiLayoutData
-class QnWorkbenchLayoutSnapshot {
+class QnWorkbenchLayoutSnapshot
+{
 public:
-    QnWorkbenchLayoutSnapshot(): cellAspectRatio(-1.0), cellSpacing(-1.0, -1.0) {}
+    QnWorkbenchLayoutSnapshot();
 
     QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &resource);
 
     QnLayoutItemDataMap items;
     QString name;
     qreal cellAspectRatio;
-    QSizeF cellSpacing;
+    qreal cellSpacing;
 
     QSize backgroundSize;
     QString backgroundImageFilename;

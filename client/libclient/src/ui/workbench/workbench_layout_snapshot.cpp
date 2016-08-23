@@ -2,7 +2,21 @@
 
 #include <core/resource/layout_resource.h>
 
-QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &resource):
+QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot()
+    :
+    items(),
+    name(),
+    cellAspectRatio(-1.0),
+    cellSpacing(-1.0),
+    backgroundSize(),
+    backgroundImageFilename(),
+    backgroundOpacity(),
+    locked(false)
+{
+}
+
+QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &resource)
+    :
     items(resource->getItems()),
     name(resource->getName()),
     cellAspectRatio(resource->cellAspectRatio()),
@@ -14,7 +28,7 @@ QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &
 {}
 
 bool operator==(const QnWorkbenchLayoutSnapshot &l, const QnWorkbenchLayoutSnapshot &r) {
-    return 
+    return
         l.name == r.name &&
         l.items == r.items &&
         qFuzzyEquals(l.cellAspectRatio, r.cellAspectRatio) &&

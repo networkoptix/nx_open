@@ -345,6 +345,16 @@
                     </params>
                     <result/>
                 </function>
+                <function proprietary="true">
+                    <name>updateInformation/freeSpaceForUpdateFiles</name>
+                    <description>Get free space available for downloading and extracting update files.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>Returns the amount of free space available for update files in bytes
+                            for each online server in the system.</caption>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>

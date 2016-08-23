@@ -8,15 +8,15 @@
 
 GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObject *parent):
     Instrument(
-        makeSet(QEvent::Wheel), 
+        makeSet(QEvent::Wheel),
         makeSet(),
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(),
         parent
     ),
     m_workbench(workbench),
-    m_speed(1.0, 1.0),
-    m_maxSpacing(1.0, 1.0)
+    m_speed(1.0),
+    m_maxSpacing(1.0)
 {
     NX_ASSERT(workbench != NULL);
 }
@@ -34,36 +34,48 @@ bool GridAdjustmentInstrument::wheelEvent(QWidget *viewport, QWheelEvent *event)
     return false;
 }
 
+qreal GridAdjustmentInstrument::maxSpacing() const
+{
+    return m_maxSpacing;
+}
+
+void GridAdjustmentInstrument::setMaxSpacing(qreal spacing)
+{
+    m_maxSpacing = spacing;
+}
+
+qreal GridAdjustmentInstrument::speed() const
+{
+    return m_speed;
+}
+
+void GridAdjustmentInstrument::setSpeed(qreal speed)
+{
+    m_speed = speed;
+}
+
 bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *event) {
     QWidget *viewport = m_currentViewport.data();
     if(viewport == NULL)
         return false;
 
-    /* delta() returns the distance that the wheel is rotated 
+    /* delta() returns the distance that the wheel is rotated
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;
 
     if(workbench()) {
         QPointF gridMousePos = workbench()->mapper()->mapToGridF(event->scenePos());
 
-        QSizeF spacing = workbench()->currentLayout()->cellSpacing();
-        QSizeF delta = m_speed * -degrees;
-        
+        const auto spacing = workbench()->currentLayout()->cellSpacing();
+        qreal delta = m_speed * -degrees;
+
         qreal k = 1.0;
-        if(!qFuzzyIsNull(delta.width())) {
-            if(delta.width() < 0) {
-                k = qMin(k, spacing.width() / -delta.width());
-            } else {
-                k = qMin(k, (m_maxSpacing.width() - spacing.width()) / delta.width());
-            }
-        }
-        
-        if(!qFuzzyIsNull(delta.height())) {
-            if(delta.height() < 0) {
-                k = qMin(k, spacing.height() / -delta.height());
-            } else {
-                k = qMin(k, (m_maxSpacing.height() - spacing.height()) / delta.height());
-            }
+        if(!qFuzzyIsNull(delta))
+        {
+            if(delta < 0)
+                k = qMin(k, spacing / -delta);
+            else
+                k = qMin(k, (m_maxSpacing - spacing) / delta);
         }
 
         workbench()->currentLayout()->setCellSpacing(spacing + k * delta);

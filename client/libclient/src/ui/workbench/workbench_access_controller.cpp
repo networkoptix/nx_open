@@ -25,8 +25,7 @@ QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) 
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     base_type(parent),
     m_user(),
-    m_globalPermissions(Qn::NoGlobalPermissions),
-    m_readOnlyMode(false)
+    m_globalPermissions(Qn::NoGlobalPermissions)
 {
     connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
     connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
@@ -177,7 +176,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     //TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
     auto checkReadOnly = [this](Qn::Permissions permissions)
     {
-        if (!m_readOnlyMode)
+        if (!qnCommon->isReadOnly())
             return permissions;
         return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };
@@ -263,7 +262,6 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
     auto newGlobalPermissions = calculateGlobalPermissions();
     bool changed = newGlobalPermissions != m_globalPermissions;
     m_globalPermissions = newGlobalPermissions;
-    m_readOnlyMode = qnCommon->isReadOnly();
 
     if (changed)
         emit globalPermissionsChanged();

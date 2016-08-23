@@ -225,6 +225,8 @@ TEST( Socket, HostNameResolve1 )
     QString ipStr = resolvedAddress.toString();
     static_cast<void>( ipStr );
     ASSERT_TRUE( connectErrorCode == SystemError::noError );
+
+    connection->pleaseStopSync();
 }
 
 TEST_F( SocketHostNameResolveTest, HostNameResolve2 )

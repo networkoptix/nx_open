@@ -8,7 +8,6 @@ angular.module('webadminApp')
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
-            $scope.settings.remoteAddresses = $scope.settings.remoteAddresses.join('\n');
 
             mediaserver.resolveNewSystemAndUser().then(function(user){
                 if(user === null){
@@ -40,11 +39,5 @@ angular.module('webadminApp')
         };
 
         $scope.webclientEnabled = Config.webclientEnabled;
-        $scope.alertVisible = true;
 
-        $scope.session = $sessionStorage;
-
-        $scope.closeAlert = function(){
-            $scope.session.serverInfoAlertHidden = true;
-        };
     });

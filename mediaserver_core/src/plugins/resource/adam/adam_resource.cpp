@@ -59,7 +59,7 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 
     if (!status)
     {
-        qDebug() << "QnAdamResource::initInternal() " << "test request has been failed";
+        qDebug() << "QnAdamResource::initInternal() " << "test request has failed";
         return CameraDiagnostics::RequestFailedResult(
             lit("Test request failed"),
             lit("couldn't get valid response from device"));

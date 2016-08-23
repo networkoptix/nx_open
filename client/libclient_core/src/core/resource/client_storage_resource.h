@@ -26,8 +26,6 @@ public:
 
     static QnClientStorageResourcePtr newStorage(const QnMediaServerResourcePtr &parentServer, const QString &url);
 
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
-
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual bool initOrUpdate() const override;
@@ -50,6 +48,10 @@ public:
 
     bool isActive() const;
     void setActive(bool value);
+
+protected:
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
+
 signals:
     void freeSpaceChanged(const QnResourcePtr &storage);
     void totalSpaceChanged(const QnResourcePtr &storage);

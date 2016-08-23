@@ -58,13 +58,6 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
 
     this->host = host;
     this->port = port;
-
-    //connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-    //        this, SLOT(socketStateChanged(QAbstractSocket::SocketState)));
-    //connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)),
-    //        this, SLOT(socketError(QAbstractSocket::SocketError)));
-    //connect(m_socket, SIGNAL(readyRead()),
-    //        this, SLOT(socketReadyRead()));
 }
 
 SmtpClient::~SmtpClient() {}

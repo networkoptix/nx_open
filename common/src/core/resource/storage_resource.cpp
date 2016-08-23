@@ -8,6 +8,7 @@
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 
 QnStorageResource::QnStorageResource():
+    base_type(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
     m_usedForWriting(false),
@@ -73,7 +74,7 @@ void QnStorageResource::setUsedForWriting(bool isUsedForWriting) {
     emit isUsedForWritingChanged(::toSharedPointer(this));
 }
 
-bool QnStorageResource::isUsedForWriting() const 
+bool QnStorageResource::isUsedForWriting() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_usedForWriting;
@@ -131,20 +132,26 @@ float QnStorageResource::getAvarageWritingUsage() const
     return 0.0;
 }
 
-void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     NX_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
-    QnResource::updateInner(other, modifiedFields);
+
+    base_type::updateInternal(other, notifiers);
 
     QnStorageResource* localOther = dynamic_cast<QnStorageResource*>(other.data());
-    if (localOther) {
+    if (localOther)
+    {
         if (m_usedForWriting != localOther->m_usedForWriting)
-            modifiedFields << "isUsedForWritingChanged";
-        m_usedForWriting = localOther->m_usedForWriting;
+        {
+            m_usedForWriting = localOther->m_usedForWriting;
+            notifiers << [r = toSharedPointer(this)]{emit r->isUsedForWritingChanged(r);};
+        }
 
         if (m_isBackup != localOther->m_isBackup)
-            modifiedFields << "isBackupChanged";
-        m_isBackup = localOther->m_isBackup;
+        {
+            m_isBackup = localOther->m_isBackup;
+            notifiers << [r = toSharedPointer(this)]{ emit r->isBackupChanged(r); };
+        }
 
         m_spaceLimit = localOther->m_spaceLimit;
         m_maxStoreTime = localOther->m_maxStoreTime;
@@ -154,7 +161,7 @@ void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
 void QnStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
-    if (getId().isNull() && !getParentId().isNull()) 
+    if (getId().isNull() && !getParentId().isNull())
         setId(fillID(getParentId(), value));
 }
 
@@ -168,8 +175,8 @@ QnUuid QnStorageResource::fillID(const QnUuid& mserverId, const QString& url)
 bool QnStorageResource::isExternal() const
 {
     QString storageUrl = getUrl();
-    return 
-        storageUrl.trimmed().startsWith(lit("\\\\"))            || 
+    return
+        storageUrl.trimmed().startsWith(lit("\\\\"))            ||
         QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"))  ||
         storageUrl.indexOf(lit("://")) != -1;
 }
@@ -192,10 +199,10 @@ void QnStorageResource::setBackup(bool value) {
     emit isBackupChanged(::toSharedPointer(this));
 }
 
-bool QnStorageResource::isBackup() const 
-{ 
+bool QnStorageResource::isBackup() const
+{
     QnMutexLocker lk(&m_mutex);
-    return m_isBackup; 
+    return m_isBackup;
 }
 
 bool QnStorageResource::isWritable() const {

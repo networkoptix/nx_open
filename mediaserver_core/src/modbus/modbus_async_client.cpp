@@ -10,294 +10,180 @@ namespace
 }
 
 QnModbusAsyncClient::QnModbusAsyncClient():
-    m_state(ModbusClientState::ready),
-    m_requestSequenceNum(0),
-    m_terminated(false),
-    m_connected(false)
+    m_state(ModbusClientState::disconnected),
+    m_modbusConnection(nullptr),
+    m_requestSequenceNumber(0),
+    m_hasPendingMessage(false)
 {
-    initSocket();
 }
 
-QnModbusAsyncClient::QnModbusAsyncClient(const SocketAddress& endpoint):
-    m_state(ModbusClientState::ready),
-    m_requestSequenceNum(false),
-    m_terminated(false),
-    m_connected(false)
+QnModbusAsyncClient::QnModbusAsyncClient(const SocketAddress& endpoint):  
+    m_state(ModbusClientState::disconnected),
+    m_modbusConnection(nullptr),
+    m_requestSequenceNumber(0),
+    m_hasPendingMessage(false),
+    m_endpoint(endpoint)
 {
-    setEndpoint(endpoint);
 }
 
 QnModbusAsyncClient::~QnModbusAsyncClient()
 {
-    if (m_socket)
-    {
-        m_socket->pleaseStopSync();
-        m_socket->shutdown();
-    }
+    stopWhileInAioThread();
 }
 
 void QnModbusAsyncClient::setEndpoint(const SocketAddress& endpoint)
 {
-    m_endpoint = endpoint;
-    initSocket();
-}
-
-bool QnModbusAsyncClient::initSocket()
-{
-    m_connected = false;
-
-    m_sendBuffer.reserve(nx_modbus::kModbusMaxMessageLength);
-    m_recvBuffer.reserve(nx_modbus::kModbusMaxMessageLength);
-
-    if (m_socket)
-    {
-        m_socket->pleaseStopSync();
-        m_socket->shutdown();
-    }
-
-    m_socket = SocketFactory::createStreamSocket();
-
-    if (!m_socket->setRecvTimeout(kRecvTimeout) ||
-        !m_socket->setSendTimeout(kSendTimeout))
-    {
-        m_socket.reset();
-        return false;
-    }
-
-    return true;
-}
-
-void QnModbusAsyncClient::readAsync(quint64 currentRequestSequenceNum)
-{
-    auto handler =
-        [currentRequestSequenceNum, this](SystemError::ErrorCode errorCode, size_t bytesRead)
+    post(
+        [this, endpoint]()
         {
-            QnMutexLocker lock(&m_mutex);
-
-            if (m_terminated)
+            if (endpoint == m_endpoint)
                 return;
 
-            if(currentRequestSequenceNum != m_requestSequenceNum)
-                return;
-
-            onSomeBytesReadAsync(m_socket.get(), currentRequestSequenceNum, errorCode, bytesRead);
-        };
-
-    m_socket->readSomeAsync(&m_recvBuffer, handler);
+            m_modbusConnection.reset();
+            m_state = ModbusClientState::disconnected;
+            m_endpoint = endpoint;
+            m_hasPendingMessage = false;
+            m_requestSequenceNumber = 0;
+        });
 }
 
-void QnModbusAsyncClient::asyncSendDone(
-    AbstractSocket *sock,
-    quint64 currentSequenceNum,
-    SystemError::ErrorCode errorCode,
-    size_t bytesWritten)
+void QnModbusAsyncClient::openConnection()
 {
+    if (m_endpoint.isNull())
+        return;
+
+    if (m_state != ModbusClientState::disconnected)
+        return;
+
+    auto handler = [this](SystemError::ErrorCode errorCode){ onConnectionDone(errorCode); };
+    
+    bool kSslNeeded = false;
+    auto connectionSocket = SocketFactory::createStreamSocket(
+        kSslNeeded, SocketFactory::NatTraversalType::nttDisabled);
+
+    connectionSocket->bindToAioThread(getAioThread());
+
+    if (!connectionSocket->setNonBlockingMode(true) ||
+        !connectionSocket->setSendTimeout(kSendTimeout) ||
+        !connectionSocket->setRecvTimeout(kRecvTimeout))
+    {
+        connectionSocket->post(
+            std::bind(handler, SystemError::getLastOSErrorCode()));
+
+        return;
+    }
+
+    m_modbusConnection.reset(
+        new ModbusProtocolConnection(this, std::move(connectionSocket)));
+
+    m_modbusConnection->setMessageHandler(
+        [this](ModbusMessage message) { onMessage(message); });
+
+    m_state = ModbusClientState::connecting;
+
+    m_modbusConnection->socket()->connectAsync(m_endpoint, handler);
+}
+
+
+void QnModbusAsyncClient::onConnectionDone(SystemError::ErrorCode errorCode)
+{
+    if (m_state != ModbusClientState::connecting)
+        return;
+
     if (errorCode != SystemError::noError)
     {
-        qDebug() << SystemError::getLastOSErrorText();
-        emitError(lit("ModbusAsyncClient: error while sending request. %1").arg(errorCode));
+        m_state = ModbusClientState::disconnected;
+
+        onError(errorCode, lit("Error while connecting to endpoint %1.")
+            .arg(m_endpoint.toString()));
+
         return;
     }
-    m_recvBuffer.truncate(0);
 
-    m_state = ModbusClientState::readingHeader;
+    m_state = ModbusClientState::connected;
 
-    readAsync(currentSequenceNum);
+    m_modbusConnection->startReadingConnection();
+
+    sendPendingMessage();
 }
 
-void QnModbusAsyncClient::onSomeBytesReadAsync(
-    AbstractSocket *sock,
-    quint64 currentRequestSequenceNum,
-    SystemError::ErrorCode errorCode,
-    size_t bytesRead)
+void QnModbusAsyncClient::sendPendingMessage()
 {
-    if ( errorCode != SystemError::noError)
-    {
-        emitError(lit("ModbusAsyncClient: error while reading response. %1").arg(errorCode));
-        return;
-    }
+    NX_ASSERT(m_state == ModbusClientState::connected);
 
-    processState(currentRequestSequenceNum);
-}
-
-void QnModbusAsyncClient::processState(quint64 currentRequestSequenceNum)
-{
-    if (m_state == ModbusClientState::ready
-        || m_state == ModbusClientState::sendingMessage)
-    {
-        const auto logMessage = lit(
-            "ModbusAsyncClient: Got unexpected data. It's not good");
-
-        NX_LOG(logMessage, cl_logWARNING);
-        qDebug() << logMessage;
-
-        emitError(logMessage);
-        return;
-    }
-    else if (m_state == ModbusClientState::readingHeader)
-    {
-        processHeader(currentRequestSequenceNum);
-    }
-    else if (m_state == ModbusClientState::readingData)
-    {
-        processData(currentRequestSequenceNum);
-    }
-}
-
-void QnModbusAsyncClient::processHeader(quint64 currentRequestSequenceNum)
-{
-    Q_ASSERT(m_state == ModbusClientState::readingHeader);
-
-    if (m_recvBuffer.size() < ModbusMBAPHeader::size)
+    if (!m_hasPendingMessage)
         return;
 
-    auto header = ModbusMBAPHeader::decode(m_recvBuffer);
-    m_responseLength = header.length;
-
-    if (m_recvBuffer.size() > ModbusMBAPHeader::size)
-    {
-        m_state = ModbusClientState::readingData;
-        processData(currentRequestSequenceNum);
-    }
-    else
-    {
-        readAsync(currentRequestSequenceNum);
-    }
-}
-
-void QnModbusAsyncClient::processData(quint64 currentRequestSequenceNum)
-{
-    Q_ASSERT(m_state == ModbusClientState::readingData);
-
-    const quint16 fullMessageLength = ModbusMBAPHeader::size
-        + m_responseLength
-        - sizeof(decltype(ModbusMBAPHeader::unitId));
-
-    if (fullMessageLength > nx_modbus::kModbusMaxMessageLength)
-    {
-        emitError(
-            lit("Response message size is too big: %1 bytes").arg(fullMessageLength));
-
-        return;
-    }
-
-    if (m_recvBuffer.size() < fullMessageLength)
-    {
-        readAsync(currentRequestSequenceNum);
-        return;
-    }
-
-    if (m_recvBuffer.size() > fullMessageLength)
-    {
-        const auto logMessage =
-            lit("ModbusAsyncClient: buffer size is more than expected response length.")
-            + lit("Buffer size: %1 bytes, response length: %2 bytes.")
-            .arg(m_recvBuffer.size())
-            .arg(fullMessageLength);
-
-        NX_LOG(logMessage, cl_logWARNING);
-        qDebug() << logMessage;
-
-        emitError(logMessage);
-        return;
-    }
-
-    if (m_recvBuffer.size() == fullMessageLength)
-    {
-        auto response = ModbusResponse::decode(m_recvBuffer);
-        m_state = ModbusClientState::ready;
-
-        if (!response.isException())
+    m_hasPendingMessage = false;
+    m_modbusConnection->sendMessage(
+        m_pendingMessage,
+        [this](SystemError::ErrorCode errorCode)
         {
-            emit done(response);
-        }
-        else
-        {
-            emitError(
-                lit("ModbusAsyncClient, got exception: %1").arg(response.getExceptionString()));
-        }
-    }
+            if (errorCode != SystemError::noError)
+                onError(errorCode, lit("Error while sending message."));
+        });
 }
 
-void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
+void QnModbusAsyncClient::onMessage(ModbusMessage message)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    if (m_terminated)
-        return;
-
-    m_requestSequenceNum++;
-
-    m_state = ModbusClientState::ready;
-
-    m_sendBuffer.truncate(0);
-    m_recvBuffer.truncate(0);
-
-    m_sendBuffer.append(ModbusRequest::encode(request));
-
-    if (m_sendBuffer.size() > nx_modbus::kModbusMaxMessageLength)
-    {
-        emitError(
-            lit("Request size is too big: %1 bytes. Maximum request length is %2 bytes.")
-                .arg(m_sendBuffer.size())
-                .arg(nx_modbus::kModbusMaxMessageLength));
-        return;
-    }
-
-    if (m_sendBuffer.isEmpty())
-    {
-        emitError(
-            lit("Serialized request is 0 bytes length.")
-                .arg(m_sendBuffer.size())
-                .arg(nx_modbus::kModbusMaxMessageLength));
-        return;
-    }
-
-
-    m_requestFunctionCode = request.functionCode;
-    m_requestTransactionId = request.header.transactionId;
-
-    quint64 currentSequenceNum = m_requestSequenceNum;
-
-    auto handler =
-        [currentSequenceNum, this](
-            SystemError::ErrorCode errorCode,
-            size_t bytesWritten)
-        {
-            QnMutexLocker lock(&m_mutex);
-
-            if (m_terminated)
-                return;
-
-            if (currentSequenceNum != m_requestSequenceNum)
-                return;
-
-            asyncSendDone(m_socket.get(), currentSequenceNum, errorCode, bytesWritten);
-        };
-
-    m_state = ModbusClientState::sendingMessage;
-
-    if (!m_connected)
-    {
-        if (!(initSocket() && m_socket->connect(m_endpoint) && m_socket->setNonBlockingMode(true)))
-        {
-            emitError(
-                lit("ModbusAsyncClient, unable to connect to endpoint %1")
-                    .arg(m_endpoint.toString()));
-            return;
-        }
-
-        m_connected = true;
-    }
-
-    m_socket->sendAsync(m_sendBuffer, handler);
+    // Looks strange, but needed because doModbusRequestAsync should return transaction id
+    // before 'done' signal will be emitted.
+    { QnMutexLocker lock(&m_mutex); }
+    
+    emit done(message);
 }
 
-void QnModbusAsyncClient::readCoilsAsync(quint16 startCoil, quint16 coilNumber)
+void QnModbusAsyncClient::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* connection)
 {
-    ModbusRequest request;
+    QN_UNUSED(connection);
 
-    request.functionCode = FunctionCode::kReadCoils;
+    m_modbusConnection.reset();
+    m_state = ModbusClientState::disconnected;
+    
+    onError(closeReason, lit("Connection closed."));
+}
+
+void QnModbusAsyncClient::doModbusRequestAsync(const ModbusMessage &message)
+{
+    post(
+        [this, message]()
+        {
+            m_pendingMessage = message;
+            m_hasPendingMessage = true;
+
+            if (m_state == ModbusClientState::disconnected)
+                openConnection();
+            else if (m_state == ModbusClientState::connected)
+                sendPendingMessage();
+        });
+}
+
+void QnModbusAsyncClient::onError(SystemError::ErrorCode errorCode, QString& errorStr)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_lastErrorString = errorStr.append(
+            lit(" Error code: %1").arg(errorCode));
+    }
+
+    emit error();
+}
+
+quint16 QnModbusAsyncClient::readDiscreteInputsAsync(quint16 startRegister, quint16 registerCount)
+{
+    QN_UNUSED(startRegister);
+    QN_UNUSED(registerCount);
+
+    NX_ASSERT(false, "QnModbusAsyncClient::readDiscreteInputsAsync is not implemented");
+
+    return 0;
+}
+
+quint16 QnModbusAsyncClient::readCoilsAsync(quint16 startCoil, quint16 coilNumber)
+{
+    ModbusMessage message;
+
+    message.functionCode = FunctionCode::kReadCoils;
 
     QByteArray data;
     QDataStream stream(&data, QIODevice::WriteOnly);
@@ -305,17 +191,62 @@ void QnModbusAsyncClient::readCoilsAsync(quint16 startCoil, quint16 coilNumber)
 
     stream << startCoil << coilNumber;
 
-    request.data = data;
-    request.header = buildHeader(request);
+    message.data = data;
+    message.header = buildHeader(message);
 
-    doModbusRequestAsync(request);
+    {
+        QnMutexLocker lock(&m_mutex);
+        doModbusRequestAsync(message);
+        return message.header.transactionId;
+    }
 }
 
-ModbusMBAPHeader QnModbusAsyncClient::buildHeader(const ModbusRequest& request)
+quint16 QnModbusAsyncClient::writeCoilsAsync(quint16 startCoilAddress, const QByteArray& data)
+{
+    QN_UNUSED(startCoilAddress);
+    QN_UNUSED(data);
+
+    NX_ASSERT(false, "QnModbusAsyncClient::writeCoilsAsync is not implemented");
+
+    return 0;
+}
+
+quint16 QnModbusAsyncClient::readInputRegistersAsync(quint16 startRegister, quint16 registerCount)
+{
+    QN_UNUSED(startRegister);
+    QN_UNUSED(registerCount);
+
+    NX_ASSERT(false, "QnModbusAsyncClient::readInputRegisterAsync is not implemented");
+
+    return 0;
+}
+
+
+quint16 QnModbusAsyncClient::readHoldingRegistersAsync(quint32 startRegister, quint32 registerCount)
+{
+    QN_UNUSED(startRegister);
+    QN_UNUSED(registerCount);
+
+    NX_ASSERT(false, "QnModbusAsyncClient::readHoldingRegistersAsync is not implemented");
+
+    return 0;
+}
+
+quint16 QnModbusAsyncClient::writeHoldingRegistersAsync(quint32 startRegister, const QByteArray& data)
+{
+    QN_UNUSED(startRegister);
+    QN_UNUSED(data);
+
+    NX_ASSERT(false, "QnModbusAsyncClient::writeHoldingRegistersAsync is not implemented");
+
+    return 0;
+}
+
+ModbusMBAPHeader QnModbusAsyncClient::buildHeader(const ModbusMessage& request)
 {
     ModbusMBAPHeader header;
 
-    header.transactionId = ++m_requestTransactionId;
+    header.transactionId = ++m_requestSequenceNumber;
     header.protocolId = 0x00;
     header.unitId = 0x01;
     header.length = sizeof(header.unitId)
@@ -327,24 +258,11 @@ ModbusMBAPHeader QnModbusAsyncClient::buildHeader(const ModbusRequest& request)
 
 QString QnModbusAsyncClient::getLastErrorString() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_lastErrorString;
 }
 
-void QnModbusAsyncClient::terminate()
+void nx_modbus::QnModbusAsyncClient::stopWhileInAioThread()
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_terminated = true;
-    }
-
-    m_socket->pleaseStopSync();
+    m_modbusConnection.reset();
 }
-
-void nx_modbus::QnModbusAsyncClient::emitError(const QString& errorStr)
-{
-    m_lastErrorString = errorStr;
-    m_state = ModbusClientState::ready;
-    initSocket();
-    emit error();
-}
-

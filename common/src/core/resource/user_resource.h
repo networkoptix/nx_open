@@ -91,7 +91,7 @@ signals:
     void enabledChanged(const QnResourcePtr& user);
 
 protected:
-    virtual void updateInner(const QnResourcePtr& other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 private:
     QnUserType m_userType;

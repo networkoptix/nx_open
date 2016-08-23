@@ -750,7 +750,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         if (!qnCommon->isReadOnly())
             return permissions;
         return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission
-            | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+            | Qn::WritePasswordPermission | Qn::WriteEmailPermission | Qn::WriteFullNamePermission);
     };
 
     auto checkUserType = [targetUser](Qn::Permissions permissions)
@@ -771,7 +771,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (targetUser == user)
     {
         /* Everyone can edit own data. */
-        result |= Qn::ReadPermission | Qn::ReadWriteSavePermission | Qn::WritePasswordPermission;
+        result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission
+            | Qn::WriteEmailPermission | Qn::WriteFullNamePermission;
     }
     else
     {
@@ -785,11 +786,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
             /* Admins can only be edited by owner, other users - by all admins. */
             if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
-                result |= Qn::ReadWriteSavePermission
-                    | Qn::WriteNamePermission
-                    | Qn::WritePasswordPermission
-                    | Qn::WriteAccessRightsPermission
-                    | Qn::RemovePermission;
+                result |= Qn::FullUserPermissions;
         }
     }
 

@@ -4,10 +4,12 @@
 #include <client/client_globals.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 
+#include <utils/common/connective.h>
+
 class QnStatusOverlayWidget;
 class QnStatusOverlayWidget;
 
-class QnStatusOverlayController: public QObject
+class QnStatusOverlayController: public Connective<QObject>
 {
     Q_OBJECT
 
@@ -19,6 +21,9 @@ class QnStatusOverlayController: public QObject
         NOTIFY currentButtonChanged)
     Q_PROPERTY(bool isErrorOverlay READ isErrorOverlay NOTIFY isErrorOverlayChanged)
 
+    typedef QPointer<QnStatusOverlayWidget> StatusOverlayWidgetPtr;
+
+    using base_type = Connective<QObject>;
 public:
     enum class Button
     {
@@ -30,7 +35,7 @@ public:
     };
 
     QnStatusOverlayController(const QnResourcePtr& resource,
-        QnStatusOverlayWidget* widget);
+        const StatusOverlayWidgetPtr& widget, QObject* parent = nullptr);
 
     virtual ~QnStatusOverlayController() = default;
 
@@ -80,7 +85,7 @@ private:
     static IntStringHash getButtonCaptions(const QnResourcePtr& resource);
 
 private:
-    QnStatusOverlayWidget* const m_widget;
+    const StatusOverlayWidgetPtr m_widget;
     const IntStringHash m_buttonTexts;
 
     QnStatusOverlayWidget::Controls m_visibleItems;

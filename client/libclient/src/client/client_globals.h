@@ -136,7 +136,7 @@ namespace Qn
         VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
         /* Layout-based. */
-        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
+        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type qreal. */
         LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
         LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
         LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */

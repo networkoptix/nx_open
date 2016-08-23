@@ -54,6 +54,7 @@ qint64 getDiskFreeSpace(const QString &root);
 
 qint64 getDiskTotalSpace(const QString &root);
 
+// TODO: #ynikitenkov move to cpp, get rid of define
 #define DEFAULT_APPSERVER_HOST "127.0.0.1"
 #define DEFAULT_APPSERVER_PORT 7001
 

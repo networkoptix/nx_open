@@ -32,7 +32,7 @@ QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
 
     addAnimator(m_frameOpacityAnimator);
 
-    connect(this, SIGNAL(finished()), this, SLOT(at_animation_finished()));
+    connect(this, &AbstractAnimator::finished, this, &QnCurtainAnimator::at_animation_finished);
 }
 
 QnCurtainAnimator::~QnCurtainAnimator()
