@@ -16,6 +16,9 @@
 #include <common/common_module.h>
 #include <cloud/cloud_connection_manager.h>
 
+#include <rest/helpers/permissions_helper.h>
+#include <rest/server/rest_connection_processor.h>
+
 
 QnSaveCloudSystemCredentialsHandler::QnSaveCloudSystemCredentialsHandler(
     const CloudConnectionManager& cloudConnectionManager)
@@ -29,17 +32,23 @@ int QnSaveCloudSystemCredentialsHandler::executePost(
     const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor*)
+    const QnRestConnectionProcessor* owner)
 {
     const CloudCredentialsData data = QJson::deserialized<CloudCredentialsData>(body);
-    return execute(data, result);
+    return execute(data, result, owner);
 }
 
 int QnSaveCloudSystemCredentialsHandler::execute(
     const CloudCredentialsData& data,
-    QnJsonRestResult& result)
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
 {
     using namespace nx::cdb;
+
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+        return QnPermissionsHelper::notOwnerError(result);
 
     NX_LOGX(lm("Saving cloud credentials"), cl_logDEBUG1);
 

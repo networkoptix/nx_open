@@ -28,7 +28,7 @@ public:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor*);
 
-    int execute(const CloudCredentialsData& data, QnJsonRestResult& result);
+    int execute(const CloudCredentialsData& data, QnJsonRestResult& result, const QnRestConnectionProcessor* owner);
 
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
