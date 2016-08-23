@@ -71,7 +71,8 @@ class AsyncSocketImplHelper
 public:
     AsyncSocketImplHelper(
         SocketType* _socket,
-        AbstractCommunicatingSocket* _abstractSocketPtr )
+        AbstractCommunicatingSocket* _abstractSocketPtr,
+        int _ipVersion)
     :
         BaseAsyncSocketImplHelper<SocketType>( _socket ),
         m_abstractSocketPtr( _abstractSocketPtr ),
@@ -85,7 +86,8 @@ public:
         m_recvHandlerTerminatedFlag( nullptr ),
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
-        m_asyncSendIssued( false )
+        m_asyncSendIssued( false ),
+        m_ipVersion( _ipVersion )
     {
         assert( this->m_socket );
         assert( m_abstractSocketPtr );
@@ -181,6 +183,7 @@ public:
                 else if( !startAsyncConnect( SocketAddress(resolvedAddress, addr.port) ) )
                     this->post( std::bind( m_connectHandler, SystemError::getLastOSErrorCode() ) );
             },
+            m_ipVersion,
             this );
     }
 
@@ -318,6 +321,7 @@ private:
 
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     std::atomic<bool> m_asyncSendIssued;
+    const int m_ipVersion;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {

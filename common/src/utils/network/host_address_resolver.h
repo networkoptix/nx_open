@@ -45,11 +45,11 @@ public:
     bool resolveAddressAsync(
         const HostAddress& addressToResolve,
         std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
-        RequestID reqID );
+        int ipVersion, RequestID reqID );
     /*!
         \note This method is re-enterable
     */
-    bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress );
+    bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress, int ipVersion );
 
     //!Returns \a true if address \a addr is resolved
     static bool isAddressResolved( const HostAddress& addr );
@@ -72,12 +72,14 @@ private:
         std::function<void(SystemError::ErrorCode, const HostAddress&)> completionHandler;
         RequestID reqID;
         size_t sequence;
+        int ipVersion;
 
         ResolveTask(
             HostAddress _hostAddress,
             std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
             RequestID _reqID,
-            size_t _sequence );
+            size_t _sequence,
+            int _ipVersion);
     };
 
     bool m_terminated;
@@ -86,6 +88,7 @@ private:
     std::list<ResolveTask> m_taskQueue;
     RequestID m_runningTaskReqID;
     size_t m_currentSequence;
+    int ipVersion;
 };
 
 #endif  //HOST_ADDRESS_RESOLVER_H
