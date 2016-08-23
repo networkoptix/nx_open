@@ -292,6 +292,7 @@ void QnNotificationWidget::setTooltipEnclosingRect(const QRectF& rect)
 void QnNotificationWidget::setGeometry(const QRectF& geometry)
 {
     base_type::setGeometry(geometry);
+    m_textLabel->setPreferredHeight(m_textLabel->widget()->heightForWidth(geometry.width()));
 
     QRectF buttonGeometry(QPointF(), m_closeButton->size());
     buttonGeometry.moveTopRight(rect().topRight() + QPointF(0, 1));
