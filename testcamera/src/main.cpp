@@ -4,7 +4,6 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
@@ -15,6 +14,12 @@
 #include "core/resource_management/resource_properties.h"
 #include "core/resource/storage_plugin_factory.h"
 
+#include "camera_pool.h"
+
+extern "C"
+{
+#include <libavformat/avformat.h>
+}
 
 QString doUnquote(const QString& fileName)
 {
@@ -40,9 +45,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
-    
-    ffmpegInit();  
-    
+
+    ffmpegInit();
+
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
 
@@ -54,7 +59,7 @@ int main(int argc, char *argv[])
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     qDebug() << QN_APPLICATION_NAME << "version" << QN_APPLICATION_VERSION;
-    
+
     if (argc == 1)
     {
         qDebug() << "usage:";

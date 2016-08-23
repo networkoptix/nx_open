@@ -6,7 +6,7 @@
 #include "test_camera.h"
 #include "utils/network/socket.h"
 #include "utils/common/long_runnable.h"
-#include "utils/network/tcp_listener.h"
+#include <network/tcp_listener.h>
 
 class QnCameraDiscoveryListener;
 
@@ -21,7 +21,7 @@ public:
 
     static void initGlobalInstance( QnCameraPool* _inst );
     static QnCameraPool* instance();
-    
+
     void addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq);
     QnTestCamera* findCamera(const QString& mac) const;
     QByteArray getDiscoveryResponse();
