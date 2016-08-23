@@ -333,7 +333,10 @@ namespace nx_http
 
     void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
-        m_proxyEndpoint = proxyEndpoint;
+        if (proxyEndpoint.isNull())
+            m_proxyEndpoint.reset();
+        else
+            m_proxyEndpoint = proxyEndpoint;
     }
 
     void AsyncHttpClient::setConnectionHeader(const StringType& value)

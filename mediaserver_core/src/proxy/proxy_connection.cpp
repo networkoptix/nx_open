@@ -244,8 +244,12 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 {
     Q_D(QnProxyConnectionProcessor);
 
-    if (!QnUniversalRequestProcessor::needStandardProxy(d->request))
+    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
     {
+        dstUrl = d->request.requestLine.url;
+    }
+    else
+	{
         QUrl url = d->request.requestLine.url;
         QString host = url.host();
         QString urlPath = url.path();
@@ -261,7 +265,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
             QString protocol = urlPath.mid(proxyEndPos + 1, protocolEndPos - proxyEndPos - 1);
             if (!isProtocol(protocol)) {
-                protocol = dstUrl.scheme();
+                protocol = url.scheme();
                 if (protocol.isEmpty())
                     protocol = "http";
                 protocolEndPos = proxyEndPos;
