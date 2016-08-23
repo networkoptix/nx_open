@@ -109,7 +109,7 @@ int QnSetupCloudSystemRestHandler::execute(
 
 
     QnSaveCloudSystemCredentialsHandler subHandler(m_cloudConnectionManager);
-    int httpResult = subHandler.execute(data, result);
+    int httpResult = subHandler.execute(data, result, owner);
     if (result.error != QnJsonRestResult::NoError)
     {
         //changing system name back
