@@ -396,7 +396,8 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
-    m_gen(m_rd())
+    m_gen(m_rd()),
+    m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt())
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -2020,9 +2021,13 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
         return false;
 
     QString newName;
-    bool renameOK = renameFileWithDuration(fileName, newName, durationMs, storage);
-    if (!renameOK)
-        qDebug() << lit("File %1 rename failed").arg(fileName);
+    bool renameOK = false;
+    if (!m_isRenameDisabled)
+    {
+        renameOK = renameFileWithDuration(fileName, newName, durationMs, storage);
+        if (!renameOK)
+            qDebug() << lit("File %1 rename failed").arg(fileName);
+    }
 
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, quality);
     if (catalog == 0)
