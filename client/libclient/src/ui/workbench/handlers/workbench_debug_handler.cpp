@@ -1,5 +1,8 @@
 #include "workbench_debug_handler.h"
 
+#include <QtWidgets/QLineEdit>
+#include <QtWebKitWidgets/QWebView>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -9,6 +12,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
+#include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workaround/qtbug_workaround.h>
 
@@ -39,6 +43,41 @@ private:
         button->setToolButtonStyle(Qt::ToolButtonTextOnly);
         return button;
     }
+};
+
+class QnWebViewDialog: public QDialog
+{
+    using base_type = QDialog;
+public:
+    QnWebViewDialog(QWidget* parent = nullptr):
+        base_type(parent, Qt::Window),
+        m_page(new QnWebPage(this)),
+        m_webView(new QWebView(this)),
+        m_urlLineEdit(new QLineEdit(this))
+    {
+        m_webView->setPage(m_page);
+
+        QVBoxLayout *layout = new QVBoxLayout(this);
+        layout->setContentsMargins(QMargins());
+        layout->addWidget(m_urlLineEdit);
+        layout->addWidget(m_webView);
+        connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
+        {
+            m_webView->load(m_urlLineEdit->text());
+        });
+    }
+
+    QString url() const { return m_urlLineEdit->text(); }
+    void setUrl(const QString& value)
+    {
+        m_urlLineEdit->setText(value);
+        m_webView->load(QUrl::fromUserInput(value));
+    }
+
+private:
+    QnWebPage* m_page;
+    QWebView* m_webView;
+    QLineEdit* m_urlLineEdit;
 };
 
 
@@ -83,9 +122,13 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered()
     Q_UNUSED(showPalette);
 }
 
+#include <ui/dialogs/setup_wizard_dialog.h>
+
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {
-    //at_debugShowResourcePoolAction_triggered();
+    auto dialog(new QnWebViewDialog(mainWindow()));
+    dialog->setUrl(lit("http://localhost:7001"));
+    dialog->show();
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered()
