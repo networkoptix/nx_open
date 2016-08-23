@@ -3,18 +3,13 @@
 #include <common/common_module.h>
 
 #include <client/client_module.h>
-#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/resource_type.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
-
-#include <ui/style/skin.h>
 
 #include <nx/fusion/model_functions.h>
 
