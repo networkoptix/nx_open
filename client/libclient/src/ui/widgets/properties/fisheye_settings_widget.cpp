@@ -39,27 +39,31 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     connect(ui->viewDownButton,        &QPushButton::clicked, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->viewUpButton,          &QPushButton::clicked, this, &QnFisheyeSettingsWidget::dataChanged);
 
-    connect(ui->sizeSlider, &QSlider::sliderMoved, this,
+    connect(ui->sizeSlider, &QSlider::valueChanged, this,
         [this](int value)
         {
+            QSignalBlocker signalBlocker(ui->sizeSlider);
             ui->calibrateWidget->setRadius(value * 0.01);
         });
 
-    connect(ui->xOffsetSlider, &QSlider::sliderMoved, this,
+    connect(ui->xOffsetSlider, &QSlider::valueChanged, this,
         [this](int value)
         {
+            QSignalBlocker signalBlocker(ui->xOffsetSlider);
             ui->calibrateWidget->setCenter(QPointF(value * 0.01, ui->calibrateWidget->center().y()));
         });
 
-    connect(ui->yOffsetSlider, &QSlider::sliderMoved, this,
+    connect(ui->yOffsetSlider, &QSlider::valueChanged, this,
         [this](int value)
         {
+            QSignalBlocker signalBlocker(ui->yOffsetSlider);
             ui->calibrateWidget->setCenter(QPointF(ui->calibrateWidget->center().x(), 1.0 - value * 0.01));
         });
 
-    connect(ui->ellipticitySlider, &QSlider::sliderMoved, this,
+    connect(ui->ellipticitySlider, &QSlider::valueChanged, this,
         [this](int value)
         {
+            QSignalBlocker signalBlocker(ui->ellipticitySlider);
             ui->calibrateWidget->setHorizontalStretch(value / 50.0);
         });
 
