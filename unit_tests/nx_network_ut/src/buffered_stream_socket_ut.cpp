@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/system_socket.h>
-#include <nx/network/extended_stream_socket.h>
+#include <nx/network/buffered_stream_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 
 namespace nx {
@@ -9,21 +9,21 @@ namespace network {
 namespace test {
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
-    TEST, ExtendedStreamSocket,
+    TEST, BufferedStreamSocket,
     []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     []()
     {
-        return std::make_unique<ExtendedStreamSocket>(
+        return std::make_unique<BufferedStreamSocket>(
             std::make_unique<TCPSocket>(false, AF_INET));
     })
 
-class ExtendedStreamSocketTest:
+class BufferedStreamSocketTest:
     public ::testing::Test
 {
 protected:
     std::unique_ptr<AbstractStreamServerSocket> server;
     std::unique_ptr<AbstractStreamSocket> client;
-    std::unique_ptr<ExtendedStreamSocket> accepted;
+    std::unique_ptr<BufferedStreamSocket> accepted;
 
     nx::utils::TestSyncQueue<SystemError::ErrorCode> acceptedResults;
     Buffer buffer;
@@ -45,19 +45,19 @@ protected:
         std::unique_ptr<AbstractStreamSocket> acceptedRaw(server->accept());
         ASSERT_NE(acceptedRaw, nullptr) << SystemError::getLastOSErrorText().toStdString();
 
-        accepted = std::make_unique<ExtendedStreamSocket>(std::move(acceptedRaw));
+        accepted = std::make_unique<BufferedStreamSocket>(std::move(acceptedRaw));
         ASSERT_TRUE(accepted->setRecvTimeout(500));
     }
 };
 
-TEST_F(ExtendedStreamSocketTest, waitForRecvData)
+TEST_F(BufferedStreamSocketTest, catchRecvEvent)
 {
     ASSERT_TRUE(accepted->setNonBlockingMode(true));
-    accepted->waitForRecvData(acceptedResults.pusher());
+    accepted->catchRecvEvent(acceptedResults.pusher());
     ASSERT_EQ(acceptedResults.pop(), SystemError::timedOut);
 
     buffer.reserve(kTestMessage.size() * kClientCount);
-    accepted->waitForRecvData(acceptedResults.pusher());
+    accepted->catchRecvEvent(acceptedResults.pusher());
     for (int i = 0; i < kClientCount; ++i)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
@@ -76,7 +76,7 @@ TEST_F(ExtendedStreamSocketTest, waitForRecvData)
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
 
     buffer = Buffer(kTestMessage.size() * kClientCount, '\0');
-    accepted->waitForRecvData(acceptedResults.pusher());
+    accepted->catchRecvEvent(acceptedResults.pusher());
     for (int i = 0; i < kClientCount; ++i)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
@@ -86,13 +86,13 @@ TEST_F(ExtendedStreamSocketTest, waitForRecvData)
     ASSERT_TRUE(buffer.startsWith(kTestMessage));
     ASSERT_TRUE(buffer.endsWith(kTestMessage));
 
-    accepted->waitForRecvData(acceptedResults.pusher());
+    accepted->catchRecvEvent(acceptedResults.pusher());
     client.reset();
     ASSERT_EQ(acceptedResults.pop(), SystemError::connectionReset);
     ASSERT_TRUE(acceptedResults.isEmpty());
 }
 
-TEST_F(ExtendedStreamSocketTest, injectRecvData)
+TEST_F(BufferedStreamSocketTest, injectRecvData)
 {
     accepted->injectRecvData(kTestMessage);
     ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
@@ -103,8 +103,8 @@ TEST_F(ExtendedStreamSocketTest, injectRecvData)
     ASSERT_TRUE(buffer.endsWith(kTestMessage));
 
     accepted->injectRecvData(kTestMessage);
-    accepted->injectRecvData(kTestMessage, ExtendedStreamSocket::Inject::replace);
-    accepted->injectRecvData(kTestMessage, ExtendedStreamSocket::Inject::begin);
+    accepted->injectRecvData(kTestMessage, BufferedStreamSocket::Inject::replace);
+    accepted->injectRecvData(kTestMessage, BufferedStreamSocket::Inject::begin);
     client.reset();
 
     buffer = Buffer(kTestMessage.size() * 3, '\0');
