@@ -21,7 +21,7 @@
 #include "socket_test_helper.h"
 
 
-namespace 
+namespace
 {
     const int SECONDS_TO_WAIT_AFTER_TEST = 5;
 }
@@ -228,9 +228,10 @@ TEST( Socket, HostNameResolve3 )
         ASSERT_TRUE(
             HostAddressResolver::instance()->resolveAddressSync(
                 QLatin1String("ya.ru"),
-                &resolvedAddress) );
+                &resolvedAddress,
+                AF_INET));
 
-        ASSERT_TRUE((bool)resolvedAddress.ipV4() != 0);
+        ASSERT_TRUE((bool)resolvedAddress.ipV4());
         ASSERT_NE(resolvedAddress.ipV4()->s_addr, 0);
     }
 
@@ -239,7 +240,8 @@ TEST( Socket, HostNameResolve3 )
         ASSERT_FALSE(
             HostAddressResolver::instance()->resolveAddressSync(
                 QLatin1String("hren2349jf234.ru"),
-                &resolvedAddress));
+                &resolvedAddress,
+                AF_INET));
     }
 }
 
