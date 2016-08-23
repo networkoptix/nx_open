@@ -410,7 +410,8 @@ Socket::SockAddrPtr Socket::makeAddr(const SocketAddress& socketAddress)
     if (!HostAddressResolver::isAddressResolved(socketAddress.address) &&
         !HostAddressResolver::instance()->resolveAddressSync(
             socketAddress.address.toString(),
-            const_cast<HostAddress*>(&socketAddress.address)))
+            const_cast<HostAddress*>(&socketAddress.address),
+            m_ipVersion))
     {
         return SockAddrPtr();
     }
@@ -540,7 +541,7 @@ CommunicatingSocket::CommunicatingSocket(
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
+            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr, ipVersion ) ),
         type,
         protocol,
         ipVersion,
@@ -559,7 +560,7 @@ CommunicatingSocket::CommunicatingSocket(
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr ) ),
+            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr, ipVersion ) ),
         newConnSD,
         ipVersion,
         sockImpl ),
