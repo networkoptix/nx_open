@@ -28,9 +28,7 @@ class TransactionLog;
 class IncomingTransactionDispatcher
 {
 public:
-    IncomingTransactionDispatcher(
-        TransactionLog* const transactionLog,
-        nx::db::AsyncSqlQueryExecutor* const dbManager);
+    IncomingTransactionDispatcher(TransactionLog* const transactionLog);
 
     /** 
         \note Method is non-blocking, result is delivered by invoking \a completionHandler
@@ -41,37 +39,40 @@ public:
         const QByteArray& data,
         TransactionProcessedHandler completionHandler);
 
-    /** register processor function by command type */
-    template<int TransactionCommandValue, typename TransactionDataType>
+    /** Register processor function by command type. */
+    template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
     void registerTransactionHandler(
         typename TransactionProcessor<
-            TransactionCommandValue, TransactionDataType
-        >::ProcessEc2TransactionFunc processTranFunc)
+            TransactionCommandValue, TransactionDataType, AuxiliaryArgType
+        >::ProcessEc2TransactionFunc processTranFunc,
+        typename TransactionProcessor<
+            TransactionCommandValue, TransactionDataType, AuxiliaryArgType
+        >::OnTranProcessedFunc onTranProcessedFunc)
     {
         m_transactionProcessors.emplace(
             (::ec2::ApiCommand::Value)TransactionCommandValue,
             std::make_unique<typename TransactionProcessor<
-                TransactionCommandValue, TransactionDataType>>(
+                TransactionCommandValue, TransactionDataType, AuxiliaryArgType>>(
                     m_transactionLog,
-                    m_dbManager,
-                    std::move(processTranFunc)));
+                    std::move(processTranFunc),
+                    std::move(onTranProcessedFunc)));
     }
 
-    /** register processor function that will do everything itself */
+    /** Register processor function that does not need to save data to DB. */
     template<int TransactionCommandValue, typename TransactionDataType>
-    void registerSpecialTransactionHandler(
-        nx::utils::MoveOnlyFunc<void(
-            const nx::String& /*systemId*/,
-            const TransactionTransportHeader& /*transportHeader*/,
-            TransactionDataType /*data*/,
-            TransactionProcessedHandler /*handler*/)> /*processTranFunc*/)
+    void registerSpecialCommandHandler(
+        typename SpecialCommandProcessor<
+            TransactionCommandValue, TransactionDataType
+        >::ProcessorFunc processTranFunc)
     {
-        //TODO #ak
+        m_transactionProcessors.emplace(
+            (::ec2::ApiCommand::Value)TransactionCommandValue,
+            std::make_unique<typename SpecialCommandProcessor<
+                TransactionCommandValue, TransactionDataType>>(std::move(processTranFunc)));
     }
 
 private:
     TransactionLog* const m_transactionLog;
-    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     std::map<
         ::ec2::ApiCommand::Value,
         std::unique_ptr<AbstractTransactionProcessor>
@@ -96,6 +97,7 @@ private:
                 });
             return;
         }
+        //TODO should we always call completionHandler in the same thread?
         return it->second->processTransaction(
             transportHeader,
             transaction,

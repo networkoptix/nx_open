@@ -54,44 +54,28 @@ public:
     Specific transaction logic is implemented by specific manager
 */
 template<int TransactionCommandValue, typename TransactionDataType>
-class TransactionProcessor
-:
+class BaseTransactionProcessor
+    :
     public AbstractTransactionProcessor
 {
 public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
-    typedef nx::utils::MoveOnlyFunc<
-        nx::db::DBResult(QSqlDatabase*, nx::String /*systemId*/, TransactionDataType)
-    > ProcessEc2TransactionFunc;
-
-    /**
-       @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
-    */
-    TransactionProcessor(
-        TransactionLog* const transactionLog,
-        nx::db::AsyncSqlQueryExecutor* const dbManager,
-        ProcessEc2TransactionFunc processTranFunc)
-    :
-        m_transactionLog(transactionLog),
-        m_dbManager(dbManager),
-        m_processTranFunc(std::move(processTranFunc))
-    {
-    }
 
     virtual void processTransaction(
         TransactionTransportHeader /*transportHeader*/,
         ::ec2::QnAbstractTransaction /*transaction*/,
         QnUbjsonReader<QByteArray>* const /*stream*/,
-        TransactionProcessedHandler completionHandler)
+        TransactionProcessedHandler completionHandler) override
     {
         //TODO
+        NX_ASSERT(false);
     }
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         ::ec2::QnAbstractTransaction abstractTransaction,
         const QJsonObject& serializedTransactionData,
-        TransactionProcessedHandler completionHandler)
+        TransactionProcessedHandler completionHandler) override
     {
         auto transaction = Ec2Transaction(std::move(abstractTransaction));
         if (!QJson::deserialize(serializedTransactionData["params"], &transaction.params))
@@ -113,6 +97,85 @@ public:
             std::move(completionHandler));
     }
 
+protected:
+    nx::network::aio::Timer m_aioTimer;
+
+    virtual void processTransaction(
+        TransactionTransportHeader transportHeader,
+        Ec2Transaction transaction,
+        TransactionProcessedHandler handler) = 0;
+};
+
+
+/** Processes special transactions.
+    Those are usually transactions that does not modify business data help in data synchronization
+*/
+template<int TransactionCommandValue, typename TransactionDataType>
+class SpecialCommandProcessor
+:
+    public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
+{
+public:
+    typedef nx::utils::MoveOnlyFunc<void(
+        const nx::String& /*systemId*/,
+        TransactionTransportHeader /*transportHeader*/,
+        ::ec2::QnTransaction<TransactionDataType> /*data*/,
+        TransactionProcessedHandler /*handler*/)> ProcessorFunc;
+
+    SpecialCommandProcessor(ProcessorFunc processorFunc)
+    :
+        m_processorFunc(std::move(processorFunc))
+    {
+    }
+
+private:
+    ProcessorFunc m_processorFunc;
+
+    virtual void processTransaction(
+        TransactionTransportHeader transportHeader,
+        Ec2Transaction transaction,
+        TransactionProcessedHandler handler) override
+    {
+        const auto systemId = transportHeader.systemId;
+        m_processorFunc(
+            std::move(systemId),
+            std::move(transportHeader),
+            std::move(transaction),
+            std::move(handler));
+    }
+};
+
+/** Does abstract transaction processing logic.
+    Specific transaction logic is implemented by specific manager
+*/
+template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
+class TransactionProcessor
+:
+    public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
+{
+public:
+    typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
+    typedef nx::utils::MoveOnlyFunc<
+        nx::db::DBResult(QSqlDatabase*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
+    > ProcessEc2TransactionFunc;
+    typedef nx::utils::MoveOnlyFunc<
+        void(nx::db::DBResult, AuxiliaryArgType)
+    > OnTranProcessedFunc;
+
+    /**
+       @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
+    */
+    TransactionProcessor(
+        TransactionLog* const transactionLog,
+        ProcessEc2TransactionFunc processTranFunc,
+        OnTranProcessedFunc onTranProcessedFunc)
+    :
+        m_transactionLog(transactionLog),
+        m_processTranFunc(std::move(processTranFunc)),
+        m_onTranProcessedFunc(std::move(onTranProcessedFunc))
+    {
+    }
+
 private:
     struct TransactionContext
     {
@@ -121,54 +184,39 @@ private:
     };
 
     TransactionLog* const m_transactionLog;
-    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     ProcessEc2TransactionFunc m_processTranFunc;
+    OnTranProcessedFunc m_onTranProcessedFunc;
     nx::network::aio::Timer m_aioTimer;
 
-    void processTransaction(
+    virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         Ec2Transaction transaction,
-        TransactionProcessedHandler handler)
+        TransactionProcessedHandler handler) override
     {
         using namespace std::placeholders;
-
+        
+        auto auxiliaryArg = std::make_unique<AuxiliaryArgType>();
+        auto auxiliaryArgPtr = auxiliaryArg.get();
         m_transactionLog->startDbTransaction(
             transportHeader.systemId,
             std::bind(
                 &TransactionProcessor::processTransactionInDbConnectionThread, this,
                 _1,
                 _2,
-                TransactionContext{ std::move(transportHeader), std::move(transaction) }),
-            [this, handler = std::move(handler)](
+                TransactionContext{ std::move(transportHeader), std::move(transaction) },
+                auxiliaryArgPtr),
+            [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
                 nx::db::DBResult dbResult) mutable
             {
-                dbProcessingCompleted(dbResult, std::move(handler));
+                dbProcessingCompleted(dbResult, std::move(*auxiliaryArg), std::move(handler));
             });
-
-
-
-        //m_dbManager->executeUpdate<TransactionContext, api::ResultCode>(
-        //    std::bind(
-        //        &TransactionProcessor::processTransactionInDbConnectionThread,
-        //        this, _1, _2, _3),
-        //    TransactionContext{ std::move(transportHeader), std::move(transaction) },
-        //    [this, handler = std::move(handler)](
-        //        nx::db::DBResult dbResult,
-        //        TransactionContext transactionContext,
-        //        api::ResultCode resultCode) mutable
-        //    {
-        //        dbProcessingCompleted(
-        //            dbResult,
-        //            std::move(transactionContext),
-        //            resultCode,
-        //            std::move(handler));
-        //    });
     }
 
     nx::db::DBResult processTransactionInDbConnectionThread(
         api::ResultCode resultCode,
         QSqlDatabase* connection,
-        const TransactionContext& transactionContext)
+        const TransactionContext& transactionContext,
+        AuxiliaryArgType* const auxiliaryArg)
     {
         if (resultCode != api::ResultCode::ok)
         {
@@ -214,7 +262,8 @@ private:
         dbResultCode = m_processTranFunc(
             connection,
             transactionContext.transportHeader.systemId,
-            std::move(transactionContext.transaction.params));
+            std::move(transactionContext.transaction.params),
+            auxiliaryArg);
         if (dbResultCode != nx::db::DBResult::ok)
         {
             NX_LOGX(lm("Error processing transaction %1 received from (%2, %3). %4")
@@ -229,8 +278,12 @@ private:
 
     void dbProcessingCompleted(
         nx::db::DBResult dbResult,
+        AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
+        if (m_onTranProcessedFunc)
+            m_onTranProcessedFunc(dbResult, std::move(auxiliaryArg));
+
         switch (dbResult)
         {
             case nx::db::DBResult::ok:

@@ -37,13 +37,13 @@ ConnectionManager::ConnectionManager(
 {
     using namespace std::placeholders;
 
-    m_transactionDispatcher->registerSpecialTransactionHandler
+    m_transactionDispatcher->registerSpecialCommandHandler
         <::ec2::ApiCommand::tranSyncRequest, ::ec2::ApiSyncRequestData>(
             std::bind(&ConnectionManager::processSyncRequest, this, _1, _2, _3, _4));
-    m_transactionDispatcher->registerSpecialTransactionHandler
+    m_transactionDispatcher->registerSpecialCommandHandler
         <::ec2::ApiCommand::tranSyncResponse, ::ec2::QnTranStateResponse>(
             std::bind(&ConnectionManager::processSyncResponse, this, _1, _2, _3, _4));
-    m_transactionDispatcher->registerSpecialTransactionHandler
+    m_transactionDispatcher->registerSpecialCommandHandler
         <::ec2::ApiCommand::tranSyncDone, ::ec2::ApiTranSyncDoneData>(
             std::bind(&ConnectionManager::processSyncDone, this, _1, _2, _3, _4));
 }
@@ -306,7 +306,7 @@ void ConnectionManager::fetchDataFromConnectRequest(
 void ConnectionManager::processSyncRequest(
     const nx::String& systemId,
     const TransactionTransportHeader& transportHeader,
-    ::ec2::ApiSyncRequestData data,
+    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
     TransactionProcessedHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -324,7 +324,7 @@ void ConnectionManager::processSyncRequest(
 void ConnectionManager::processSyncResponse(
     const nx::String& systemId,
     const TransactionTransportHeader& transportHeader,
-    ::ec2::QnTranStateResponse data,
+    ::ec2::QnTransaction<::ec2::QnTranStateResponse> data,
     TransactionProcessedHandler handler)
 {
     //TODO #ak
@@ -333,7 +333,7 @@ void ConnectionManager::processSyncResponse(
 void ConnectionManager::processSyncDone(
     const nx::String& systemId,
     const TransactionTransportHeader& transportHeader,
-    ::ec2::ApiTranSyncDoneData data,
+    ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
     TransactionProcessedHandler handler)
 {
     //TODO #ak

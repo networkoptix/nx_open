@@ -77,7 +77,7 @@ TransactionTransport::~TransactionTransport()
     stopWhileInAioThread();
 }
 
-void TransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+void TransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* /*aioThread*/)
 {
     //implementation should be done in ::ec2::QnTransactionTransportBase
     NX_ASSERT(false);
@@ -104,11 +104,11 @@ void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handle
 
 void TransactionTransport::processSyncRequest(
     const TransactionTransportHeader& /*transportHeader*/,
-    ::ec2::ApiSyncRequestData data,
+    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
     TransactionProcessedHandler handler)
 {
     m_tranStateToSynchronizeTo = m_transactionLogReader->getCurrentState();
-    m_remotePeerTranState = std::move(data.persistentState);
+    m_remotePeerTranState = std::move(data.params.persistentState);
 
     //sending sync response
     ::ec2::QnTransaction<::ec2::QnTranStateResponse>
@@ -150,19 +150,21 @@ void TransactionTransport::onTransactionsReadFromLog(
 }
 
 void TransactionTransport::processSyncResponse(
-    const TransactionTransportHeader& transportHeader,
-    ::ec2::QnTranStateResponse data,
-    TransactionProcessedHandler handler)
+    const TransactionTransportHeader& /*transportHeader*/,
+    ::ec2::QnTransaction<::ec2::QnTranStateResponse> /*data*/,
+    TransactionProcessedHandler /*handler*/)
 {
     //TODO no need to do anything?
+    NX_ASSERT(false);
 }
 
 void TransactionTransport::processSyncDone(
-    const TransactionTransportHeader& transportHeader,
-    ::ec2::ApiTranSyncDoneData data,
-    TransactionProcessedHandler handler)
+    const TransactionTransportHeader& /*transportHeader*/,
+    ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> /*data*/,
+    TransactionProcessedHandler /*handler*/)
 {
     //TODO no need to do anything?
+    NX_ASSERT(false);
 }
 
 void TransactionTransport::fillAuthInfo(

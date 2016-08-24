@@ -19,11 +19,9 @@ namespace ec2 {
 using namespace ::ec2;
 
 IncomingTransactionDispatcher::IncomingTransactionDispatcher(
-    TransactionLog* const transactionLog,
-    nx::db::AsyncSqlQueryExecutor* const dbManager)
+    TransactionLog* const transactionLog)
 :
-    m_transactionLog(transactionLog),
-    m_dbManager(dbManager)
+    m_transactionLog(transactionLog)
 {
 }
 

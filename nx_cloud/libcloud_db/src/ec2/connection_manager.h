@@ -176,17 +176,17 @@ private:
     void processSyncRequest(
         const nx::String& systemId,
         const TransactionTransportHeader& transportHeader,
-        ::ec2::ApiSyncRequestData data,
+        ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
         TransactionProcessedHandler handler);
     void processSyncResponse(
         const nx::String& systemId,
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTranStateResponse data,
+        ::ec2::QnTransaction<::ec2::QnTranStateResponse> data,
         TransactionProcessedHandler handler);
     void processSyncDone(
         const nx::String& systemId,
         const TransactionTransportHeader& transportHeader,
-        ::ec2::ApiTranSyncDoneData data,
+        ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
         TransactionProcessedHandler handler);
 };
 

@@ -54,7 +54,7 @@ public:
         ::ec2::QnTransaction<TransactionDataType> /*transaction*/,
         TransactionTransportHeader /*transportHeader*/)
     {
-        //TODO
+        //TODO returning nx::db::DBResult::cancelled if transaction should be skipped
         return db::DBResult::statementError;
     }
 

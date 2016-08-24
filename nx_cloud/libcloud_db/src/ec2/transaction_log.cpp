@@ -25,6 +25,9 @@ void TransactionLog::startDbTransaction(
     nx::utils::MoveOnlyFunc<nx::db::DBResult(api::ResultCode, QSqlDatabase*)> dbOperationsFunc,
     nx::utils::MoveOnlyFunc<void(nx::db::DBResult)> onDbUpdateCompleted)
 {
+    //TODO execution of requests to same system MUST be serialized
+    //TODO monitoring request queue size and returning api::ResultCode::retryLater if exceeded
+
     //TODO
 }
 

@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0
+
 #include "control_message_processor.h"
 
 #include <functional>
@@ -64,3 +66,5 @@ nx::db::DBResult ControlMessageProcessor::processSyncDone(
 }   // namespace ec2
 }   // namespace cdb
 }   // namespace nx
+
+#endif
