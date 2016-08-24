@@ -74,7 +74,7 @@ TEST(TcpReverseConnector, General)
             ASSERT_EQ(client->send(response.data(), response.size()), response.size());
         });
 
-    auto connector = std::make_unique<ReverseConnector>("client", "server");
+    auto connector = std::make_unique<ReverseConnector>("client", "server", nullptr);
     utils::promise<void> connectorDone;
     connector->connect(
         SocketAddress(HostAddress::localhost, serverAddress.get_future().get().port),
