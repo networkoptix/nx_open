@@ -95,6 +95,18 @@ angular.module('webadminApp')
         }
 
 
+        function stringifyValues(object){
+            if(!jQuery.isPlainObject(object) && !jQuery.isArray(object)){
+                return object;
+            }
+            var result = jQuery.isPlainObject(object)?{}:[];
+            for(var key in object){
+                result[key] =  String(object[key]);
+            }
+            return result;
+        }
+
+
         return {
             checkCurrentPassword:function(password){
                 var login = $localStorage.login;
@@ -277,7 +289,7 @@ angular.module('webadminApp')
                     cloudSystemID: systemId,
                     cloudAuthKey: authKey,
                     cloudAccountName: cloudAccountName,
-                    systemSettings: systemSettings
+                    systemSettings: stringifyValues(systemSettings)
                 });
             },
 
@@ -286,7 +298,7 @@ angular.module('webadminApp')
                     systemName: systemName,
                     adminAccount: adminAccount,
                     password: adminPassword,
-                    systemSettings: systemSettings
+                    systemSettings: stringifyValues(systemSettings)
                 });
             },
 
