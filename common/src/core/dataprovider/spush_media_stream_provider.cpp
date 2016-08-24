@@ -79,10 +79,10 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     {
         QnSleep::msleep(100); // to avoid large CPU usage
 
-        closeStream(); // to release resources 
+        closeStream(); // to release resources
 
         setNeedKeyData();
-        if (isInitialized) 
+        if (isInitialized)
 		{
             mFramesLost++;
             m_stat[0].onData(0, false);
@@ -120,7 +120,7 @@ void CLServerPushStreamReader::run()
             openStream();
             continue;
         }
-        else if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
+        else if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME)
         {
             m_needControlTimer.restart();
             if (!m_openedWithStreamCtrl && isCameraControlRequired()) {
@@ -160,7 +160,7 @@ void CLServerPushStreamReader::run()
         }
         m_FrameCnt++;
 
-        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
         checkTime(data);
@@ -252,7 +252,8 @@ void CLServerPushStreamReader::beforeRun()
     if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
         m_cameraAudioEnabled = camera->isAudioEnabled();
         //TODO: #GDM get rid of resourceChanged
-        connect(camera.data(),  SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(at_resourceChanged(QnResourcePtr)), Qt::DirectConnection);
+        connect(camera.data(),  &QnResource::resourceChanged, this,
+            &CLServerPushStreamReader::at_resourceChanged, Qt::DirectConnection);
     }
 }
 

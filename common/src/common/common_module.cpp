@@ -127,7 +127,8 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
 }
 
-void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
+void QnCommonModule::setRemoteGUID(const QnUuid &guid)
+{
     {
         QnMutexLocker lock( &m_mutex );
         if (m_remoteUuid == guid)
@@ -213,13 +214,19 @@ void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QStrin
     NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an NX_ASSERT here? Something is wrong with resource data json file. */
 }
 
-void QnCommonModule::updateModuleInformation() {
+void QnCommonModule::updateModuleInformation()
+{
+    /* This code works only on server side. */
+    NX_ASSERT(!moduleGUID().isNull());
+
     QnMutexLocker lk( &m_mutex );
     QnModuleInformation moduleInformationCopy = m_moduleInformation;
     lk.unlock();
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
-    if (server) {
+    NX_ASSERT(server);
+    if (server)
+    {
         QnModuleInformation moduleInformation = server->getModuleInformation();
         moduleInformationCopy.port = moduleInformation.port;
         moduleInformationCopy.name = moduleInformation.name;

@@ -127,6 +127,7 @@ void onAcceptedConnection(
 TEST_F(SocketUdt, cancelConnect)
 {
     UdtStreamServerSocket serverSocket(AF_INET);
+    ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
     ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
     serverSocket.listen();
     using namespace std::placeholders;

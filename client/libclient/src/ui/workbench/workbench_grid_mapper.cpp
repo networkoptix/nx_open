@@ -33,28 +33,33 @@ void QnWorkbenchGridMapper::setCellSize(const QSizeF &cellSize) {
     emit cellSizeChanged();
 }
 
-void QnWorkbenchGridMapper::setSpacing(const QSizeF &spacing) {
-    if(qFuzzyEquals(spacing, m_spacing))
+qreal QnWorkbenchGridMapper::spacing() const
+{
+    return m_spacing.width();
+}
+
+QSizeF QnWorkbenchGridMapper::step() const
+{
+    return m_cellSize + m_spacing;
+}
+
+void QnWorkbenchGridMapper::setSpacing(qreal spacing)
+{
+    if(qFuzzyEquals(spacing, m_spacing.width()))
         return;
 
-    m_spacing = spacing;
+    m_spacing = QSizeF(spacing, spacing);
 
     emit spacingChanged();
 }
 
-void QnWorkbenchGridMapper::setVerticalSpacing(qreal spacing) {
-    setSpacing(QSizeF(m_spacing.width(), spacing));
-}
-
-void QnWorkbenchGridMapper::setHorizontalSpacing(qreal spacing) {
-    setSpacing(QSizeF(spacing, m_spacing.height()));
-}
-
-QPointF QnWorkbenchGridMapper::mapToGridF(const QPointF &pos) const {
+QPointF QnWorkbenchGridMapper::mapToGridF(const QPointF &pos) const
+{
     return cwiseDiv(pos - m_origin, toPoint(m_cellSize + m_spacing));
 }
 
-QPointF QnWorkbenchGridMapper::mapFromGridF(const QPointF &gridPos) const {
+QPointF QnWorkbenchGridMapper::mapFromGridF(const QPointF &gridPos) const
+{
     return m_origin + cwiseMul(gridPos, toPoint(m_cellSize + m_spacing));
 }
 
@@ -67,11 +72,13 @@ QPointF QnWorkbenchGridMapper::mapFromGrid(const QPoint &gridPos) const {
     return mapFromGridF(gridPos);
 }
 
-QSizeF QnWorkbenchGridMapper::mapToGridF(const QSizeF &size) const {
+QSizeF QnWorkbenchGridMapper::mapToGridF(const QSizeF &size) const
+{
     return cwiseDiv(size + m_spacing, m_cellSize + m_spacing);
 }
 
-QSizeF QnWorkbenchGridMapper::mapFromGridF(const QSizeF &gridSize) const {
+QSizeF QnWorkbenchGridMapper::mapFromGridF(const QSizeF &gridSize) const
+{
     return cwiseMul(gridSize, m_cellSize + m_spacing) - m_spacing;
 }
 
@@ -114,6 +121,7 @@ QRectF QnWorkbenchGridMapper::mapFromGrid(const QRect &gridRect) const {
     return mapFromGridF(QRectF(gridRect));
 }
 
-QPointF QnWorkbenchGridMapper::mapDeltaToGridF(const QPointF &delta) const {
+QPointF QnWorkbenchGridMapper::mapDeltaToGridF(const QPointF &delta) const
+{
     return cwiseDiv(delta, toPoint(m_cellSize + m_spacing));
 }

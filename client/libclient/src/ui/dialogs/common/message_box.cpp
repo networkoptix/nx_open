@@ -252,6 +252,7 @@ QPushButton *QnMessageBox::addButton(
     Q_D(QnMessageBox);
 
     QPushButton *addedButton = ui->buttonBox->addButton(text, role);
+    d->customButtons.append(addedButton);
 
     if (!d->escapeButton)
         d->detectEscapeButton();
@@ -267,6 +268,7 @@ QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
     Q_D(QnMessageBox);
 
     QPushButton *addedButton = ui->buttonBox->addButton(button);
+    d->customButtons.append(addedButton);
 
     if (!d->escapeButton)
         d->detectEscapeButton();
@@ -337,8 +339,9 @@ QAbstractButton *QnMessageBox::defaultButton() const
     return d->defaultButton;
 }
 
-void QnMessageBox::setDefaultButton(QAbstractButton *button)
+void QnMessageBox::setDefaultButton(QAbstractButton* button)
 {
+    NX_ASSERT(ui->buttonBox->buttons().contains(button));
     if (!ui->buttonBox->buttons().contains(button))
         return;
 

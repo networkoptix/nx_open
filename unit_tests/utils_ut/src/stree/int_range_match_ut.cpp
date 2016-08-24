@@ -97,6 +97,7 @@ TEST_F(StreeRangeMatch, intValue)
         "    <set resName=\"outAttr\" resValue=\"default\"/>\n"
         "    <condition resName=\"intAttr\" matchType=\"range\">\n"
         "        <set value=\"0-9\" resName=\"outAttr\" resValue=\"first\"/>\n"
+        "        <set value=\"0-9\" resName=\"outAttr\" resValue=\"xxx\"/>\n"
         "        <set value=\"20-30\" resName=\"outAttr\" resValue=\"second\"/>\n"
         "    </condition>\n"
         "</sequence>\n";

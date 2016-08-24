@@ -16,8 +16,7 @@ export COLORTERM=yes
 export LESS_TERMCAP_se=
 export CUSTOMIZATION=${deb.customization.company.name}
 killall gpm
-/opt/$CUSTOMIZATION/mediaserver/var/scripts/stop_lite_client
-export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib:/opt/$CUSTOMIZATION/lib/ffmpeg
+export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib
 LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so"
 /opt/$CUSTOMIZATION/lite_client/bin/mobile_client $*
-echo 1 > /sys/class/graphics/fb0/blank
+echo 1>/sys/class/graphics/fb0/blank

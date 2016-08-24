@@ -3,11 +3,10 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/layout_resource.h"
-#include "core/resource_management/resource_discovery_manager.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_discovery_manager.h>
 
 #include <nx_ec/ec_api.h>
 
@@ -16,6 +15,12 @@
 
 #include <utils/common/app_info.h>
 
+#define DEBUG_CLIENT_MESSAGE_PROCESSOR
+#ifdef DEBUG_CLIENT_MESSAGE_PROCESSOR
+#define TRACE(...) qDebug() << "QnClientMessageProcessor: " << __VA_ARGS__;
+#else
+#define TRACE(...)
+#endif
 
 QnClientMessageProcessor::QnClientMessageProcessor()
     :
@@ -57,6 +62,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection)
     {
+        TRACE("Connection established to " << connection->connectionInfo().ecsGuid);
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
         //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     }
@@ -162,12 +168,6 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
         if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
             layout->requestStore();
     }
-
-    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-    {
-        if (user->isOwner())
-            qnCommon->updateModuleInformation();
-    }
 }
 
 void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data)
@@ -237,9 +237,9 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     setConnectionState(QnConnectionState::Ready);
+    TRACE("Received initial notification while connected to " << qnCommon->remoteGUID().toString());
+    NX_EXPECT(qnCommon->currentServer());
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();
-
-    qnCommon->updateModuleInformation();
 }

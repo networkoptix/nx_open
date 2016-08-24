@@ -30,7 +30,6 @@ public:
     //!Implementation of QnMediaResource::toResource
     virtual QnResourcePtr toResourcePtr() override;
 
-    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 private:
     Qn::ResourceStatus m_localStatus;
 };

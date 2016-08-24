@@ -225,6 +225,7 @@ namespace nx_http
         {
             undefined = 0,
             _continue = 100,
+            upgrade = 101,
 
             ok = 200,
             noContent = 204,
@@ -267,6 +268,7 @@ namespace nx_http
         static const StringType HEAD;
         static const StringType POST;
         static const StringType PUT;
+        static const StringType OPTIONS;
     };
 
     //!Represents string like HTTP/1.1, RTSP/1.0

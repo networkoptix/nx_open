@@ -52,10 +52,10 @@ public:
 
     /**
      * Sets the layout's spacing.
-     * 
+     *
      * \param spacing                   Spacing value.
      */
-    void setSpacing(const QSizeF &spacing);
+    void setSpacing(qreal spacing);
 
     /**
      * Sets the default vertical spacing.
@@ -74,30 +74,12 @@ public:
     /**
      * \returns                         Spacing.
      */
-    const QSizeF &spacing() const {
-        return m_spacing;
-    }
-
-    /**
-     * \returns                         Vertical spacing.
-     */
-    qreal verticalSpacing() const {
-        return m_spacing.height();
-    }
-    
-    /**
-     * \returns                         Horizontal spacing.
-     */
-    qreal horizontalSpacing() const {
-        return m_spacing.width();
-    }
+    qreal spacing() const;
 
     /**
      * \returns                         Grid step, sum of cell size and spacing.
      */
-    QSizeF step() const {
-        return m_cellSize + m_spacing;
-    }
+    QSizeF step() const;
 
     /**
      * \param pos                       Position in scene coordinates to map to grid coordinates.
@@ -183,7 +165,7 @@ signals:
     void originChanged();
     void cellSizeChanged();
     void spacingChanged();
-    
+
 private:
     QPointF m_origin;
     QSizeF m_cellSize;
