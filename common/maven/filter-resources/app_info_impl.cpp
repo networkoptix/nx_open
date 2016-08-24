@@ -180,12 +180,12 @@ QString QnAppInfo::defaultCloudHost()
 
 QString QnAppInfo::defaultCloudPortalUrl()
 {
-    return QStringLiteral("${cloud.portalUrl}");
+    return QStringLiteral("https://""${cloud.host}");
 }
 
 QString QnAppInfo::defaultCloudModulesXmlUrl()
 {
-    return QStringLiteral("${cloud.modulesXmlUrl}");
+    return QStringLiteral("http://""${cloud.host}"":8083/cloud_modules.xml");
 }
 
 QString QnAppInfo::cloudName()

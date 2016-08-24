@@ -7,7 +7,6 @@
 
 #include <QtCore/QBuffer>
 
-#include <nx/network/app_info.h>
 #include <nx/utils/log/log.h>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
@@ -87,7 +86,7 @@ void CloudModuleEndPointFetcher::get(
         },
         Qt::DirectConnection);
     m_requestIsRunning = true;
-    m_httpClient->doGet(QUrl(nx::network::AppInfo::cloudModulesXmlUrl()));
+    m_httpClient->doGet(QUrl(QnAppInfo::defaultCloudModulesXmlUrl()));
 }
 
 void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
