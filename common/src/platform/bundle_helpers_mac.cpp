@@ -6,8 +6,6 @@
 
 namespace {
 
-const auto kBundleRelativePath = lit("/./");   // TODO: change to releative to contents/macos
-
 const auto kAppClassTag = cf::QnCFString(lit("NSPrincipalClass"));
 const auto kHiDpiSupportTag = cf::QnCFString(lit("NSHighResolutionCapable"));
 
@@ -21,7 +19,7 @@ const auto kAppCalssAplicationValue = lit("NSApplication");
 **/
 bool QnBundleHelpers::isInHiDpiMode(const QString& path)
 {
-    const auto url = cf::QnCFUrl::createFileUrl(path + kBundleRelativePath);
+    const auto url = cf::QnCFUrl::createFileUrl(path);
 
     // TODO: #ynikitenkov Add QnCFBundle class
     const cf::QnCFRefHolder<CFBundleRef> bundle(CFBundleCreate(kCFAllocatorDefault, url.ref()));
