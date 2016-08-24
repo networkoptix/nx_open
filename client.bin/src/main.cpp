@@ -547,13 +547,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     const auto devicePixelCustomAspect =
 #if defined(Q_OS_MACX)
-        // Manually set device piel ratio aspect to 2 on mac os
+        // Manually set device pixel ratio aspect to 2 on mac os
         (QnBundleHelpers::isInHiDpiMode(QCoreApplication::applicationDirPath()) ? 1 : 2);
 #else
         1;
 #endif
 
-    qDebug() << "----" << devicePixelCustomAspect;
     for (const auto screen: QApplication::screens())
     {
         static const qreal kMinHiDpiRatio = 1.49;  //< At least 1.5x
