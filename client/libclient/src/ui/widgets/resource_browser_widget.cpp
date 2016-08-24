@@ -568,19 +568,19 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
 
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-    auto withNodeType = [nodeType](QnActionParameters& parameters)
+    auto withNodeType = [nodeType](QnActionParameters parameters)
         {
             return parameters.withArgument(Qn::NodeTypeRole, nodeType);
         };
 
     if (nodeType == Qn::VideoWallItemNode)
-        return withNodeType(QnActionParameters(selectedVideoWallItems()));
+        return withNodeType(selectedVideoWallItems());
 
     if (nodeType == Qn::VideoWallMatrixNode)
-        return withNodeType(QnActionParameters(selectedVideoWallMatrices()));
+        return withNodeType(selectedVideoWallMatrices());
 
     if (!index.data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
-        return withNodeType(QnActionParameters(selectedLayoutItems()));
+        return withNodeType(selectedLayoutItems());
 
     QnActionParameters result(selectedResources());
 
