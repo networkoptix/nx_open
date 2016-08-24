@@ -91,7 +91,7 @@ angular.module('webadminApp', [
             controller: 'SetupCtrl'
         })
         .otherwise({
-            redirectTo: '/view'
+            redirectTo: '/settings'
         });
 }).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
     var original = $location.path;
