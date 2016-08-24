@@ -23,7 +23,6 @@ for (project in session.getProjects())
     file << "${project.artifactId}.file = ${project.build.outputDirectory}/${project.artifactId}.pro\n"
 
     def deps = []
-    println project
     for (dependency in project.dependencies)
     {
         if (getProjectType(dependency.artifactId) == "cpp")
