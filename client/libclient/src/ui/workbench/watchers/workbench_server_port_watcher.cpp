@@ -20,7 +20,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr &resource)
         {
-            if (m_currentServer.isNull() || (resource != m_currentServer))
+            if (resource != m_currentServer)
                 return;
 
             disconnect(m_currentServer, nullptr, this, nullptr);
