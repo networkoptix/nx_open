@@ -27,7 +27,7 @@ namespace stree
             less,
             wildcard,
             presence,    //<! \a true if resource is present in input set
-            range
+            range,
         };
 
         Value fromString( const QString& str );

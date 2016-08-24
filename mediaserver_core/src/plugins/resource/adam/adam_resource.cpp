@@ -45,11 +45,11 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 
     QUrl url(getUrl());
     auto host  = url.host();
-    auto port = url.port(nx_modbus::kDefaultModbusPort);
+    auto port = url.port(nx::modbus::kDefaultModbusPort);
 
     SocketAddress endpoint(host, port);
 
-    nx_modbus::QnModbusClient testClient(endpoint);
+    nx::modbus::QnModbusClient testClient(endpoint);
 
     int triesLeft = 3;
     bool status = false;
@@ -59,7 +59,7 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 
     if (!status)
     {
-        qDebug() << "QnAdamResource::initInternal() " << "test request has been failed";
+        qDebug() << "QnAdamResource::initInternal() " << "test request has failed";
         return CameraDiagnostics::RequestFailedResult(
             lit("Test request failed"),
             lit("couldn't get valid response from device"));

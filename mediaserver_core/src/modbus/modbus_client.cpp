@@ -1,14 +1,18 @@
 #include "modbus_client.h"
 #include "modbus.h"
 
-using namespace nx_modbus;
-
 namespace
 {
     const int kDefaultConnectionTimeoutMs = 4000;
     const int kSendTimeout = 4000;
     const int kReceiveTimeout = 4000;
 }
+
+namespace nx
+{
+
+namespace modbus
+{
 
 QnModbusClient::QnModbusClient():
     m_requestTransactionId(0),
@@ -250,7 +254,15 @@ ModbusResponse QnModbusClient::writeSingleHoldingRegister(
     return response;
 }
 
-ModbusResponse nx_modbus::QnModbusClient::readCoils(
+ModbusResponse QnModbusClient::readDiscreteInputs(quint16 startAddress, quint16 inputCount, bool* outStatus)
+{
+    NX_ASSERT(false, "QnModbusClient::readDiscreteInputs not implemented.");
+
+    *outStatus = false; 
+    return ModbusResponse();
+}
+
+ModbusResponse QnModbusClient::readCoils(
     quint16 startCoilAddress,
     quint16 coilCount,
     bool* outStatus)
@@ -269,3 +281,23 @@ ModbusResponse nx_modbus::QnModbusClient::readCoils(
 
     return doModbusRequest(request, outStatus);
 }
+
+ModbusResponse QnModbusClient::writeCoils(quint16 startCoilAddress, const QByteArray& data, bool *outStatus)
+{
+    NX_ASSERT(false, "QnModbusClient::writeCoils not implemented.");
+
+    *outStatus = false;
+    return ModbusResponse();
+}
+
+ModbusResponse QnModbusClient::readInputRegisters(quint16 startRegister, quint16 registerCount, bool* outStatus)
+{
+    NX_ASSERT(false, "QnModbusClient::readInputRegisters not implemented.");
+
+    *outStatus = false;
+    return ModbusResponse();
+}
+
+} //< Closing namespace modbus.
+
+} //< Closing namespace nx.

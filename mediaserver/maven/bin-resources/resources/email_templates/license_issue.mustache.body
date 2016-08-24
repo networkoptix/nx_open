@@ -8,12 +8,14 @@
         </tr>
     </thead>
     <tbody>
-{{#aggregated}}
-        <tr>
-            <td><b>{{reason}}</b></td>
-            <td>{{{timestamp}}}</td>
-        </tr>
-{{/aggregated}}
+    {{#aggregated}}
+        {{#reasonContext.disabledCameras}}
+            <tr>
+                <td><b>{{.}}</b></td>
+                <td>{{{timestamp}}}</td>
+            </tr>
+        {{/reasonContext.disabledCameras}}
+    {{/aggregated}}
     </tbody>
 </table>
 

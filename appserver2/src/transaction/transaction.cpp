@@ -16,7 +16,11 @@ namespace ec2
     {
         QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
 
-        Value fromString(const QString& val) { return getTransactionDescriptorByName(val)->getValue(); }
+        Value fromString(const QString& val) 
+		{
+            auto descriptor = getTransactionDescriptorByName(val);
+            return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
+        }
 
         bool isSystem( Value val ) { return getTransactionDescriptorByValue(val)->isSystem; }
 

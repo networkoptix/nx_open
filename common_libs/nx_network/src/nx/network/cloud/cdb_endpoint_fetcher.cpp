@@ -136,18 +136,19 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
     SocketAddress* const moduleEndpoint)
 {
     stree::ResourceContainer inputData;
+    const QnSoftwareVersion productVersion(QnAppInfo::applicationVersion());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
-        QnSoftwareVersion(QnAppInfo::applicationVersion()).major());
+        productVersion.major());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionMinor,
-        QnSoftwareVersion(QnAppInfo::applicationVersion()).minor());
+        productVersion.minor());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionBugfix,
-        QnSoftwareVersion(QnAppInfo::applicationVersion()).bugfix());
+        productVersion.bugfix());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionBuild,
-        QnSoftwareVersion(QnAppInfo::applicationVersion()).build());
+        productVersion.build());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionFull,
         QnAppInfo::applicationVersion());

@@ -1,4 +1,4 @@
-#include "extended_stream_socket.h"
+#include "buffered_stream_socket.h"
 
 #include <cstring>
 
@@ -9,13 +9,13 @@ static const int kRecvBufferCapacity = 1024 * 4;
 namespace nx {
 namespace network {
 
-ExtendedStreamSocket::ExtendedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket)
+BufferedStreamSocket::BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket)
     : m_socket(std::move(socket))
 {
     setDelegate(m_socket.get());
 }
 
-void ExtendedStreamSocket::waitForRecvData(
+void BufferedStreamSocket::catchRecvEvent(
     std::function<void(SystemError::ErrorCode)> handler)
 {
     if (!m_internalRecvBuffer.isEmpty())
@@ -28,7 +28,7 @@ void ExtendedStreamSocket::waitForRecvData(
         &m_internalRecvBuffer,
         [this, handler = std::move(handler)](SystemError::ErrorCode code, size_t size) mutable
         {
-            NX_LOGX(lm("waitForRecvData read size=%1: %2")
+            NX_LOGX(lm("catchRecvEvent read size=%1: %2")
                 .arg(code == SystemError::noError ? size : 0)
                 .arg(SystemError::toString(code)), cl_logDEBUG2);
 
@@ -41,8 +41,11 @@ void ExtendedStreamSocket::waitForRecvData(
         });
 }
 
-void ExtendedStreamSocket::injectRecvData(Buffer buffer, Inject injectType)
+void BufferedStreamSocket::injectRecvData(Buffer buffer, Inject injectType)
 {
+    NX_LOGX(lm("injectRecvData size=%1, injectType=%2")
+        .arg(buffer.size()).arg(static_cast<int>(injectType)), cl_logDEBUG2);
+
     switch (injectType)
     {
         case Inject::only:
@@ -63,44 +66,44 @@ void ExtendedStreamSocket::injectRecvData(Buffer buffer, Inject injectType)
     NX_ASSERT(false, lm("Unexpected enum value: %1").arg((int)injectType));
 }
 
-bool ExtendedStreamSocket::bind(const SocketAddress& localAddress)
+bool BufferedStreamSocket::bind(const SocketAddress& localAddress)
 {
     return m_socket->bind(localAddress);
 }
 
-SocketAddress ExtendedStreamSocket::getLocalAddress() const
+SocketAddress BufferedStreamSocket::getLocalAddress() const
 {
     return m_socket->getLocalAddress();
 }
 
-bool ExtendedStreamSocket::close()
+bool BufferedStreamSocket::close()
 {
     return m_socket->close();
 }
 
-bool ExtendedStreamSocket::isClosed() const
+bool BufferedStreamSocket::isClosed() const
 {
     return m_socket->isClosed();
 }
 
-bool ExtendedStreamSocket::shutdown()
+bool BufferedStreamSocket::shutdown()
 {
     return m_socket->shutdown();
 }
 
-bool ExtendedStreamSocket::reopen()
+bool BufferedStreamSocket::reopen()
 {
     return m_socket->reopen();
 }
 
-bool ExtendedStreamSocket::connect(
+bool BufferedStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
     return m_socket->connect(remoteAddress, timeoutMillis);
 }
 
-int ExtendedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
+int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     if (m_internalRecvBuffer.isEmpty())
         return m_socket->recv(buffer, bufferLen, flags);
@@ -122,41 +125,41 @@ int ExtendedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     return (recv < 0) ? (int)internalSize : internalSize + recv;
 }
 
-int ExtendedStreamSocket::send(const void* buffer, unsigned int bufferLen)
+int BufferedStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
     return m_socket->send(buffer, bufferLen);
 }
 
-SocketAddress ExtendedStreamSocket::getForeignAddress() const
+SocketAddress BufferedStreamSocket::getForeignAddress() const
 {
     return m_socket->getForeignAddress();
 }
 
-bool ExtendedStreamSocket::isConnected() const
+bool BufferedStreamSocket::isConnected() const
 {
     return m_socket->isConnected();
 }
 
-void ExtendedStreamSocket::cancelIOAsync(
+void BufferedStreamSocket::cancelIOAsync(
     aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     return m_socket->cancelIOAsync(eventType, std::move(handler));
 }
 
-void ExtendedStreamSocket::cancelIOSync(aio::EventType eventType)
+void BufferedStreamSocket::cancelIOSync(aio::EventType eventType)
 {
     return m_socket->cancelIOSync(eventType);
 }
 
-void ExtendedStreamSocket::connectAsync(
+void BufferedStreamSocket::connectAsync(
     const SocketAddress& address,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_socket->connectAsync(address, std::move(handler));
 }
 
-void ExtendedStreamSocket::readSomeAsync(
+void BufferedStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
@@ -181,7 +184,7 @@ void ExtendedStreamSocket::readSomeAsync(
         });
 }
 
-void ExtendedStreamSocket::sendAsync(
+void BufferedStreamSocket::sendAsync(
     const nx::Buffer& buf,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {

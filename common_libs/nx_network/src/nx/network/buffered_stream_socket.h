@@ -6,26 +6,26 @@ namespace nx {
 namespace network {
 
 /**
- * Stream socket wrapper with extended async functionality.
+ * Stream socket wrapper with internal buffering to extend async functionality.
  */
-class NX_NETWORK_API ExtendedStreamSocket:
+class NX_NETWORK_API BufferedStreamSocket:
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
 public:
-    ExtendedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket);
+    BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket);
 
     /**
      * Handler will be called as soon as there is some data ready to recv.
      * @note: is not thread safe (conflicts with recv and recvAsync)
      */
-    void waitForRecvData(std::function<void(SystemError::ErrorCode)> handler);
+    void catchRecvEvent(std::function<void(SystemError::ErrorCode)> handler);
 
     enum class Inject { only, replace, begin, end };
 
     /**
      * Injects data to internal buffer if we need to pass socket to another processor but read
      * more we could process ourserve.
-     * @note: does not affect waitForRecvData and is not thread safe (conflicts with recv and recvAsync)
+     * @note: does not affect catchRecvEvent and is not thread safe (conflicts with recv and recvAsync)
      */
     void injectRecvData(Buffer buffer, Inject injectType = Inject::only);
 
