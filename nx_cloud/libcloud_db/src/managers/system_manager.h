@@ -14,9 +14,10 @@
 #include <vector>
 
 #include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/global_fun.hpp>
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
+#include <boost/multi_index/ordered_index.hpp>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
@@ -153,6 +154,9 @@ public:
         data::DataFilter filter);
         
 private:
+    static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
+        const api::SystemSharing&);
+
     typedef boost::multi_index::multi_index_container<
         data::SystemData,
         boost::multi_index::indexed_by<
@@ -180,13 +184,19 @@ private:
                 api::SystemSharing, std::string, &api::SystemSharing::accountEmail>>,
             //indexing by system
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
-                api::SystemSharing, std::string, &api::SystemSharing::systemID>>
+                api::SystemSharing, std::string, &api::SystemSharing::systemID>>,
+            //indexing by pair<systemId, vmsUserId>
+            boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
+                const api::SystemSharing&,
+                std::pair<std::string, std::string>,
+                &SystemManager::extractSystemIdAndVmsUserId>>
         >
     > AccountSystemAccessRoleDict;
 
     constexpr static const int kSharingUniqueIndex = 0;
     constexpr static const int kSharingByAccountEmail = 1;
     constexpr static const int kSharingBySystemId = 2;
+    constexpr static const int kSharingBySystemIdAndVmsUserIdIndex = 3;
 
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
@@ -298,12 +308,19 @@ private:
     nx::db::DBResult processEc2SaveUser(
         QSqlDatabase* dbConnection,
         const nx::String& systemId,
-        ::ec2::ApiUserData data);
+        ::ec2::ApiUserData data,
+        data::SystemSharing* const systemSharingData);
+    void onEc2SaveUserDone(
+        nx::db::DBResult dbResult,
+        data::SystemSharing sharing);
     nx::db::DBResult processEc2RemoveUser(
         QSqlDatabase* dbConnection,
         const nx::String& systemId,
-        ::ec2::ApiIdData data);
-
+        ::ec2::ApiIdData data,
+        data::SystemSharing* const systemSharingData);
+    void onEc2RemoveUserDone(
+        nx::db::DBResult dbResult,
+        data::SystemSharing sharing);
 };
 
 }   //cdb

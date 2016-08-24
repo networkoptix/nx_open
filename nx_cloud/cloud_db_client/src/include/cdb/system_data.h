@@ -110,6 +110,8 @@ public:
     std::string groupID;
     std::string customPermissions;
     bool isEnabled;
+    //TODO #ak this field is redundant here. Move it to libcloud_db internal data structures
+    std::string vmsUserId;
 
     SystemSharing()
     :

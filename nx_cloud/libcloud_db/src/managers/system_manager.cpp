@@ -9,13 +9,13 @@
 
 #include <QtSql/QSqlQuery>
 
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/serialization/sql.h>
+#include <nx/fusion/serialization/sql_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/guard.h>
 #include <utils/common/sync_call.h>
-#include <nx/fusion/serialization/lexical.h>
-#include <nx/fusion/serialization/sql.h>
-#include <nx/fusion/serialization/sql_functions.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
@@ -59,11 +59,13 @@ SystemManager::SystemManager(
 
     //registering transaction handler
     m_transactionDispatcher->registerTransactionHandler
-        <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData>(
-            std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3));
+        <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData, data::SystemSharing>(
+            std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3, _4),
+            std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2));
     m_transactionDispatcher->registerTransactionHandler
-        <::ec2::ApiCommand::removeUser, ::ec2::ApiIdData>(
-            std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3));
+        <::ec2::ApiCommand::removeUser, ::ec2::ApiIdData, data::SystemSharing>(
+            std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3, _4),
+            std::bind(&SystemManager::onEc2RemoveUserDone, this, _1, _2));
 }
 
 SystemManager::~SystemManager()
@@ -524,6 +526,12 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     return resultData;
 }
 
+std::pair<std::string, std::string> SystemManager::extractSystemIdAndVmsUserId(
+    const api::SystemSharing& data)
+{
+    return std::make_pair(data.systemID, data.vmsUserId);
+}
+
 nx::db::DBResult SystemManager::insertSystemToDB(
     QSqlDatabase* const connection,
     const data::SystemRegistrationDataWithAccount& newSystem,
@@ -609,39 +617,6 @@ void SystemManager::systemAdded(
         : api::ResultCode::dbError,
         std::move(systemData));
 }
-
-//nx::db::DBResult SystemManager::insertSystemSharingToDB(
-//    QSqlDatabase* const connection,
-//    const data::SystemSharing& systemSharing)
-//{
-//    const auto account = m_accountManager.findAccountByUserName(systemSharing.accountEmail);
-//    if (!account)
-//    {
-//        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. Account not found").
-//            arg(systemSharing.systemID).
-//            arg(systemSharing.accountEmail), cl_logDEBUG1);
-//        return db::DBResult::notFound;
-//    }
-//
-//    QSqlQuery insertSystemToAccountBinding(*connection);
-//    insertSystemToAccountBinding.prepare(
-//        "INSERT INTO system_to_account( account_id, system_id, access_role_id ) "
-//        " VALUES( :accountID, :systemID, :accessRole )");
-//    QnSql::bind(systemSharing, &insertSystemToAccountBinding);
-//    insertSystemToAccountBinding.bindValue(
-//        ":accountID",
-//        QnSql::serialized_field(account->id));
-//    if (!insertSystemToAccountBinding.exec())
-//    {
-//        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
-//            arg(systemSharing.systemID).
-//            arg(systemSharing.accountEmail).
-//            arg(connection->lastError().text()), cl_logDEBUG1);
-//        return db::DBResult::ioError;
-//    }
-//
-//    return nx::db::DBResult::ok;
-//}
 
 void SystemManager::systemSharingAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
@@ -815,9 +790,9 @@ nx::db::DBResult SystemManager::updateSharingInDB(
         updateRemoveSharingQuery.prepare(
             "REPLACE INTO system_to_account( "
                 "account_id, system_id, access_role_id, "
-                "group_id, custom_permissions, is_enabled ) "
+                "group_id, custom_permissions, is_enabled, vms_user_id ) "
             "VALUES( :accountID, :systemID, :accessRole, "
-                     ":groupID, :customPermissions, :isEnabled )");
+                    ":groupID, :customPermissions, :isEnabled, :vmsUserId )");
     QnSql::bind(sharing, &updateRemoveSharingQuery);
     updateRemoveSharingQuery.bindValue(
         ":accountID",
@@ -1159,7 +1134,8 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
                "sa.access_role_id as accessRole, "
                "sa.group_id as groupID, "
                "sa.custom_permissions as customPermissions, "
-               "sa.is_enabled as isEnabled "
+               "sa.is_enabled as isEnabled, "
+               "sa.vms_user_id as vmsUserId "
         "FROM system_to_account sa, account a "
         "WHERE sa.account_id = a.id");
     if (!readSystemToAccountQuery.exec())
@@ -1247,22 +1223,112 @@ void SystemManager::expiredSystemsDeletedFromDb(
     m_dropExpiredSystemsTaskStillRunning = false;
 }
 
-nx::db::DBResult SystemManager::processEc2SaveUser(
-    QSqlDatabase* /*dbConnection*/,
-    const nx::String& /*systemId*/,
-    ::ec2::ApiUserData /*data*/)
+static api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)
 {
-    //TODO #ak
-    return nx::db::DBResult::statementError;
+    switch (permissions)
+    {
+        case Qn::GlobalLiveViewerPermissionSet:
+            return api::SystemAccessRole::liveViewer;
+        case Qn::GlobalViewerPermissionSet:
+            return api::SystemAccessRole::viewer;
+        case Qn::GlobalAdvancedViewerPermissionSet:
+            return api::SystemAccessRole::advancedViewer;
+        case Qn::GlobalAdminPermissionSet:
+            return api::SystemAccessRole::cloudAdmin;
+        default:
+            return api::SystemAccessRole::custom;
+    }
+}
+
+nx::db::DBResult SystemManager::processEc2SaveUser(
+    QSqlDatabase* dbConnection,
+    const nx::String& systemId,
+    ::ec2::ApiUserData data,
+    data::SystemSharing* const systemSharingData)
+{
+    NX_LOGX(lm("Processing vms transaction saveUser. user %1, systemId %2, permissions %3, enabled %4")
+        .arg(data.email).arg(systemId)
+        .arg(QnLexical::serialized(data.permissions)).arg(data.isEnabled),
+        cl_logDEBUG2);
+
+    //preparing SystemSharing structure
+    systemSharingData->systemID = systemId.toStdString();
+    systemSharingData->accountEmail = data.email.toStdString();
+    systemSharingData->customPermissions = QnLexical::serialized(data.permissions).toStdString();
+    systemSharingData->groupID = data.groupId.toStdString();
+    systemSharingData->isEnabled = data.isEnabled;
+    systemSharingData->accessRole =
+        data.isAdmin
+        ? api::SystemAccessRole::owner
+        : permissionsToAccessRole(data.permissions);
+    systemSharingData->vmsUserId = data.id.toStdString();
+
+    //updating db
+    return updateSharingInDB(dbConnection, *systemSharingData);
+}
+
+void SystemManager::onEc2SaveUserDone(
+    nx::db::DBResult dbResult,
+    data::SystemSharing sharing)
+{
+    if (dbResult != nx::db::DBResult::ok)
+        return;
+
+    //updating "systems by account id" index
+    QnMutexLocker lk(&m_mutex);
+    auto& accountSystemPairIndex =
+        m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
+    accountSystemPairIndex.erase(sharing);
+    if (sharing.accessRole != api::SystemAccessRole::none)
+    {
+        //inserting modified version
+        accountSystemPairIndex.emplace(sharing);
+    }
 }
 
 nx::db::DBResult SystemManager::processEc2RemoveUser(
-    QSqlDatabase* /*dbConnection*/,
-    const nx::String& /*systemId*/,
-    ::ec2::ApiIdData /*data*/)
+    QSqlDatabase* dbConnection,
+    const nx::String& systemId,
+    ::ec2::ApiIdData data,
+    data::SystemSharing* const systemSharingData)
 {
-    //TODO #ak
-    return nx::db::DBResult::statementError;
+    NX_LOGX(lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
+        .arg(systemId).str(data.id),
+        cl_logDEBUG2);
+
+    QSqlQuery removeSharingQuery(*dbConnection);
+    removeSharingQuery.prepare(
+        "DELETE FROM system_to_account "
+        "  WHERE system_id=:systemId AND vms_user_id=:vmsUserId");
+    removeSharingQuery.bindValue(":systemId", QnSql::serialized_field(systemId));
+    removeSharingQuery.bindValue(":vmsUserId", QnSql::serialized_field(data.id.toStdString()));
+    if (!removeSharingQuery.exec())
+    {
+        NX_LOGX(lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
+            .arg(systemId).str(data.id).arg(dbConnection->lastError().text()),
+            cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    systemSharingData->systemID = systemId;
+    systemSharingData->vmsUserId = data.id.toStdString();
+
+    return db::DBResult::ok;
+}
+
+void SystemManager::onEc2RemoveUserDone(
+    nx::db::DBResult dbResult,
+    data::SystemSharing sharing)
+{
+    if (dbResult != nx::db::DBResult::ok)
+        return;
+
+    //updating "systems by account id" index
+    QnMutexLocker lk(&m_mutex);
+    auto& systemSharingBySystemIdAndVmsUserId =
+        m_accountAccessRoleForSystem.get<kSharingBySystemIdAndVmsUserIdIndex>();
+    systemSharingBySystemIdAndVmsUserId.erase(
+        std::make_pair(sharing.systemID, sharing.vmsUserId));
 }
 
 }   //cdb

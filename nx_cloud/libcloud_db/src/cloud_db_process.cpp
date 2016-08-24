@@ -192,7 +192,7 @@ int CloudDBProcess::exec()
         m_eventManager = &eventManager;
 
         ec2::TransactionLog transactionLog(&dbManager);
-        ec2::IncomingTransactionDispatcher transactionDispatcher(&transactionLog, &dbManager);
+        ec2::IncomingTransactionDispatcher transactionDispatcher(&transactionLog);
         ec2::ConnectionManager ec2ConnectionManager(
             settings,
             &transactionLog,
@@ -567,6 +567,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kTemporaryAccountCredentialsProlongationPeriod);
     dbStructureUpdater.addUpdateScript(db::kAddCustomAndDisabledAccessRoles);
     dbStructureUpdater.addUpdateScript(db::kAddMoreFieldsToSystemSharing);
+    dbStructureUpdater.addUpdateScript(db::kAddVmsUserIdToSystemSharing);
     return dbStructureUpdater.updateStructSync();
 }
 

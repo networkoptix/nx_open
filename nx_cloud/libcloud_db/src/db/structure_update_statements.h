@@ -449,6 +449,12 @@ ALTER TABLE system_to_account ADD COLUMN custom_permissions VARCHAR(1024) NULL; 
 ALTER TABLE system_to_account ADD COLUMN is_enabled INTEGER NULL;            \
 ";
 
+//#CLOUD-486. Implementing saveUser vms transaction
+static const char kAddVmsUserIdToSystemSharing[] =
+"                                                                           \
+ALTER TABLE system_to_account ADD COLUMN vms_user_id VARCHAR(64) NULL;      \
+";
+
 }   //db
 }   //cdb
 }   //nx
