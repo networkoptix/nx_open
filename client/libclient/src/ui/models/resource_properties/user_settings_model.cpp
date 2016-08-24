@@ -6,6 +6,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_parameters.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -95,6 +97,19 @@ void QnUserSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
 {
     if (!m_user)
         return;
+
+    QnLayoutResourceList layoutsToShare = qnResPool->getResources(value)
+        .filtered<QnLayoutResource>(
+            [](const QnLayoutResourcePtr& layout)
+            {
+                return !layout->isFile() && !layout->isShared();
+            });
+
+    for (const auto& layout : layoutsToShare)
+    {
+        menu()->trigger(QnActions::ShareLayoutAction,
+            QnActionParameters(layout).withArgument(Qn::UserResourceRole, m_user));
+    }
 
     qnResourceAccessManager->setAccessibleResources(m_user->getId(), value);
 }

@@ -375,6 +375,7 @@ void QnUserSettingsDialog::applyChanges()
     }
 
     updateButtonBox();
+    loadDataToUi();
 }
 
 void QnUserSettingsDialog::showEvent(QShowEvent* event)
