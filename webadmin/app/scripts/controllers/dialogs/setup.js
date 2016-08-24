@@ -411,7 +411,7 @@ angular.module('webadminApp')
 
             $log.log("Request for id and authKey on cloud portal ...");
             //1. Request auth key from cloud_db
-            cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
+            return cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                 function(message) {
                     if (message.data.resultCode && message.data.resultCode !== 'ok') {
                         cloudErrorHandler(message);
@@ -651,7 +651,7 @@ angular.module('webadminApp')
                 back: 'systemName',
                 skip: 'localLogin',
                 next: function(){
-                    connectToCloud(true)
+                    return connectToCloud(true);
                 }
             },
             cloudLogin:{
