@@ -181,11 +181,11 @@ bool SelfUpdater::updateApplauncher()
         backup->restore(QnDirectoryBackupBehavior::Copy);
     }
 
-    if (!updateApplauncherDesktopIcon())
-        return false;
-
     /* Run newest applauncher via our own minilauncher. */
     if (!runMinilaucher())
+        return false;
+
+    if (!updateApplauncherDesktopIcon())
         return false;
 
     /* If we failed, return now. */
