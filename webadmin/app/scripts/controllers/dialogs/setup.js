@@ -691,7 +691,7 @@ angular.module('webadminApp')
             },
 
             localLogin:{
-                back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
+                back: 'systemName',
                 next: initOfflineSystem,
                 valid: function(){
                     return checkForm($scope.forms.localForm) &&
