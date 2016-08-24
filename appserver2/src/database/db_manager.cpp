@@ -2884,57 +2884,30 @@ ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
     return rez;
 }
 
-template<typename F>
-ErrorCode QnDbManager::cleanupAccessRightsAfterAction(F action, const QnUuid& resourceId)
-{
-    auto internalResourceId = getResourceInternalId(resourceId);
-
-    ErrorCode result = (this->*action)(resourceId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    QSqlQuery removeQuery(m_sdb);
-    QString removeQueryStr("DELETE FROM vms_access_rights WHERE resource_ptr_id = :resourceId;");
-
-    if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    removeQuery.bindValue(":resourceId", internalResourceId);
-    if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    return ErrorCode::ok;
-}
-
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
 {
-    auto cleanupHelper = [this, &tran] (ErrorCode (QnDbManager::*actionPtr)(const QnUuid&))
-    {
-        return cleanupAccessRightsAfterAction(actionPtr, tran.params.id);
-    };
-
     switch(tran.command)
     {
     case ApiCommand::removeCamera:
-        return cleanupHelper(&QnDbManager::removeCamera);
+        return removeCamera(tran.params.id);
     case ApiCommand::removeStorage:
-        return cleanupHelper(&QnDbManager::removeStorage);
+        return removeStorage(tran.params.id);
     case ApiCommand::removeMediaServer:
-        return cleanupHelper(&QnDbManager::removeServer);
+        return removeServer(tran.params.id);
     case ApiCommand::removeServerUserAttributes:
         return removeMediaServerUserAttributes(tran.params.id);
     case ApiCommand::removeLayout:
-        return cleanupHelper(&QnDbManager::removeLayout);
+        return removeLayout(tran.params.id);
     case ApiCommand::removeBusinessRule:
         return removeBusinessRule(tran.params.id);
     case ApiCommand::removeUser:
-        return cleanupHelper(&QnDbManager::removeUser);
+        return removeUser(tran.params.id);
     case ApiCommand::removeUserGroup:
         return removeUserGroup(tran.params.id);
     case ApiCommand::removeVideowall:
-        return cleanupHelper(&QnDbManager::removeVideowall);
+        return removeVideowall(tran.params.id);
     case ApiCommand::removeWebPage:
-        return cleanupHelper(&QnDbManager::removeWebPage);
+        return removeWebPage(tran.params.id);
     case ApiCommand::removeCameraUserAttributes:
         return removeCameraAttributes(tran.params.id);
     default:
