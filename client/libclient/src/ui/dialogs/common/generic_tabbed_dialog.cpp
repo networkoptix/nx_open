@@ -206,13 +206,14 @@ void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled)
     if (!m_tabWidget)
         return;
 
-    for (Page &page: m_pages)
+    for (Page& page : m_pages)
     {
         if (page.key != key)
             continue;
 
         if (page.enabled == enabled)
             return;
+
         page.enabled = enabled;
 
         int index = m_tabWidget->indexOf(page.widget);
@@ -228,8 +229,7 @@ void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled)
     NX_ASSERT(false);
 }
 
-
-void QnGenericTabbedDialog::setTabWidget(QTabWidget *tabWidget)
+void QnGenericTabbedDialog::setTabWidget(QTabWidget* tabWidget)
 {
     NX_ASSERT(!m_tabWidget);
     m_tabWidget = tabWidget;
@@ -240,9 +240,9 @@ void QnGenericTabbedDialog::initializeTabWidget()
     if (m_tabWidget)
         return; /* Already initialized with a direct call to setTabWidget in derived class's constructor. */
 
-    QList<QTabWidget *> tabWidgets = findChildren<QTabWidget *>(QString(), Qt::FindDirectChildrenOnly);
-    NX_ASSERT(tabWidgets.size() == 1);
-    if(tabWidgets.size() != 1)
+    auto tabWidgets = findChildren<QTabWidget*>();
+    NX_ASSERT(tabWidgets.size() == 1, "Call setTabWidget() from the constructor.");
+    if (tabWidgets.size() != 1)
         return;
 
     setTabWidget(tabWidgets[0]);
