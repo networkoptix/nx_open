@@ -856,24 +856,6 @@
     </message>
   </context>
   <context>
-    <name>../static/views/log.html</name>
-    <message>
-      <location filename="../static/views/log.html"/>
-      <source>Log</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Refresh</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Open in new window</source>
-      <translation> </translation>
-    </message>
-  </context>
-  <context>
     <name>../static/views/login.html</name>
     <message>
       <location filename="../static/views/login.html"/>
