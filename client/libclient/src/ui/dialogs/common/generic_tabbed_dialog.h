@@ -138,10 +138,13 @@ protected:
 
     QList<Page> allPages() const;
     QList<Page> modifiedPages() const;
+
+protected:
+    void setTabWidget(QTabWidget* tabWidget);
+
 private:
     void initializeTabWidget();
 
-    void setTabWidget(QTabWidget *tabWidget);
 private:
     QList<Page> m_pages;
     QPointer<QTabWidget> m_tabWidget;

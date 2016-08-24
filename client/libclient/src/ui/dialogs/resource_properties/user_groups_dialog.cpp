@@ -29,6 +29,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this))
 {
     ui->setupUi(this);
+    setTabWidget(ui->tabWidget);
 
     addPage(SettingsPage, m_settingsPage, tr("Role Info"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));

@@ -225,31 +225,25 @@ void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled)
     }
 
     qnWarning("QnGenericTabbedDialog '%1' does not contain %2", metaObject()->className(), key);
+    NX_ASSERT(false);
 }
 
 
 void QnGenericTabbedDialog::setTabWidget(QTabWidget *tabWidget)
 {
-    if(m_tabWidget.data() == tabWidget)
-        return;
-
+    NX_ASSERT(!m_tabWidget);
     m_tabWidget = tabWidget;
 }
 
 void QnGenericTabbedDialog::initializeTabWidget()
 {
-    if(m_tabWidget)
+    if (m_tabWidget)
         return; /* Already initialized with a direct call to setTabWidget in derived class's constructor. */
 
     QList<QTabWidget *> tabWidgets = findChildren<QTabWidget *>(QString(), Qt::FindDirectChildrenOnly);
-    if(tabWidgets.empty()) {
-        qnWarning("QnGenericTabbedDialog '%1' doesn't have a QTabWidget.", metaObject()->className());
+    NX_ASSERT(tabWidgets.size() == 1);
+    if(tabWidgets.size() != 1)
         return;
-    }
-    if(tabWidgets.size() > 1) {
-        qnWarning("QnGenericTabbedDialog '%1' has several QTabWidgets.", metaObject()->className());
-        return;
-    }
 
     setTabWidget(tabWidgets[0]);
 }
