@@ -40,11 +40,10 @@
                         </tbody>
                     </table>
                 </tab>
-                <tab heading="Logs">
+                <tab heading="Log">
                     <br>
-                    <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=7'}}"></iframe>
-                    <a ng-href="{{logUrl +'?lines=7'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
-                    <a href="#/log/" class="btn btn-default">More lines</a>
+                    <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
+                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
                     <a ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
                 </tab>
             </tabset>
