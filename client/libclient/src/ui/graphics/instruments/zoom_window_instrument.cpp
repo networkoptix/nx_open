@@ -349,20 +349,26 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
 
     connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
         [this]()
-    {
-        const auto penWidth = kZoomLineWidth * m_scaleWatcher.scale();
-        const auto pen = QPen(m_zoomWindowColor, penWidth, Qt::SolidLine,
-            Qt::SquareCap, Qt::MiterJoin);
-        if (selectionItem())
-            selectionItem()->setPen(pen);
-
-        for (const auto widget : m_dataByWidget)
         {
-            if (widget.windowWidget)
-                widget.windowWidget->setFrameWidth(penWidth);
-        }
-    });
+            const auto penWidth = kZoomLineWidth * m_scaleWatcher.scale();
+            const auto pen = QPen(m_zoomWindowColor, penWidth, Qt::SolidLine,
+                Qt::SquareCap, Qt::MiterJoin);
+            if (selectionItem())
+                selectionItem()->setPen(pen);
 
+            for (const auto widget : m_dataByWidget)
+            {
+                if (widget.windowWidget)
+                    widget.windowWidget->setFrameWidth(penWidth);
+            }
+        });
+
+    connect(this, &Instrument::sceneChanged, this,
+        [this]()
+        {
+            if (scene() && !m_scaleWatcher.initialized())
+                m_scaleWatcher.initialize(scene());
+        });
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
@@ -461,10 +467,6 @@ void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {
 
 void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget)
 {
-    const auto currentScene = scene();
-    if (currentScene)
-        m_scaleWatcher.setScene(currentScene);
-
     ZoomData &data = m_dataByWidget[widget];
 
     ZoomOverlayWidget *overlayWidget = ensureOverlayWidget(zoomTargetWidget);

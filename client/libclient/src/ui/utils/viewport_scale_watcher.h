@@ -15,16 +15,19 @@ public:
 
     ~QnViewportScaleWatcher();
 
-    void setScene(QGraphicsScene* scene);
+    bool initialized() const;
+
+    void initialize(QGraphicsScene* scene);
 
     qreal scale() const;
+
+public:
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 signals:
     void scaleChanged();
 
 private:
-    virtual bool eventFilter(QObject* watched, QEvent* event) override;
-
     void updateScale();
 
 private:

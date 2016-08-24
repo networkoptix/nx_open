@@ -130,7 +130,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_mouseInWidget(false),
     m_renderStatus(Qn::NothingRendered),
     m_lastNewFrameTimeMSec(0),
-    m_selectionState(SelectionState::kInvalid),
+    m_selectionState(SelectionState::invalid),
     m_scaleWatcher(),
     m_framePainter()
 {
@@ -197,11 +197,11 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
             setGeometry(calculateGeometry(m_enclosingGeometry));
     });
 
-    connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
-        [this]() { updateFrameWidth(); });
+    connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged,
+        this, &QnResourceWidget::updateFrameWidth);
 
-    connect(this, &QnResourceWidget::geometryChanged, this,
-        [this]() { updateFrameGeometry(); });
+    connect(this, &QnResourceWidget::geometryChanged,
+        this, &QnResourceWidget::updateFrameGeometry);
 
     connect(this, &QnResourceWidget::frameDistinctionColorChanged, this,
         [this]() { m_framePainter.setColor(calculateFrameColor()); });
@@ -552,7 +552,7 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
         updateSelectedState();
 
     if (change == QGraphicsItem::ItemSceneHasChanged)
-        m_scaleWatcher.setScene(scene());
+        m_scaleWatcher.initialize(scene());
 
     return base_type::itemChange(change, value);
 }
@@ -931,20 +931,20 @@ void QnResourceWidget::updateSelectedState()
     const auto calculateSelectedState =
         [this]()
         {
-            const bool selected = (m_options & DisplaySelection) && isSelected();
+            const bool selected = (m_options.testFlag(DisplaySelection) && isSelected());
             const bool focused = isSelected();
             const bool active = isLocalActive();
 
             if (selected && focused && active)
-                return SelectionState::kFocusedAndSelected;
+                return SelectionState::focusedAndSelected;
             else if (!active && selected)
-                return SelectionState::kSelected;
+                return SelectionState::selected;
             else if (focused)
-                return SelectionState::kFocused;
+                return SelectionState::focused;
             else if (active)
-                return SelectionState::kInactiveFocused;
+                return SelectionState::inactiveFocused;
 
-            return SelectionState::kNotSelected;
+            return SelectionState::notSelected;
         };
 
     const auto selectionState = calculateSelectedState();
@@ -974,21 +974,25 @@ void QnResourceWidget::updateFrameGeometry()
 
 qreal QnResourceWidget::calculateFrameWidth() const
 {
-    return (m_selectionState == SelectionState::kSelected ? 1 : 2);
+    static const auto kSelectedFrameWidth = 1;
+    static const auto kNormalFrameWidth = 2;
+    return (m_selectionState == SelectionState::selected
+        ? kSelectedFrameWidth
+        : kNormalFrameWidth);
 }
 
 QColor QnResourceWidget::calculateFrameColor() const
 {
     switch (m_selectionState)
     {
-        case SelectionState::kFocusedAndSelected:
-        case SelectionState::kSelected:
+        case SelectionState::focusedAndSelected:
+        case SelectionState::selected:
             return qnNxStyle->mainColor(QnNxStyle::Colors::kBrand);
-        case SelectionState::kFocused:
+        case SelectionState::focused:
             return (m_frameDistinctionColor.isValid()
                 ? m_frameDistinctionColor.lighter()
                 : qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(4));
-        case SelectionState::kInactiveFocused:
+        case SelectionState::inactiveFocused:
             return (m_frameDistinctionColor.isValid()
                 ? m_frameDistinctionColor
                 : qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(3));

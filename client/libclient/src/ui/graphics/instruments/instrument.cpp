@@ -61,6 +61,20 @@ Instrument::Instrument(WatchedType type, const EventTypeSet &eventTypes, QObject
     m_watchedEventTypes[type] = eventTypes;
 }
 
+QGraphicsScene* Instrument::scene() const
+{
+    return m_scene;
+}
+
+void Instrument::setScene(QGraphicsScene* scene)
+{
+    if (m_scene == scene)
+        return;
+
+    m_scene = scene;
+    emit sceneChanged();
+}
+
 void Instrument::initialize() {
     m_manager = NULL;
     m_scene = NULL;
@@ -89,7 +103,7 @@ namespace {
 const Instrument::EventTypeSet &Instrument::watchedEventTypes(WatchedType type) const {
     if (type < 0 || type >= WatchedTypeCount) {
         qnWarning("Invalid watched type %1", type);
-        
+
         return *globalEmptyEventTypeSet();
     }
 
@@ -129,7 +143,7 @@ void Instrument::addItemCondition(InstrumentItemCondition *itemCondition) {
 
     if(m_itemConditions.contains(itemCondition))
         return; /* Re-registration is allowed. */
- 
+
     m_ownedItemConditions.insert(itemCondition);
     m_itemConditions.push_back(itemCondition);
 }
@@ -189,12 +203,12 @@ QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPointF &sce
         return QList<QGraphicsItem *>();
     }
 
-    /* Note that it would be more correct to use view->mapToScene(QRect(viewPos, QSize(1, 1))). 
+    /* Note that it would be more correct to use view->mapToScene(QRect(viewPos, QSize(1, 1))).
      * However, this is not the way it is implemented in Qt, so we have no other options but to mimic Qt behavior. */
     QRectF pointRect = QRectF(scenePos, QSizeF(1, 1));
     if (!view->isTransformed())
         return m_scene->items(pointRect, Qt::IntersectsItemShape, Qt::DescendingOrder);
-    
+
     return m_scene->items(pointRect, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform());
 }
 
@@ -327,7 +341,7 @@ bool Instrument::dispatchEvent(T *watched, QEvent *event) {
     case QEvent::TabletPress:
     case QEvent::TabletRelease:
         return tabletEvent(watched, static_cast<QTabletEvent *>(event));
-    case QEvent::KeyPress: 
+    case QEvent::KeyPress:
         return keyPressEvent(watched, static_cast<QKeyEvent *>(event));
     case QEvent::KeyRelease:
         return keyReleaseEvent(watched, static_cast<QKeyEvent *>(event));
@@ -468,6 +482,6 @@ bool Instrument::dispatchEvent(QGraphicsItem *watched, QEvent *event) {
 AnimationTimer *Instrument::animationTimer() {
     if(m_animationTimer.isNull())
         m_animationTimer.reset(new AnimationTimer());
-        
+
     return m_animationTimer.data();
 }

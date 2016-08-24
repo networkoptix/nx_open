@@ -239,7 +239,7 @@ void QnGridItem::at_itemAnimator_finished() {
 QVariant QnGridItem::itemChange(GraphicsItemChange change, const QVariant& value)
 {
     if (change == QGraphicsItem::ItemSceneHasChanged)
-        m_scaleWatcher.setScene(scene());
+        m_scaleWatcher.initialize(scene());
 
     return base_type::itemChange(change, value);
 }

@@ -370,12 +370,12 @@ private:
 private:
     enum class SelectionState
     {
-        kInvalid,
-        kNotSelected,
-        kInactiveFocused,
-        kFocused,
-        kSelected,
-        kFocusedAndSelected
+        invalid,
+        notSelected,
+        inactiveFocused,
+        focused,
+        selected,
+        focusedAndSelected,
     };
 
     void updateSelectedState();

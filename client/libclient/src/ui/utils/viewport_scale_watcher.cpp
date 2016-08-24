@@ -15,9 +15,15 @@ QnViewportScaleWatcher::~QnViewportScaleWatcher()
 {
 }
 
-void QnViewportScaleWatcher::setScene(QGraphicsScene* scene)
+bool QnViewportScaleWatcher::initialized() const
 {
-    if (m_viewport)
+    return (m_viewport != nullptr);
+}
+
+void QnViewportScaleWatcher::initialize(QGraphicsScene* scene)
+{
+    NX_ASSERT(!initialized(), "Viewport has been set already");
+    if (initialized())
         return;
 
     m_viewport = (!scene || scene->views().empty() ? nullptr : scene->views().first());
