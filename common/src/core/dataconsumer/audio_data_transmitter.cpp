@@ -3,6 +3,8 @@
 #include "audio_data_transmitter.h"
 #include <utils/common/sleep.h>
 #include <core/resource/resource.h>
+
+#include <set>
 #include <QFile>
 
 QnAbstractAudioTransmitter::QnAbstractAudioTransmitter():
@@ -24,7 +26,7 @@ void QnAbstractAudioTransmitter::endOfRun()
 void QnAbstractAudioTransmitter::makeRealTimeDelay(const QnConstCompressedAudioDataPtr& audioData)
 {
     m_transmittedPacketDuration += audioData->getDurationMs();
-    qint64  diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();
+    qint64  diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();    
     if(diff > 0)
         QnSleep::msleep(diff);
 }
@@ -43,7 +45,7 @@ bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data
 
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_providers.empty() || m_providers.begin()->second != data->dataProvider)
+        if (m_providers.empty() || m_providers.begin()->second.data() != data->dataProvider)
             return true; //< data from non active provider
     }
 
@@ -73,11 +75,25 @@ void QnAbstractAudioTransmitter::unsubscribe(QnAbstractStreamDataProvider* dataP
 
 void QnAbstractAudioTransmitter::removePacketsByProvider(QnAbstractStreamDataProvider* dataProvider)
 {
+    bool removeSince = false;
+    std::set<QnAbstractStreamDataProvider*> providersToFlush;
+
+    for (auto it = m_providers.begin(); it != m_providers.end(); ++it)
+    {
+        if (it->second.data() == dataProvider)
+            removeSince = true;
+
+        if (!removeSince)
+            continue;
+        
+        providersToFlush.insert(it->second.data());
+    }
+
     m_dataQueue.lock();
     for (int i = m_dataQueue.size() - 1; i >= 0; --i)
     {
         auto packet = m_dataQueue.atUnsafe(i);
-        if (packet && packet->dataProvider == dataProvider)
+        if (packet && providersToFlush.count(packet->dataProvider))
             m_dataQueue.removeAtUnsafe(i);
     }
     m_dataQueue.unlock();
@@ -121,6 +137,9 @@ void QnAbstractAudioTransmitter::subscribe(
     }
 
     m_providers.emplace(priority, dataProvider);
+
+    if (m_providers.begin()->second == dataProvider)
+        m_dataQueue.clear();
 
     dataProvider->addDataProcessor(this);
     if (auto owner = dataProvider->getOwner())
