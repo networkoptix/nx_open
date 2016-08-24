@@ -103,6 +103,8 @@ namespace attrs
         udtHpEndpointList,
         connectionMethods,
         ignoreSourceAddress,
+        tcpReverseEndpointList,
+        isPersistent,
 
         udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
         rendezvousConnectTimeout,
@@ -215,6 +217,12 @@ namespace attrs
             : EndpointList( TYPE, endpoints ) {}
     };
 
+    struct NX_NETWORK_API TcpReverseEndpointList : EndpointList
+    {
+        static const AttributeType TYPE = tcpReverseEndpointList;
+        TcpReverseEndpointList( const std::list< SocketAddress >& endpoints )
+            : EndpointList( TYPE, endpoints ) {}
+    };
 
     /** Base class for string list based attributes */
     struct NX_NETWORK_API StringList : StringAttribute

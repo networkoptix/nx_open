@@ -6,6 +6,7 @@
 #include <nx/fusion/serialization/lexical.h>
 
 #include "tunnel/udp/acceptor.h"
+#include "tunnel/tcp/reverse_tunnel_acceptor.h"
 
 
 namespace nx {
@@ -30,8 +31,25 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
                     return std::unique_ptr<AbstractTunnelAcceptor>();
 
                 auto acceptor = std::make_unique<udp::TunnelAcceptor>(
-                    std::move(event.udpEndpointList),
-                    event.params);
+                    std::move(event.udpEndpointList), event.params);
+
+                return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
+            }
+
+            return std::unique_ptr<AbstractTunnelAcceptor>();
+        });
+
+    makers.push_back(
+        [](const hpm::api::ConnectionRequestedEvent& event)
+        {
+            using namespace hpm::api::ConnectionMethod;
+            if (event.connectionMethods & reverseConnect)
+            {
+                if (!event.tcpReverseEndpointList.size())
+                    return std::unique_ptr<AbstractTunnelAcceptor>();
+
+                auto acceptor = std::make_unique<tcp::ReverseTunnelAcceptor>(
+                    std::move(event.tcpReverseEndpointList), event.params);
 
                 return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
             }

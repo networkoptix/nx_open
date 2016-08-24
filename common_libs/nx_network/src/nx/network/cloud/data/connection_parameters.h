@@ -7,8 +7,10 @@
 
 #include <chrono>
 
-#include "stun_message_data.h"
+#include <nx/network/retry_timer.h>
+#include <nx/network/http/asynchttpclient.h>
 
+#include "stun_message_data.h"
 
 namespace nx {
 namespace hpm {
@@ -34,6 +36,10 @@ public:
         received during \a rendezvousConnectTimeout*udpTunnelKeepAliveRetries period
     */
     int udpTunnelKeepAliveRetries;
+
+    // TODO: add to serializeAttributes + parseAttributes
+    nx::network::RetryPolicy tcpReverseRetryPolicy;
+    nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
 
     ConnectionParameters();
 
