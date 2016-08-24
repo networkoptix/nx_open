@@ -512,10 +512,15 @@ span.danger{
 .system-info{
   background-color: $gray-lighter;
 
+  .panel-title{
+    font-size: 20px;
+  }
+
   td{
     vertical-align: top;
     &:first-child{
       white-space:nowrap;
+      padding-right:5px;
     }
   }
 
