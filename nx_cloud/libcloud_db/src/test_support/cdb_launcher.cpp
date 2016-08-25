@@ -115,7 +115,7 @@ bool CdbLauncher::waitUntilStarted()
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
 
     //retrieving module info
-    auto connection = m_connectionFactory->createConnection("", "");
+    auto connection = m_connectionFactory->createConnection();
     api::ResultCode result = api::ResultCode::ok;
     std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
         std::bind(
@@ -177,7 +177,7 @@ api::ResultCode CdbLauncher::addAccount(
     if (accountData->customization.empty())
         accountData->customization = QnAppInfo::customizationName().toStdString();
 
-    auto connection = connectionFactory()->createConnection("", "");
+    auto connection = connectionFactory()->createConnection();
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;

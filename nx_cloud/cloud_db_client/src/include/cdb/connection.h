@@ -117,7 +117,13 @@ public:
         \note No connection to cloud is performed in this method!
     */
     virtual std::unique_ptr<api::Connection> createConnection() = 0;
+    virtual std::unique_ptr<api::Connection> createConnection(
+        const std::string& username,
+        const std::string password) = 0;
     virtual std::unique_ptr<api::EventConnection> createEventConnection() = 0;
+    virtual std::unique_ptr<api::EventConnection> createEventConnection(
+        const std::string& username,
+        const std::string password) = 0;
     //!Returns text description of \a resultCode
     virtual std::string toString(api::ResultCode resultCode) const = 0;
 

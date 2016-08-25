@@ -40,9 +40,27 @@ std::unique_ptr<api::Connection> ConnectionFactory::createConnection()
     return std::make_unique<Connection>(&m_endPointFetcher);
 }
 
+std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
+    const std::string& username,
+    const std::string password)
+{
+    auto connection = createConnection();
+    connection->setCredentials(username, password);
+    return connection;
+}
+
 std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection()
 {
     return std::make_unique<EventConnection>(&m_endPointFetcher);
+}
+
+std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection(
+    const std::string& username,
+    const std::string password)
+{
+    auto connection = createEventConnection();
+    connection->setCredentials(username, password);
+    return connection;
 }
 
 std::string ConnectionFactory::toString(api::ResultCode resultCode) const
