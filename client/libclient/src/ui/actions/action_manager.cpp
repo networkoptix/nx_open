@@ -1526,11 +1526,15 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("User Settings...")).
         condition(hasFlags(Qn::user));
 
-    factory(QnActions::UserGroupsAction).
+    factory(QnActions::UserRolesAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("User Roles...")).
+        conditionalText(tr("Role Settings..."), new QnTreeNodeTypeCondition(Qn::RoleNode, this)).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
+        condition(new QnDisjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::UsersNode, this),
+            new QnTreeNodeTypeCondition(Qn::RoleNode, this),
+            this));
 
     factory(QnActions::CameraIssuesAction).
         mode(QnActionTypes::DesktopMode).

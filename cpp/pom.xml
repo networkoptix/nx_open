@@ -23,6 +23,7 @@
         <postfix.libs/>
         <linux.arm.oslibs>${linux.oslibs}</linux.arm.oslibs>
         <rdep.global.packages>qt any/boost</rdep.global.packages>
+        <projectType>cpp</projectType>
     </properties>
 
     <build>
@@ -257,9 +258,9 @@
                                             <value><![CDATA[
       <TargetMachine>Machine${machine.type}</TargetMachine>
     </Lib>]]></value>
-                                        </replacement>                                        
+                                        </replacement>
 
-                                        
+
 
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->

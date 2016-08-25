@@ -2,6 +2,7 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/common/geometry.h>
+#include <ui/style/helper.h>
 
 namespace {
 
@@ -79,8 +80,7 @@ void QnSelectableButton::paintEvent(QPaintEvent* event)
 
     if (!option.state.testFlag(QStyle::State_Enabled))
     {
-        const qreal kDisabledOpacity = 0.3;
-        painter.setOpacity(kDisabledOpacity);
+        painter.setOpacity(style::Hints::kDisabledItemOpacity);
         option.state &= ~(QStyle::State_Sunken | QStyle::State_MouseOver);
     }
 

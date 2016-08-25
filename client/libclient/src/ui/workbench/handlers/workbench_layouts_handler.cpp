@@ -994,6 +994,8 @@ void QnWorkbenchLayoutsHandler::at_removeFromServerAction_triggered()
             shared << layout;
         else if (owner)
             common[owner] << layout;
+        else
+            canAutoDelete << layout; /* Invalid layout */
     }
     removeLayouts(canAutoDelete);
 

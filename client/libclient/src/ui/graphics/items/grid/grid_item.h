@@ -7,7 +7,7 @@
 #include <client/client_color_types.h>
 
 #include <utils/common/hash.h> /* For qHash(QPoint). */
-
+#include <ui/utils/viewport_scale_watcher.h>
 #include <ui/animation/animated.h>
 #include <ui/customization/customized.h>
 
@@ -20,7 +20,6 @@ class QnGridHighlightItem;
 class QnGridItem: public Customized<Animated<QGraphicsObject> > {
     Q_OBJECT
     Q_PROPERTY(QnGridColors colors READ colors WRITE setColors)
-    Q_PROPERTY(qreal lineWidth READ lineWidth WRITE setLineWidth)
 
     typedef Customized<Animated<QGraphicsObject> > base_type;
 
@@ -33,7 +32,7 @@ public:
     };
 
     QnGridItem(QGraphicsItem *parent = NULL);
-    
+
     virtual ~QnGridItem();
 
     virtual QRectF boundingRect() const override;
@@ -43,9 +42,6 @@ public:
 
     const QnGridColors &colors() const;
     void setColors(const QnGridColors &colors);
-
-    qreal lineWidth() const;
-    void setLineWidth(qreal lineWidth);
 
     QColor stateColor(int cellState) const;
     void setStateColor(int cellState, const QColor &color);
@@ -69,6 +65,9 @@ protected slots:
     void at_itemAnimator_finished();
 
 private:
+    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+
+private:
     struct PointData {
         PointData(): state(Initial), item(NULL) {}
 
@@ -83,6 +82,7 @@ private:
     QHash<int, QColor> m_colorByState;
     QHash<QPoint, PointData> m_dataByCell;
     QList<QnGridHighlightItem *> m_freeItems;
+    QnViewportScaleWatcher m_scaleWatcher;
 };
 
 

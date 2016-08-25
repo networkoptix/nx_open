@@ -141,7 +141,6 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
 
     auto createItem = [this, &state](const QnUuid &id) {
         QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
-        itemWidget->setFrameColors(frameColors());
         if (state.contains(id))
             itemWidget->setInfoVisible(state[id] > 0, false);
 

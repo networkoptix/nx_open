@@ -434,14 +434,14 @@ void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
 void QnUpdateProcess::at_checkFreeSpaceTask_finished(
     int errorCode, const QSet<QnUuid>& failedPeers)
 {
-    if (errorCode != 0)
+    if (errorCode == QnCheckFreeSpacePeerTask::NotEnoughFreeSpaceError)
     {
-        auto warning = new QnLowFreeSpaceWarning;
-        warning->failedPeers = failedPeers;
+        QnLowFreeSpaceWarning warning;
+        warning.failedPeers = failedPeers;
 
         emit lowFreeSpaceWarning(warning);
 
-        if (!warning->ignore)
+        if (!warning.ignore)
         {
             setAllPeersStage(QnPeerUpdateStage::Init);
             m_failedPeerIds = failedPeers;
