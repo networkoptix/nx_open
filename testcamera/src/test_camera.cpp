@@ -1,6 +1,6 @@
 
 #include "test_camera.h"
-#include "utils/network/socket.h"
+#include "nx/network/socket.h"
 
 #include <QDebug>
 

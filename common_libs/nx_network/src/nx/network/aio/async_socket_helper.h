@@ -198,10 +198,11 @@ public:
         }
 
         m_addressResolverIsInUse = true;
-        nx::network::SocketGlobals::addressResolver().resolveAsync(
-            addr.address,
-            [this, addr]( SystemError::ErrorCode errorCode,
-                          std::vector< nx::network::cloud::AddressEntry > addresses )
+
+        auto resolveHandler =
+            [this, addr](
+                SystemError::ErrorCode errorCode,
+                std::vector< nx::network::cloud::AddressEntry > addresses )
             {
                 //always calling m_connectHandler within aio thread socket is bound to
                 if( addresses.empty() )
@@ -243,8 +244,10 @@ public:
                     {
                         handler(errorCode);
                     });
-            },
-            this );
+            };
+
+        nx::network::SocketGlobals::addressResolver().resolveAsync(
+            addr.address, std::move(resolveHandler), false, m_ipVersion, this);
     }
 
     void readSomeAsync( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )

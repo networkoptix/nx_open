@@ -586,9 +586,10 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     int ipVersion,
     PollableSystemSocketImpl* sockImpl )
 :
-    Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr, natTraversal, ipVersion ) ),
+    Socket<InterfaceToImplement>(
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
+            new aio::AsyncSocketImplHelper<Pollable>(
+                this, this, natTraversal, ipVersion)),
         type,
         protocol,
         ipVersion,
@@ -606,9 +607,10 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     int ipVersion,
     PollableSystemSocketImpl* sockImpl )
 :
-    Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr, natTraversal, ipVersion ) ),
+    Socket<InterfaceToImplement>(
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
+            new aio::AsyncSocketImplHelper<Pollable>(
+                this, this, natTraversal, ipVersion)),
         newConnSD,
         ipVersion,
         sockImpl),

@@ -201,7 +201,7 @@ void AddressResolver::resolveDomain(
 
 void AddressResolver::resolveAsync(
     const HostAddress& hostName, ResolveHandler handler,
-    bool natTraversal, void* requestId)
+    bool natTraversal, int ipVersion, void* requestId)
 {
     if (hostName.isResolved())
     {
@@ -233,13 +233,13 @@ void AddressResolver::resolveAsync(
         .str(hostName).arg(requestId), cl_logDEBUG1);
 
     if (info->second.isLikelyCloudAddress && natTraversal)
-        mediatorResolve(info, &lk, true);
+        mediatorResolve(info, &lk, true, ipVersion);
     else
-        dnsResolve(info, &lk, natTraversal);
+        dnsResolve(info, &lk, natTraversal, ipVersion);
 }
 
 std::vector<AddressEntry> AddressResolver::resolveSync(
-     const HostAddress& hostName, bool natTraversal = false)
+     const HostAddress& hostName, bool natTraversal, int ipVersion)
 {
     utils::promise<std::vector<AddressEntry>> promise;
     auto handler = [&](
@@ -254,7 +254,7 @@ std::vector<AddressEntry> AddressResolver::resolveSync(
         promise.set_value(std::move(entries));
     };
 
-    resolveAsync(hostName, std::move(handler), natTraversal);
+    resolveAsync(hostName, std::move(handler), natTraversal, ipVersion);
     return promise.get_future().get();
 }
 
@@ -412,12 +412,12 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 }
 
 void AddressResolver::dnsResolve(
-    HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator)
+    HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
     switch (info->second.dnsState())
     {
         case HostAddressInfo::State::resolved:
-            if (needMediator) mediatorResolve(info, lk, false);
+            if (needMediator) mediatorResolve(info, lk, false, ipVersion);
             return;
         case HostAddressInfo::State::inProgress:
             return;
@@ -429,7 +429,7 @@ void AddressResolver::dnsResolve(
     lk->unlock();
     m_dnsResolver.resolveAddressAsync(
         info->first,
-        [this, info, needMediator](
+        [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, const HostAddress& host)
         {
             std::vector<Guard> guards;
@@ -445,18 +445,19 @@ void AddressResolver::dnsResolve(
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
             if (needMediator && !info->second.isResolved(true))
-                mediatorResolve(info, &lk, false); // in case it's not resolved yet
+                mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },
+        ipVersion,
         this);
 }
 
 void AddressResolver::mediatorResolve(
-    HaInfoIterator info, QnMutexLockerBase* lk, bool needDns)
+    HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion)
 {
     switch (info->second.mediatorState())
     {
         case HostAddressInfo::State::resolved:
-            if (needDns) dnsResolve(info, lk, false);
+            if (needDns) dnsResolve(info, lk, false, ipVersion);
             return;
         case HostAddressInfo::State::inProgress:
             return;
@@ -465,7 +466,7 @@ void AddressResolver::mediatorResolve(
     }
 
     if (kResolveOnMediator)
-        return mediatorResolveImpl(info, lk, needDns);
+        return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
     if (info->second.isLikelyCloudAddress
         && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
@@ -487,13 +488,13 @@ void AddressResolver::mediatorResolve(
 }
 
 void AddressResolver::mediatorResolveImpl(
-    HaInfoIterator info, QnMutexLockerBase* lk, bool needDns)
+    HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion)
 {
     info->second.mediatorProgress();
     lk->unlock();
     m_mediatorConnection->resolvePeer(
         nx::hpm::api::ResolvePeerRequest(info->first.toString().toUtf8()),
-        [this, info, needDns](
+        [this, info, needDns, ipVersion](
             nx::hpm::api::ResultCode resultCode,
             nx::hpm::api::ResolvePeerResponse response)
         {
@@ -527,7 +528,7 @@ void AddressResolver::mediatorResolveImpl(
             info->second.setMediatorEntries(std::move(entries));
             guards = grabHandlers(code, info);
             if (needDns && !info->second.isResolved(true))
-                dnsResolve(info, &lk, false); // in case it's not resolved yet
+                dnsResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         });
 }
 

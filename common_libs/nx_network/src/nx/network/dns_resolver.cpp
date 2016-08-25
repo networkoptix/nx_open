@@ -65,8 +65,8 @@ void DnsResolver::resolveAddressAsync(
     m_cond.wakeAll();
 }
 
-bool HostAddressResolver::resolveAddressSync(
-bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )
+bool DnsResolver::resolveAddressSync(
+    const QString& hostName, HostAddress* const resolvedAddress, int ipVersion )
 {
     if( hostName.isEmpty() )
     {

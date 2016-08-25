@@ -42,7 +42,8 @@ public:
     /*!
         \note This method is re-enterable
     */
-    bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress, int ipVersion );
+    bool resolveAddressSync(
+        const QString& hostName, HostAddress* const resolvedAddress, int ipVersion );
 
     /*!
         \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
