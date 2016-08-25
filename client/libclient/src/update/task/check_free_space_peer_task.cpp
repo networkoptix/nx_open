@@ -62,7 +62,7 @@ void QnCheckFreeSpacePeerTask::doStart()
             }
 
             QSet<QnUuid> failed;
-            for (const auto id: peers())
+            for (const auto& id: peers())
             {
                 const auto server = qnResPool->getResourceById<QnMediaServerResource>(id);
                 if (!server)
