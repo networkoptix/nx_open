@@ -679,10 +679,7 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
 
         int result;
         socklen_t result_len = sizeof(result);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0)
-            iSelRet = 0;
-
-        if (result != 0)
+        if ((getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
             iSelRet = 0;
 
         break;
