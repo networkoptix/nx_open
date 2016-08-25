@@ -12,37 +12,41 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 
-namespace
-{
-    const int kTextSpacing = 6;
+namespace {
 
-    const qreal kMinimumLabelsFontSize = 10.0;
-    const qreal kMaximumLabelsFontSize = 14.0;
-    const qreal kMinimumGridFontSize = 7.0;
-    const qreal kMaximumGridFontSize = 12.0;
+const int kTextSpacing = 6;
 
-    const qreal kFontIncreaseStep = 0.5;
+const qreal kMinimumLabelsFontSize = 10.0;
+const qreal kMaximumLabelsFontSize = 14.0;
+const qreal kMinimumGridFontSize = 7.0;
+const qreal kMaximumGridFontSize = 12.0;
+
+const qreal kFontIncreaseStep = 0.5;
+
+static const int kDefaultFps = 10;
+static const Qn::RecordingType kDefaultRecordingType = Qn::RT_Always;
 
 } // anonymous namespace
 
-
-QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent) :
-    QWidget(parent),
-    m_showFps(true),
-    m_showQuality(true),
-    m_gridLeftOffset(0),
-    m_gridTopOffset(0),
-    m_mousePressed(false),
-    m_enabled(true),
-    m_readOnly(false),
-    m_cellSize(-1)
+QnScheduleGridWidget::CellParams::CellParams():
+    fps(kDefaultFps),
+    quality(Qn::QualityNormal),
+    recordingType(kDefaultRecordingType)
 {
-    m_mouseMoveCell = QPoint(-2, -2);
-    m_defaultParams[FpsParam] = 10;
-    m_defaultParams[QualityParam] = Qn::QualityNormal;
-    m_defaultParams[RecordTypeParam] = Qn::RT_Always;
+}
 
+bool QnScheduleGridWidget::CellParams::operator==(const CellParams& other) const
+{
+    return fps == other.fps
+        && quality == other.quality
+        && recordingType == other.recordingType;
+}
+
+QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
+    QWidget(parent)
+{
     updateCellColors();
 
     resetCellValues();
@@ -51,7 +55,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent) :
     date = date.addDays(1 - date.dayOfWeek());
     for (int i = 0; i < kDaysPerWeek; ++i)
     {
-        m_weekDays << date.toString(QLatin1String("ddd"));
+        m_weekDays << date.toString(lit("ddd"));
         date = date.addDays(1);
     }
 
@@ -152,7 +156,7 @@ void QnScheduleGridWidget::initMetrics()
         // checking numbers like 11, 22, .. 99
         if (m_showFps)
             for (int i = 0; i < 9 && !tooBig; i++)
-                tooBig |= (metrics.width(QString::number(i*11)) > maxLength);
+                tooBig |= (metrics.width(QString::number(i * 11)) > maxLength);
 
         if (tooBig)
             break;
@@ -209,44 +213,48 @@ QRectF QnScheduleGridWidget::cornerHeaderCell() const
 
 CustomPaintedBase::PaintFunction QnScheduleGridWidget::paintFunction(Qn::RecordingType type) const
 {
-    return [this, type](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
-    {
-        Q_UNUSED(widget);
-        bool hovered = option->state.testFlag(QStyle::State_MouseOver);
-
-        QColor color((hovered ? m_cellColorsHovered : m_cellColors)[type]);
-        QColor colorInside((hovered ? m_insideColorsHovered : m_insideColors)[type]);
-
-        painter->fillRect(option->rect, color);
-
-        if (colorInside.toRgb() != color.toRgb())
+    return
+        [this, type](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
         {
-            QnScopedPainterBrushRollback brushRollback(painter, colorInside);
-            QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.border, 0));
-            QnScopedPainterTransformRollback transformRollback(painter);
-            painter->translate(option->rect.topLeft());
-            painter->scale(option->rect.width(), option->rect.height());
+            Q_UNUSED(widget);
+            bool hovered = option->state.testFlag(QStyle::State_MouseOver);
 
-            static const qreal trOffset = 1.0 / 6.0;
-            static const qreal trSize = 1.0 / 10.0;
-            static const std::array<QPointF, 4> points({
-                QPointF(1.0 - trOffset - trSize, trOffset),
-                QPointF(1.0 - trOffset, trOffset + trSize),
-                QPointF(trOffset + trSize, 1.0 - trOffset),
-                QPointF(trOffset, 1.0 - trSize - trOffset) });
+            QColor color((hovered ? m_cellColorsHovered : m_cellColors)[type]);
+            QColor colorInside((hovered ? m_insideColorsHovered : m_insideColors)[type]);
 
-            painter->drawLine(0.0, 1.0, 1.0, 0.0);
-            painter->drawPolygon(points.data(), static_cast<int>(points.size()));
-        }
+            painter->fillRect(option->rect, color);
 
-        return true;
-    };
+            if (colorInside.toRgb() != color.toRgb())
+            {
+                QnScopedPainterBrushRollback brushRollback(painter, colorInside);
+                QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.border, 0));
+                QnScopedPainterTransformRollback transformRollback(painter);
+                painter->translate(option->rect.topLeft());
+                painter->scale(option->rect.width(), option->rect.height());
+
+                static const qreal trOffset = 1.0 / 6.0;
+                static const qreal trSize = 1.0 / 10.0;
+                static const std::array<QPointF, 4> points({
+                    QPointF(1.0 - trOffset - trSize, trOffset),
+                    QPointF(1.0 - trOffset, trOffset + trSize),
+                    QPointF(trOffset + trSize, 1.0 - trOffset),
+                    QPointF(trOffset, 1.0 - trSize - trOffset)});
+
+                painter->drawLine(0.0, 1.0, 1.0, 0.0);
+                painter->drawPolygon(points.data(), static_cast<int>(points.size()));
+            }
+
+            return true;
+        };
 }
 
 void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
     QPainter p(this);
+
+    if (!isEnabled() || !m_active)
+        p.setOpacity(style::Hints::kDisabledItemOpacity);
 
     if (!m_cornerSize.isValid())
         initMetrics();
@@ -294,13 +302,13 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 
     QStyleOption option;
     option.initFrom(this);
-    option.rect = QRect(0, 0, cellSize-1, cellSize-1);
+    option.rect = QRect(0, 0, cellSize - 1, cellSize - 1);
 
     for (int x = 0; x < columnCount(); ++x)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
-            uint recordTypeIdx(m_gridParams[x][y][RecordTypeParam].toUInt());
+            auto cellParams = m_gridParams[x][y];
             option.state &= ~QStyle::State_MouseOver;
 
             if (!m_mousePressed)
@@ -313,36 +321,47 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
             }
             else if (m_selectedCellsRect.normalized().contains(x, y))
             {
-                recordTypeIdx = m_defaultParams[RecordTypeParam].toUInt();
+                cellParams = m_brushParams;
                 option.state |= QStyle::State_MouseOver;
             }
 
             QTransform transform = p.transform();
             p.translate(x * cellSize + 1, y * cellSize + 1);
 
-            paintFunction(static_cast<Qn::RecordingType>(recordTypeIdx))(&p, &option, this);
+            paintFunction(cellParams.recordingType)(&p, &option, this);
 
             // draw text parameters
-            if (recordTypeIdx != Qn::RT_Never)
+            if (cellParams.recordingType != Qn::RT_Never)
             {
                 p.setPen(m_colors.gridLabel);
-                Qn::StreamQuality quality = (Qn::StreamQuality) m_gridParams[x][y][QualityParam].toInt();
+                Qn::StreamQuality quality = cellParams.quality;
 
                 if (m_showFps)
                 {
+                    bool fpsValid = cellParams.recordingType == Qn::RT_Never || cellParams.fps > 0;
+                    NX_ASSERT(fpsValid);
+                    QString fps = cellParams.recordingType != Qn::RT_Never && cellParams.fps > 0
+                        ? QString::number(cellParams.fps)
+                        : lit("-");
+
                     if (m_showQuality)
                     {
-                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
-                        p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
+                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)),
+                            Qt::AlignCenter, fps);
+                        p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)),
+                            Qt::AlignCenter, toShortDisplayString(quality));
                     }
                     else
                     {
-                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
+                        p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)),
+                            Qt::AlignCenter, fps);
                     }
+
                 }
                 else if (m_showQuality)
                 {
-                    p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
+                    p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)),
+                        Qt::AlignCenter, toShortDisplayString(quality));
                 }
             }
 
@@ -372,7 +391,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
     // draw selection
     if (!m_selectedRect.isEmpty())
     {
-        QColor defColor = m_cellColors[m_defaultParams[RecordTypeParam].toUInt()];
+        QColor defColor = m_cellColors[kDefaultRecordingType];
         QColor brushColor = subColor(defColor, qnGlobals->selectionOpacityDelta());
 
         p.setPen(subColor(defColor, qnGlobals->selectionBorderDelta()));
@@ -390,7 +409,7 @@ void QnScheduleGridWidget::resizeEvent(QResizeEvent *event)
 void QnScheduleGridWidget::leaveEvent(QEvent* event)
 {
     Q_UNUSED(event);
-    m_mouseMovePos = QPoint(-1,-1);
+    m_mouseMovePos = QPoint(-1, -1);
     m_mouseMoveCell = QPoint(-2, -2);
     m_selectedCellsRect = QRect();
     update();
@@ -417,8 +436,8 @@ void QnScheduleGridWidget::mouseMoveEvent(QMouseEvent* event)
 QPoint QnScheduleGridWidget::mapToGrid(const QPoint& pos, bool doTruncate) const
 {
     qreal cellSize = this->cellSize();
-    int cellX = (pos.x() - m_gridLeftOffset)/cellSize;
-    int cellY = (pos.y() - m_gridTopOffset)/cellSize;
+    int cellX = (pos.x() - m_gridLeftOffset) / cellSize;
+    int cellY = (pos.y() - m_gridTopOffset) / cellSize;
 
     if (doTruncate)
         return QPoint(qBound(0, cellX, columnCount() - 1), qBound(0, cellY, rowCount() - 1));
@@ -451,60 +470,41 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent* event)
     m_mousePressPos = event->pos();
     m_mousePressed = true;
     m_mousePressCell = cell;
-
-    if (cell.x() == -1 && cell.y() == -1)
-    {
-        for (int y = 0; y < rowCount(); ++y)
-            for (int x = 0; x < columnCount(); ++x)
-                updateCellValueInternal(QPoint(x, y));
-    }
-    else if (cell.x() == -1 && isValidRow(cell.y()))
-    {
-        for (int x = 0; x < columnCount(); ++x)
-            updateCellValueInternal(QPoint(x, cell.y()));
-    }
-    else if (cell.y() == -1 && isValidColumn(cell.x()))
-    {
-        for (int y = 0; y < rowCount(); ++y)
-            updateCellValueInternal(QPoint(cell.x(), y));
-    }
-    else if (isValidCell(cell))
-    {
-        updateCellValueInternal(cell);
-    }
-
     m_selectedCellsRect = QRect(cell, cell);
 
     update();
-    setEnabled(true);
+    setActive(true);
 }
 
 void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     if (m_mousePressed)
     {
-        QPoint cell1 = mapToGrid(m_mousePressPos, true);
-        QPoint cell2 = mapToGrid(event->pos(), true);
+        QPoint mouseReleaseCell = mapToGrid(event->pos(), false);
+        if (m_mousePressCell == mouseReleaseCell)
+        {
+            handleCellClicked(mouseReleaseCell);
+        }
+        else
+        {
+            QPoint cell1 = mapToGrid(m_mousePressPos, true);
+            QPoint cell2 = mapToGrid(event->pos(), true);
 
-        /* We cannot use QRect::normalized here, as it provides not the results we need. */
-        int x1 = qMin(cell1.x(), cell2.x());
-        int x2 = qMax(cell1.x(), cell2.x());
-        int y1 = qMin(cell1.y(), cell2.y());
-        int y2 = qMax(cell1.y(), cell2.y());
+            /* We cannot use QRect::normalized here, as it provides not the results we need. */
+            int x1 = qMin(cell1.x(), cell2.x());
+            int x2 = qMax(cell1.x(), cell2.x());
+            int y1 = qMin(cell1.y(), cell2.y());
+            int y2 = qMax(cell1.y(), cell2.y());
 
-        for (int x = x1; x <= x2; ++x)
-            for (int y = y1; y <= y2; ++y)
-                updateCellValueInternal(QPoint(x,y));
+            for (int x = x1; x <= x2; ++x)
+                for (int y = y1; y <= y2; ++y)
+                    updateCellValueInternal(QPoint(x, y));
+        }
     }
 
     m_mousePressed = false;
     m_selectedRect = QRect();
     update();
-}
-
-void QnScheduleGridWidget::setDefaultParam(ParamType number, const QVariant& value)
-{
-    m_defaultParams[number] = value;
 }
 
 void QnScheduleGridWidget::setShowFps(bool value)
@@ -527,59 +527,39 @@ void QnScheduleGridWidget::setShowQuality(bool value)
     update();
 }
 
-QVariant QnScheduleGridWidget::cellValue(const QPoint& cell, ParamType paramType) const
+void QnScheduleGridWidget::handleCellClicked(const QPoint& cell)
 {
-    if (!isValidCell(cell))
-        return QVariant();
-
-    if (paramType < 0 || paramType >= ParamCount)
-        return QVariant();
-
-    return m_gridParams[cell.x()][cell.y()][paramType];
-}
-
-void QnScheduleGridWidget::setCellValue(const QPoint& cell, ParamType paramType, const QVariant& value)
-{
-    if (!isValidCell(cell))
-        return;
-
-    if (paramType < 0 || paramType >= ParamCount)
-        return;
-
-    QVariant& localValue = m_gridParams[cell.x()][cell.y()][paramType];
-    if (localValue == value)
-        return;
-
-    localValue = value;
-
-    emit cellValueChanged(cell);
-
-    update();
-}
-
-Qn::RecordingType QnScheduleGridWidget::cellRecordingType(const QPoint& cell) const
-{
-    QVariant value = cellValue(cell, RecordTypeParam);
-    if (value.isValid())
-        return Qn::RecordingType(value.toUInt());
-
-    return Qn::RT_Always;
-}
-
-void QnScheduleGridWidget::setCellRecordingType(const QPoint& cell, const Qn::RecordingType& value)
-{
-    setCellValue(cell, RecordTypeParam, value);
+    if (cell.x() == -1 && cell.y() == -1)
+    {
+        for (int y = 0; y < rowCount(); ++y)
+            for (int x = 0; x < columnCount(); ++x)
+                updateCellValueInternal(QPoint(x, y));
+    }
+    else if (cell.x() == -1 && isValidRow(cell.y()))
+    {
+        for (int x = 0; x < columnCount(); ++x)
+            updateCellValueInternal(QPoint(x, cell.y()));
+    }
+    else if (cell.y() == -1 && isValidColumn(cell.x()))
+    {
+        for (int y = 0; y < rowCount(); ++y)
+            updateCellValueInternal(QPoint(cell.x(), y));
+    }
+    else if (isValidCell(cell))
+    {
+        updateCellValueInternal(cell);
+    }
 }
 
 void QnScheduleGridWidget::updateCellValueInternal(const QPoint& cell)
 {
     NX_ASSERT(isValidCell(cell));
 
-    setCellValueInternal(cell, m_defaultParams);
+    setCellValue(cell, m_brushParams);
     update();
 }
 
-void QnScheduleGridWidget::setCellValueInternal(const QPoint& cell, const CellParams& value)
+void QnScheduleGridWidget::setCellValue(const QPoint& cell, const CellParams& value)
 {
     NX_ASSERT(isValidCell(cell));
 
@@ -592,29 +572,35 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint& cell, const CellPa
     emit cellValueChanged(cell);
 }
 
-void QnScheduleGridWidget::setCellValueInternal(const QPoint& cell, ParamType type, const QVariant& value)
+QnScheduleGridWidget::CellParams QnScheduleGridWidget::brush() const
+{
+    return m_brushParams;
+}
+
+void QnScheduleGridWidget::setBrush(const CellParams& params)
+{
+    m_brushParams = params;
+}
+
+QnScheduleGridWidget::CellParams QnScheduleGridWidget::cellValue(const QPoint& cell) const
 {
     NX_ASSERT(isValidCell(cell));
-    NX_ASSERT(type >= 0 && type < ParamCount);
+    if (!isValidCell(cell))
+        return CellParams();
 
-    CellParams& localValue = m_gridParams[cell.x()][cell.y()];
-    if (localValue[type] == value)
-        return;
-
-    localValue[type] = value;
-
-    emit cellValueChanged(cell);
+    return m_gridParams[cell.x()][cell.y()];
 }
 
 void QnScheduleGridWidget::resetCellValues()
 {
     CellParams emptyParams;
-    emptyParams[QualityParam] = Qn::QualityNotDefined;
-    emptyParams[RecordTypeParam] = Qn::RT_Never;
+    emptyParams.fps = 0;
+    emptyParams.quality = Qn::QualityNotDefined;
+    emptyParams.recordingType = Qn::RT_Never;
 
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)
-            setCellValueInternal(QPoint(col, row), emptyParams);
+            setCellValue(QPoint(col, row), emptyParams);
 }
 
 bool QnScheduleGridWidget::isReadOnly() const
@@ -630,12 +616,26 @@ void QnScheduleGridWidget::setReadOnly(bool readOnly)
     m_readOnly = readOnly;
 }
 
+bool QnScheduleGridWidget::isActive() const
+{
+    return m_active;
+}
+
+void QnScheduleGridWidget::setActive(bool value)
+{
+    if (m_active == value)
+        return;
+    m_active = value;
+    update();
+}
+
 bool QnScheduleGridWidget::isValidCell(const QPoint& cell) const
 {
     return isValidColumn(cell.x()) && isValidRow(cell.y());
 }
 
-bool QnScheduleGridWidget::isValidRow(int row) const {
+bool QnScheduleGridWidget::isValidRow(int row) const
+{
     return row >= 0 && row < rowCount();
 }
 
@@ -650,14 +650,18 @@ void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
-            int fps = m_gridParams[x][y][FpsParam].toInt();
+            auto cell = m_gridParams[x][y];
+            int fps = cell.fps;
             int value = maxFps;
 
-            if (m_gridParams[x][y][RecordTypeParam] == Qn::RT_MotionAndLowQuality)
+            if (cell.recordingType == Qn::RT_MotionAndLowQuality)
                 value = maxDualStreamFps;
 
             if (fps > value)
-                setCellValueInternal(QPoint(x, y), FpsParam, value);
+            {
+                cell.fps = value;
+                setCellValue(QPoint(x, y), cell);
+            }
         }
     }
 }
@@ -669,14 +673,15 @@ int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
-            Qn::RecordingType rt = static_cast<Qn::RecordingType>(m_gridParams[x][y][RecordTypeParam].toUInt());
+            auto cell = m_gridParams[x][y];
+            Qn::RecordingType rt = cell.recordingType;
             if (motionPlusLqOnly && rt != Qn::RT_MotionAndLowQuality)
                 continue;
 
             if (rt == Qn::RT_Never)
                 continue;
 
-            fps = qMax(fps, m_gridParams[x][y][FpsParam].toInt());
+            fps = qMax(fps, cell.fps);
         }
     }
     return fps;

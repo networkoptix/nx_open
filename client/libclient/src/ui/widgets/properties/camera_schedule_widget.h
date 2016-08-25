@@ -8,57 +8,41 @@
 #include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/connective.h>
 
 namespace Ui {
-    class CameraScheduleWidget;
+class CameraScheduleWidget;
 }
 
-class QnCameraScheduleWidget: public QWidget, public QnWorkbenchContextAware, public QnUpdatable
+class QnCameraScheduleWidget: public Connective<QWidget>,
+    public QnWorkbenchContextAware,
+    public QnUpdatable
 {
     Q_OBJECT
-    Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks NOTIFY scheduleTasksChanged USER true DESIGNABLE false)
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
+    using base_type = Connective<QWidget>;
+
 public:
-    explicit QnCameraScheduleWidget(QWidget *parent = 0);
+    explicit QnCameraScheduleWidget(QWidget* parent = 0);
     virtual ~QnCameraScheduleWidget();
 
-    void setChangesDisabled(bool);
-    bool isChangesDisabled() const;
+    void overrideMotionType(Qn::MotionType motionTypeOverride = Qn::MT_Default);
 
-    QList<QnScheduleTask::Data> scheduleTasks() const;
-    void setScheduleTasks(const QnScheduleTaskList taskFrom);
-    void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
+    QnScheduleTaskList scheduleTasks() const;
+    void setScheduleTasks(const QnScheduleTaskList& value);
+
     void setScheduleEnabled(bool enabled);
     bool isScheduleEnabled() const;
-
-    /**
-     * @brief setMaxFps             Set maximum fps value that can be placed on the grid.
-     * @param value                 Maximum allowed fps value for record types "always" and "motion only".
-     * @param dualStreamValue       Maximum allowed fps value for record type "motion-plus-lq".
-     */
-    void setMaxFps(int value, int dualStreamValue);
-    void setFps(int value);
-
-    /**
-     * @brief getGridMaxFps         Get maximum fps value placed on a grid. If parameter motionPlusLqOnly set, then
-     *                              only cells with recording type RecordingType_MotionPlusLQ will be taken into account.
-     * @param motionPlusLqOnly      Whether we should check only cells with recording type RecordingType_MotionPlusLQ.
-     * @return                      Maximum fps value.
-     */
-    int getGridMaxFps(bool motionPlusLqOnly = false);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMotionAvailable(bool available);
-    bool isMotionAvailable() const;
-
-    void setRecordingParamsAvailability(bool available);
-    bool isRecordingParamsAvailable() const;
-
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
+
+    void updateFromResources();
+    void submitToResources();
 
     /** Returns true if there is at least one "record-motion" square on the grid */
     bool hasMotionOnGrid() const;
@@ -69,8 +53,6 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
     int maxRecordedDays() const;
     int minRecordedDays() const;
-
-    static const int RecordedDaysDontChange = INT_MAX;
 
 signals:
     void archiveRangeChanged();
@@ -86,7 +68,10 @@ protected:
 
     virtual void afterContextInitialized() override;
 
-private slots:
+private:
+
+    void updateRecordThresholds(QnScheduleTaskList& tasks);
+
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
     void updateArchiveRangeEnabledState();
@@ -97,6 +82,7 @@ private slots:
     void updateLicensesButtonVisible();
     void updateRecordSpinboxes();
     void updateMaxFpsValue(bool motionPlusLqToggled);
+    void updateRecordingParamsAvailable();
 
     void updateColors();
 
@@ -106,10 +92,24 @@ private slots:
     void at_licensesButton_clicked();
     void at_releaseSignalizer_activated(QObject *target);
     void at_exportScheduleButton_clicked();
+
 private:
+
+    /**
+    * @brief getGridMaxFps         Get maximum fps value placed on a grid. If parameter motionPlusLqOnly set, then
+    *                              only cells with recording type RecordingType_MotionPlusLQ will be taken into account.
+    * @param motionPlusLqOnly      Whether we should check only cells with recording type RecordingType_MotionPlusLQ.
+    * @return                      Maximum fps value.
+    */
+    int getGridMaxFps(bool motionPlusLqOnly = false);
+
+    void setFps(int value);
+
     void updateScheduleEnabled();
     void updateMinDays();
     void updateMaxDays();
+    void updateMaxFPS();
+    void updateMotionAvailable();
 
     int qualityToComboIndex(const Qn::StreamQuality& q);
 
@@ -126,7 +126,6 @@ private:
     bool m_disableUpdateGridParams;
     bool m_motionAvailable;
     bool m_recordingParamsAvailable;
-    bool m_changesDisabled;
     bool m_readOnly;
 
     /**
@@ -138,4 +137,7 @@ private:
      * @brief m_maxDualStreamingFps     Maximum fps value for record types "motion-plus-lq"
      */
     int m_maxDualStreamingFps;
+
+
+    Qn::MotionType m_motionTypeOverride;
 };
