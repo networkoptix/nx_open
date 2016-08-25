@@ -195,8 +195,8 @@
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
-                        <version>1.4</version>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <version>2.0</version>
                         <executions>
                             <execution>
                                 <phase>initialize</phase>

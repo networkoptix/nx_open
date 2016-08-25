@@ -247,10 +247,10 @@ void QnCameraSettingsWidget::reject()
     switch (mode())
     {
         case SingleMode:
-            m_singleWidget->reject();
+            m_singleWidget->updateFromResource(true);
             break;
         case MultiMode:
-            m_multiWidget->reject();
+            m_multiWidget->updateFromResources();
             break;
         default:
             break;

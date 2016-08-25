@@ -118,9 +118,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
     m_centralHolder(new QnViewportBoundWidget(this)),
     m_extrasHolder(new QnViewportBoundWidget(this)),
 
-    m_preloader(new QnBusyIndicatorGraphicsWidget(nullptr, 0,
-        qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6),
-        qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2))),
+    m_preloader(new QnBusyIndicatorGraphicsWidget()),
 
     m_imageItem(new QGraphicsPixmapItem(this)),
 
@@ -130,6 +128,9 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
     m_button(new QPushButton()),
     m_description(new QnWordWrappedLabel())
 {
+    m_preloader->setIndicatorColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6));
+    m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
+
     setOpacity(kBaseOpacity);
     setAcceptedMouseButtons(Qt::NoButton);
 

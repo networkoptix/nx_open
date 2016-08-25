@@ -7,13 +7,11 @@
 
 #include <ui/common/aligner.h>
 #include <ui/common/palette.h>
-#include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/input_field.h>
 
 #include <watchers/cloud_status_watcher.h>
@@ -44,9 +42,6 @@ public:
     void at_cloudStatusWatcher_error();
 
     void showCredentialsError(bool show);
-
-public:
-    QnBusyIndicatorWidget* busyIndicator;
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
@@ -57,8 +52,6 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->setupUi(this);
 
     Q_D(QnLoginToCloudDialog);
-
-    d->busyIndicator->setParent(ui->loginButton);
 
     ui->loginInputField->setTitle(tr("E-Mail"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
@@ -125,10 +118,8 @@ void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)
 
 QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent) :
     QObject(parent),
-    q_ptr(parent),
-    busyIndicator(new QnBusyIndicatorWidget(parent))
+    q_ptr(parent)
 {
-    new QnWidgetAnchor(busyIndicator);
 }
 
 void QnLoginToCloudDialogPrivate::updateUi()
@@ -154,8 +145,7 @@ void QnLoginToCloudDialogPrivate::lockUi(bool locked)
     q->ui->logoPanel->graphicsEffect()->setEnabled(locked);
     q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
 
-    q->ui->loginButton->setText(locked ? QString() : tr("Login"));
-    busyIndicator->setVisible(locked);
+    q->ui->loginButton->showIndicator(locked);
 }
 
 void QnLoginToCloudDialogPrivate::unlockUi()

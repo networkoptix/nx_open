@@ -5,7 +5,10 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
 
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_parameters.h>
 #include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_groups_settings_model.h>
 #include <ui/style/helper.h>
@@ -29,6 +32,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this))
 {
     ui->setupUi(this);
+    setTabWidget(ui->tabWidget);
 
     addPage(SettingsPage, m_settingsPage, tr("Role Info"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
@@ -199,7 +203,21 @@ void QnUserGroupsDialog::applyChanges()
         if (existing != group)
             qnResourcesChangesManager->saveUserGroup(group);
 
-        qnResourcesChangesManager->saveAccessibleResources(group, m_model->accessibleResources(group.id));
+        auto resources = m_model->accessibleResources(group.id);
+        QnLayoutResourceList layoutsToShare = qnResPool->getResources(resources)
+            .filtered<QnLayoutResource>(
+                [](const QnLayoutResourcePtr& layout)
+                {
+                    return !layout->isFile() && !layout->isShared();
+                });
+
+        for (const auto& layout : layoutsToShare)
+        {
+            menu()->trigger(QnActions::ShareLayoutAction,
+                QnActionParameters(layout).withArgument(Qn::UuidRole, group.id));
+        }
+
+        qnResourcesChangesManager->saveAccessibleResources(group, resources);
     }
 
     for (const auto& group : qnResourceAccessManager->userGroups())
@@ -221,5 +239,6 @@ void QnUserGroupsDialog::applyChanges()
     }
 
     updateButtonBox();
+    loadDataToUi();
 }
 
