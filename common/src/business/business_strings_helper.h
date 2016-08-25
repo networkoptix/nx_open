@@ -41,7 +41,7 @@ public:
 
     static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
     static QString eventDetails(const QnBusinessEventParameters &params, const QString& delimiter);
-    static QString renderEventDetailsText(QVariantHash contextMap);
+    static QString renderEventDetailsText(QVariantMap contextMap);
 
     //TODO: #vasilenko isPublic field is not used, why?
     static QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic);
