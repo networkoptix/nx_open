@@ -68,6 +68,7 @@ private:
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
     bool checkDBCap() const;
+    bool updatePermissionsHelper(const QString& userName) const;
 
     // It is for smb mount points with linux server .
     // Translates remote url to local temporary mount folder.
