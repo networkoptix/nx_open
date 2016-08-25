@@ -313,6 +313,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 
     /* AccessibleResources are also updated here. */
     applyChanges(user);
+    NX_ASSERT(!(user->isCloud() && user->getEmail().isEmpty()));
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(user, apiUser);

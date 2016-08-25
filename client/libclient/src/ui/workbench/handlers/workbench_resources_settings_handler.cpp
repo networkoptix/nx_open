@@ -75,7 +75,6 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
     QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
-    user->setId(QnUuid::createUuid());
     user->addFlags(Qn::local);
 
     QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog, mainWindow());
