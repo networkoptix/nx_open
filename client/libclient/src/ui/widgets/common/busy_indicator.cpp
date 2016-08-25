@@ -304,6 +304,7 @@ void QnBusyIndicatorPainter::paintIndicator(QPainter* painter, const QPointF& or
 
     int timeMs = d->currentTimeMs;
 
+    //TODO: #common Will not work with cosmetic pens in scaled painter
     qreal radius = d->dotRadius;
     if (painter->pen().style() != Qt::NoPen)
         radius -= qMax(painter->pen().widthF(), 1.0) * 0.5;
