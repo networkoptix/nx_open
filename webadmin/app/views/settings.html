@@ -8,7 +8,7 @@
 
             <alert type="warning" ng-if="settings.ecDbReadOnly">The system is running in safe mode. Changes are impossible.</alert>
             <tabset ng-hide="settings.ecDbReadOnly">
-                <tab heading="Server">
+                <tab heading="Server" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
@@ -48,7 +48,7 @@
                     </div>
                 </tab>
 
-                <tab heading="System">
+                <tab heading="System" active="active.system">
                     <div>
                         <h3>Name</h3>
                         <div class="row">

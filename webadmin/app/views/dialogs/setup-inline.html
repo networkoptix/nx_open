@@ -253,6 +253,11 @@
     </p>
 </div>
 
+<div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
+    <div class="master-success"><span class="preloader"></span></div>
+    <h2>Connecting to cloud ...</h2>
+    <p class="master-description">It may take several moments</p>
+</div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
