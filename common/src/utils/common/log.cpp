@@ -151,9 +151,9 @@ private:
     void openFileImpl()
     {
         #ifdef Q_OS_WIN
-            m_file.open(currFileName().toStdWString(), std::ios_base::app);
+            m_file.open(currFileName().toStdWString(), std::ios_base::app | std::ios_base::out);
         #else
-            m_file.open(currFileName().toStdString(), std::ios_base::app);
+            m_file.open(currFileName().toStdString(), std::ios_base::app | std::ios_base::out);
         #endif
 
         if (m_file.fail())
