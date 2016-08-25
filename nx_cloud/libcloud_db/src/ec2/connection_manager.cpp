@@ -23,8 +23,6 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
-static const QnUuid kCdbGuid("{A1D368E4-3D01-4B18-8642-898272D7CDA9}");
-
 ConnectionManager::ConnectionManager(
     const conf::Settings& settings,
     TransactionLog* const transactionLog,
@@ -33,7 +31,11 @@ ConnectionManager::ConnectionManager(
     m_settings(settings),
     m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
-    m_localPeerData(kCdbGuid, QnUuid::createUuid(), Qn::PT_CloudServer, Qn::UbjsonFormat)
+    m_localPeerData(
+        QnCommonModule::instance()->moduleGUID(),
+        QnUuid::createUuid(),
+        Qn::PT_CloudServer,
+        Qn::UbjsonFormat)
 {
     using namespace std::placeholders;
 
@@ -54,7 +56,7 @@ ConnectionManager::~ConnectionManager()
 }
 
 void ConnectionManager::createTransactionConnection(
-    nx_http::HttpServerConnection* const /*connection*/,
+    nx_http::HttpServerConnection* const connection,
     stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
@@ -82,33 +84,40 @@ void ConnectionManager::createTransactionConnection(
     nx::String contentEncoding;
     fetchDataFromConnectRequest(request, &remotePeer, &contentEncoding);
 
+    //newTransport MUST be ready to accept connections before sending response
+    const nx::String systemIdLocal(systemId.c_str());
+    auto newTransport = std::make_unique<TransactionTransport>(
+        connection->getAioThread(),
+        m_transactionLog,
+        systemIdLocal,
+        connectionId,
+        m_localPeerData,
+        remotePeer,
+        connection->socket()->getForeignAddress(),
+        request,
+        contentEncoding);
+
+    ConnectionContext context{
+        std::move(newTransport),
+        connectionId,
+        std::make_pair(systemIdLocal, remotePeer.id.toByteArray()) };
+
+    addNewConnection(std::move(context));
+
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent = 
-        [this,
-            connectionId = std::move(connectionId),
-            systemId = std::move(systemId),
-            remotePeer = std::move(remotePeer),
-            request = std::move(request),
-            contentEncoding](
-                nx_http::HttpServerConnection* connection)
+        [this, connectionId = std::move(connectionId)](
+            nx_http::HttpServerConnection* connection)
         {
-            const nx::String systemIdLocal(systemId.c_str());
-            auto newTransport = std::make_unique<TransactionTransport>(
-                m_transactionLog,
-                systemIdLocal,
-                connectionId,
-                m_localPeerData,
-                remotePeer,
-                QSharedPointer<AbstractCommunicatingSocket>(connection->takeSocket().release()),
-                request,
-                contentEncoding);
+            QnMutexLocker lk(&m_mutex);
 
-            ConnectionContext context{
-                std::move(newTransport),
-                connectionId,
-                std::make_pair(systemIdLocal, remotePeer.id.toByteArray()) };
+            const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
+            auto connectionIter = connectionByIdIndex.find(connectionId);
+            NX_ASSERT(connectionIter != connectionByIdIndex.end());
 
-            addNewConnection(std::move(context));
+            connectionIter->connection->setOutgoingConnection(
+                QSharedPointer<AbstractCommunicatingSocket>(connection->takeSocket().release()));
+            connectionIter->connection->startOutgoingChannel();
         };
 
     response->headers.emplace("Content-Type", ec2::TransactionTransport::TUNNEL_CONTENT_TYPE);
@@ -123,6 +132,7 @@ void ConnectionManager::createTransactionConnection(
         nx::String::number(nx_ec::EC2_PROTO_VERSION));
     response->headers.emplace("X-Nx-Cloud", "true");
     response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
+
     completionHandler(nx_http::StatusCode::ok, nullptr, std::move(connectionEvents));
 }
 
@@ -157,7 +167,7 @@ void ConnectionManager::pushTransaction(
         {
             connectionPtr->receivedTransaction(
                 std::move(request.headers),
-                request.messageBody);
+                std::move(request.messageBody));
         });
 
     completionHandler(nx_http::StatusCode::ok, nullptr, nx_http::ConnectionEvents());

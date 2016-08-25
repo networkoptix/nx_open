@@ -120,6 +120,8 @@ private:
 
 TEST_F(MserverCloudSynchronization, general)
 {
+    constexpr static const auto kWaitTimeout = std::chrono::seconds(5);
+
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
@@ -137,7 +139,7 @@ TEST_F(MserverCloudSynchronization, general)
     //creating transaction connection
     ASSERT_TRUE(
         openTransactionConnectionAndWaitForResult(
-            system1.id, system1.authKey, std::chrono::seconds(5)));
+            system1.id, system1.authKey, kWaitTimeout));
 }
 
 }   //namespace cdb

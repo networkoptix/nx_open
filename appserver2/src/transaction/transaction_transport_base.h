@@ -98,13 +98,12 @@ public:
     };
     static QString toString( State state );
 
-    //!Initializer for incoming connection
+    /** Initializer for incoming connection. */
     QnTransactionTransportBase(
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
-        QSharedPointer<AbstractCommunicatingSocket> socket,
         ConnectionType::Type connectionType,
         const nx_http::Request& request,
         const QByteArray& contentEncoding,
@@ -118,6 +117,9 @@ public:
     ~QnTransactionTransportBase();
 
     void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
+
+    /** Enables outgoing transaction channel. */
+    void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
 
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
     int keepAliveProbeCount() const;

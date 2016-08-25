@@ -15,19 +15,21 @@
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
-#include <api/global_settings.h>
-#include <platform/process/current_process.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/type_utils.h>
-#include <utils/common/systemerror.h>
-#include <utils/db/db_structure_updater.h>
+
+#include <api/global_settings.h>
+#include <common/common_module.h>
+#include <platform/process/current_process.h>
 #include <utils/common/app_info.h>
 #include <utils/common/guard.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
+#include <utils/common/systemerror.h>
+#include <utils/db/db_structure_updater.h>
 
 #include <cloud_db_client/src/cdb_request_path.h>
 
@@ -113,6 +115,8 @@ const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
     return m_httpEndpoints;
 }
 
+static const QnUuid kCdbGuid("{674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB}");
+
 #ifdef USE_QAPPLICATION
 int CloudDBProcess::executeApplication()
 #else
@@ -129,6 +133,9 @@ int CloudDBProcess::exec()
 
     try
     {
+        QnCommonModule commonModule;
+        commonModule.setModuleGUID(kCdbGuid);
+
         //reading settings
         conf::Settings settings;
         //parsing command line arguments

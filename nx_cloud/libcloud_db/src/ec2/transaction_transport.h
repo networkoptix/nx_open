@@ -39,12 +39,13 @@ public:
 
     //!Initializer for incoming connection
     TransactionTransport(
+        nx::network::aio::AbstractAioThread* aioThread,
         TransactionLog* const transactionLog,
         const nx::String& systemId,
         const nx::String& connectionId,
         const ::ec2::ApiPeerData& localPeer,
         const ::ec2::ApiPeerData& remotePeer,
-        QSharedPointer<AbstractCommunicatingSocket> socket,
+        const SocketAddress& remotePeerEndpoint,
         const nx_http::Request& request,
         const QByteArray& contentEncoding);
     virtual ~TransactionTransport();
@@ -55,6 +56,8 @@ public:
     /** Set handler to be executed when tcp connection is closed */
     void setOnConnectionClosed(ConnectionClosedEventHandler handler);
     void setOnGotTransaction(GotTransactionEventHandler handler);
+
+    void startOutgoingChannel();
 
     void processSyncRequest(
         const TransactionTransportHeader& transportHeader,
@@ -76,6 +79,12 @@ public:
         ::ec2::QnTransaction<T> transaction,
         TransactionTransportHeader transportHeader)
     {
+        NX_LOGX(
+            QnLog::EC2_TRAN_LOG,
+            lm("Sending transaction %1 to (%2, %3)").str(transaction.command)
+                .str(remotePeer().id).str(m_connectionOriginatorEndpoint),
+            cl_logDEBUG1);
+
         post([this, transaction = std::move(transaction),
                 transportHeader = std::move(transportHeader)]() mutable
             {
@@ -89,6 +98,12 @@ public:
                         std::move(transportHeader.vmsTransportHeader));
                     return;
                 }
+
+                NX_LOGX(
+                    QnLog::EC2_TRAN_LOG,
+                    lm("Postponing send transaction %1 to (%2, %3)").str(transaction.command)
+                        .str(remotePeer().id).str(m_connectionOriginatorEndpoint),
+                    cl_logDEBUG1);
 
                 //cannot send transaction right now: updating local transaction sequence
                 const ::ec2::QnTranStateKey tranStateKey(

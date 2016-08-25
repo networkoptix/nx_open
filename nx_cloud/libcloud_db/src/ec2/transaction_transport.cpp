@@ -19,12 +19,13 @@ constexpr static const int kKeepAliveProbeCount = 3;
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
 TransactionTransport::TransactionTransport(
+    nx::network::aio::AbstractAioThread* aioThread,
     TransactionLog* const transactionLog,
     const nx::String& systemId,
     const nx::String& connectionId,
     const ::ec2::ApiPeerData& localPeer,
     const ::ec2::ApiPeerData& remotePeer,
-    QSharedPointer<AbstractCommunicatingSocket> socket,
+    const SocketAddress& remotePeerEndpoint,
     const nx_http::Request& request,
     const QByteArray& contentEncoding)
 :
@@ -35,7 +36,6 @@ TransactionTransport::TransactionTransport(
             ::ec2::ConnectionLockGuard::Direction::Incoming),
         localPeer,
         remotePeer,
-        socket,
         ::ec2::ConnectionType::incoming,
         request,
         contentEncoding,
@@ -47,7 +47,7 @@ TransactionTransport::TransactionTransport(
         remotePeer.dataFormat)),
     m_systemId(systemId),
     m_connectionId(connectionId),
-    m_connectionOriginatorEndpoint(socket->getForeignAddress()),
+    m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_haveToSendSyncDone(false)
 {
     using namespace std::placeholders;
@@ -57,8 +57,8 @@ TransactionTransport::TransactionTransport(
     m_transactionLogReader->setOnJsonTransactionReady(
         std::bind(&TransactionTransport::addTransportHeaderToJsonTransaction, this, _1));
 
-    nx::network::aio::BasicPollable::bindToAioThread(socket->getAioThread());
-    m_transactionLogReader->bindToAioThread(socket->getAioThread());
+    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    m_transactionLogReader->bindToAioThread(aioThread);
     setState(Connected);
     //ignoring "state changed to Connected" signal
 
@@ -77,11 +77,12 @@ TransactionTransport::~TransactionTransport()
     stopWhileInAioThread();
 }
 
-void TransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* /*aioThread*/)
+void TransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
+    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+
     //implementation should be done in ::ec2::QnTransactionTransportBase
-    NX_ASSERT(false);
-    //nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    //NX_ASSERT(false);
     //socket->bindToAioThread(aioThread);
     //m_transactionLogReader->bindToAioThread(aioThread);
 }
@@ -100,6 +101,26 @@ void TransactionTransport::setOnConnectionClosed(
 void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
+}
+
+void TransactionTransport::startOutgoingChannel()
+{
+    NX_LOGX(lm("Starting outgoing transaction channel to (%1; %2)")
+        .arg(remotePeer().id).str(m_connectionOriginatorEndpoint),
+        cl_logDEBUG1);
+
+    //sending tranSyncRequest
+    ::ec2::QnTransaction<::ec2::ApiSyncRequestData>
+        requestTran(::ec2::ApiCommand::tranSyncRequest);
+    requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
+
+    TransactionTransportHeader transportHeader;
+    transportHeader.vmsTransportHeader.processedPeers << remotePeer().id;
+    transportHeader.vmsTransportHeader.processedPeers << localPeer().id;
+
+    sendTransaction(
+        std::move(requestTran),
+        std::move(transportHeader));
 }
 
 void TransactionTransport::processSyncRequest(
@@ -141,7 +162,7 @@ void TransactionTransport::onTransactionsReadFromLog(
         NX_LOGX(lm("m_transactionLogReader->getTransactions returned %1. "
             "Closing connection %2 from peer (%3; %4)")
             .arg(api::toString(resultCode)).arg(m_connectionId)
-            .arg(remotePeer().id).arg(m_connectionOriginatorEndpoint.toString()),
+            .arg(remotePeer().id).str(m_connectionOriginatorEndpoint),
             cl_logDEBUG1);
         setState(Closed);   //closing connection
     }
@@ -155,7 +176,7 @@ void TransactionTransport::processSyncResponse(
     TransactionProcessedHandler /*handler*/)
 {
     //TODO no need to do anything?
-    NX_ASSERT(false);
+    //NX_ASSERT(false);
 }
 
 void TransactionTransport::processSyncDone(
@@ -164,7 +185,7 @@ void TransactionTransport::processSyncDone(
     TransactionProcessedHandler /*handler*/)
 {
     //TODO no need to do anything?
-    NX_ASSERT(false);
+    //NX_ASSERT(false);
 }
 
 void TransactionTransport::fillAuthInfo(

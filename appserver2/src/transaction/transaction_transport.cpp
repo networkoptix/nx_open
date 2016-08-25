@@ -27,7 +27,6 @@ QnTransactionTransport::QnTransactionTransport(
         std::move(connectionLockGuard),
         localPeer,
         remotePeer,
-        std::move(socket),
         connectionType,
         request,
         contentEncoding,
@@ -35,6 +34,7 @@ QnTransactionTransport::QnTransactionTransport(
         QnGlobalSettings::instance()->keepAliveProbeCount()),
     m_userAccessData(userAccessData)
 {
+    setOutgoingConnection(std::move(socket));
 }
 
 QnTransactionTransport::QnTransactionTransport(const ApiPeerData& localPeer)

@@ -252,8 +252,10 @@ namespace nx_http
 
         NX_NETWORK_API StringType toString(Value);
         NX_NETWORK_API StringType toString(int);
-        NX_NETWORK_API bool isSuccessCode(Value);
-        NX_NETWORK_API bool isSuccessCode(int);
+        /** Returns \a true if \a  statusCode is 2xx */
+        NX_NETWORK_API bool isSuccessCode(Value statusCode);
+        /** Returns \a true if \a  statusCode is 2xx */
+        NX_NETWORK_API bool isSuccessCode(int statusCode);
 
         NX_NETWORK_API bool isMessageBodyAllowed(int statusCode);
     };

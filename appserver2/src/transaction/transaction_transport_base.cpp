@@ -121,7 +121,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
-    QSharedPointer<AbstractCommunicatingSocket> socket,
     ConnectionType::Type connectionType,
     const nx_http::Request& request,
     const QByteArray& contentEncoding,
@@ -135,22 +134,10 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         keepAliveProbeCount)
 {
     m_remotePeer = remotePeer;
-    m_outgoingDataSocket = std::move(socket);
     m_connectionType = connectionType;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
     m_connectionLockGuard = std::move(connectionLockGuard);
-
-    using namespace std::chrono;
-    if (!m_outgoingDataSocket->setSendTimeout(
-            duration_cast<milliseconds>(kSocketSendTimeout).count()))
-    {
-        const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG(QnLog::EC2_TRAN_LOG,
-            lit("Error setting socket write timeout for transaction connection %1 received from %2").
-            arg(connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()).
-            arg(SystemError::toString(osErrorCode)), cl_logWARNING );
-    }
 
     //TODO #ak use binary filter stream for serializing transactions
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
@@ -166,9 +153,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
                 keepAliveHeader.timeout);
     }
 
-    if( m_connectionType == ConnectionType::bidirectional )
-        m_incomingDataSocket = m_outgoingDataSocket;
-
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
@@ -176,9 +160,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
     using namespace std::placeholders;
     if( m_contentEncoding == "gzip" )
-    {
         m_compressResponseMsgBody = true;
-    }
 
     //creating parser sequence: http_msg_stream_parser -> ext_headers_processor -> transaction handler
     auto incomingTransactionsRequestsParser = std::make_shared<nx_http::HttpMessageStreamParser>();
@@ -200,14 +182,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     incomingTransactionsRequestsParser->setNextFilter( std::move(extensionHeadersProcessor) );
 
     m_incomingTransactionStreamParser = std::move(incomingTransactionsRequestsParser);
-
-    startSendKeepAliveTimerNonSafe();
-
-    //monitoring m_outgoingDataSocket for connection close
-    m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
-    m_outgoingDataSocket->readSomeAsync(
-        &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2) );
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
@@ -294,6 +268,37 @@ QnTransactionTransportBase::~QnTransactionTransportBase()
 
     if (m_ttFinishCallback)
         m_ttFinishCallback();
+}
+
+void QnTransactionTransportBase::setOutgoingConnection(
+    QSharedPointer<AbstractCommunicatingSocket> socket)
+{
+    using namespace std::chrono;
+    using namespace std::placeholders;
+
+    m_outgoingDataSocket = std::move(socket);
+    if (!m_outgoingDataSocket->setSendTimeout(
+            duration_cast<milliseconds>(kSocketSendTimeout).count()))
+    {
+        const auto osErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("Error setting socket write timeout for transaction connection %1 received from %2")
+                .arg(m_connectionGuid.toString())
+                .arg(m_outgoingDataSocket->getForeignAddress().toString())
+                .arg(SystemError::toString(osErrorCode)),
+            cl_logWARNING);
+    }
+
+    if (m_connectionType == ConnectionType::bidirectional)
+        m_incomingDataSocket = m_outgoingDataSocket;
+
+    startSendKeepAliveTimerNonSafe();
+
+    //monitoring m_outgoingDataSocket for connection close
+    m_dummyReadBuffer.reserve(DEFAULT_READ_BUFFER_SIZE);
+    m_outgoingDataSocket->readSomeAsync(
+        &m_dummyReadBuffer,
+        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2));
 }
 
 std::chrono::milliseconds QnTransactionTransportBase::connectionKeepAliveTimeout() const
@@ -1131,7 +1136,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     if (m_connectionLockGuard.isNull())
         m_connectionLockGuard = ConnectionLockGuard(m_remotePeer.id, ConnectionLockGuard::Direction::Outgoing);
 
-    if( (statusCode/100) != (nx_http::StatusCode::ok/100) ) //checking that statusCode is 2xx
+    if( !nx_http::StatusCode::isSuccessCode(statusCode) ) //checking that statusCode is 2xx
     {
         cancelConnecting();
         return;
