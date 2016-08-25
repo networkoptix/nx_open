@@ -11,7 +11,8 @@ QnProgressWidget::QnProgressWidget(QWidget *parent):
     layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QMovie* movie = qnSkin->newMovie("loading.gif", this);
+    const char* gifName = devicePixelRatio() == 1 ? "loading.gif" : "loading@2x.gif";
+    QMovie* movie = qnSkin->newMovie(gifName, this);
     m_img->setMovie(movie);
     if (movie->loopCount() >= 0)
         connect(movie, &QMovie::finished, movie, &QMovie::start);

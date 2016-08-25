@@ -116,7 +116,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-    ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->loadingProgressBar->hide();
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);

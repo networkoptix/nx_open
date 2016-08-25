@@ -2023,22 +2023,30 @@ void QnNxStyle::drawControl(
             if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
             {
                 bool checkable = isCheckableButton(option);
-                bool leftAligned = widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
+                bool leftAligned = checkable
+                    || widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
 
-                /* If button is standard, break to standard drawing: */
-                if (!checkable && !leftAligned)
-                    break;
+                bool customForeground = widget && widget->foregroundRole() != QPalette::ButtonText;
 
-                /* Calculate minimal label width: */
-                int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
-                if (!buttonOption->icon.isNull())
-                    minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
-                if (!buttonOption->text.isEmpty())
-                    minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
-
-                /* Draw standard button content left-aligned: */
                 QStyleOptionButton newOpt(*buttonOption);
-                newOpt.rect.setWidth(minLabelWidth);
+
+                if (leftAligned)
+                {
+                    /* Calculate minimal label width: */
+                    int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
+                    if (!buttonOption->icon.isNull())
+                        minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
+                    if (!buttonOption->text.isEmpty())
+                        minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
+
+                    /* Draw standard button content left-aligned: */
+                    newOpt.rect.setWidth(minLabelWidth);
+                }
+
+                /* Support for custom foreground role for buttons: */
+                if (customForeground)
+                    newOpt.palette.setColor(QPalette::ButtonText, newOpt.palette.color(widget->foregroundRole()));
+
                 base_type::drawControl(element, &newOpt, painter, widget);
 
                 /* Draw switch right-aligned: */

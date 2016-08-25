@@ -128,7 +128,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     ui->clearFilterButton->setDefaultAction(m_resetFilterAction);
     ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
-    ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
     ui->loadingProgressBar->hide();
 

@@ -300,7 +300,8 @@
     "QnPanel": {
         "palette": {
             "default": {
-                "window": "dark8"
+                "window": "dark8",
+                "alternateBase": "#61282B"
             }
         }
     },
