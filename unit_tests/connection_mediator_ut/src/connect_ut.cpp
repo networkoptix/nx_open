@@ -37,6 +37,7 @@ protected:
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
         listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
+            settings,
             &cloud,
             &stunMessageDispatcher,
             &listeningPeerPool);
@@ -56,6 +57,7 @@ protected:
     nx::stun::MessageDispatcher stunMessageDispatcher;
 
     CloudDataProviderMock cloud;
+    conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
     std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;

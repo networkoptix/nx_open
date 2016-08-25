@@ -83,7 +83,12 @@ namespace nx_http
             std::chrono::milliseconds responseReadTimeout;
             std::chrono::milliseconds messageBodyReadTimeout;
 
-            Timeouts();
+            Timeouts(
+                std::chrono::milliseconds send = kDefaultSendTimeout,
+                std::chrono::milliseconds recv = kDefaultResponseReadTimeout,
+                std::chrono::milliseconds msgBody = kDefaultMessageBodyReadTimeout);
+
+            bool operator==(const Timeouts& rhs) const;
         };
 
         static const int UNLIMITED_RECONNECT_TRIES = -1;

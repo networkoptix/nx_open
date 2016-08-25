@@ -50,6 +50,7 @@ namespace methods
         connectionResult,
         udpHolePunchingSyn,
         tunnelConnectionChosen,
+        clientBind,
     };
 
     NX_NETWORK_API nx::String toString(Value val);
@@ -110,6 +111,13 @@ namespace attrs
         rendezvousConnectTimeout,
         udpTunnelKeepAliveInterval,
         udpTunnelKeepAliveRetries,
+        tcpReverseRetryMaxCount,
+        tcpReverseRetryInitialDelay,
+        tcpReverseRetryDelayMultiplier,
+        tcpReverseRetryMaxDelay,
+        tcpReverseHttpSendTimeout,
+        tcpReverseHttpReadTimeout,
+        tcpReverseHttpMsgBodyTimeout,
 
         systemErrorCode = stun::attrs::userDefined + 0x500,
     };

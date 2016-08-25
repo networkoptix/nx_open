@@ -128,6 +128,17 @@ protected:
         return true;
     }
 
+    template<typename Attribute>
+    void readAttributeValue(
+        const nx::stun::Message& message,
+        const int type,
+        Attribute* value,
+        Attribute defaultValue)
+    {
+        if (!readAttributeValue(message, type, value))
+            *value = std::move(defaultValue);
+    }
+
     template<typename AttributeType, typename EnumType>
     bool readEnumAttributeValue(
         const nx::stun::Message& message,

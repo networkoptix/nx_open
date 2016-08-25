@@ -39,6 +39,8 @@ public:
         unsigned int delayMultiplier,
         std::chrono::milliseconds maxDelay);
 
+    bool operator==(const RetryPolicy& rhs) const;
+
     void setMaxRetryCount(unsigned int retryCount);
     unsigned int maxRetryCount() const;
 
@@ -53,7 +55,8 @@ public:
     void setMaxDelay(std::chrono::milliseconds delay);
     std::chrono::milliseconds maxDelay() const;
 
-private:
+// TODO: consider to make it a simple struct
+//private:
     unsigned int m_maxRetryCount;
     std::chrono::milliseconds m_initialDelay;
     unsigned int m_delayMultiplier;
