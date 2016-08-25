@@ -363,6 +363,14 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
         QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
+        connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+            [this]
+            {
+                if (m_videoWallMode.ready)
+                    return;
+                m_videoWallMode.ready = true;
+                submitDelayedItemOpen();
+            });
         connect(clientMessageProcessor,   &QnCommonMessageProcessor::videowallControlMessageReceived,
                 this,                     &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
 
@@ -1815,15 +1823,8 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
     });
 
-    if (m_videoWallMode.active) {
-        if (resource->getId() != m_videoWallMode.guid)
-            return;
-
-        if (m_videoWallMode.ready)
-            return;
-        m_videoWallMode.ready = true;
-        submitDelayedItemOpen();
-    } else {
+    if (!m_videoWallMode.active)
+    {
         connect(videoWall, &QnVideoWallResource::pcAdded,       this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
         connect(videoWall, &QnVideoWallResource::pcChanged,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
         connect(videoWall, &QnVideoWallResource::pcRemoved,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);

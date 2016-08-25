@@ -4,6 +4,7 @@
 #include <utils/common/model_functions.h>
 
 #include <common/user_permissions.h>
+#include <client/client_runtime_settings.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>
@@ -67,7 +68,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
 
     // Adds current user permissions metric
     const auto currentUser = context()->user();
-    Q_ASSERT_X(currentUser, Q_FUNC_INFO, "There is no current user!");
+    Q_ASSERT_X(qnRuntime->isVideoWallMode() || currentUser, Q_FUNC_INFO, "There is no current user!");
     if (!currentUser)
         return result;
 

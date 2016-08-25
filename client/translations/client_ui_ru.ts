@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -887,32 +887,32 @@
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP запрос</translation>
     </message>
     <message>
         <location/>
         <source>HTTP url</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP URL</translation>
     </message>
     <message>
         <location/>
         <source>Login to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя пользователя для аутентификации (необязательно)</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя пользователя</translation>
     </message>
     <message>
         <location/>
         <source>Password to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ппроль для аутентификации (необязательно)</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль</translation>
     </message>
 </context>
 <context>
@@ -928,27 +928,27 @@
     <message>
         <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
         <source>Export Rapid Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт с быстрой прокруткой</translation>
     </message>
     <message>
         <location/>
         <source>Initial Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Изначальная длина фрагмента</translation>
     </message>
     <message>
         <location/>
         <source>Exported Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Длина после экспорта</translation>
     </message>
     <message>
         <location/>
         <source>Rapid Review speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость прокрутки</translation>
     </message>
     <message>
         <location/>
         <source>Frames Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Интервал между кадрами</translation>
     </message>
 </context>
 <context>
@@ -1670,7 +1670,7 @@
     <message>
         <location/>
         <source>Play to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизвести для пользователя</translation>
     </message>
 </context>
 <context>
@@ -2452,7 +2452,7 @@
     <message>
         <location/>
         <source>Speak to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизвести для пользователя</translation>
     </message>
 </context>
 <context>

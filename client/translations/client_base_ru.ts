@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1221,7 +1221,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт с быстрой прокруткой...</translation>
     </message>
 </context>
 <context>
@@ -2041,12 +2041,12 @@ to view more bookmarks</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбор устройства</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 не поддерживает двухсторонный звук</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -2625,7 +2625,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unable to connect to the server</source>
-        <translation>Нет соединения с сервером.</translation>
+        <translation>Нет соединения с сервером</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
@@ -2738,7 +2738,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation>Не удалось сохранить копию базы данных сервера в %1</translation>
+        <translation>Не удалось сохранить копию базы данных сервера в %1.</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -2753,19 +2753,19 @@ to view more bookmarks</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">Невозможно обнаружить звуковой кодек %1.</translation>
+        <translation>Невозможно обнаружить звуковой кодек &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">Невозможно инициализировать звуковой кодек.</translation>
+        <translation>Невозможно инициализировать звуковой кодек.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Первичное звуковое устройство не выбрано.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Формат устройства ввода %1 не поддерживается.</translation>
     </message>
 </context>
 <context>
@@ -2966,8 +2966,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform>и %1 пользовалел(и)</numerusform>
+        <translation>
+            <numerusform>и %1 пользовалел(и)...</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -3007,56 +3007,56 @@ to view more bookmarks</source>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">с</translation>
+        <translation>с</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">м</translation>
+        <translation>м</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">ч</translation>
+        <translation>ч</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">д</translation>
+        <translation>д</translation>
     </message>
     <message numerus="yes">
         <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nмс</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nс</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nм</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nч</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nд</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -4385,7 +4385,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки звука</translation>
     </message>
 </context>
 <context>
@@ -4792,7 +4792,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Битрейт</translation>
     </message>
 </context>
 <context>
@@ -4996,7 +4996,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">Экспорт закладки...</translation>
+        <translation>Экспорт закладки...</translation>
     </message>
 </context>
 <context>
@@ -5581,7 +5581,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">Невозможно выполнить проверку.</translation>
+        <translation>Невозможно выполнить проверку.</translation>
     </message>
 </context>
 <context>
@@ -6203,19 +6203,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство ввода не выбрано.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Поток недоступен, пожалуйста, повторите попытку позже.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сетевая ошибка.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите и говорите</translation>
     </message>
 </context>
 <context>
@@ -6843,19 +6843,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 определил, что Вы используете дисплей с высоким разрешением. Некоторые элементы интерфейса %1 могут отображаться некорректно.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>это известная проблема и она будет исправлена в версии 3.0.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>А пока проблема может быть решена изменением разрешения монитора.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Предупреждение: поддержка экранов с высоким разрешением</translation>
     </message>
 </context>
 <context>
@@ -7151,7 +7151,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранный интервал слишком короток, чтобы произвести экспорт с быстрой прокруткой.</translation>
     </message>
 </context>
 <context>
