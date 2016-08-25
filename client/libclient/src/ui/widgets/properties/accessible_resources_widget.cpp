@@ -258,21 +258,6 @@ void QnAccessibleResourcesWidget::applyChanges()
     auto oldFiltered = QnResourceAccessFilter::filteredResources(m_filter, accessibleResources);
     auto newFiltered = m_resourcesModel->checkedResources();
 
-    if (m_filter == QnResourceAccessFilter::LayoutsFilter)
-    {
-        QnLayoutResourceList layoutsToShare = qnResPool->getResources(newFiltered).
-            filtered<QnLayoutResource>([](const QnLayoutResourcePtr& layout)
-        {
-            return !layout->isShared();
-        });
-
-        for (const auto& layout : layoutsToShare)
-        {
-            layout->setParentId(QnUuid());
-            menu()->trigger(QnActions::SaveLayoutAction, QnActionParameters(layout));
-        }
-    }
-
     accessibleResources.subtract(oldFiltered);
     accessibleResources.unite(newFiltered);
 

@@ -18,6 +18,7 @@ Item
         width: parent.width
 
         topPadding: 6
+        leftPadding: -4
         spacing: 2
 
         RowLayout

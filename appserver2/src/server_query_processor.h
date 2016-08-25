@@ -331,6 +331,11 @@ private:
         const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
+    ErrorCode removeObjAccessRightsHelper(
+        const QnUuid& id,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend);
+
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
@@ -405,6 +410,13 @@ private:
             default:
                 NX_ASSERT(0);
         }
+
+        RUN_AND_CHECK_ERROR(
+            removeObjAccessRightsHelper(
+                tran.params.id,
+                connection,
+                transactionsToSend),
+            lit("Remove resource access rights failed"));
 
         if(errorCode != ErrorCode::ok)
             return errorCode;

@@ -101,6 +101,17 @@ Page
         }
     }
 
+    DummyMessage
+    {
+        anchors.fill: parent
+        title: qsTr("No cameras available on this layout")
+        buttonText: qsTr("Show all cameras")
+        onButtonClicked: uiController.layoutId = ""
+        visible: camerasGrid.count == 0
+                 && uiController.layoutId != ""
+                 && connectionManager.online
+    }
+
     Loader
     {
         id: searchListLoader
@@ -138,6 +149,13 @@ Page
                     leftPadding: 10
                     width: 4
                 }
+            }
+
+            DummyMessage
+            {
+                anchors.fill: parent
+                title: qsTr("Nothing found")
+                visible: camerasList.count == 0
             }
         }
     }

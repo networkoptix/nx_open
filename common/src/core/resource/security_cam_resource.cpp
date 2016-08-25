@@ -329,9 +329,12 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
     emit motionRegionChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks) {
+void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList& scheduleTasks)
+{
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if ((*userAttributesLock)->scheduleTasks == scheduleTasks)
+            return;
         (*userAttributesLock)->scheduleTasks = scheduleTasks;
     }
     emit scheduleTasksChanged(::toSharedPointer(this));

@@ -80,37 +80,37 @@ namespace detail {
 /**
  * <tt>Instrument</tt> is a base class for detached event processing on a graphics scene,
  * its views and items.
- * 
- * Each instrument supplies a set of event types that it is willing to watch 
+ *
+ * Each instrument supplies a set of event types that it is willing to watch
  * for each of the watched types. These sets are supplied through the
  * <tt>Instrument</tt>'s constructor.
- * 
- * As addition and removal of graphics items to and from the scene cannot be 
- * automatically detected, items must either inherit from <tt>Instrumented</tt> 
+ *
+ * As addition and removal of graphics items to and from the scene cannot be
+ * automatically detected, items must either inherit from <tt>Instrumented</tt>
  * class, or be registered and unregistered manually.
- * 
- * Scene and its views must always be registered manually. They will be 
+ *
+ * Scene and its views must always be registered manually. They will be
  * unregistered upon destruction, so there is no need to unregister them
  * manually.
- * 
- * Instrument provides several extension points for the derived classes to 
+ *
+ * Instrument provides several extension points for the derived classes to
  * track its current state. Instrument state consists of:
  * <ul>
- * <li>Installed bit, accessed via <tt>isInstalled()</tt> function. 
+ * <li>Installed bit, accessed via <tt>isInstalled()</tt> function.
  *     If not installed, instrument does not receive events and has no
  *     associated scene, views or items.
- *     Derived classes can track changes of this bit by reimplementing 
+ *     Derived classes can track changes of this bit by reimplementing
  *     <tt>installedNotify()</tt> and <tt>aboutToBeUninstalledNotify()</tt> functions. </li>
- * <li>Enabled bit, accessed via <tt>isEnabled()</tt> function. 
+ * <li>Enabled bit, accessed via <tt>isEnabled()</tt> function.
  *     If not enabled, instrument does not receive events. However, it still
  *     can access its associated scene, views and items.
  *     Derived classes can track changes of this bit by reimplementing
  *     <tt>enabledNotify()</tt> and <tt>aboutToBeDisabledNotify()</tt> functions. </li>
  * </ul>
- * 
+ *
  * Note that when uninstalled, instrument is always considered disabled. Upon
  * installation it restores its enabled state. This means that if the instrument
- * is installed and then uninstalled, the following notification functions will 
+ * is installed and then uninstalled, the following notification functions will
  * be called:
  * <ol>
  * <li><tt>installedNotify()</tt></li>
@@ -118,12 +118,12 @@ namespace detail {
  * <li><tt>aboutToBeDisabledNotify()</tt></li>
  * <li><tt>aboutToBeUninstalledNotify()</tt></li>
  * <ol>
- * 
+ *
  * This is why in most cases it is enough for the derived class to
  * reimplement only <tt>aboutToBeDisabledNotify()</tt> function.
- * 
+ *
  * Note that it is a <b>must</b> to call <tt>ensureUninstalled()</tt> function
- * inside derived class's destructor if it reimplements either 
+ * inside derived class's destructor if it reimplements either
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
 class Instrument: public Customized<Connective<QObject> >, protected QnGeometry, protected QnSceneTransformations {
@@ -147,10 +147,10 @@ public:
 
     /**
      * Constructor.
-     * 
-     * When installed, instrument will watch the given set of event types for 
-     * each watched type. 
-     * 
+     *
+     * When installed, instrument will watch the given set of event types for
+     * each watched type.
+     *
      * \param viewportEventTypes       Set of viewport event types that this instrument watches.
      * \param viewEventTypes           Set of view event types that this instrument watches.
      * \param sceneEventTypes          Set of scene event types that this instrument watches.
@@ -161,7 +161,7 @@ public:
 
     /**
      * Constructor.
-     * 
+     *
      * \param type                     Type of the objects that this instrument watches.
      * \param eventTypes               Set of event types that this instrument watches.
      * \param parent                   Parent of this instrument.
@@ -181,7 +181,7 @@ public:
 
     /**
      * \param type                     Type of an object that can be watched by this instrument.
-     * \returns                        Set of event types for the given watched 
+     * \returns                        Set of event types for the given watched
      *                                 type that this instrument watches.
      */
     const EventTypeSet &watchedEventTypes(WatchedType type) const;
@@ -206,18 +206,18 @@ public:
      *
      * \returns                        Graphics scene that this instrument is installed to.
      */
-    QGraphicsScene *scene() const {
-        return m_scene;
-    }
+    QGraphicsScene *scene() const;
+
+    void setScene(QGraphicsScene* scene);
 
     /**
-     * \returns                        Set of all graphics views that this 
+     * \returns                        Set of all graphics views that this
      *                                 instrument watches.
      */
     QSet<QGraphicsView *> views() const;
 
     /**
-     * Disables or enables this instrument. Note that disabled instruments 
+     * Disables or enables this instrument. Note that disabled instruments
      * cannot filter events.
      *
      * \param enabled                  Whether this instrument is enabled.
@@ -237,9 +237,9 @@ public:
     }
 
     /**
-     * This function sets item conditions of the instrument. Note that once 
+     * This function sets item conditions of the instrument. Note that once
      * instrument is installed, item conditions cannot be changed.
-     * 
+     *
      * Instrument takes ownership of the supplied item conditions.
      *
      * \param itemConditions           New item conditions for this instrument.
@@ -249,7 +249,7 @@ public:
     /**
      * This function registers additional item condition with this instrument.
      * Note that once instrument is installed, new item conditions cannot be added.
-     * 
+     *
      * Instrument takes ownership of the supplied item condition.
      *
      * \param itemCondition            Item condition to add to this instrument's item conditions list.
@@ -259,7 +259,7 @@ public:
     /**
      * This function unregisters an item condition with this instrument.
      * Note that once instrument is installed, new item conditions cannot be added.
-     * 
+     *
      * \param itemCondition            Item condition to remove from this instrument's item condition list.
      */
     void removeItemCondition(InstrumentItemCondition *itemCondition);
@@ -272,7 +272,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \returns                        Empty event type set.
      */
     static EventTypeSet makeSet() {
@@ -281,7 +281,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventType                Event type.
      * \returns                        Set constructed from the given event type.
      */
@@ -293,7 +293,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventType0               First event type.
      * \param eventType1               Second event type.
      * \returns                        Set constructed from the given event types.
@@ -307,7 +307,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventType0               First event type.
      * \param eventType1               Second event type.
      * \param eventType2               Third event type.
@@ -323,7 +323,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventType0               First event type.
      * \param eventType1               Second event type.
      * \param eventType2               Third event type.
@@ -341,7 +341,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventType0               First event type.
      * \param eventType1               Second event type.
      * \param eventType2               Third event type.
@@ -361,7 +361,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventType0               First event type.
      * \param eventType1               Second event type.
      * \param eventType2               Third event type.
@@ -383,7 +383,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventType0               First event type.
      * \param eventType1               Second event type.
      * \param eventType2               Third event type.
@@ -408,7 +408,7 @@ public:
 
     /**
      * This function is to be used in constructors of derived classes.
-     * 
+     *
      * \param eventTypes               Array of event types.
      * \returns                        Set constructed from the given event types.
      */
@@ -455,7 +455,7 @@ signals:
     void aboutToBeUninstalled();
 
     /**
-     * This signal is emitted whenever the instrument is enabled. 
+     * This signal is emitted whenever the instrument is enabled.
      */
     void enabled();
 
@@ -463,6 +463,8 @@ signals:
      * This signal is emitted whenever the instrument is disabled.
      */
     void aboutToBeDisabled();
+
+    void sceneChanged();
 
 protected:
     friend class InstrumentManagerPrivate; /* Messes with our internals. */
@@ -472,10 +474,10 @@ protected:
 
     /**
      * Ensure that this instrument is uninstalled.
-     * 
+     *
      * This method is to be called from destructor of the derived class if
-     * it preforms some complex actions during uninstallation. 
-     * This is because derived implementation of the <tt>aboutToBeUninstalled</tt> 
+     * it preforms some complex actions during uninstallation.
+     * This is because derived implementation of the <tt>aboutToBeUninstalled</tt>
      * extension point cannot be called from the destructor of the base class.
      */
     void ensureUninstalled();
@@ -526,7 +528,7 @@ protected:
      *                                 ignore transformations.
      * \param viewPos                  Position in view coordinates to get item at.
      * \param condition                Condition that returned item should satisfy.
-     * \returns                        Topmost item of the given type at the given 
+     * \returns                        Topmost item of the given type at the given
      *                                 position that satisfies the given condition.
      */
     template<class GraphicsItem, class Condition>
@@ -539,23 +541,23 @@ protected:
      * \param view                     Current view. Used to handle items that
      *                                 ignore transformations.
      * \param viewPos                  Position in view coordinates to get item at.
-     * \returns                        Topmost item of the given type at the given 
+     * \returns                        Topmost item of the given type at the given
      *                                 position.
      */
     template<class GraphicsItem>
     GraphicsItem *item(QGraphicsView *view, const QPoint &viewPos) const {
         return this->item<GraphicsItem>(view, viewPos, detail::AlwaysTrue());
     }
-    
+
     /**
-     * For the returned timer to be functional, the instrument must be 
-     * subscribed to <tt>Animation</tt> viewport event. 
-     * 
+     * For the returned timer to be functional, the instrument must be
+     * subscribed to <tt>Animation</tt> viewport event.
+     *
      * Note that if the instrument is disabled, it won't receive the <tt>Animation</tt>
      * events, and thus the timer won't work.
-     * 
+     *
      * \returns                         Animation timer for this instrument that is
-     *                                  synced with paint events. 
+     *                                  synced with paint events.
      */
     AnimationTimer *animationTimer();
 
@@ -566,7 +568,7 @@ protected:
 
     /**
      * Extension point for instrument disabling.
-     * 
+     *
      * Scene may be NULL inside this call, which would mean that scene is being
      * destroyed.
      */
@@ -574,19 +576,19 @@ protected:
 
     /**
      * Extension point for instrument installation.
-     * 
+     *
      * It is guaranteed that scene will not be NULL inside this call.
-     * 
+     *
      * Note that <tt>enabledNotify()</tt> will be called right after this call.
      */
     virtual void installedNotify() {}
 
     /**
      * Extension point for instrument uninstallation.
-     * 
+     *
      * Scene may be NULL inside this call, which would mean that scene is being
      * destroyed.
-     * 
+     *
      * Note that </tt>aboutToBeDisabledNotify()</tt> will be called right before this call.
      */
     virtual void aboutToBeUninstalledNotify() {}

@@ -29,6 +29,7 @@ Item
 
         Image
         {
+            x: -2
             source: enabled ? lp("/images/cloud.png")
                             : lp("/images/cloud_disabled.png")
         }

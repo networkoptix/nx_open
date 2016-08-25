@@ -19,16 +19,17 @@
 #include "ui/widgets/properties/storage_config_widget.h"
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
-QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
-    : base_type(parent)
-    , ui(new Ui::ServerSettingsDialog)
-    , m_server()
-    , m_generalPage(new QnServerSettingsWidget(this))
-    , m_statisticsPage(new QnStorageAnalyticsWidget(this))
-    , m_storagesPage(new QnStorageConfigWidget(this))
-    , m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
+QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
+    base_type(parent),
+    ui(new Ui::ServerSettingsDialog),
+    m_server(),
+    m_generalPage(new QnServerSettingsWidget(this)),
+    m_statisticsPage(new QnStorageAnalyticsWidget(this)),
+    m_storagesPage(new QnStorageConfigWidget(this)),
+    m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
 {
     ui->setupUi(this);
+    setTabWidget(ui->tabWidget);
 
     addPage(SettingsPage, m_generalPage, tr("General"));
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
@@ -39,24 +40,27 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
         menu()->trigger(QnActions::WebClientAction, m_server);
     });
 
-
     //TODO: #GDM #access connect to resource pool to check if server was deleted
 
     ui->buttonBox->addButton(m_webPageButton, QDialogButtonBox::HelpRole);
     setHelpTopic(m_webPageButton, Qn::ServerSettings_WebClient_Help);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
-    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources) {
-        if (isHidden())
-            return;
+    connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
+        [this](const QnResourceList& resources)
+        {
+            if (isHidden())
+                return;
 
-        auto servers = resources.filtered<QnMediaServerResource>([](const QnMediaServerResourcePtr &server){
-            return !QnMediaServerResource::isFakeServer(server);
+            auto servers = resources.filtered<QnMediaServerResource>(
+                [](const QnMediaServerResourcePtr &server)
+                {
+                    return !QnMediaServerResource::isFakeServer(server);
+                });
+
+            if (!servers.isEmpty())
+                setServer(servers.first());
         });
-
-        if (!servers.isEmpty())
-            setServer(servers.first());
-    });
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -70,13 +74,16 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog()
-{}
+{
+}
 
-QnMediaServerResourcePtr QnServerSettingsDialog::server() const {
+QnMediaServerResourcePtr QnServerSettingsDialog::server() const
+{
     return m_server;
 }
 
-void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
+void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
+{
     if (m_server == server)
         return;
 
@@ -92,8 +99,6 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
 
     m_server = server;
 
-
-
     if (m_server)
         connect(m_server, &QnResource::statusChanged, this, &QnServerSettingsDialog::updateWebPageButton);
 
@@ -101,30 +106,32 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr &server) {
     updateWebPageButton();
 }
 
-void QnServerSettingsDialog::retranslateUi() {
+void QnServerSettingsDialog::retranslateUi()
+{
     base_type::retranslateUi();
-    if (m_server) {
+    if (m_server)
+    {
         bool readOnly = !accessController()->hasPermissions(m_server, Qn::WritePermission | Qn::SavePermission);
         setWindowTitle(readOnly
             ? tr("Server Settings - %1 (readonly)").arg(m_server->getName())
-            : tr("Server Settings - %1").arg(m_server->getName())
-            );
+            : tr("Server Settings - %1").arg(m_server->getName()));
 
-    } else {
+    }
+    else
+    {
         setWindowTitle(tr("Server Settings"));
     }
 }
 
-QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog() {
+QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog()
+{
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
     return QnMessageBox::question(
         this,
         tr("Server not saved"),
         tr("Apply changes to server %1?")
-        .arg(m_server
-            ? m_server->getName()
-            : QString()),
+        .arg(m_server ? m_server->getName() : QString()),
         QDialogButtonBox::Yes | QDialogButtonBox::No,
         QDialogButtonBox::Yes);
 }

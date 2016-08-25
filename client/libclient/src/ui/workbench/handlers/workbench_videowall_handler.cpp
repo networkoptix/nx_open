@@ -53,7 +53,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
-#include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -61,6 +60,7 @@
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/widgets/views/resource_list_view.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -1497,10 +1497,11 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
     QnVideoWallItemIndexList items = parameters.videoWallItems();
 
     QnResourceList resources;
-    foreach(const QnVideoWallItemIndex &index, items)
+    for (const auto& index: items)
     {
         if (!index.isValid())
             continue;
+
         QnResourcePtr proxyResource(new QnResource());
         proxyResource->setId(index.uuid());
         proxyResource->setName(index.item().name);
@@ -1508,21 +1509,30 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         resources.append(proxyResource);
     }
 
-    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
+    const auto question = tr("Are you sure you want to permanently delete these %n item(s)?",
+        "", resources.size());
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
         tr("Delete Items"),
-        tr("Are you sure you want to permanently delete these %n item(s)?", "", resources.size()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No
-    );
-    if (button != QDialogButtonBox::Yes)
+        tr("Confirm items deleting"),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox.setInformativeText(question);
+    messageBox.addCustomWidget(new QnResourceListView(resources));
+    auto result = messageBox.exec();
+
+    if (result != QDialogButtonBox::Yes)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
-    foreach(const QnVideoWallItemIndex &index, items)
+    for (const auto& index: items)
     {
         if (!index.isValid())
             continue;
+
         index.videowall()->items()->removeItem(index.uuid());
         videoWalls << index.videowall();
     }
@@ -2000,32 +2010,42 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
     QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
 
     QnResourceList resources;
-    foreach(const QnVideoWallMatrixIndex &index, matrices)
+    for (const auto& matrix: matrices)
     {
-        if (!index.videowall() || !index.videowall()->matrices()->hasItem(index.uuid()))
+        if (!matrix.videowall() || !matrix.videowall()->matrices()->hasItem(matrix.uuid()))
             continue;
+
         QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setId(index.uuid());
-        proxyResource->setName(index.videowall()->matrices()->getItem(index.uuid()).name);
+        proxyResource->setId(matrix.uuid());
+        proxyResource->setName(matrix.videowall()->matrices()->getItem(matrix.uuid()).name);
         qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallMatrix);
         resources.append(proxyResource);
     }
 
-    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
+    const auto question = tr("Are you sure you want to permanently delete these %n matrices?",
+        "", resources.size());
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
         tr("Delete Matrices"),
-        tr("Are you sure you want to permanently delete these %n matrices?", "", resources.size()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No
-    );
-    if (button != QDialogButtonBox::Yes)
+        tr("Confirm matrices deleting"),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox.setInformativeText(question);
+    messageBox.addCustomWidget(new QnResourceListView(resources));
+    auto result = messageBox.exec();
+
+    if (result != QDialogButtonBox::Yes)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
-    foreach(const QnVideoWallMatrixIndex &matrix, matrices)
+    for (const auto& matrix: matrices)
     {
         if (!matrix.videowall())
             continue;
+
         matrix.videowall()->matrices()->removeItem(matrix.uuid());
         videoWalls << matrix.videowall();
     }

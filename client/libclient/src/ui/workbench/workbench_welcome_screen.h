@@ -8,6 +8,7 @@
 #include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/style/generic_palette.h>
+#include <nx/utils/raii_guard.h>
 
 class QnCloudStatusWatcher;
 typedef QList<QUrl> UrlsList;
@@ -124,6 +125,16 @@ signals:
     void resetAutoLogin();
 
     void globalPreloaderVisibleChanged();
+
+private:
+    void connectToLocalSystemImpl(
+        const QString& systemId,
+        const QString& serverUrl,
+        const QString& userName,
+        const QString& password,
+        bool storePassword,
+        bool autoLogin,
+        const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());
 
 private:
     void showScreen();

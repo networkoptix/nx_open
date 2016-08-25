@@ -73,6 +73,7 @@ namespace Qn
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
     static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");
+    static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
 
 
     // Mediaserver info for Statistics

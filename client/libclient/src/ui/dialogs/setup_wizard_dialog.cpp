@@ -40,7 +40,7 @@ QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
     });
 #endif
     layout->addWidget(d->webView);
-    setFixedSize(480, 374);
+    setFixedSize(500, 400);
 }
 
 QnSetupWizardDialog::~QnSetupWizardDialog()

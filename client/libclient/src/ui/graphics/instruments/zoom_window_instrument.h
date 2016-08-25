@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/utils/viewport_scale_watcher.h>
 
 class FixedArSelectionItem;
 class ZoomOverlayWidget;
@@ -19,15 +20,11 @@ class QnMediaResourceWidget;
 
 class ZoomWindowInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT
-    Q_PROPERTY(QVector<QColor> colors READ colors WRITE setColors)
     typedef DragProcessingInstrument base_type;
 
 public:
     ZoomWindowInstrument(QObject *parent = NULL);
     virtual ~ZoomWindowInstrument();
-
-    const QVector<QColor> &colors() const { return m_colors; }
-    void setColors(const QVector<QColor> &colors) { m_colors = colors; }
 
 signals:
     void zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect);
@@ -113,6 +110,8 @@ private:
     QPointer<QnMediaResourceWidget> m_zoomedWidget;
     QPointer<ZoomWindowWidget> m_windowTarget;
     QPointer<ZoomWindowWidget> m_storedWindowWidget;
+
+    QnViewportScaleWatcher m_scaleWatcher;
 };
 
 #endif // QN_ZOOM_WINDOW_INSTRUMENT_H

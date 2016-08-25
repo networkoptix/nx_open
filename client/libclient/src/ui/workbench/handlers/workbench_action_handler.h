@@ -61,8 +61,6 @@ public:
     virtual ~QnWorkbenchActionHandler();
 
 protected:
-    ec2::AbstractECConnectionPtr connection2() const;
-
     struct AddToLayoutParams {
         bool usePosition;
         QPointF position;

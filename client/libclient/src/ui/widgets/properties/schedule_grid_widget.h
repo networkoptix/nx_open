@@ -23,33 +23,39 @@ public:
     explicit QnScheduleGridWidget(QWidget* parent = nullptr);
     virtual ~QnScheduleGridWidget();
 
-    enum ParamType
-    {
-        FpsParam,
-        QualityParam,
-        RecordTypeParam,
-        DiffersFlagParam,
-        ParamCount
-    };
-
-    void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFps(bool value);
     void setShowQuality(bool value);
 
     inline int rowCount() const { return kDaysPerWeek; }
     inline int columnCount() const { return kHoursPerDay; }
 
-    QVariant cellValue(const QPoint& cell, ParamType paramType) const;
-    void setCellValue(const QPoint& cell, ParamType paramType, const QVariant& value);
-    void resetCellValues();
+    struct CellParams
+    {
+        int fps;
+        Qn::StreamQuality quality;
+        Qn::RecordingType recordingType;
 
-    Qn::RecordingType cellRecordingType(const QPoint& cell) const;
-    void setCellRecordingType(const QPoint& cell, const Qn::RecordingType& value);
+        CellParams();
+        bool operator==(const CellParams& other) const;
+    };
+
+    CellParams brush() const;
+    void setBrush(const CellParams& params);
+
+    CellParams cellValue(const QPoint& cell) const;
+    void setCellValue(const QPoint& cell, const CellParams& params);
+    void resetCellValues();
 
     virtual QSize minimumSizeHint() const override;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
+
+    /** Active grid widget contains actual tasks. Widget may be set inactive e.g. when we are
+     *  editing several cameras with different schedules.
+     */
+    bool isActive() const;
+    void setActive(bool value);
 
     void setMaxFps(int maxFps, int maxDualStreamFps); // todo: move this methods to camera schedule widget
     int getMaxFps(bool motionPlusLqOnly); // todo: move this methods to camera schedule widget
@@ -74,12 +80,10 @@ protected:
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-    using CellParams = std::array<QVariant, ParamCount>;
     using RowParams = std::array<CellParams, kDaysPerWeek>;
     using GridParams = std::array<RowParams, kHoursPerDay>;
 
-    void setCellValueInternal(const QPoint& cell, const CellParams& value);
-    void setCellValueInternal(const QPoint& cell, ParamType type, const QVariant& value);
+    void handleCellClicked(const QPoint& cell);
     void updateCellValueInternal(const QPoint& cell);
 
     QPoint mapToGrid(const QPoint& pos, bool doTruncate) const;
@@ -102,22 +106,22 @@ private:
     QRectF cornerHeaderCell() const;
 
 private:
-    CellParams m_defaultParams;
+    CellParams m_brushParams; /**< Params which we are using for user input. */
     GridParams m_gridParams;
-    bool m_showFps;
-    bool m_showQuality;
+    bool m_showFps = true;
+    bool m_showQuality = true;
     QString m_cornerText;
     QStringList m_weekDays;
     QSize m_cornerSize;
-    int m_gridLeftOffset;
-    int m_gridTopOffset;
+    int m_gridLeftOffset = 0;
+    int m_gridTopOffset = 0;
     QPoint m_mousePressPos;
     QPoint m_mouseMovePos;
-    QPoint m_mouseMoveCell;
+    QPoint m_mouseMoveCell = QPoint(-2, -2);
     QPoint m_mousePressCell;
     QRect m_selectedCellsRect;
     QRect m_selectedRect;
-    bool m_mousePressed;
+    bool m_mousePressed = false;
     QFont m_labelsFont;
     QFont m_gridFont;
     QnScheduleGridColors m_colors;
@@ -128,8 +132,8 @@ private:
     TypeColors m_insideColors;
     TypeColors m_insideColorsHovered;
 
-    bool m_enabled;
-    bool m_readOnly;
+    bool m_readOnly = false;
+    bool m_active = true;
 
-    mutable int m_cellSize;
+    mutable int m_cellSize = -1;
 };

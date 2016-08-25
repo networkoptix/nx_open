@@ -247,13 +247,6 @@ code{
 
 /* Iframe with logs on info page */
 .log-frame{
-  border: none;
-  width: 100%;
-  height:300px;
-  border-radius:5px;
-}
-
-.log-frame-big{
   border:1px solid silver;
   width: 100%;
   height:600px;
@@ -519,10 +512,15 @@ span.danger{
 .system-info{
   background-color: $gray-lighter;
 
+  .panel-title{
+    font-size: 20px;
+  }
+
   td{
     vertical-align: top;
     &:first-child{
       white-space:nowrap;
+      padding-right:5px;
     }
   }
 

@@ -56,4 +56,17 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
     return errorCode;
 }
+
+ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
+    const QnUuid& id,
+    const AbstractECConnectionPtr& connection,
+    std::list<std::function<void()>>* const transactionsToSend)
+{
+    QnTransaction<ApiIdData> removeObjAccessRightsTran(ApiCommand::removeAccessRights, ApiIdData(id));
+    ErrorCode errorCode = processUpdateSync(removeObjAccessRightsTran, transactionsToSend, 0);
+    if (errorCode != ErrorCode::ok)
+        return errorCode;
+
+    return ErrorCode::ok;
+}
 } //namespace ec2
