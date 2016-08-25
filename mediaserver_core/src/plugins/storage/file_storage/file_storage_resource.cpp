@@ -463,6 +463,8 @@ bool QnFileStorageResource::updatePermissionsHelper(const QString& userName) con
                 .arg(errCode), cl_logWARNING);
         return false;
     }
+
+    return true;
 }
 
 bool QnFileStorageResource::updatePermissions() const
