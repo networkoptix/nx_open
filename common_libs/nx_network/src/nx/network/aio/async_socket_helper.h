@@ -77,7 +77,8 @@ public:
     AsyncSocketImplHelper(
         SocketType* _socket,
         AbstractCommunicatingSocket* _abstractSocketPtr,
-        bool _natTraversalEnabled )
+        bool _natTraversalEnabled,
+        int _ipVersion )
     :
         BaseAsyncSocketImplHelper<SocketType>( _socket ),
         m_abstractSocketPtr( _abstractSocketPtr ),
@@ -93,7 +94,8 @@ public:
         m_threadHandlerIsRunningIn( NULL ),
         m_natTraversalEnabled( _natTraversalEnabled ),
         m_asyncSendIssued( false ),
-        m_addressResolverIsInUse( false )
+        m_addressResolverIsInUse( false ),
+        m_ipVersion( _ipVersion )
     {
         NX_ASSERT( this->m_socket );
         NX_ASSERT( m_abstractSocketPtr );
@@ -242,7 +244,6 @@ public:
                         handler(errorCode);
                     });
             },
-            m_natTraversalEnabled,
             this );
     }
 
@@ -384,6 +385,7 @@ private:
     const bool m_natTraversalEnabled;
     std::atomic<bool> m_asyncSendIssued;
     std::atomic<bool> m_addressResolverIsInUse;
+    const int m_ipVersion;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {

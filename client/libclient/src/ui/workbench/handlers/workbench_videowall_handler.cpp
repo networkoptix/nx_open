@@ -404,6 +404,14 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
         QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
+        connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+            [this]
+            {
+                if (m_videoWallMode.ready)
+                    return;
+                m_videoWallMode.ready = true;
+                submitDelayedItemOpen();
+            });
         connect(clientMessageProcessor, &QnCommonMessageProcessor::videowallControlMessageReceived,
             this, &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
 
@@ -2056,26 +2064,16 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
     });
 
-    if (m_videoWallMode.active)
+    if (!m_videoWallMode.active)
     {
-        if (resource->getId() != m_videoWallMode.guid)
-            return;
+        connect(videoWall, &QnVideoWallResource::pcAdded,       this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
+        connect(videoWall, &QnVideoWallResource::pcChanged,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
+        connect(videoWall, &QnVideoWallResource::pcRemoved,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);
+        connect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
+        connect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
+        connect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
 
-        if (m_videoWallMode.ready)
-            return;
-        m_videoWallMode.ready = true;
-        submitDelayedItemOpen();
-    }
-    else
-    {
-        connect(videoWall, &QnVideoWallResource::pcAdded, this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
-        connect(videoWall, &QnVideoWallResource::pcChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
-        connect(videoWall, &QnVideoWallResource::pcRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);
-        connect(videoWall, &QnVideoWallResource::itemAdded, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
-        connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
-        connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
-
-        foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
+        foreach (const QnVideoWallItem &item, videoWall->items()->getItems())
             at_videoWall_itemAdded(videoWall, item);
     }
 }

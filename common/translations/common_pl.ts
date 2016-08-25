@@ -420,6 +420,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -981,11 +985,11 @@
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moduł WE/WY</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moduł WE/WY</translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -993,7 +997,7 @@
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moduł WE/WY</translation>
     </message>
 </context>
 <context>

@@ -452,7 +452,8 @@ SockAddrPtr Socket<InterfaceToImplement>::makeAddr(const SocketAddress& socketAd
     if (!socketAddress.address.isResolved() &&
         !SocketGlobals::addressResolver().dnsResolver().resolveAddressSync(
             socketAddress.address.toString(),
-            const_cast<HostAddress*>(&socketAddress.address)))
+            const_cast<HostAddress*>(&socketAddress.address),
+            m_ipVersion))
     {
         return SockAddrPtr();
     }
@@ -583,14 +584,11 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     int type,
     int protocol,
     int ipVersion,
-    PollableSystemSocketImpl* sockImpl)
+    PollableSystemSocketImpl* sockImpl )
 :
-    Socket<InterfaceToImplement>(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
-            new aio::AsyncSocketImplHelper<Pollable>(
-                this,
-                this,
-                natTraversal)),
+    Socket(
+        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
+            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr, natTraversal, ipVersion ) ),
         type,
         protocol,
         ipVersion,
@@ -606,14 +604,11 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     bool natTraversal,
     int newConnSD,
     int ipVersion,
-    PollableSystemSocketImpl* sockImpl)
+    PollableSystemSocketImpl* sockImpl )
 :
-    Socket<InterfaceToImplement>(
-        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
-            new aio::AsyncSocketImplHelper<Pollable>(
-                this,
-                this,
-                natTraversal)),
+    Socket(
+        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
+            new AsyncSocketImplHelper<Pollable>( this, abstractSocketPtr, natTraversal, ipVersion ) ),
         newConnSD,
         ipVersion,
         sockImpl),

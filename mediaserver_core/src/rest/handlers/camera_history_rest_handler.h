@@ -12,6 +12,7 @@
 
 class QnCameraHistoryRestHandler: public QnFusionRestHandler
 {
+    friend struct BuildHistoryDataAccess;
 public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
 private:
