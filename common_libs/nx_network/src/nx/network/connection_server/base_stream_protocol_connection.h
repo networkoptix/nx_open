@@ -136,6 +136,19 @@ namespace nx_api
             MessageType msg,
             std::function<void(SystemError::ErrorCode)> handler)
         {
+            if (m_sendCompletionHandler)
+            {
+                decltype(m_sendCompletionHandler) addHandler;
+                std::swap(addHandler, m_sendCompletionHandler);
+                handler =
+                    [baseHandler = std::move(handler), addHandler = std::move(addHandler)](
+                        SystemError::ErrorCode code)
+                    {
+                        baseHandler(code);
+                        addHandler(code);
+                    };
+            }
+
             auto newTask = std::make_shared<SendTask>(
                 std::move(msg),
                 std::move(handler)); //TODO #ak get rid of shared_ptr here when generic lambdas are available
@@ -157,6 +170,11 @@ namespace nx_api
                 std::move(data),
                 std::move(handler));
             addNewTaskToQueue(std::move(newTask));
+        }
+
+        void setSendCompletionHandler(std::function<void(SystemError::ErrorCode)> handler)
+        {
+            m_sendCompletionHandler = std::move(handler);
         }
 
     private:

@@ -11,6 +11,11 @@
 
 const uint8_t kDbVersion = 1;
 
+/*	It is ok to have at most 2 read errors per storage at mediaserver start.
+*	In most cases this means that we've read all data and hit the eof.
+*/
+const int kMaxReadErrorCount = 2;
+
 namespace
 {
 const std::chrono::seconds kVacuumInterval(3600 * 24);
@@ -63,6 +68,7 @@ QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
     m_ioDevice(nullptr),
     m_lastReadError(nx::media_db::Error::NoError),
     m_lastWriteError(nx::media_db::Error::NoError),
+	m_readErrorCount(0),
     m_gen(m_rd()),
     m_vacuumTimePoint(std::chrono::system_clock::now()),
     m_vacuumThreadRunning(false)
@@ -623,8 +629,18 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
 void QnStorageDb::handleError(nx::media_db::Error error) 
 {
     QnMutexLocker lk(&m_errorMutex);
-    if (error != nx::media_db::Error::NoError)
-        NX_LOG(lit("%1 DB error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
+    if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
+	{
+		if (error == nx::media_db::Error::ReadError && m_readErrorCount >= kMaxReadErrorCount)
+		{
+			NX_LOG(lit("%1 DB read error %2. Read errors count = %3")
+					   .arg(Q_FUNC_INFO)
+					   .arg((int)error)
+					   .arg(m_readErrorCount),
+				   cl_logWARNING);
+			++m_readErrorCount;
+		}
+	}
     m_lastReadError = error;
 }
 

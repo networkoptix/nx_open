@@ -36,7 +36,6 @@ public:
     {
     }
 
-
     bool operator<(const Range& rhs) const
     {
         return left < rhs.left;
@@ -93,16 +92,6 @@ public:
         return m_container.end();
     }
 
-    //void erase(const iterator& pos)
-    //{
-    //    m_container.erase(pos);
-    //}
-
-    //iterator find(const key_type& key)
-    //{
-    //    return m_container.upper_bound(key);
-    //}
-
     const_iterator find(const KeyType& valueToFind) const
     {
         const auto it = m_container.lower_bound(Range(valueToFind, valueToFind));
@@ -121,7 +110,15 @@ public:
     template<typename KeyTypeRef, typename MappedTypeRef>
     std::pair<iterator, bool> emplace(KeyTypeRef&& key, MappedTypeRef&& mapped)
     {
-        const auto it = m_container.emplace(
+        const auto iterRange = m_container.equal_range(key);
+        for (auto it = iterRange.first; it != iterRange.second; ++it)
+        {
+            if (it->first.right == key.right)
+                return std::make_pair(it, false);
+        }
+
+        const auto it = m_container.emplace_hint(
+            iterRange.first,
             std::forward<KeyTypeRef>(key),
             std::forward<MappedTypeRef>(mapped));
         return std::make_pair(it, true);

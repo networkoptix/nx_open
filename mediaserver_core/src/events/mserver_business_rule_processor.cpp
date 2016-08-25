@@ -93,6 +93,7 @@ namespace {
 	static const QString tpTimestampDate(lit("timestampDate"));
 	static const QString tpTimestampTime(lit("timestampTime"));
     static const QString tpReason(lit("reason"));
+    static const QString tpReasonContext(lit("reasonContext"));
     static const QString tpAggregated(lit("aggregated"));
     static const QString tpInputPort(lit("inputPort"));
     static const QString tpHasCameras(lit("hasCameras"));
@@ -809,6 +810,22 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     case BackupFinishedEvent:
         {
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+
+            // Fill event-specific reason context here
+            QVariantMap reasonContext;
+
+            if (params.reasonCode == LicenseRemoved)
+            {
+                QVariantList disabledCameras;
+
+                for (const QString &id: params.description.split(L';'))
+                    if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                        disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
+
+                reasonContext[lit("disabledCameras")] = disabledCameras;
+            }
+            detailsMap[tpReasonContext] = reasonContext;
+
             break;
         }
     case CameraIpConflictEvent: {

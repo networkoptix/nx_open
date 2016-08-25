@@ -69,7 +69,7 @@ QString QnAdamResourceSearcher::generatePhysicalId(const QString& url) const
 }
 
 QByteArray QnAdamResourceSearcher::executeAsciiCommand(
-    nx_modbus::QnModbusClient& client,
+    nx::modbus::QnModbusClient& client,
     const QString& commandStr)
 {
     QnAdamAsciiCommand command(commandStr);
@@ -99,7 +99,7 @@ QByteArray QnAdamResourceSearcher::executeAsciiCommand(
     return response.data.mid(4, endOfStr);
 }
 
-QString QnAdamResourceSearcher::getAdamModuleName(nx_modbus::QnModbusClient& client)
+QString QnAdamResourceSearcher::getAdamModuleName(nx::modbus::QnModbusClient& client)
 {
     QString commandStr("$01M");
 
@@ -111,7 +111,7 @@ QString QnAdamResourceSearcher::getAdamModuleName(nx_modbus::QnModbusClient& cli
     return QString::fromLatin1(response).trimmed();
 }
 
-QString QnAdamResourceSearcher::getAdamModuleFirmware(nx_modbus::QnModbusClient& client)
+QString QnAdamResourceSearcher::getAdamModuleFirmware(nx::modbus::QnModbusClient& client)
 {
     QString commandStr("$01F");
 
@@ -134,7 +134,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
 
     SocketAddress endpoint(url.host(), 502);
 
-    nx_modbus::QnModbusClient modbusClient(endpoint);
+    nx::modbus::QnModbusClient modbusClient(endpoint);
 
     if(!modbusClient.connect())
         return result;
@@ -262,7 +262,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
                 QUrl url;
                 url.setScheme(lit("//"));
                 url.setHost(remoteEndpoint.address.toString());
-                url.setPort(nx_modbus::kDefaultModbusPort);
+                url.setPort(nx::modbus::kDefaultModbusPort);
 
                 // No user/password required.
                 QAuthenticator auth;

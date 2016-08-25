@@ -75,8 +75,21 @@ public:
                 QStringList tmp = path.split('/');
                 while (!tmp.isEmpty() && tmp.last().isEmpty())
                     tmp.pop_back();
+                QString commandStr;
                 if (!tmp.isEmpty())
-                    tran.command = ApiCommand::fromString(tmp.last());
+                {
+                    commandStr = tmp.last();
+                    tran.command = ApiCommand::fromString(commandStr);
+                }
+
+                if (tran.command == ApiCommand::NotDefined)
+                {
+                    QnJsonRestResult jsonResult;
+                    jsonResult.setError(QnJsonRestResult::InvalidParameter,
+                        lit("Unknown api command %1").arg(commandStr));
+                    resultBody = QJson::serialized(jsonResult);
+                    return nx_http::StatusCode::ok;
+                }
 
                 // todo: temporary fix. Revert this check after merge with x_VMS-3408_cloud_sync
                 if (tran.command == ApiCommand::restoreDatabase)

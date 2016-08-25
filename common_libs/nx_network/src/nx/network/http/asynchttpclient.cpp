@@ -216,6 +216,17 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    void AsyncHttpClient::doOptions(const QUrl& url)
+    {
+        NX_ASSERT(url.isValid());
+
+        resetDataBeforeNewRequest();
+        m_url = url;
+        m_url.setPath(QLatin1String("*"));
+        composeRequest(nx_http::Method::OPTIONS);
+        initiateHttpMessageDelivery(url);
+    }
+
     const nx_http::Request& AsyncHttpClient::request() const
     {
         return m_request;
@@ -813,8 +824,12 @@ namespace nx_http
                 //    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
             }
             //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
-            m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
-            m_request.headers.insert(std::make_pair("Host", m_url.host().toLatin1()));
+
+            if (m_additionalHeaders.count("Connection") == 0)
+                m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
+
+            if (m_additionalHeaders.count("Host") == 0)
+                m_request.headers.insert(std::make_pair("Host", m_url.host().toLatin1()));
         }
 
         m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());

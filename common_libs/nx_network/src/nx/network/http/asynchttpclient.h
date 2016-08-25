@@ -105,15 +105,18 @@ namespace nx_http
         virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
         State state() const;
+
         //!Returns true if no response has been recevied due to transport error
         bool failed() const;
         SystemError::ErrorCode lastSysErrorCode() const;
+
         //!Start GET request to \a url
         /*!
         \return true, if socket is created and async connect is started. false otherwise
         To get error description use SystemError::getLastOSErrorCode()
         */
         void doGet(const QUrl& url);
+
         //!Start POST request to \a url
         /*!
         \todo Infinite POST message body support
@@ -125,11 +128,16 @@ namespace nx_http
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody,
             bool includeContentLength = true);
+
         void doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody);
+
+        void doOptions(const QUrl& url);
+
         const nx_http::Request& request() const;
+
         /*!
         Response is valid only after signal \a responseReceived() has been emitted
         \return Can be NULL if no response has been received yet

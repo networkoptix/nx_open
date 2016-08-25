@@ -96,9 +96,42 @@ void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
         });
 }
 
-////////////////////////////////////////////////////////////
-//// class AbstractDatagramSocket
-////////////////////////////////////////////////////////////
+KeepAliveOptions::KeepAliveOptions(int timeSec, int intervalSec, int probeCount):
+    timeSec(timeSec),
+    intervalSec(intervalSec),
+    probeCount(probeCount)
+{
+}
+
+bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
+{
+    return timeSec == rhs.timeSec
+        && intervalSec == rhs.intervalSec
+        && probeCount == rhs.probeCount;
+}
+
+QString KeepAliveOptions::toString() const
+{
+    // TODO: Use JSON serrialization instead?
+    return lm("{ %1, %2, %3 }").arg(timeSec).arg(intervalSec).arg(probeCount);
+}
+
+boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
+{
+    QStringRef stringRef(&string);
+    if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
+        stringRef = stringRef.mid(1, stringRef.length() - 2);
+
+    const auto split = stringRef.split(QLatin1String(","));
+    if (split.size() != 3)
+        return boost::none;
+
+    KeepAliveOptions options;
+    options.timeSec = split[0].trimmed().toInt();
+    options.intervalSec = split[1].trimmed().toInt();
+    options.probeCount = split[2].trimmed().toInt();
+    return options;
+}
 
 bool AbstractDatagramSocket::setDestAddr(
     const QString& foreignAddress,
