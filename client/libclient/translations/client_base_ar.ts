@@ -611,18 +611,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ask About Statistics Reporting</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1252,6 +1240,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Enable Background Animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Rapid Review...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3079,9 +3071,16 @@ to view more bookmarks</source>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3112,6 +3111,80 @@ to view more bookmarks</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%nms</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%ns</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nm</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nh</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nd</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3543,10 +3616,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3918,10 +3987,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>The information you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4907,6 +4972,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>less than an hour</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -5056,10 +5125,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5119,6 +5184,10 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5695,10 +5764,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>TLS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5720,6 +5785,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7054,6 +7123,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -7352,6 +7437,10 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Unable to export video.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7573,10 +7662,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

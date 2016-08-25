@@ -43,22 +43,18 @@ namespace ite
             uint8_t code = m_cmdRecv.returnCode();
             unsigned error = ReturnChannelError::NO_ERROR;
 
+            if (error || code)
+                debug_printf("[RC] TxID %d, cmd 0x%x, error: %d, ret code: %d\n", txID(), cmdID, error, code);
+            else if (cmdID != 0xf000)
+                debug_printf("[RC] TxID %d, cmd 0x%x\n", txID(), cmdID);
+
             {
                 std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
                 error = ::parseRC(this, cmdID, m_cmdRecv.data(), m_cmdRecv.size());
-            }
 
-            if (error || code)
-                debug_printf("[RC] cmd 0x%x, error: %d, ret code: %d\n", cmdID, error, code);
-
-            if (error != ReturnChannelError::NO_ERROR)
-                return;
-
-            {
-                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-                resetWanted(cmdID, code);
+                if (error == ReturnChannelError::NO_ERROR)
+                    resetWanted(cmdID, code);
             }
         }
 #if 1

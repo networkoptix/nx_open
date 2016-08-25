@@ -8,6 +8,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 
 class QnCachingCameraDataLoader;
+typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
 
 class QnCameraDataManager : public QObject
 {
@@ -15,14 +16,14 @@ class QnCameraDataManager : public QObject
 public:
     explicit QnCameraDataManager(QObject *parent = 0);
     virtual ~QnCameraDataManager();
-   
-    QnCachingCameraDataLoader *loader(const QnMediaResourcePtr &resource, bool createIfNotExists = true);
+
+    QnCachingCameraDataLoaderPtr loader(const QnMediaResourcePtr &resource, bool createIfNotExists = true);
 
     void clearCache();
 signals:
     void periodsChanged(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
 private:
-    mutable QHash<QnMediaResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
+    mutable QHash<QnMediaResourcePtr, QnCachingCameraDataLoaderPtr> m_loaderByResource;
 };
 
 #endif // CAMERA_DATA_MANAGER_H

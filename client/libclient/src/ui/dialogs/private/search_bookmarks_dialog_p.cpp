@@ -94,7 +94,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     , m_openInNewTabAction      (new QAction(action(QnActions::OpenInNewLayoutAction)->text(), this))
     , m_editBookmarkAction      (new QAction(action(QnActions::EditCameraBookmarkAction)->text(), this))
-    , m_exportBookmarkAction    (new QAction(tr("Export bookmark..."), this))
+    , m_exportBookmarkAction    (new QAction(tr("Export Bookmark..."), this))
     , m_removeBookmarksAction   (new QAction(action(QnActions::RemoveBookmarksAction)->text(), this))
     , m_updatingNow(false)
 {

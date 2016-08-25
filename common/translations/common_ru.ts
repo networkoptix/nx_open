@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -419,6 +419,10 @@
     <message>
         <source>Recording on I/O modules is disabled:</source>
         <translation>Запись на модуле ввода/вывода отклочена:</translation>
+    </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation>Выполнить HTTP запрос</translation>
     </message>
 </context>
 <context>

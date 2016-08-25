@@ -2188,20 +2188,18 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
 
 void QnWorkbenchActionHandler::onHiDpiWarningMessageAction()
 {
-    static const bool kIsSupportLink = !QnAppInfo::supportLink().isEmpty();
-    static const auto kAddress = (kIsSupportLink
-        ? QnAppInfo::supportLink() : QnAppInfo::supportEmailAddress());
-    static const auto addressPrefix = (kIsSupportLink ? QString() : lit("mailto:"));
-    static const auto kSupportPortalLink = lit("<a href = \"%1%2\">%2</a>")
-        .arg(addressPrefix, kAddress);
+    static const auto kAlignedParagrapth = lit("<p align=\"center\" style=\"margin:4\">%1</p>");
+    static const auto kComment = "%1 Will be replaced by product name";
+    static const auto kMessageTemplate = lit("%1%2%3").arg(
+        kAlignedParagrapth.arg(tr("%1 has detected that you have a high resolution "
+            "screen and as a result %1 may not be displaying well.", kComment)),
+        kAlignedParagrapth.arg(tr("We are aware of this issue and a fix will be coming in v3.0.")),
+        kAlignedParagrapth.arg(tr("In the meantime please adjust your screen's resolution if "
+            "needed for a better experience.")));
 
-    static const auto kComment = "%1 Will be replaced by product name, %2 - by link to support portal";
-    static const auto kMessage =
-        tr("%1 is not optimized for HiDpi screens yet and might look wrong. "
-        "Please write to %2 if you have any problems.", kComment)
-        .arg(QnAppInfo::productNameLong(), kSupportPortalLink);
+    static const auto kMessage = kMessageTemplate.arg(QnAppInfo::productNameLong());
 
-    QnMessageBox::warning(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
+    QnMessageBox::showNoIconDialog(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {

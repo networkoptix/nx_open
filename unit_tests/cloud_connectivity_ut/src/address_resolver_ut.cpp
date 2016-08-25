@@ -104,7 +104,9 @@ public:
                     }
 
                     syncQueue.push(true);
-                });
+                },
+                true,
+                AF_INET);
         }
 
         for (size_t counter = kSimultaneousQueries; counter; --counter)
@@ -345,7 +347,7 @@ TEST(AddressResolverRealTest, Cancel)
     {
         for (const auto& address : kTestAddresses)
         {
-            SocketGlobals::addressResolver().resolveAsync(address, doNone, true, this);
+            SocketGlobals::addressResolver().resolveAsync(address, doNone, true, AF_INET, this);
             if (timeout) std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
             SocketGlobals::addressResolver().cancel(this);
             if (!timeout) timeout = 10;

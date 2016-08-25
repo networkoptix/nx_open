@@ -486,13 +486,13 @@ void QnLoginDialog::at_saveButton_clicked() {
     const QUrl url = currentUrl();
 
     if (!url.isValid()) {
-        QnMessageBox::warning(this, tr("Invalid Paramaters"), tr("Entered hostname is not valid."));
+        QnMessageBox::warning(this, tr("Invalid Parameters"), tr("Entered hostname is not valid."));
         ui->hostnameLineEdit->setFocus();
         return;
     }
 
     if (url.host().length() == 0) {
-        QnMessageBox::warning(this, tr("Invalid Paramaters"), tr("Host field cannot be empty."));
+        QnMessageBox::warning(this, tr("Invalid Parameters"), tr("Host field cannot be empty."));
         ui->hostnameLineEdit->setFocus();
         return;
     }

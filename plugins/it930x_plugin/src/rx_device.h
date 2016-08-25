@@ -4,9 +4,11 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <condition_variable>
 
 #include "it930x.h"
 #include "dev_reader.h"
+#include <plugins/camera_plugin.h>
 
 namespace nxcip
 {
@@ -15,25 +17,14 @@ namespace nxcip
 
 namespace ite
 {
+    class CameraManager;
+
     unsigned str2num(std::string& s);
     std::string num2str(unsigned id);
 
     class TxDevice;
     typedef std::shared_ptr<TxDevice> TxDevicePtr;
 
-    ///
-    struct DevLink
-    {
-        uint16_t rxID;
-        uint16_t txID;
-        unsigned channel;
-
-        DevLink()
-        :   rxID(0), txID(0), channel(0)
-        {}
-    };
-
-    ///
     class RxDevice
     {
     public:
@@ -44,7 +35,7 @@ namespace ite
             NOT_A_CHANNEL = 16 // TxDevice::CHANNELS_NUM
         };
 
-        static constexpr unsigned MIN_STRENGTH() { return 60; }
+        static constexpr unsigned MIN_STRENGTH() { return 70; }
         static constexpr unsigned MIN_QUALITY() { return 60; }
 
         static constexpr unsigned RC_DELAY_MS() { return 250; }
@@ -81,30 +72,18 @@ namespace ite
         //
 
         RxDevice(unsigned id);
+        ~RxDevice();
 
         unsigned short rxID() const { return m_rxID; }
-        unsigned short txID() const
-        {
-            if (m_channel <= NOT_A_CHANNEL)
-                return m_txs[m_channel].present;
-            return 0;
-        }
 
+        bool isOpened() const { return m_it930x.get(); }
         DevReader * reader() { return m_devReader.get(); }
         bool isReading() const { return m_devReader->hasThread(); }
 
         bool subscribe(unsigned stream) { return m_devReader->subscribe(stream2pid(stream)); }
         void unsubscribe(unsigned stream) { m_devReader->unsubscribe(stream2pid(stream)); }
 
-        bool lockCamera(TxDevicePtr txDev);
-        bool tryLockC(unsigned freq, bool prio = true, const char ** reason = nullptr);
-        bool isLocked() const;
-        void unlockC(bool resetRx = false);
-
-        bool startSearchTx(unsigned channel, unsigned timeoutMS);
-        void stopSearchTx(DevLink& outDevLink);
-
-        bool configureTx(unsigned encNo);
+        bool configureTx();
         void processRcQueue();
         void updateTxParams();
 
@@ -133,150 +112,64 @@ namespace ite
         bool setEncoderParams(unsigned streamNo, const nxcip::LiveStreamConfig& config);
 
         // TX stuff
-
-        void setTx(unsigned channel, uint16_t txID = 0)
-        {
-            debug_printf("[search] found Rx: %d; Tx: %d (%04x); channel: %d\n", rxID(), txID, txID, channel);
-
-            if (channel >= m_txs.size())
-                return;
-
-            if (txID)
-                m_txs[channel].set(txID);
-            else
-                m_txs[channel].lose();
-        }
-
-        uint16_t getTx(unsigned channel, bool lost = false) const
-        {
-            if (channel >= m_txs.size())
-                return 0;
-
-            if (lost)
-                return m_txs[channel].lost;
-            return m_txs[channel].present;
-        }
-#if 0
-        void checkTx(unsigned channel, uint16_t txID)
-        {
-            debug_printf("[search] restore Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
-
-            if (channel >= m_txs.size())
-                return;
-
-            m_txs[channel].check(txID);
-        }
-#endif
-        unsigned chan4Tx(uint16_t txID) const
-        {
-            for (size_t i = 0; i < m_txs.size(); ++i)
-                if (m_txs[i].present == txID)
-                    return i;
-            return NOT_A_CHANNEL;
-        }
-
-        void forgetTx(uint16_t txID)
-        {
-            for (size_t i = 0; i < m_txs.size(); ++i)
-                if (m_txs[i].present == txID)
-                    m_txs[i].lose();
-        }
-
-        void setChannel(unsigned channel)
-        {
-            if (channel >= m_txs.size())
-                return;
-
-            if (m_txs[channel].present)
-            {
-                m_channel = channel;
-
-                for (size_t i = 0; i < m_txs.size(); ++i)
-                    m_txs[i].lose();
-            }
-        }
-
         bool changeChannel(unsigned channel);
         void updateOSD();
+        void stats();
+
+        // <refactor>
+        bool findBestTx();
+
+        bool testChannel(int chan, int &bestChan, int &bestStrength, int &txID);
+
+        bool deviceReady() const {return m_deviceReady;}
+        nxcip::CameraInfo getCameraInfo() const;
+        TxDevicePtr getTxDevice() const {return m_txDev;}
+        void startReader()
+        {
+            if (!m_devReader->hasThread())
+                m_devReader->start(m_it930x.get());
+        }
+
+        void stopReader()
+        {
+            m_devReader->stop();
+            m_devReader->clearBuf();
+        }
+
+        void shutdown();
+        void startWatchDog();
+
+        void setCamera(CameraManager *cam)
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_cam = cam;
+        }
+        bool isLocked() const;
+
+        void pleaseStop() { m_needStop = true; }
+
+        bool needStop() const { return m_needStop; }
+        bool running() const { return m_running; }
 
     private:
-        ///
-        struct TxPresence
-        {
-            uint16_t present;
-            uint16_t lost;
+        std::atomic_bool 	m_deviceReady;
+        // </refactor>
 
-            TxPresence()
-            :   present(0), lost(0), m_lock(false)
-            {}
-
-            void set(uint16_t txID)
-            {
-                bool expected = false;
-                while (! m_lock.compare_exchange_weak(expected, true))
-                    ;
-
-                present = txID;
-                lost = 0;
-
-                m_lock.store(false);
-            }
-
-            void lose()
-            {
-                bool expected = false;
-                while (! m_lock.compare_exchange_weak(expected, true))
-                    ;
-
-                if (present)
-                {
-                    lost = present;
-                    present = 0;
-                }
-
-                m_lock.store(false);
-            }
-
-            void check(uint16_t txID)
-            {
-                bool expected = false;
-                while (! m_lock.compare_exchange_weak(expected, true))
-                    ;
-
-                if (present == 0)
-                    lost = txID;
-
-                m_lock.store(false);
-            }
-
-        private:
-            std::atomic_bool m_lock;
-        };
-
-        ///
-        struct Sync
-        {
-            mutable std::mutex mutex;
-            std::condition_variable cond;
-            std::atomic_bool usedByCamera;
-            bool waiting;
-            std::atomic_bool searching;
-
-            Sync()
-            :   usedByCamera(false),
-                waiting(false),
-                searching(false)
-            {}
-        };
+    private:
 
         mutable std::mutex m_mutex;
+        mutable std::mutex m_cvMutex;
+        std::condition_variable m_cvConfig;
+        std::atomic<bool> m_needStop;
+        std::atomic<bool> m_running;
+        std::thread m_watchDogThread;
+        bool m_configuring;
+
         std::unique_ptr<It930x> m_it930x;
         std::unique_ptr<DevReader> m_devReader;
         TxDevicePtr m_txDev;                    // locked Tx device (as camera)
         const uint16_t m_rxID;
-        unsigned m_channel;
-        Sync m_sync;
-        std::vector<TxPresence> m_txs;
+        std::atomic<uint8_t> m_channel;
 
         // info from DTV receiver
         uint8_t m_signalQuality;
@@ -284,14 +177,15 @@ namespace ite
         bool m_signalPresent;
         IteDriverInfo m_rxInfo;
 
+        CameraManager *m_cam;
         // locked Tx device
 
         bool isLocked_u() const { return m_it930x.get() && m_it930x->hasStream(); }
         bool wantedByCamera() const;
         void resetFrozen();
-
         bool open();
-        void stats();
+        void close();
+        bool lockAndStart(int chan, int txId);
 
         bool sendRC(RcCommand * cmd);
         bool sendRC(RcCommand * cmd, unsigned attempts);
