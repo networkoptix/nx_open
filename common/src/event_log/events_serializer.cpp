@@ -18,7 +18,7 @@ inline int readInt(quint8* &curPtr)
 
 inline QnUuid readQnId(quint8* &curPtr)
 {
-    const QByteArray uuid = QByteArray::fromRawData((const char*) curPtr, 16);
+    const QByteArray uuid = QByteArray::fromRawData((const char*)curPtr, 16);
     curPtr += 16;
     return QnUuid::fromRfc4122(uuid);
 }
@@ -30,33 +30,50 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
 
     QnBusinessActionDataList& events = *(eventsPtr.data());
 
-
     if (data.size() < 4)
         return;
 
-    quint8* curPtr = (quint8*) data.data();
+    quint8* curPtr = (quint8*)data.data();
     int sz = readInt(curPtr);
-    if (sz < 0 || sz > 10000000) {
+    if (sz < 0 || sz > 10000000)
+    {
         qWarning() << "Invalid binary data for events log. Ignoring";
         return;
     }
 
     events.resize(sz);
-    for (int i = 0; i < sz; ++i) {
+    for (int i = 0; i < sz; ++i)
+    {
         QnBusinessActionData& action = events[i];
         action.flags = readInt(curPtr);
         action.actionType = (QnBusiness::ActionType) readInt(curPtr);
         action.businessRuleId = readQnId(curPtr);
         action.aggregationCount = readInt(curPtr);
-        int runTimeParamsLen = readInt(curPtr);
-        QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
-        action.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(ba);
-        curPtr += runTimeParamsLen;
+        {
+            int runTimeParamsLen = readInt(curPtr);
+            QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
+            if (ba.size() != runTimeParamsLen || runTimeParamsLen < 0)
+            {
+                NX_ASSERT(false, "Invalid stream");
+                events.resize(i);
+                return;
+            }
+            action.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(ba);
+            curPtr += runTimeParamsLen;
+        }
 
-        int actionParamsLen = readInt(curPtr);
-        ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
-        action.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(ba);
-        curPtr += actionParamsLen;
+        {
+            int actionParamsLen = readInt(curPtr);
+            QByteArray ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
+            if (ba.size() != actionParamsLen || actionParamsLen < 0)
+            {
+                NX_ASSERT(false, "Invalid stream");
+                events.resize(i);
+                return;
+            }
+            action.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(ba);
+            curPtr += actionParamsLen;
+        }
 
     }
 
