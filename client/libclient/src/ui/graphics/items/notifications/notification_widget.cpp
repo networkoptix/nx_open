@@ -293,6 +293,9 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
 {
     base_type::setGeometry(geometry);
 
+    auto label = m_textLabel->widget();
+    m_textLabel->setPreferredHeight(label->heightForWidth(label->width()));
+
     QRectF buttonGeometry(QPointF(), m_closeButton->size());
     buttonGeometry.moveTopRight(rect().topRight() + QPointF(0, 1));
     m_closeButton->setGeometry(buttonGeometry);

@@ -39,7 +39,7 @@ void InstrumentManagerPrivate::init() {
     viewDispatcher     = new InstrumentEventDispatcher<QGraphicsView>(q);
     viewportDispatcher = new InstrumentEventDispatcher<QWidget>(q);
     itemDispatcher     = new InstrumentEventDispatcher<QGraphicsItem>(q);
-    
+
     paintSyncer        = new InstrumentPaintSyncer(q);
     paintSyncer->addListener(this);
     startListening();
@@ -105,7 +105,7 @@ void InstrumentManagerPrivate::tick(int deltaTime) {
 
 void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
     /* Initialize instrument. */
-    instrument->m_scene = scene;
+    instrument->setScene(scene);
     instrument->m_manager = q_func();
 
     /* Install instrument. */
@@ -121,7 +121,7 @@ void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument,
 void InstrumentManagerPrivate::uninstallInstrumentInternal(Instrument *instrument) {
     /* Don't let instrument use the scene if it's being destroyed. */
     if (sceneIsBeingDestroyed)
-        instrument->m_scene = NULL;
+        instrument->setScene(nullptr);
 
     /* Notify. */
     instrument->sendInstalledNotifications(false);
@@ -191,7 +191,7 @@ void InstrumentManagerPrivate::unregisterSceneInternal() {
     scene = NULL;
     if (filterItem != NULL) { /* We may get called from filter item's destructor, hence the check for NULL. */
         filterItem->setDestructionListener(NULL);
-        delete filterItem; 
+        delete filterItem;
         filterItem = NULL;
     }
 
@@ -207,8 +207,8 @@ void InstrumentManagerPrivate::registerViewInternal(QGraphicsView *view) {
 
     registerViewportInternal(view);
 
-    /* This one is important. Mouse tracking is disabled by default, so 
-     * instruments won't be getting mouse move events if there are no items 
+    /* This one is important. Mouse tracking is disabled by default, so
+     * instruments won't be getting mouse move events if there are no items
      * on the scene. */
     view->viewport()->setMouseTracking(true);
 }
@@ -225,15 +225,15 @@ void InstrumentManagerPrivate::unregisterViewInternal(QObject *view, bool viewIs
 
 void InstrumentManagerPrivate::registerViewportInternal(QGraphicsView *view) {
     view->viewport()->installEventFilter(viewportDispatcher);
-    
+
     QObject::connect(view->viewport(), &QObject::destroyed, q_func(), &InstrumentManager::at_viewport_destroyed);
 
     QWidget *viewport = view->viewport();
     addSyncedViewport(viewport);
     viewportDispatcher->registerTarget(viewport);
 
-    /* Create a viewport destruction watcher. 
-     * It will be destroyed before the viewport's destructed gets a chance to send some events 
+    /* Create a viewport destruction watcher.
+     * It will be destroyed before the viewport's destructed gets a chance to send some events
      * that may get into our handlers and mess everything up. */
     QObject *viewportWatcher = new QObject(view->viewport());
     viewportWatcher->setObjectName(QLatin1String(viewportWatcherName));
@@ -267,7 +267,7 @@ void InstrumentManagerPrivate::registerItemInternal(QGraphicsItem *item) {
 void InstrumentManagerPrivate::unregisterItemInternal(QGraphicsItem *item) {
     items.remove(item);
 
-    if(filterItem != NULL) 
+    if(filterItem != NULL)
         item->removeSceneEventFilter(filterItem); /* We may get called from filter item's destructor, hence the check for NULL. */
 
     itemDispatcher->unregisterTarget(item);
@@ -280,7 +280,7 @@ void InstrumentManagerPrivate::at_view_destroyed(QObject *view) {
 
 void InstrumentManagerPrivate::at_viewport_destroyed(QObject *viewport) {
     /* We may get here in two cases:
-     * 
+     *
      * 1. View is being destroyed.
      * 2. Viewport is being changed. In this case view is alive and we just need to switch to new viewport. */
     QObject *view = viewport->parent();
@@ -394,7 +394,7 @@ bool InstrumentManager::uninstallInstrument(Instrument *instrument) {
         return false;
     }
 
-    if (!instrument->isInstalled()) 
+    if (!instrument->isInstalled())
         return false;
 
     if (instrument->manager() != this) {
@@ -586,7 +586,7 @@ AnimationTimer *InstrumentManager::animationTimer() const {
 AnimationTimer *InstrumentManager::animationTimer(QGraphicsScene *scene) {
     if(!scene)
         return NULL;
-    
+
     if(InstrumentManager *manager = instance(scene))
         return manager->animationTimer();
 

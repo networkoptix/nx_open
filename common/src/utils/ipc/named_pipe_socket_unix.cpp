@@ -90,20 +90,34 @@ SystemError::ErrorCode NamedPipeSocket::write( const void* buf, unsigned int byt
 }
 
 //!Reads in synchronous mode
-SystemError::ErrorCode NamedPipeSocket::read( void* buf, unsigned int bytesToRead, unsigned int* const bytesRead )
+SystemError::ErrorCode NamedPipeSocket::read(
+    void* buf, unsigned int bytesToRead, unsigned int* const bytesRead)
 {
-    for( ;; )
+    timeval timeout{3, 0};
+
+    for (;;)
     {
-        const ssize_t numberOfBytesRead = ::read( m_impl->hPipe, buf, bytesToRead );
-        if( numberOfBytesRead < 0 )
+        fd_set readFds;
+        FD_ZERO(&readFds);
+        FD_SET(m_impl->hPipe, &readFds);
+
+        if (select(m_impl->hPipe + 1, &readFds, nullptr, nullptr, &timeout) == 1)
         {
-            const int errCode = errno;
-            if( errCode == EINTR )
-                continue;
-            return errCode;
+            const ssize_t numberOfBytesRead = ::read(m_impl->hPipe, buf, bytesToRead);
+            if (numberOfBytesRead < 0)
+            {
+                const int errCode = errno;
+                if (errCode == EINTR)
+                    continue;
+                return errCode;
+            }
+            *bytesRead = numberOfBytesRead;
+            return SystemError::noError;
         }
-        *bytesRead = numberOfBytesRead;
-        return SystemError::noError;
+        else
+        {
+            return SystemError::timedOut;
+        }
     }
 }
 

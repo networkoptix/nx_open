@@ -29,7 +29,7 @@ ecs.db-wal
 !launcher*.vcproj
 *_tmp.py*
 donotrebuild
-vms.pro
+vms*.pro
 .idea
 .branch.properties
 x86/*

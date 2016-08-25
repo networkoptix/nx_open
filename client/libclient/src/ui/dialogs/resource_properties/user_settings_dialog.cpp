@@ -107,11 +107,15 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     });
 
     ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
-    connect(m_editGroupsButton, &QPushButton::clicked, this, [this]
-    {
-        QnUuid groupId = isPageVisible(ProfilePage) ? m_user->userGroup() : m_settingsPage->selectedUserGroup();
-        menu()->trigger(QnActions::UserGroupsAction, QnActionParameters().withArgument(Qn::ResourceUidRole, groupId));
-    });
+    connect(m_editGroupsButton, &QPushButton::clicked, this,
+        [this]
+        {
+            QnUuid groupId = isPageVisible(ProfilePage)
+                ? m_user->userGroup()
+                : m_settingsPage->selectedUserGroup();
+            menu()->trigger(QnActions::UserRolesAction,
+                QnActionParameters().withArgument(Qn::UuidRole, groupId));
+        });
 
     m_editGroupsButton->setVisible(false);
 
@@ -373,6 +377,7 @@ void QnUserSettingsDialog::applyChanges()
     }
 
     updateButtonBox();
+    loadDataToUi();
 }
 
 void QnUserSettingsDialog::showEvent(QShowEvent* event)

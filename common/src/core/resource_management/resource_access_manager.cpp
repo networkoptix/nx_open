@@ -552,15 +552,22 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResour
     return Qn::NoPermissions;
 }
 
-Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVirtualCameraResourcePtr& camera) const
+Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user,
+    const QnVirtualCameraResourcePtr& camera) const
 {
     TRACE("Calculate permissions of user " << user->getName() << " to camera " << camera->getName())
     NX_ASSERT(camera);
 
-    if (!QnResourceAccessProvider::isAccessibleResource(user, camera))
-        return Qn::NoPermissions;
+    Qn::Permissions result = Qn::NoPermissions;
 
-    Qn::Permissions result = Qn::ReadPermission;
+    /* Admins must be able to remove any cameras to delete servers.  */
+    if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
+        result |= Qn::RemovePermission;
+
+    if (!QnResourceAccessProvider::isAccessibleResource(user, camera))
+        return result;
+
+    result |= Qn::ReadPermission;
     if (hasGlobalPermission(user, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 

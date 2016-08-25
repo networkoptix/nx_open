@@ -1,6 +1,5 @@
 #include <qcoreapplication.h>
 
-#include <nx/network/socket_global.h>
 #include <nx/utils/test_support/run_test.h>
 
 int main(int argc, char **argv)

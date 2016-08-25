@@ -8,7 +8,7 @@
 #include <utils/math/color_transformations.h>
 #include "utils/media/bitStream.h"
 
-QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
+QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::WeekTimeScheduleDialog),
     m_disableUpdateGridParams(false),
@@ -22,9 +22,9 @@ QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
     connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this, &QnWeekTimeScheduleDialog::updateColors);
     updateColors();
 
-    connect(ui->valueOnButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
-    connect(ui->valueOffButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
-    connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
+    connect(ui->valueOnButton, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
+    connect(ui->valueOffButton, SIGNAL(toggled(bool)), this, SLOT(updateGridParams()));
+    connect(ui->gridWidget, SIGNAL(cellActivated(QPoint)), this, SLOT(at_gridWidget_cellActivated(QPoint)));
 
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -54,22 +54,25 @@ QString QnWeekTimeScheduleDialog::scheduleTasks() const
     quint8 buffer[24]; // qPower2Floor(24*7/8, 4)
     BitStreamWriter writer;
     writer.setBuffer(buffer, sizeof(buffer));
-    try {
+    try
+    {
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
         {
-            for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
+            for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
+            {
                 const QPoint cell(col, row);
 
-                Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
+                Qn::RecordingType recordType = ui->gridWidget->cellValue(cell).recordingType;
                 writer.putBit(recordType != Qn::RT_Never);
             }
         }
         writer.flushBits();
-    } catch(...)
+    }
+    catch (...)
     {
         // it is never happened if grid size is correct
     }
-    QByteArray result = QByteArray::fromRawData((char*) buffer, 24*7/8);
+    QByteArray result = QByteArray::fromRawData((char*)buffer, 24 * 7 / 8);
     return QString::fromUtf8(result.toHex());
 }
 
@@ -77,25 +80,38 @@ void QnWeekTimeScheduleDialog::setScheduleTasks(const QString& value)
 {
     disconnectFromGridWidget(); /* We don't want to get 100500 notifications. */
 
-    if (value.isEmpty()) {
+    if (value.isEmpty())
+    {
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
         {
             for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
-                ui->gridWidget->setCellRecordingType(QPoint(col, row), Qn::RT_Always);
+            {
+                const QPoint cell(col, row);
+                auto params = ui->gridWidget->cellValue(cell);
+                params.recordingType = Qn::RT_Always;
+                ui->gridWidget->setCellValue(cell, params);
+            }
         }
     }
-    else {
+    else
+    {
         QByteArray schedule = QByteArray::fromHex(value.toUtf8());
-        try {
-            BitStreamReader reader((quint8*) schedule.data(), schedule.size());
+        try
+        {
+            BitStreamReader reader((quint8*)schedule.data(), schedule.size());
             for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
             {
-                for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
+                for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
+                {
                     const QPoint cell(col, row);
-                    ui->gridWidget->setCellRecordingType(cell, reader.getBit() ? Qn::RT_Always : Qn::RT_Never);
+                    auto params = ui->gridWidget->cellValue(cell);
+                    params.recordingType = reader.getBit() ? Qn::RT_Always : Qn::RT_Never;
+                    ui->gridWidget->setCellValue(cell, params);
                 }
             }
-        } catch(...) {
+        }
+        catch (...)
+        {
             // we are here if value is empty
             // it is never happened if grid size is correct
         }
@@ -114,21 +130,23 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
     if (m_disableUpdateGridParams)
         return;
 
-    Qn::RecordingType recordType = Qn::RT_Never;
+    QnScheduleGridWidget::CellParams brush;
+    brush.recordingType = Qn::RT_Never;
     if (ui->valueOnButton->isChecked())
-        recordType = Qn::RT_Always;
+        brush.recordingType = Qn::RT_Always;
     else if (ui->valueOffButton->isChecked())
-        recordType = Qn::RT_Never;
+        brush.recordingType = Qn::RT_Never;
     else
         qWarning() << "QnWeekTimeScheduleDialog::No record type is selected!";
 
-    if(!fromUserInput)
-        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::RecordTypeParam, recordType);
+    if (!fromUserInput)
+        ui->gridWidget->setBrush(brush);
 
     emit gridParamsChanged();
 }
 
-void QnWeekTimeScheduleDialog::updateColors() {
+void QnWeekTimeScheduleDialog::updateColors()
+{
     ui->valueOnButton->setColor(ui->gridWidget->colors().recordAlways);
     ui->valueOffButton->setColor(ui->gridWidget->colors().recordNever);
 }
@@ -141,9 +159,10 @@ void QnWeekTimeScheduleDialog::at_gridWidget_cellActivated(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
 
-    Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
+    Qn::RecordingType recordType = ui->gridWidget->cellValue(cell).recordingType;
 
-    switch (recordType) {
+    switch (recordType)
+    {
         case Qn::RT_Always:
             ui->valueOnButton->setChecked(true);
             break;

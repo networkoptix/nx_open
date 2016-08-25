@@ -35,6 +35,8 @@ def process_files():
                 if location is not None and location.get('filename'):
                     save_content(active_filename,active_content)
                     active_filename = os.path.join(root_directory, location.get('filename'))
+                    if not os.path.isfile(active_filename):  # file was removed - jump to next content
+                        break
                     with open(active_filename, 'r') as file_descriptor:
                         active_content = file_descriptor.read()
 

@@ -11,8 +11,6 @@ namespace Ui {
 class MultipleCameraSettingsWidget;
 }
 
-class QnCameraSettingsWidgetPrivate;
-
 class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware, public QnUpdatable
 {
     Q_OBJECT
@@ -35,27 +33,17 @@ public:
     bool licensedParametersModified() const;
     void updateFromResources();
     void submitToResources();
-    void reject();
 
     /** Check if second stream is enabled if there are Motion+LQ tasks in schedule. */
     bool isValidSecondStream();
 
-    bool hasDbChanges() const
-    {
-        return m_hasDbChanges;
-    }
+    bool hasDbChanges() const;
 
     /** Checks if user changed controls but not applied them to the schedule */
-    bool hasScheduleControlsChanges() const
-    {
-        return m_hasScheduleControlsChanges;
-    }
+    bool hasScheduleControlsChanges() const;
 
     /** Clear flag that user changed schedule controls but not applied them */
-    void clearScheduleControlsChanges()
-    {
-        m_hasScheduleControlsChanges = false;
-    }
+    void clearScheduleControlsChanges();
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -64,15 +52,10 @@ public:
 signals:
     void hasChangesChanged();
 
-    private slots:
+private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
-
-    void updateMaxFPS();
-
-protected:
-    QnCameraSettingsWidgetPrivate* d_ptr;
 
 private:
     void setHasDbChanges(bool hasChanges);
@@ -82,13 +65,11 @@ private:
 
 private:
     Q_DISABLE_COPY(QnMultipleCameraSettingsWidget)
-    Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
 
     QnVirtualCameraResourceList m_cameras;
     bool m_hasDbChanges;
-    bool m_hasScheduleChanges;
     bool m_hasScheduleEnabledChanges;
 
     bool m_loginWasEmpty;
@@ -98,5 +79,4 @@ private:
     bool m_hasScheduleControlsChanges;
 
     bool m_readOnly;
-    bool m_inUpdateMaxFps;
 };

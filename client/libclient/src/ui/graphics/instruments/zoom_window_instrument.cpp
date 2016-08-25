@@ -14,6 +14,7 @@
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
 #include <ui/style/globals.h>
+#include <ui/style/nx_style.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
@@ -22,15 +23,17 @@
 #include <ui/workbench/workbench.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/graphics/painters/frame_painter.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
 #include "selection_item.h"
 
-namespace {
-    const qreal zoomWindowMinSize = 0.1;
-    const qreal zoomWindowMaxSize = 0.9;
-
+namespace
+{
+    const qreal kZoomWindowMinSize = 0.1;
+    const qreal kZoomWindowMaxSize = 0.9;
+    const qreal kZoomLineWidth = 1;
 } // anonymous namespace
 
 class ZoomOverlayWidget;
@@ -44,11 +47,9 @@ class ZoomWindowWidget: public Instrumented<QnClickableWidget>, public Constrain
 public:
     ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags),
-        m_interactive(true)
+        m_interactive(true),
+        m_framePainter()
     {
-        auto margin = qnGlobals->zoomFrameWidth();
-        setWindowFrameMargins(margin, margin, margin, margin);
-
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
 
@@ -75,12 +76,14 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
-    QColor frameColor() const {
-        return m_frameColor;
+    QColor frameColor() const
+    {
+        return m_framePainter.color();
     }
 
-    void setFrameColor(const QColor &frameColor) {
-        m_frameColor = frameColor;
+    void setFrameColor(const QColor &frameColor)
+    {
+        m_framePainter.setColor(frameColor);
     }
 
     bool isInteractive() const {
@@ -94,6 +97,11 @@ public:
         m_interactive = interactive;
 
         updateInteractivity();
+    }
+
+    void setFrameWidth(qreal frameWidth)
+    {
+        m_framePainter.setFrameWidth(frameWidth);
     }
 
 protected:
@@ -119,25 +127,19 @@ protected:
         );
 
         setGeometry(geometry);
-        
+
         event->accept();
     }
 
     virtual QRectF constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint = QPointF()) const override;
 
-    virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
-        qreal l, t, r, b;
-        getWindowFrameMargins(&l, &t, &r, &b);
-
-        QSizeF size = this->size();
-        qreal w = size.width();
-        qreal h = size.height();
-        QColor color = toTransparent(m_frameColor, 0.75);
-
-        painter->fillRect(QRectF(-l,      -t,      w + l + r,   t), color);
-        painter->fillRect(QRectF(-l,      h,       w + l + r,   b), color);
-        painter->fillRect(QRectF(-l,      0,       l,           h), color);
-        painter->fillRect(QRectF(w,       0,       r,           h), color);
+    virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override
+    {
+        const auto offset = QPointF(kZoomLineWidth, kZoomLineWidth);
+        const auto targetSize = (size() + QSizeF(offset.x(), offset.y()) * 2);
+        const auto targetRect = QRectF(-offset, targetSize);
+        m_framePainter.setBoundingRect(targetRect);
+        m_framePainter.paint(*painter);
     }
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
@@ -167,9 +169,9 @@ private:
 
 private:
     bool m_interactive;
-    QColor m_frameColor;
     QPointer<ZoomOverlayWidget> m_overlay;
     QPointer<QnMediaResourceWidget> m_zoomWidget;
+    QnFramePainter m_framePainter;
 };
 
 
@@ -179,7 +181,7 @@ private:
 class ZoomOverlayWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 public:
-    ZoomOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+    ZoomOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags),
         m_interactive(true)
     {
@@ -199,7 +201,7 @@ public:
         widget->setParentItem(this);
         widget->setInteractive(m_interactive);
         m_rectByWidget.insert(widget, QRectF(0.0, 0.0, 1.0, 1.0));
-        
+
         updateLayout(widget);
     }
 
@@ -210,7 +212,7 @@ public:
         }
         m_rectByWidget.remove(widget);
     }
-    
+
     void setWidgetRect(ZoomWindowWidget *widget, const QRectF &rect, bool updateLayout) {
         if(!m_rectByWidget.contains(widget))
             return;
@@ -280,7 +282,7 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qt::WindowF
     /* Size constraints go first. */
     QSizeF maxSize = geometry.size();
     if(overlayWidget)
-        maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size() * zoomWindowMaxSize), overlayWidget->size() * zoomWindowMinSize);
+        maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size() * kZoomWindowMaxSize), overlayWidget->size() * kZoomWindowMinSize);
 
     result = ConstrainedResizable::constrainedGeometry(geometry, pinSection, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
 
@@ -329,20 +331,44 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
         makeSet(QEvent::MouseButtonPress),
         makeSet(),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
+        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease),
         parent
     ),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_scaleWatcher()
 {
     /* Sensible default. */
-    m_colors 
-        << QColor(192, 32, 32)
-        << QColor(32, 192, 32)
-        << QColor(64, 64, 255);
+    m_colors
+        << qnNxStyle->mainColor(QnNxStyle::Colors::kYellow)
+        << qnNxStyle->mainColor(QnNxStyle::Colors::kGreen).lighter(2)
+        << qnNxStyle->mainColor(QnNxStyle::Colors::kRed).lighter(2);
 
     connect(display(), &QnWorkbenchDisplay::zoomLinkAdded,              this, &ZoomWindowInstrument::at_display_zoomLinkAdded);
     connect(display(), &QnWorkbenchDisplay::zoomLinkAboutToBeRemoved,   this, &ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved);
     connect(display(), &QnWorkbenchDisplay::widgetChanged,              this, &ZoomWindowInstrument::at_display_widgetChanged);
+
+    connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
+        [this]()
+        {
+            const auto penWidth = kZoomLineWidth * m_scaleWatcher.scale();
+            const auto pen = QPen(m_zoomWindowColor, penWidth, Qt::SolidLine,
+                Qt::SquareCap, Qt::MiterJoin);
+            if (selectionItem())
+                selectionItem()->setPen(pen);
+
+            for (const auto widget : m_dataByWidget)
+            {
+                if (widget.windowWidget)
+                    widget.windowWidget->setFrameWidth(penWidth);
+            }
+        });
+
+    connect(this, &Instrument::sceneChanged, this,
+        [this]()
+        {
+            if (scene() && !m_scaleWatcher.initialized())
+                m_scaleWatcher.initialize(scene());
+        });
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
@@ -409,13 +435,13 @@ void ZoomWindowInstrument::ensureSelectionItem() {
 
     m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(QPen(Qt::white, qnGlobals->zoomFrameWidth(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     selectionItem()->setBrush(Qt::NoBrush);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
     selectionItem()->setOptions(FixedArSelectionItem::DrawSideElements);
 
-    if(scene())
-        scene()->addItem(selectionItem());
+    const auto currentScene = scene();
+    if (currentScene)
+        currentScene->addItem(selectionItem());
 }
 
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
@@ -439,7 +465,8 @@ void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {
     m_dataByWidget.remove(widget);
 }
 
-void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget) {
+void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget)
+{
     ZoomData &data = m_dataByWidget[widget];
 
     ZoomOverlayWidget *overlayWidget = ensureOverlayWidget(zoomTargetWidget);
@@ -453,6 +480,7 @@ void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaRe
         windowWidget = new ZoomWindowWidget();
     }
     windowWidget->setZoomWidget(widget);
+    windowWidget->setFrameWidth(kZoomLineWidth * m_scaleWatcher.scale());
     overlayWidget->addWidget(windowWidget);
     data.windowWidget = windowWidget;
     connect(windowWidget, &ZoomWindowWidget::geometryChanged,   this, &ZoomWindowInstrument::at_windowWidget_geometryChanged);
@@ -497,7 +525,7 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget *widget) {
         opacity = 1.0;
         interactive = true;
     }
-    
+
     if(instant) {
         opacityAnimator(overlayWidget, 1.0)->stop();
         overlayWidget->setOpacity(opacity);
@@ -632,11 +660,11 @@ void ZoomWindowInstrument::startDrag(DragInfo *) {
     selectionItem()->setViewport(m_viewport.data());
     opacityAnimator(selectionItem())->stop();
     selectionItem()->setOpacity(1.0);
-    
+
     m_zoomWindowColor = nextZoomWindowColor();
-    
+
     QPen pen = selectionItem()->pen();
-    pen.setColor(toTransparent(m_zoomWindowColor, 0.75)); // TODO: #Elric write in 1 line? 
+    pen.setColor(m_zoomWindowColor); // TODO: #Elric write in 1 line?
     selectionItem()->setPen(pen);
 
     /* Everything else will be initialized in the first call to drag(). */
@@ -661,15 +689,15 @@ void ZoomWindowInstrument::finishDrag(DragInfo *) {
         opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
         QRectF zoomRect = cwiseDiv(selectionItem()->rect(), target()->size());
-        if(zoomRect.width() <= zoomWindowMinSize || zoomRect.height() <= zoomWindowMinSize) {
+        if(zoomRect.width() <= kZoomWindowMinSize || zoomRect.height() <= kZoomWindowMinSize) {
             zoomRect = movedInto(
-                expanded(aspectRatio(zoomRect), QSizeF(zoomWindowMinSize, zoomWindowMinSize), zoomRect.center(), Qt::KeepAspectRatioByExpanding),
+                expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMinSize, kZoomWindowMinSize), zoomRect.center(), Qt::KeepAspectRatioByExpanding),
                 QRectF(0.0, 0.0, 1.0, 1.0)
             );
         }
-        if(zoomRect.width() >= zoomWindowMaxSize || zoomRect.height() >= zoomWindowMaxSize)
-            zoomRect = expanded(aspectRatio(zoomRect), QSizeF(zoomWindowMaxSize, zoomWindowMaxSize), zoomRect.center(), Qt::KeepAspectRatio);
-        
+        if(zoomRect.width() >= kZoomWindowMaxSize || zoomRect.height() >= kZoomWindowMaxSize)
+            zoomRect = expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMaxSize, kZoomWindowMaxSize), zoomRect.center(), Qt::KeepAspectRatio);
+
         emit zoomRectCreated(target(), m_zoomWindowColor, zoomRect);
     }
 
@@ -716,7 +744,7 @@ void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role) {
 
     if(m_zoomedWidget)
         updateOverlayMode(m_zoomedWidget.data());
-    
+
     m_zoomedWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(role));
 
     if(m_zoomedWidget)
@@ -751,9 +779,9 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
         return;
 
     QnMediaResourceWidget *newTargetWidget = this->item<QnMediaResourceWidget>(view, info->mouseViewportPos());
-    if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target()) 
+    if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target())
         return;
-    
+
     QnAction *action = menu()->action(QnActions::CreateZoomWindowAction);
     if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != Qn::EnabledAction)
         return;

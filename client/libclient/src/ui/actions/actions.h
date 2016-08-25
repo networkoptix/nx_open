@@ -583,9 +583,9 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
         UserSettingsAction,
 
         /**
-         * Opens user groups dialog.
+         * Opens user roles dialog.
          */
-        UserGroupsAction,
+        UserRolesAction,
 
         /**
          * Opens camera settings dialog.
