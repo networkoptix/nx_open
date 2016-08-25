@@ -419,26 +419,16 @@ int QnFileStorageResource::mountTmpDrive() const
 }
 #else
 
-bool QnFileStorageResource::updatePermissionsHelper(const QString& userName) const
+bool QnFileStorageResource::updatePermissionsHelper(
+    LPWSTR userName,
+    LPWSTR password,
+    NETRESOURCE* netRes) const
 {
-    NETRESOURCE netRes;
-    memset(&netRes, 0, sizeof(netRes));
-    netRes.dwType = RESOURCETYPE_DISK;
-
-    QUrl storageUrl(getUrl());
-    QString path = lit("\\\\") + storageUrl.host() +
-                   lit("\\") + storageUrl.path().mid((1));
-
-    netRes.lpRemoteName = (LPWSTR) path.constData();
-
-    LPWSTR password = (LPWSTR) storageUrl.password().constData();
-    LPWSTR user = (LPWSTR) userName.constData();
-
     DWORD errCode = WNetUseConnection(
         0,   // window handler, not used
-        &netRes,
+        netRes,
         password,
-        user,
+        userName,
         0,   // connection flags, should work with just 0 though
         0,
         0,   // additional connection info buffer size
@@ -446,7 +436,7 @@ bool QnFileStorageResource::updatePermissionsHelper(const QString& userName) con
     );
 
     if (errCode == ERROR_SESSION_CREDENTIAL_CONFLICT)
-    {   // That means that user has alreay used this network resource
+    {   // That means that user has already used this network resource
         // with different credentials set.
         // If so we can attempt to just use this resource as local one.
         NX_LOG(lit("%1 Mounting remote drive %2 SESSION_CREDENTIAL_CONFLICT error. It may work though.")
@@ -472,25 +462,34 @@ bool QnFileStorageResource::updatePermissions() const
     NX_LOG(lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()), cl_logDEBUG2);
     if (getUrl().startsWith("smb://"))
     {
+        NETRESOURCE netRes;
+        memset(&netRes, 0, sizeof(netRes));
+        netRes.dwType = RESOURCETYPE_DISK;
+
+        QUrl storageUrl(getUrl());
+        QString path = lit("\\\\") + storageUrl.host() +
+                       lit("\\") + storageUrl.path().mid((1));
+
+        netRes.lpRemoteName = (LPWSTR) path.constData();
+        LPWSTR password = (LPWSTR) storageUrl.password().constData();
         QString userName = QUrl(getUrl()).userName().isEmpty() 
             ? "guest" 
             : QUrl(getUrl()).userName();
 
-        if (!updatePermissionsHelper(userName))
+        if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
         {
             userName = lit("WORKGROUP\\") + userName;
-
-            if (!updatePermissionsHelper(userName))
+            if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
             {
                 DWORD bufSize = 1024;
                 TCHAR sysUserName[1024];
                 if (GetUserName(sysUserName, &bufSize))
                 {
                     userName = QString::fromWCharArray(sysUserName, bufSize);
-                    if (!updatePermissionsHelper(userName))
+                    if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
                     {
                         userName = lit("WORKGROUP\\") + userName;
-                        if (!updatePermissionsHelper(userName))
+                        if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
                             return false;
                     }
                 }
