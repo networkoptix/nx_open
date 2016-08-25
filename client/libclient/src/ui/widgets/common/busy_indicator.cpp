@@ -448,8 +448,14 @@ void QnBusyIndicatorGraphicsWidget::paint(QPainter* painter, const QStyleOptionG
     Q_UNUSED(widget);
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterBrushRollback brushRollback(painter, m_indicatorColor);
-    QnScopedPainterPenRollback penRollback(painter, QPen(m_borderColor));
+
+    QnScopedPainterBrushRollback brushRollback(painter, m_indicatorColor.isValid()
+        ? QBrush(m_indicatorColor)
+        : QBrush(Qt::NoBrush));
+
+    QnScopedPainterPenRollback penRollback(painter, m_borderColor.isValid()
+        ? QPen(m_borderColor)
+        : QPen(Qt::NoPen));
 
     paintIndicator(painter, indicatorRect().topLeft());
 }
