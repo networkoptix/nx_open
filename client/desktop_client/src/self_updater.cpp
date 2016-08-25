@@ -3,6 +3,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
 #include <QtCore/QStandardPaths>
+#include <QtCore/QCoreApplication>
 
 #include <api/applauncher_api.h>
 
@@ -29,6 +30,8 @@ QString backupPostfix()
 {
 #if defined(Q_OS_MACX)
     return lit("/../../backup");
+#elif defined(Q_OS_LINUX)
+    return lit("/../backup");
 #else
     return lit("/backup");
 #endif
@@ -38,17 +41,17 @@ QString applauncherPostfix()
 {
 #if defined(Q_OS_MACX)
     return lit("/Contents/MacOS/");
+#elif defined(Q_OS_LINUX)
+    return lit("/bin/");
 #endif
     return QString();
 }
 
-}
+} // namespace
 
 namespace nx {
 namespace vms {
 namespace client {
-
-
 
 SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     m_clientVersion(QnAppInfo::applicationVersion())
@@ -89,29 +92,39 @@ bool SelfUpdater::registerUriHandler()
 
 QnDirectoryBackupPtr copyApplauncherInstance(const QString& from, const QString& to)
 {
-    const QStringList kTargetFileFilters =
+    QStringList targetFileFilters =
     {
+    #if defined(Q_OS_WIN)
         QLatin1String("*.dll"),
+    #endif
         QnClientAppInfo::launcherVersionFile(),
         QnClientAppInfo::applauncherBinaryName()
     };
 
-#if defined(Q_OS_MACX)
-    static const auto kFrameworkPostfix = lit("/../Frameworks/");
+    /* Move installed applaucher to backup folder. */
     const auto filesBackup = QnDirectoryBackupPtr(
-        new QnDirectoryBackup(from, kTargetFileFilters, to));
-    const auto frameworkBackup = QnDirectoryBackupPtr(new QnDirectoryRecursiveBackup(
-        from + kFrameworkPostfix, to + kFrameworkPostfix));
+        new QnDirectoryBackup(from, targetFileFilters, to));
+
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+
+    static const auto kLibsPostfix =
+        #if defined(Q_OS_LINUX)
+            lit("/../lib/");
+        #else
+            lit("/../Frameworks/");
+        #endif
+
+    const auto libsBackup = QnDirectoryBackupPtr(new QnDirectoryRecursiveBackup(
+        from + kLibsPostfix, to + kLibsPostfix));
 
     const auto multipleBackup = new QnMultipleDirectoriesBackup();
-    const auto result = QnDirectoryBackupPtr(multipleBackup);
     multipleBackup->addDirectoryBackup(filesBackup);
-    multipleBackup->addDirectoryBackup(frameworkBackup);
-    return result;
-#else
-    /* Move installed applaucher to backup folder. */
-    return QnDirectoryBackupPtr(new QnDirectoryBackup(from, kTargetFileFilters, to));
-#endif
+    multipleBackup->addDirectoryBackup(libsBackup);
+    return QnDirectoryBackupPtr(multipleBackup);
+
+#endif // defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+
+    return filesBackup;
 }
 
 bool SelfUpdater::updateApplauncher()
