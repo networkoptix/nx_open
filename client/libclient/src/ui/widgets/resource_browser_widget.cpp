@@ -560,60 +560,62 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
 
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
 {
-    auto currentTarget = [this, scope]
-    {
-        if (scope != Qn::TreeScope)
-            return QnActionParameters();
-
-        QItemSelectionModel* selectionModel = currentSelectionModel();
-
-        Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
-        if (nodeType == Qn::VideoWallItemNode)
-            return QnActionParameters(selectedVideoWallItems());
-
-        if (nodeType == Qn::VideoWallMatrixNode)
-            return QnActionParameters(selectedVideoWallMatrices());
-
-        if (!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
-            return QnActionParameters(selectedLayoutItems());
-
-        QnActionParameters result(selectedResources());
-
-        /* For working with shared layout links we must know owning user resource. */
-        QModelIndex parentIndex = selectionModel->currentIndex().parent();
-        Qn::NodeType parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-
-        /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
-        QnUserResourcePtr user;
-        QnUuid roleId;
-        switch (parentNodeType)
-        {
-            case Qn::LayoutsNode:
-                user = context()->user();
-                break;
-            case Qn::AccessibleResourcesNode:
-            case Qn::AccessibleLayoutsNode:
-                user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
-                roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
-                break;
-            case Qn::ResourceNode:
-                user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
-                break;
-            default:
-                break;
-        }
-
-        result.setArgument(Qn::UserResourceRole, user);
-        result.setArgument(Qn::UuidRole, roleId);
-        return result;
-    };
+    if (scope != Qn::TreeScope)
+        return QnActionParameters();
 
     QItemSelectionModel* selectionModel = currentSelectionModel();
-    Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    QModelIndex index = selectionModel->currentIndex();
 
-    auto result = currentTarget().withArgument(Qn::NodeTypeRole, nodeType);
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-    return result; // TODO: #Elric just pass all the data through?
+    auto withNodeType = [nodeType](QnActionParameters parameters)
+        {
+            return parameters.withArgument(Qn::NodeTypeRole, nodeType);
+        };
+
+    if (nodeType == Qn::VideoWallItemNode)
+        return withNodeType(selectedVideoWallItems());
+
+    if (nodeType == Qn::VideoWallMatrixNode)
+        return withNodeType(selectedVideoWallMatrices());
+
+    if (!index.data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
+        return withNodeType(selectedLayoutItems());
+
+    QnActionParameters result(selectedResources());
+
+    /* For working with shared layout links we must know owning user resource. */
+    QModelIndex parentIndex = index.parent();
+    Qn::NodeType parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
+    QnUserResourcePtr user;
+    QnUuid roleId;
+
+    if (nodeType == Qn::RoleNode)
+        roleId = index.data(Qn::UuidRole).value<QnUuid>();
+
+    switch (parentNodeType)
+    {
+        case Qn::LayoutsNode:
+            user = context()->user();
+            break;
+        case Qn::AccessibleResourcesNode:
+        case Qn::AccessibleLayoutsNode:
+            user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+            roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
+            break;
+        case Qn::ResourceNode:
+            user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+            break;
+        default:
+            break;
+    }
+
+    result.setArgument(Qn::UserResourceRole, user);
+    result.setArgument(Qn::UuidRole, roleId);
+    result.setArgument(Qn::NodeTypeRole, nodeType);
+    return result;
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force)

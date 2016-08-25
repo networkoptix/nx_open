@@ -201,8 +201,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     nx_http::header::DigestAuthorization originalAuthHeader;
     if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
         return false;
-    if (originalAuthHeader.authScheme != nx_http::header::AuthScheme::digest ||
-        originalAuthHeader.digest->params["realm"] != QnAppInfo::realm().toUtf8())
+    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
     {
         return true; //< no need to update, it is non server proxy request
     }
@@ -245,60 +244,67 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 {
     Q_D(QnProxyConnectionProcessor);
 
-    QUrl url = d->request.requestLine.url;
-    QString host = url.host();
-    QString urlPath = url.path();
-
-    // todo: this code is deprecated and isn't compatible with WEB client
-    // It never used for WEB client purpose
-    if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
+    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
     {
-        int proxyEndPos = urlPath.indexOf('/', 2); // remove proxy prefix
-        int protocolEndPos = urlPath.indexOf('/', proxyEndPos+1); // remove proxy prefix
-        if (protocolEndPos == -1)
-            return false;
+        dstUrl = d->request.requestLine.url;
+    }
+    else
+	{
+        QUrl url = d->request.requestLine.url;
+        QString host = url.host();
+        QString urlPath = url.path();
 
-        QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
-        if (!isProtocol(protocol)) {
-            protocol = dstUrl.scheme();
-            if (protocol.isEmpty())
-                protocol = "http";
-            protocolEndPos = proxyEndPos;
+        // todo: this code is deprecated and isn't compatible with WEB client
+        // It never used for WEB client purpose
+        if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
+        {
+            int proxyEndPos = urlPath.indexOf('/', 2); // remove proxy prefix
+            int protocolEndPos = urlPath.indexOf('/', proxyEndPos + 1); // remove proxy prefix
+            if (protocolEndPos == -1)
+                return false;
+
+            QString protocol = urlPath.mid(proxyEndPos + 1, protocolEndPos - proxyEndPos - 1);
+            if (!isProtocol(protocol)) {
+                protocol = url.scheme();
+                if (protocol.isEmpty())
+                    protocol = "http";
+                protocolEndPos = proxyEndPos;
+            }
+
+            int hostEndPos = urlPath.indexOf('/', protocolEndPos + 1); // remove proxy prefix
+            if (hostEndPos == -1)
+                hostEndPos = urlPath.size();
+
+            host = urlPath.mid(protocolEndPos + 1, hostEndPos - protocolEndPos - 1);
+            if (host.startsWith("{"))
+                dstRoute.id = QnUuid::fromStringSafe(host);
+
+            urlPath = urlPath.mid(hostEndPos);
+
+            // get dst ip and port
+            QStringList hostAndPort = host.split(':');
+            int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
+
+            dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+        }
+        else {
+            QString scheme = url.scheme();
+            if (scheme.isEmpty())
+                scheme = lit("http");
+
+            int defaultPort = getDefaultPortByProtocol(scheme);
+            dstUrl = QUrl(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
         }
 
-        int hostEndPos = urlPath.indexOf('/', protocolEndPos+1); // remove proxy prefix
-        if (hostEndPos == -1)
-            hostEndPos = urlPath.size();
-
-        host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
-        if (host.startsWith("{"))
-            dstRoute.id = QnUuid::fromStringSafe(host);
-
-        urlPath = urlPath.mid(hostEndPos);
-
-        // get dst ip and port
-        QStringList hostAndPort = host.split(':');
-        int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
-
-        dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+        if (urlPath.isEmpty())
+            urlPath = "/";
+        QString query = url.query();
+        if (!query.isEmpty()) {
+            urlPath += lit("?");
+            urlPath += query;
+        }
+        d->request.requestLine.url = urlPath;
     }
-    else {
-        QString scheme = url.scheme();
-        if (scheme.isEmpty())
-            scheme = lit("http");
-
-        int defaultPort = getDefaultPortByProtocol(scheme);
-        dstUrl = QUrl(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
-    }
-
-    if (urlPath.isEmpty())
-        urlPath = "/";
-    QString query = url.query();
-    if (!query.isEmpty()) {
-        urlPath += lit("?");
-        urlPath += query;
-    }
-    d->request.requestLine.url = urlPath;
 
     nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     QnUuid cameraGuid;
@@ -315,11 +321,18 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     if (itr != d->request.headers.end())
         dstRoute.id = QnUuid::fromStringSafe(itr->second);
 
-    if (dstRoute.id == qnCommon->moduleGUID()) {
+    if (dstRoute.id == qnCommon->moduleGUID())
+    {
         if (!cameraGuid.isNull())
         {
             if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
                 dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+        }
+        else if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+        {
+            QUrl url = d->request.requestLine.url;
+            int defaultPort = getDefaultPortByProtocol(url.scheme());
+            dstRoute.addr = SocketAddress(url.host(), url.port(defaultPort));
         }
         else
         {
@@ -357,7 +370,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             if (existAuthSession.isEmpty())
                 nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
 
-            QString path = urlPath;
+            QString path = d->request.requestLine.url.path();
             if (!path.startsWith(QLatin1Char('/')))
                 path.prepend(QLatin1Char('/'));
             if (dstRoute.id.isNull())

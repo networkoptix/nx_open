@@ -2,19 +2,26 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchCloudHandlerPrivate;
+#include <utils/common/connective.h>
 
-class QnWorkbenchCloudHandler : public QObject, public QnWorkbenchContextAware
+class QnLoginToCloudDialog;
+
+class QnWorkbenchCloudHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     QnWorkbenchCloudHandler(QObject *parent = nullptr);
-    ~QnWorkbenchCloudHandler();
+    virtual ~QnWorkbenchCloudHandler() override;
 
 private:
-    QScopedPointer<QnWorkbenchCloudHandlerPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnWorkbenchCloudHandler)
+    void at_loginToCloudAction_triggered();
+    void at_logoutFromCloudAction_triggered();
+    void at_openCloudMainUrlAction_triggered();
+    void at_openCloudManagementUrlAction_triggered();
+
+private:
     Q_DISABLE_COPY(QnWorkbenchCloudHandler)
+    QPointer<QnLoginToCloudDialog> m_loginToCloudDialog;
 };

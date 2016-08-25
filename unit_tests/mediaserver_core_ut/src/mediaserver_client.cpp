@@ -31,9 +31,12 @@ void MediaServerClient::saveCloudSystemCredentials(
         .arg(m_mediaServerEndpoint.toString()));
     url.setUserName(m_userName);
     url.setPassword(m_password);
+    nx_http::AuthInfo authInfo;
+    authInfo.username = m_userName;
+    authInfo.password = m_password;
     auto fusionClient = 
         std::make_shared<nx_http::FusionDataHttpClient<
-            CloudCredentialsData, QnJsonRestResult>>(url, inputData);
+            CloudCredentialsData, QnJsonRestResult>>(url, std::move(authInfo), inputData);
     auto fusionClientPtr = fusionClient.get();
     fusionClientPtr->execute(
         [fusionClient = std::move(fusionClient),

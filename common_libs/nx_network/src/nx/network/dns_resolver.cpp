@@ -21,12 +21,14 @@ DnsResolver::ResolveTask::ResolveTask(
     HostAddress _hostAddress,
     std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
     RequestID _reqID,
-    size_t _sequence )
+    size_t _sequence,
+    int _ipVersion)
 :
     hostAddress( std::move( _hostAddress ) ),
     completionHandler( _completionHandler ),
     reqID( _reqID ),
-    sequence( _sequence )
+    sequence( _sequence ),
+    ipVersion(_ipVersion)
 {
 }
 
@@ -54,14 +56,17 @@ void DnsResolver::pleaseStop()
 void DnsResolver::resolveAddressAsync(
     const HostAddress& addressToResolve,
     std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
-    RequestID reqID )
+    int ipVersion, RequestID reqID )
 {
     QnMutexLocker lk( &m_mutex );
-    m_taskQueue.push_back( ResolveTask( addressToResolve, completionHandler, reqID, ++m_currentSequence ) );
+    m_taskQueue.push_back( ResolveTask(
+        addressToResolve, completionHandler, reqID, ++m_currentSequence, ipVersion ) );
+
     m_cond.wakeAll();
 }
 
-bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )
+bool DnsResolver::resolveAddressSync(
+    const QString& hostName, HostAddress* const resolvedAddress, int ipVersion )
 {
     if( hostName.isEmpty() )
     {
@@ -72,6 +77,10 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
     addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_flags = AI_ALL;    /* For wildcard IP address */
+
+    // Do not serach for IPv6 addresseses on IpV4 sockets
+    if (ipVersion == AF_INET)
+        hints.ai_family = ipVersion;
 
     addrinfo* addressInfo = nullptr;
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
@@ -105,23 +114,38 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
 
     std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(addressInfo, &freeaddrinfo);
 
-    // TODO: support multi-address
-    for (addrinfo* info = addressInfo; info; info = addressInfo->ai_next)
+    std::vector<HostAddress> ipAddresses;
+    for (addrinfo* info = addressInfo; info; info = info->ai_next)
     {
         if (info->ai_family == AF_INET)
         {
-            resolvedAddress->m_ipV4 = ((sockaddr_in*)(info->ai_addr))->sin_addr;
-            return true;
+            ipAddresses.emplace_back(HostAddress(
+                ((sockaddr_in*)(info->ai_addr))->sin_addr));
         }
-
-        if (info->ai_family == AF_INET6)
+        else if (info->ai_family == AF_INET6)
         {
-            resolvedAddress->m_ipV6 = ((sockaddr_in6*)(info->ai_addr))->sin6_addr;
-            return true;
+            ipAddresses.emplace_back(HostAddress(
+                ((sockaddr_in6*)(info->ai_addr))->sin6_addr));
         }
     }
 
-    SystemError::setLastErrorCode( SystemError::hostNotFound );
+    if (ipAddresses.empty())
+    {
+        SystemError::setLastErrorCode( SystemError::hostNotFound );
+        return true;
+    }
+
+    // TODO: support multi-address!
+    //  currently we return first v4 address (if any) or first v6
+    std::sort(ipAddresses.begin(), ipAddresses.end(),
+        [](const HostAddress& left, const HostAddress& right)
+    {
+        // The address with IPv4 comes before address without IPv4
+        return (left.m_ipV4) && (!right.m_ipV4);
+    });
+
+    resolvedAddress->m_ipV4 = std::move(ipAddresses.begin()->m_ipV4);
+    resolvedAddress->m_ipV6 = std::move(ipAddresses.begin()->m_ipV6);
     return true;
 }
 
@@ -161,7 +185,7 @@ void DnsResolver::run()
 
         HostAddress resolvedAddress;
         const SystemError::ErrorCode resolveErrorCode =
-            resolveAddressSync( task.hostAddress.toString(), &resolvedAddress )
+            resolveAddressSync( task.hostAddress.toString(), &resolvedAddress, task.ipVersion )
             ? SystemError::noError
             : SystemError::getLastOSErrorCode();
 

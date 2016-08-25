@@ -1358,7 +1358,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
+        auto loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
         else

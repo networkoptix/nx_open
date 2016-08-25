@@ -2,7 +2,6 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
@@ -12,6 +11,13 @@
 #include "api/global_settings.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource/storage_plugin_factory.h"
+
+#include "camera_pool.h"
+
+extern "C"
+{
+#include <libavformat/avformat.h>
+}
 
 #include <utils/common/app_info.h>
 

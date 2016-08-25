@@ -332,9 +332,21 @@ namespace nx_http
         m_proxyUserPassword = userPassword;
     }
 
+    void AsyncHttpClient::setAuth(const AuthInfo& auth)
+    {
+        setUserName(auth.username);
+        setUserPassword(auth.password);
+        setProxyUserName(auth.proxyUsername);
+        setProxyUserPassword(auth.proxyPassword);
+        setProxyVia(auth.proxyEndpoint);
+    }
+
     void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
-        m_proxyEndpoint = proxyEndpoint;
+        if (proxyEndpoint.isNull())
+            m_proxyEndpoint.reset();
+        else
+            m_proxyEndpoint = proxyEndpoint;
     }
 
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -557,7 +569,7 @@ namespace nx_http
             {
                 if (!m_proxyAuthorizationTried && (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
                 {
-                    if (resendRequestWithAuthorization(*response))
+                    if (resendRequestWithAuthorization(*response, true))
                         return;
                 }
             }
@@ -934,7 +946,8 @@ namespace nx_http
         const QString userPassword = isProxy ? m_proxyUserPassword : m_userPassword;
 
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
-        NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized);
+        NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
+                  response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
 
         HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find(authenticateHeaderName);
         if (wwwAuthenticateIter == response.headers.end())
@@ -966,12 +979,12 @@ namespace nx_http
             header::DigestAuthorization digestAuthorizationHeader;
             if (!calcDigestResponse(
                     m_request.requestLine.method,
-                    m_userName.toUtf8(),
+                    userName.toUtf8(),
                     m_authType != authDigestWithPasswordHash
-                        ? m_userPassword.toUtf8()
+                        ? userPassword.toUtf8()
                         : boost::optional<nx_http::BufferType>(),
                     m_authType == authDigestWithPasswordHash
-                        ? m_userPassword.toLatin1()
+                        ? userPassword.toLatin1()
                         : boost::optional<nx_http::BufferType>(),
                     m_url.path().toUtf8(),
                     wwwAuthenticateHeader,

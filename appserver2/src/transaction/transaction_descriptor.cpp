@@ -153,6 +153,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeCameraUserAttributes:
             return notificationParams.cameraNotificationManager->triggerNotification(tran);
         case ApiCommand::forcePrimaryTimeServer:
+        case ApiCommand::removeAccessRights:
             //#ak no notification needed
             break;
         default:

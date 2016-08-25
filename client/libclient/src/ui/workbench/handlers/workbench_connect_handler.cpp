@@ -253,7 +253,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
     });
 
 
-    connect(QnAppServerConnectionFactory::getConnection2()->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
+    connect(connection2()->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
         QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
@@ -264,10 +264,10 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed()
 {
 
-    if (QnAppServerConnectionFactory::getConnection2())
+    if (connection2())
     {
-        disconnect(QnAppServerConnectionFactory::getConnection2().get(), nullptr, this, nullptr);
-        disconnect(QnAppServerConnectionFactory::getConnection2().get(), nullptr, QnSyncTime::instance(), nullptr);
+        disconnect(connection2().get(), nullptr, this, nullptr);
+        disconnect(connection2().get(), nullptr, QnSyncTime::instance(), nullptr);
     }
 
     disconnect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, NULL);
@@ -519,7 +519,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
-    QnClientMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+    QnClientMessageProcessor::instance()->init(connection2());
 
     QnSessionManager::instance()->start();
     QnResource::startCommandProc();

@@ -16,14 +16,15 @@
 #include "module_info.h"
 #include "result_code.h"
 #include "system_manager.h"
+#include <nx/network/socket_common.h>
 
 
 namespace nx {
 namespace cdb {
 /*!
     Contains classes and methods for manipulating cloud_db data.
-    Many methods accept \a completionHandler a an argument. 
-    This is functor that is called on operation completion/failure 
+    Many methods accept \a completionHandler a an argument.
+    This is functor that is called on operation completion/failure
     and reports \a ResultCode and output data (if applicable).
     \warning Implementation is allowed to invoke \a completionHandler directly within calling function.
         This allows all this methods to return \a void
@@ -41,7 +42,24 @@ class SystemAccessListModifiedEvent
 {
 };
 
-class Connection
+class BaseConnection
+{
+public:
+    virtual ~BaseConnection() {}
+    //!Set credentials to use
+    /*!
+    This method does not try to connect to cloud_db check credentials
+    */
+    virtual void setCredentials(
+        const std::string& login,
+        const std::string& password) = 0;
+    virtual void setProxyCredentials(
+        const std::string& login,
+        const std::string& password) = 0;
+    virtual void setProxyVia(const SocketAddress& proxyEndpoint) = 0;
+};
+
+class Connection: public BaseConnection
 {
 public:
     virtual ~Connection() {}
@@ -50,13 +68,6 @@ public:
     virtual api::SystemManager* systemManager() = 0;
     virtual api::AuthProvider* authProvider() = 0;
 
-    //!Set credentials to use
-    /*!
-        This method does not try to connect to cloud_db check credentials
-    */
-    virtual void setCredentials(
-        const std::string& login,
-        const std::string& password) = 0;
     //!Pings cloud_db with current creentials
     virtual void ping(std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) = 0;
 };
@@ -69,17 +80,17 @@ public:
 };
 
 /**
-    If existing connection has failed, reconnect attempt will be performed. 
+    If existing connection has failed, reconnect attempt will be performed.
         If failed to reconnect, \a onConnectionLost event will be reported
 */
-class EventConnection
+class EventConnection: public BaseConnection
 {
 public:
     /** If event handler is running in another thread, blocks until handler has returned */
     virtual ~EventConnection() {}
 
     /** Must be called just after object creation to start receiving events
-        @param eventHandlers Handles are invoked in unspecified internal thread. 
+        @param eventHandlers Handles are invoked in unspecified internal thread.
             Single \a EventConnection instance always uses same thread
         @param completionHandler Used to report result. Can be \a nullptr
         \note This method can be called again only after \a onConnectionLost has been reported
@@ -100,19 +111,19 @@ public:
         \note Instanciates connection only if connection to cloud is available and provided credentials are valid
     */
     virtual void connect(
-        const std::string& login,
-        const std::string& password,
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) = 0;
     //!Creates connection object without checking credentials provided
     /*!
         \note No connection to cloud is performed in this method!
     */
+    virtual std::unique_ptr<api::Connection> createConnection() = 0;
     virtual std::unique_ptr<api::Connection> createConnection(
-        const std::string& login,
-        const std::string& password) = 0;
+        const std::string& username,
+        const std::string password) = 0;
+    virtual std::unique_ptr<api::EventConnection> createEventConnection() = 0;
     virtual std::unique_ptr<api::EventConnection> createEventConnection(
-        const std::string& login,
-        const std::string& password) = 0;
+        const std::string& username,
+        const std::string password) = 0;
     //!Returns text description of \a resultCode
     virtual std::string toString(api::ResultCode resultCode) const = 0;
 

@@ -549,7 +549,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
 {
     QnEmailAttachmentList attachments;
-    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
+	QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 	QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
@@ -658,14 +658,14 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
     m_aggregatedEmails.erase( aggregatedActionIter );
 }
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
+QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
                                                                  const QnBusinessAggregationInfo &aggregationInfo,
                                                                  QnEmailAttachmentList& attachments)
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    QVariantHash contextMap;
+	QVariantMap contextMap;
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
@@ -761,7 +761,7 @@ QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
 }
 
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
+QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QnInfoDetail& aggregationData,
     Qn::ResourceInfoLevel detailLevel,
@@ -772,7 +772,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnBusinessEventParameters& params = aggregationData.runtimeParams();
     const int aggregationCount = aggregationData.count();
 
-    QVariantHash detailsMap;
+	QVariantMap detailsMap;
 
     if( addSubAggregationData )
     {
@@ -833,7 +833,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         QVariantList conflicts;
         int n = 0;
         foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
-            QVariantHash conflict;
+			QVariantMap conflict;
             conflict[lit("number")] = ++n;
             conflict[lit("mac")] = mac;
             conflicts << conflict;
@@ -852,7 +852,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
             const QString &server = itr.key();
             foreach (const QString &camera, conflicts.camerasByServer[server]) {
-                QVariantHash conflict;
+                QVariantMap conflict;
                 conflict[lit("number")] = ++n;
                 conflict[lit("ip")] = server;
                 conflict[lit("mac")] = camera;

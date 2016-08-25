@@ -57,7 +57,7 @@ signals:
     void checkForUpdatesFinished(const QnCheckForUpdateResult &result);
     void updateFinished(QnUpdateResult result);
 
-    void lowFreeSpaceWarning(QnLowFreeSpaceWarning* lowFreeSpaceWarning);
+    void lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
 
 private:
     void startUpdate(const QnUpdateTarget &target);

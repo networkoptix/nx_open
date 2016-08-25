@@ -339,8 +339,9 @@ QAbstractButton *QnMessageBox::defaultButton() const
     return d->defaultButton;
 }
 
-void QnMessageBox::setDefaultButton(QAbstractButton *button)
+void QnMessageBox::setDefaultButton(QAbstractButton* button)
 {
+    NX_ASSERT(ui->buttonBox->buttons().contains(button));
     if (!ui->buttonBox->buttons().contains(button))
         return;
 

@@ -321,15 +321,22 @@
 </div>
 
 <div class="panel-footer">
-    <button class="btn btn-default" ng-if="activeStep.cancel"
-            ng-click="cancel()">Cancel</button>
-    <button class="btn btn-default" ng-if="activeStep.back"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary pull-right" ng-if="activeStep.next"
+    <button class="btn btn-default"
+            ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            enter-button
+            ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default"
+            ng-if="activeStep.back"
+            ng-disabled="lockNextButton"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary pull-right"
+            ng-if="activeStep.next"
+            ng-disabled="lockNextButton"
+            enter-button autofocus
             ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button class="btn btn-primary pull-right" ng-if="activeStep.finish"
-            enter-button
-            ng-click="finish()" ng-disabled="lockNextButton" autofocus>Finish</button>
+    <button class="btn btn-primary pull-right"
+            ng-if="activeStep.finish"
+            ng-disabled="lockNextButton"
+            enter-button autofocus
+            ng-click="finish()">Finish</button>
 </div>

@@ -261,10 +261,9 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setUrl(url.toString());
 
     auto auth = determineResourceCredentials(resource);
-    resource->setAuth(auth);
+    resource->setDefaultAuth(auth);
 
     local_results.push_back(resource);
-
 
     addMultichannelResources(local_results);
     

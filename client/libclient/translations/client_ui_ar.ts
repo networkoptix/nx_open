@@ -923,6 +923,34 @@
     </message>
 </context>
 <context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FisheyeSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>

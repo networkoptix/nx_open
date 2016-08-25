@@ -894,28 +894,28 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::MessageBoxAction).
         flags(Qn::NoTarget).
-        text(tr("Show Message"));
+        text(lit("Show Message"));
 
     factory(QnActions::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Show Version Mismatch Message"));
+        text(lit("Show Version Mismatch Message"));
 
     factory(QnActions::BetaVersionMessageAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Show Beta Version Warning Message"));
+        text(lit("Show Beta Version Warning Message"));
 
     factory(QnActions::HiDpiSupportMessageAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Show HiDpi Support Warning Message"));
+        text(lit("Show HiDpi Support Warning Message"));
 
     factory(QnActions::AllowStatisticsReportMessageAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Ask About Statistics Reporting"));
+        text(lit("Ask About Statistics Reporting"));
 
     factory(QnActions::BrowseUrlAction).
         flags(Qn::NoTarget).
@@ -1526,11 +1526,15 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("User Settings...")).
         condition(hasFlags(Qn::user));
 
-    factory(QnActions::UserGroupsAction).
+    factory(QnActions::UserRolesAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("User Roles...")).
+        conditionalText(tr("Role Settings..."), new QnTreeNodeTypeCondition(Qn::RoleNode, this)).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
+        condition(new QnDisjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::UsersNode, this),
+            new QnTreeNodeTypeCondition(Qn::RoleNode, this),
+            this));
 
     factory(QnActions::CameraIssuesAction).
         mode(QnActionTypes::DesktopMode).

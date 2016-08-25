@@ -72,7 +72,6 @@
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -306,10 +305,6 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
         delete m_currentUserLayoutsMenu.data();
 
     deleteDialogs();
-}
-
-ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
-    return QnAppServerConnectionFactory::getConnection2();
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
@@ -802,64 +797,81 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     QnMediaServerResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
     m_awaitingMoveCameras.remove(handle);
 
-    if (status != 0) {
-        QnResourceListDialog::exec(
-            mainWindow(),
-            modifiedResources,
+    if (status != 0)
+    {
+        const auto question = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
+                tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
+                tr("Cannot move these %n I/O modules to server %1. Server is unresponsive.", "", modifiedResources.size())
+            ),
+            modifiedResources
+        ).arg(server->getName());
+
+        QnMessageBox messageBox(
+            QnMessageBox::Warning,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                    tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                    tr("Cannot move these %n I/O modules to server %1. Server is unresponsive.", "", modifiedResources.size())
-                    ),
-                modifiedResources
-                ).arg(server->getName()),
-            QDialogButtonBox::Ok
-            );
+            tr("Cannot move cameras"),
+            QDialogButtonBox::Ok,
+            mainWindow());
+        messageBox.setDefaultButton(QDialogButtonBox::Ok);
+        messageBox.setInformativeText(question);
+        messageBox.addCustomWidget(new QnResourceListView(modifiedResources));
+        messageBox.exec();
         return;
     }
 
     QnVirtualCameraResourceList errorResources; // TODO: #Elric check server cameras
-    for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();) {
-        if (!reply.uniqueIdList.contains((*itr)->getUniqueId())) {
+    for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();)
+    {
+        if (!reply.uniqueIdList.contains((*itr)->getUniqueId()))
+        {
             errorResources << *itr;
             itr = modifiedResources.erase(itr);
         }
-        else {
+        else
+        {
             ++itr;
         }
     }
 
-    if (!errorResources.empty()) {
-        QDialogButtonBox::StandardButton result =
-            QnResourceListDialog::exec(
-                mainWindow(),
-                errorResources,
-                Qn::MainWindow_Tree_DragCameras_Help,
-                tr("Error"),
-                QnDeviceDependentStrings::getNameFromSet(
-                    QnCameraDeviceStringSet(
-                        tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
-                        tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
-                        tr("Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?", "", errorResources.size())
-                        ),
-                    modifiedResources
-                    ).arg(server->getName()),
-                QDialogButtonBox::Yes | QDialogButtonBox::No
-                );
+    if (!errorResources.empty())
+    {
+        const auto question = QnDeviceDependentStrings::getNameFromSet(
+            QnCameraDeviceStringSet(
+                tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
+                tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
+                tr("Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?", "", errorResources.size())
+            ),
+            errorResources
+        ).arg(server->getName());
+
+        QnMessageBox messageBox(
+            QnMessageBox::Warning,
+            Qn::MainWindow_Tree_DragCameras_Help,
+            tr("Error"),
+            tr("Cannot move cameras"),
+            QDialogButtonBox::Yes | QDialogButtonBox::No,
+            mainWindow());
+        messageBox.setDefaultButton(QDialogButtonBox::Yes);
+        messageBox.setInformativeText(question);
+        messageBox.addCustomWidget(new QnResourceListView(modifiedResources));
+        auto result = messageBox.exec();
+
         /* If user is sure, return invalid cameras back to list. */
         if (result == QDialogButtonBox::Yes)
             modifiedResources << errorResources;
     }
 
     const QnUuid serverId = server->getId();
-    qnResourcesChangesManager->saveCameras(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
+    qnResourcesChangesManager->saveCameras(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera)
+    {
         camera->setPreferedServerId(serverId);
     });
 
-    qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera) {
+    qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera)
+    {
         camera->setParentId(serverId);
     });
 }
@@ -1168,22 +1180,14 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
     });
 
-    QString question;
-    if (cameras.size() == resources.size())
-    {
-        question = QnDeviceDependentStrings::getNameFromSet(
+    const auto question = (cameras.size() == resources.size())
+        ? QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Do you really want to delete the following %n devices?", "", cameras.size()),
                 tr("Do you really want to delete the following %n cameras?", "", cameras.size()),
                 tr("Do you really want to delete the following %n I/O modules?", "", cameras.size())
-                ),
-            cameras
-            );
-    }
-    else
-    {
-        question = tr("Do you really want to delete the following %n items?", "", resources.size());
-    }
+            ), cameras)
+        : tr("Do you really want to delete the following %n items?", "", resources.size());
 
     QString information;
     if (!onlineAutoDiscoveredCameras.isEmpty())
@@ -1618,20 +1622,28 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
     QnEnvironment::showInGraphicalShell(resource->getUrl());
 }
 
-void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
-    QSet<QnResourcePtr> resources = menu()->currentParameters(sender()).resources().toSet();
+void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered()
+{
+    auto resources = menu()->currentParameters(sender()).resources().toSet().toList();
 
-    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-        mainWindow(),
-        resources.toList(),
+    const auto question = tr("Are you sure you want to permanently delete these %n files?",
+        "", resources.size());
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::MainWindow_Tree_DragCameras_Help,
         tr("Delete Files"),
-        tr("Are you sure you want to permanently delete these %n files?", "", resources.size()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No
-        );
-    if (button != QDialogButtonBox::Yes)
+        tr("Confirm files deleting"),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox.setInformativeText(question);
+    messageBox.addCustomWidget(new QnResourceListView(resources));
+    auto result = messageBox.exec();
+    if (result != QDialogButtonBox::Yes)
         return;
 
-    QnFileProcessor::deleteLocalResources(resources.toList());
+    QnFileProcessor::deleteLocalResources(resources);
 }
 
 bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {
@@ -2176,20 +2188,18 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
 
 void QnWorkbenchActionHandler::onHiDpiWarningMessageAction()
 {
-    static const bool kIsSupportLink = !QnAppInfo::supportLink().isEmpty();
-    static const auto kAddress = (kIsSupportLink
-        ? QnAppInfo::supportLink() : QnAppInfo::supportEmailAddress());
-    static const auto addressPrefix = (kIsSupportLink ? QString() : lit("mailto:"));
-    static const auto kSupportPortalLink = lit("<a href = \"%1%2\">%2</a>")
-        .arg(addressPrefix, kAddress);
+    static const auto kAlignedParagrapth = lit("<p align=\"center\" style=\"margin:4\">%1</p>");
+    static const auto kComment = "%1 Will be replaced by product name";
+    static const auto kMessageTemplate = lit("%1%2%3").arg(
+        kAlignedParagrapth.arg(tr("%1 has detected that you have a high resolution "
+            "screen and as a result %1 may not be displaying well.", kComment)),
+        kAlignedParagrapth.arg(tr("We are aware of this issue and a fix will be coming in v3.0.")),
+        kAlignedParagrapth.arg(tr("In the meantime please adjust your screen's resolution if "
+            "needed for a better experience.")));
 
-    static const auto kComment = "%1 Will be replaced by product name, %2 - by link to support portal";
-    static const auto kMessage =
-        tr("%1 is not optimized for HiDpi screens yet and might look wrong. "
-        "Please write to %2 if you have any problems.", kComment)
-        .arg(QnAppInfo::productNameLong(), kSupportPortalLink);
+    static const auto kMessage = kMessageTemplate.arg(QnAppInfo::productNameLong());
 
-    QnMessageBox::warning(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
+    QnMessageBox::showNoIconDialog(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {

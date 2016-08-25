@@ -233,6 +233,8 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <projectType>generic</projectType>
     </properties>
 
     <build>
@@ -734,6 +736,7 @@
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+		<module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/connection_mediator-deb</module>

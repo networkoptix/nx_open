@@ -11,8 +11,6 @@
 
 #include <utils/common/connective.h>
 
-class QnWorkbenchPermissionsNotifier;
-
 /**
  * This class can be used for watching the resource pool for a user resource
  * that has a specific name.

@@ -25,6 +25,16 @@
 
 namespace nx_http
 {
+    struct AuthInfo
+    {
+        QString username;
+        QString password;
+        QString proxyUsername;
+        QString proxyPassword;
+        SocketAddress proxyEndpoint;
+    };
+
+
     class AsyncHttpClientPtr;
 
     //!Http client. All operations are done asynchronously
@@ -173,7 +183,9 @@ namespace nx_http
         void setUserPassword(const QString& userPassword);
         void setProxyUserName(const QString& userName);
         void setProxyUserPassword(const QString& userPassword);
+        void setAuth(const AuthInfo& auth);
         void setProxyVia(const SocketAddress& proxyEndpoint);
+        void setConnectionHeader(const StringType& value);
 
         //!If set to \a true client will not try to add Authorization header to the first request. \a false by default
         void setDisablePrecalculatedAuthorization(bool val);

@@ -6,11 +6,11 @@
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
 
+#include <nx/utils/compiler_options.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/semaphore.h>
-#include "utils/common/stoppable.h"
 #include <utils/common/safe_direct_connection.h>
-
+#include <utils/common/stoppable.h>
 
 class QnLongRunnablePoolPrivate;
 

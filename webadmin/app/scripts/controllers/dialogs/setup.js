@@ -139,6 +139,7 @@ angular.module('webadminApp')
             mediaserver.systemCloudInfo().then(function(data){
                 $scope.settings.cloudSystemID = data.cloudSystemID;
                 $scope.settings.cloudEmail = data.cloudAccountName;
+                $log.log("Got response about systemCloudInfo");
                 sendCredentialsToNativeClient();
                 $log.log("System is in cloud! go to CloudSuccess");
                 $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}", $scope.settings.cloudSystemID);
@@ -146,6 +147,7 @@ angular.module('webadminApp')
 
                 $scope.next('cloudSuccess');
             },function(){
+                $log.log("failed to get systemCloudInfo");
                 mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
 
@@ -409,7 +411,7 @@ angular.module('webadminApp')
 
             $log.log("Request for id and authKey on cloud portal ...");
             //1. Request auth key from cloud_db
-            cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
+            return cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                 function(message) {
                     if (message.data.resultCode && message.data.resultCode !== 'ok') {
                         cloudErrorHandler(message);
@@ -649,7 +651,7 @@ angular.module('webadminApp')
                 back: 'systemName',
                 skip: 'localLogin',
                 next: function(){
-                    connectToCloud(true)
+                    return connectToCloud(true);
                 }
             },
             cloudLogin:{
@@ -689,7 +691,7 @@ angular.module('webadminApp')
             },
 
             localLogin:{
-                back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
+                back: 'systemName',
                 next: initOfflineSystem,
                 valid: function(){
                     return checkForm($scope.forms.localForm) &&

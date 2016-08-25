@@ -165,9 +165,9 @@ int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourceP
     ctx.oneServer = true;
     ctx.ignoreIncompatible = true;
 
-    int handle = proxy->apiConnection()->getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
-    m_twoStepRequests[handle] = ctx;
-    return handle;
+    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    m_twoStepRequests[ctx.nonceRequestHandle] = ctx;
+    return ctx.nonceRequestHandle;
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)

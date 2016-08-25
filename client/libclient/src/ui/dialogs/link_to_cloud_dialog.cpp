@@ -18,11 +18,10 @@
 #include <utils/common/html.h>
 
 #include <ui/common/aligner.h>
-#include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/busy_indicator.h>
+#include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 
 using namespace nx::cdb;
@@ -74,8 +73,7 @@ public:
         decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
-    QnBusyIndicatorWidget* busyIndicator;
-    QString okTitle;
+    QnBusyIndicatorButton* indicatorButton;
 };
 
 QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
@@ -84,6 +82,16 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     d_ptr(new QnLinkToCloudDialogPrivate(this))
 {
     ui->setupUi(this);
+    Q_D(QnLinkToCloudDialog);
+
+    /* We replace standard button instead of simply adding our one to keep OS theme values: */
+    QScopedPointer<QAbstractButton> okButton(ui->buttonBox->button(QDialogButtonBox::Ok));
+    d->indicatorButton->setText(okButton->text()); // Title from OS theme
+    d->indicatorButton->setIcon(okButton->icon()); // Icon from OS theme
+    d->indicatorButton->setDefault(true);
+    d->indicatorButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    ui->buttonBox->removeButton(okButton.data());
+    ui->buttonBox->addButton(d->indicatorButton, QDialogButtonBox::AcceptRole);
 
     QFont font;
     font.setPixelSize(kHeaderFontSizePixels);
@@ -109,11 +117,6 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     auto opacityEffect = new QGraphicsOpacityEffect(this);
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
-
-    Q_D(QnLinkToCloudDialog);
-
-    //TODO: #vkutin Create a "QnIndicatorPushButton" and use it here and in QnLoginToCloudDialog
-    d->busyIndicator->setParent(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     ui->loginInputField->setText(qnSettings->cloudLogin());
     ui->passwordInputField->setText(qnSettings->cloudPassword());
@@ -153,10 +156,8 @@ QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog* pare
     q_ptr(parent),
     connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
     linkedSuccessfully(false),
-    busyIndicator(new QnBusyIndicatorWidget(parent))
+    indicatorButton(new QnBusyIndicatorButton(parent))
 {
-    new QnWidgetAnchor(busyIndicator);
-
     const auto cdbEndpoint = qnSettings->cdbEndpoint();
     if (!cdbEndpoint.isEmpty())
     {
@@ -173,9 +174,8 @@ QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog* pare
 void QnLinkToCloudDialogPrivate::updateUi()
 {
     Q_Q(QnLinkToCloudDialog);
-    auto okButton = q->ui->buttonBox->button(QDialogButtonBox::Ok);
-    okButton->setEnabled(q->ui->loginInputField->isValid()
-                      && q->ui->passwordInputField->isValid());
+    indicatorButton->setEnabled(q->ui->loginInputField->isValid()
+                             && q->ui->passwordInputField->isValid());
 
     showCredentialsError(false);
 };
@@ -198,15 +198,10 @@ void QnLinkToCloudDialogPrivate::lockUi(bool locked)
 
     q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
 
-    auto okButton = q->ui->buttonBox->button(QDialogButtonBox::Ok);
-    okButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
-    okButton->setFocus();
+    indicatorButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
+    indicatorButton->setFocus();
 
-    if (!okButton->text().isEmpty())
-        okTitle = okButton->text();
-
-    okButton->setText(locked ? QString() : okTitle);
-    busyIndicator->setVisible(locked);
+    indicatorButton->showIndicator(locked);
 }
 
 void QnLinkToCloudDialogPrivate::bindSystem()
@@ -223,11 +218,12 @@ void QnLinkToCloudDialogPrivate::bindSystem()
         return;
     }
 
-    q->ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    indicatorButton->setEnabled(false);
 
-    cloudConnection = connectionFactory->createConnection(
-                          q->ui->loginInputField->text().trimmed().toStdString(),
-                          q->ui->passwordInputField->text().trimmed().toStdString());
+    cloudConnection = connectionFactory->createConnection();
+    cloudConnection->setCredentials(
+        q->ui->loginInputField->text().trimmed().toStdString(),
+        q->ui->passwordInputField->text().trimmed().toStdString());
 
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnCommon->localSystemName().toStdString();

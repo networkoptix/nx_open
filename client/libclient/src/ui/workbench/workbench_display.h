@@ -351,7 +351,6 @@ protected:
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
-    void updateFrameWidths();
 
     void updateBackground(const QnLayoutResourcePtr &layout);
 
@@ -440,9 +439,6 @@ private:
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;
-
-    /** Whether frame widths need updating. */
-    bool m_frameWidthsDirty;
 
     Qn::MarginFlags m_zoomedMarginFlags, m_normalMarginFlags;
 
