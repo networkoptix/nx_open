@@ -187,9 +187,8 @@ int QnMergeSystemsRestHandler::execute(
         client.setMessageBodyReadTimeoutMs(requestTimeout);
 
         QUrlQuery query;
-        query.addQueryItem("checkOwnerPermissions", QnLexical::serialized(true));
-        query.addQueryItem("showAddresses", QnLexical::serialized(true));
-        query.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
+        query.addQueryItem("checkOwnerPermissions", lit("true"));
+        query.addQueryItem("showAddresses", lit("true"));
 
         QUrl requestUrl(url);
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
