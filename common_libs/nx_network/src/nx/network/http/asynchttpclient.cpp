@@ -772,11 +772,22 @@ namespace nx_http
             //m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
             //TODO #ak check if whole message body is received (if message body size is known)
             m_httpStreamReader.flush();
-            m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) ||
-                (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
-                (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
-                ? sDone
-                : sFailed;
+            if (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody &&
+                m_httpStreamReader.contentLength() &&
+                m_httpStreamReader.contentLength().get() > m_httpStreamReader.messageBodyBytesRead())
+            {
+                m_state = sFailed;
+                m_lastSysErrorCode = SystemError::connectionReset;
+            }
+            else
+            {
+                m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) ||
+                    (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
+                    (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
+                    ? sDone
+                    : sFailed;
+            }
+
             m_connectionClosed = true;
             return 0;
         }
