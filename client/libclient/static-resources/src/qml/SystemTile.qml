@@ -66,7 +66,7 @@ BaseTile
             else if (wrongVersion.length)
                 return wrongVersion;
             else if (!isCompatibleCloudHost)
-                return qsTr("INCOMPATIBLE CLOUD VERSION");
+                return qsTr("INCOMPATIBLE");
             else if (compatibleVersion.length)
                 return compatibleVersion;
             else if (!impl.isOnline)
