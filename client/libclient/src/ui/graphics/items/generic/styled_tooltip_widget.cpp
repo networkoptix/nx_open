@@ -10,14 +10,14 @@
 
 
 QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem* parent):
-    base_type(parent)
+    base_type(parent),
+    m_tailLength(style::Metrics::kStandardPadding)
 {
     setRoundingRadius(0.0);
+    setTailWidth(m_tailLength * 2.0);
 
     const int margin = style::Metrics::kStandardPadding;
     setContentsMargins(margin, margin, margin, margin);
-    setTailLength(margin);
-    setTailWidth(margin * 2.0);
 
     setZValue(std::numeric_limits<qreal>::max());
     updateTailPos();
