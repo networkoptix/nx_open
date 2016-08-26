@@ -270,16 +270,10 @@ QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const
 
 void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index)
 {
-    QModelIndex baseIndex = index.column() == Qn::NameColumn
-        ? index
-        : index.sibling(index.row(), Qn::NameColumn);
-
+    QModelIndex baseIndex = index.sibling(index.row(), Qn::NameColumn);
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->detailsWidget->setName(toolTip);
-
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    ui->detailsWidget->setTargetResource(camera ? camera->getId() : QnUuid());
+    ui->detailsWidget->setTargetResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     ui->detailsWidget->layout()->activate();
 }
 
