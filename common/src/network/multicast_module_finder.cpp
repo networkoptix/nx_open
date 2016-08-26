@@ -230,6 +230,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (response->type != QnModuleInformation::nxMediaServerId() && response->type != QnModuleInformation::nxECId())
         return true;
 
+    //TODO: #GDM #isCompatibleCustomization VMS-2163
     if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
     {
         NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 on local address %4").

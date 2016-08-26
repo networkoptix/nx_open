@@ -33,6 +33,8 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/aio/pollset.h>
 
+#include <utils/common/app_info.h>
+
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int MAX_PROXY_TTL = 8;

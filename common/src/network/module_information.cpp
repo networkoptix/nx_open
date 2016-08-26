@@ -6,6 +6,8 @@
 #include <common/common_module.h>
 #include <nx_ec/ec_proto_version.h>
 
+#include <utils/common/app_info.h>
+
 namespace {
     /*!
     This string represents client during search with NetworkOptixModuleFinder class.
@@ -16,8 +18,32 @@ namespace {
     const QString nxMediaServerId = lit("Media Server");
 }
 
-bool QnModuleInformation::isCompatibleToCurrentSystem() const {
-    return hasCompatibleVersion() && systemName == qnCommon->localSystemName();
+QnModuleInformation::QnModuleInformation():
+    type(),
+    customization(),
+    version(),
+    systemInformation(),
+    systemName(),
+    name(),
+    port(0),
+    id(),
+    sslAllowed(false),
+    protoVersion(0),
+    runtimeId(),
+    serverFlags(0),
+    realm(QnAppInfo::realm()),
+    ecDbReadOnly(false),
+    cloudSystemId(),
+    cloudHost(QnAppInfo::defaultCloudHost())
+{
+}
+
+bool QnModuleInformation::isCompatibleToCurrentSystem() const
+{
+    //TODO: #GDM #isCompatibleCustomization VMS-2163
+    return hasCompatibleVersion()
+        && systemName == qnCommon->localSystemName()
+        && cloudHost == QnAppInfo::defaultCloudHost();
 }
 
 bool QnModuleInformation::hasCompatibleVersion() const {
