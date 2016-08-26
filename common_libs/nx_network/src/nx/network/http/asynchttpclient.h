@@ -25,6 +25,16 @@
 
 namespace nx_http
 {
+    struct AuthInfo
+    {
+        QString username;
+        QString password;
+        QString proxyUsername;
+        QString proxyPassword;
+        SocketAddress proxyEndpoint;
+    };
+
+
     class AsyncHttpClientPtr;
 
     //!Http client. All operations are done asynchronously
@@ -168,6 +178,7 @@ namespace nx_http
         void setUserPassword(const QString& userPassword);
         void setProxyUserName(const QString& userName);
         void setProxyUserPassword(const QString& userPassword);
+        void setAuth(const AuthInfo& auth);
         void setProxyVia(const SocketAddress& proxyEndpoint);
         void setConnectionHeader(const StringType& value);
 
@@ -280,7 +291,6 @@ namespace nx_http
         //TODO #ak remove this member
         nx::network::aio::Timer m_aioThreadBinder;
         bool m_precalculatedAuthorizationDisabled;
-        StringType m_connectionHeader;
 
         AsyncHttpClient();
 

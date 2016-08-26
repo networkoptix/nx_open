@@ -522,7 +522,7 @@ template class UdtSocket<AbstractStreamServerSocket>;
 UdtStreamSocket::UdtStreamSocket(int ipVersion)
 :
     m_aioHelper(
-        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/)),
+        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/, AF_INET)),
     m_noDelay(false)
 {
     open();
@@ -534,7 +534,7 @@ UdtStreamSocket::UdtStreamSocket(int ipVersion)
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state)
 :
     UdtSocket(impl, state),
-    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false, AF_INET)),
     m_noDelay(false)
 {
 }

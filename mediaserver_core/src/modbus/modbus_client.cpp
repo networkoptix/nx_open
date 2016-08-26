@@ -1,14 +1,18 @@
 #include "modbus_client.h"
 #include "modbus.h"
 
-using namespace nx_modbus;
-
 namespace
 {
     const int kDefaultConnectionTimeoutMs = 4000;
     const int kSendTimeout = 4000;
     const int kReceiveTimeout = 4000;
 }
+
+namespace nx
+{
+
+namespace modbus
+{
 
 QnModbusClient::QnModbusClient():
     m_requestTransactionId(0),
@@ -293,3 +297,7 @@ ModbusResponse QnModbusClient::readInputRegisters(quint16 startRegister, quint16
     *outStatus = false;
     return ModbusResponse();
 }
+
+} //< Closing namespace modbus.
+
+} //< Closing namespace nx.

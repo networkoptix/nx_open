@@ -176,7 +176,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnVirtualCameraResourcePtr &camera)
     {
-        if (QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(camera))
+        if (auto loader =  m_cameraDataManager->loader(camera))
             loader->discardCachedData();
     });
 
@@ -721,8 +721,8 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
 
     connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if (QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false))
-    {
+    if(auto loader = m_cameraDataManager->loader(syncedResource, false))
+	{
         loader->setEnabled(true);
     }
 
@@ -754,7 +754,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnVirtualCameraResource>());
 
-    if (QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false))
+    if(auto loader = m_cameraDataManager->loader(syncedResource, false))
     {
         loader->setMotionRegions(QList<QRegion>());
         if (!m_syncedResources.contains(syncedResource))
@@ -859,7 +859,7 @@ void QnWorkbenchNavigator::jumpBackward()
     m_pausedOverride = false;
 
     qint64 pos = reader->startTime();
-    if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
+    if (auto loader = loaderByWidget(m_currentMediaWidget))
     {
         bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
@@ -905,7 +905,7 @@ void QnWorkbenchNavigator::jumpForward()
     {
         pos = reader->endTime();
     }
-    else if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
+    else if (auto loader = loaderByWidget(m_currentMediaWidget))
     {
         bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
@@ -1472,7 +1472,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type)
     {
         /* Use empty periods. */
     }
-    else if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
+    else if (auto loader = loaderByWidget(m_currentMediaWidget))
     {
         periods = loader->periods(type);
     }
@@ -1516,24 +1516,23 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
         return;
 
     /* We don't want duplicate loaders. */
-    QSet<QnCachingCameraDataLoader *> loaders;
+    QSet<QnCachingCameraDataLoaderPtr> loaders;
     foreach(const QnMediaResourceWidget *widget, m_syncedWidgets)
     {
         if (timePeriodType == Qn::MotionContent && !widget->options().testFlag(QnResourceWidget::DisplayMotion))
         {
             /* Ignore it. */
         }
-        else if (QnCachingCameraDataLoader *loader = loaderByWidget(widget))
+        else if (auto loader = loaderByWidget(widget))
         {
             loaders.insert(loader);
         }
     }
 
     std::vector<QnTimePeriodList> periodsList;
-    foreach(QnCachingCameraDataLoader *loader, loaders)
-    {
+    for (auto loader: loaders)
         periodsList.push_back(loader->periods(timePeriodType));
-    }
+
     QnTimePeriodList syncedPeriods = m_timeSlider->timePeriods(SyncedLine, timePeriodType);
 
     m_threadedChunksMergeTool[timePeriodType]->queueMerge(periodsList, syncedPeriods, startTimeMs, m_chunkMergingProcessHandle);
@@ -1772,7 +1771,7 @@ void QnWorkbenchNavigator::updateThumbnailsLoader()
             return true;
 
         /* Check if the camera has recorded periods. */
-        QnCachingCameraDataLoader *loader = loaderByWidget(widget, false);
+        auto loader = loaderByWidget(widget, false);
         if (!loader || loader->periods(Qn::RecordingContent).empty())
             return false;
 
@@ -1930,10 +1929,10 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-QnCachingCameraDataLoader* QnWorkbenchNavigator::loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists)
+QnCachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists)
 {
     if (!widget || !widget->resource())
-        return NULL;
+        return QnCachingCameraDataLoaderPtr();
     return m_cameraDataManager->loader(widget->resource(), createIfNotExists);
 }
 
@@ -2114,7 +2113,7 @@ void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnMediaResourceWidge
 {
     /* We check that the loader can be created (i.e. that the resource is camera)
      * just to feel safe. */
-    if (QnCachingCameraDataLoader *loader = loaderByWidget(widget))
+    if (auto loader = loaderByWidget(widget))
         loader->setMotionRegions(widget->motionSelection());
 }
 

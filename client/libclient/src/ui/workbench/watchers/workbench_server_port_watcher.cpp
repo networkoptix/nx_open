@@ -12,51 +12,48 @@
 #include <core/resource_management/resource_pool.h>
 
 QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-
-    , m_currentServerId()
+    :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    m_currentServer()
 {
-    connect(qnResPool, &QnResourcePool::resourceRemoved
-        , this, [this](const QnResourcePtr &resource)
-    {
-        if (m_currentServerId.isNull() || !resource || (resource->getId() != m_currentServerId))
-            return;
-
-        const auto removedServer = resource.dynamicCast<QnMediaServerResource>();
-        if (!removedServer)
-            return;
-
-        disconnect(removedServer, nullptr, this, nullptr);
-        m_currentServerId = QnUuid();
-    });
-
-    connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived
-        , this, [this]()
-    {
-        const auto currentServer = qnCommon->currentServer();
-
-        NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "qnCommon->currentServer() is NULL!");
-        if (!currentServer)
-            return;
-
-        connect(currentServer, &QnMediaServerResource::portChanged, this
-            , [this](const QnResourcePtr &resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr &resource)
         {
-            const auto currentServer = resource.dynamicCast<QnMediaServerResource>();
+            if (resource != m_currentServer)
+                return;
+
+            disconnect(m_currentServer, nullptr, this, nullptr);
+            m_currentServer.clear();
+        });
+
+    connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this,
+        [this]()
+        {
+            const auto currentServer = qnCommon->currentServer();
+
+            NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "qnCommon->currentServer() is NULL!");
             if (!currentServer)
                 return;
 
-            QUrl url = QnAppServerConnectionFactory::url();
-            if (url.isEmpty() || (url.port() == currentServer->getPort()))
-                return;
+            m_currentServer = currentServer;
+            connect(currentServer, &QnMediaServerResource::portChanged, this
+                , [this](const QnResourcePtr &resource)
+            {
+                const auto currentServer = resource.dynamicCast<QnMediaServerResource>();
+                if (!currentServer)
+                    return;
 
-            url.setPort(currentServer->getPort());
-            QnAppServerConnectionFactory::setUrl(url);
+                QUrl url = QnAppServerConnectionFactory::url();
+                if (url.isEmpty() || (url.port() == currentServer->getPort()))
+                    return;
 
-            context()->menu()->trigger(QnActions::ReconnectAction);
+                url.setPort(currentServer->getPort());
+                QnAppServerConnectionFactory::setUrl(url);
+
+                context()->menu()->trigger(QnActions::ReconnectAction);
+            });
         });
-    });
 }
 
 QnWorkbenchServerPortWatcher::~QnWorkbenchServerPortWatcher()

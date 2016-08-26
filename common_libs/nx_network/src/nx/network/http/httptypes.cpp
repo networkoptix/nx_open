@@ -223,6 +223,8 @@ namespace nx_http
             {
                 case _continue:
                     return StringType("Continue");
+                case upgrade:
+                    return StringType("Switching Protocols");
                 case ok:
                     return StringType("OK");
                 case noContent:

@@ -30,7 +30,6 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
-class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
 

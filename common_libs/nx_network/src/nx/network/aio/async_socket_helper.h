@@ -77,7 +77,8 @@ public:
     AsyncSocketImplHelper(
         SocketType* _socket,
         AbstractCommunicatingSocket* _abstractSocketPtr,
-        bool _natTraversalEnabled )
+        bool _natTraversalEnabled,
+        int _ipVersion )
     :
         BaseAsyncSocketImplHelper<SocketType>( _socket ),
         m_abstractSocketPtr( _abstractSocketPtr ),
@@ -93,7 +94,8 @@ public:
         m_threadHandlerIsRunningIn( NULL ),
         m_natTraversalEnabled( _natTraversalEnabled ),
         m_asyncSendIssued( false ),
-        m_addressResolverIsInUse( false )
+        m_addressResolverIsInUse( false ),
+        m_ipVersion( _ipVersion )
     {
         NX_ASSERT( this->m_socket );
         NX_ASSERT( m_abstractSocketPtr );
@@ -196,10 +198,11 @@ public:
         }
 
         m_addressResolverIsInUse = true;
-        nx::network::SocketGlobals::addressResolver().resolveAsync(
-            addr.address,
-            [this, addr]( SystemError::ErrorCode errorCode,
-                          std::vector< nx::network::cloud::AddressEntry > addresses )
+
+        auto resolveHandler =
+            [this, addr](
+                SystemError::ErrorCode errorCode,
+                std::vector< nx::network::cloud::AddressEntry > addresses )
             {
                 //always calling m_connectHandler within aio thread socket is bound to
                 if( addresses.empty() )
@@ -241,9 +244,10 @@ public:
                     {
                         handler(errorCode);
                     });
-            },
-            m_natTraversalEnabled,
-            this );
+            };
+
+        nx::network::SocketGlobals::addressResolver().resolveAsync(
+            addr.address, std::move(resolveHandler), false, m_ipVersion, this);
     }
 
     void readSomeAsync( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -384,6 +388,7 @@ private:
     const bool m_natTraversalEnabled;
     std::atomic<bool> m_asyncSendIssued;
     std::atomic<bool> m_addressResolverIsInUse;
+    const int m_ipVersion;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {

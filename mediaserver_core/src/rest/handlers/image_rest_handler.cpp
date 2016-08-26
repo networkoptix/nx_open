@@ -25,6 +25,8 @@ extern "C"
 #include <camera/get_image_helper.h>
 #include <http/custom_headers.h>
 #include <utils/common/util.h>
+#include <rest/server/rest_connection_processor.h>
+#include <core/resource_management/resource_access_manager.h>
 
 int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
 {
@@ -38,7 +40,12 @@ int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
     return CODE_INVALID_PARAMETER;
 }
 
-int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnImageRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
@@ -117,6 +124,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
+
+    if (!qnResourceAccessManager->hasPermission(owner->accessRights(), res, Qn::Permission::ReadPermission))
+        return nx_http::StatusCode::forbidden;
 
     CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(res, time, dstSize, roundMethod, rotate);
     if (!outFrame)

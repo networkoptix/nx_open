@@ -13,7 +13,6 @@
 #include <utils/common/delayed.h>
 #include <utils/common/app_info.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
@@ -259,13 +258,25 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     bool storePassword,
     bool autoLogin)
 {
+    connectToLocalSystemImpl(systemId, serverUrl, userName, password, storePassword, autoLogin);
+}
+
+void QnWorkbenchWelcomeScreen::connectToLocalSystemImpl(
+    const QString& systemId,
+    const QString& serverUrl,
+    const QString& userName,
+    const QString& password,
+    bool storePassword,
+    bool autoLogin,
+    const QnRaiiGuardPtr& completionTracker)
+{
     if (!connectingToSystem().isEmpty())
         return; //< Connection process is in progress
 
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, serverUrl, userName, password, storePassword, autoLogin, systemId]()
+        [this, serverUrl, userName, password, storePassword, autoLogin, systemId, completionTracker]()
         {
             setConnectingToSystem(systemId);
 
@@ -334,12 +345,14 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
         if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
         {
-            connectToLocalSystem(QString(), serverUrl, dialog->localLogin(), dialog->localPassword(), false, false);
+            connectToLocalSystemImpl(QString(), serverUrl, dialog->localLogin(),
+                dialog->localPassword(), false, false, controlsGuard);
         }
         else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
         {
             qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
-            connectToLocalSystem(QString(), serverUrl, dialog->cloudLogin(), dialog->cloudPassword(), false, false);
+            connectToLocalSystemImpl(QString(), serverUrl, dialog->cloudLogin(),
+                dialog->cloudPassword(), false, false, controlsGuard);
         }
 
     };

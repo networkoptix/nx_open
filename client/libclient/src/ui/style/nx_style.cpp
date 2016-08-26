@@ -429,8 +429,9 @@ void QnNxStyle::drawPrimitive(
 
         case PE_PanelButtonCommand:
         {
-            const bool pressed = option->state.testFlag(State_Sunken);
-            const bool hovered = option->state.testFlag(State_MouseOver);
+            const bool enabled = option->state.testFlag(State_Enabled);
+            const bool pressed = enabled && option->state.testFlag(State_Sunken);
+            const bool hovered = enabled && option->state.testFlag(State_MouseOver);
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
@@ -1980,6 +1981,38 @@ void QnNxStyle::drawControl(
 
                 return;
             }
+            break;
+        }
+
+        case CE_PushButtonBevel:
+        {
+            if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
+            {
+                /* Draw panel for hovered and pressed flat buttons: */
+                if (buttonOption->features.testFlag(QStyleOptionButton::Flat)
+                    && (buttonOption->state.testFlag(State_Sunken)
+                     || buttonOption->state.testFlag(State_MouseOver)))
+                {
+                    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+                    QnScopedPainterBrushRollback brushRollback(painter);
+
+                    if (buttonOption->state.testFlag(State_Sunken))
+                        painter->setBrush(findColor(option->palette.color(QPalette::Base)).darker(1).color());
+                    else
+                        painter->setBrush(option->palette.dark());
+
+                    static const qreal kRoundingRadius = 2.0;
+                    painter->drawRoundedRect(option->rect, kRoundingRadius, kRoundingRadius);
+
+                    /* Call standard paint for frames etc.
+                     * Clear pressed state to avoid more panel painting. */
+                    QStyleOptionButton optionCopy(*buttonOption);
+                    optionCopy.state &= ~(State_On | State_Sunken);
+                    base_type::drawControl(element, &optionCopy, painter, widget);
+                    return;
+                }
+            }
+
             break;
         }
 

@@ -420,3 +420,10 @@ bool QnUserResource::passwordExpired() const
 
     return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
 }
+
+void QnUserResource::fillId()
+{
+    NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
+    QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
+    setId(id);
+}

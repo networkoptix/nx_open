@@ -15,32 +15,32 @@ namespace
 {
     enum RoleId
     {
-        FirstRoleId = Qt::UserRole + 1
+        FirstRoleId = Qt::UserRole + 1,
 
-        , SearchRoleId = FirstRoleId
-        , SystemNameRoleId
-        , SystemIdRoleId
+        SearchRoleId = FirstRoleId,
+        SystemNameRoleId,
+        SystemIdRoleId,
 
-        , OwnerDescriptionRoleId
-        , LastPasswordRoleId
+        OwnerDescriptionRoleId,
+        LastPasswordRoleId,
 
-        , IsFactorySystemRoleId
+        IsFactorySystemRoleId,
 
-        , IsCloudSystemRoleId
-        , IsOnlineRoleId
-        , IsCompatibleRoleId
-        , IsCompatibleVersionRoleId
-        , IsCorrectCustomizationRoleId
+        IsCloudSystemRoleId,
+        IsOnlineRoleId,
+        IsCompatibleRoleId,
+        IsCompatibleVersionRoleId,
+        IsCompatibleCloudHostRoleId,
+        IsCorrectCustomizationRoleId,
 
-        , WrongVersionRoleId
-        , CompatibleVersionRoleId
-        , WrongCustomizationRoleId
+        WrongVersionRoleId,
+        CompatibleVersionRoleId,
+        WrongCustomizationRoleId,
 
         // For local systems
-        , LastPasswordsModelRoleId
+        LastPasswordsModelRoleId,
 
-
-        , RolesCount
+        RolesCount
     };
 
     typedef QHash<int, QByteArray> RoleNames;
@@ -58,6 +58,7 @@ namespace
         result.insert(IsOnlineRoleId, "isOnline");
         result.insert(IsCompatibleRoleId, "isCompatible");
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
+        result.insert(IsCompatibleCloudHostRoleId, "isCompatibleCloudHost");
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
 
         result.insert(WrongVersionRoleId, "wrongVersion");
@@ -123,6 +124,7 @@ public:
     QString getCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
+    bool isCompatibleCloudHost(const QnSystemDescriptionPtr& systemDescription) const;
     QString getIncompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCorrectCustomization(const QnSystemDescriptionPtr& systemDescription) const;
     bool isFactorySystem(const QnSystemDescriptionPtr& systemDescription) const;
@@ -182,6 +184,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     const auto system = d->internalData[row]->system;
+
     switch(role)
     {
         case SearchRoleId:
@@ -234,6 +237,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return d->isCompatibleVersion(system);
         case WrongVersionRoleId:
             return d->getIncompatibleVersion(system);
+        case IsCompatibleCloudHostRoleId:
+            return d->isCompatibleCloudHost(system);
         case CompatibleVersionRoleId:
             return d->getCompatibleVersion(system);
         case WrongCustomizationRoleId:
@@ -338,7 +343,8 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     const auto serverAction = [this, systemDescription](const QnUuid& id)
     {
         Q_UNUSED(id);
-        emitDataChanged(systemDescription, QVector<int>() << SearchRoleId);
+        /* Alot of roles depend on server adding/removing. */
+        emitDataChanged(systemDescription, QVector<int>());
     };
 
     data->connections
@@ -527,8 +533,26 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
 {
     return isCompatibleVersion(sysemDescription)
         && isCorrectCustomization(sysemDescription)
+        && isCompatibleCloudHost(sysemDescription)
            // TODO: add more checks
         ;
+}
+
+bool QnSystemsModelPrivate::isCompatibleCloudHost(const QnSystemDescriptionPtr& systemDescription) const
+{
+    const auto servers = systemDescription->servers();
+    if (servers.isEmpty())
+        return true;
+
+    const auto predicate =
+        [this](const QnModuleInformation& serverInfo)
+        {
+            return serverInfo.cloudHost != QnAppInfo::defaultCloudHost();
+        };
+
+    const auto incompatibleIt =
+        std::find_if(servers.begin(), servers.end(), predicate);
+    return incompatibleIt == servers.end();
 }
 
 QString QnSystemsModelPrivate::getIncompatibleCustomization(
@@ -539,10 +563,15 @@ QString QnSystemsModelPrivate::getIncompatibleCustomization(
         return QString();
 
     const auto customization = QnAppInfo::customizationName();
+//     const auto customization = qnRuntime->isDevMode() // client-CORE!!!
+//         ? QString()
+//         : QnAppInfo::customizationName();
     const auto predicate = [customization](const QnModuleInformation& serverInfo)
     {
-        // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2163
-        return (customization != serverInfo.customization);
+        //TODO: #GDM #isCompatibleCustomization VMS-2163
+        return !customization.isEmpty()
+            && !serverInfo.customization.isEmpty()
+            && customization != serverInfo.customization;
     };
 
     const auto incompatibleIt =

@@ -679,7 +679,7 @@ void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaS
 
 void fromResourceToApi(const QnResourcePtr& src, ApiResourceData& dst)
 {
-    NX_ASSERT(!src->getId().isNull());
+    //NX_ASSERT(!src->getId().isNull());
     NX_ASSERT(!src->getTypeId().isNull());
 
     dst.id = src->getId();

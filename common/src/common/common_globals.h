@@ -706,8 +706,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        WriteEmailPermission            = 0x0800,
-        WriteFullNamePermission         = 0x1000,
+        WriteEmailPermission            = 0x0800,   /**< Permission to edit user's email. */
+        WriteFullNamePermission         = 0x1000,   /**< Permission to edit user's full name. */
         FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission
                                             | RemovePermission | WritePasswordPermission
                                             | WriteAccessRightsPermission

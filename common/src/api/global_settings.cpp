@@ -82,8 +82,6 @@ namespace
     const QString kServerDiscoveryPingTimeout(lit("serverDiscoveryPingTimeoutSec"));
     const int kServerDiscoveryPingTimeoutDefault = 60;
 
-    const QString kCloudPortalUrl(lit("cloudPortalUrl"));
-
     const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
     const bool kArecontRtspEnabledDefault = false;
     const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
@@ -270,14 +268,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 {
-    m_cloudPortalUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kCloudPortalUrl, QnAppInfo::defaultCloudPortalUrl(), this);
     m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAccountName, QString(), this);
     m_cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemID, QString(), this);
     m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAuthKey, QString(), this);
 
     QnGlobalSettings::AdaptorList result;
     result
-        << m_cloudPortalUrlAdaptor
         << m_cloudAccountNameAdaptor
         << m_cloudSystemIDAdaptor
         << m_cloudAuthKeyAdaptor
@@ -726,16 +722,6 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryPingTimeout() const
 void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const
 {
     m_serverDiscoveryPingTimeoutAdaptor->setValue(newInterval.count());
-}
-
-QString QnGlobalSettings::cloudPortalUrl() const
-{
-    return m_cloudPortalUrlAdaptor->value();
-}
-
-void QnGlobalSettings::setCloudPortalUrl(const QString& url)
-{
-    m_cloudPortalUrlAdaptor->setValue(url);
 }
 
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const

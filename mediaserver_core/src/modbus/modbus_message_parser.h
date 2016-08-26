@@ -4,7 +4,9 @@
 
 #include <nx/network/connection_server/base_protocol_message_types.h>
 
-namespace nx_modbus
+namespace nx
+{
+namespace modbus
 {
 
 class ModbusMessageParser
@@ -40,4 +42,7 @@ private:
 
 };
 
-}
+} //< Closing namespace modbus
+
+} //< Cosing namespace nx
+

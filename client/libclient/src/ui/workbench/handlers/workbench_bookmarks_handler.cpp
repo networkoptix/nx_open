@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 
+#include <utils/common/app_info.h>
+
 namespace {
 
 /* How long 'Press Ctrl-B' hint should be displayed. */

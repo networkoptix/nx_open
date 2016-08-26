@@ -6,7 +6,10 @@
 
 #include "modbus.h"
 
-namespace nx_modbus
+namespace nx
+{
+
+namespace modbus
 {
 
 class QnModbusClient
@@ -54,4 +57,6 @@ private:
     std::shared_ptr<AbstractStreamSocket> m_socket;
 };
 
-}
+} //< Closing namespace modbus.
+
+} //< Closing namespace nx.

@@ -103,7 +103,6 @@ void QnAxisAudioTransmitter::prepare()
     QnMutexLocker lock(&m_mutex);
     m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_outputFormat.codec())));
     m_transcoder->setSampleRate(m_outputFormat.sampleRate());
-    m_state = TransmitterState::WaitingForConnection;
 }
 
 void QnAxisAudioTransmitter::at_requestHeadersHasBeenSent(

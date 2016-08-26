@@ -735,10 +735,10 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     ui->updateProgessBar->setFormat(status.arg(value));
 }
 
-void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning* lowFreeSpaceWarning)
+void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning)
 {
     const auto failedServers =
-        qnResPool->getResources<QnMediaServerResource>(lowFreeSpaceWarning->failedPeers);
+        qnResPool->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
 
     QScopedPointer<QnMessageBox> dialog(new QnMessageBox(
         QnMessageBox::Warning, -1, tr("Warning"),
@@ -752,7 +752,7 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning* l
 
     const auto result = dialog->exec();
 
-    lowFreeSpaceWarning->ignore = true;
+    lowFreeSpaceWarning.ignore = true;
 
     if (result == QDialogButtonBox::Cancel)
         m_updateTool->cancelUpdate();

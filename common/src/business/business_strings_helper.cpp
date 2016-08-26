@@ -475,9 +475,9 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
 
         result = QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("Recording on devices is disabled:"),
-                    tr("Recording on cameras is disabled:"),
-                    tr("Recording on I/O modules is disabled:")
+                    tr("Not enough licenses. Recording has been disabled on following devices:"),
+                    tr("Not enough licenses. Recording has been disabled on following cameras:"),
+                    tr("Not enough licenses. Recording has been disabled on following I/O modules:")
                 ),
                 disabledCameras
             );

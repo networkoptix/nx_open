@@ -237,7 +237,7 @@ int launchFile(const wstring& executePath)
 
         // start client
         static const wchar_t kPathTemplate[](L"\"%s\" \"%s\" --exported");
-        wchar_t buffer[MAX_PATH*2 +3];
+        wchar_t buffer[sizeof(kPathTemplate) / sizeof(kPathTemplate[0]) + (MAX_PATH-2)*2];
         wsprintf(buffer, kPathTemplate, getFullFileName(dstDir, CLIENT_FILE_NAME).c_str(), executePath.c_str());
         if (!startProcessAsync(buffer, dstDir))
         {

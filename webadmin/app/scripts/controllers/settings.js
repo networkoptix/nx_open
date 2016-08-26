@@ -4,6 +4,21 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
 
 
+        $scope.active={
+            system: $location.path() === '/settings/system',
+            server: $location.path() === '/settings/server'
+        };
+        $scope.$watch("active.system",function(){
+            if( $scope.active.system){
+                $location.path('/settings/system');
+            }
+        });
+        $scope.$watch("active.server",function(){
+            if( $scope.active.server){
+                $location.path('/settings/server');
+            }
+        });
+
         mediaserver.getModuleInformation().then(function (r) {
 
             if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){

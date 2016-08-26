@@ -161,27 +161,28 @@ Rectangle
 
                 delegate: Item
                 {
-                    z: tile.z;
-                    width: grid.cellWidth;
-                    height: grid.cellHeight;
+                    z: tile.z
+                    width: grid.cellWidth
+                    height: grid.cellHeight
 
                     SystemTile
                     {
-                        id: tile;
-                        visualParent: screenHolder;
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        anchors.verticalCenter: parent.verticalCenter;
+                        id: tile
+                        visualParent: screenHolder
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
 
-                        systemId: model.systemId;
-                        systemName: model.systemName;
+                        systemId: model.systemId
+                        systemName: model.systemName
                         ownerDescription: model.ownerDescription
 
-                        isFactoryTile: model.isFactorySystem;
-                        isCloudTile: model.isCloudSystem;
+                        isFactoryTile: model.isFactorySystem
+                        isCloudTile: model.isCloudSystem
 
-                        wrongVersion: model.wrongVersion;
-                        wrongCustomization: model.wrongCustomization;
-                        compatibleVersion: model.compatibleVersion;
+                        wrongVersion: model.wrongVersion
+                        wrongCustomization: model.wrongCustomization
+                        isCompatibleCloudHost: model.isCompatibleCloudHost
+                        compatibleVersion: model.compatibleVersion
 
                         Component.onCompleted: { grid.watcher.addItem(this); }
                     }

@@ -73,7 +73,8 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        const bool isProxy = isProxyForCamera(d->request);
+        // set variable to true if standard proxy_unauthorized should be used
+        const bool isProxy = needStandardProxy(d->request);
         QElapsedTimer t;
         t.restart();
         AuthMethod::Value usedMethod = AuthMethod::noAuth;
@@ -245,7 +246,18 @@ bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
             return true;
     }
 
-    return isProxyForCamera(request);
+    return needStandardProxy(request);
+}
+
+bool QnUniversalRequestProcessor::needStandardProxy(const nx_http::Request& request)
+{
+    return isCloudRequest(request) || isProxyForCamera(request);
+}
+
+bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request)
+{
+    return request.requestLine.url.path().startsWith("/cdb") ||
+           request.requestLine.url.path().startsWith("/nxcloud");
 }
 
 bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& request)

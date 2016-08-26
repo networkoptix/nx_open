@@ -1,16 +1,23 @@
 #include <sstream>
 #include <thread>
 
-#include <plugins/camera_plugin.h>
-
 #include "timer.h"
 #include "tx_device.h"
 #include "mpeg_ts_packet.h"
 #include "rx_device.h"
+#include "camera_manager.h"
+#include "discovery_manager.h"
+
+#if defined(_DEBUG)
+Logger logger("/opt/networkoptix/mediaserver/var/log/it930x.log");
+#endif
+
 
 namespace ite
 {
-    std::mutex It930x::m_rcMutex;
+//	std::mutex It930x::m_rcMutex;
+    RxSyncManager rxSyncManager;
+    RxHintManager rxHintManager;
 
     unsigned str2num(std::string& s)
     {
@@ -29,25 +36,387 @@ namespace ite
     }
 
     //
+    RxDevice::~RxDevice()
+    {
+        ITE_LOG() << FMT("Stopping Rx %d", m_rxID);
+        pleaseStop();
+        if (m_watchDogThread.joinable()) {
+            m_watchDogThread.join();
+        }
+        close();
+        ITE_LOG() << FMT("Stopping Rx %d Done", m_rxID);
+    }
 
     RxDevice::RxDevice(unsigned id)
-    :   m_devReader( new DevReader() ),
+      : m_deviceReady(false),
+        m_needStop(false),
+        m_running(false),
+        m_configuring(false),
+        m_devReader(new DevReader),
         m_rxID(id),
         m_channel(NOT_A_CHANNEL),
-        m_txs(TxDevice::CHANNELS_NUM),
         m_signalQuality(0),
         m_signalStrength(0),
-        m_signalPresent(false)
+        m_signalPresent(false),
+        m_cam(nullptr)
     {
-        open();
-        resetFrozen();
     }
+
+    // <refactor>
+    void RxDevice::shutdown()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_txDev) {
+            rxSyncManager.unlock(m_txDev->txID());
+        }
+        if (!m_cam)
+            debug_printf("[RxDevice::shutdown] Rx %d. No related camera found\n!", m_rxID);
+        else
+        {
+            std::lock_guard<std::mutex> lock(m_cam->get_mutex());
+            m_cam->rxDeviceRef().reset();
+            m_cam = nullptr;
+        }
+
+        stopReader();
+        m_txDev.reset();
+        m_it930x->unlockFrequency();
+
+        ITE_LOG() << FMT("Rx %d shutdown done", m_rxID);
+        m_deviceReady = false;
+    }
+
+    void RxDevice::startWatchDog()
+    {
+        // starting watchdog thread
+        static const int WATCHDOG_GOOD_TIMEOUT = 3000;      // ms
+        static const int WATCHDOG_BAD_TIMEOUT = 3 * 1000;  // ms
+
+        m_watchDogThread = std::thread(
+            [this]
+            {
+                if(open())
+                {
+                    m_running = true;
+                    ITE_LOG() << FMT("Open rx %d successfull", m_rxID);
+                }
+                else
+                {
+                    ITE_LOG() << FMT("Open rx %d failed, device is not operational", m_rxID);
+                    return;
+                }
+
+                int timeout = WATCHDOG_GOOD_TIMEOUT;
+                while (true)
+                {
+                    if (m_needStop)
+                        break;
+
+                    stats();
+                    ITE_LOG() << FMT("[Rx watchdog] Rx %d getting stats DONE; " \
+                                     "stats: %d; m_deviceReady: %d; m_needStop: %d",
+                                     m_rxID, (int)good(), (int)m_deviceReady.load(), (int)m_needStop);
+
+                    if (!good() || !m_deviceReady)
+                    {
+                        debug_printf("[Rx watchdog] Rx %d became bad. shutting down.\n", m_rxID);
+                        shutdown();
+
+                        if(findBestTx())
+                            timeout = WATCHDOG_GOOD_TIMEOUT;
+                        else
+                            timeout = WATCHDOG_BAD_TIMEOUT;
+                    }
+                    else if (!m_devReader->hasThread())
+                    {
+                        printf("[Rx watchdog] Rx %d NO READER thread. shutting down.\n", m_rxID);
+                        shutdown();
+
+                        if(findBestTx())
+                            timeout = WATCHDOG_GOOD_TIMEOUT;
+                        else
+                            timeout = WATCHDOG_BAD_TIMEOUT;
+                    }
+                    else if (good() && m_deviceReady)
+                    {
+                        Timer testTimer;
+                        const int TEST_TIME = 4000;
+                        bool first = true;
+                        bool wrongCamera = false;
+
+                        debug_printf("[Rx watchdog] Rx %d. Device seems good. Starting testing camera ID\n", m_rxID);
+
+                        m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
+
+                        while (testTimer.elapsedMS() < TEST_TIME)
+                        {
+                            RcPacketBuffer pktBuf;
+                            if (! m_devReader->getRcPacket(pktBuf))
+                            {
+                                debug_printf("[Rx watchdog] Rx %d. NO RC packet\n", m_rxID);
+                                break;
+                            }
+
+                            if (pktBuf.pid() != It930x::PID_RETURN_CHANNEL)
+                            {
+                                debug_printf("[Rx watchdog] packet error: wrong PID\n");
+                                continue;
+                            }
+
+                            if (pktBuf.checkbit())
+                            {
+                                debug_printf("[Rx watchdog] packet error: TS error bit\n");
+                                continue;
+                            }
+
+                            RcPacket pkt = pktBuf.packet();
+                            if (! pkt.isOK())
+                            {
+                                pkt.print();
+                                continue;
+                            }
+
+                            if (pkt.txID() == 0 || pkt.txID() == 0xffff)
+                            {
+                                debug_printf("[Rx watchdog] wrong txID: %d\n", pkt.txID());
+                                continue;
+                            }
+
+                            if (first)
+                            {
+                                if (pkt.txID() != m_cam->cameraId())
+                                {
+                                    debug_printf(
+                                        "[Rx watchdog] WRONG CAMERA. Pkt::TXID: %d, Cam::txID: %d shutting down\n",
+                                        pkt.txID(),
+                                        m_cam->cameraId()
+                                    );
+                                    wrongCamera = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
+
+                        if (wrongCamera)
+                        {
+                            shutdown();
+
+                            if(findBestTx())
+                                timeout = WATCHDOG_GOOD_TIMEOUT;
+                            else
+                                timeout = WATCHDOG_BAD_TIMEOUT;
+                        }
+                    }
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+                }
+                m_running = false;
+            }
+        );
+    }
+
+
+    bool RxDevice::testChannel(int chan, int &bestChan, int &bestStrength, int &txID)
+    {
+        // We need to read from channel for some time
+        static const int SEARCH_READ_TIME = 2000; // ms
+
+        m_it930x->unlockFrequency();
+        if (m_it930x->lockFrequency(TxDevice::freq4chan(chan)))
+        {
+            ITE_LOG() << FMT("[search] Rx: %d; lock channel %d succeded getting stats", m_rxID, chan);
+            stats();
+
+            if (good())
+            {
+                ITE_LOG() << FMT("[search] Rx: %d; get stats %d succeded, starting reading", m_rxID, chan);
+
+                if (m_devReader)
+                    m_devReader->stop();
+                else
+                    m_devReader.reset(new DevReader);
+
+                m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
+                m_devReader->start(m_it930x.get(), SEARCH_READ_TIME);
+
+                ITE_LOG() << FMT("[search] Rx: %d; channel %d waiting for the reader", m_rxID, chan);
+
+                m_devReader->wait();
+                ITE_LOG() << FMT("[search] Rx: %d; channel %d wait for read is over", m_rxID, chan);
+
+                bool first = true;
+                for (;;)
+                {
+                    if (m_needStop)
+                        return false;
+
+                    ITE_LOG() << FMT("[search] Rx: %d, channel: %d, reading RC channel", m_rxID, chan);
+
+                    RcPacketBuffer pktBuf;
+                    if (! m_devReader->getRcPacket(pktBuf))
+                    {
+                        ITE_LOG() << FMT("[search] Rx %d. NO RC packet", m_rxID);
+                        break;
+                    }
+
+                    if (pktBuf.pid() != It930x::PID_RETURN_CHANNEL)
+                    {
+                        ITE_LOG() << FMT("[RC] packet error: wrong PID");
+                        break;
+                    }
+
+                    if (pktBuf.checkbit())
+                    {
+                        ITE_LOG() << FMT("[RC] packet error: TS error bit");
+                        break;
+                    }
+
+                    RcPacket pkt = pktBuf.packet();
+                    if (! pkt.isOK())
+                    {
+                        pkt.print();
+                        break;
+                    }
+
+                    if (pkt.txID() == 0 || pkt.txID() == 0xffff)
+                    {
+                        ITE_LOG() << FMT("[RC] wrong txID: %d\n", pkt.txID());
+                        break;
+                    }
+
+                    ITE_LOG() << FMT("[RC] Rx %d pkt.txID: %d", m_rxID, pkt.txID());
+
+                    if (first)
+                    {
+                        bestChan = chan;
+                        bestStrength = strength();
+                        m_channel = chan;
+                        txID = pkt.txID();
+
+                        m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
+                        m_it930x->unlockFrequency();
+                        return true;
+                    }
+                }
+                m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
+            }
+        }
+        m_it930x->unlockFrequency();
+        return false;
+    }
+
+    bool RxDevice::lockAndStart(int chan, int txId)
+    {
+        m_it930x->lockFrequency(TxDevice::freq4chan(chan));
+        m_txDev.reset(new TxDevice(txId, TxDevice::freq4chan(chan)));
+        printf("[search] Rx %d; Found camera %d FINAL\n", m_rxID, txId);
+        for (int i = 0; i < 2; ++i) {
+            subscribe(i);
+        }
+        startReader();
+        m_deviceReady.store(true);
+        return true;
+    }
+
+    bool RxDevice::findBestTx()
+    {
+        int bestStrength = 0;
+        int bestChan = 0;
+        int txID = 0;
+        std::lock_guard<std::mutex> lock(m_mutex);
+        // trying hints first
+        auto hints = rxHintManager.getHintsByRx(m_rxID);
+
+        for (const auto &hint: hints)
+        {
+            if (m_needStop)
+                return false;
+
+            if (rxHintManager.useHint(m_rxID, hint.txId, hint.chan))
+            {
+                if (testChannel(hint.chan, bestChan, bestStrength, txID) &&
+                    txID == hint.txId &&
+                    rxSyncManager.lock(m_rxID, hint.txId))
+                {
+                    ITE_LOG() << FMT("[search] Hint (rxID: %d, chan: %d, txID: %d) helped", m_rxID, hint.chan, hint.txId);
+                    return lockAndStart(bestChan, txID);
+                }
+                else
+                {
+                    ITE_LOG() << FMT("[search] Hint (rxID: %d, hint.chan: %d, hint.txID: %d) failed; actual TxID: %d", m_rxID, hint.chan, hint.txId, txID);
+                }
+            }
+        }
+
+        // hints didn't help, starting normal discovery routine
+        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
+        {
+            if (m_needStop)
+                return false;
+
+            if (testChannel(i, bestChan, bestStrength, txID))
+            {
+                ITE_LOG() << FMT("[search] Rx: %d. Test channel %d succeeded. Strength is %d, camera is %d\n", m_rxID, i, bestStrength, txID);
+
+                if (rxSyncManager.lock(m_rxID, txID))
+                    return lockAndStart(bestChan, txID);
+                else
+                {
+                    ITE_LOG() << FMT("[search] Rx: %d. This channel (%d) seems already locked. Need to continue.\n", m_rxID, i);
+                }
+
+            }
+//            else
+//                ITE_LOG() << FMT("[search] Rx: %d. testChannel() failed for channel %d", m_rxID, i);
+        }
+
+        m_it930x->unlockFrequency();
+        printf("[search] Rx: %d; Search failed\n", m_rxID);
+
+        return false;
+    }
+
+    // If there is no camera connected returns empty camera info,
+    // otherwise - return actual info.
+    nxcip::CameraInfo RxDevice::getCameraInfo() const
+    {
+        debug_printf("[RxDevice::getCameraInfo] Rx %d; Asked for camera info\n", m_rxID);
+
+        nxcip::CameraInfo info;
+        memset(&info, 0, sizeof(nxcip::CameraInfo));
+        if (!m_deviceReady || !m_txDev)
+        {
+            debug_printf(
+                "[RxDevice::getCameraInfo] Rx %d; Can't get camera info camera info\n",
+                m_rxID
+            );
+            return info;
+        }
+
+        std::string strTxID = RxDevice::id2str(m_txDev->txID());
+        std::string url = std::string("localhost:") + strTxID;
+
+        strncpy( info.modelName, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::modelName)-1) ); // TODO
+        strncpy( info.url, url.c_str(), sizeof(nxcip::CameraInfo::url)-1 );
+        strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
+
+        std::stringstream ss;
+        ss << m_rxID << ',' <<  m_txDev->txID() << ',' << TxDevice::freq4chan(m_channel);
+
+        unsigned len = std::min(ss.str().size(), sizeof(nxcip::CameraInfo::auxiliaryData)-1);
+        strncpy(info.auxiliaryData, ss.str().c_str(), len);
+        info.auxiliaryData[len] = 0;
+
+        return info;
+    }
+    // </refactor
 
     bool RxDevice::open()
     {
         try
         {
-            m_it930x.reset(); // dtor first
             m_it930x.reset(new It930x(m_rxID));
             m_it930x->info(m_rxInfo);
             return true;
@@ -55,11 +424,16 @@ namespace ite
         catch (DtvException& ex)
         {
             debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
-
             m_it930x.reset();
         }
 
         return false;
+    }
+
+    void RxDevice::close()
+    {
+        stopReader();
+        m_it930x.reset();
     }
 
     void RxDevice::resetFrozen()
@@ -68,7 +442,6 @@ namespace ite
         {
             if (m_it930x)
             {
-                debug_printf("[it930x] Reset Rx device %d\n", m_rxID);
                 m_it930x->rxReset();
             }
         }
@@ -78,154 +451,6 @@ namespace ite
 
             m_it930x.reset();
         }
-    }
-
-    bool RxDevice::wantedByCamera() const
-    {
-        {
-            std::unique_lock<std::mutex> cvLock( m_sync.mutex ); // LOCK
-
-            if (m_sync.waiting)
-                return true;
-        }
-
-        if (m_sync.usedByCamera)
-            return true;
-
-        return false;
-    }
-
-    bool RxDevice::lockCamera(TxDevicePtr txDev)
-    {
-        using std::chrono::system_clock;
-
-        static const unsigned TIMEOUT_MS = 5000;
-        static const std::chrono::milliseconds timeout(TIMEOUT_MS);
-
-        if (! txDev)
-            return false;
-
-        uint16_t txID = txDev->txID();
-        unsigned chan = chan4Tx(txID);
-
-        // lock only one camera
-        bool expected = false;
-        if (m_sync.usedByCamera.compare_exchange_strong(expected, true))
-        {
-            for (unsigned i = 0; i < 2; ++i)
-            {
-                if (tryLockC(chan))
-                {
-                    if (good())
-                        m_devReader->start(m_it930x.get());
-
-                    m_txDev = txDev;
-                    m_txDev->open();
-                    return true;
-                }
-
-                if (i)
-                {
-                    m_sync.usedByCamera = false;
-                    break;
-                }
-
-                std::unique_lock<std::mutex> cvLock( m_sync.mutex ); // LOCK
-
-                m_sync.waiting = true;
-                m_sync.cond.wait_until(cvLock, system_clock::now() + timeout); // WAIT
-
-                // usedByCamera is false here (unset on channel unlock)
-
-                m_sync.usedByCamera = true;
-                m_sync.waiting = false;
-            }
-        }
-
-        debug_printf("[camera] can't lock Rx: %d; Tx %d; channel: %d; used: %d\n",
-                     m_rxID, txID, chan, m_sync.usedByCamera.load());
-        return false;
-    }
-
-    bool RxDevice::tryLockC(unsigned channel, bool prio, const char ** reason)
-    {
-        if (channel >= RxDevice::NOT_A_CHANNEL)
-            return false;
-
-        if (! prio && wantedByCamera())
-        {
-            if (reason)
-                *reason = "wanted by camera";
-            return false;
-        }
-
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        if (! prio && wantedByCamera())
-        {
-            if (reason)
-                *reason = "wanted by camera";
-            return false;
-        }
-
-        // prevent double locking at all (even with the same frequency)
-        if (isLocked_u())
-        {
-            if (reason)
-                *reason = "locked";
-            return false;
-        }
-
-        if (!m_it930x && !open())
-        {
-            if (reason)
-                *reason = "can't open Rx device";
-            return false;
-        }
-
-        try
-        {
-            //static const unsigned QUALITY_TIMEOUT_MS = 1000;
-
-            m_it930x->lockFrequency( TxDevice::freq4chan(channel) );
-
-            //Timer::sleep(QUALITY_TIMEOUT_MS);
-            stats();
-
-            m_channel = channel;
-            return true;
-        }
-        catch (DtvException& ex)
-        {
-            debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
-
-            m_it930x.reset();
-            m_channel = NOT_A_CHANNEL;
-            if (reason)
-                *reason = "exception";
-        }
-
-        return false;
-    }
-
-    void RxDevice::unlockC(bool resetRx)
-    {
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        m_devReader->stop();
-
-        if (m_it930x)
-            m_it930x->unlockFrequency();
-        if (resetRx)
-            resetFrozen();
-
-        if (m_txDev)
-            m_txDev->close();
-        m_txDev.reset();
-        m_channel = NOT_A_CHANNEL;
-
-        m_sync.usedByCamera = false;
-        m_sync.cond.notify_all(); // NOTIFY
     }
 
     bool RxDevice::isLocked() const
@@ -247,101 +472,6 @@ namespace ite
         m_it930x->statistic(m_signalQuality, m_signalStrength, m_signalPresent, locked);
     }
 
-    bool RxDevice::startSearchTx(unsigned channel, unsigned timeoutMS)
-    {
-        if (m_sync.searching)
-        {
-            debug_printf("[search] BUG. Try to lock 2 channels same time. Rx: %d; channels: %d vs %d\n", rxID(), m_channel, channel);
-            return false;
-        }
-
-        const char * reason;
-        if (tryLockC(channel, false, &reason))
-        {
-            debug_printf("[search] %d sec. Rx: %d; channel: %d (%d); quality: %d; strength: %d; presence: %d\n",
-                   timeoutMS/1000, rxID(), channel, TxDevice::freq4chan(channel), quality(), strength(), present());
-
-            if (good())
-            {
-                m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
-                m_devReader->start(m_it930x.get(), timeoutMS);
-
-                m_sync.searching.store(true);
-                return true;
-            }
-
-            unlockC();
-            return false;
-        }
-
-        debug_printf("[search] can't lock Rx: %d; channel: %d (%d) - %s\n",
-                    rxID(), channel, TxDevice::freq4chan(channel), reason ? reason : "unknown reason");
-        return false;
-    }
-
-    void RxDevice::stopSearchTx(DevLink& devLink)
-    {
-        devLink.txID = 0;
-
-        if (m_sync.searching /*&& isLocked()*/)
-        {
-            m_devReader->wait();
-
-            bool first = true;
-            for (;;)
-            {
-                RcPacketBuffer pktBuf;
-                if (! m_devReader->getRcPacket(pktBuf))
-                    break;
-
-                if (pktBuf.pid() != It930x::PID_RETURN_CHANNEL)
-                {
-                    debug_printf("[RC] packet error: wrong PID\n");
-                    continue;
-                }
-
-                if (pktBuf.checkbit())
-                {
-                    debug_printf("[RC] packet error: TS error bit\n");
-                    continue;
-                }
-
-                RcPacket pkt = pktBuf.packet();
-                if (! pkt.isOK())
-                {
-                    pkt.print();
-                    continue;
-                }
-
-                if (pkt.txID() == 0 || pkt.txID() == 0xffff)
-                {
-                    debug_printf("[RC] wrong txID: %d\n", pkt.txID());
-                    continue;
-                }
-
-                if (first && m_channel < NOT_A_CHANNEL)
-                {
-                    first = false;
-                    devLink.rxID = m_rxID;
-                    devLink.txID = pkt.txID();
-                    devLink.channel = m_channel;
-
-                    setTx(m_channel, devLink.txID);
-                }
-
-                if (pkt.txID() != devLink.txID)
-                    debug_printf("[RC] different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
-            }
-
-            m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
-            unlockC();
-        }
-
-        m_sync.searching.store(false);
-    }
-
-    //
-
     void RxDevice::processRcQueue()
     {
         TxDevicePtr txDev = m_txDev;
@@ -362,20 +492,15 @@ namespace ite
         }
     }
 
-    bool RxDevice::configureTx(unsigned encNo)
+    bool RxDevice::configureTx()
     {
         static const unsigned WAIT_MS = 30000;
 
         TxDevicePtr txDev = m_txDev;
         if (! txDev)
             return false;
-
-        // HACK: don't want to init it twice. It should init both encoders or none.
-        if (encNo)
-        {
-             Timer::sleep(WAIT_MS * 1.2f); // wait for init in encoder 0
-             return txDev->ready();
-        }
+        if (txDev->ready())
+            return true;
 
         Timer timer(true);
         while (! txDev->ready())
@@ -389,7 +514,7 @@ namespace ite
             processRcQueue();
             updateTxParams();
 
-            Timer::sleep(50);
+            Timer::sleep(100);
         }
 
         return txDev->ready();
@@ -419,7 +544,9 @@ namespace ite
         bool ok = cmd && cmd->isValid() && txDev && m_it930x;
         if (!ok)
         {
-            debug_printf("[RC send] bad command or device. RxID: %d TxID: %d\n", rxID(), (txDev ? txDev->txID() : 0));
+            debug_printf("[RC send] bad command or device. RxID: %d TxID: %d \
+                          cmd: %p cmd->isValid(): %d m_it930x: %d\n",
+                         rxID(), (txDev ? txDev->txID() : 0), cmd, (cmd ? cmd->isValid() : 0), (bool)m_it930x);
             Timer::sleep(RC_DELAY_MS());
             return false;
         }

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export vblank_mode=0
-
 USER_APPLAUNCHER_DIR="$HOME/Library/Application Support/${company.name}/applauncher/${customization}/Contents/MacOS"
 
 if [ -x "$USER_APPLAUNCHER_DIR/applauncher-bin" ]

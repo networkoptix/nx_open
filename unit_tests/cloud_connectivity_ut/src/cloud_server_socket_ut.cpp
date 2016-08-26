@@ -51,9 +51,7 @@ public:
         NX_LOGX(lm("removed, %1 sockets left").arg(m_clientsLimit), cl_logDEBUG1);
     }
 
-    void accept(std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractStreamSocket>)> handler) override
+    void accept(AcceptHandler handler) override
     {
         if (m_clientsLimit == 0)
         {
@@ -115,9 +113,7 @@ struct FakeTcpTunnelAcceptor
         NX_LOGX(lm("removed, c=%1").str(m_hasConnection), cl_logDEBUG1);
     }
 
-    void accept(std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) override
+    void accept(AcceptHandler handler) override
     {
         if (!m_designatedAioThread)
         {

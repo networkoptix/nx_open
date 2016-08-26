@@ -60,7 +60,7 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_inUpdateScale, true);
-
+    // TODO: #ynikitenkov Reuse QnViewportScaleWatcher class
     /* Assume affine transform that does not change x/y scale separately. */
     QTransform sceneToViewport = view->viewportTransform();
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());

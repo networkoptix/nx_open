@@ -62,7 +62,7 @@ void QnCheckFreeSpacePeerTask::doStart()
             }
 
             QSet<QnUuid> failed;
-            for (const auto id: peers())
+            for (const auto& id: peers())
             {
                 const auto server = qnResPool->getResourceById<QnMediaServerResource>(id);
                 if (!server)
@@ -86,15 +86,27 @@ void QnCheckFreeSpacePeerTask::doStart()
                 finish(NotEnoughFreeSpaceError, failed);
         };
 
-    m_requestId = qnCommon->currentServer()->restConnection()->getFreeSpaceForUpdateFiles(
-        true, handleReply);
+    // TODO: #dklychkov Revise this fix: currentServer() returns null if connected to bpi.
+    auto currentServer = qnCommon->currentServer();
+    if (currentServer)
+    {
+        m_requestId = currentServer->restConnection()->getFreeSpaceForUpdateFiles(
+            true, handleReply);
+    }
+    else
+    {
+        m_requestId = -1;
+        finish(NoError);
+    }
 }
 
 void QnCheckFreeSpacePeerTask::doCancel()
 {
     if (m_requestId >= 0)
     {
-        qnCommon->currentServer()->restConnection()->cancelRequest(m_requestId);
+        auto currentServer = qnCommon->currentServer();
+        if (currentServer)
+            currentServer->restConnection()->cancelRequest(m_requestId);
         m_requestId = -1;
     }
 }

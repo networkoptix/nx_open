@@ -1,5 +1,7 @@
 #include "reverse_connector.h"
 
+#include "reverse_headers.h"
+
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 
@@ -8,20 +10,30 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-ReverseConnector::ReverseConnector(String selfName, String targetName):
-    m_selfName(std::move(selfName)),
-    m_targetName(std::move(targetName))
+ReverseConnector::ReverseConnector(
+    String selfHostName, String targetHostName, aio::AbstractAioThread* aioThread)
+:
+    m_targetHostName(std::move(targetHostName))
 {
+    m_httpClient = nx_http::AsyncHttpClient::create();
+    if (aioThread)
+        m_httpClient->bindToAioThread(aioThread);
+
+    m_httpClient->addAdditionalHeader(kConnection, kUpgrade);
+    m_httpClient->addAdditionalHeader(kUpgrade, kNxRc);
+    m_httpClient->addAdditionalHeader(kNxRcHostName, selfHostName);
+}
+
+void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
+{
+    m_httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
+    m_httpClient->setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
+    m_httpClient->setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
 }
 
 void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler handler)
 {
     // TODO: use timeout
-    m_httpClient = nx_http::AsyncHttpClient::create();
-    m_httpClient->addAdditionalHeader(kUpgrade, kNxRc);
-    m_httpClient->setConnectionHeader(kUpgrade);
-    m_httpClient->addAdditionalHeader(kNxRcHostName, m_selfName);
-
     QObject::connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
         [this, handler=std::move(handler)](nx_http::AsyncHttpClientPtr)
@@ -38,27 +50,37 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
                 return handler(SystemError::connectionAbort);
             }
 
-             handler(processHeaders(m_httpClient->response()->headers));
+            handler(processHeaders(m_httpClient->response()->headers));
         });
 
     // TODO: think about HTTPS
     m_httpClient->doOptions(endpoint.toUrl());
 }
 
-std::unique_ptr<ExtendedStreamSocket> ReverseConnector::takeSocket()
+std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()
 {
-    auto socket = std::make_unique<ExtendedStreamSocket>(m_httpClient->takeSocket());
-    socket->injectRecvData(m_httpClient->fetchMessageBodyBuffer());
+    auto socket = std::make_unique<BufferedStreamSocket>(m_httpClient->takeSocket());
+    auto buffer = m_httpClient->fetchMessageBodyBuffer();
+
+    if (buffer.size())
+        socket->injectRecvData(std::move(buffer));
+
     return socket;
 }
 
-size_t ReverseConnector::getPoolSize() const
+boost::optional<size_t> ReverseConnector::getPoolSize() const
 {
     const auto value = m_httpClient->response()->headers.find(kNxRcPoolSize);
     if (value == m_httpClient->response()->headers.end())
-        return 0;
+        return boost::none;
 
-    return (size_t)QString::fromUtf8(value->second).toInt();
+    bool isOk;
+    auto result = (size_t)QString::fromUtf8(value->second).toInt(&isOk);
+
+    if (isOk)
+        return result;
+    else
+        return boost::none;
 }
 
 boost::optional<KeepAliveOptions> ReverseConnector::getKeepAliveOptions() const
@@ -76,12 +98,12 @@ SystemError::ErrorCode ReverseConnector::processHeaders(const nx_http::HttpHeade
     if (upgrade == headers.end() || !upgrade->second.startsWith(kNxRc))
         return SystemError::invalidData;
 
-    const auto connection = headers.find("Connection");
+    const auto connection = headers.find(kConnection);
     if (connection == headers.end() || connection->second != kUpgrade)
         return SystemError::invalidData;
 
     const auto hostName = headers.find(kNxRcHostName);
-    if (hostName == headers.end() || hostName->second != m_targetName)
+    if (hostName == headers.end() || hostName->second != m_targetHostName)
         return SystemError::hostNotFound;
 
     return SystemError::noError;

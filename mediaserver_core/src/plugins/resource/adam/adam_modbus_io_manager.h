@@ -57,7 +57,7 @@ private:
 
     void fetchAllPortStates();
 
-    void processAllPortStatesResponse(const nx_modbus::ModbusMessage& response);
+    void processAllPortStatesResponse(const nx::modbus::ModbusMessage& response);
     void updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
     void setDebounceForPort(const QString& portId, bool portState);
     QnIOStateDataList getDebouncedStates() const;
@@ -65,7 +65,7 @@ private:
     bool getBitValue(const QByteArray& bytes, quint64 bitIndex) const;
     quint32 getPortCoil(const QString& ioPortId, bool& success) const;
 
-    void routeMonitoringFlow(nx_modbus::ModbusMessage response);
+    void routeMonitoringFlow(nx::modbus::ModbusMessage response);
     void handleMonitoringError();
     void scheduleMonitoringIteration();
 
@@ -86,8 +86,8 @@ private:
 
     QnIOStateDataList m_ioStates;
 
-    nx_modbus::QnModbusAsyncClient m_client;
-    nx_modbus::QnModbusClient m_outputClient;
+    nx::modbus::QnModbusAsyncClient m_client;
+    nx::modbus::QnModbusClient m_outputClient;
     InputStateChangeCallback m_inputStateChangedCallback;
     NetworkIssueCallback m_networkIssueCallback;
 

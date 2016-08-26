@@ -57,11 +57,12 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
-const char* qn_searchModelPropertyName = "_qn_searchModel";
-const char* qn_searchSynchronizerPropertyName = "_qn_searchSynchronizer";
-const char* qn_filterPropertyName = "_qn_filter";
-//    const char* qn_searchCriterionPropertyName = "_qn_searchCriterion";
-}
+
+const char* kSearchModelPropertyName = "_qn_searchModel";
+const char* kSearchSynchronizerPropertyName = "_qn_searchSynchronizer";
+const char* kFilterPropertyName = "_qn_filter";
+
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnResourceBrowserToolTipWidget
@@ -103,7 +104,6 @@ void QnResourceBrowserToolTipWidget::setPixmap(const QPixmap& pixmap)
     updateTailPos();
 }
 
-
 void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
 {
     if (m_thumbnailVisible == visible)
@@ -143,12 +143,12 @@ void QnResourceBrowserToolTipWidget::updateTailPos()
     qreal parentPos = m_pointTo.y();
 
     if (parentPos - halfHeight < 0)
-        setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.top())));
+        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound(rect.top() + tailWidth())));
+    else if (parentPos + halfHeight > enclosingRect.height())
+        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound(rect.bottom() - tailWidth())));
     else
-        if (parentPos + halfHeight > enclosingRect.height())
-            setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.bottom())));
-        else
-            setTailPos(QPointF(qRound(rect.left() - 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound((rect.top() + rect.bottom()) / 2)));
+
     base_type::pointTo(m_pointTo);
 }
 
@@ -270,7 +270,7 @@ bool QnResourceBrowserWidget::isLayoutSearchable(QnWorkbenchLayout* layout) cons
 
 QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayout* layout, bool create) const
 {
-    QnResourceSearchProxyModel* result = layout->property(qn_searchModelPropertyName).value<QnResourceSearchProxyModel*>();
+    QnResourceSearchProxyModel* result = layout->property(kSearchModelPropertyName).value<QnResourceSearchProxyModel*>();
     if (create && !result)
     {
         result = new QnResourceSearchProxyModel(layout);
@@ -280,7 +280,7 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
-        layout->setProperty(qn_searchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel*>(result));
+        layout->setProperty(kSearchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel*>(result));
 
         //initial filter setup
         setupInitialModelCriteria(result);
@@ -290,25 +290,25 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
 
 QnResourceSearchSynchronizer* QnResourceBrowserWidget::layoutSynchronizer(QnWorkbenchLayout* layout, bool create) const
 {
-    QnResourceSearchSynchronizer* result = layout->property(qn_searchSynchronizerPropertyName).value<QnResourceSearchSynchronizer*>();
+    QnResourceSearchSynchronizer* result = layout->property(kSearchSynchronizerPropertyName).value<QnResourceSearchSynchronizer*>();
     if (create && !result && isLayoutSearchable(layout))
     {
         result = new QnResourceSearchSynchronizer(layout);
         result->setLayout(layout);
         result->setModel(layoutModel(layout, true));
-        layout->setProperty(qn_searchSynchronizerPropertyName, QVariant::fromValue<QnResourceSearchSynchronizer*>(result));
+        layout->setProperty(kSearchSynchronizerPropertyName, QVariant::fromValue<QnResourceSearchSynchronizer*>(result));
     }
     return result;
 }
 
 QString QnResourceBrowserWidget::layoutFilter(QnWorkbenchLayout* layout) const
 {
-    return layout->property(qn_filterPropertyName).toString();
+    return layout->property(kFilterPropertyName).toString();
 }
 
 void QnResourceBrowserWidget::setLayoutFilter(QnWorkbenchLayout* layout, const QString& filter) const
 {
-    layout->setProperty(qn_filterPropertyName, filter);
+    layout->setProperty(kFilterPropertyName, filter);
 }
 
 void QnResourceBrowserWidget::killSearchTimer()
@@ -560,60 +560,62 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
 
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
 {
-    auto currentTarget = [this, scope]
-    {
-        if (scope != Qn::TreeScope)
-            return QnActionParameters();
-
-        QItemSelectionModel* selectionModel = currentSelectionModel();
-
-        Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
-        if (nodeType == Qn::VideoWallItemNode)
-            return QnActionParameters(selectedVideoWallItems());
-
-        if (nodeType == Qn::VideoWallMatrixNode)
-            return QnActionParameters(selectedVideoWallMatrices());
-
-        if (!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
-            return QnActionParameters(selectedLayoutItems());
-
-        QnActionParameters result(selectedResources());
-
-        /* For working with shared layout links we must know owning user resource. */
-        QModelIndex parentIndex = selectionModel->currentIndex().parent();
-        Qn::NodeType parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-
-        /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
-        QnUserResourcePtr user;
-        QnUuid roleId;
-        switch (parentNodeType)
-        {
-            case Qn::LayoutsNode:
-                user = context()->user();
-                break;
-            case Qn::AccessibleResourcesNode:
-            case Qn::AccessibleLayoutsNode:
-                user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
-                roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
-                break;
-            case Qn::ResourceNode:
-                user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
-                break;
-            default:
-                break;
-        }
-
-        result.setArgument(Qn::UserResourceRole, user);
-        result.setArgument(Qn::UuidRole, roleId);
-        return result;
-    };
+    if (scope != Qn::TreeScope)
+        return QnActionParameters();
 
     QItemSelectionModel* selectionModel = currentSelectionModel();
-    Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    QModelIndex index = selectionModel->currentIndex();
 
-    auto result = currentTarget().withArgument(Qn::NodeTypeRole, nodeType);
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-    return result; // TODO: #Elric just pass all the data through?
+    auto withNodeType = [nodeType](QnActionParameters parameters)
+        {
+            return parameters.withArgument(Qn::NodeTypeRole, nodeType);
+        };
+
+    if (nodeType == Qn::VideoWallItemNode)
+        return withNodeType(selectedVideoWallItems());
+
+    if (nodeType == Qn::VideoWallMatrixNode)
+        return withNodeType(selectedVideoWallMatrices());
+
+    if (!index.data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
+        return withNodeType(selectedLayoutItems());
+
+    QnActionParameters result(selectedResources());
+
+    /* For working with shared layout links we must know owning user resource. */
+    QModelIndex parentIndex = index.parent();
+    Qn::NodeType parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
+    QnUserResourcePtr user;
+    QnUuid roleId;
+
+    if (nodeType == Qn::RoleNode)
+        roleId = index.data(Qn::UuidRole).value<QnUuid>();
+
+    switch (parentNodeType)
+    {
+        case Qn::LayoutsNode:
+            user = context()->user();
+            break;
+        case Qn::AccessibleResourcesNode:
+        case Qn::AccessibleLayoutsNode:
+            user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+            roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
+            break;
+        case Qn::ResourceNode:
+            user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+            break;
+        default:
+            break;
+    }
+
+    result.setArgument(Qn::UserResourceRole, user);
+    result.setArgument(Qn::UuidRole, roleId);
+    result.setArgument(Qn::NodeTypeRole, nodeType);
+    return result;
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force)

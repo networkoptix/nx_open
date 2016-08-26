@@ -1,6 +1,8 @@
 #include "modbus_message_parser.h"
 
-namespace nx_modbus
+namespace nx
+{
+namespace modbus
 {
 
 ModbusMessageParser::ModbusMessageParser() :
@@ -29,14 +31,17 @@ nx_api::ParserState ModbusMessageParser::parse(const nx::Buffer& buf, size_t* by
 
 nx_api::ParserState ModbusMessageParser::state() const
 {
-    return 
-        m_state == ModbusMessageParser::State::initial ? 
-            nx_api::ParserState::init :
-        m_state == ModbusMessageParser::State::done ?
-            nx_api::ParserState::done : 
-        m_state == ModbusMessageParser::State::failed ? 
-            nx_api::ParserState::failed :
-            nx_api::ParserState::inProgress;
+    switch (m_state)
+    {
+        case ModbusMessageParser::State::initial:
+            return nx_api::ParserState::init;
+        case ModbusMessageParser::State::done:
+            return nx_api::ParserState::done;
+        case ModbusMessageParser::State::failed:
+            return nx_api::ParserState::failed;
+        default:
+            return nx_api::ParserState::inProgress;
+    }
 }
 
 void ModbusMessageParser::reset()
@@ -84,4 +89,6 @@ ModbusMessageParser::State ModbusMessageParser::parseData(const nx::Buffer& buff
     return m_state;
 }
 
-}
+} //< Closing namespace modbus
+
+} //< Closing namespace nx

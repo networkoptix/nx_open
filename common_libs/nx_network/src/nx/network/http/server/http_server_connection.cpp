@@ -228,18 +228,27 @@ namespace nx_http
 
         if( responseMsgBody )
         {
-            nx_http::insertOrReplaceHeader(
-                &msg.response->headers,
-                nx_http::HttpHeader( "Content-Type", responseMsgBody->mimeType() ) );
-
-            const auto contentLength = responseMsgBody->contentLength();
-            if( contentLength )
+            const auto contentType = responseMsgBody->mimeType();
+            if (contentType.isEmpty())
+            {
+                // Switching protocols, no content information should be provided at all
+                responseMsgBody.reset();
+            }
+            else
+            {
                 nx_http::insertOrReplaceHeader(
                     &msg.response->headers,
-                    nx_http::HttpHeader(
-                        "Content-Length",
-                        nx_http::StringType::number(
-                            static_cast<qulonglong>( contentLength.get() ) ) ) );
+                    nx_http::HttpHeader( "Content-Type", contentType ) );
+
+                const auto contentLength = responseMsgBody->contentLength();
+                if( contentLength )
+                    nx_http::insertOrReplaceHeader(
+                        &msg.response->headers,
+                        nx_http::HttpHeader(
+                            "Content-Length",
+                            nx_http::StringType::number(
+                                static_cast<qulonglong>( contentLength.get() ) ) ) );
+            }
         }
         else
         {

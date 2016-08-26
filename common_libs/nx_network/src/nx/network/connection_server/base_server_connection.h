@@ -166,6 +166,7 @@ namespace nx_api
         std::unique_ptr<AbstractCommunicatingSocket> takeSocket()
         {
             auto socket = std::move(m_streamSocket);
+            socket->cancelIOSync(nx::network::aio::etNone);
             m_streamSocket = nullptr;
             return std::move(socket);
         }

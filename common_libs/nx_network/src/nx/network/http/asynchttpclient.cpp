@@ -67,8 +67,7 @@ namespace nx_http
         m_lastSysErrorCode(SystemError::noError),
         m_requestSequence(0),
         m_forcedEof(false),
-        m_precalculatedAuthorizationDisabled(false),
-        m_connectionHeader("keep-alive")
+        m_precalculatedAuthorizationDisabled(false)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -322,14 +321,21 @@ namespace nx_http
         m_proxyUserPassword = userPassword;
     }
 
-    void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+    void AsyncHttpClient::setAuth(const AuthInfo& auth)
     {
-        m_proxyEndpoint = proxyEndpoint;
+        setUserName(auth.username);
+        setUserPassword(auth.password);
+        setProxyUserName(auth.proxyUsername);
+        setProxyUserPassword(auth.proxyPassword);
+        setProxyVia(auth.proxyEndpoint);
     }
 
-    void AsyncHttpClient::setConnectionHeader(const StringType& value)
+    void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
-        m_connectionHeader = value;
+        if (proxyEndpoint.isNull())
+            m_proxyEndpoint.reset();
+        else
+            m_proxyEndpoint = proxyEndpoint;
     }
 
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -552,7 +558,7 @@ namespace nx_http
             {
                 if (!m_proxyAuthorizationTried && (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
                 {
-                    if (resendRequestWithAuthorization(*response))
+                    if (resendRequestWithAuthorization(*response, true))
                         return;
                 }
             }
@@ -830,8 +836,12 @@ namespace nx_http
                 //    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
             }
             //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
-            m_request.headers.insert(std::make_pair("Connection", m_connectionHeader));
-            m_request.headers.insert(std::make_pair("Host", m_url.host().toLatin1()));
+
+            if (m_additionalHeaders.count("Connection") == 0)
+                m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
+
+            if (m_additionalHeaders.count("Host") == 0)
+                m_request.headers.insert(std::make_pair("Host", m_url.host().toLatin1()));
         }
 
         m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
@@ -925,7 +935,8 @@ namespace nx_http
         const QString userPassword = isProxy ? m_proxyUserPassword : m_userPassword;
 
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
-        NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized);
+        NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
+                  response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
 
         HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find(authenticateHeaderName);
         if (wwwAuthenticateIter == response.headers.end())
@@ -957,12 +968,12 @@ namespace nx_http
             header::DigestAuthorization digestAuthorizationHeader;
             if (!calcDigestResponse(
                     m_request.requestLine.method,
-                    m_userName.toUtf8(),
+                    userName.toUtf8(),
                     m_authType != authDigestWithPasswordHash
-                        ? m_userPassword.toUtf8()
+                        ? userPassword.toUtf8()
                         : boost::optional<nx_http::BufferType>(),
                     m_authType == authDigestWithPasswordHash
-                        ? m_userPassword.toLatin1()
+                        ? userPassword.toLatin1()
                         : boost::optional<nx_http::BufferType>(),
                     m_url.path().toUtf8(),
                     wwwAuthenticateHeader,

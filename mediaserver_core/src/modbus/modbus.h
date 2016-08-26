@@ -3,7 +3,9 @@
 #include <qglobal.h>
 #include <nx/network/buffer.h>
 
-namespace nx_modbus
+namespace nx
+{
+namespace modbus
 {
 
 const quint16 kDefaultModbusPort = 502;
@@ -64,6 +66,8 @@ struct ModbusMBAPHeader
     quint16 length;
     quint8 unitId;
 
+    ModbusMBAPHeader();
+
     static QByteArray encode(const ModbusMBAPHeader& header);
     static ModbusMBAPHeader decode(const QByteArray& header);
     static const size_t size =
@@ -80,6 +84,8 @@ struct ModbusMessage
     ModbusMBAPHeader header;
     quint8 functionCode;
     QByteArray data;
+
+    ModbusMessage();
 
     bool isException() const;
     QString getExceptionString() const;
@@ -144,4 +150,6 @@ struct ModbusIdResponseData
     static ModbusIdResponseData decode(const QByteArray& response);
 };
 
-}
+} //< Closing namespace modbus.
+
+} //< Closing namespace nx.

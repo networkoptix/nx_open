@@ -21,6 +21,8 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
+#include <utils/common/app_info.h>
+
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     : base_type(parent)
     , ui(new Ui::QnSystemAdministrationDialog)
