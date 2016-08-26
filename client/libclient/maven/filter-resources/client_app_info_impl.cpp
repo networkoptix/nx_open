@@ -49,3 +49,25 @@ QString QnClientAppInfo::launcherVersionFile()
 {
     return QStringLiteral("${launcher.version.file}");
 }
+
+QString QnClientAppInfo::binDirSuffix()
+{
+    #if defined(Q_OS_LINUX)
+        return QStringLiteral("bin");
+    #elif defined(Q_OS_MACX)
+        return QStringLiteral("Contents/MacOS");
+    #else
+        return QString();
+    #endif
+}
+
+QString QnClientAppInfo::libDirSuffix()
+{
+    #if defined(Q_OS_LINUX)
+        return QStringLiteral("lib");
+    #elif defined(Q_OS_MACX)
+        return QStringLiteral("Frameworks");
+    #else
+        return QString();
+    #endif
+}
