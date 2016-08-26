@@ -103,7 +103,7 @@
         <Property Id="SERVER_LOGIN" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes"/>
         <Property Id="SYS_ID_TIME" Secure="yes">
-            <RegistrySearch Id="SysIdTimeReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="sysIdTime" Type="raw" Win64="yes"/>
+            <RegistrySearch Id="SysIdTimeReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="sysIdTime" Type="DWORD" Win64="yes"/>
         </Property>
         <Property Id="SERVER_PASSWORD_CONFIRM" Secure="yes"/>
 
