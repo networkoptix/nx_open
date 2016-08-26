@@ -12,6 +12,7 @@
 #include <api/runtime_info_manager.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_message_processor.h>
