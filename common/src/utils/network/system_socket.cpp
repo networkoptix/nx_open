@@ -676,6 +676,12 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
 
         if( (sockPollfd.revents & POLLOUT) == 0 )
             iSelRet = 0;
+
+        int result;
+        socklen_t result_len = sizeof(result);
+        if ((getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
+            iSelRet = 0;
+
         break;
     }
 #endif
