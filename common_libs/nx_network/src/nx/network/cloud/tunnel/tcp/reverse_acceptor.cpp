@@ -98,17 +98,21 @@ void ReverseAcceptor::NxRcHandler::processRequest(
     stree::ResourceContainer,
     nx_http::Request request,
     nx_http::Response* const response,
-    std::function<void(
-        const nx_http::StatusCode::Value code,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> handler)
+    nx_http::HttpRequestProcessedHandler handler)
 {
     auto connectionIt = request.headers.find(kConnection);
     if (connectionIt == request.headers.end() || connectionIt->second != kUpgrade)
-        return handler(nx_http::StatusCode::notAcceptable, nullptr);
+        return handler(
+            nx_http::StatusCode::notAcceptable,
+            nullptr,
+            nx_http::ConnectionEvents());
 
     auto upgradeIt = request.headers.find(kUpgrade);
     if (upgradeIt == request.headers.end() || !upgradeIt->second.startsWith(kNxRc))
-        return handler(nx_http::StatusCode::notImplemented, nullptr);
+        return handler(
+            nx_http::StatusCode::notImplemented,
+            nullptr,
+            nx_http::ConnectionEvents());
 
     String upgrade = upgradeIt->second + ", ";
     request.requestLine.version.serialize(&upgrade);
@@ -117,7 +121,10 @@ void ReverseAcceptor::NxRcHandler::processRequest(
 
     auto hostNameIt = request.headers.find(kNxRcHostName);
     if (hostNameIt == request.headers.end() || hostNameIt->second.isEmpty())
-        return handler(nx_http::StatusCode::badRequest, nullptr);
+        return handler(
+            nx_http::StatusCode::badRequest,
+            nullptr,
+            nx_http::ConnectionEvents());
 
     NX_LOGX(lm("request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
     connection->setSendCompletionHandler(
@@ -129,7 +136,10 @@ void ReverseAcceptor::NxRcHandler::processRequest(
         });
 
     m_acceptor->setNxRcHeaders(&response->headers);
-    handler(nx_http::StatusCode::upgrade, std::make_unique<UpgradeMsgBody>());
+    handler(
+        nx_http::StatusCode::upgrade,
+        std::make_unique<UpgradeMsgBody>(),
+        nx_http::ConnectionEvents());
 }
 
 } // namespace tcp

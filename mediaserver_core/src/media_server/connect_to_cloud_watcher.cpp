@@ -1,8 +1,10 @@
 #include "connect_to_cloud_watcher.h"
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <transaction/transaction_message_bus.h>
-#include <api/global_settings.h>
+#include <utils/common/app_info.h>
+
 
 QnConnectToCloudWatcher::QnConnectToCloudWatcher()
 {
@@ -14,8 +16,10 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher()
 
 void QnConnectToCloudWatcher::at_updateConnection()
 {
+    //TODO #ak should take url from CdbEndpointFetcher
+
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    QUrl cloudUrl = qnGlobalSettings->cloudPortalUrl();
+    QUrl cloudUrl = QnAppInfo::defaultCloudPortalUrl();
     bool needCloudConnect =
         localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync) &&
         !cloudUrl.isEmpty() &&

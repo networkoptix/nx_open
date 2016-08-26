@@ -18,6 +18,7 @@
 #include <llutil/hardware_id.h>
 #include <network/http_connection_listener.h>
 #include <rest/server/rest_connection_processor.h>
+#include <utils/common/app_info.h>
 #include <utils/common/guard.h>
 #include <utils/common/settings.h>
 
