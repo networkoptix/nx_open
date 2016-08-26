@@ -28,10 +28,6 @@
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
-namespace {
-const auto kMinTimeGapBetweenActions = std::chrono::milliseconds(200);
-}
-
 QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 {
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
@@ -143,42 +139,8 @@ void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& a
     }
 }
 
-bool QnBusinessRuleProcessor::isActionTooFrequent(const QnUuid& resourceId, qint64 timestamp) const
-{
-    QnMutexLocker lock(&m_actionToTimeMutex);
-    ResourceActionToTimeMap::iterator actionTimeIt = m_actionToTime.find(resourceId);
-    std::chrono::steady_clock::time_point currentActionTimePoint{std::chrono::microseconds(timestamp)};
-
-    if (actionTimeIt == m_actionToTime.cend())
-    {
-        auto resultPair = m_actionToTime.emplace(resourceId, currentActionTimePoint);
-        NX_ASSERT(resultPair.second);
-        if (!resultPair.second)
-            NX_LOG(lit("%1 m_actionToTime.emplace() failed. Out of memory?").arg(Q_FUNC_INFO), cl_logWARNING);
-    }
-    else
-    {
-        auto timePeriodSinceLastAction = currentActionTimePoint - actionTimeIt->second;
-        actionTimeIt->second = currentActionTimePoint;
-        if (timePeriodSinceLastAction < kMinTimeGapBetweenActions)
-        {
-            NX_LOG(lit("%1 This resource %2 generates actions too frequently.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(resourceId.toString()), 
-                   cl_logDEBUG1);
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    auto resourceId = res ? res->getId() : QnUuid();
-    if (isActionTooFrequent(resourceId, action->getRuntimeParams().eventTimestampUsec))
-        return;
-
     if (needProxyAction(action, res))
         doProxyAction(action, res);
     else {

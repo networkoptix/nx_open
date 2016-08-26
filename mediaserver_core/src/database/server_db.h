@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+#include <map>
 #include <QtSql/QtSql>
 
 #include <api/model/audit/audit_record.h>
@@ -28,6 +30,10 @@ class QnServerDb :
     public Singleton<QnServerDb>
 {
     Q_OBJECT
+
+    using TimePointType = std::chrono::steady_clock::time_point;
+    using ResourceActionToTimeMap = std::map<QnUuid, TimePointType>;
+
 public:
     QnServerDb();
 
@@ -84,6 +90,7 @@ protected:
 
     bool addOrUpdateBookmark(const QnCameraBookmark &bookmark, bool isUpdate);
     void updateBookmarkCount();
+    bool isActionTooFrequent(const QnUuid& resourceId, qint64 timestamp) const;
 
 private:
     bool createDatabase();
@@ -103,6 +110,9 @@ private:
     qint64 m_eventKeepPeriod;
     QnDbTransaction m_tran;
     std::function<void(size_t)> m_updateBookmarkCount;
+
+    mutable ResourceActionToTimeMap m_actionToTime;
+    mutable QnMutex m_actionToTimeMutex;
 };
 
 #define qnServerDb QnServerDb::instance()

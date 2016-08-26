@@ -1,9 +1,6 @@
 #ifndef __BUSINESS_RULE_PROCESSOR_H_
 #define __BUSINESS_RULE_PROCESSOR_H_
 
-#include <chrono>
-#include <map>
-
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
@@ -97,10 +94,6 @@ private:
 class QnBusinessRuleProcessor: public QThread
 {
     Q_OBJECT
-
-    using TimePointType = std::chrono::steady_clock::time_point;
-    using ResourceActionToTimeMap = std::map<QnUuid, TimePointType>;
-
 public:
     QnBusinessRuleProcessor();
     virtual ~QnBusinessRuleProcessor();
@@ -172,7 +165,6 @@ private:
     bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
-    bool isActionTooFrequent(const QnUuid& resourceId, qint64 timestamp) const;
 protected:
     mutable QnMutex m_mutex;
 private:
@@ -208,9 +200,6 @@ private:
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
-
-    mutable ResourceActionToTimeMap m_actionToTime;
-    mutable QnMutex m_actionToTimeMutex;
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()
