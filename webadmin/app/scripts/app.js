@@ -30,9 +30,16 @@ angular.module('webadminApp', [
     });
 
     customRouteProvider
-        .when('/settings', {
+        .when('/settings/system', {
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
+        })
+        .when('/settings/server', {
+            templateUrl: 'views/settings.html',
+            controller: 'SettingsCtrl'
+        })
+        .when('/settings/', {
+            redirectTo: '/settings/server'
         })
         .when('/join', {
             templateUrl: 'views/join.html',

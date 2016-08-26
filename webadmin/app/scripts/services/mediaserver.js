@@ -151,15 +151,16 @@ angular.module('webadminApp')
                         var nonce = data.data.reply.nonce;
 
                         var auth = self.digest(login, password, realm, nonce);
-
-                        $localStorage.login = login;
-                        $localStorage.nonce = nonce;
-                        $localStorage.realm = realm;
-                        $localStorage.auth = auth;
+                        $localStorage.$reset();
 
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
+                        },function(){
+                            $localStorage.login = login;
+                            $localStorage.nonce = nonce;
+                            $localStorage.realm = realm;
+                            $localStorage.auth = auth;
                         });
                     });
                 }
