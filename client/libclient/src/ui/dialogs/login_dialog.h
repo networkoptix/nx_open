@@ -1,11 +1,9 @@
-#ifndef QN_LOGIN_DIALOG_H
-#define QN_LOGIN_DIALOG_H
+#pragma once
 
 #include <memory>
 
 #include <QtWidgets/QDialog>
 
-#include <api/model/connection_info.h>
 #include <nx_ec/ec_api.h>
 
 #include <client/client_settings.h>
@@ -25,10 +23,11 @@ class QnResourceWidgetRenderer;
 class QnRenderingWidget;
 
 namespace Ui {
-    class LoginDialog;
+class LoginDialog;
 }
 
-class QnLoginDialog : public QnDialog, public QnWorkbenchContextAware {
+class QnLoginDialog: public QnDialog, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef QnDialog base_type;
@@ -36,7 +35,7 @@ public:
     explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnLoginDialog();
 
-public slots:
+    public slots:
     virtual void accept() override;
     virtual void reject() override;
 
@@ -60,7 +59,7 @@ protected:
      */
     void resetAutoFoundConnectionsModel();
 
-private slots:
+    private slots:
     void updateAcceptibility();
     void updateFocus();
     void updateUsability();
@@ -92,21 +91,15 @@ private:
 
     QnRenderingWidget *m_renderingWidget;
 
-    struct QnEcData {
-        QnUuid id;
+    struct QnFoundSystemData
+    {
+        QnModuleInformation info;
         QUrl url;
-        QnSoftwareVersion version;
-        int protoVersion;
-        QString systemName;
 
-        QnEcData();
-
-        bool operator==(const QnEcData& other) const;
-        bool operator!=(const QnEcData& other) const;
+        bool operator==(const QnFoundSystemData& other) const;
+        bool operator!=(const QnFoundSystemData& other) const;
     };
 
     /** Hash list of automatically found Servers based on seed as key. */
-    QHash<QnUuid, QnEcData> m_foundEcs;
+    QHash<QnUuid, QnFoundSystemData> m_foundSystems;
 };
-
-#endif // LOGINDIALOG_H
