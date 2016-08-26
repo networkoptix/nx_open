@@ -10,9 +10,11 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
 
 #include <transaction/transaction_transport.h>
 
+#include "ec2/appserver2_process.h"
 #include "test_setup.h"
 #include "transaction_transport.h"
 
@@ -118,7 +120,7 @@ private:
     }
 };
 
-TEST_F(MserverCloudSynchronization, general)
+TEST_F(MserverCloudSynchronization, establishConnection)
 {
     constexpr static const auto kWaitTimeout = std::chrono::seconds(5);
 
@@ -140,6 +142,122 @@ TEST_F(MserverCloudSynchronization, general)
     ASSERT_TRUE(
         openTransactionConnectionAndWaitForResult(
             system1.id, system1.authKey, kWaitTimeout));
+}
+
+class MserverCloudSynchronization2
+    :
+    public ::testing::Test
+{
+public:
+    MserverCloudSynchronization2()
+    {
+        const auto tmpDir = 
+            CdbLauncher::temporaryDirectoryPath().isEmpty()
+            ? QDir::homePath()
+            : CdbLauncher::temporaryDirectoryPath() + "/ec2_cloud_sync_ut.data";
+
+        const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
+        m_appserver2.addArg(dbFileArg.toStdString().c_str());
+    }
+
+    ~MserverCloudSynchronization2()
+    {
+        m_appserver2.stop();
+        m_cdb.stop();
+    }
+
+    utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>* appserver2()
+    {
+        return &m_appserver2;
+    }
+
+    CdbLauncher* cdb()
+    {
+        return &m_cdb;
+    }
+
+    const CdbLauncher* cdb() const
+    {
+        return &m_cdb;
+    }
+
+    api::ResultCode bindRandomSystem()
+    {
+        api::ResultCode result = m_cdb.addActivatedAccount(&m_account, &m_accountPassword);
+        if (result != api::ResultCode::ok)
+            return result;
+
+        //adding system1 to account1
+        result = m_cdb.bindRandomSystem(m_account.email, m_accountPassword, &m_system);
+        if (result != api::ResultCode::ok)
+            return result;
+
+        //saving cloud credentials to vms db
+        ec2::ApiUserDataList users;
+        if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
+                ->getUsersSync(&users) != ec2::ErrorCode::ok)
+        {
+            return api::ResultCode::unknownError;
+        }
+
+        QnUuid adminUserId;
+        for (const auto& user: users)
+        {
+            if (user.name == "admin")
+                adminUserId = user.id;
+        }
+        if (adminUserId.isNull())
+            return api::ResultCode::notFound;
+
+        ec2::ApiResourceParamWithRefDataList params;
+        params.emplace_back(ec2::ApiResourceParamWithRefData(
+            adminUserId,
+            "cloudSystemID",
+            QString::fromStdString(m_system.id)));
+        params.emplace_back(ec2::ApiResourceParamWithRefData(
+            adminUserId,
+            "cloudAuthKey",
+            QString::fromStdString(m_system.authKey)));
+        ec2::ApiResourceParamWithRefDataList outParams;
+        if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
+                ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
+        {
+            return api::ResultCode::unknownError;
+        }
+
+        return api::ResultCode::ok;
+    }
+
+    const api::SystemData& registeredSystemData() const
+    {
+        return m_system;
+    }
+
+    QUrl cdbEc2TransactionUrl() const
+    {
+        QUrl url(lit("http://%1/").arg(cdb()->endpoint().toString()));
+        url.setUserName(QString::fromStdString(m_system.id));
+        url.setPassword(QString::fromStdString(m_system.authKey));
+        return url;
+    }
+
+private:
+    utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> m_appserver2;
+    CdbLauncher m_cdb;
+    api::AccountData m_account;
+    std::string m_accountPassword;
+    api::SystemData m_system;
+};
+
+TEST_F(MserverCloudSynchronization2, general)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+    std::this_thread::sleep_for(std::chrono::minutes(100));
 }
 
 }   //namespace cdb
