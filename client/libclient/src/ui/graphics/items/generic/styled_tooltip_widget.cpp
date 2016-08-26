@@ -6,29 +6,24 @@
 #include <QtWidgets/QApplication>
 
 #include <ui/common/palette.h>
+#include <ui/style/helper.h>
 
 
 QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem* parent):
-    base_type(parent),
-    m_tailLength(10.0)
+    base_type(parent)
 {
-    setContentsMargins(5.0, 5.0, 5.0, 5.0);
-    setTailWidth(5.0);
+    setRoundingRadius(0.0);
 
-    setPaletteColor(this, QPalette::WindowText, QColor(63, 159, 216));
-    setWindowBrush(QColor(0, 0, 0, 255));
-    setFrameBrush(QColor(203, 210, 233, 128));
-    setFrameWidth(1.0);
-
-    QFont fixedFont = QApplication::font();
-    fixedFont.setPixelSize(14);
-    setFont(fixedFont);
+    const int margin = style::Metrics::kStandardPadding;
+    setContentsMargins(margin, margin, margin, margin);
+    setTailLength(margin);
+    setTailWidth(margin * 2.0);
 
     setZValue(std::numeric_limits<qreal>::max());
     updateTailPos();
 }
 
-QnStyledTooltipWidget::~QnStyledTooltipWidget() 
+QnStyledTooltipWidget::~QnStyledTooltipWidget()
 {
 }
 
@@ -47,7 +42,7 @@ void QnStyledTooltipWidget::setTailLength(qreal tailLength)
     updateTailPos();
 }
 
-void QnStyledTooltipWidget::setGeometry(const QRectF& rect) 
+void QnStyledTooltipWidget::setGeometry(const QRectF& rect)
 {
     QSizeF oldSize = size();
 
