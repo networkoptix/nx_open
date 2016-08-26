@@ -25,6 +25,7 @@
 
 namespace
 {
+
     const char DELIMITER('$');
     const char STRING_LIST_DELIM('\n');
 
@@ -607,9 +608,6 @@ bool QnServerDb::removeLogForRes(QnUuid resId)
 
 bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 {
-    qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
-    QnUuid eventResId = action->getRuntimeParams().eventResourceId;
-
     QnWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
@@ -619,6 +617,9 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
     insQuery.prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_guid, toggle_state, aggregation_count, event_type, "
         "event_resource_guid, action_resource_guid) "
         "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid, :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);");
+
+    qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
+    QnUuid eventResId = action->getRuntimeParams().eventResourceId;
 
     QnBusinessActionParameters actionParams = action->getParams();
 

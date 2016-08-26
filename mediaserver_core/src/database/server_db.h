@@ -84,7 +84,6 @@ protected:
 
     bool addOrUpdateBookmark(const QnCameraBookmark &bookmark, bool isUpdate);
     void updateBookmarkCount();
-
 private:
     bool createDatabase();
     bool cleanupEvents();
