@@ -228,7 +228,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (QnAppInfo::defaultCloudHost() != remoteModuleInformation.defaultCloudHost)
+    if (QnAppInfo::defaultCloudHost() != remoteModuleInformation.cloudHost)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge because servers are built with different cloud host")
             .arg(data.url), cl_logDEBUG1);
