@@ -103,7 +103,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_state = NotDefined;
     m_connected = false;
     m_prevGivenHandlerID = 0;
-    m_authByKey = true;
+    m_credentialsSource = CredentialsSource::serverKey;
     m_postedTranCount = 0;
     m_asyncReadScheduled = false;
     m_remoteIdentityTime = 0;
@@ -500,7 +500,17 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         this, &QnTransactionTransportBase::at_httpClientDone,
         Qt::DirectConnection);
 
-    fillAuthInfo( m_httpClient, m_authByKey );
+    if (remotePeerUrl.userName().isEmpty())
+    {
+        fillAuthInfo( m_httpClient, m_credentialsSource == CredentialsSource::serverKey );
+    }
+    else
+    {
+        m_credentialsSource = CredentialsSource::remoteUrl;
+        m_httpClient->setUserName(remotePeerUrl.userName());
+        m_httpClient->setUserPassword(remotePeerUrl.password());
+    }
+
     if (m_localPeer.isServer() && QnCommonModule::instance())
         m_httpClient->addAdditionalHeader(
             Qn::EC2_SYSTEM_NAME_HEADER_NAME,
@@ -1005,7 +1015,16 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
                 m_outgoingTranClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &QnTransactionTransportBase::postTransactionDone,
                 Qt::DirectConnection );
-            fillAuthInfo( m_outgoingTranClient, true );
+            
+            if (m_remotePeerCredentials.isNull())
+            {
+                fillAuthInfo( m_outgoingTranClient, true );
+            }
+            else
+            {
+                m_outgoingTranClient->setUserName(m_remotePeerCredentials.user());
+                m_outgoingTranClient->setUserPassword(m_remotePeerCredentials.password());
+            }
 
             m_postTranBaseUrl = m_remoteAddr;
             m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
@@ -1059,14 +1078,17 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
 
     if (statusCode == nx_http::StatusCode::unauthorized)
     {
-        if (m_authByKey) {
-            m_authByKey = false;
-            fillAuthInfo( m_httpClient, m_authByKey );
+        m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
+        if (m_credentialsSource < CredentialsSource::none)
+        {
+            fillAuthInfo( m_httpClient, m_credentialsSource == CredentialsSource::serverKey );
             repeatDoGet();
         }
-        else {
+        else
+        {
             QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
-            if (!guid.isNull()) {
+            if (!guid.isNull())
+            {
                 emit peerIdDiscovered(remoteAddr(), guid);
                 emit remotePeerUnauthorized(guid);
             }
@@ -1140,6 +1162,12 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     {
         cancelConnecting();
         return;
+    }
+
+    if (auto password = client->authCacheItem().password)
+    {
+        m_remotePeerCredentials.setUser(client->authCacheItem().userName);
+        m_remotePeerCredentials.setPassword(*password);
     }
 
     if (getState() == QnTransactionTransportBase::Error || getState() == QnTransactionTransportBase::Closed) {

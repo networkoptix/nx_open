@@ -268,6 +268,14 @@ private:
         prAccepting
     };
 
+    enum class CredentialsSource
+    {
+        remoteUrl,
+        serverKey,
+        appserverConnectionFactory,
+        none,
+    };
+
     const ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
@@ -295,7 +303,7 @@ private:
     int m_prevGivenHandlerID;
 
     QByteArray m_extraData;
-    bool m_authByKey;
+    CredentialsSource m_credentialsSource;
     QElapsedTimer m_lastReceiveTimer;
     int m_postedTranCount;
     bool m_asyncReadScheduled;
@@ -326,6 +334,7 @@ private:
     std::chrono::milliseconds m_tcpKeepAliveTimeout;
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
+    QAuthenticator m_remotePeerCredentials;
 
 private:
     QnTransactionTransportBase(
