@@ -306,7 +306,8 @@ angular.module('webadminApp')
 
             changeSystemName:function(systemName){
                 return wrapPost(proxy + '/web/api/configure', {
-                    systemName:systemName
+                    wholeSystem: true,
+                    systemName: systemName
                 });
             },
 
