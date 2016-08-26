@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <chrono>
 
 #include <boost/optional.hpp>
@@ -25,12 +26,25 @@ QString toString(const T& t)
     return toStringSfinae(t, 0);
 }
 
+NX_UTILS_API QString toString(void* p);
 NX_UTILS_API QString toString(const QByteArray& t);
 
 NX_UTILS_API QString toString(const std::chrono::hours& t);
 NX_UTILS_API QString toString(const std::chrono::minutes& t);
 NX_UTILS_API QString toString(const std::chrono::seconds& t);
 NX_UTILS_API QString toString(const std::chrono::milliseconds& t);
+
+template<typename T>
+QString toString(const std::unique_ptr<T>& p)
+{
+    return toString((void*)p.get());
+}
+
+template<typename T>
+QString toString(const std::shared_ptr<T>& p)
+{
+    return toString((void*)p.get());
+}
 
 template<typename T>
 QString toString(const boost::optional<T>& t)

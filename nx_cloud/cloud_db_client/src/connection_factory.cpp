@@ -24,8 +24,6 @@ ConnectionFactory::ConnectionFactory()
 }
 
 void ConnectionFactory::connect(
-    const std::string& /*login*/,
-    const std::string& /*password*/,
     std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler)
 {
     //TODO #ak downloading xml with urls
@@ -37,24 +35,32 @@ void ConnectionFactory::connect(
         std::unique_ptr<api::Connection>());
 }
 
-std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
-    const std::string& login,
-    const std::string& password)
+std::unique_ptr<api::Connection> ConnectionFactory::createConnection()
 {
-    return std::make_unique<Connection>(
-        &m_endPointFetcher,
-        login,
-        password);
+    return std::make_unique<Connection>(&m_endPointFetcher);
+}
+
+std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
+    const std::string& username,
+    const std::string password)
+{
+    auto connection = createConnection();
+    connection->setCredentials(username, password);
+    return connection;
+}
+
+std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection()
+{
+    return std::make_unique<EventConnection>(&m_endPointFetcher);
 }
 
 std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection(
-    const std::string& login,
-    const std::string& password)
+    const std::string& username,
+    const std::string password)
 {
-    return std::make_unique<EventConnection>(
-        &m_endPointFetcher,
-        login,
-        password);
+    auto connection = createEventConnection();
+    connection->setCredentials(username, password);
+    return connection;
 }
 
 std::string ConnectionFactory::toString(api::ResultCode resultCode) const

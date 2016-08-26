@@ -507,14 +507,6 @@ to view more bookmarks</source>
         <translation>복원</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>메세지 보기</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>버젼 정보 오류 보기</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>브라우져 열기...</translation>
     </message>
@@ -705,10 +697,6 @@ to view more bookmarks</source>
     <message>
         <source>Activate PTZ Tour</source>
         <translation>PTZ 투어 활성화</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>베타버전의 경고 메세지보기</translation>
     </message>
     <message>
         <source>Manage...</source>
@@ -1214,6 +1202,10 @@ to view more bookmarks</source>
         <source>Add Bookmark...</source>
         <translation>북마크 추가</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1674,14 +1666,6 @@ to view more bookmarks</source>
         <translation>모든 사용자</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>음원 선택</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>텍스트 입력</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>모든 장치</translation>
     </message>
@@ -2006,6 +1990,19 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation>변경 적용</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2686,6 +2683,25 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished">%1 오디오 인코더를 찾을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2875,9 +2891,11 @@ to view more bookmarks</source>
             <numerusform>%1 (%n times)</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation>%1사요자 외</translation>
+        <translation type="unfinished">
+            <numerusform>%1사요자 외</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2908,6 +2926,55 @@ to view more bookmarks</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>녹화설정 호환되지 않는 장치 존재.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished">초</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation type="unfinished">분</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation type="unfinished">시간</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished">일</translation>
+    </message>
+    <message numerus="yes">
+        <source>%nms</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%ns</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nm</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nh</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nd</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3300,10 +3367,6 @@ to view more bookmarks</source>
         <translation>테스트 실행 실패.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>인터넷에 연결된 서버가 없습니다.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>시간제한</translation>
     </message>
@@ -3352,10 +3415,6 @@ to view more bookmarks</source>
     <message>
         <source>No new users found.</source>
         <translation>신규 사용자 없음.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>인터넷에 연결된 서버가 없습니다.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3691,10 +3750,6 @@ to view more bookmarks</source>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>연결을 삭제하시겠습니까: %1?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>잘못된 변수</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -4224,6 +4279,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>설정을 저장하지 못했습니다. 시스템 관리자에게 문의하세요.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4605,6 +4664,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Archived duration in calendar days since the first recording</source>
         <translation>Archived duration in calendar days since the first recording</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4754,10 +4817,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>북마크 내보내기</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>북마크 검색&quot;이름순, 태그순, 설명순서&quot;</translation>
     </message>
@@ -4802,6 +4861,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">
             <numerusform>%n I/O 모듈들</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished">북마크 내보내기</translation>
     </message>
 </context>
 <context>
@@ -5369,12 +5432,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>성공</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>인터넷에 연결된 서버가 존재하지 테스트 진행 할수없습니다.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>설정값이 유효하지 않아 테스트 진행 할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5413,10 +5476,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Activate analog license to remove this message</source>
         <translation>이 메세지를 지우시려면 아날로그 인증 키를 활성화 하십시오</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation></translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -5990,6 +6049,25 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Select file...</source>
         <translation>파일선택...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6568,6 +6646,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>장치 추가가 진행중입니다. 취소 하시겠습니까?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6856,6 +6950,10 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>총 30분이상되는 여러개의 비디오가 내보내기 진행 됩니다.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7039,10 +7137,6 @@ If you understand this and would like to proceed please click Merge to continue.
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_교정_%1.jpg</translation>
-    </message>
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>

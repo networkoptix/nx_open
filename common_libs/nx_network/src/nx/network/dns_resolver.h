@@ -38,12 +38,12 @@ public:
     void resolveAddressAsync(
         const HostAddress& addressToResolve,
         std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
-        RequestID reqID );
-
+        int ipVersion, RequestID reqID );
     /*!
         \note This method is re-enterable
     */
-    bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress );
+    bool resolveAddressSync(
+        const QString& hostName, HostAddress* const resolvedAddress, int ipVersion );
 
     /*!
         \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
@@ -65,12 +65,14 @@ private:
         std::function<void(SystemError::ErrorCode, const HostAddress&)> completionHandler;
         RequestID reqID;
         size_t sequence;
+        int ipVersion;
 
         ResolveTask(
             HostAddress _hostAddress,
             std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
             RequestID _reqID,
-            size_t _sequence );
+            size_t _sequence,
+            int _ipVersion);
     };
 
     bool m_terminated;
@@ -79,6 +81,7 @@ private:
     std::list<ResolveTask> m_taskQueue;
     RequestID m_runningTaskReqID;
     size_t m_currentSequence;
+    int ipVersion;
 };
 
 } // namespace network

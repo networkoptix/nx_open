@@ -294,6 +294,7 @@ void CloudStreamSocket::connectAsync(
             &CloudStreamSocket::onAddressResolved,
             this, sharedOperationGuard, remotePort, _1, _2),
         true,
+        m_ipVersion,
         this);
 }
 

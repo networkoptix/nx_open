@@ -12,13 +12,15 @@ namespace ite
     class ContentPacket;
 
     //!
-    class StreamReader : public nxcip::StreamReader, public ObjectCounter<StreamReader>
+    class StreamReader : public DefaultRefCounter<nxcip::StreamReader>
     {
-        DEF_REF_COUNTER
-
     public:
         StreamReader(CameraManager * cameraManager, int encoderNumber);
         virtual ~StreamReader();
+
+        // nxcip::PluginInterface
+
+        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::StreamReader
 
@@ -31,6 +33,10 @@ namespace ite
         CameraManager * m_cameraManager;
         int m_encoderNumber;
         bool m_interrupted;
+
+#if 1
+        int64_t m_ts = 0;
+#endif
 
         std::shared_ptr<ContentPacket> nextPacket();
     };

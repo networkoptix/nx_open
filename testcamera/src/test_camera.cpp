@@ -1,5 +1,6 @@
 
 #include "test_camera.h"
+#include "nx/network/socket.h"
 
 #include <QDebug>
 
@@ -8,6 +9,7 @@
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
 #include "plugins/resource/test_camera/testcamera_const.h"
+
 #include "utils/common/sleep.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/nalUnits.h"
@@ -71,7 +73,7 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
     m_mac = "92-61";
     m_num = htonl(m_num);
     QByteArray last = QByteArray((const char*) &m_num, 4).toHex();
-    while (!last.isEmpty()) 
+    while (!last.isEmpty())
     {
         m_mac += '-';
         m_mac += last.left(2);
@@ -198,7 +200,7 @@ void QnTestCamera::startStreaming(AbstractStreamSocket* socket, bool isSecondary
     while (1)
     {
         QString fileName = fileList[fileIndex];
-        
+
         QList<QnCompressedVideoDataPtr> data = QnFileCache::instance()->getMediaData(fileName);
         if (data.isEmpty())
         {

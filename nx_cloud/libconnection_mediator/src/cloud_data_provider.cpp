@@ -113,8 +113,9 @@ CloudDataProvider::CloudDataProvider( const std::string& address,
     : m_updateInterval( std::move( updateInterval ) )
     , m_isTerminated( false )
     , m_connectionFactory( makeConnectionFactory( address ) )
-    , m_connection( m_connectionFactory->createConnection( user, password ) )
+    , m_connection( m_connectionFactory->createConnection() )
 {
+    m_connection->setCredentials(user, password);
     updateSystemsAsync();
 }
 

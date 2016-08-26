@@ -262,7 +262,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 {
 
     qint64 durationMs = period.durationMs;
-    QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
     if (loader)
     {
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
@@ -418,7 +418,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         if (selectedExtension.contains(lit(".avi")))
         {
-            QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+            auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
             if (loader && archive)
             {
@@ -932,7 +932,7 @@ void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
 
     qint64 durationMs = period.durationMs;
     QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
-    QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
     if (loader)
     {
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);

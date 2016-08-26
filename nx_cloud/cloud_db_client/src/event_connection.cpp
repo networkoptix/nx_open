@@ -22,15 +22,11 @@ namespace cdb {
 namespace cl {
 
 EventConnection::EventConnection(
-    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
-    std::string login,
-    std::string password)
-:
+    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher)
+    :
     m_cdbEndPointFetcher(
         std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
             endPointFetcher)),
-    m_login(std::move(login)),
-    m_password(std::move(password)),
     m_reconnectTimer(network::RetryPolicy(
         network::RetryPolicy::kInfiniteRetries,
         std::chrono::milliseconds::zero(),
@@ -38,6 +34,23 @@ EventConnection::EventConnection(
         std::chrono::minutes(1))),
     m_state(State::init)
 {
+}
+
+void EventConnection::setCredentials(const std::string& login, const std::string& password)
+{
+    m_auth.username = QString::fromStdString(login);
+    m_auth.password = QString::fromStdString(password);
+}
+
+void EventConnection::setProxyCredentials(const std::string& login, const std::string& password)
+{
+    m_auth.proxyUsername = QString::fromStdString(login);
+    m_auth.proxyPassword = QString::fromStdString(password);
+}
+
+void EventConnection::setProxyVia(const SocketAddress& proxyEndpoint)
+{
+    m_auth.proxyEndpoint = proxyEndpoint;
 }
 
 EventConnection::~EventConnection()
@@ -107,8 +120,7 @@ void EventConnection::initiateConnection()
     url.setHost(m_cdbEndpoint.address.toString());
     url.setPort(m_cdbEndpoint.port);
     url.setPath(url.path() + kSubscribeToSystemEventsPath);
-    url.setUserName(QString::fromStdString(m_login));
-    url.setPassword(QString::fromStdString(m_password));
+    m_httpClient->setAuth(m_auth);
     m_httpClient->doGet(url);
 }
 

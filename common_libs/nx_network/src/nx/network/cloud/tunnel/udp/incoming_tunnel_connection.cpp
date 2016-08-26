@@ -54,9 +54,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
     }
 }
 
-void IncomingTunnelConnection::accept(std::function<void(
-    SystemError::ErrorCode,
-    std::unique_ptr<AbstractStreamSocket>)> handler)
+void IncomingTunnelConnection::accept(AcceptHandler handler)
 {
     NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
     m_serverSocket->dispatch(

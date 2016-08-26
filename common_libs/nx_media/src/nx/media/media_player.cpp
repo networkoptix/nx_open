@@ -215,6 +215,8 @@ private:
         QSize highResolution, AVCodecID highCodec, QSize lowResolution, AVCodecID lowCodec);
 
     void doPeriodicTasks();
+
+    void log(const QString& message) const;
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -841,20 +843,31 @@ bool PlayerPrivate::isTranscodingSupported(const QnVirtualCameraResourcePtr& cam
     return server->getServerFlags() & Qn::SF_SupportsTranscoding;
 }
 
+void PlayerPrivate::log(const QString& message) const
+{
+    NX_LOG(lit("[media_player @%1] %2")
+        .arg(reinterpret_cast<uintptr_t>(this), 8, 16, QLatin1Char('0'))
+        .arg(message), cl_logDEBUG1);
+}
+
 //-------------------------------------------------------------------------------------------------
 // Player
 
-Player::Player(QObject *parent)
-:
+Player::Player(QObject *parent):
     QObject(parent),
     d_ptr(new PlayerPrivate(this))
 {
+    Q_D(const Player);
+    d->log(lit("Player()"));
     conf.reload();
 }
 
 Player::~Player()
 {
+    Q_D(const Player);
+    d->log(lit("~Player() BEGIN"));
     stop();
+    d->log(lit("~Player() END"));
 }
 
 Player::State Player::playbackState() const
@@ -890,6 +903,8 @@ qint64 Player::position() const
 void Player::setPosition(qint64 value)
 {
     Q_D(Player);
+    d->log(lit("setPosition(%1)").arg(value));
+
     d->lastSeekTimeMs = value;
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
@@ -916,6 +931,7 @@ void Player::setMaxTextureSize(int value)
 void Player::play()
 {
     Q_D(Player);
+    d->log(lit("play()"));
 
     if (d->state == State::Playing)
         return;
@@ -933,12 +949,14 @@ void Player::play()
 void Player::pause()
 {
     Q_D(Player);
+    d->log(lit("pause()"));
     d->setState(State::Paused);
 }
 
 void Player::stop()
 {
     Q_D(Player);
+    d->log(lit("stop()"));
 
     if (d->archiveReader && d->dataConsumer)
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
@@ -960,28 +978,35 @@ void Player::setSource(const QUrl& url)
 
     const QUrl& newUrl = *conf.substitutePlayerUrl ? QUrl(conf.substitutePlayerUrl) : url;
 
-    if (newUrl != d->url)
+    if (newUrl == d->url)
     {
-        const auto currentState = d->state;
-
-        stop();
-        d->url = newUrl;
-
-        const QString path(d->url.path().mid(1));
-        d->isLocalFile = d->url.scheme() == lit("file");
-        if (d->isLocalFile)
-        {
-            d->resource.reset(new QnAviResource(path));
-            d->resource->setStatus(Qn::Online);
-        }
-        else
-        {
-            d->resource = qnResPool->getResourceById(QnUuid(path));
-        }
-
-        if (d->resource && currentState == State::Playing)
-            play();
+        d->log(lit("setSource(\"%1\"): no change, ignoring").arg(newUrl.toString()));
+        return;
     }
+
+    d->log(lit("setSource(\"%1\") BEGIN").arg(newUrl.toString()));
+
+    const State currentState = d->state;
+
+    stop();
+    d->url = newUrl;
+
+    const QString path(d->url.path().mid(1));
+    d->isLocalFile = d->url.scheme() == lit("file");
+    if (d->isLocalFile)
+    {
+        d->resource.reset(new QnAviResource(path));
+        d->resource->setStatus(Qn::Online);
+    }
+    else
+    {
+        d->resource = qnResPool->getResourceById(QnUuid(path));
+    }
+
+    if (d->resource && currentState == State::Playing)
+        play();
+
+    d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));
 }
 
 void Player::setVideoSurface(QAbstractVideoSurface* videoSurface)
@@ -1030,10 +1055,15 @@ void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
     if (d->videoQuality == videoQuality)
+    {
+        d->log(lit("setVideoQuality(%1): no change, ignoring").arg(videoQuality));
         return;
+    }
+    d->log(lit("setVideoQuality(%1) BEGIN").arg(videoQuality));
     d->videoQuality = videoQuality;
     d->applyVideoQuality();
     emit videoQualityChanged();
+    d->log(lit("setVideoQuality(%1) END").arg(videoQuality));
 }
 
 QSize Player::currentResolution() const

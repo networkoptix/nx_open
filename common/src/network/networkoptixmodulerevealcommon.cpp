@@ -89,8 +89,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
     serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
     ecDbReadOnly = map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
-    cloudSystemId = map.value(lit("cloudSystemId")).toString();
-    cloudHost = map.value(lit("cloudHost"), cloudHost).toString();
+    cloudSystemId =  map.value(lit("cloudSystemId")).toString();
+    cloudHost = map.value(lit("cloudHost")).toString();
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

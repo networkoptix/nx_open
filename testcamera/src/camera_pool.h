@@ -21,7 +21,7 @@ public:
 
     static void initGlobalInstance( QnCameraPool* _inst );
     static QnCameraPool* instance();
-    
+
     void addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq);
     QnTestCamera* findCamera(const QString& mac) const;
     QByteArray getDiscoveryResponse();

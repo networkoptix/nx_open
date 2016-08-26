@@ -543,6 +543,16 @@ APPLY(504, setAccessRights, ApiAccessRightsData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_rights by resource id */ \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        false, \
                        false, \
