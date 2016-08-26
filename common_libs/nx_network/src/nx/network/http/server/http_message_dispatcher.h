@@ -93,9 +93,12 @@ namespace nx_http
                     if (maker != methodFactory->second.end())
                         requestProcessor = maker->second();
 
-                    const auto anyMaker = methodFactory->second.find(kAnyPath);
-                    if (anyMaker != methodFactory->second.end())
-                        requestProcessor = anyMaker->second();
+                    if (!requestProcessor)
+                    {
+                        const auto anyMaker = methodFactory->second.find(kAnyPath);
+                        if (anyMaker != methodFactory->second.end())
+                            requestProcessor = anyMaker->second();
+                    }
                 }
             }
 
@@ -107,6 +110,13 @@ namespace nx_http
                     auto maker = methodFactory->second.find(path);
                     if (maker != methodFactory->second.end())
                         requestProcessor = maker->second();
+
+                    if (!requestProcessor)
+                    {
+                        auto maker = methodFactory->second.find(kAnyPath);
+                        if (maker != methodFactory->second.end())
+                            requestProcessor = maker->second();
+                    }
                 }
             }
 

@@ -28,10 +28,15 @@ public:
     template<class T>
     void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
     {
-        if (remotePeer().peerType == Qn::PT_CloudServer &&
-            transaction.transactionType != TransactionType::Cloud)
+        if (remotePeer().peerType == Qn::PT_CloudServer)
         {
-            return;
+            if (transaction.transactionType != TransactionType::Cloud &&
+                transaction.command != ApiCommand::tranSyncRequest &&
+                transaction.command != ApiCommand::tranSyncResponse &&
+                transaction.command != ApiCommand::tranSyncDone)
+            {
+                return;
+            }
         }
 
         auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);

@@ -59,17 +59,17 @@ public:
 
     void startOutgoingChannel();
 
-    void processSyncRequest(
+    void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
         ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
         TransactionProcessedHandler handler);
 
-    void processSyncResponse(
+    void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
         ::ec2::QnTransaction<::ec2::QnTranStateResponse> data,
         TransactionProcessedHandler handler);
 
-    void processSyncDone(
+    void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
         ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
         TransactionProcessedHandler handler);
@@ -81,15 +81,15 @@ public:
     {
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
-            lm("Sending transaction %1 to (%2, %3)").str(transaction.command)
-                .str(remotePeer().id).str(m_connectionOriginatorEndpoint),
+            lm("Sending transaction %1 to %2").str(transaction.command)
+                .str(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG1);
 
         post([this, transaction = std::move(transaction),
                 transportHeader = std::move(transportHeader)]() mutable
             {
-                if (isReadyToSend(transaction.command) /*&& queue size is too large*/)  //TODO #ak check transaction to send queue size
-                    setWriteSync(false);
+                //if (isReadyToSend(transaction.command) && queue size is too large)  //TODO #ak check transaction to send queue size
+                //    setWriteSync(false);
 
                 if (isReadyToSend(transaction.command))
                 {
@@ -101,8 +101,8 @@ public:
 
                 NX_LOGX(
                     QnLog::EC2_TRAN_LOG,
-                    lm("Postponing send transaction %1 to (%2, %3)").str(transaction.command)
-                        .str(remotePeer().id).str(m_connectionOriginatorEndpoint),
+                    lm("Postponing send transaction %1 to %2").str(transaction.command)
+                        .str(m_commonTransportHeaderOfRemoteTransaction),
                     cl_logDEBUG1);
 
                 //cannot send transaction right now: updating local transaction sequence
@@ -114,6 +114,8 @@ public:
                 //transaction will be sent later
             });
     }
+
+    const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const;
 
 protected:
     virtual void fillAuthInfo(
@@ -127,6 +129,7 @@ private:
     const nx::String m_systemId;
     const nx::String m_connectionId;
     const SocketAddress m_connectionOriginatorEndpoint;
+    TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     /** tran state, we need to synchronize remote side to, before we can mark it write sync */
     ::ec2::QnTranState m_tranStateToSynchronizeTo;
     /** tran state of remote peer. Transactions before this state have been sent to the peer */

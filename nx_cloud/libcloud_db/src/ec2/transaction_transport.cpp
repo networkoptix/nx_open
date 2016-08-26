@@ -52,6 +52,11 @@ TransactionTransport::TransactionTransport(
 {
     using namespace std::placeholders;
 
+    m_commonTransportHeaderOfRemoteTransaction.connectionId = connectionId;
+    m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
+    m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
+    m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = remotePeer.id;
+
     m_transactionLogReader->setOnUbjsonTransactionReady(
         std::bind(&TransactionTransport::addTransportHeaderToUbjsonTransaction, this, _1));
     m_transactionLogReader->setOnJsonTransactionReady(
@@ -59,7 +64,7 @@ TransactionTransport::TransactionTransport(
 
     nx::network::aio::BasicPollable::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
-    setState(Connected);
+    setState(ReadyForStreaming);
     //ignoring "state changed to Connected" signal
 
     QObject::connect(
@@ -105,8 +110,8 @@ void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handle
 
 void TransactionTransport::startOutgoingChannel()
 {
-    NX_LOGX(lm("Starting outgoing transaction channel to (%1; %2)")
-        .arg(remotePeer().id).str(m_connectionOriginatorEndpoint),
+    NX_LOGX(lm("Starting outgoing transaction channel to %1")
+        .str(m_commonTransportHeaderOfRemoteTransaction),
         cl_logDEBUG1);
 
     //sending tranSyncRequest
@@ -123,7 +128,7 @@ void TransactionTransport::startOutgoingChannel()
         std::move(transportHeader));
 }
 
-void TransactionTransport::processSyncRequest(
+void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
     ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
     TransactionProcessedHandler handler)
@@ -151,26 +156,7 @@ void TransactionTransport::processSyncRequest(
         std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2));
 }
 
-void TransactionTransport::onTransactionsReadFromLog(
-    api::ResultCode resultCode,
-    std::vector<nx::Buffer> serializedTransactions)
-{
-    //TODO handle api::ResultCode::tryLater result code
-
-    if (resultCode != api::ResultCode::ok)
-    {
-        NX_LOGX(lm("m_transactionLogReader->getTransactions returned %1. "
-            "Closing connection %2 from peer (%3; %4)")
-            .arg(api::toString(resultCode)).arg(m_connectionId)
-            .arg(remotePeer().id).str(m_connectionOriginatorEndpoint),
-            cl_logDEBUG1);
-        setState(Closed);   //closing connection
-    }
-
-    //TODO posting transactions to send
-}
-
-void TransactionTransport::processSyncResponse(
+void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
     ::ec2::QnTransaction<::ec2::QnTranStateResponse> /*data*/,
     TransactionProcessedHandler /*handler*/)
@@ -179,13 +165,19 @@ void TransactionTransport::processSyncResponse(
     //NX_ASSERT(false);
 }
 
-void TransactionTransport::processSyncDone(
+void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
     ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> /*data*/,
     TransactionProcessedHandler /*handler*/)
 {
     //TODO no need to do anything?
     //NX_ASSERT(false);
+}
+
+const TransactionTransportHeader& 
+    TransactionTransport::commonTransportHeaderOfRemoteTransaction() const
+{
+    return m_commonTransportHeaderOfRemoteTransaction;
 }
 
 void TransactionTransport::fillAuthInfo(
@@ -224,6 +216,24 @@ void TransactionTransport::onStateChanged(
         if (m_connectionClosedEventHandler)
             m_connectionClosedEventHandler(SystemError::connectionReset);
     }
+}
+
+void TransactionTransport::onTransactionsReadFromLog(
+    api::ResultCode resultCode,
+    std::vector<nx::Buffer> serializedTransactions)
+{
+    //TODO handle api::ResultCode::tryLater result code
+
+    if (resultCode != api::ResultCode::ok)
+    {
+        NX_LOGX(lm("m_transactionLogReader->getTransactions returned %1. "
+            "Closing connection from peer %2")
+            .arg(api::toString(resultCode)).str(m_commonTransportHeaderOfRemoteTransaction),
+            cl_logDEBUG1);
+        setState(Closed);   //closing connection
+    }
+
+    //TODO posting transactions to send
 }
 
 void TransactionTransport::addTransportHeaderToUbjsonTransaction(

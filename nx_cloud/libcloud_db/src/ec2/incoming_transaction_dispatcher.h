@@ -93,7 +93,7 @@ private:
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
                 {
-                    completionHandler(api::ResultCode::badRequest);
+                    completionHandler(api::ResultCode::notFound);
                 });
             return;
         }

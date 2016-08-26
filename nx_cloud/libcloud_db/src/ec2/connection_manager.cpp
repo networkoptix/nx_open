@@ -10,6 +10,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
 
+#include <cloud_db_client/src/cdb_request_path.h>
 #include <http/custom_headers.h>
 
 #include "access_control/authorization_manager.h"
@@ -41,13 +42,16 @@ ConnectionManager::ConnectionManager(
 
     m_transactionDispatcher->registerSpecialCommandHandler
         <::ec2::ApiCommand::tranSyncRequest, ::ec2::ApiSyncRequestData>(
-            std::bind(&ConnectionManager::processSyncRequest, this, _1, _2, _3, _4));
+            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::ApiSyncRequestData>,
+                        this, _1, _2, _3, _4));
     m_transactionDispatcher->registerSpecialCommandHandler
         <::ec2::ApiCommand::tranSyncResponse, ::ec2::QnTranStateResponse>(
-            std::bind(&ConnectionManager::processSyncResponse, this, _1, _2, _3, _4));
+            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::QnTranStateResponse>,
+                        this, _1, _2, _3, _4));
     m_transactionDispatcher->registerSpecialCommandHandler
         <::ec2::ApiCommand::tranSyncDone, ::ec2::ApiTranSyncDoneData>(
-            std::bind(&ConnectionManager::processSyncDone, this, _1, _2, _3, _4));
+            std::bind(&ConnectionManager::processSpecialTransaction<::ec2::ApiTranSyncDoneData>,
+                        this, _1, _2, _3, _4));
 }
 
 ConnectionManager::~ConnectionManager()
@@ -67,22 +71,36 @@ void ConnectionManager::createTransactionConnection(
 
     std::string systemId;
     if (!authInfo.get(attr::authSystemID, &systemId))
+    {
+        NX_LOGX(lm("Ignoring createTransactionConnection request without systemId from %1")
+            .str(connection->socket()->getForeignAddress()), cl_logDEBUG1);
         return completionHandler(
             nx_http::StatusCode::ok,
             nullptr,
             nx_http::ConnectionEvents());
+    }
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
+    {
+        NX_LOGX(lm("Ignoring createTransactionConnection request without %1 header from %2")
+            .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME)
+            .str(connection->socket()->getForeignAddress()),
+            cl_logDEBUG1);
         return completionHandler(
             nx_http::StatusCode::badRequest,
             nullptr,
             nx_http::ConnectionEvents());
+    }
     auto connectionId = connectionIdIter->second;
 
     ::ec2::ApiPeerData remotePeer;
     nx::String contentEncoding;
     fetchDataFromConnectRequest(request, &remotePeer, &contentEncoding);
+
+    NX_LOGX(lm("Received createTransactionConnection request from (%1.%2; %3)")
+        .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
+        cl_logDEBUG1);
 
     //newTransport MUST be ready to accept connections before sending response
     const nx::String systemIdLocal(systemId.c_str());
@@ -143,6 +161,12 @@ void ConnectionManager::pushTransaction(
     nx_http::Response* const /*response*/,
     nx_http::HttpRequestProcessedHandler completionHandler)
 {
+    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath))
+        return completionHandler(
+            nx_http::StatusCode::notFound,
+            nullptr,
+            nx_http::ConnectionEvents());
+
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
         return completionHandler(
@@ -189,7 +213,15 @@ void ConnectionManager::addNewConnection(ConnectionContext context)
             this, context.connection->connectionGuid().toByteArray(),
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    m_connections.insert(std::move(context));
+    NX_LOGX(lm("Adding new transaction connection %1 from %2")
+        .arg(context.connectionId)
+        .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
+        cl_logDEBUG1);
+
+    if (!m_connections.insert(std::move(context)).second)
+    {
+        NX_CRITICAL(false);
+    }
 }
 
 template<int connectionIndexNumber, typename ConnectionKeyType>
@@ -199,29 +231,37 @@ void ConnectionManager::removeExistingConnection(
 {
     auto& connectionIndex = m_connections.get<connectionIndexNumber>();
     auto existingConnectionIter = connectionIndex.find(connectionKey);
-    if (existingConnectionIter != connectionIndex.end())
-    {
-        //removing existing connection
-        std::unique_ptr<TransactionTransport> existingConnection;
-        connectionIndex.modify(
-            existingConnectionIter,
-            [&existingConnection](ConnectionContext& data)
-            {
-                existingConnection = std::move(data.connection);
-            });
-        TransactionTransport* connectionPtr = existingConnection.get();
-        connectionPtr->pleaseStop(
-            [existingConnection = std::move(existingConnection)]() mutable
-            {
-                existingConnection.reset();
-            });
-        connectionIndex.erase(existingConnectionIter);
-    }
+    if (existingConnectionIter == connectionIndex.end())
+        return;
+
+    existingConnectionIter->connection->post(
+        [this,
+            connectionKey = std::move(connectionKey),
+            locker = m_startedAsyncCallsCounter.getScopedIncrement()]()
+        {
+            auto& connectionIndex = m_connections.get<connectionIndexNumber>();
+            auto existingConnectionIter = connectionIndex.find(connectionKey);
+            if (existingConnectionIter == connectionIndex.end())
+                return;
+
+            //removing existing connection
+            std::unique_ptr<TransactionTransport> existingConnection;
+            connectionIndex.modify(
+                existingConnectionIter,
+                [&existingConnection](ConnectionContext& data)
+                {
+                    existingConnection = std::move(data.connection);
+                });
+
+            existingConnection.reset();
+            connectionIndex.erase(existingConnectionIter);
+        });
 }
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
     //always called within transport's aio thread
+    NX_LOGX(lm("Removing transaction connection %1").arg(connectionId), cl_logDEBUG1);
 
     QnMutexLocker lk(&m_mutex);
     auto& index = m_connections.get<kConnectionByIdIndex>();
@@ -313,10 +353,11 @@ void ConnectionManager::fetchDataFromConnectRequest(
     *remotePeer = ::ec2::ApiPeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 }
 
-void ConnectionManager::processSyncRequest(
-    const nx::String& systemId,
+template<typename TransactionDataType>
+void ConnectionManager::processSpecialTransaction(
+    const nx::String& /*systemId*/,
     const TransactionTransportHeader& transportHeader,
-    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
+    ::ec2::QnTransaction<TransactionDataType> data,
     TransactionProcessedHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -325,28 +366,10 @@ void ConnectionManager::processSyncRequest(
     NX_ASSERT(connectionIter != connectionByIdIndex.end());
     lk.unlock();
 
-    connectionIter->connection->processSyncRequest(
+    connectionIter->connection->processSpecialTransaction(
         transportHeader,
         std::move(data),
         std::move(handler));
-}
-
-void ConnectionManager::processSyncResponse(
-    const nx::String& systemId,
-    const TransactionTransportHeader& transportHeader,
-    ::ec2::QnTransaction<::ec2::QnTranStateResponse> data,
-    TransactionProcessedHandler handler)
-{
-    //TODO #ak
-}
-
-void ConnectionManager::processSyncDone(
-    const nx::String& systemId,
-    const TransactionTransportHeader& transportHeader,
-    ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
-    TransactionProcessedHandler handler)
-{
-    //TODO #ak
 }
 
 }   // namespace ec2

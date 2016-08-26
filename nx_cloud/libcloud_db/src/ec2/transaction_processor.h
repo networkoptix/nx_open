@@ -62,13 +62,29 @@ public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
 
     virtual void processTransaction(
-        TransactionTransportHeader /*transportHeader*/,
-        ::ec2::QnAbstractTransaction /*transaction*/,
-        QnUbjsonReader<QByteArray>* const /*stream*/,
+        TransactionTransportHeader transportHeader,
+        ::ec2::QnAbstractTransaction abstractTransaction,
+        QnUbjsonReader<QByteArray>* const stream,
         TransactionProcessedHandler completionHandler) override
     {
-        //TODO
-        NX_ASSERT(false);
+        auto transaction = Ec2Transaction(std::move(abstractTransaction));
+        if (!QnUbjson::deserialize(stream, &transaction.params))
+        {
+            NX_LOGX(lm("Failed to deserialize ubjson transaction %1 received from %2")
+                .arg(::ec2::ApiCommand::toString(transaction.command)).str(transportHeader),
+                cl_logWARNING);
+            m_aioTimer.post(
+                [completionHandler = std::move(completionHandler)]
+                {
+                    completionHandler(api::ResultCode::badRequest);
+                });
+            return;
+        }
+
+        this->processTransaction(
+            std::move(transportHeader),
+            std::move(transaction),
+            std::move(completionHandler));
     }
 
     virtual void processTransaction(
@@ -80,9 +96,9 @@ public:
         auto transaction = Ec2Transaction(std::move(abstractTransaction));
         if (!QJson::deserialize(serializedTransactionData["params"], &transaction.params))
         {
-            NX_LOGX(lm("Failed to deserialize json transaction %1 received from (%2, %3)")
-                .arg(::ec2::ApiCommand::toString(transaction.command))
-                .arg(transportHeader.systemId), cl_logWARNING);
+            NX_LOGX(lm("Failed to deserialize json transaction %1 received from %2")
+                .arg(::ec2::ApiCommand::toString(transaction.command)).str(transportHeader),
+                cl_logWARNING);
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
                 {
@@ -266,10 +282,9 @@ private:
             auxiliaryArg);
         if (dbResultCode != nx::db::DBResult::ok)
         {
-            NX_LOGX(lm("Error processing transaction %1 received from (%2, %3). %4")
+            NX_LOGX(lm("Error processing transaction %1 received from %2. %3")
                 .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
-                .arg(transactionContext.transportHeader.systemId)
-                .str(transactionContext.transportHeader.endpoint)
+                .str(transactionContext.transportHeader)
                 .arg(connection->lastError().text()),
                 cl_logWARNING);
         }

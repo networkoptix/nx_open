@@ -21,14 +21,28 @@ TransactionLog::TransactionLog(nx::db::AsyncSqlQueryExecutor* const dbManager)
 }
 
 void TransactionLog::startDbTransaction(
-    const nx::String& systemId,
+    const nx::String& /*systemId*/,
     nx::utils::MoveOnlyFunc<nx::db::DBResult(api::ResultCode, QSqlDatabase*)> dbOperationsFunc,
     nx::utils::MoveOnlyFunc<void(nx::db::DBResult)> onDbUpdateCompleted)
 {
-    //TODO execution of requests to same system MUST be serialized
     //TODO monitoring request queue size and returning api::ResultCode::retryLater if exceeded
+    //TODO execution of requests to the same system MUST be serialized
 
-    //TODO
+    m_dbManager->executeUpdate(
+        [dbOperationsFunc = std::move(dbOperationsFunc)]
+            (QSqlDatabase* dbConnection) -> nx::db::DBResult
+        {
+            return dbOperationsFunc(api::ResultCode::ok, dbConnection);
+        },
+        [onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
+            nx::db::DBResult dbResult)
+        {
+            if (dbResult != nx::db::DBResult::ok)
+            {
+                //TODO #ak rolling back transaction log change
+            }
+            onDbUpdateCompleted(dbResult);
+        });
 }
 
 ////////////////////////////////////////////////////////////
@@ -65,7 +79,7 @@ void TransactionLogReader::getTransactions(
     post(
         [completionHandler = std::move(completionHandler)]()
         {
-            completionHandler(api::ResultCode::dbError, std::vector<nx::Buffer>());
+            completionHandler(api::ResultCode::ok, std::vector<nx::Buffer>());
         });
 }
 

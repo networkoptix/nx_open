@@ -15,6 +15,7 @@
 #include <transaction/transaction_transport_header.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -335,6 +336,7 @@ private:
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
     QAuthenticator m_remotePeerCredentials;
+    nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
 private:
     QnTransactionTransportBase(

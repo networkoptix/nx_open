@@ -471,7 +471,8 @@ void CloudDBProcess::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
-        kPushEc2TransactionPath,
+        //kPushEc2TransactionPath,
+        nx_http::kAnyPath.toStdString().c_str(),   //dispatcher does not support max prefix by now
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 }

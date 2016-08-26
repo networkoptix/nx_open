@@ -55,7 +55,7 @@ public:
         TransactionTransportHeader /*transportHeader*/)
     {
         //TODO returning nx::db::DBResult::cancelled if transaction should be skipped
-        return db::DBResult::statementError;
+        return db::DBResult::ok;
     }
 
 private:
@@ -85,6 +85,8 @@ public:
         nx::utils::MoveOnlyFunc<void(
             api::ResultCode resultCode,
             std::vector<nx::Buffer> serializedTransactions)> completionHandler);
+
+    //TODO #ak following method MUST be asynchronous
     ::ec2::QnTranState getCurrentState() const;
 
     /** Called before returning ubjson-transaction to the caller.

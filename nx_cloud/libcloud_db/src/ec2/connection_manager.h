@@ -173,20 +173,12 @@ private:
         const nx_http::Request& request,
         ::ec2::ApiPeerData* const remotePeer,
         nx::String* const contentEncoding);
-    void processSyncRequest(
+
+    template<typename TransactionDataType>
+    void processSpecialTransaction(
         const nx::String& systemId,
         const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
-        TransactionProcessedHandler handler);
-    void processSyncResponse(
-        const nx::String& systemId,
-        const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<::ec2::QnTranStateResponse> data,
-        TransactionProcessedHandler handler);
-    void processSyncDone(
-        const nx::String& systemId,
-        const TransactionTransportHeader& transportHeader,
-        ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
+        ::ec2::QnTransaction<TransactionDataType> data,
         TransactionProcessedHandler handler);
 };
 

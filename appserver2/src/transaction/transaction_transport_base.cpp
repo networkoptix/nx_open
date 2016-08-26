@@ -394,7 +394,12 @@ void QnTransactionTransportBase::setStateNoLock(State state)
     else if (this->m_state != state)
     {
         this->m_state = state;
+
+        nx::utils::ObjectDestructionFlag::Watcher watcher(
+            &m_connectionFreedFlag);
         emit stateChanged(state);
+        if (watcher.objectDestroyed())
+            return; //connection has been removed by handler
     }
     m_cond.wakeAll();
 }
@@ -690,7 +695,13 @@ void QnTransactionTransportBase::receivedTransactionNonSafe( const QnByteArrayCo
     NX_ASSERT( !transportHeader.processedPeers.empty() );
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
         arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+
+    nx::utils::ObjectDestructionFlag::Watcher watcher(
+        &m_connectionFreedFlag);
     emit gotTransaction( m_remotePeer.dataFormat, serializedTran, transportHeader);
+    if (watcher.objectDestroyed())
+        return; //connection has been removed by handler
+
     ++m_postedTranCount;
 }
 
@@ -998,6 +1009,8 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         {
             using namespace std::chrono;
             m_outgoingTranClient = nx_http::AsyncHttpClient::create();
+            if (m_incomingDataSocket)
+                m_outgoingTranClient->bindToAioThread(m_incomingDataSocket->getAioThread());
             m_outgoingTranClient->setSendTimeoutMs(
                 duration_cast<milliseconds>(kSocketSendTimeout).count());   //it can take a long time to send large transactions
             m_outgoingTranClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
@@ -1089,8 +1102,21 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
             if (!guid.isNull())
             {
-                emit peerIdDiscovered(remoteAddr(), guid);
-                emit remotePeerUnauthorized(guid);
+                {
+                    nx::utils::ObjectDestructionFlag::Watcher watcher(
+                        &m_connectionFreedFlag);
+                    emit peerIdDiscovered(remoteAddr(), guid);
+                    if (watcher.objectDestroyed())
+                        return; //connection has been removed by handler
+                }
+
+                {
+                    nx::utils::ObjectDestructionFlag::Watcher watcher(
+                        &m_connectionFreedFlag);
+                    emit remotePeerUnauthorized(guid);
+                    if (watcher.objectDestroyed())
+                        return; //connection has been removed by handler
+                }
             }
             cancelConnecting();
         }
@@ -1153,7 +1179,11 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             m_remotePeer.dataFormat = Qn::UbjsonFormat;
     #endif
 
+    nx::utils::ObjectDestructionFlag::Watcher watcher(
+        &m_connectionFreedFlag);
     emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
+    if (watcher.objectDestroyed())
+        return; //connection has been removed by handler
 
     if (m_connectionLockGuard.isNull())
         m_connectionLockGuard = ConnectionLockGuard(m_remotePeer.id, ConnectionLockGuard::Direction::Outgoing);
