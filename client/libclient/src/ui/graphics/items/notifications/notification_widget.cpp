@@ -193,6 +193,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
     m_closeButton->setFixedSize(QnSkin::maximumSize(m_closeButton->icon()));
     m_closeButton->setToolTip(tr("Close"));
+    m_closeButton->setVisible(false);
     connect(m_closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
 
     m_textLabel->setWordWrap(true);
