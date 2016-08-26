@@ -37,6 +37,8 @@
 
 #include <nx/vms/utils/system_uri.h>
 
+#include <utils/common/app_info.h>
+
 #include <watchers/cloud_status_watcher.h>
 
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):

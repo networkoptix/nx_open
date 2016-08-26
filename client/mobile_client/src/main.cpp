@@ -16,6 +16,7 @@
 #include <api/runtime_info_manager.h>
 #include <nx_ec/ec2_lib.h>
 #include <common/common_module.h>
+#include <utils/common/app_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/settings_migration.h>
 

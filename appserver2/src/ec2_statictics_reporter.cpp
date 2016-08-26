@@ -8,7 +8,9 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/random.h>
+
 #include <utils/common/synctime.h>
+#include <utils/common/app_info.h>
 
 #include "ec2_connection.h"
 

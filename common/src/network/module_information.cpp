@@ -18,7 +18,7 @@ namespace {
     const QString nxMediaServerId = lit("Media Server");
 }
 
-QnModuleInformation::QnModuleInformation() :
+QnModuleInformation::QnModuleInformation():
     type(),
     customization(),
     version(),

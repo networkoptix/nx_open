@@ -7,12 +7,16 @@
 #include "business/actions/panic_business_action.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_history.h>
+
+#include <plugins/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
 
@@ -23,10 +27,8 @@
 
 #include <media_server/serverutil.h>
 
-#include <utils/math/math.h>
 #include <nx/utils/log/log.h>
 #include "camera/get_image_helper.h"
-#include "core/resource_management/resource_properties.h"
 
 #include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
@@ -39,8 +41,7 @@
 #include "business/business_strings_helper.h"
 #include <business/actions/system_health_business_action.h>
 #include "business/events/mserver_conflict_business_event.h"
-#include "core/resource/camera_history.h"
-#include <utils/common/synctime.h>
+
 #include <common/common_module.h>
 
 #include <core/ptz/ptz_controller_pool.h>
@@ -54,10 +55,14 @@
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
-#include <utils/common/systemerror.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <plugins/resource/avi/avi_resource.h>
+
 #include <nx/streaming/abstract_archive_stream_reader.h>
+
+#include <utils/common/app_info.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
