@@ -680,6 +680,12 @@ bool QnMainWindow::event(QEvent *event) {
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);
 
+    if (event->type() == QEvent::Show)
+    {
+        const auto window = m_view->viewport()->windowHandle();
+        const auto flags = (window->flags() & Qt::WindowType_Mask);
+        window->setFlags(flags | Qt::ForeignWindow);
+    }
     return result;
 }
 
