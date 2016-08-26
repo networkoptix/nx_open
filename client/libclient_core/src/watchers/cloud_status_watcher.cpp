@@ -363,7 +363,8 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         return;
     }
 
-    cloudConnection = connectionFactory->createConnection(cloudLogin.toStdString(), cloudPassword.toStdString());
+    cloudConnection = connectionFactory->createConnection();
+    cloudConnection->setCredentials(cloudLogin.toStdString(), cloudPassword.toStdString());
     createTemporaryCredentials();
 
     Q_Q(QnCloudStatusWatcher);
@@ -484,9 +485,8 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
     if (!temporaryConnection)
     {
         TRACE("Creating new temporary connection");
-        temporaryConnection = connectionFactory->createConnection(
-            temporaryCredentials.login,
-            temporaryCredentials.password);
+        temporaryConnection = connectionFactory->createConnection();
+        temporaryConnection->setCredentials(temporaryCredentials.login, temporaryCredentials.password);
     }
 
     NX_ASSERT(temporaryConnection);

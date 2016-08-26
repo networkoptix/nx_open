@@ -31,12 +31,11 @@ QString getFullAlias(const QString& postfix)
     return lit("%1_%2").arg(kNotificationWidgetAlias, postfix);
 };
 
-const char* actionIndexPropertyName = "_qn_actionIndex";
+const char* kActionIndexPropertyName = "_qn_actionIndex";
 
 const int kColorSignMargin = 4;
 const int kHorizontalMargin = 12;
 const int kVerticalMargin = 6;
-const int kCloseButtonSize = 12;
 
 } // anonymous namespace
 
@@ -54,25 +53,11 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem* parent) 
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    QnImageButtonWidget* closeButton = new QnImageButtonWidget(this);
-    closeButton->setToolTip(lit("%1 (<b>%2</b>)").arg(tr("Close")).arg(tr("Right Click")));
-    closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #dklychkov
-    closeButton->setFixedSize(kCloseButtonSize, kCloseButtonSize);
-    connect(closeButton, &QnImageButtonWidget::clicked, this, [this]()
-    {
-        emit buttonClicked(getFullAlias(lit("close")));
-    });
-    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
-
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addItem(m_textLabel);
 
-    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Horizontal);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addItem(m_layout);
-    layout->addItem(closeButton);
-    setLayout(layout);
+    setLayout(m_layout);
 
     updateTailPos();
 }
@@ -132,12 +117,12 @@ void QnNotificationToolTipWidget::updateTailPos()
     qreal parentPos = parentItem()->mapToItem(list, m_pointTo).y();
 
     if (parentPos - halfHeight < m_enclosingRect.top())
-        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.top())));
+        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound(rect.top() + tailWidth())));
     else
     if (parentPos + halfHeight > m_enclosingRect.bottom())
-        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound(rect.bottom())));
+        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound(rect.bottom() - tailWidth())));
     else
-        setTailPos(QPointF(qRound(rect.right() + 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound((rect.top() + rect.bottom()) / 2)));
 
     base_type::pointTo(m_pointTo);
 }
@@ -193,6 +178,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
     m_closeButton->setFixedSize(QnSkin::maximumSize(m_closeButton->icon()));
     m_closeButton->setToolTip(tr("Close"));
+    m_closeButton->setVisible(false);
     connect(m_closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
 
     m_textLabel->setWordWrap(true);
@@ -309,7 +295,7 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
 
     button->setIcon(icon);
     button->setToolTip(tooltip);
-    button->setProperty(actionIndexPropertyName, m_actions.size());
+    button->setProperty(kActionIndexPropertyName, m_actions.size());
     button->setFixedSize(QnSkin::maximumSize(icon));
 
     if (m_defaultActionIdx < 0 || defaultAction)

@@ -99,13 +99,13 @@ void QnResourceDetailsWidget::setDescription(const QString& description)
     m_descriptionLabel->setHidden(description.isEmpty());
 }
 
-QnUuid QnResourceDetailsWidget::targetResource() const
+const QnResourcePtr& QnResourceDetailsWidget::targetResource() const
 {
     return m_preview->targetResource();
 }
 
-void QnResourceDetailsWidget::setTargetResource(const QnUuid& target)
+void QnResourceDetailsWidget::setTargetResource(const QnResourcePtr& target)
 {
     m_preview->setTargetResource(target);
-    m_preview->setHidden(target.isNull());
+    m_preview->setHidden(!m_preview->targetResource());
 }

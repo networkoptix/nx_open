@@ -25,7 +25,8 @@ public:
         DependentSystemBoundToCloudError,
         BothSystemBoundToCloudError,
         UnconfiguredSystemError,
-        notLocalOwner
+        notLocalOwner,
+        differentCloudHostError
     };
 
     explicit QnMergeSystemsTool(QObject *parent = 0);

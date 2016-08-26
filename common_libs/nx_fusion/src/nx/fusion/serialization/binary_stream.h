@@ -3,8 +3,6 @@
 
 #include "binary_fwd.h"
 
-#include <QtCore/QDebug>
-
 #ifndef QN_NO_QT
 #   include <QtCore/QByteArray>
 #endif

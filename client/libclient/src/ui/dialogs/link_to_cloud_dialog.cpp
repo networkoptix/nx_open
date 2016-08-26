@@ -24,6 +24,8 @@
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 
+#include <utils/common/app_info.h>
+
 using namespace nx::cdb;
 
 namespace
@@ -220,9 +222,10 @@ void QnLinkToCloudDialogPrivate::bindSystem()
 
     indicatorButton->setEnabled(false);
 
-    cloudConnection = connectionFactory->createConnection(
-                          q->ui->loginInputField->text().trimmed().toStdString(),
-                          q->ui->passwordInputField->text().trimmed().toStdString());
+    cloudConnection = connectionFactory->createConnection();
+    cloudConnection->setCredentials(
+        q->ui->loginInputField->text().trimmed().toStdString(),
+        q->ui->passwordInputField->text().trimmed().toStdString());
 
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnCommon->localSystemName().toStdString();

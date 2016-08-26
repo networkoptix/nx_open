@@ -15,7 +15,6 @@
 
 	<properties>
 		<product.title>${project.name}</product.title>	
-        <guid>${it930x_plugin.guid}</guid>
 
 		<qt.libs>core</qt.libs>
 		<global.libs>-lcommon -lnx_streaming</global.libs>
@@ -32,6 +31,24 @@
 			<properties>
 				<buildLib>sharedlib</buildLib>
 			</properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>build_variables</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type> 
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>common</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type>
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/common/pom.xml</systemPath>
+                </dependency>        
+            </dependencies>             
 		</profile>	
 	</profiles>	
 </project>

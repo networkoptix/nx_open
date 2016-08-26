@@ -14,7 +14,10 @@ namespace tcp {
 class NX_NETWORK_API ReverseConnector
 {
 public:
-    ReverseConnector(String selfName, String targetName);
+    ReverseConnector(
+        String selfHostName, String targetHostName, aio::AbstractAioThread* aioThread);
+
+    void setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts);
 
     // TODO: MoveOnlyFunc when HttpClient supports it
     typedef std::function<void(SystemError::ErrorCode)> ConnectHandler;
@@ -27,8 +30,7 @@ public:
 private:
     SystemError::ErrorCode processHeaders(const nx_http::HttpHeaders& headers);
 
-    const String m_selfName;
-    const String m_targetName;
+    const String m_targetHostName;
     nx_http::AsyncHttpClientPtr m_httpClient;
     std::function<void(SystemError::ErrorCode)> m_handler;
 };

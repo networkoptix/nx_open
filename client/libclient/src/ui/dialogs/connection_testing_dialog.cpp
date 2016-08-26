@@ -83,7 +83,9 @@ void QnConnectionTestingDialog::tick() {
     updateUi(false, tr("Request timeout"));
 }
 
-void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo) {
+void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode errorCode,
+    const QnConnectionInfo &connectionInfo)
+{
     Q_UNUSED(reqID)
 
     if (!m_timeoutTimer->isActive())
@@ -91,9 +93,11 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     m_timeoutTimer->stop();
     ui->progressBar->setValue(ui->progressBar->maximum());
 
-    QnConnectionDiagnosticsHelper::TestConnectionResult testResult = QnConnectionDiagnosticsHelper::validateConnectionTest(connectionInfo, errorCode);
+    auto testResult = QnConnectionDiagnosticsHelper::validateConnectionTest(
+        connectionInfo, errorCode);
 
-    updateUi(testResult.result == QnConnectionDiagnosticsHelper::Result::Success, testResult.details, testResult.helpTopicId);
+    updateUi(testResult.result == QnConnectionDiagnosticsHelper::Result::Success,
+        testResult.details, testResult.helpTopicId);
 }
 
 void QnConnectionTestingDialog::updateUi(bool success, const QString &details, int helpTopicId) {

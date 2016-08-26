@@ -94,12 +94,12 @@ private:
 
     static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);
 
-    static QVariantHash eventDescriptionMap(
+    static QVariantMap eventDescriptionMap(
         const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo &aggregationInfo,
         QnEmailAttachmentList& attachments);
 
-    static QVariantHash eventDetailsMap(
+    static QVariantMap eventDetailsMap(
         const QnAbstractBusinessActionPtr& action,
         const QnInfoDetail& aggregationData,
         Qn::ResourceInfoLevel detailLevel,

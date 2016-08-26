@@ -327,6 +327,14 @@
         }}
     },
 
+    "QnStyledTooltipWidget": {
+        "palette": { "default": {
+            "window": "dark13",
+            "windowText": "light4",
+            "highlight": "light4.setAlpha(0)"
+        }}
+    },
+
     "QnSliderTooltipWidget": {
         "palette": { "default": {
             "window": "light4",
@@ -479,20 +487,6 @@
             "background": "dark7",
             "visualizer": "red_core"
         }
-    },
-
-    "QnStyledTooltipWidget": {
-        "windowColor": "QColor(0, 0, 0, 255)",
-        "frameColor": "QColor(203, 210, 233, 128)",
-        "palette": { "default": { "windowText": "opaqueSelection" } }
-    },
-
-    "QnResourceBrowserToolTipWidget": {
-        "palette": { "default": { "windowText": "#f0f0f0" } }
-    },
-
-    "QnNotificationToolTipWidget": {
-        "palette": { "default": { "windowText": "#f0f0f0" } }
     },
 
     "QnGridItem": {

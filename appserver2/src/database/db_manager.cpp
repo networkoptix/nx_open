@@ -2884,14 +2884,42 @@ ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
     return rez;
 }
 
-template<typename F>
-ErrorCode QnDbManager::cleanupAccessRightsAfterAction(F action, const QnUuid& resourceId)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
 {
-    auto internalResourceId = getResourceInternalId(resourceId);
+    switch(tran.command)
+    {
+    case ApiCommand::removeCamera:
+        return removeCamera(tran.params.id);
+    case ApiCommand::removeStorage:
+        return removeStorage(tran.params.id);
+    case ApiCommand::removeMediaServer:
+        return removeServer(tran.params.id);
+    case ApiCommand::removeServerUserAttributes:
+        return removeMediaServerUserAttributes(tran.params.id);
+    case ApiCommand::removeLayout:
+        return removeLayout(tran.params.id);
+    case ApiCommand::removeBusinessRule:
+        return removeBusinessRule(tran.params.id);
+    case ApiCommand::removeUser:
+        return removeUser(tran.params.id);
+    case ApiCommand::removeUserGroup:
+        return removeUserGroup(tran.params.id);
+    case ApiCommand::removeVideowall:
+        return removeVideowall(tran.params.id);
+    case ApiCommand::removeWebPage:
+        return removeWebPage(tran.params.id);
+    case ApiCommand::removeCameraUserAttributes:
+        return removeCameraAttributes(tran.params.id);
+    case ApiCommand::removeAccessRights:
+        return removeResourceAccessRights(tran.params.id);
+    default:
+        return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
+    }
+}
 
-    ErrorCode result = (this->*action)(resourceId);
-    if (result != ErrorCode::ok)
-        return result;
+ErrorCode QnDbManager::removeResourceAccessRights(const QnUuid& id)
+{
+    auto internalResourceId = getResourceInternalId(id);
 
     QSqlQuery removeQuery(m_sdb);
     QString removeQueryStr("DELETE FROM vms_access_rights WHERE resource_ptr_id = :resourceId;");
@@ -2904,42 +2932,6 @@ ErrorCode QnDbManager::cleanupAccessRightsAfterAction(F action, const QnUuid& re
         return ErrorCode::dbError;
 
     return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
-{
-    auto cleanupHelper = [this, &tran] (ErrorCode (QnDbManager::*actionPtr)(const QnUuid&))
-    {
-        return cleanupAccessRightsAfterAction(actionPtr, tran.params.id);
-    };
-
-    switch(tran.command)
-    {
-    case ApiCommand::removeCamera:
-        return cleanupHelper(&QnDbManager::removeCamera);
-    case ApiCommand::removeStorage:
-        return cleanupHelper(&QnDbManager::removeStorage);
-    case ApiCommand::removeMediaServer:
-        return cleanupHelper(&QnDbManager::removeServer);
-    case ApiCommand::removeServerUserAttributes:
-        return removeMediaServerUserAttributes(tran.params.id);
-    case ApiCommand::removeLayout:
-        return cleanupHelper(&QnDbManager::removeLayout);
-    case ApiCommand::removeBusinessRule:
-        return removeBusinessRule(tran.params.id);
-    case ApiCommand::removeUser:
-        return cleanupHelper(&QnDbManager::removeUser);
-    case ApiCommand::removeUserGroup:
-        return removeUserGroup(tran.params.id);
-    case ApiCommand::removeVideowall:
-        return cleanupHelper(&QnDbManager::removeVideowall);
-    case ApiCommand::removeWebPage:
-        return cleanupHelper(&QnDbManager::removeWebPage);
-    case ApiCommand::removeCameraUserAttributes:
-        return removeCameraAttributes(tran.params.id);
-    default:
-        return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
-    }
 }
 
 ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)

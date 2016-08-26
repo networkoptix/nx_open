@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="hu" sourcelanguage="en">
+<TS version="2.1" language="hu" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -413,6 +413,10 @@
     <message>
         <source>Recording on I/O modules is disabled:</source>
         <translation>Rögzítés az I/O modulon kikapcsolva:</translation>
+    </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

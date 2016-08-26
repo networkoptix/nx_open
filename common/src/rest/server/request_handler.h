@@ -8,8 +8,10 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QSharedPointer>
 
-#include "utils/common/request_param.h"
-#include "nx/utils/string.h"
+#include <nx/utils/string.h>
+
+#include <common/common_globals.h>
+#include <utils/common/request_param.h>
 
 
 class TCPSocket;

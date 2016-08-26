@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -883,11 +883,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTP запрос</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>HTTP URL</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>Имя пользователя для аутентификации (необязательно)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Имя пользователя</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>Ппроль для аутентификации (необязательно)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Пароль</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>&amp;PTZ позиция:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>Экспорт с быстрой прокруткой</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>Изначальная длина фрагмента</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>Длина после экспорта</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>Скорость прокрутки</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>Интервал между кадрами</translation>
     </message>
 </context>
 <context>
@@ -1605,6 +1666,11 @@
         <location/>
         <source>Test...</source>
         <translation>Проверка...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>Воспроизвести для пользователя</translation>
     </message>
 </context>
 <context>
@@ -2382,6 +2448,11 @@
         <location/>
         <source>Test...</source>
         <translation>Проверка...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>Воспроизвести для пользователя</translation>
     </message>
 </context>
 <context>

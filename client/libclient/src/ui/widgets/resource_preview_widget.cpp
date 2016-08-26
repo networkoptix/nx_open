@@ -5,8 +5,9 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/geometry.h>
 #include <ui/style/helper.h>
@@ -41,7 +42,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
 
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, [this](const QnUuid& resourceId, const QPixmap& thumbnail)
     {
-        if (m_target != resourceId)
+        if (!m_target || m_target->getId() != resourceId)
             return;
 
         if (m_status != QnCameraThumbnailManager::Loaded)
@@ -55,7 +56,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
 
     connect(m_thumbnailManager, &QnCameraThumbnailManager::statusChanged, this, [this](const QnUuid& resourceId, QnCameraThumbnailManager::ThumbnailStatus status)
     {
-        if (m_target != resourceId)
+        if (!m_target || m_target->getId() != resourceId)
             return;
 
         m_status = status;
@@ -79,20 +80,22 @@ QnResourcePreviewWidget::~QnResourcePreviewWidget()
 {
 }
 
-QnUuid QnResourcePreviewWidget::targetResource() const
+const QnResourcePtr& QnResourcePreviewWidget::targetResource() const
 {
     return m_target;
 }
 
-void QnResourcePreviewWidget::setTargetResource(const QnUuid &target)
+void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
 {
-    if (m_target == target)
+    auto camera = target.dynamicCast<QnVirtualCameraResource>();
+
+    if (camera == m_target)
         return;
 
-    m_target = target;
+    m_target = camera;
     m_resolutionHint = QSize();
 
-    if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(m_target))
+    if (camera)
     {
         m_thumbnailManager->selectResource(camera);
 
@@ -116,6 +119,11 @@ void QnResourcePreviewWidget::setThumbnailSize(const QSize &size)
     m_thumbnailManager->setThumbnailSize(size);
     m_cachedSizeHint = QSize();
     updateGeometry();
+}
+
+QnBusyIndicatorWidget* QnResourcePreviewWidget::busyIndicator() const
+{
+    return m_indicator;
 }
 
 void QnResourcePreviewWidget::paintEvent(QPaintEvent *event)

@@ -173,19 +173,23 @@ QString QnAppInfo::updateGeneratorUrl()
     return QStringLiteral("${update.generator.url}");
 }
 
+//Filling string constant with zeros to be able to change this constant in already-built binary
+static const char* kCloudHostNameWithPrefix = "this_is_cloud_host_name ${cloud.host}\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_cloud_host_name");
+
 QString QnAppInfo::defaultCloudHost()
 {
-    return QStringLiteral("${cloud.host}");
+    return QString::fromUtf8(kCloudHostName);
 }
 
 QString QnAppInfo::defaultCloudPortalUrl()
 {
-    return QStringLiteral("${cloud.portalUrl}");
+    return QString::fromLatin1("https://%1").arg(defaultCloudHost());
 }
 
 QString QnAppInfo::defaultCloudModulesXmlUrl()
 {
-    return QStringLiteral("${cloud.modulesXmlUrl}");
+    return QString::fromLatin1("http://%1:8083/cloud_modules.xml").arg(defaultCloudHost());
 }
 
 QString QnAppInfo::cloudName()
