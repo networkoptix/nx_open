@@ -1,17 +1,16 @@
-#ifndef MODULE_INFORMATION_H
-#define MODULE_INFORMATION_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
-#include <utils/common/app_info.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <utils/common/id.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 
-struct QnModuleInformation {
+struct QnModuleInformation
+{
     QString type;
     QString customization;
     QnSoftwareVersion version;
@@ -27,11 +26,10 @@ struct QnModuleInformation {
     QString realm;
     bool ecDbReadOnly;
     QString cloudSystemId;
+    QString cloudPortalUrl;
     QString cloudHost;
 
-    QnModuleInformation()
-        : port(0), sslAllowed(false), protoVersion(0), serverFlags(0), realm(QnAppInfo::realm()), ecDbReadOnly(false)
-    {}
+    QnModuleInformation();
 
     bool isCompatibleToCurrentSystem() const;
     bool hasCompatibleVersion() const;
@@ -43,7 +41,8 @@ struct QnModuleInformation {
     static QString nxClientId();
 };
 
-struct QnModuleInformationWithAddresses : QnModuleInformation {
+struct QnModuleInformationWithAddresses : QnModuleInformation
+{
     QSet<QString> remoteAddresses;
     QnModuleInformationWithAddresses() {}
     QnModuleInformationWithAddresses(const QnModuleInformation &other) :
@@ -60,5 +59,3 @@ struct QnModuleInformationWithAddresses : QnModuleInformation {
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(metatype)(eq))
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformationWithAddresses, (ubjson)(xml)(json)(metatype)(eq))
-
-#endif // MODULE_INFORMATION_H

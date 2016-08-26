@@ -2255,7 +2255,6 @@ void MediaServerProcess::run()
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
-    selfInformation.cloudHost = QnAppInfo::defaultCloudHost();
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
