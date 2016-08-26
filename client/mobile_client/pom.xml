@@ -208,7 +208,7 @@
                                         <provisioning_script>${root.dir}/build_utils/shell/get_provisioning_id.sh ${provisioning_profile}</provisioning_script>
                                     </properties>
                                     <source>
-                                        def command = project.properties.provisioning_script
+                                        def command = properties.provisioning_script
                                         def process = command.execute()
                                         process.waitFor()
                                         project.properties.provisioning_profile_id = process.in.text.trim()
