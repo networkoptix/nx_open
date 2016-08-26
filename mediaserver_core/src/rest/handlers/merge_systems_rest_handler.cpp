@@ -41,6 +41,8 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace
 {
     const int requestTimeout = 60000;
@@ -142,7 +144,8 @@ int QnMergeSystemsRestHandler::execute(
     if (data.mergeOneServer)
         data.takeRemoteSettings = false;
 
-    if (data.url.isEmpty()) {
+    if (data.url.isEmpty())
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"url\""), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("url")));
@@ -183,9 +186,14 @@ int QnMergeSystemsRestHandler::execute(
         client.setSendTimeoutMs(requestTimeout);
         client.setMessageBodyReadTimeoutMs(requestTimeout);
 
+        QUrlQuery query;
+        query.addQueryItem("checkOwnerPermissions", QnLexical::serialized(true));
+        query.addQueryItem("showAddresses", QnLexical::serialized(true));
+        query.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
+
         QUrl requestUrl(url);
-        requestUrl.setPath(lit("/api/moduleInformationAuthenticated?checkOwnerPermissions=true"));
-        requestUrl.setQuery(lit("showAddresses=true"));
+        requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
+        requestUrl.setQuery(query);
         addAuthToRequest(requestUrl, data.getKey);
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
@@ -236,6 +244,7 @@ int QnMergeSystemsRestHandler::execute(
         else if (!data.takeRemoteSettings && isRemoteInCloud)
             canMerge = false;
     }
+
     if (!canMerge)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge systems bound to cloud")
@@ -244,6 +253,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
+    //TODO: #GDM #isCompatibleCustomization VMS-2163
     bool customizationOK = remoteModuleInformation.customization == QnAppInfo::customizationName() ||
                            remoteModuleInformation.customization.isEmpty() ||
                            QnModuleFinder::instance()->isCompatibilityMode();
@@ -271,16 +281,16 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
+    if (!backupDatabase())
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
+            .arg(data.takeRemoteSettings), cl_logDEBUG1);
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
+        return nx_http::StatusCode::ok;
+    }
+
     if (data.takeRemoteSettings)
     {
-        if (!backupDatabase())
-        {
-            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
-                .arg(data.takeRemoteSettings), cl_logDEBUG1);
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
-            return nx_http::StatusCode::ok;
-        }
-
         if (!applyRemoteSettings(data.url, remoteModuleInformation.systemName, data.getKey, data.postKey, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
@@ -288,16 +298,9 @@ int QnMergeSystemsRestHandler::execute(
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
-    } else
+    }
+    else
     {
-        if (!backupDatabase())
-        {
-            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
-                .arg(data.takeRemoteSettings), cl_logDEBUG1);
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
-            return nx_http::StatusCode::ok;
-        }
-
         if (!applyCurrentSettings(data.url, data.getKey, data.postKey, data.mergeOneServer, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
