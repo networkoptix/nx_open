@@ -12,6 +12,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <network/authenticate_helper.h>
 
+#include <utils/common/app_info.h>
+
 
 GenericUserDataProvider::GenericUserDataProvider()
 {

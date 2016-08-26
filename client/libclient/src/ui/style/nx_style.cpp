@@ -429,8 +429,9 @@ void QnNxStyle::drawPrimitive(
 
         case PE_PanelButtonCommand:
         {
-            const bool pressed = option->state.testFlag(State_Sunken);
-            const bool hovered = option->state.testFlag(State_MouseOver);
+            const bool enabled = option->state.testFlag(State_Enabled);
+            const bool pressed = enabled && option->state.testFlag(State_Sunken);
+            const bool hovered = enabled && option->state.testFlag(State_MouseOver);
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 

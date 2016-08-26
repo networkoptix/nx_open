@@ -14,6 +14,7 @@ BaseTile
     property string systemId;
     property bool isFactoryTile: false;
     property bool isCloudTile: false;
+    property bool isCompatibleCloudHost: false;
 
     property string wrongVersion;
     property string wrongCustomization;
@@ -26,11 +27,11 @@ BaseTile
         if (isFactoryTile)
             return true;
 
-        if (wrongCustomization.length || wrongVersion.length)
+        if (wrongCustomization.length || wrongVersion.length || !isCompatibleCloudHost)
             return false;
 
         if (isCloudTile)
-            return control.areaLoader.item && control.areaLoader.item.isOnline;
+            return control.impl.isOnline;
 
         return true;
     }
@@ -45,17 +46,18 @@ BaseTile
 
         if (!control.isAvailable)
             return Style.colors.custom.systemTile.disabled;
-        else if (control.isHovered)
+
+        if (control.isHovered)
             return Style.colors.custom.systemTile.backgroundHovered;
-        else if (control.isAvailable)
-            return Style.colors.custom.systemTile.background;
+
+        return Style.colors.custom.systemTile.background;
     }
 
     indicator
     {
         visible: ((impl.tileType !== impl.kFactorySystemTileType) &&
             (wrongVersion.length || wrongCustomization.length ||
-             compatibleVersion.length || !impl.isOnline));
+             compatibleVersion.length || !impl.isOnline || !isCompatibleCloudHost));
 
         text:
         {
@@ -63,6 +65,8 @@ BaseTile
                 return wrongCustomization;
             else if (wrongVersion.length)
                 return wrongVersion;
+            else if (!isCompatibleCloudHost)
+                return qsTr("INCOMPATIBLE CLOUD VERSION");
             else if (compatibleVersion.length)
                 return compatibleVersion;
             else if (!impl.isOnline)
@@ -74,7 +78,7 @@ BaseTile
         textColor:
         {
            if (wrongCustomization.length || wrongVersion.length ||
-                compatibleVersion.length)
+                compatibleVersion.length || !isCompatibleCloudHost)
            {
                return Style.colors.shadow;
            }
@@ -84,7 +88,7 @@ BaseTile
 
         color:
         {
-            if (wrongCustomization.length || wrongVersion.length)
+            if (wrongCustomization.length || wrongVersion.length || !isCompatibleCloudHost)
                 return Style.colors.red_main;
             else if (compatibleVersion.length)
                 return Style.colors.yellow_main;
@@ -181,7 +185,10 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.isOnline; } )
+                currentAreaItem.enabled = Qt.binding( function()
+                {
+                    return control.impl.isOnline && control.isAvailable;
+                });
             }
         }
     }
@@ -224,10 +231,10 @@ BaseTile
                 return kLocalSystemTileType;
         }
 
-        readonly property bool isOnline: !control.impl.hostsModel.isEmpty;
-        readonly property color standardColor: Style.colors.custom.systemTile.background;
-        readonly property color hoveredColor: Style.lighterColor(standardColor);
-        readonly property color inactiveColor: Style.colors.shadow;
+        readonly property bool isOnline: !control.impl.hostsModel.isEmpty
+        readonly property color standardColor: Style.colors.custom.systemTile.background
+        readonly property color hoveredColor: Style.lighterColor(standardColor)
+        readonly property color inactiveColor: Style.colors.shadow
 
         readonly property bool hasSavedConnection:
         {

@@ -21,6 +21,7 @@
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 
+#include <utils/common/app_info.h>
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
 static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;

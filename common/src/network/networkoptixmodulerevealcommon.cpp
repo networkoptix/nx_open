@@ -13,8 +13,10 @@
 #include "common/common_module.h"
 
 namespace {
-    const QByteArray revealRequestStr   ("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
-    const QString moduleInfoStr (lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
+
+const QByteArray revealRequestStr("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
+const QString moduleInfoStr(lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
+
 }
 
 QByteArray RevealRequest::serialize()
@@ -27,7 +29,8 @@ QByteArray RevealRequest::serialize()
     return result;
 }
 
-bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd) {
+bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd)
+{
     if (bufEnd - bufStart < revealRequestStr.size())
         return false;
 
@@ -43,7 +46,9 @@ RevealResponse::RevealResponse(const QnModuleInformation &other)
 {
 }
 
-QByteArray RevealResponse::serialize() {
+//TODO: #ak why don't we sending and receiving realm here? Should we add new fields here?
+QByteArray RevealResponse::serialize()
+{
     QVariantMap map;
     map[lit("application")] = type;
     map[lit("version")] = version.toString();
@@ -59,10 +64,12 @@ QByteArray RevealResponse::serialize() {
     map[lit("flags")] = QnLexical::serialized(serverFlags);
     map[lit("ecDbReadOnly")] = ecDbReadOnly;
     map[lit("cloudSystemId")] = cloudSystemId;
+    map[lit("cloudHost")] = cloudHost;
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
-bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
+bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
+{
     while (bufStart < bufEnd && *bufStart != '{')
         bufStart++;
 
@@ -82,7 +89,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
     serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
     ecDbReadOnly = map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
-    cloudSystemId =  map.value(lit("cloudSystemId")).toString();
+    cloudSystemId = map.value(lit("cloudSystemId")).toString();
+    cloudHost = map.value(lit("cloudHost"), cloudHost).toString();
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

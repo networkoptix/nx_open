@@ -169,7 +169,8 @@ void QnDirectModuleFinder::activateRequests() {
     }
 }
 
-void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
+void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
+{
     reply->deleteLater();
 
     QUrl url = reply->url();
@@ -213,6 +214,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
         return;
     }
 
+    //TODO: #GDM #isCompatibleCustomization VMS-2163
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
     {
         NX_LOG(lit("QnDirectModuleFinder. Received reply from imcompatible server: url %1, customization %2. Ignoring reply...")
