@@ -149,7 +149,7 @@ bool SelfUpdater::updateApplauncher()
         return false;
     }
 
-    const QDir backupDir(targetDir.absoluteFilePath(lit("backup")));
+    QDir backupDir(targetDir.absoluteFilePath(lit("backup")));
     const auto backup = copyApplauncherInstance(targetDir, backupDir);
     if (!backup->backup(QnDirectoryBackupBehavior::Move))
     {
@@ -187,6 +187,8 @@ bool SelfUpdater::updateApplauncher()
         NX_LOG(lit("Failed to update Applauncher."), cl_logERROR);
         return false;
     }
+
+    backupDir.removeRecursively();
 
     NX_LOG(lit("Applauncher updated successfully."), cl_logINFO);
     return true;
