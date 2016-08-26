@@ -22,12 +22,9 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/log/log.h>
 
 namespace
 {
-    const auto kMinTimeGapBetweenActions = std::chrono::milliseconds(200);
-    
     const char DELIMITER('$');
     const char STRING_LIST_DELIM('\n');
 
@@ -608,43 +605,10 @@ bool QnServerDb::removeLogForRes(QnUuid resId)
     return execSQLQuery(&delQuery, Q_FUNC_INFO);
 }
 
-bool QnServerDb::isActionTooFrequent(const QnUuid& resourceId, qint64 timestamp) const
-{
-    QnMutexLocker lock(&m_actionToTimeMutex);
-    ResourceActionToTimeMap::iterator actionTimeIt = m_actionToTime.find(resourceId);
-    std::chrono::steady_clock::time_point currentActionTimePoint{std::chrono::nanoseconds(timestamp)};
-
-    if (actionTimeIt == m_actionToTime.cend())
-    {
-        auto resultPair = m_actionToTime.emplace(resourceId, currentActionTimePoint);
-        NX_ASSERT(resultPair.second);
-        if (!resultPair.second)
-            NX_LOG(lit("%1 m_actionToTime.emplace() failed. Out of memory?").arg(Q_FUNC_INFO), cl_logWARNING);
-    }
-    else
-    {
-        auto timePeriodSinceLastAction = currentActionTimePoint - actionTimeIt->second;
-        actionTimeIt->second = currentActionTimePoint;
-        if (timePeriodSinceLastAction < kMinTimeGapBetweenActions)
-        {
-            NX_LOG(lit("%1 This resource %2 generates actions too frequently.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(resourceId.toString()), 
-                   cl_logDEBUG1);
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 {
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
-
-    if (isActionTooFrequent(eventResId, timestampUsec))
-        return false;
 
     QnWriteLocker lock(&m_mutex);
 
