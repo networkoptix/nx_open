@@ -49,45 +49,48 @@
 #include <ui/style/custom_style.h>
 
 namespace {
-    void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
-        foreach(QObject *object, objects)
-            if(object != exclude)
-                if(QWidget *widget = qobject_cast<QWidget *>(object))
-                    widget->setEnabled(enabled);
-    }
 
-    QStandardItem* newConnectionItem(const QString& text, const QUrl& url)
+void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled)
+{
+    for (QObject *object: objects)
     {
-        if (url.isEmpty())
-            return nullptr;
-
-        auto result = new QStandardItem(text);
-        result->setData(url, Qn::UrlRole);
-        return result;
+        if (object != exclude)
+        {
+            if (QWidget *widget = qobject_cast<QWidget *>(object))
+                widget->setEnabled(enabled);
+        }
     }
+}
+
+QStandardItem* newConnectionItem(const QString& text, const QUrl& url)
+{
+    if (url.isEmpty())
+        return nullptr;
+
+    auto result = new QStandardItem(text);
+    result->setData(url, Qn::UrlRole);
+    return result;
+}
 
 } // anonymous namespace
 
 /************************************************************************/
-/* QnEcData                                                             */
+/* QnFoundSystemData                                                             */
 /************************************************************************/
 
-QnLoginDialog::QnEcData::QnEcData() :
-    protoVersion(0)
+bool QnLoginDialog::QnFoundSystemData::operator==(const QnFoundSystemData& other) const
 {
-}
-
-bool QnLoginDialog::QnEcData::operator==(const QnEcData& other) const {
     return
-           id == other.id
-        && url == other.url
-        && version == other.version
-        && protoVersion == other.protoVersion
-        && systemName == other.systemName
+        url == other.url
+        && info.id == other.info.id
+        && info.version == other.info.version
+        && info.protoVersion == other.info.protoVersion
+        && info.systemName == other.info.systemName
         ;
 }
 
-bool QnLoginDialog::QnEcData::operator!=(const QnEcData& other) const {
+bool QnLoginDialog::QnFoundSystemData::operator!=(const QnFoundSystemData& other) const
+{
     return !(*this == other);
 }
 
@@ -95,7 +98,7 @@ bool QnLoginDialog::QnEcData::operator!=(const QnEcData& other) const {
 /* QnLoginDialog                                                        */
 /************************************************************************/
 
-QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
+QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::LoginDialog),
@@ -111,7 +114,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
     NX_ASSERT(bbLayout);
-    if (bbLayout) {
+    if (bbLayout)
+    {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
         versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
         QFont font = versionLabel->font();
@@ -120,11 +124,12 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
         bbLayout->insertWidget(0, versionLabel);
     }
 
-    static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
+    static const char *introNames[] = {"intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL};
     QString introPath;
-    for(const char **introName = introNames; *introName != NULL; introName++) {
+    for (const char **introName = introNames; *introName != NULL; introName++)
+    {
         introPath = qnSkin->path(*introName);
-        if(!introPath.isEmpty())
+        if (!introPath.isEmpty())
             break;
     }
 
@@ -137,9 +142,9 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
     layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,10);
+    layout->setContentsMargins(0, 0, 0, 10);
     layout->addWidget(m_renderingWidget);
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_renderingWidget );
+    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
     m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);
@@ -153,16 +158,16 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_connectionsModel->appendRow(m_savedSessionsItem);
     m_connectionsModel->appendRow(m_autoFoundItem);
 
-    connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(QModelIndex)), this,   SLOT(at_connectionsComboBox_currentIndexChanged(QModelIndex)));
-    connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
-    connect(ui->saveButton,                 SIGNAL(clicked()),                      this,   SLOT(at_saveButton_clicked()));
-    connect(ui->deleteButton,               SIGNAL(clicked()),                      this,   SLOT(at_deleteButton_clicked()));
-    connect(ui->passwordLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
-    connect(ui->loginLineEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
-    connect(ui->hostnameLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
-    connect(ui->portSpinBox,                SIGNAL(valueChanged(int)),              this,   SLOT(updateAcceptibility()));
-    connect(ui->buttonBox,                  SIGNAL(accepted()),                     this,   SLOT(accept()));
-    connect(ui->buttonBox,                  SIGNAL(rejected()),                     this,   SLOT(reject()));
+    connect(ui->connectionsComboBox, SIGNAL(currentIndexChanged(QModelIndex)), this, SLOT(at_connectionsComboBox_currentIndexChanged(QModelIndex)));
+    connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
+    connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(at_saveButton_clicked()));
+    connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
+    connect(ui->passwordLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateAcceptibility()));
+    connect(ui->loginLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateAcceptibility()));
+    connect(ui->hostnameLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateAcceptibility()));
+    connect(ui->portSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateAcceptibility()));
+    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     resetConnectionsModel();
     updateFocus();
@@ -170,22 +175,24 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
 
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged,         this, &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleAddressFound,    this, &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,            this, &QnLoginDialog::at_moduleFinder_moduleLost);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleAddressFound, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost, this, &QnLoginDialog::at_moduleFinder_moduleLost);
 
-    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+    foreach(const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
         at_moduleFinder_moduleChanged(moduleInformation);
 }
 
 QnLoginDialog::~QnLoginDialog() {}
 
-void QnLoginDialog::updateFocus() {
+void QnLoginDialog::updateFocus()
+{
     ui->passwordLineEdit->setFocus();
     ui->passwordLineEdit->selectAll();
 }
 
-QUrl QnLoginDialog::currentUrl() const {
+QUrl QnLoginDialog::currentUrl() const
+{
     QUrl url;
     url.setScheme(lit("http"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
@@ -195,14 +202,16 @@ QUrl QnLoginDialog::currentUrl() const {
     return url;
 }
 
-void QnLoginDialog::accept() {
+void QnLoginDialog::accept()
+{
     QUrl url = currentUrl();
-    if (!url.isValid()) {
+    if (!url.isValid())
+    {
         QnMessageBox::warning(this, tr("Invalid Login Information"), tr("The login information you have entered is not valid."));
         return;
     }
 
-    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url,this,
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url, this,
         [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
     {
         if (m_requestHandle != handle)
@@ -212,22 +221,23 @@ void QnLoginDialog::accept() {
         updateUsability();
 
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
-        switch (status) {
-        case QnConnectionDiagnosticsHelper::Result::Success:
+        switch (status)
         {
-            const bool autoLogin = ui->autoLoginCheckBox->isChecked();
-            QnActionParameters params;
-            params.setArgument(Qn::UrlRole, url);
-            params.setArgument(Qn::AutoLoginRole, autoLogin);
-            params.setArgument(Qn::StorePasswordRole, autoLogin);
-            menu()->trigger(QnActions::ConnectAction, params);
-            break;
-        }
-        case QnConnectionDiagnosticsHelper::Result::RestartRequested:
-            menu()->trigger(QnActions::DelayedForcedExitAction);
-            break; // to avoid cycle
-        default:    //error
-            return;
+            case QnConnectionDiagnosticsHelper::Result::Success:
+            {
+                const bool autoLogin = ui->autoLoginCheckBox->isChecked();
+                QnActionParameters params;
+                params.setArgument(Qn::UrlRole, url);
+                params.setArgument(Qn::AutoLoginRole, autoLogin);
+                params.setArgument(Qn::StorePasswordRole, autoLogin);
+                menu()->trigger(QnActions::ConnectAction, params);
+                break;
+            }
+            case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+                menu()->trigger(QnActions::DelayedForcedExitAction);
+                break; // to avoid cycle
+            default:    //error
+                return;
         }
 
         base_type::accept();
@@ -235,8 +245,10 @@ void QnLoginDialog::accept() {
     updateUsability();
 }
 
-void QnLoginDialog::reject() {
-    if(m_requestHandle == -1) {
+void QnLoginDialog::reject()
+{
+    if (m_requestHandle == -1)
+    {
         base_type::reject();
         return;
     }
@@ -245,19 +257,22 @@ void QnLoginDialog::reject() {
     updateUsability();
 }
 
-void QnLoginDialog::changeEvent(QEvent *event) {
+void QnLoginDialog::changeEvent(QEvent *event)
+{
     base_type::changeEvent(event);
 
-    switch (event->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
+    switch (event->type())
+    {
+        case QEvent::LanguageChange:
+            ui->retranslateUi(this);
+            break;
+        default:
+            break;
     }
 }
 
-void QnLoginDialog::showEvent(QShowEvent *event) {
+void QnLoginDialog::showEvent(QShowEvent *event)
+{
     base_type::showEvent(event);
 
     bool autoLogin = qnSettings->autoLogin();
@@ -321,7 +336,7 @@ void QnLoginDialog::resetSavedSessionsModel()
     }
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
-    for (const auto& connection: recentConnections)
+    for (const auto& connection : recentConnections)
     {
         if (!connection.isStoredPassword && connection.name.isEmpty())
             continue;
@@ -333,7 +348,7 @@ void QnLoginDialog::resetSavedSessionsModel()
 void QnLoginDialog::resetAutoFoundConnectionsModel()
 {
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
-    if (m_foundEcs.size() == 0)
+    if (m_foundSystems.size() == 0)
     {
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
@@ -341,25 +356,38 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
     }
     else
     {
-        foreach (const QnEcData& data, m_foundEcs)
+        for (const QnFoundSystemData& data: m_foundSystems)
         {
             QUrl url = data.url;
 
             auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(
-                QString(), data.protoVersion, data.version);
+                QString(), data.info.protoVersion, data.info.version);
 
             bool isCompatible = (compatibilityCode == QnConnectionDiagnosticsHelper::Result::Success);
 
             QString title;
-            if (!data.systemName.isEmpty())
-                title = lit("%3 - (%1:%2)").arg(url.host()).arg(url.port()).arg(data.systemName);
+            if (!data.info.systemName.isEmpty())
+            {
+                title = lit("%3 - (%1:%2)")
+                    .arg(url.host()).arg(url.port()).arg(data.info.systemName);
+            }
             else
+            {
                 title = lit("%1:%2").arg(url.host()).arg(url.port());
+            }
+
             if (!isCompatible)
-                title += lit(" (v%1)").arg(data.version.toString(QnSoftwareVersion::BugfixFormat));
+            {
+                title += lit(" (v%1)")
+                    .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
+            }
+
 #ifdef _DEBUG
             if (!isCompatible)
-                title += lit(" (%1)").arg(QnConnectionDiagnosticsHelper::resultToString(compatibilityCode));
+            {
+                title += lit(" (%1)")
+                    .arg(QnConnectionDiagnosticsHelper::resultToString(compatibilityCode));
+            }
 #endif // _DEBUG
 
 
@@ -373,7 +401,8 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
     }
 }
 
-void QnLoginDialog::updateAcceptibility() {
+void QnLoginDialog::updateAcceptibility()
+{
     bool acceptable =
         !ui->passwordLineEdit->text().isEmpty() &&
         !ui->loginLineEdit->text().trimmed().isEmpty() &&
@@ -384,8 +413,10 @@ void QnLoginDialog::updateAcceptibility() {
     ui->testButton->setEnabled(acceptable);
 }
 
-void QnLoginDialog::updateUsability() {
-    if(m_requestHandle == -1) {
+void QnLoginDialog::updateUsability()
+{
+    if (m_requestHandle == -1)
+    {
         ::setEnabled(children(), ui->buttonBox, true);
         ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), true);
         unsetCursor();
@@ -393,7 +424,9 @@ void QnLoginDialog::updateUsability() {
 
         updateAcceptibility();
         updateFocus();
-    } else {
+    }
+    else
+    {
         ::setEnabled(children(), ui->buttonBox, false);
         ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), false);
         setCursor(Qt::BusyCursor);
@@ -405,7 +438,8 @@ void QnLoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index) {
+void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index)
+{
     QStandardItem* item = m_connectionsModel->itemFromIndex(index);
     QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
     ui->hostnameLineEdit->setText(url.host());
@@ -422,10 +456,12 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     updateFocus();
 }
 
-void QnLoginDialog::at_testButton_clicked() {
+void QnLoginDialog::at_testButton_clicked()
+{
     QUrl url = currentUrl();
 
-    if (!url.isValid()) {
+    if (!url.isValid())
+    {
         QnMessageBox::warning(this, tr("Invalid Parameters"), tr("The information you have entered is not valid."));
         return;
     }
@@ -433,7 +469,8 @@ void QnLoginDialog::at_testButton_clicked() {
     bool connectRequested = false;
 
     QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
-    connect(dialog.data(), &QnConnectionTestingDialog::connectRequested, this, [&connectRequested] {
+    connect(dialog.data(), &QnConnectionTestingDialog::connectRequested, this, [&connectRequested]
+    {
         connectRequested = true;
     });
 
@@ -482,16 +519,19 @@ QStandardItem* QnLoginDialog::newConnectionItem(const QnUserRecentConnectionData
     return result;
 }
 
-void QnLoginDialog::at_saveButton_clicked() {
+void QnLoginDialog::at_saveButton_clicked()
+{
     const QUrl url = currentUrl();
 
-    if (!url.isValid()) {
+    if (!url.isValid())
+    {
         QnMessageBox::warning(this, tr("Invalid Parameters"), tr("Entered hostname is not valid."));
         ui->hostnameLineEdit->setFocus();
         return;
     }
 
-    if (url.host().length() == 0) {
+    if (url.host().length() == 0)
+    {
         QnMessageBox::warning(this, tr("Invalid Parameters"), tr("Host field cannot be empty."));
         ui->hostnameLineEdit->setFocus();
         return;
@@ -527,7 +567,7 @@ void QnLoginDialog::at_saveButton_clicked() {
             QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
             QDialogButtonBox::Yes);
 
-        switch(button)
+        switch (button)
         {
             case QDialogButtonBox::Cancel:
                 return;
@@ -556,7 +596,7 @@ void QnLoginDialog::at_saveButton_clicked() {
     bool rejected = false;
     const auto itNewEnd = std::remove_if(connections.begin(), connections.end(),
         [this, &rejected, systemName, userName = url.userName()]
-        (const QnUserRecentConnectionData& connection)
+    (const QnUserRecentConnectionData& connection)
     {
         if (rejected || (connection.systemName != systemName) || (connection.url.userName() != userName))
             return false;
@@ -622,22 +662,22 @@ void QnLoginDialog::at_deleteButton_clicked()
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    QSet<SocketAddress> addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
+void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation)
+{
+    auto addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
 
-    if (addresses.isEmpty()) {
+    if (addresses.isEmpty())
+    {
         at_moduleFinder_moduleLost(moduleInformation);
         return;
     }
 
-    QnEcData data;
-    data.id = moduleInformation.id;
-    data.version = moduleInformation.version;
-    data.protoVersion = moduleInformation.protoVersion;
-    data.systemName = moduleInformation.systemName;
+    QnFoundSystemData data;
+    data.info = moduleInformation;
 
     /* prefer localhost */
-    SocketAddress address = SocketAddress(QHostAddress(QHostAddress::LocalHost).toString(), moduleInformation.port);
+    SocketAddress address = SocketAddress(QHostAddress(QHostAddress::LocalHost).toString(),
+        moduleInformation.port);
     if (!addresses.contains(address))
         address = *addresses.cbegin();
 
@@ -645,22 +685,30 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
     data.url.setHost(address.address.toString());
     data.url.setPort(address.port);
 
-    if (m_foundEcs.contains(moduleInformation.id)) {
-        QnEcData &oldData = m_foundEcs[moduleInformation.id];
-        if (!QHostAddress(address.address.toString()).isLoopback() && addresses.contains(oldData.url.host()))
+    if (m_foundSystems.contains(moduleInformation.id))
+    {
+        QnFoundSystemData &oldData = m_foundSystems[moduleInformation.id];
+        if (!QHostAddress(address.address.toString()).isLoopback()
+                && addresses.contains(oldData.url.host()))
+        {
             data.url.setHost(oldData.url.host());
+        }
 
-        if (oldData != data) {
+        if (oldData != data)
+        {
             oldData = data;
             resetAutoFoundConnectionsModel();
         }
-    } else {
-        m_foundEcs.insert(moduleInformation.id, data);
+    }
+    else
+    {
+        m_foundSystems.insert(moduleInformation.id, data);
         resetAutoFoundConnectionsModel();
     }
 }
 
-void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    if (m_foundEcs.remove(moduleInformation.id))
+void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation)
+{
+    if (m_foundSystems.remove(moduleInformation.id))
         resetAutoFoundConnectionsModel();
 }

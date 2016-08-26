@@ -1057,9 +1057,7 @@ public:
 
         clientContext.reset(SSL_CTX_new(SSLv23_client_method()));
         SSL_CTX_set_options(
-            clientContext.get(),
-            SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 |
-            SSL_OP_NO_DTLSv1 | SSL_OP_NO_DTLSv1_2);
+            clientContext.get(), 0);
 
         SSL_CTX_set_session_id_context(
             serverContext.get(),
@@ -1820,7 +1818,7 @@ void SslSocket::sendAsync(
     });
 }
 
-int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen) 
+int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen)
 {
     // For async operation here
     Q_D(SslSocket);

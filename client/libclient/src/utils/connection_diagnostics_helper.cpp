@@ -26,7 +26,9 @@ QnSoftwareVersion QnConnectionDiagnosticsHelper::minSupportedVersion()
 }
 
 QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(
-    const QString &brand, int protoVersion, const QnSoftwareVersion& version)
+    const QString &brand,
+    int protoVersion,
+    const QnSoftwareVersion& version)
 {
     if (version < minSupportedVersion())
         return Result::IncompatibleVersion;
@@ -35,13 +37,18 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         return Result::IncompatibleProtocol;
 
     //checking brand compatibility
-    bool compatibleBrand = qnRuntime->isDevMode() || brand.isEmpty() || brand == QnAppInfo::productNameShort();
+    bool compatibleBrand = qnRuntime->isDevMode()
+        || brand.isEmpty()
+        || brand == QnAppInfo::productNameShort();
+
     return compatibleBrand
         ? Result::Success
         : Result::IncompatibleBrand;
 }
 
-QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode)
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(
+    const QnConnectionInfo &connectionInfo,
+    ec2::ErrorCode errorCode)
 {
     if (errorCode == ec2::ErrorCode::unauthorized)
         return Result::Unauthorized;
@@ -52,12 +59,16 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
     if (errorCode != ec2::ErrorCode::ok)
         return Result::ServerError;
 
-    return validateConnectionLight(connectionInfo.brand, connectionInfo.nxClusterProtoVersion
-        , connectionInfo.version);
+    return validateConnectionLight(connectionInfo.brand, connectionInfo.nxClusterProtoVersion,
+        connectionInfo.version);
 }
 
 
-QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnection(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode, const QUrl &url, QWidget* parentWidget)
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnection(
+    const QnConnectionInfo &connectionInfo,
+    ec2::ErrorCode errorCode,
+    const QUrl &url,
+    QWidget* parentWidget)
 {
     QnConnectionDiagnosticsHelper::Result result = validateConnectionLight(connectionInfo, errorCode);
     if (result == Result::Success)
