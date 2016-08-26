@@ -59,6 +59,7 @@ QByteArray RevealResponse::serialize() {
     map[lit("flags")] = QnLexical::serialized(serverFlags);
     map[lit("ecDbReadOnly")] = ecDbReadOnly;
     map[lit("cloudSystemId")] = cloudSystemId;
+    map[lit("defaultCloudHost")] = defaultCloudHost;
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
@@ -83,6 +84,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
     ecDbReadOnly = map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
     cloudSystemId =  map.value(lit("cloudSystemId")).toString();
+    defaultCloudHost = map.value(lit("defaultCloudHost")).toString();
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

@@ -27,6 +27,7 @@ struct QnModuleInformation {
     QString realm;
     bool ecDbReadOnly;
     QString cloudSystemId;
+    QString defaultCloudHost;
 
     QnModuleInformation()
         : port(0), sslAllowed(false), protoVersion(0), serverFlags(0), realm(QnAppInfo::realm()), ecDbReadOnly(false)
@@ -52,7 +53,7 @@ struct QnModuleInformationWithAddresses : QnModuleInformation {
 
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation) \
     (systemName)(name)(port)(id)(sslAllowed)(protoVersion)(runtimeId) \
-    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)
+    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)(defaultCloudHost)
 
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 

@@ -528,7 +528,10 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.serverFlags = getServerFlags();
 
     if (const auto credentials = nx::network::SocketGlobals::mediatorConnector().getSystemCredentials())
+    {
         moduleInformation.cloudSystemId = QString::fromUtf8(credentials->systemId);
+        moduleInformation.defaultCloudHost = QnAppInfo::defaultCloudHost();
+    }
 
     return moduleInformation;
 }

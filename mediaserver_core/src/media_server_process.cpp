@@ -2255,9 +2255,13 @@ void MediaServerProcess::run()
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
+    selfInformation.defaultCloudHost = QnAppInfo::defaultCloudHost();
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
+
+    // show our cloud host value in registry in case of installer will check it
+    MSSettings::roSettings()->setValue("defaultCloudHost", selfInformation.defaultCloudHost);
 
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
