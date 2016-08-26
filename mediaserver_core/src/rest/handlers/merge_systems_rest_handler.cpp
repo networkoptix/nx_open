@@ -41,8 +41,6 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
-#include <nx/fusion/model_functions.h>
-
 namespace
 {
     const int requestTimeout = 60000;
