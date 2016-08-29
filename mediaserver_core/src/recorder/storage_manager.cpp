@@ -1680,7 +1680,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
         else
         {
             systemStorageIt = it;
-            systemStorageSpace = (*it)->getTotalSpace();
+            systemStorageSpace += (*it)->getTotalSpace();
         }
     }
 
