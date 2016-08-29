@@ -30,9 +30,10 @@ TimePeriodEx findMinStartTimePeriod(
             continue; //< no periods left
 
         const auto& period = chunks[i].periods[scanPos[i]];
-        if (result.isNull() ||
-            period.startTimeMs < result.startTimeMs ||
-           (period.startTimeMs == result.startTimeMs && period.endTimeMs() > result.endTimeMs()))
+        if (result.isNull()
+            || period.startTimeMs < result.startTimeMs
+            || (period.startTimeMs == result.startTimeMs
+                && period.endTimeMs() > result.endTimeMs()))
         {
             result = TimePeriodEx(period, i);
         }
@@ -42,7 +43,8 @@ TimePeriodEx findMinStartTimePeriod(
 
 } // namespace
 
-ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
+ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(
+    const MultiServerPeriodDataList& chunks)
 {
     ec2::ApiCameraHistoryItemDataList result;
     std::vector<int> scanPos(chunks.size());
@@ -54,7 +56,10 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
         if (prevPeriod.contains(period))
             continue; //< no time advance
         if (prevPeriod.index != period.index)
-            result.push_back(ec2::ApiCameraHistoryItemData(chunks[period.index].guid, period.startTimeMs));
+        {
+            result.push_back(
+                ec2::ApiCameraHistoryItemData(chunks[period.index].guid, period.startTimeMs));
+        }
         prevPeriod = period;
     }
     return result;
@@ -77,7 +82,8 @@ int QnCameraHistoryRestHandler::executeGet(
         QnChunksRequestData updatedRequest = request;
         updatedRequest.resList.clear();
         updatedRequest.resList.push_back(camera);
-        MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
+        MultiServerPeriodDataList chunks =
+            QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
         ec2::ApiCameraHistoryData outputRecord;
         outputRecord.cameraId = camera->getId();
         outputRecord.items = buildHistoryData(chunks);
