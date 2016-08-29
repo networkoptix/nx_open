@@ -21,8 +21,7 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
 #include <api/http_client_pool.h>
-
-
+#include <nx/network/socket_global.h>
 
 namespace nx_http {
 
@@ -49,6 +48,7 @@ public:
     }
 
 protected:
+    nx::network::SocketGlobals::InitGuard m_guard;
     std::unique_ptr<TestHttpServer> m_testHttpServer;
     std::unique_ptr<TestHttpServer> m_testHttpServer2;
 };
