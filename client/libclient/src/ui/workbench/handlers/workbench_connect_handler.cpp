@@ -500,18 +500,20 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         }
     }
 
+
+    QUrl ecUrl = connectionInfo.ecUrl;
+    if (connectionInfo.allowSslConnections)
+        ecUrl.setScheme(lit("https"));
+
     if (connectionInfo.newSystem)
     {
         storeConnection();
         showWelcomeScreen();
         auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setupFactorySystem(connectionInfo.ecUrl.toString());
+        /* Method is called from QML where we are passing QString. */
+        welcomeScreen->setupFactorySystem(ecUrl.toString());
         return ec2::ErrorCode::ok;
     }
-
-    QUrl ecUrl = connectionInfo.ecUrl;
-    if (connectionInfo.allowSslConnections)
-        ecUrl.setScheme(lit("https"));
 
     QnAppServerConnectionFactory::setUrl(ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
