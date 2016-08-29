@@ -30,9 +30,11 @@
 #include <utils/common/buffered_file.h>
 #include <utils/media/ffmpeg_helper.h>
 
-static const int MOTION_PREBUFFER_SIZE = 8;
-static const float HIGH_DATA_LIMIT = 0.7f;
-static const float LOW_DATA_LIMIT = 0.3f;
+namespace {
+static const int kMotionPrebufferSize = 8;
+static const double kHighDataLimit = 0.7;
+static const double kLowDataLimit = 0.3;
+} // namespace
 
 std::atomic<qint64> QnServerStreamRecorder::m_totalQueueSize;
 std::atomic<int> QnServerStreamRecorder::m_totalRecorders;
@@ -146,7 +148,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         QnMutexLocker lock(&m_queueSizeMutex);
         if (needToStop())
             return;
-        addQueueSize(media->dataSize());
+        addQueueSizeUnsafe(media->dataSize());
         QnStreamRecorder::putData(nonConstData);
     }
 }
@@ -154,28 +156,28 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
 void QnServerStreamRecorder::updateRebuildState()
 {
     QnMutexLocker lock( &m_queueSizeMutex );
-    pauseRebuildIfHighData();
-    resumeRebuildIfLowData();
+    pauseRebuildIfHighDataNoLock();
+    resumeRebuildIfLowDataNoLock();
 }
 
-void QnServerStreamRecorder::pauseRebuildIfHighData()
+void QnServerStreamRecorder::pauseRebuildIfHighDataNoLock()
 {
     const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
     if (!m_rebuildBlocked && (
-        (float)m_totalQueueSize > totalAllowedBytes * HIGH_DATA_LIMIT ||
-        (float)m_dataQueue.size() > m_maxRecordQueueSizeElements * HIGH_DATA_LIMIT))
+        (double) m_totalQueueSize > totalAllowedBytes * kHighDataLimit ||
+        (double) m_dataQueue.size() > m_maxRecordQueueSizeElements * kHighDataLimit))
     {
         m_rebuildBlocked = true;
         DeviceFileCatalog::rebuildPause(this);
     }
 }
 
-void QnServerStreamRecorder::resumeRebuildIfLowData()
+void QnServerStreamRecorder::resumeRebuildIfLowDataNoLock()
 {
     const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
     if (m_rebuildBlocked && (
-        (float)m_totalQueueSize < totalAllowedBytes * LOW_DATA_LIMIT &&
-        (float)m_dataQueue.size() < m_maxRecordQueueSizeElements * LOW_DATA_LIMIT))
+        (double) m_totalQueueSize < totalAllowedBytes * kLowDataLimit &&
+        (double) m_dataQueue.size() < m_maxRecordQueueSizeElements * kLowDataLimit))
     {
         m_rebuildBlocked = false;
         DeviceFileCatalog::rebuildResume(this);
@@ -225,7 +227,7 @@ bool QnServerStreamRecorder::cleanupQueueIfOverflow()
     while (m_dataQueue.pop(data, 0))
     {
         if (auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data))
-            addQueueSize(- (qint64) media->dataSize());
+            addQueueSizeUnsafe(- (qint64) media->dataSize());
     }
 
     return true;
@@ -599,7 +601,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 }
 
-void QnServerStreamRecorder::addQueueSize(qint64 value)
+void QnServerStreamRecorder::addQueueSizeUnsafe(qint64 value)
 {
     m_queuedSize += value;
     m_totalQueueSize += value;
@@ -613,7 +615,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        addQueueSize(- (qint64) media->dataSize());
+        addQueueSizeUnsafe(- (qint64) media->dataSize());
     }
 
     // for empty schedule we record all time
@@ -758,7 +760,7 @@ void QnServerStreamRecorder::endOfRun()
 
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        addQueueSize(-m_queuedSize);
+        addQueueSizeUnsafe(-m_queuedSize);
         m_dataQueue.clear();
         --m_totalRecorders;
         m_rebuildBlocked = false;
@@ -794,7 +796,7 @@ void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)
 
 void QnServerStreamRecorder::keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md)
 {
-    if (m_recentlyMotion.size() == MOTION_PREBUFFER_SIZE)
+    if (m_recentlyMotion.size() == kMotionPrebufferSize)
         m_recentlyMotion.dequeue();
     m_recentlyMotion.enqueue(md);
 }

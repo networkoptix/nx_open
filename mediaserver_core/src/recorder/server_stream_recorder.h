@@ -91,10 +91,10 @@ private:
         AVIOContext** context) override;
 
     void updateRebuildState();
-    void pauseRebuildIfHighData();
-    void resumeRebuildIfLowData();
+    void pauseRebuildIfHighDataNoLock();
+    void resumeRebuildIfLowDataNoLock();
     bool cleanupQueueIfOverflow();
-    void addQueueSize(qint64 value);
+    void addQueueSizeUnsafe(qint64 value);
 private slots:
     void at_recordingFinished(
         const ErrorStruct   &status,
