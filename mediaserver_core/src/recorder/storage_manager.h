@@ -107,6 +107,7 @@ public:
     );
 
     QnStorageResourceList getStorages() const;
+    QSet<QnStorageResourcePtr> getWritableStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
@@ -172,7 +173,6 @@ private:
 
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
-    QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, std::function<void(int current, int total)> progressCallback = nullptr);

@@ -1,7 +1,7 @@
 #include "storage_manager.h"
 
+#include <stdio.h>
 #include <QtCore/QDir>
-
 
 #include <utils/fs/file.h>
 #include <utils/common/util.h>
@@ -68,26 +68,75 @@ struct TasksQueueInfo {
 };
 
 #if defined(Q_OS_WIN)
-QString sysDrivePath()
+const QString& getDevicePath(const QString& path)
 {
+    return path;
+}
+
+const QString& sysDrivePath()
+{
+    static QString deviceString;
+
+    if (!deviceString.isNull())
+        return deviceString;
+
     const DWORD bufSize = MAX_PATH + 1;
     TCHAR buf[bufSize];
     GetWindowsDirectory(buf, bufSize);
 
-    return QString::fromWCharArray(buf, bufSize).left(3);
+    deviceString = QString::fromWCharArray(buf, bufSize).left(3);
+
+    return deviceString;
 }
+
 #elif defined(Q_OS_LINUX)
-QString sysDrivePath()
+
+const QString getDevicePath(const QString& path)
 {
-    return QString();
+    QString command = lit("df ") + path;
+    FILE* pipe;
+    char buf[BUFSIZ];
+
+    if (( pipe = popen(command.toLatin1().constData(), "r")) == NULL)
+    {
+        NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        return QString();
+    }
+
+    if (fgets(buf, BUFSIZ, pipe) == NULL) // header line
+    {
+        pclose(pipe);
+        return QString();
+    }
+
+    if (fgets(buf, BUFSIZ, pipe) == NULL) // data
+    {
+        pclose(pipe);
+        return QString();
+    }
+
+    auto dataString = QString::fromUtf8(buf);
+    QString deviceString = dataString.section(QRegularExpression("\\s+"), 0, 0);
+
+    pclose(pipe);
+
+    return deviceString;
 }
+
+const QString& sysDrivePath()
+{
+    static QString devicePath = getDevicePath(lit("/root"));
+    return devicePath;
+}
+
 #endif
 
 bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
 {
-    return storage->getUrl().startsWith(sysDrivePath());
+    QString sysPath = sysDrivePath();
+    return sysPath.isNull() ? false : getDevicePath(storage->getUrl()).startsWith(sysDrivePath());
 }
-}
+} // namespace <anonymous>
 
 class ArchiveScanPosition
 {
