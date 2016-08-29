@@ -25,12 +25,12 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     m_target(),
     m_cachedSizeHint(),
     m_resolutionHint(),
+    m_aspectRatio(kDefaultAspectRatio),
     m_preview(new QLabel(this)),
     m_placeholder(new QLabel(this)),
     m_indicator(new QnBusyIndicatorWidget(this)),
     m_pages(new QStackedWidget(this)),
-    m_status(QnCameraThumbnailManager::None),
-    m_aspectRatio(kDefaultAspectRatio)
+    m_status(QnCameraThumbnailManager::None)
 {
     m_pages->addWidget(m_preview);
     m_pages->addWidget(m_placeholder);
