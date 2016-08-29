@@ -58,7 +58,6 @@ public:
     bool isLocal() const;
 
     /**
-    /**
      * WARNING: There is a logical bug in here:
      *  "!(a > b) && !(a < b)" does not mean "a == b"
      */

@@ -34,9 +34,6 @@ void QnBusyIndicatorButton::paintEvent(QPaintEvent* event)
         option.icon = QIcon();
     }
 
-    if (!option.state.testFlag(QStyle::State_Enabled))
-        option.state &= ~(QStyle::State_MouseOver | QStyle::State_Sunken);
-
     QStylePainter(this).drawControl(QStyle::CE_PushButton, option);
 }
 

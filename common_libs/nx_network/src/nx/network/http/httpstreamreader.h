@@ -66,6 +66,7 @@ namespace nx_http
         /** moves message out of parser */
         Message takeMessage();
         ReadState state() const;
+        quint64 messageBodyBytesRead() const;
         size_t messageBodyBufferSize() const;
         //!Returns internal message body buffer and clears internal buffer
         BufferType fetchMessageBody();

@@ -8,7 +8,10 @@ def getProjectType(String artifactId)
     return "generic"
 }
 
-def proFilePath = project.properties["root.dir"] + "/vms-${project.properties.arch}.pro"
+def proFilePath = project.properties["root.dir"] +
+    "/vms-" +
+    project.properties["build.suffix"] +
+    ".pro"
 
 def file = new File(proFilePath)
 

@@ -2049,6 +2049,13 @@ void MediaServerProcess::run()
         return;
     }
 
+    if (connectInfo.cloudHost != QnAppInfo::defaultCloudHost())
+    {
+        NX_LOG(lit("Incompatible Server version detected (cloud host name &1)! Giving up.")
+            .arg(connectInfo.cloudHost), cl_logERROR);
+        return;
+    }
+
     while (!needToStop() && !initResourceTypes(ec2Connection))
     {
         QnSleep::msleep(1000);
@@ -2258,6 +2265,9 @@ void MediaServerProcess::run()
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
+
+    // show our cloud host value in registry in case of installer will check it
+    MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
 
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {

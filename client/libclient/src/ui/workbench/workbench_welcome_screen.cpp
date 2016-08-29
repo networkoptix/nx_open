@@ -231,11 +231,6 @@ QString QnWorkbenchWelcomeScreen::softwareVersion() const
     return QnAppInfo::applicationVersion();
 }
 
-QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
-{
-    return QnConnectionDiagnosticsHelper::minSupportedVersion().toString();
-}
-
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
 {
     return !extractResources(urls).isEmpty();

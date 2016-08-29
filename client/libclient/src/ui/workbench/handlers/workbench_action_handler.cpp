@@ -282,9 +282,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
 
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
-    connect(action(QnActions::HiDpiSupportMessageAction), &QAction::triggered,
-        this, &QnWorkbenchActionHandler::onHiDpiWarningMessageAction);
-
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
@@ -2184,22 +2181,6 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
         tr("This is a beta version of %1.")
         .arg(qApp->applicationDisplayName()));
-}
-
-void QnWorkbenchActionHandler::onHiDpiWarningMessageAction()
-{
-    static const auto kAlignedParagrapth = lit("<p align=\"center\" style=\"margin:4\">%1</p>");
-    static const auto kComment = "%1 Will be replaced by product name";
-    static const auto kMessageTemplate = lit("%1%2%3").arg(
-        kAlignedParagrapth.arg(tr("%1 has detected that you have a high resolution "
-            "screen and as a result %1 may not be displaying well.", kComment)),
-        kAlignedParagrapth.arg(tr("We are aware of this issue and a fix will be coming in v3.0.")),
-        kAlignedParagrapth.arg(tr("In the meantime please adjust your screen's resolution if "
-            "needed for a better experience.")));
-
-    static const auto kMessage = kMessageTemplate.arg(QnAppInfo::productNameLong());
-
-    QnMessageBox::showNoIconDialog(mainWindow(), tr("HiDpi Screens Support Warning"), kMessage);
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {

@@ -7,7 +7,7 @@ Column
     id: control;
 
     property string userName;
-    property bool isOnline;
+    property bool enabled;
 
     spacing: 10; // TODO: check is bottom margin is 8px
 
@@ -21,7 +21,7 @@ Column
        anchors.leftMargin: 4;
 
        disableable: false;
-       enabled: control.isOnline;
+       enabled: control.enabled;
        text: control.userName;
        font: Style.fonts.systemTile.info;
        standardColor: Style.colors.text;
@@ -31,12 +31,13 @@ Column
     Image
     {
        id: imageItem;
+       enabled: control.enabled;
 
        anchors.left: parent.left;
 
        width: 24;
        height: 24;
-       source: (isOnline
+       source: (enabled
            ? "qrc:/skin/welcome_page/cloud_online.png"
            : "qrc:/skin/welcome_page/cloud_offline.png");
     }

@@ -57,11 +57,12 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
-const char* qn_searchModelPropertyName = "_qn_searchModel";
-const char* qn_searchSynchronizerPropertyName = "_qn_searchSynchronizer";
-const char* qn_filterPropertyName = "_qn_filter";
-//    const char* qn_searchCriterionPropertyName = "_qn_searchCriterion";
-}
+
+const char* kSearchModelPropertyName = "_qn_searchModel";
+const char* kSearchSynchronizerPropertyName = "_qn_searchSynchronizer";
+const char* kFilterPropertyName = "_qn_filter";
+
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnResourceBrowserToolTipWidget
@@ -103,7 +104,6 @@ void QnResourceBrowserToolTipWidget::setPixmap(const QPixmap& pixmap)
     updateTailPos();
 }
 
-
 void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
 {
     if (m_thumbnailVisible == visible)
@@ -143,12 +143,12 @@ void QnResourceBrowserToolTipWidget::updateTailPos()
     qreal parentPos = m_pointTo.y();
 
     if (parentPos - halfHeight < 0)
-        setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.top())));
+        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound(rect.top() + tailWidth())));
+    else if (parentPos + halfHeight > enclosingRect.height())
+        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound(rect.bottom() - tailWidth())));
     else
-        if (parentPos + halfHeight > enclosingRect.height())
-            setTailPos(QPointF(qRound(rect.left() - 10.0), qRound(rect.bottom())));
-        else
-            setTailPos(QPointF(qRound(rect.left() - 10.0), qRound((rect.top() + rect.bottom()) / 2)));
+        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound((rect.top() + rect.bottom()) / 2)));
+
     base_type::pointTo(m_pointTo);
 }
 
@@ -270,7 +270,7 @@ bool QnResourceBrowserWidget::isLayoutSearchable(QnWorkbenchLayout* layout) cons
 
 QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayout* layout, bool create) const
 {
-    QnResourceSearchProxyModel* result = layout->property(qn_searchModelPropertyName).value<QnResourceSearchProxyModel*>();
+    QnResourceSearchProxyModel* result = layout->property(kSearchModelPropertyName).value<QnResourceSearchProxyModel*>();
     if (create && !result)
     {
         result = new QnResourceSearchProxyModel(layout);
@@ -280,7 +280,7 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
-        layout->setProperty(qn_searchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel*>(result));
+        layout->setProperty(kSearchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel*>(result));
 
         //initial filter setup
         setupInitialModelCriteria(result);
@@ -290,25 +290,25 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
 
 QnResourceSearchSynchronizer* QnResourceBrowserWidget::layoutSynchronizer(QnWorkbenchLayout* layout, bool create) const
 {
-    QnResourceSearchSynchronizer* result = layout->property(qn_searchSynchronizerPropertyName).value<QnResourceSearchSynchronizer*>();
+    QnResourceSearchSynchronizer* result = layout->property(kSearchSynchronizerPropertyName).value<QnResourceSearchSynchronizer*>();
     if (create && !result && isLayoutSearchable(layout))
     {
         result = new QnResourceSearchSynchronizer(layout);
         result->setLayout(layout);
         result->setModel(layoutModel(layout, true));
-        layout->setProperty(qn_searchSynchronizerPropertyName, QVariant::fromValue<QnResourceSearchSynchronizer*>(result));
+        layout->setProperty(kSearchSynchronizerPropertyName, QVariant::fromValue<QnResourceSearchSynchronizer*>(result));
     }
     return result;
 }
 
 QString QnResourceBrowserWidget::layoutFilter(QnWorkbenchLayout* layout) const
 {
-    return layout->property(qn_filterPropertyName).toString();
+    return layout->property(kFilterPropertyName).toString();
 }
 
 void QnResourceBrowserWidget::setLayoutFilter(QnWorkbenchLayout* layout, const QString& filter) const
 {
-    layout->setProperty(qn_filterPropertyName, filter);
+    layout->setProperty(kFilterPropertyName, filter);
 }
 
 void QnResourceBrowserWidget::killSearchTimer()

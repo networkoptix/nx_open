@@ -24,6 +24,8 @@
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 
+#include <utils/common/app_info.h>
+
 using namespace nx::cdb;
 
 namespace

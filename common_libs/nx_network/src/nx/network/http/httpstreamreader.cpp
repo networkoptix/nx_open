@@ -186,6 +186,12 @@ namespace nx_http
         return m_state;
     }
 
+    quint64 HttpStreamReader::messageBodyBytesRead() const
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        return m_messageBodyBytesRead;
+    }
+
     size_t HttpStreamReader::messageBodyBufferSize() const
     {
         std::unique_lock<std::mutex> lk( m_mutex );

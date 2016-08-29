@@ -30,7 +30,6 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
     Q_PROPERTY(QString softwareVersion READ softwareVersion CONSTANT)
-    Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
@@ -67,8 +66,6 @@ public: // Properties
     void setGlobalPreloaderVisible(bool value);
 
     QString softwareVersion() const;
-
-    QString minSupportedVersion() const;
 
 public slots:
     bool isAcceptableDrag(const UrlsList& urls);

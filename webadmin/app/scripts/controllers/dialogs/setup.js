@@ -360,10 +360,6 @@ angular.module('webadminApp')
         function connectToCloud(preset){
             $log.log("Connect to cloud");
 
-            if(preset){
-                $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
-                $scope.settings.cloudPassword = $scope.settings.presetCloudPassword;
-            }
             $scope.settings.cloudError = false;
             if(debugMode){
                 $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
@@ -387,6 +383,7 @@ angular.module('webadminApp')
                         $scope.settings.cloudError = formatError('notAuthorized');
                     }
 
+                    $scope.next('cloudLogin');
                     releaseNext();
                     return;
                 }
@@ -400,7 +397,9 @@ angular.module('webadminApp')
 
                 // Do not go further here, show connection error
                 $scope.next('cloudFailure');
+                releaseNext();
             }
+
             function errorHandler(error)
             {
                 logMediaserverError(error);
@@ -651,15 +650,20 @@ angular.module('webadminApp')
                 back: 'systemName',
                 skip: 'localLogin',
                 next: function(){
-                    return connectToCloud(true);
+                    $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
+                    $scope.settings.cloudPassword = $scope.settings.presetCloudPassword;
+                    return 'cloudProcess';
                 }
             },
             cloudLogin:{
                 back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
-                next: connectToCloud,
+                next: 'cloudProcess',
                 valid: function(){
                     return checkForm($scope.forms.cloudForm);
                 }
+            },
+            cloudProcess:{
+                onShow: connectToCloud
             },
             cloudSuccess:{
                 finish: true
