@@ -98,8 +98,6 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     m_previewWidget->busyIndicator()->setDotRadius(style::Metrics::kStandardPadding / 2.0);
     m_previewWidget->busyIndicator()->setDotSpacing(style::Metrics::kStandardPadding);
 
-    m_textLabel->setAlignment(Qt::AlignCenter);
-
     auto layout = new QVBoxLayout(m_embeddedWidget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_previewWidget);
