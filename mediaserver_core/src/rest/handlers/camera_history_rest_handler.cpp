@@ -1,12 +1,10 @@
-#include <QUrlQuery>
-#include <QWaitCondition>
+#include "camera_history_rest_handler.h"
 
 #include <vector>
 
 #include <api/helpers/chunks_request_data.h>
-
-#include "camera_history_rest_handler.h"
-#include "core/resource/camera_resource.h"
+#include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <core/resource/camera_resource.h>
 
 namespace {
 
