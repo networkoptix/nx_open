@@ -7,7 +7,7 @@
 #include <utils/common/connective.h>
 
 class QLabel;
-class QPlainTextEdit;
+class QnTextEditLabel;
 class QnResourcePreviewWidget;
 
 class QnResourceDetailsWidget : public Connective<QnPanel>
@@ -29,6 +29,6 @@ public:
 
 private:
     QnResourcePreviewWidget* m_preview;
-    QPlainTextEdit* m_nameTextEdit;
+    QnTextEditLabel* m_nameTextEdit;
     QLabel* m_descriptionLabel;
 };

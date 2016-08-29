@@ -4,6 +4,7 @@
 #include <QtWidgets/QPlainTextEdit>
 
 #include <ui/style/helper.h>
+#include <ui/widgets/common/text_edit_label.h>
 #include <ui/widgets/resource_preview_widget.h>
 
 namespace {
@@ -21,7 +22,7 @@ namespace {
 QnResourceDetailsWidget::QnResourceDetailsWidget(QWidget* parent) :
     base_type(parent),
     m_preview(new QnResourcePreviewWidget(this)),
-    m_nameTextEdit(new QPlainTextEdit(this)),
+    m_nameTextEdit(new QnTextEditLabel(this)),
     m_descriptionLabel(new QLabel(this))
 {
     QFont font;
@@ -38,29 +39,7 @@ QnResourceDetailsWidget::QnResourceDetailsWidget(QWidget* parent) :
     font.setWeight(kCameraNameFontWeight);
     m_nameTextEdit->setFont(font);
     m_nameTextEdit->setProperty(style::Properties::kDontPolishFontProperty, true);
-    m_nameTextEdit->setFrameStyle(QFrame::NoFrame);
-    m_nameTextEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-    m_nameTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_nameTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_nameTextEdit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-    m_nameTextEdit->setReadOnly(true);
-    m_nameTextEdit->setTextInteractionFlags(Qt::NoTextInteraction);
-    m_nameTextEdit->setFocusPolicy(Qt::NoFocus);
-    m_nameTextEdit->viewport()->unsetCursor();
-    m_nameTextEdit->document()->setDocumentMargin(0.0);
     m_nameTextEdit->hide();
-
-    /*
-    * We use QPlainTextEdit instead of QLabel because we want the label wrapped at any place, not just word boundary.
-    *  But it doesn't have precise vertical size hint, therefore we have to adjust maximum vertical size.
-    */
-    connect(m_nameTextEdit->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
-        [this](const QSizeF& size)
-        {
-            /* QPlainTextDocument measures height in lines, not pixels. */
-            int height = static_cast<int>(m_nameTextEdit->fontMetrics().height() * size.height());
-            m_nameTextEdit->setMaximumHeight(height);
-        });
 
     m_descriptionLabel->setWordWrap(true);
 
