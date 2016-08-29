@@ -1671,7 +1671,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
     qint64 totalSpace = 0;
     qint64 systemStorageSpace = 0;
-    QSet<QnStorageResourcePtr>::iterator systemStorageIt = result.end();
+    std::vector<QSet<QnStorageResourcePtr>::iterator> systemStorageItVec;
 
     for (auto it = result.begin(); it != result.end(); ++it)
     {
@@ -1679,13 +1679,16 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
             totalSpace += (*it)->getTotalSpace();
         else
         {
-            systemStorageIt = it;
+            systemStorageItVec.push_back(it);
             systemStorageSpace += (*it)->getTotalSpace();
         }
     }
 
-    if (totalSpace > systemStorageSpace * kSystemStorageTreshold && systemStorageIt != result.end())
-        result.remove(*systemStorageIt);
+    if (totalSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
+    {
+        for (auto it : systemStorageItVec)
+            result.remove(*it);
+    }
 
     if (!result.empty())
         m_isWritableStorageAvail = true;
