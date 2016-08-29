@@ -3598,16 +3598,18 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 //getUsers
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
-    const QString queryStr = R"(
+    QString queryStr = R"(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
         u.is_superuser as isAdmin, u.email,
         p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions,
-        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud, p.full_name as fullName
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud,
+        coalesce((SELECT value from vms_kvpair WHERE resource_guid = r.guid and name = '%1'), p.full_name) as fullName
         FROM vms_resource r
         JOIN auth_user u on u.id = r.id
         JOIN vms_userprofile p on p.user_id = u.id
         ORDER BY r.guid
     )";
+    queryStr = queryStr.arg(Qn::USER_FULL_NAME);
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);

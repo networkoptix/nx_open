@@ -390,12 +390,12 @@ bool QnResourceAccessManager::hasPermission(
 bool QnResourceAccessManager::hasPermission(
     const Qn::UserAccessData& accessRights,
     const QnResourcePtr& mediaResource,
-    Qn::Permission permission) const
+    Qn::Permissions permissions) const
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
     if (accessRights.access == Qn::UserAccessData::Access::ReadAllResources &&
-        permission == Qn::ReadPermission)
+        permissions == Qn::ReadPermission)
     {
         return true;
     }
@@ -404,7 +404,7 @@ bool QnResourceAccessManager::hasPermission(
     if (!userResource)
         return false;
 
-    return hasPermission(userResource, mediaResource, permission);
+    return hasPermission(userResource, mediaResource, permissions);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const

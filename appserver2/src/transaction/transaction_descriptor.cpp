@@ -399,7 +399,7 @@ struct AllowForAllAccessOut
     RemotePeerAccess operator()(const Qn::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
 };
 
-bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& resourceId, Qn::Permission permission)
+bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& resourceId, Qn::Permissions permissions)
 {
     if (hasSystemAccess(accessData))
         return true;
@@ -409,11 +409,11 @@ bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& re
     if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
         return true;
 
-    if (permission == Qn::ReadPermission
+    if (permissions == Qn::ReadPermission
         && accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             return true;
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
+    return qnResourceAccessManager->hasPermission(userResource, target, permissions);
 }
 
 struct ModifyResourceAccess
@@ -502,7 +502,13 @@ struct ModifyResourceParamAccess
             return qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
                 qnResPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
-        return resourceAccessHelper(accessData, param.resourceId, Qn::SavePermission);
+
+        Qn::Permissions permissions = Qn::SavePermission;
+        if (param.name == Qn::USER_FULL_NAME)
+            permissions |= Qn::WriteFullNamePermission;
+
+        return resourceAccessHelper(accessData, param.resourceId, permissions);
+
     }
 
     bool isRemove;

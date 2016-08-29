@@ -10,7 +10,6 @@
 namespace {
     static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
     static const int MSEC_PER_SEC = 1000;
-    static const QString kFullUserName(lit("FullUserName"));
 }
 
 
@@ -84,12 +83,6 @@ QByteArray QnUserResource::getHash() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_hash;
-}
-
-QString QnUserResource::getName() const
-{
-    QString result = propertyDictionary->value(getId(), kFullUserName);
-    return result.isNull() ? QnResource::getName() : result;
 }
 
 void QnUserResource::setHash(const QByteArray& hash)
@@ -300,8 +293,9 @@ void QnUserResource::setEmail(const QString& email)
 
 QString QnUserResource::fullName() const
 {
+    QString result = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
     QnMutexLocker locker(&m_mutex);
-    return m_fullName;
+    return result.isNull() ? m_fullName : result;
 }
 
 void QnUserResource::setFullName(const QString& value)
