@@ -90,8 +90,7 @@ void QnCheckFreeSpacePeerTask::doStart()
     auto currentServer = qnCommon->currentServer();
     if (currentServer)
     {
-        m_requestId = currentServer->restConnection()->getFreeSpaceForUpdateFiles(
-            true, handleReply);
+        m_requestId = currentServer->restConnection()->getFreeSpaceForUpdateFiles(handleReply);
     }
     else
     {

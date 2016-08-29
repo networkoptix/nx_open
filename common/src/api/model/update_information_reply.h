@@ -13,4 +13,14 @@ struct QnUpdateFreeSpaceReply
 
 #define QnUpdateFreeSpaceReply_Fields (freeSpaceByServerId)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnUpdateFreeSpaceReply, (ubjson)(xml)(json)(csv_record)(metatype))
+struct QnCloudHostCheckReply
+{
+    QString cloudHost;
+    QList<QnUuid> failedServers;
+};
+
+#define QnCloudHostCheckReply_Fields (cloudHost)(failedServers)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnUpdateFreeSpaceReply)(QnCloudHostCheckReply),
+    (ubjson)(xml)(json)(csv_record)(metatype))
