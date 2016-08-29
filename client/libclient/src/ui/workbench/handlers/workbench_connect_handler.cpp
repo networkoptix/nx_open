@@ -469,8 +469,8 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!
-    QnConnectionDiagnosticsHelper::Result status = silent
-        ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
+    auto status = silent
+        ? QnConnectionValidator::validateConnection(connectionInfo, errCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
 
     const auto systemName = connectionInfo.systemName;
@@ -485,9 +485,9 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     switch (status)
     {
-        case QnConnectionDiagnosticsHelper::Result::Success:
+        case Qn::ConnectionResult::success:
             break;
-        case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+        case Qn::ConnectionResult::compatibilityMode:
             storeConnection();
             menu()->trigger(QnActions::DelayedForcedExitAction);
             return ec2::ErrorCode::ok; // to avoid cycle
@@ -499,8 +499,6 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
                 : errCode;
         }
     }
-
-
 
     if (connectionInfo.newSystem)
     {

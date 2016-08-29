@@ -8,14 +8,15 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
-#include <utils/common/product_features.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
 
-#include "common/common_module.h"
+#include <common/common_module.h>
 #include "module_information.h"
+
+#include <utils/common/app_info.h>
 #include "utils/common/cryptographic_hash.h"
 
 static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
@@ -231,10 +232,19 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return true;
 
     //TODO: #GDM #isCompatibleCustomization VMS-2163
-    if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
+    if (!m_compatibilityMode &&
+        response->customization.compare(QnAppInfo::customizationName(), Qt::CaseInsensitive) != 0)
     {
         NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 on local address %4").
             arg(response->type).arg(remoteEndpoint.toString()).arg(response->customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
+        return false;
+    }
+
+    //TODO: #GDM #isCompatibleCustomization VMS-2163
+    if (response->cloudHost != QnAppInfo::defaultCloudHost())
+    {
+        NX_LOGX(lit("Ignoring %1 (%2) with different cloud host %3 on local address %4").
+            arg(response->type).arg(remoteEndpoint.toString()).arg(response->cloudHost).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
 
