@@ -128,6 +128,16 @@ const QString& sysDrivePath()
     static QString devicePath = getDevicePath(lit("/root"));
     return devicePath;
 }
+#else
+const QString& getDevicePath(const QString& path)
+{
+    return path;
+}
+
+const QString& sysDrivePath()
+{
+    return QString();
+}
 
 #endif
 
