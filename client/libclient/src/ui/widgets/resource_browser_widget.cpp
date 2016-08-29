@@ -88,8 +88,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
 {
     m_proxyWidget->setVisible(false);
     m_proxyWidget->setWidget(m_embeddedWidget);
-
-    //TODO: #vkutin Handle thumbnail clicks
+    m_proxyWidget->installSceneEventFilter(this);
 
     /* To keep aspect ratio specify only maximum height for server request: */
     m_previewWidget->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
@@ -117,6 +116,18 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     m_previewWidget->setFont(font);
 
     updateTailPos();
+}
+
+bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
+{
+    if (watched == m_proxyWidget
+        && event->type() == QEvent::GraphicsSceneMousePress
+        && static_cast<QGraphicsSceneMouseEvent*>(event)->button() == Qt::LeftButton)
+    {
+        thumbnailClicked();
+    }
+
+    return base_type::sceneEventFilter(watched, event);
 }
 
 void QnResourceBrowserToolTipWidget::setText(const QString& text)

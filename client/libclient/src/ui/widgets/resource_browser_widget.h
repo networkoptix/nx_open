@@ -68,6 +68,9 @@ public:
 signals:
     void thumbnailClicked();
 
+protected:
+    virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
+
 private:
     QGraphicsProxyWidget* m_proxyWidget;
     QWidget* m_embeddedWidget;
