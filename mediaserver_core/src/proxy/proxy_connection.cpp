@@ -39,6 +39,9 @@ class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int MAX_PROXY_TTL = 8;
 
+// NOTE: MSG_DONTWAIT is not supported for windows, so it makes sense using only when event
+//  is already reported by pullset as they do not lie on windows and may report false positive on
+//  some linux implementations.
 #ifdef Q_OS_WIN
     static int nonBlockingFlag = 0;
 #else
@@ -47,6 +50,9 @@ static const int MAX_PROXY_TTL = 8;
 
 static bool wouldSocketBlock(int returnCode)
 {
+    if (returnCode >= 0)
+        return false;
+
     auto code = SystemError::getLastOSErrorCode();
     if (code == SystemError::interrupted ||
         code == SystemError::wouldBlock ||
