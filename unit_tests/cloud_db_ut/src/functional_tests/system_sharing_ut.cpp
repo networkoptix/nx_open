@@ -1053,7 +1053,7 @@ TEST_F(SystemSharing, DISABLED_remove_sharing_unknown_system)
             api::SystemAccessRole::none));
 }
 
-TEST_F(SystemSharing, setSystemUserList)
+TEST_F(SystemSharing, DISABLED_setSystemUserList)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());

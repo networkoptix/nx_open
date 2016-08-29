@@ -162,6 +162,11 @@ QnUuid QnUuid::fromStringSafe(const QByteArray& uuid)
     return QnUuid(QUuid(uuid));
 }
 
+QnUuid QnUuid::fromStringSafe(const std::string& uuid)
+{
+    return QnUuid(QUuid(QByteArray::fromRawData(uuid.c_str(), uuid.size())));
+}
+
 QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset) {
     static_assert(sizeof(uint) <= sizeof(decltype(QUuid::data1)), "Offset type must be not greater than storage field size.");
     QUuid result = baseId;

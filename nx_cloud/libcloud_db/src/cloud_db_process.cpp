@@ -133,9 +133,6 @@ int CloudDBProcess::exec()
 
     try
     {
-        QnCommonModule commonModule;
-        commonModule.setModuleGUID(kCdbGuid);
-
         //reading settings
         conf::Settings settings;
         //parsing command line arguments
@@ -201,6 +198,7 @@ int CloudDBProcess::exec()
         ec2::TransactionLog transactionLog(&dbManager);
         ec2::IncomingTransactionDispatcher transactionDispatcher(&transactionLog);
         ec2::ConnectionManager ec2ConnectionManager(
+            kCdbGuid,
             settings,
             &transactionLog,
             &transactionDispatcher);
@@ -213,6 +211,7 @@ int CloudDBProcess::exec()
             accountManager,
             eventManager,
             &dbManager,
+            &transactionLog,
             &transactionDispatcher);
         m_systemManager = &systemManager;
 

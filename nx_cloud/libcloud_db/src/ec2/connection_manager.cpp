@@ -25,6 +25,7 @@ namespace cdb {
 namespace ec2 {
 
 ConnectionManager::ConnectionManager(
+    const QnUuid& moduleGuid,
     const conf::Settings& settings,
     TransactionLog* const transactionLog,
     IncomingTransactionDispatcher* const transactionDispatcher)
@@ -33,7 +34,7 @@ ConnectionManager::ConnectionManager(
     m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
     m_localPeerData(
-        QnCommonModule::instance()->moduleGUID(),
+        moduleGuid,
         QnUuid::createUuid(),
         Qn::PT_CloudServer,
         Qn::UbjsonFormat)

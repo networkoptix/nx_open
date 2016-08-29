@@ -22,6 +22,7 @@ enum class DBResult
     ioError,
     notFound,
     cancelled,
+    retryLater,
 };
 
 

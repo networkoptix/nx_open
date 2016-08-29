@@ -14,13 +14,18 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
+
+#include <core/resource/param.h>
 #include <utils/common/guard.h>
+#include <utils/common/id.h>
 #include <utils/common/sync_call.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "account_manager.h"
+#include "ec2/data_conversion.h"
 #include "ec2/incoming_transaction_dispatcher.h"
+#include "ec2/transaction_log.h"
 #include "event_manager.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
@@ -35,6 +40,7 @@ SystemManager::SystemManager(
     const AccountManager& accountManager,
     const EventManager& eventManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
+    ec2::TransactionLog* const transactionLog,
     ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error)
 :
     m_settings(settings),
@@ -42,6 +48,7 @@ SystemManager::SystemManager(
     m_accountManager(accountManager),
     m_eventManager(eventManager),
     m_dbManager(dbManager),
+    m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
     m_dropSystemsTimerId(0),
     m_dropExpiredSystemsTaskStillRunning(false)
@@ -147,17 +154,45 @@ void SystemManager::bindSystemToAccount(
         return;
     }
 
-    data::SystemRegistrationDataWithAccount registrationDataWithAccount(
+    auto registrationDataWithAccount = std::make_unique<data::SystemRegistrationDataWithAccount>(
         std::move(registrationData));
-    registrationDataWithAccount.accountEmail = accountEmail.toStdString();
+    registrationDataWithAccount->accountEmail = accountEmail.toStdString();
+    auto registrationDataWithAccountPtr = registrationDataWithAccount.get();
+    auto newSystemData = std::make_unique<data::SystemData>();
+    auto newSystemDataPtr = newSystemData.get();
+    newSystemData->id = QnUuid::createUuid().toSimpleString().toStdString();   //guid without {}
 
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemRegistrationDataWithAccount, data::SystemData>(
-        std::bind(&SystemManager::insertSystemToDB, this, _1, _2, _3),
-        std::move(registrationDataWithAccount),
-        std::bind(&SystemManager::systemAdded,
-                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, _3, std::move(completionHandler)));
+    auto dbUpdateFunc = 
+        [this, registrationDataWithAccountPtr, newSystemDataPtr](
+            QSqlDatabase* const connection) -> nx::db::DBResult
+        {
+            return insertSystemToDB(
+                connection,
+                *registrationDataWithAccountPtr,
+                newSystemDataPtr);
+        };
+
+    auto onDbUpdateCompletedFunc = 
+        [this,
+            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            registrationDataWithAccount = std::move(registrationDataWithAccount),
+            newSystemData = std::move(newSystemData),
+            completionHandler = std::move(completionHandler)](
+                nx::db::DBResult dbResult)
+        {
+            systemAdded(
+                std::move(locker),
+                dbResult,
+                std::move(*registrationDataWithAccount),
+                std::move(*newSystemData),
+                std::move(completionHandler));
+        };
+
+    // Creating db transaction via TransactionLog.
+    m_transactionLog->startDbTransaction(
+        newSystemDataPtr->id.c_str(),
+        std::move(dbUpdateFunc),
+        std::move(onDbUpdateCompletedFunc));
 }
 
 void SystemManager::unbindSystem(
@@ -285,12 +320,37 @@ void SystemManager::shareSystem(
     std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemSharing>(
-        std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
-        std::move(sharing),
-        std::bind(&SystemManager::sharingUpdated,
-            this, m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, std::move(completionHandler)));
+
+    sharing.vmsUserId = guidFromArbitraryData(sharing.accountEmail).toSimpleString().toStdString();
+    auto sharingOHeap = std::make_unique<data::SystemSharing>(std::move(sharing));
+    data::SystemSharing* sharingOHeapPtr = sharingOHeap.get();
+
+    auto dbUpdateFunc = 
+        [this, sharingOHeapPtr](QSqlDatabase* const connection) -> nx::db::DBResult
+        {
+            return updateSharingInDbAndGenerateTransaction(
+                connection,
+                *sharingOHeapPtr);
+        };
+
+    auto onDbUpdateCompletedFunc = 
+        [this,
+            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            sharingOHeap = std::move(sharingOHeap),
+            completionHandler = std::move(completionHandler)](
+                nx::db::DBResult dbResult)
+        {
+            sharingUpdated(
+                std::move(locker),
+                dbResult,
+                std::move(*sharingOHeap),
+                std::move(completionHandler));
+        };
+
+    m_transactionLog->startDbTransaction(
+        sharing.systemID.c_str(),
+        std::move(dbUpdateFunc),
+        std::move(onDbUpdateCompletedFunc));
 }
 
 void SystemManager::setSystemUserList(
@@ -299,7 +359,8 @@ void SystemManager::setSystemUserList(
     std::function<void(api::ResultCode)> completionHandler)
 {
     //request is disabled for now since it is not secure
-    //return completionHandler(api::ResultCode::forbidden);
+    //TODO #ak remove this request
+    return completionHandler(api::ResultCode::forbidden);
 
     std::string systemId;
     if (!authzInfo.get(attr::authSystemID, &systemId))
@@ -516,9 +577,8 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     api::SystemSharingEx resultData;
     resultData.api::SystemSharing::operator=(*it);
 
-    const auto account =
-        m_accountManager.findAccountByUserName(accountEmail);
-    if (!static_cast<bool>(account))
+    const auto account = m_accountManager.findAccountByUserName(accountEmail);
+    if (!account)
         return boost::none;
 
     resultData.accountID = account->id;
@@ -551,7 +611,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
                            "status_code, expiration_utc_timestamp) "
         " VALUES(:id, :name, :customization, :authKey, :ownerAccountID, "
                 ":status, :expiration_utc_timestamp)");
-    systemData->id = QnUuid::createUuid().toSimpleString().toStdString();   //guid without {}
+    NX_ASSERT(!systemData->id.empty());
     systemData->name = newSystem.name;
     systemData->customization = newSystem.customization;
     systemData->authKey = QnUuid::createUuid().toSimpleString().toStdString();
@@ -579,7 +639,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     systemSharing.accountEmail = newSystem.accountEmail;
     systemSharing.systemID = systemData->id;
     systemSharing.accessRole = api::SystemAccessRole::owner;
-    auto result = updateSharingInDB(connection, systemSharing);
+    auto result = updateSharingInDbAndGenerateTransaction(connection, systemSharing);
     if (result != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
@@ -769,7 +829,7 @@ void SystemManager::systemDeleted(
         : api::ResultCode::dbError);
 }
 
-nx::db::DBResult SystemManager::updateSharingInDB(
+nx::db::DBResult SystemManager::updateSharingInDb(
     QSqlDatabase* const connection,
     const data::SystemSharing& sharing)
 {
@@ -807,6 +867,65 @@ nx::db::DBResult SystemManager::updateSharingInDB(
     }
 
     return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
+    QSqlDatabase* const connection,
+    const data::SystemSharing& sharing)
+{
+    const auto account = m_accountManager.findAccountByUserName(sharing.accountEmail);
+    if (!account)
+        return nx::db::DBResult::notFound;
+
+    nx::db::DBResult result = nx::db::DBResult::ok;
+    if (sharing.accessRole != api::SystemAccessRole::none)
+    {
+        //generating saveUser transaction
+        ::ec2::ApiUserData userData;
+        ec2::convert(sharing, &userData);
+        result = m_transactionLog->generateTransactionAndSaveToLog<
+            ::ec2::ApiCommand::saveUser>(
+                connection,
+                sharing.systemID.c_str(),
+                std::move(userData));
+
+        //generating "save full name" transaction
+        ::ec2::ApiResourceParamWithRefData fullNameData;
+        fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
+        fullNameData.name = Qn::USER_FULL_NAME;
+        fullNameData.value = QString::fromStdString(account->fullName);
+        result = m_transactionLog->generateTransactionAndSaveToLog<
+            ::ec2::ApiCommand::setResourceParam>(
+                connection,
+                sharing.systemID.c_str(),
+                std::move(fullNameData));
+    }
+    else
+    {
+        //generating removeUser transaction
+        ::ec2::ApiIdData userId;
+        ec2::convert(sharing, &userId);
+        result = m_transactionLog->generateTransactionAndSaveToLog<
+            ::ec2::ApiCommand::removeUser>(
+                connection,
+                sharing.systemID.c_str(),
+                std::move(userId));
+
+        //generating removeResourceParam transaction
+        ::ec2::ApiResourceParamWithRefData fullNameParam;
+        fullNameParam.resourceId = QnUuid(sharing.vmsUserId.c_str());
+        fullNameParam.name = Qn::USER_FULL_NAME;
+        result = m_transactionLog->generateTransactionAndSaveToLog<
+            ::ec2::ApiCommand::removeResourceParam>(
+                connection,
+                sharing.systemID.c_str(),
+                std::move(fullNameParam));
+    }
+
+    if (result != nx::db::DBResult::ok)
+        return result;
+
+    return updateSharingInDb(connection, sharing);
 }
 
 void SystemManager::sharingUpdated(
@@ -861,7 +980,7 @@ nx::db::DBResult SystemManager::updateUserListInDB(
     {
         if (sharingData.accessRole == api::SystemAccessRole::none)
             continue;
-        const auto resCode = updateSharingInDB(connection, sharingData);
+        const auto resCode = updateSharingInDb(connection, sharingData);
         if (resCode != nx::db::DBResult::ok)
             return resCode;
     }
@@ -1116,8 +1235,6 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
         {
             NX_ASSERT(false);
         }
-
-        //TODO #ak other indexes may be required also (e.g., systems by account, systems by name, etc..)
     }
 
     return db::DBResult::ok;
@@ -1223,23 +1340,6 @@ void SystemManager::expiredSystemsDeletedFromDb(
     m_dropExpiredSystemsTaskStillRunning = false;
 }
 
-static api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)
-{
-    switch (permissions)
-    {
-        case Qn::GlobalLiveViewerPermissionSet:
-            return api::SystemAccessRole::liveViewer;
-        case Qn::GlobalViewerPermissionSet:
-            return api::SystemAccessRole::viewer;
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            return api::SystemAccessRole::advancedViewer;
-        case Qn::GlobalAdminPermissionSet:
-            return api::SystemAccessRole::cloudAdmin;
-        default:
-            return api::SystemAccessRole::custom;
-    }
-}
-
 nx::db::DBResult SystemManager::processEc2SaveUser(
     QSqlDatabase* dbConnection,
     const nx::String& systemId,
@@ -1253,18 +1353,10 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
 
     //preparing SystemSharing structure
     systemSharingData->systemID = systemId.toStdString();
-    systemSharingData->accountEmail = data.email.toStdString();
-    systemSharingData->customPermissions = QnLexical::serialized(data.permissions).toStdString();
-    systemSharingData->groupID = data.groupId.toStdString();
-    systemSharingData->isEnabled = data.isEnabled;
-    systemSharingData->accessRole =
-        data.isAdmin
-        ? api::SystemAccessRole::owner
-        : permissionsToAccessRole(data.permissions);
-    systemSharingData->vmsUserId = data.id.toStdString();
+    ec2::convert(data, systemSharingData);
 
     //updating db
-    return updateSharingInDB(dbConnection, *systemSharingData);
+    return updateSharingInDb(dbConnection, *systemSharingData);
 }
 
 void SystemManager::onEc2SaveUserDone(

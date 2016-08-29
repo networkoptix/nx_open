@@ -44,6 +44,7 @@ enum class ResultCode
 
     /** received data in unexpected/unsupported format */
     invalidFormat,
+    retryLater,
 
     unknownError
 };

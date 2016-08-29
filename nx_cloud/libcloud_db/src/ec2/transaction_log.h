@@ -35,12 +35,13 @@ public:
     TransactionLog(nx::db::AsyncSqlQueryExecutor* const dbManager);
 
     /** Begins SQL DB transaction and passes that to \a dbOperationsFunc.
-        \note api::ResultCode::retryLater can be returned if 
+        \note nx::db::DBResult::retryLater can be reported to \a onDbUpdateCompleted if 
             there are already too many requests for transaction
+        \note In case of error \a dbUpdateFunc can be skipped
     */
     void startDbTransaction(
         const nx::String& systemId,
-        nx::utils::MoveOnlyFunc<nx::db::DBResult(api::ResultCode, QSqlDatabase*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::DBResult)> onDbUpdateCompleted);
 
     /** 
@@ -55,6 +56,17 @@ public:
         TransactionTransportHeader /*transportHeader*/)
     {
         //TODO returning nx::db::DBResult::cancelled if transaction should be skipped
+        return db::DBResult::ok;
+    }
+
+    /** This method should be used when generating new transactions */
+    template<int TransactionCommandValue, typename TransactionDataType>
+    nx::db::DBResult generateTransactionAndSaveToLog(
+        QSqlDatabase* /*connection*/,
+        const nx::String& /*systemId*/,
+        TransactionDataType /*transactionData*/)
+    {
+        //TODO #ak
         return db::DBResult::ok;
     }
 

@@ -22,7 +22,7 @@ TransactionLog::TransactionLog(nx::db::AsyncSqlQueryExecutor* const dbManager)
 
 void TransactionLog::startDbTransaction(
     const nx::String& /*systemId*/,
-    nx::utils::MoveOnlyFunc<nx::db::DBResult(api::ResultCode, QSqlDatabase*)> dbOperationsFunc,
+    nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbOperationsFunc,
     nx::utils::MoveOnlyFunc<void(nx::db::DBResult)> onDbUpdateCompleted)
 {
     //TODO monitoring request queue size and returning api::ResultCode::retryLater if exceeded
@@ -32,7 +32,7 @@ void TransactionLog::startDbTransaction(
         [dbOperationsFunc = std::move(dbOperationsFunc)]
             (QSqlDatabase* dbConnection) -> nx::db::DBResult
         {
-            return dbOperationsFunc(api::ResultCode::ok, dbConnection);
+            return dbOperationsFunc(dbConnection);
         },
         [onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
             nx::db::DBResult dbResult)

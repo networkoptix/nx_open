@@ -54,6 +54,7 @@ class ConnectionManager
 {
 public:
     ConnectionManager(
+        const QnUuid& moduleGuid,
         const conf::Settings& settings,
         TransactionLog* const transactionLog,
         IncomingTransactionDispatcher* const transactionDispatcher);

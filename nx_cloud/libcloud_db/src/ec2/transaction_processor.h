@@ -218,7 +218,6 @@ private:
             std::bind(
                 &TransactionProcessor::processTransactionInDbConnectionThread, this,
                 _1,
-                _2,
                 TransactionContext{ std::move(transportHeader), std::move(transaction) },
                 auxiliaryArgPtr),
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
@@ -229,23 +228,10 @@ private:
     }
 
     nx::db::DBResult processTransactionInDbConnectionThread(
-        api::ResultCode resultCode,
         QSqlDatabase* connection,
         const TransactionContext& transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
-        if (resultCode != api::ResultCode::ok)
-        {
-            NX_LOGX(lm("Error getting Db connection for transaction %1 received from (%2, %3). "
-                "ec2 transaction log returned %4")
-                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
-                .arg(transactionContext.transportHeader.systemId)
-                .str(transactionContext.transportHeader.endpoint)
-                .arg(api::toString(resultCode)),
-                cl_logWARNING);
-            return nx::db::DBResult::ioError;
-        }
-
         //DB transaction is created down the stack
 
         auto dbResultCode =
@@ -305,7 +291,10 @@ private:
             case nx::db::DBResult::cancelled:
                 return completionHandler(api::ResultCode::ok);
             default:
-                return completionHandler(api::ResultCode::dbError);
+                return completionHandler(
+                    dbResult == nx::db::DBResult::retryLater
+                    ? api::ResultCode::retryLater
+                    : api::ResultCode::dbError);
         }
     }
 };

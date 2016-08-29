@@ -22,12 +22,12 @@
 namespace nx {
 namespace cdb {
 
-class MserverCloudSynchronization
+class Ec2MserverCloudSynchronization
 :
     public CdbFunctionalTest
 {
 public:
-    MserverCloudSynchronization()
+    Ec2MserverCloudSynchronization()
     :
         m_moduleGuid(QnUuid::createUuid()),
         m_runningInstanceGuid(QnUuid::createUuid()),
@@ -120,7 +120,7 @@ private:
     }
 };
 
-TEST_F(MserverCloudSynchronization, establishConnection)
+TEST_F(Ec2MserverCloudSynchronization, establishConnection)
 {
     constexpr static const auto kWaitTimeout = std::chrono::seconds(5);
 
@@ -144,12 +144,12 @@ TEST_F(MserverCloudSynchronization, establishConnection)
             system1.id, system1.authKey, kWaitTimeout));
 }
 
-class MserverCloudSynchronization2
+class Ec2MserverCloudSynchronization2
     :
     public ::testing::Test
 {
 public:
-    MserverCloudSynchronization2()
+    Ec2MserverCloudSynchronization2()
     {
         const auto tmpDir = 
             CdbLauncher::temporaryDirectoryPath().isEmpty()
@@ -160,7 +160,7 @@ public:
         m_appserver2.addArg(dbFileArg.toStdString().c_str());
     }
 
-    ~MserverCloudSynchronization2()
+    ~Ec2MserverCloudSynchronization2()
     {
         m_appserver2.stop();
         m_cdb.stop();
@@ -249,7 +249,7 @@ private:
     api::SystemData m_system;
 };
 
-TEST_F(MserverCloudSynchronization2, general)
+TEST_F(Ec2MserverCloudSynchronization2, general)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());

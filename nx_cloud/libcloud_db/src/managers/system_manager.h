@@ -47,6 +47,7 @@ class EventManager;
 
 namespace ec2 {
 class IncomingTransactionDispatcher;
+class TransactionLog;
 }   // namespace ec2 
 
 /*!
@@ -69,6 +70,7 @@ public:
         const AccountManager& accountManager,
         const EventManager& eventManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
+        ec2::TransactionLog* const transactionLog,
         ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error);
     virtual ~SystemManager();
 
@@ -203,6 +205,7 @@ private:
     const AccountManager& m_accountManager;
     const EventManager& m_eventManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    ec2::TransactionLog* const m_transactionLog;
     ec2::IncomingTransactionDispatcher* const m_transactionDispatcher;
     //!map<id, system>
     SystemsDict m_systems;
@@ -250,7 +253,10 @@ private:
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
-    nx::db::DBResult updateSharingInDB(
+    nx::db::DBResult updateSharingInDb(
+        QSqlDatabase* const connection,
+        const data::SystemSharing& sharing);
+    nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         QSqlDatabase* const connection,
         const data::SystemSharing& sharing);
     void sharingUpdated(
