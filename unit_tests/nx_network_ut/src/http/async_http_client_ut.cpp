@@ -14,6 +14,7 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/future.h>
 #include <utils/media/custom_output_stream.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
@@ -245,5 +246,55 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
     }
 }
 
+static QByteArray kBrokenResponse
+(
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Length: 100\r\n\r\n"
+    "not enough content"
+);
+
+TEST_F(AsyncHttpClientTest, ConnectionBreak)
+{
+    nx::utils::promise<int> serverPort;
+    std::thread serverThread(
+        [&]()
+        {
+            const auto server = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+            ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+            ASSERT_TRUE(server->listen());
+            serverPort.set_value(server->getLocalAddress().port);
+
+            std::unique_ptr<AbstractStreamSocket> client(server->accept());
+            ASSERT_TRUE((bool)client);
+
+            QByteArray buffer(1024, Qt::Uninitialized);
+            int size = 0;
+            while (!buffer.contains(QByteArray("\r\n\r\n", 4)))
+            {
+                auto recv = client->recv(buffer.data() + size, buffer.size() - size);
+                ASSERT_GT(recv, 0);
+                size += recv;
+            }
+
+            buffer.resize(size);
+            ASSERT_EQ(client->send(kBrokenResponse.data(), kBrokenResponse.size()), kBrokenResponse.size());
+        });
+
+    auto client = nx_http::AsyncHttpClient::create();
+    nx::utils::promise<void> clientDone;
+    QObject::connect(
+        client.get(), &nx_http::AsyncHttpClient::done,
+        [&](nx_http::AsyncHttpClientPtr client)
+        {
+            EXPECT_TRUE(client->failed());
+            EXPECT_EQ(client->fetchMessageBodyBuffer(), QByteArray("not enough content"));
+            EXPECT_EQ(client->lastSysErrorCode(), SystemError::connectionReset);
+            clientDone.set_value();
+        });
+
+    client->doGet(lit("http://127.0.0.1:%1/test").arg(serverPort.get_future().get()));
+    serverThread.join();
+    clientDone.get_future().wait();
+}
 
 } // namespace nx_http
