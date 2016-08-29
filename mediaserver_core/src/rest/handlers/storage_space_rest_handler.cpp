@@ -53,7 +53,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
         );
     };
 
-    auto enumerate = [enoughSpace, fastRequest, &reply] (const QnStorageResourceList &storages)
+    auto enumerate = [enoughSpace, fastRequest, &reply] (const QSet<QnStorageResourcePtr>& storages)
     {
         for (const auto& storage: storages)
         {
@@ -67,8 +67,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
         }
     };
 
-    enumerate(qnNormalStorageMan->getStorages());
-    enumerate(qnBackupStorageMan->getStorages());
+    enumerate(qnNormalStorageMan->getWritableStorages());
+    enumerate(qnBackupStorageMan->getWritableStorages());
 
     if (!fastRequest)
     {
