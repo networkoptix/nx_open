@@ -86,24 +86,21 @@ void QnCheckFreeSpacePeerTask::doStart()
                 finish(NotEnoughFreeSpaceError, failed);
         };
 
-    // TODO: #dklychkov Revise this fix: currentServer() returns null if connected to bpi.
-    auto currentServer = qnCommon->currentServer();
-    if (currentServer)
+    const auto currentServer = qnCommon->currentServer();
+    if (!currentServer)
     {
-        m_requestId = currentServer->restConnection()->getFreeSpaceForUpdateFiles(handleReply);
+        finish(CheckFailed);
+        return;
     }
-    else
-    {
-        m_requestId = -1;
-        finish(NoError);
-    }
+
+    m_requestId = currentServer->restConnection()->getFreeSpaceForUpdateFiles(handleReply);
 }
 
 void QnCheckFreeSpacePeerTask::doCancel()
 {
     if (m_requestId >= 0)
     {
-        auto currentServer = qnCommon->currentServer();
+        const auto currentServer = qnCommon->currentServer();
         if (currentServer)
             currentServer->restConnection()->cancelRequest(m_requestId);
         m_requestId = -1;
