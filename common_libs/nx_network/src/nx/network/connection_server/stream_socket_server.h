@@ -85,11 +85,6 @@ public:
         m_cond.wakeAll();
     }
 
-    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
-    {
-        m_socket->bindToAioThread(aioThread);
-    }
-
 protected:
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
@@ -182,6 +177,11 @@ public:
         }
         m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this,
                                         std::placeholders::_1, std::placeholders::_2));
+    }
+
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        m_socket->bindToAioThread(aioThread);
     }
 
 protected:
