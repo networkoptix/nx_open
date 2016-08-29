@@ -63,7 +63,7 @@
                     <Condition>SYS_ID_TIME</Condition>
 
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
-                        <RegistryValue Type="integer" Name="sysIdTime" Value="[SYS_ID_TIME]"/>
+                        <RegistryValue Type="string" Name="sysIdTime" Value="[SYS_ID_TIME]"/>
                     </RegistryKey>
                 </Component>
 
