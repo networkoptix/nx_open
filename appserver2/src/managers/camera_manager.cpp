@@ -116,10 +116,12 @@ namespace ec2
     int QnCameraManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::removeCamera, id, [handler, reqID](ec2::ErrorCode errorCode)
-        {
-            handler->done(reqID, errorCode);
-        });
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeCamera, ApiIdData(id),
+            [handler, reqID](ec2::ErrorCode errorCode)
+            {
+                handler->done(reqID, errorCode);
+            });
         return reqID;
     }
 

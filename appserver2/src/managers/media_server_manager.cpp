@@ -97,7 +97,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::removeMediaServer, id,
+            ApiCommand::removeMediaServer, ApiIdData(id),
             [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
