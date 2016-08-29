@@ -16,6 +16,8 @@ public:
 protected:
     virtual void mousePressEvent(QMouseEvent* event) override;
 
+    virtual void showEvent(QShowEvent *event) override;
+
 signals:
     void justPressed();
 };

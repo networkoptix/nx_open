@@ -14,6 +14,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 namespace {
 const int kTitleBarHeight = 24;
@@ -37,10 +38,22 @@ QToolButton* newActionButton(
     if (popup)
     {
         button->setPopupMode(QToolButton::InstantPopup);
-        QObject::connect(button, &QnToolButton::justPressed, [action]()
+        QObject::connect(button, &QnToolButton::justPressed, [button, action]()
         {
             action->trigger();
+
+            // Below is workaround-related stuff for HiDpi screens
+            const auto menu = action->menu();
+            if (!menu)
+                return;
+
+            QnHiDpiWorkarounds::toolButtonMenuWorkaround(button, menu);
+            action->setMenu(nullptr);
         });
+    }
+    else
+    {
+        button->setDefaultAction(action);
     }
 
     if (helpTopicId != Qn::Empty_Help)

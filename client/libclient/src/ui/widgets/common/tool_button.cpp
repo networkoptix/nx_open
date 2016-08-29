@@ -19,3 +19,12 @@ void QnToolButton::mousePressEvent(QMouseEvent* event)
     emit justPressed();
     base_type::mousePressEvent(event);
 }
+
+void QnToolButton::showEvent(QShowEvent *event)
+{
+    /*
+    auto window = windowHandle();
+    const auto flags = (window->flags() & Qt::WindowType_Mask);
+    window->setFlags(flags | Qt::ForeignWindow);
+    */
+}

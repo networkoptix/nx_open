@@ -601,19 +601,27 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
         qnRedAssController->setMode(Qn::AutoResolution);
 }
 
-void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
-    m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
+void QnWorkbenchActionHandler::at_mainMenuAction_triggered()
+{
+    if (!m_mainMenu)
+        m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
     action(QnActions::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
-void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
+void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered()
+{
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
-    m_currentUserLayoutsMenu = menu()->newMenu(QnActions::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
+    if (!m_currentUserLayoutsMenu)
+    {
+        m_currentUserLayoutsMenu = menu()->newMenu(
+            QnActions::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
+    }
 
-    action(QnActions::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
+    action(QnActions::OpenCurrentUserLayoutMenu)->setMenu(
+        m_currentUserLayoutsMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {

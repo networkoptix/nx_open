@@ -12,7 +12,6 @@
 #include <QtWidgets/QTreeView>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QGraphicsLinearLayout>
-
 #include <camera/camera_thumbnail_manager.h>
 
 #include <client/client_runtime_settings.h>
@@ -54,6 +53,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
@@ -376,7 +376,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
         return;
 
     /* Run menu. */
-    QAction* action = menu->exec(pos);
+    QAction* action = QnHiDpiWorkarounds::showMenu(menu.data(), pos);
 
     /* Process tree-local actions. */
     if (m_renameActions.values().contains(action))
@@ -746,7 +746,9 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent* event)
         QPoint pos = currentTreeWidget()->selectionPos();
         if (pos.isNull())
             return;
-        showContextMenuAt(display()->view()->mapToGlobal(pos));
+
+        qDebug() << "--- initial: " << pos;
+        showContextMenuAt(QnHiDpiWorkarounds::scaledToGlobal(pos));
     }
 }
 
