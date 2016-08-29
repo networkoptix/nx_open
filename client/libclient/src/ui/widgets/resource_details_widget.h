@@ -1,6 +1,9 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
+
 #include <ui/widgets/common/panel.h>
+
 #include <utils/common/connective.h>
 
 class QLabel;
@@ -21,13 +24,8 @@ public:
     QString description() const;
     void setDescription(const QString& description);
 
-    QnUuid targetResource() const;
-    void setTargetResource(const QnUuid& target);
-
-#if 0
-    QSize thumbnailSize() const;
-    void setThumbnailSize(const QSize& size);
-#endif
+    const QnResourcePtr& targetResource() const;
+    void setTargetResource(const QnResourcePtr& target);
 
 private:
     QnResourcePreviewWidget* m_preview;

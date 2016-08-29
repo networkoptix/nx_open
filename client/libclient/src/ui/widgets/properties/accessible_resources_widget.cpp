@@ -439,21 +439,10 @@ void QnAccessibleResourcesWidget::initSortFilterModel()
 
 void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
 {
-    if (!index.isValid())
-    {
-        ui->detailsWidget->setName(QString());
-        ui->detailsWidget->setTargetResource(QnUuid());
-        return;
-    }
-
     QModelIndex baseIndex = index.sibling(index.row(), QnAccessibleResourcesModel::NameColumn);
-
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->detailsWidget->setName(toolTip);
-
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    ui->detailsWidget->setTargetResource(camera ? camera->getId() : QnUuid());
+    ui->detailsWidget->setTargetResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     ui->detailsWidget->layout()->activate();
 }
 

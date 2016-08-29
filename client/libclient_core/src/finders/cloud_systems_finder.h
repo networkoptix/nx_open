@@ -11,7 +11,6 @@
 #include <watchers/cloud_status_watcher.h>
 
 class QTimer;
-struct QnConnectionInfo;
 
 class QnCloudSystemsFinder : public Connective<QnAbstractSystemsFinder>
 {

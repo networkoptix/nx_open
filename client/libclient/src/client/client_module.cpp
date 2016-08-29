@@ -475,7 +475,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 

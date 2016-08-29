@@ -34,10 +34,12 @@ struct QnConnectionInfo
     bool ecDbReadOnly;
     bool newSystem;
     QString effectiveUserName;
+    QString cloudHost;
 };
 
 #define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)\
-    (box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)(newSystem)
+    (box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)(newSystem)\
+    (cloudHost)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

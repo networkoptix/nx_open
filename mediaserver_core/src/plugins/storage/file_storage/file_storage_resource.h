@@ -6,6 +6,10 @@
 #include <utils/common/app_info.h>
 #include <platform/platform_abstraction.h>
 
+#if defined(Q_OS_WIN)
+#include <wtypes.h>
+#endif
+
 /*
 * QnFileStorageResource uses custom implemented IO access
 */
