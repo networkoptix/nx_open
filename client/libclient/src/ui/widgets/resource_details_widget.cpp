@@ -38,7 +38,6 @@ QnResourceDetailsWidget::QnResourceDetailsWidget(QWidget* parent) :
     font.setPixelSize(kCameraNameFontPixelSize);
     font.setWeight(kCameraNameFontWeight);
     m_nameTextEdit->setFont(font);
-    m_nameTextEdit->setProperty(style::Properties::kDontPolishFontProperty, true);
     m_nameTextEdit->hide();
 
     m_descriptionLabel->setWordWrap(true);
