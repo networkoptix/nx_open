@@ -84,7 +84,7 @@ const QString& sysDrivePath()
     TCHAR buf[bufSize];
     GetWindowsDirectory(buf, bufSize);
 
-    deviceString = QString::fromWCharArray(buf, bufSize).left(3);
+    deviceString = QString::fromWCharArray(buf, bufSize).left(2);
 
     return deviceString;
 }
@@ -1669,14 +1669,14 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
     const qint64 kSystemStorageTreshold = 5;
 
-    qint64 totalSpace = 0;
+    qint64 totalNonSystemStoragesSpace = 0;
     qint64 systemStorageSpace = 0;
     std::vector<QSet<QnStorageResourcePtr>::iterator> systemStorageItVec;
 
     for (auto it = result.begin(); it != result.end(); ++it)
     {
         if (!isStorageOnSystemDrive(*it))
-            totalSpace += (*it)->getTotalSpace();
+            totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
             systemStorageItVec.push_back(it);
@@ -1684,7 +1684,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
         }
     }
 
-    if (totalSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
+    if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
     {
         for (auto it : systemStorageItVec)
             result.remove(*it);
