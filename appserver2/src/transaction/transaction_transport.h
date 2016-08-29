@@ -28,16 +28,8 @@ public:
     template<class T>
     void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
     {
-        if (remotePeer().peerType == Qn::PT_CloudServer)
-        {
-            if (transaction.transactionType != TransactionType::Cloud &&
-                transaction.command != ApiCommand::tranSyncRequest &&
-                transaction.command != ApiCommand::tranSyncResponse &&
-                transaction.command != ApiCommand::tranSyncDone)
-            {
-                return;
-            }
-        }
+        if (!transactionShouldBeSentToRemotePeer(transaction))
+            return;
 
         auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
@@ -54,11 +46,8 @@ public:
     template<template<typename, typename> class Cont, typename Param, typename A>
     void sendTransaction(const QnTransaction<Cont<Param, A>>& transaction, const QnTransactionTransportHeader& header)
     {
-        if (remotePeer().peerType == Qn::PT_CloudServer &&
-            transaction.transactionType != TransactionType::Cloud)
-        {
+        if (!transactionShouldBeSentToRemotePeer(transaction))
             return;
-        }
 
         auto td = ec2::getTransactionDescriptorByTransaction(transaction);
         auto remoteAccess = td->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
@@ -102,6 +91,23 @@ protected:
 
 private:
     const Qn::UserAccessData m_userAccessData;
+
+    template<class T>
+    bool transactionShouldBeSentToRemotePeer(const QnTransaction<T>& transaction)
+    {
+        if (remotePeer().peerType == Qn::PT_CloudServer)
+        {
+            if (transaction.transactionType != TransactionType::Cloud &&
+                transaction.command != ApiCommand::tranSyncRequest &&
+                transaction.command != ApiCommand::tranSyncResponse &&
+                transaction.command != ApiCommand::tranSyncDone)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 };
 
 }   // namespace ec2
