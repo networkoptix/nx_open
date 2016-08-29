@@ -47,25 +47,46 @@
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
 namespace {
-    static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
-    static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
-    static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
-    static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
-    static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
+static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
+static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
+static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
-    const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
-    const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
+const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
+const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
 
-    const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
+const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 
-    struct TasksQueueInfo {
-        int tasksCount;
-        int currentTask;
+struct TasksQueueInfo {
+    int tasksCount;
+    int currentTask;
 
-        TasksQueueInfo() : tasksCount(0), currentTask(0) {}
-        void reset(int size = 0) {tasksCount = size; currentTask = 0;}
-        bool isEmpty() const { return tasksCount == 0; }
-    };
+    TasksQueueInfo() : tasksCount(0), currentTask(0) {}
+    void reset(int size = 0) {tasksCount = size; currentTask = 0;}
+    bool isEmpty() const { return tasksCount == 0; }
+};
+
+#if defined(Q_OS_WIN)
+QString sysDrivePath()
+{
+    const DWORD bufSize = MAX_PATH + 1;
+    TCHAR buf[bufSize];
+    GetWindowsDirectory(buf, bufSize);
+
+    return QString::fromWCharArray(buf, bufSize).left(3);
+}
+#elif defined(Q_OS_LINUX)
+QString sysDrivePath()
+{
+    return QString();
+}
+#endif
+
+bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
+{
+    return storage->getUrl().startsWith(sysDrivePath());
+}
 }
 
 class ArchiveScanPosition
@@ -1584,6 +1605,27 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
                 result << fileStorage;
         }
     }
+
+    const qint64 kSystemStorageTreshold = 5;
+
+    qint64 totalSpace = 0;
+    qint64 systemStorageSpace = 0;
+    QSet<QnStorageResourcePtr>::iterator systemStorageIt = result.end();
+
+    for (auto it = result.begin(); it != result.end(); ++it)
+    {
+        if (!isStorageOnSystemDrive(*it))
+            totalSpace += (*it)->getTotalSpace();
+        else
+        {
+            systemStorageIt = it;
+            systemStorageSpace = (*it)->getTotalSpace();
+        }
+    }
+
+    if (totalSpace > systemStorageSpace * kSystemStorageTreshold && systemStorageIt != result.end())
+        result.remove(*systemStorageIt);
+
     if (!result.empty())
         m_isWritableStorageAvail = true;
     else
