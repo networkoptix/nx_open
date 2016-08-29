@@ -48,7 +48,7 @@ bool QnModuleInformation::isCompatibleToCurrentSystem() const
 
 bool QnModuleInformation::hasCompatibleVersion() const {
     return  protoVersion == nx_ec::EC2_PROTO_VERSION &&
-            isCompatible(version, qnCommon->engineVersion());
+        isCompatible(version, qnCommon->engineVersion());
 }
 
 void QnModuleInformation::fixRuntimeId()

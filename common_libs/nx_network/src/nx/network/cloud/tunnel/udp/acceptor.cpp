@@ -33,9 +33,7 @@ void TunnelAcceptor::setUdpMaxRetransmissions(int count)
     m_udpMaxRetransmissions = count;
 }
 
-void TunnelAcceptor::accept(std::function<void(
-    SystemError::ErrorCode,
-    std::unique_ptr<AbstractIncomingTunnelConnection>)> handler)
+void TunnelAcceptor::accept(AcceptHandler handler)
 {
     NX_ASSERT(!m_acceptHandler);
     NX_ASSERT(!m_udpMediatorConnection);

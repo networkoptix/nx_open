@@ -418,15 +418,50 @@ int QnFileStorageResource::mountTmpDrive() const
     return 0;
 }
 #else
+
+bool QnFileStorageResource::updatePermissionsHelper(
+    LPWSTR userName,
+    LPWSTR password,
+    NETRESOURCE* netRes) const
+{
+    DWORD errCode = WNetUseConnection(
+        0,   // window handler, not used
+        netRes,
+        password,
+        userName,
+        0,   // connection flags, should work with just 0 though
+        0,
+        0,   // additional connection info buffer size
+        NULL // additional connection info buffer
+    );
+
+    if (errCode == ERROR_SESSION_CREDENTIAL_CONFLICT)
+    {   // That means that user has already used this network resource
+        // with different credentials set.
+        // If so we can attempt to just use this resource as local one.
+        NX_LOG(lit("%1 Mounting remote drive %2 SESSION_CREDENTIAL_CONFLICT error. It may work though.")
+                .arg(Q_FUNC_INFO)
+                .arg(getUrl()), cl_logDEBUG1);
+        return true;
+    }
+
+    if (errCode != NO_ERROR)
+    {
+        NX_LOG(lit("%1 Mounting remote drive %2 error %3.")
+                .arg(Q_FUNC_INFO)
+                .arg(getUrl())
+                .arg(errCode), cl_logWARNING);
+        return false;
+    }
+
+    return true;
+}
+
 bool QnFileStorageResource::updatePermissions() const
 {
     NX_LOG(lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()), cl_logDEBUG2);
     if (getUrl().startsWith("smb://"))
     {
-        QString userName = QUrl(getUrl()).userName().isEmpty() ?
-                           "guest" :
-                            QUrl(getUrl()).userName();
-
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
         netRes.dwType = RESOURCETYPE_DISK;
@@ -436,40 +471,34 @@ bool QnFileStorageResource::updatePermissions() const
                        lit("\\") + storageUrl.path().mid((1));
 
         netRes.lpRemoteName = (LPWSTR) path.constData();
-
         LPWSTR password = (LPWSTR) storageUrl.password().constData();
-        LPWSTR user = (LPWSTR) userName.constData();
+        QString userName = QUrl(getUrl()).userName().isEmpty() 
+            ? "guest" 
+            : QUrl(getUrl()).userName();
 
-        DWORD errCode = WNetUseConnection(
-            0,   // window handler, not used
-            &netRes,
-            password,
-            user,
-            0,   // connection flags, should work with just 0 though
-            0,
-            0,   // additional connection info buffer size
-            NULL // additional connection info buffer
-        );
-
-        if (errCode == ERROR_SESSION_CREDENTIAL_CONFLICT)
-        {   // That means that user has alreay used this network resource
-            // with different credentials set.
-            // If so we can attempt to just use this resource as local one.
-            NX_LOG(lit("%1 Mounting remote drive %2 SESSION_CREDENTIAL_CONFLICT error. It may work though.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(getUrl()), cl_logDEBUG1);
-            return true;
-        }
-
-        if (errCode != NO_ERROR)
+        if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
         {
-            NX_LOG(lit("%1 Mounting remote drive %2 error %3.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(getUrl())
-                    .arg(errCode), cl_logWARNING);
-            return false;
+            userName = lit("WORKGROUP\\") + userName;
+            if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
+            {
+                DWORD bufSize = 1024;
+                TCHAR sysUserName[1024];
+                if (GetUserName(sysUserName, &bufSize))
+                {
+                    userName = QString::fromWCharArray(sysUserName, bufSize);
+                    if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
+                    {
+                        userName = lit("WORKGROUP\\") + userName;
+                        if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
+                            return false;
+                    }
+                }
+                else
+                    return false;
+            }
         }
     }
+
     return true;
 }
 

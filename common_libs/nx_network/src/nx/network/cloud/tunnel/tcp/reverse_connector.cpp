@@ -10,20 +10,30 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-ReverseConnector::ReverseConnector(String selfName, String targetName):
-    m_selfName(std::move(selfName)),
-    m_targetName(std::move(targetName))
+ReverseConnector::ReverseConnector(
+    String selfHostName, String targetHostName, aio::AbstractAioThread* aioThread)
+:
+    m_targetHostName(std::move(targetHostName))
 {
+    m_httpClient = nx_http::AsyncHttpClient::create();
+    if (aioThread)
+        m_httpClient->bindToAioThread(aioThread);
+
+    m_httpClient->addAdditionalHeader(kConnection, kUpgrade);
+    m_httpClient->addAdditionalHeader(kUpgrade, kNxRc);
+    m_httpClient->addAdditionalHeader(kNxRcHostName, selfHostName);
+}
+
+void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
+{
+    m_httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
+    m_httpClient->setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
+    m_httpClient->setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
 }
 
 void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler handler)
 {
     // TODO: use timeout
-    m_httpClient = nx_http::AsyncHttpClient::create();
-    m_httpClient->addAdditionalHeader(kConnection, kUpgrade);
-    m_httpClient->addAdditionalHeader(kUpgrade, kNxRc);
-    m_httpClient->addAdditionalHeader(kNxRcHostName, m_selfName);
-
     QObject::connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
         [this, handler=std::move(handler)](nx_http::AsyncHttpClientPtr)
@@ -40,7 +50,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
                 return handler(SystemError::connectionAbort);
             }
 
-             handler(processHeaders(m_httpClient->response()->headers));
+            handler(processHeaders(m_httpClient->response()->headers));
         });
 
     // TODO: think about HTTPS
@@ -93,7 +103,7 @@ SystemError::ErrorCode ReverseConnector::processHeaders(const nx_http::HttpHeade
         return SystemError::invalidData;
 
     const auto hostName = headers.find(kNxRcHostName);
-    if (hostName == headers.end() || hostName->second != m_targetName)
+    if (hostName == headers.end() || hostName->second != m_targetHostName)
         return SystemError::hostNotFound;
 
     return SystemError::noError;

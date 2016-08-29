@@ -5,14 +5,10 @@
 #include "dev_reader.h"
 #include "dev_read_thread.h"
 
+extern Logger logger;
+
 namespace ite
 {
-    INIT_OBJECT_COUNTER(ContentPacket)
-    INIT_OBJECT_COUNTER(Demux)
-    INIT_OBJECT_COUNTER(DeviceBuffer)
-    INIT_OBJECT_COUNTER(DevReader)
-
-
     // DeviceBuffer
 
     bool DeviceBuffer::sync()
@@ -69,7 +65,10 @@ namespace ite
         if (ret < 0)
             return ret;
         if (ret == 0)
+        {
+            ITE_LOG() << FMT("[reader] readDevice() returned 0");
             return hasRead;
+        }
 
         return hasRead + read(buf, bufSize);
     }
@@ -80,13 +79,16 @@ namespace ite
 
         if (! m_device || ! m_device->hasStream())
         {
+            ITE_LOG() << FMT("[reader] readDevice() - no stream");
             clear();
             return -1;
         }
 
         m_buf.resize(m_size);
         int ret = m_device->read( &(*m_buf.begin()), m_buf.size() );
-        if (ret < 0) {
+        if (ret < 0)
+        {
+            ITE_LOG() << FMT("[reader] readDevice() m_device->read() returned %d", ret);
             m_buf.clear();
             m_pos = 0;
             return ret;
@@ -240,7 +242,6 @@ namespace ite
         {
             debug_printf("[reader] skip packet (PID: 0x%x). TS errors: %d; sequence errors: %d\n",
                          pid, pkt->tsErrors(), pkt->seqErrors());
-            pkt.reset();
         }
 
         return pkt;
@@ -314,7 +315,9 @@ namespace ite
             m_hasThread = true;
         }
         catch (std::system_error& )
-        {}
+        {
+            ITE_LOG() << FMT("[reader] Failed to create reader thread");
+        }
     }
 
     void DevReader::stop()
@@ -331,7 +334,10 @@ namespace ite
                 if (m_threadObject)
                     m_threadObject->stop();
 
-                m_readThread.join(); // possible deadlock here
+                ITE_LOG() << FMT("[reader] Wait for reader thread stopped");
+                m_readThread.join();
+                ITE_LOG() << FMT("[reader] Reader thread stopped");
+
                 m_hasThread = false;
             }
 
@@ -351,6 +357,7 @@ namespace ite
     {
         if (m_hasThread)
         {
+            debug_printf("[reader] Wait for reader thread stopped\n");
             m_readThread.join();
             m_hasThread = false;
         }
@@ -360,7 +367,10 @@ namespace ite
     {
         TsBuffer ts = m_demux.tsFromPool();
         if (! m_buf.readTSPacket(ts))
+        {
+            ITE_LOG() << FMT("[reader] readTSPacket failed");
             return false;
+        }
 
         MpegTsPacket pkt = ts.packet();
         if (pkt.syncOK())
@@ -388,6 +398,13 @@ namespace ite
         static const unsigned MAX_QUEUE_SIZE = 32; // 30 fps => ~1 sec
 
         ContentPacketPtr pkt = m_demux.dumpPacket(pid);
+
+        if (pkt && pkt->tsErrors() > MAX_TS_ERRORS)
+        {
+            pkt.reset();
+            stop();
+            debug_printf("[reader] Too many TS errors. giving up\n");
+        }
 
         if (pkt && pkt->size())
         {

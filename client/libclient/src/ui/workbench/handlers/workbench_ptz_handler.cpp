@@ -363,7 +363,8 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
 
-        menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
+        menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(widget)
+            .withArgument(Qn::FileNameRole, lit("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
     }
 }
 

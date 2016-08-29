@@ -480,6 +480,7 @@ namespace detail
         ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
         ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
         ErrorCode removeCameraAttributes(const QnUuid& id);
+        ErrorCode removeResourceAccessRights(const QnUuid& id);
         ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
@@ -588,10 +589,6 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         ErrorCode getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database);
-
-        template<typename F>
-        ErrorCode cleanupAccessRightsAfterAction(F action, const QnUuid& resourceId);
-
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

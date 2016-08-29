@@ -1,5 +1,10 @@
 #include "to_string.h"
 
+QString toString(void* p)
+{
+    return QString::fromLatin1("0x%1").arg(reinterpret_cast<qulonglong>(p), 0, 16);
+}
+
 QString toString(const QByteArray& t)
 {
     return QString::fromUtf8(t);

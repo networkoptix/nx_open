@@ -292,7 +292,7 @@ private:
 
     std::random_device m_rd;
     std::mt19937 m_gen;
-
+    bool m_isRenameDisabled;
 	mutable QnMutex m_occupiedSpaceInfoMutex;
 	StorageSpaceInfoMap m_occupiedSpaceInfo;
 };

@@ -16,6 +16,7 @@
 
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
+#include <core/resource/media_server_resource.h>
 
 
 namespace {
@@ -53,6 +54,11 @@ CloudConnectionManager::~CloudConnectionManager()
         stopMonitoringCloudEvents();
 }
 
+void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
+{
+    m_proxyAddress = proxyEndpoint;
+}
+
 boost::optional<nx::hpm::api::SystemCredentials>
     CloudConnectionManager::getSystemCredentials() const
 {
@@ -77,9 +83,21 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     const QString& cloudSystemID,
     const QString& cloudAuthKey) const
 {
-    return m_cdbConnectionFactory->createConnection(
-        cloudSystemID.toStdString(),
-        cloudAuthKey.toStdString());
+    QString proxyLogin;
+    QString proxyPassword;
+
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (server)
+    {
+        proxyLogin = server->getId().toString();
+        proxyPassword = server->getAuthKey();
+    }
+
+    auto result = m_cdbConnectionFactory->createConnection();
+    result->setCredentials(cloudSystemID.toStdString(), cloudAuthKey.toStdString());
+    result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+    result->setProxyVia(m_proxyAddress);
+    return result;
 }
 
 std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection()
@@ -172,10 +190,20 @@ bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 
 void CloudConnectionManager::monitorForCloudEvents()
 {
-    m_eventConnection =
-        m_cdbConnectionFactory->createEventConnection(
-            m_cloudSystemID.toStdString(),
-            m_cloudAuthKey.toStdString());
+    QString proxyLogin;
+    QString proxyPassword;
+
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (server)
+    {
+        proxyLogin = server->getId().toString();
+        proxyPassword = server->getAuthKey();
+    }
+
+    m_eventConnection = m_cdbConnectionFactory->createEventConnection();
+    m_eventConnection->setCredentials(m_cloudSystemID.toStdString(), m_cloudAuthKey.toStdString());
+    m_eventConnection->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+    m_eventConnection->setProxyVia(m_proxyAddress);
 
     m_eventConnectionRetryTimer = std::make_unique<nx::network::RetryTimer>(
         nx::network::RetryPolicy(

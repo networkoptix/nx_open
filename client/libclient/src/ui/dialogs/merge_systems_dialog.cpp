@@ -323,6 +323,9 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         case QnMergeSystemsTool::BothSystemBoundToCloudError:
             message = tr("Both systems are bound to the cloud. Merge is not allowed.");
             break;
+        case QnMergeSystemsTool::differentCloudHostError:
+            message = tr("These systems are built with different cloud portal URL. Merge is not allowed.");
+            break;
         case QnMergeSystemsTool::UnconfiguredSystemError:
             message = tr("System name is not configured yet.");
             break;

@@ -22,10 +22,12 @@ public:
     void setMediatorConnection(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> connection);
 
-    /** Shell be called only once to estabilish incomming tunnel connection */
-    virtual void accept(std::function<void(
+    typedef std::function<void(
         SystemError::ErrorCode,
-        std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) = 0;
+        std::unique_ptr<AbstractIncomingTunnelConnection>)> AcceptHandler;
+
+    /** Shell be called only once to estabilish incomming tunnel connection */
+    virtual void accept(AcceptHandler handler) = 0;
 
 protected:
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;

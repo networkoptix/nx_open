@@ -43,6 +43,14 @@ private:
     qint64 fetchTimestamp(
         const nx_http::Request& request,
         const QUrlQuery& urlQuery );
+
+    /*
+     * Update request to proxy it to the specified server
+     * return true if request forwarded
+     */
+    bool addProxyToRequest(
+        nx_http::Request* const request,
+        const QnMediaServerResourcePtr& serverRes);
 };
 
 #endif  //NX_AUTO_REQUEST_FORWARDER_H

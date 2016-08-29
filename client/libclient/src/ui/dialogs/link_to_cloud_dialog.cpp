@@ -222,9 +222,10 @@ void QnLinkToCloudDialogPrivate::bindSystem()
 
     indicatorButton->setEnabled(false);
 
-    cloudConnection = connectionFactory->createConnection(
-                          q->ui->loginInputField->text().trimmed().toStdString(),
-                          q->ui->passwordInputField->text().trimmed().toStdString());
+    cloudConnection = connectionFactory->createConnection();
+    cloudConnection->setCredentials(
+        q->ui->loginInputField->text().trimmed().toStdString(),
+        q->ui->passwordInputField->text().trimmed().toStdString());
 
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnCommon->localSystemName().toStdString();
