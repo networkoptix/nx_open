@@ -246,7 +246,7 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
     }
 }
 
-static QByteArray kBrockenResponse
+static QByteArray kBrokenResponse
 (
     "HTTP/1.1 200 OK\r\n"
     "Content-Length: 100\r\n\r\n"
@@ -277,7 +277,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
             }
 
             buffer.resize(size);
-            ASSERT_EQ(client->send(kBrockenResponse.data(), kBrockenResponse.size()), kBrockenResponse.size());
+            ASSERT_EQ(client->send(kBrokenResponse.data(), kBrokenResponse.size()), kBrokenResponse.size());
         });
 
     auto client = nx_http::AsyncHttpClient::create();
