@@ -31,12 +31,17 @@
 #include <utils/media/ffmpeg_helper.h>
 
 static const int MOTION_PREBUFFER_SIZE = 8;
+static const float HIGH_DATA_LIMIT = 0.7f;
+static const float LOW_DATA_LIMIT = 0.3f;
+
+std::atomic<qint64> QnServerStreamRecorder::m_totalQueueSize;
+std::atomic<int> QnServerStreamRecorder::m_totalRecorders;
 
 QnServerStreamRecorder::QnServerStreamRecorder(
     const QnResourcePtr                 &dev,
     QnServer::ChunksCatalog             catalog,
-    QnAbstractMediaStreamDataProvider*  mediaProvider
-):
+    QnAbstractMediaStreamDataProvider*  mediaProvider)
+    :
     QnStreamRecorder(dev),
     m_maxRecordQueueSizeBytes(qnGlobalSettings->maxRecorderQueueSizeBytes()),
     m_maxRecordQueueSizeElements(qnGlobalSettings->maxRecorderQueueSizePackets()),
@@ -100,7 +105,7 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
 void QnServerStreamRecorder::at_recordingFinished(
     const ErrorStruct   &status,
     const QString       &filename
-) 
+)
 {
     Q_UNUSED(filename)
     if (status.lastError == QnStreamRecorder::NoError)
@@ -125,24 +130,6 @@ void QnServerStreamRecorder::at_recordingFinished(
 bool QnServerStreamRecorder::canAcceptData() const
 {
     return true;
-    /*
-    if (!isRunning())
-        return true;
-
-    //bool rez = QnStreamRecorder::canAcceptData();
-    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && m_dataQueue.size() < m_maxRecordQueueSizeElements;
-
-
-    if (!rez) {
-        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (currentTime - m_lastWarningTime > 1000)
-        {
-            qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "frame rate decreased!";
-            m_lastWarningTime = currentTime;
-        }
-    }
-    return rez;
-    */
 }
 
 void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData)
@@ -150,56 +137,98 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     if (!isRunning())
         return;
 
-    const bool halfQueueReached = m_queuedSize >= m_maxRecordQueueSizeBytes/2 || (size_t)m_dataQueue.size() >= m_maxRecordQueueSizeElements/2;
-    if (!m_rebuildBlocked && halfQueueReached)
+    cleanupQueueIfOverflow();
+    updateRebuildState(); //< pause/resume archive rebuild
+
+    const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.get());
+    if (media)
+    {
+        QnMutexLocker lock(&m_queueSizeMutex);
+        if (needToStop())
+            return;
+        addQueueSize(media->dataSize());
+        QnStreamRecorder::putData(nonConstData);
+    }
+}
+
+void QnServerStreamRecorder::updateRebuildState()
+{
+    QnMutexLocker lock( &m_queueSizeMutex );
+    pauseRebuildIfHighData();
+    resumeRebuildIfLowData();
+}
+
+void QnServerStreamRecorder::pauseRebuildIfHighData()
+{
+    const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
+    if (!m_rebuildBlocked && (
+        (float)m_totalQueueSize > totalAllowedBytes * HIGH_DATA_LIMIT ||
+        (float)m_dataQueue.size() > m_maxRecordQueueSizeElements * HIGH_DATA_LIMIT))
     {
         m_rebuildBlocked = true;
         DeviceFileCatalog::rebuildPause(this);
     }
-    else if (m_rebuildBlocked && !halfQueueReached)
+}
+
+void QnServerStreamRecorder::resumeRebuildIfLowData()
+{
+    const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
+    if (m_rebuildBlocked && (
+        (float)m_totalQueueSize < totalAllowedBytes * LOW_DATA_LIMIT &&
+        (float)m_dataQueue.size() < m_maxRecordQueueSizeElements * LOW_DATA_LIMIT))
     {
         m_rebuildBlocked = false;
         DeviceFileCatalog::rebuildResume(this);
     }
+}
 
-    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
-    if (!rez) 
+bool QnServerStreamRecorder::cleanupQueueIfOverflow()
+{
     {
-        if (!m_recordingContextVector.empty())
+        QnMutexLocker lock( &m_queueSizeMutex );
+        // check for global overflow bytes between all recorders
+        const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
+        if (totalAllowedBytes > m_totalQueueSize)
+            return false; //< no need to cleanup
+
+        bool needCleanup = m_queuedSize > m_maxRecordQueueSizeBytes ||
+                           m_dataQueue.size() > m_maxRecordQueueSizeElements;
+        if (!needCleanup)
+            return false;
+    }
+
+    if (!m_recordingContextVector.empty())
+    {
+        size_t slowestStorageIndex;
+        int64_t slowestWriteTime = std::numeric_limits<int64_t>::min();
+
+        for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
         {
-            size_t slowestStorageIndex;
-            int64_t slowestWriteTime = std::numeric_limits<int64_t>::min();
-
-            for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
-            {
-                if (m_recordingContextVector[i].totalWriteTimeNs > slowestWriteTime)
-                    slowestStorageIndex = i;
-            }
-
-            emit storageFailure(
-                m_mediaServer,
-                qnSyncTime->currentUSecsSinceEpoch(),
-                QnBusiness::StorageTooSlowReason,
-                m_recordingContextVector[slowestStorageIndex].storage
-            );
+            if (m_recordingContextVector[i].totalWriteTimeNs > slowestWriteTime)
+                slowestStorageIndex = i;
         }
-        //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
 
-        qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
-        markNeedKeyData();
-        m_dataQueue.clear();
-        QnMutexLocker lock( &m_queueSizeMutex );
-        m_queuedSize = 0;
-        return;
+        emit storageFailure(
+            m_mediaServer,
+            qnSyncTime->currentUSecsSinceEpoch(),
+            QnBusiness::StorageTooSlowReason,
+            m_recordingContextVector[slowestStorageIndex].storage
+            );
+    }
+    //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
+
+    qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
+    markNeedKeyData();
+
+    QnMutexLocker lock( &m_queueSizeMutex );
+    QnAbstractDataPacketPtr data;
+    while (m_dataQueue.pop(data, 0))
+    {
+        if (auto media = std::dynamic_pointer_cast<QnAbstractMediaData>(data))
+            addQueueSize(- (qint64) media->dataSize());
     }
 
-
-    const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.get());
-    if (media) {
-        QnMutexLocker lock( &m_queueSizeMutex );
-        m_queuedSize += media->dataSize();
-    }
-    QnStreamRecorder::putData(nonConstData);
+    return true;
 }
 
 bool QnServerStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
@@ -216,9 +245,9 @@ QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 }
 
 void QnServerStreamRecorder::initIoContext(
-    const QnStorageResourcePtr& storage, 
+    const QnStorageResourcePtr& storage,
     const QString& url,
-    AVIOContext** context) 
+    AVIOContext** context)
 {
     Q_ASSERT(context);
     auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
@@ -265,7 +294,7 @@ void QnServerStreamRecorder::fileCreated(uintptr_t filePtr) const
 int QnServerStreamRecorder::getBufferSize() const
 {
     return qnRecordingManager->getBufferManager().getSizeForCam(
-        m_catalog, 
+        m_catalog,
         m_device->getId());
 }
 
@@ -570,6 +599,12 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 }
 
+void QnServerStreamRecorder::addQueueSize(qint64 value)
+{
+    m_queuedSize += value;
+    m_totalQueueSize += value;
+}
+
 bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
     QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
@@ -578,7 +613,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        m_queuedSize -= media->dataSize();
+        addQueueSize(- (qint64) media->dataSize());
     }
 
     // for empty schedule we record all time
@@ -708,6 +743,11 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const
     }
 }
 
+void QnServerStreamRecorder::beforeRun()
+{
+    ++m_totalRecorders;
+}
+
 void QnServerStreamRecorder::endOfRun()
 {
     updateMotionStateInternal(false, m_lastMediaTime, QnMetaDataV1Ptr());
@@ -716,14 +756,14 @@ void QnServerStreamRecorder::endOfRun()
     if(m_device->getStatus() == Qn::Recording)
         m_device->setStatus(Qn::Online);
 
-    if (m_rebuildBlocked) {
+    {
+        QnMutexLocker lock( &m_queueSizeMutex );
+        addQueueSize(-m_queuedSize);
+        m_dataQueue.clear();
+        --m_totalRecorders;
         m_rebuildBlocked = false;
         DeviceFileCatalog::rebuildResume(this);
     }
-
-    QnMutexLocker lock( &m_queueSizeMutex );
-    m_dataQueue.clear();
-    m_queuedSize = 0;
 }
 
 void QnServerStreamRecorder::setDualStreamingHelper(const QnDualStreamingHelperPtr& helper)
