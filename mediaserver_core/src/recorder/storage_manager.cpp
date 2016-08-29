@@ -128,7 +128,9 @@ const QString& sysDrivePath()
     static QString devicePath = getDevicePath(lit("/root"));
     return devicePath;
 }
-#else
+
+#else // Unsupported OS so far
+
 const QString& getDevicePath(const QString& path)
 {
     return path;
