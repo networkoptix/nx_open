@@ -14,6 +14,7 @@
 #include <api/model/connection_info.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_module.h>
 
@@ -220,10 +221,10 @@ void QnLoginDialog::accept()
         m_requestHandle = -1;
         updateUsability();
 
-        QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status)
         {
-            case QnConnectionDiagnosticsHelper::Result::Success:
+            case Qn::ConnectionResult::success:
             {
                 const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                 QnActionParameters params;
@@ -233,7 +234,7 @@ void QnLoginDialog::accept()
                 menu()->trigger(QnActions::ConnectAction, params);
                 break;
             }
-            case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+            case Qn::ConnectionResult::compatibilityMode:
                 menu()->trigger(QnActions::DelayedForcedExitAction);
                 break; // to avoid cycle
             default:    //error
@@ -360,10 +361,14 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
         {
             QUrl url = data.url;
 
-            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(
-                QString(), data.info.protoVersion, data.info.version);
+            auto compatibilityCode = QnConnectionValidator::validateConnection(data.info);
 
-            bool isCompatible = (compatibilityCode == QnConnectionDiagnosticsHelper::Result::Success);
+            /* Do not show servers with incompatible customization or cloud host */
+            if (!qnRuntime->isDevMode()
+                && compatibilityCode == Qn::ConnectionResult::incompatibleInternal)
+                    continue;
+
+            bool isCompatible = (compatibilityCode == Qn::ConnectionResult::success);
 
             QString title;
             if (!data.info.systemName.isEmpty())
@@ -381,15 +386,6 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
                 title += lit(" (v%1)")
                     .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
             }
-
-#ifdef _DEBUG
-            if (!isCompatible)
-            {
-                title += lit(" (%1)")
-                    .arg(QnConnectionDiagnosticsHelper::resultToString(compatibilityCode));
-            }
-#endif // _DEBUG
-
 
             QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);

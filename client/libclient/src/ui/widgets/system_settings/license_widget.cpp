@@ -14,12 +14,11 @@
 #include <ui/style/custom_style.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/product_features.h>
 
 namespace {
 bool isValidSerialKey(const QString &key)
 {
-    return key.length() == qnProductFeatures().freeLicenseKey.length() && !key.contains(QLatin1Char(' '));
+    return key.length() == QnAppInfo::freeLicenseKey().length() && !key.contains(QLatin1Char(' '));
 }
 
 } // anonymous namespace
@@ -36,7 +35,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
 
     ui->onlineKeyEdit->setFocus();
-    ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
+    ui->activateFreeLicenseButton->setText(QnAppInfo::freeLicenseIsTrial() ? tr("Activate Trial License") : tr("Activate Free License"));
     setWarningStyle(ui->fileLineEdit);
 
     const QString emailAddress = lit("<a href=\"mailto:%1\">%1</a>").arg(QnAppInfo::licensingEmailAddress());
@@ -60,7 +59,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
 
     connect(ui->activateFreeLicenseButton, &QPushButton::clicked, this, [this]
     {
-        setSerialKey(qnProductFeatures().freeLicenseKey);
+        setSerialKey(QnAppInfo::freeLicenseKey());
         setState(Waiting);
     });
 
