@@ -60,6 +60,13 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
     }
 }
 
+QString toString(ResultCode code)
+{
+    QString string;
+    serialize(code, &string);
+    return string;
+}
+
 } // namespace api
 } // namespace hpm
 } // namespace nx

@@ -8,6 +8,7 @@
 #include <nx/fusion/serialization/lexical.h>
 
 #include "nx/network/socket_global.h"
+#include <nx/network/cloud/tunnel/tcp/outgoing_reverse_tunnel_connection.h>
 #include "udp/connector.h"
 
 
@@ -95,6 +96,18 @@ void CrossNatConnector::connect(
     post(
         [this, timeout, handler = std::move(handler)]() mutable
         {
+            auto holder = SocketGlobals::tcpReversePool().getConnectionHolder(
+                m_targetPeerAddress.host.toString().toUtf8());
+
+            if (!holder->hasConnections())
+            {
+                return handler(
+                    SystemError::noError,
+                    std::make_unique<tcp::OutgoingReverseTunnelConnection>(
+                        nullptr, //< TODO: find out which aioThread shell be used
+                        std::move(holder)));
+            }
+
             issueConnectRequestToMediator(timeout, std::move(handler));
         });
 }

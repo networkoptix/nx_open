@@ -84,6 +84,13 @@ public:
             std::move(resultData),
             std::move(completionHandler));
     }
+
+    // TODO: get rid of all other methods
+    template<typename Request, typename Handler>
+    void send(Request request, Handler handler)
+    {
+        this->doRequest(Request::kMethod, std::move(request), std::move(handler));
+    }
 };
 
 typedef MediatorClientConnection<stun::AsyncClientUser> MediatorClientTcpConnection;

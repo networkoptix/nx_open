@@ -13,6 +13,7 @@
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
 #include "cloud/tunnel/outgoing_tunnel_pool.h"
+#include "cloud/tunnel/tcp/reverse_connection_pool.h"
 
 #define NX_NETWORK_SOCKET_GLOBALS
 
@@ -45,6 +46,10 @@ public:
     inline static
     cloud::CloudConnectSettings& cloudConnectSettings()
     { return s_instance->m_cloudConnectSettings; }
+
+    inline static
+    cloud::tcp::ReverseConnectionPool& tcpReversePool()
+    { return s_instance->m_tcpReversePool; }
 
     static void init(); /**< Should be called before any socket use */
     static void deinit(); /**< Should be called when sockets are not needed any more */
@@ -88,6 +93,7 @@ private:
     cloud::MediatorAddressPublisher m_addressPublisher;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;
+    cloud::tcp::ReverseConnectionPool m_tcpReversePool;
 
     QnMutex m_mutex;
     std::map<CustomInit, CustomDeinit> m_customInits;
