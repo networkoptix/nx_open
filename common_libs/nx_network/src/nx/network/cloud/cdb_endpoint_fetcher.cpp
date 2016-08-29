@@ -43,8 +43,8 @@ CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
 
 void CloudModuleEndPointFetcher::stopWhileInAioThread()
 {
-    //we do not need mutex here since noone uses object anymore
-    //    and internal events are delivered in same aio thread
+    //We do not need mutex here since no one uses object anymore
+    //    and internal events are delivered in same aio thread.
     m_httpClient.reset();
     m_endpointSelector.reset();
 }
