@@ -231,14 +231,21 @@ namespace nx_hls
         const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
-        //searching for requested resource
-        QnResourcePtr resource = qnResPool->getResourceByUniqueId( shortFileName.toString() );
-        if( !resource )
-            resource = QnResourcePool::instance()->getResourceByMacAddress( shortFileName.toString() );
-        if( !resource )
+        // Searching for requested resource.
+        const QString& resId = shortFileName.toString();
+        QnResourcePtr resource;
+        const QnUuid uuid = QnUuid::fromStringSafe(resId);
+        if (!uuid.isNull())
+            resource = qnResPool->getResourceById(uuid);
+        if (!resource)
+            resource = qnResPool->getResourceByUniqueId(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByMacAddress(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByUrl(resId);
+        if (!resource)
         {
-            NX_LOG( lit("HLS. Requested resource %1 not found").
-                arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
+            NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);
             return nx_http::StatusCode::notFound;
         }
 

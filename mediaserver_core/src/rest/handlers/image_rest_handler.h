@@ -17,7 +17,7 @@ public:
         QByteArray& contentType, const QnRestConnectionProcessor* owner) override;
 
 private:
-    int noVideoError(QByteArray& result, qint64 time);
+    int noVideoError(QByteArray& result, qint64 time) const;
 
 private:
     bool m_detectAvailableOnly;
