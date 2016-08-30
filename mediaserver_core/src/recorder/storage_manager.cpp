@@ -1641,6 +1641,17 @@ bool QnStorageManager::isWritableStoragesAvailable() const
 
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
+    return getWritableStorages(
+        [](const QnStorageResourcePtr& storage)
+        {
+            return storage->getStatus() != Qn::Offline &&
+                   storage->isUsedForWriting();
+        });
+}
+
+QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages(
+    std::function<bool (const QnStorageResourcePtr& storage)> filter) const
+{
     QSet<QnStorageResourcePtr> result;
 
     QnStorageManager::StorageMap storageRoots = getAllStorages();
@@ -1648,7 +1659,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
-        if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting())
+        if (fileStorage && filter(fileStorage))
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             bigStorageThreshold = qMax(bigStorageThreshold, available);
@@ -1659,7 +1670,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
-        if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting())
+        if (fileStorage  && filter(fileStorage))
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)

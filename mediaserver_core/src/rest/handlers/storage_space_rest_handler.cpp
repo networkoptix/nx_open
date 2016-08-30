@@ -40,20 +40,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
 
     QnStorageSpaceReply reply;
 
-    auto enoughSpace = [](const QnStorageResourcePtr& storage)
-    {
-        qint64 totalSpace = storage->getTotalSpace();
-
-        /* We should always display invalid storages. */
-        if (totalSpace == QnStorageResource::kUnknownSize)
-            return true;
-
-        return totalSpace >= QnFileStorageResource::calcSpaceLimit(
-            storage->getUrl()
-        );
-    };
-
-    auto enumerate = [enoughSpace, fastRequest, &reply] (const QSet<QnStorageResourcePtr>& storages)
+    auto enumerate = [fastRequest, &reply] (
+        const QnStorageResourceList& storages,
+        QSet<QnStorageResourcePtr>& writableStorages)
     {
         for (const auto& storage: storages)
         {
@@ -61,14 +50,22 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
                 continue;
 
             QnStorageSpaceData data(storage, fastRequest);
-            if (!fastRequest && !enoughSpace(storage))
-                data.isWritable = false;
+            if (!fastRequest)
+                data.isWritable = writableStorages.contains(storage);
             reply.storages.push_back(data);
         }
     };
 
-    enumerate(qnNormalStorageMan->getWritableStorages());
-    enumerate(qnBackupStorageMan->getWritableStorages());
+    auto fiter = [](const QnStorageResourcePtr& storage)
+    {
+        return storage->getStatus() != Qn::Offline;
+    };
+    enumerate(
+        qnNormalStorageMan->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : qnNormalStorageMan->getWritableStorages(fiter));
+    enumerate(
+        qnBackupStorageMan->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : qnBackupStorageMan->getWritableStorages(fiter));
 
     if (!fastRequest)
     {
