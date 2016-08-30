@@ -28,14 +28,11 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
-    void closeIfInactive();
+    void updateCloseTimer();
 
     const std::shared_ptr<ReverseConnectionHolder> m_connectionHolder;
     nx::network::aio::Timer m_timer;
-    std::chrono::steady_clock::time_point m_lastSuccessfulConnect;
-
-    SocketAttributes m_socketAttributes;
-    OnNewConnectionHandler m_connectionHandler;
+    utils::AsyncOperationGuard m_asyncGuard;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_closedHandler;
 };
 

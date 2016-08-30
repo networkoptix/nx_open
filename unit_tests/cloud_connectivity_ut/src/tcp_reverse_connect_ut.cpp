@@ -115,7 +115,7 @@ TEST_F(TcpReverseConnectTest, SimpleAsyncClientSystem)
 }
 
 // TODO: #mux Enable and fix!
-TEST_F(TcpReverseConnectTest, DISABLED_Load)
+TEST_F(TcpReverseConnectTest, Load)
 {
     std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
     enableReveseConnectionsOnClient();

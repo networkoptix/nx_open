@@ -12,8 +12,7 @@ OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
     std::shared_ptr<ReverseConnectionHolder> connectionHolder)
 :
     AbstractOutgoingTunnelConnection(aioThread),
-    m_connectionHolder(std::move(connectionHolder)),
-    m_lastSuccessfulConnect(std::chrono::steady_clock::now())
+    m_connectionHolder(std::move(connectionHolder))
 {
     if (aioThread)
         m_timer.bindToAioThread(aioThread);
@@ -22,7 +21,7 @@ OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
 
 void OutgoingReverseTunnelConnection::stopWhileInAioThread()
 {
-    m_connectionHolder->clearConnectionHandler();
+    m_asyncGuard.reset();
     m_timer.pleaseStopSync();
 }
 
@@ -37,38 +36,32 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
     OnNewConnectionHandler handler)
 {
     NX_LOGX(lm("Request for new socket with timeout: %1").str(timeout), cl_logDEBUG1);
-    m_socketAttributes = std::move(socketAttributes);
-    m_connectionHandler = std::move(handler);
-
-    m_connectionHolder->takeConnection(
-        [this](std::unique_ptr<AbstractStreamSocket> socket)
-        {
-            m_timer.post(
-                [this, socket = std::move(socket)]() mutable
-                {
-                    NX_LOGX(lm("Got new socket(%1)").arg(socket), cl_logDEBUG1);
-                    m_lastSuccessfulConnect = std::chrono::steady_clock::now();
-                    closeIfInactive();
-
-                    m_socketAttributes.applyTo(socket.get());
-                    auto handler = m_connectionHandler;
-                    handler(SystemError::noError, std::move(socket), true);
-                });
-        });
-
-    if (!timeout.count())
-        return;
-
-    m_timer.start(
+    m_connectionHolder->takeSocket(
         timeout,
-        [this]()
+        [this, guard = m_asyncGuard.sharedGuard(), timeout = std::move(timeout),
+            socketAttributes = std::move(socketAttributes), handler = std::move(handler)](
+                SystemError::ErrorCode code,
+                std::unique_ptr<AbstractStreamSocket> socket)
         {
-            NX_LOGX(lm("Could not get socket in time"), cl_logDEBUG1);
-            m_connectionHolder->clearConnectionHandler();
-            closeIfInactive();
+            if (auto lock = guard->lock())
+            {
+                NX_LOGX(lm("Got new socket(%1): %2")
+                    .args(socket, SystemError::toString(code)), cl_logDEBUG1);
 
-            auto handler = m_connectionHandler;
-            handler(SystemError::timedOut, nullptr, true);
+                if (code == SystemError::noError)
+                {
+                    socketAttributes.applyTo(socket.get());
+                    m_timer.start(
+                        kCloseTunnelWhenInactive,
+                        [this]()
+                        {
+                            if (const auto handler = std::move(m_closedHandler))
+                                handler(SystemError::timedOut);
+                        });
+                }
+
+                handler(code, std::move(socket), true);
+            }
         });
 }
 
@@ -76,24 +69,6 @@ void OutgoingReverseTunnelConnection::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_closedHandler = std::move(handler);
-}
-
-void OutgoingReverseTunnelConnection::closeIfInactive()
-{
-    m_timer.pleaseStopSync();
-    const auto timeout = std::chrono::duration_cast<std::chrono::milliseconds>(
-        m_lastSuccessfulConnect + kCloseTunnelWhenInactive - std::chrono::steady_clock::now());
-
-    if (timeout.count() > 0)
-        return m_timer.start(timeout, [this](){ closeIfInactive(); });
-
-    m_timer.post(
-        [this]()
-        {
-            NX_LOGX(lm("Connection has expired"), cl_logDEBUG1);
-            if (const auto handler = std::move(m_closedHandler))
-                handler(SystemError::timedOut);
-        });
 }
 
 } // namespace tcp

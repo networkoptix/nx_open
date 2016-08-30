@@ -51,19 +51,24 @@ class ReverseConnectionHolder
 {
 public:
     ReverseConnectionHolder(aio::AbstractAioThread* aioThread);
-    size_t connectionsCount() const;
+    void stopInAioThread();
 
     void newSocket(std::unique_ptr<AbstractStreamSocket> socket);
-    void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
+    size_t socketCount() const;
 
-    void takeConnection(std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler);
-    void clearConnectionHandler();
+    typedef utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>)> Handler;
+
+    void takeSocket(std::chrono::milliseconds timeout, Handler handler);
 
 private:
-    aio::AbstractAioThread* const m_aioThread;
-    mutable QnMutex m_mutex;
+    void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
+
+    aio::Timer m_timer;
+    std::atomic<size_t> m_socketCount;
     std::list<std::unique_ptr<AbstractStreamSocket>> m_sockets;
-    std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_handler;
+    std::multimap<std::chrono::steady_clock::time_point, Handler> m_handlers;
 };
 
 } // namespace tcp

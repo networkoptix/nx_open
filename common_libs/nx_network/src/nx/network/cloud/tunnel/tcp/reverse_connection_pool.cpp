@@ -44,7 +44,7 @@ std::shared_ptr<ReverseConnectionHolder>
     if (!holder)
         return nullptr;
 
-    const auto connections = holder->connectionsCount();
+    const auto connections = holder->socketCount();
     if (connections == 0)
         return nullptr;
 
@@ -60,6 +60,10 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
         [this, handler = std::move(completionHandler)]()
         {
             m_acceptor.reset();
+            for (auto& holder: m_connectionHolders)
+                holder.second->stopInAioThread();
+
+            m_connectionHolders.clear();
             handler();
         });
 }
@@ -141,63 +145,85 @@ std::shared_ptr<ReverseConnectionHolder>
 }
 
 ReverseConnectionHolder::ReverseConnectionHolder(aio::AbstractAioThread* aioThread):
-    m_aioThread(aioThread)
+    m_socketCount(0)
 {
+    m_timer.bindToAioThread(aioThread);
 }
 
-size_t ReverseConnectionHolder::connectionsCount() const
+
+void ReverseConnectionHolder::stopInAioThread()
 {
-    QnMutexLocker lk(&m_mutex);
-    return m_sockets.size();
-}
-
-void ReverseConnectionHolder::takeConnection(
-    std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler)
-{
-    QnMutexLocker lk(&m_mutex);
-    NX_CRITICAL(!m_handler, "Multiple handlers are not supported!");
-    m_handler = std::move(handler);
-
-    if (m_sockets.empty())
-        return;
-
-    auto socket = std::move(m_sockets.front());
-    m_sockets.pop_front();
-    lk.unlock();
-
-    auto socketPtr = socket.get();
-    socketPtr->cancelIOAsync(
-        aio::etNone,
-        [this, socket = std::move(socket)]() mutable
-        {
-            QnMutexLocker lk(&m_mutex);
-            m_handler(std::move(socket));
-            m_handler = nullptr;
-        });
-}
-
-void ReverseConnectionHolder::clearConnectionHandler()
-{
-    QnMutexLocker lk(&m_mutex);
-    m_handler = nullptr;
+    m_timer.pleaseStopSync();
 }
 
 void ReverseConnectionHolder::newSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
-    QnMutexLocker lk(&m_mutex);
-    if (m_handler)
+    if (!m_handlers.empty())
     {
-        m_handler(std::move(socket));
-        m_handler = nullptr;
-        return;
+        auto handler = std::move(m_handlers.begin()->second);
+        m_handlers.erase(m_handlers.begin());
+        return handler(SystemError::noError, std::move(socket));
     }
 
     const auto it = m_sockets.insert(m_sockets.end(), std::move(socket));
-    (*it)->bindToAioThread(m_aioThread);
+    ++m_socketCount;
+    (*it)->bindToAioThread(m_timer.getAioThread());
     monitorSocket(it);
 }
 
-void ReverseConnectionHolder::monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it)
+size_t ReverseConnectionHolder::socketCount() const
+{
+    return m_socketCount;
+}
+
+void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Handler handler)
+{
+    m_timer.post(
+        [this, expirationTime = std::chrono::steady_clock::now() + timeout,
+            handler = std::move(handler)]() mutable
+        {
+            if (m_sockets.size())
+            {
+                auto socket = std::move(m_sockets.front());
+                m_sockets.pop_front();
+                --m_socketCount;
+
+                socket->cancelIOSync(aio::etNone);
+                handler(SystemError::noError, std::move(socket));
+            }
+            else
+            {
+                const auto timeLeft = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    expirationTime - std::chrono::steady_clock::now());
+
+                if (timeLeft.count() <= 0)
+                    return handler(SystemError::timedOut, nullptr);
+
+                if (m_handlers.empty() || expirationTime < m_handlers.begin()->first)
+                {
+                    m_timer.start(
+                        timeLeft,
+                        [this]()
+                        {
+                            const auto now = std::chrono::steady_clock::now();
+                            for (auto it = m_handlers.begin(); it != m_handlers.end(); )
+                            {
+                                if (it->first > now)
+                                    return;
+
+                                it->second(SystemError::timedOut, nullptr);
+                                it = m_handlers.erase(it);
+                            }
+                        });
+                }
+
+                m_handlers.emplace(expirationTime, std::move(handler));
+            }
+        });
+}
+
+void ReverseConnectionHolder::monitorSocket(
+    std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it)
 {
     // NOTE: Here we monitor for connection close by recv as no any data is expected
     // to pop up from the socket (in such case socket will be closed anyway)
@@ -207,7 +233,6 @@ void ReverseConnectionHolder::monitorSocket(std::list<std::unique_ptr<AbstractSt
         buffer.get(),
         [this, it, buffer](SystemError::ErrorCode code, size_t size)
         {
-            QnMutexLocker lk(&m_mutex);
             if (code == SystemError::timedOut)
                 return monitorSocket(it);
 
@@ -216,6 +241,7 @@ void ReverseConnectionHolder::monitorSocket(std::list<std::unique_ptr<AbstractSt
                     size ? cl_logERROR : cl_logDEBUG1);
 
             (void)buffer; //< This buffer might be helpful for debug is case smth goes wrong!
+            --m_socketCount;
             m_sockets.erase(it);
         });
 }
