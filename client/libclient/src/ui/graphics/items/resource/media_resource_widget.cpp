@@ -282,6 +282,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
         /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
         overlayWidgets()->positionOverlay->insertItem(0, twoWayAudioItem);
+        overlayWidgets()->positionOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
     }
 
     /* Set up buttons. */
