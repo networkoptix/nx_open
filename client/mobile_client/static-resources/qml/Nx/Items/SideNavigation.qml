@@ -87,7 +87,7 @@ Drawer
         {
             anchors.fill: layoutsList
             anchors.margins: 16
-            visible: !connectionManager.online
+            visible: connectionManager.connectionState == QnConnectionManager.Disconnected
         }
 
         Column
@@ -120,7 +120,7 @@ Drawer
                 id: disconnectButton
 
                 icon: lp("/images/disconnect.png")
-                text: qsTr("Disconnect from server")
+                text: qsTr("Disconnect from system")
                 visible: connectionManager.online ||
                          connectionManager.connectionState == QnConnectionManager.Connecting
                 onClicked: uiController.disconnectFromSystem()
