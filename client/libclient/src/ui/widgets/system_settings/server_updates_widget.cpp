@@ -420,7 +420,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             QnMessageBox::critical(
                 this,
                 tr("Update unsuccessful."),
-                tr("Could not start update.")
+                tr("Update is not allowed.")
                     + lit("\n")
                     + tr("%n servers have different cloud portal URL:",
                        "", result.failedServers.size())
