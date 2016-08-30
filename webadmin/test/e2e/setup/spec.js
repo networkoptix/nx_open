@@ -5,15 +5,42 @@ describe('Setup Wizard', function () {
 
     beforeEach(function() {
         p.get();
-        //  If setup wizard is present, complete setup. Otherwise, do nothing
-        p.helper.checkPresent(p.setupDialog).then( p.helper.completeSetup, function(){});
+
+        // Try to log in, because rights model is messed up now
+        element(by.model('user.username')).isPresent().then( function(isPresent) {
+            if(isPresent) {
+                p.helper.login('noptixqa+owner@gmail.com', 'qweasd123');
+                console.log('Login dialog appeared unexpectedly.');
+                browser.sleep(1000);
+            }
+        });
+
+        element(by.model('user.username')).isPresent().then( function(isPresent) {
+            if(isPresent) {
+                p.helper.login('admin', 'admin');
+                console.log('Login dialog appeared unexpectedly.');
+                browser.sleep(1000);
+            }
+        });
+        // by that moment user should be logged in.
+
+        //  If setup wizard is present, complete setup
+        p.setupDialog.isPresent().then( function(isPresent) {
+            if(isPresent) {
+                p.helper.completeSetup(); }
+        }).then(function() {
+            p.helper.getTab('Server').click();
+        });
     });
 
     it("Button Restore Factory Defaults opens detach dialog",function(){
         expect(p.mediaServersLinks.count()).toBeGreaterThan(0);
+
         p.mediaServersLinks.count().then( function(number) {
             if (number == 1) {
+                expect(p.resetButton.isPresent()).toBe(true);
                 expect(p.resetButton.isDisplayed()).toBe(true);
+
                 p.resetButton.click();
                 expect(p.dialog.isDisplayed()).toBe(true);
                 p.cancelButton.click();
@@ -46,7 +73,7 @@ describe('Setup Wizard', function () {
         p.oldPasswordInput.clear();
         p.oldPasswordInput.sendKeys('wrong password');
         p.detachButton.click();
-        expect(p.dialog.getText()).toContain('Wrong current password specified');
+        expect(p.dialog.getText()).toContain('Wrong password');
         p.closeButton.click();
         p.get();
         expect(p.dialog.isPresent()).toBe(false);
@@ -55,45 +82,47 @@ describe('Setup Wizard', function () {
 
     it("Setup Wizard Dialog opens after server detach",function(){
         p.triggerSetupWizard();
-        browser.sleep(2000);
         p.helper.completeSetup();
-    });
+    }, 120000);
 
     it("Start but not complete setup - wizard should appear automatically",function(){
         p.triggerSetupWizard();
         browser.refresh();
-        browser.sleep(3000);
-        p.helper.checkPresent(element(by.model('user.username'))).then( function() {
-            browser.refresh();
-            browser.sleep(1000);
-        });
+        browser.sleep(1000);
         p.helper.waitIfNotDisplayed(p.setupDialog, 1000);
+        p.setupDialog.isPresent().then(function(is) {console.log(is, 'SETUP DIALOF IS')});
         expect(p.setupDialog.isPresent()).toBe(true);
         p.helper.completeSetup();
     });
 
-    it("Next button is disabled until every input is filled",function(){
+    it("Every input is required",function(){
+        var checkRequired = function(message) {
+            p.nextButton.click();
+            expect(p.setupDialog.getText()).toContain(message);
+        };
+
         p.triggerSetupWizard();
-        browser.sleep(2000);
+        browser.sleep(1000);
         p.nextButton.click();
 
         // System name screen
         p.systemNameInput.clear();
-        expect(p.nextButton.isEnabled()).toBe(false);
+        p.nextButton.click();
+        checkRequired("System name is required");
         p.systemNameInput.sendKeys('autotest-system');
 
         // Merge with existing screen
         p.mergeWithExisting.click();
 
-        p.remoteSystemInput.clear();
-        p.remotePasswordInput.clear();
-        expect(p.nextButton.isEnabled()).toBe(false);
-
         p.remoteSystemInput.sendKeys(p.helper.activeSystem);
-        expect(p.nextButton.isEnabled()).toBe(false);
+        p.remotePasswordInput.clear();
+        checkRequired("All fields are required");
+
+        p.remoteSystemInput.clear();
+        p.remotePasswordInput.sendKeys('password');
+        checkRequired("All fields are required");
 
         p.remotePasswordInput.sendKeys('password');
-        expect(p.nextButton.isEnabled()).toBe(true);
         p.backButton.click();
 
         // Connect to cloud screen
@@ -101,34 +130,36 @@ describe('Setup Wizard', function () {
 
         // cloud login screen
         p.useCloudAccButton.click();
-        p.cloudEmailInput.clear();
-        p.cloudPassInput.clear();
-        expect(p.nextButton.isEnabled()).toBe(false);
 
         p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
-        expect(p.nextButton.isEnabled()).toBe(false);
+        p.cloudPassInput.clear();
+        checkRequired("Email and password are required");
 
+        p.cloudEmailInput.clear();
         p.cloudPassInput.sendKeys('password');
-        expect(p.nextButton.isEnabled()).toBe(true);
+        checkRequired("Email and password are required");
+
         p.backButton.click();
 
         // Local login screen
         p.skipCloud.click();
-        p.localPasswordInput.clear();
-        p.localPasswordConfInput.clear();
-        expect(p.nextButton.isEnabled()).toBe(false);
 
         p.localPasswordInput.sendKeys(p.helper.password);
-        expect(p.nextButton.isEnabled()).toBe(false);
+        p.localPasswordConfInput.clear();
+        checkRequired("All fields are required");
 
+        p.localPasswordInput.clear();
         p.localPasswordConfInput.sendKeys(p.helper.password);
-        expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
+        checkRequired("All fields are required");
+
+        p.localPasswordInput.sendKeys(p.helper.password);
         p.nextButton.click();
         p.finishButton.click();
     });
 
     it("First field on every step is auto-focused",function(){
         p.triggerSetupWizard();
+        browser.sleep(1000);
         p.nextButton.click();
 
         // System name screen
@@ -187,9 +218,10 @@ describe('Setup Wizard', function () {
         // On Cloud screen - skip cloud
         p.skipCloud.click();
         p.backButton.click();
-        expect(p.setupDialog.getText()).toContain('Connect your System to Nx Cloud');
+        expect(p.setupDialog.getText()).toContain('Give your System a name');
 
         // On Cloud login screen
+        p.nextButton.click();
         p.useCloudAccButton.click();
         p.backButton.click();
         expect(p.setupDialog.getText()).toContain('Connect your System to Nx Cloud');
@@ -206,7 +238,7 @@ describe('Setup Wizard', function () {
 
     it("Enter works for next button in every place next is available: advanced settings",function(){
         p.triggerSetupWizard();
-        browser.sleep(2000);
+        browser.sleep(1000);
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
@@ -232,7 +264,7 @@ describe('Setup Wizard', function () {
 
     it("Enter works for next button in every place next is available: cloud connect",function(){
         p.triggerSetupWizard();
-        browser.sleep(2000);
+        browser.sleep(1000);
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
@@ -245,17 +277,21 @@ describe('Setup Wizard', function () {
         p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
         p.cloudPassInput.sendKeys(p.helper.password);
         expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
-
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
 
+        browser.sleep(1000);
         p.finishButton.click();
+
+        p.helper.logout();
+        p.get();
+        p.helper.login('admin', p.helper.password);
     });
 
     it("Enter works for next button in every place next is available: merge with another",function(){
         p.triggerSetupWizard();
-        browser.sleep(2000);
+        browser.sleep(1000);
         browser.actions().
             sendKeys(protractor.Key.ENTER).
             perform();
@@ -267,6 +303,7 @@ describe('Setup Wizard', function () {
             sendKeys(protractor.Key.ENTER).
             perform();
 
+        browser.sleep(1500);
         p.finishButton.click();
     });
 
@@ -351,6 +388,7 @@ describe('Setup Wizard', function () {
         p.nextButton.click();
         p.mergeWithExisting.click();
         p.remoteSystemInput.sendKeys(p.helper.activeSystem);
+        p.remoteLoginInput.sendKeys('admin');
         p.remotePasswordInput.sendKeys('wrongpassword');
         p.nextButton.click();
         expect(p.setupDialog.getText()).toContain('Wrong password');
@@ -368,6 +406,7 @@ describe('Setup Wizard', function () {
         p.nextButton.click();
         p.mergeWithExisting.click();
         p.remoteSystemInput.sendKeys('nourl');
+        p.remoteLoginInput.sendKeys('admin');
         p.remotePasswordInput.sendKeys(p.helper.password);
         p.nextButton.click();
         expect(p.setupDialog.getText()).toContain('System is unreachable or doesn\'t exist.');
@@ -385,6 +424,7 @@ describe('Setup Wizard', function () {
         p.nextButton.click();
         p.mergeWithExisting.click();
         p.remoteSystemInput.sendKeys(p.helper.activeSystem);
+        p.remoteLoginInput.sendKeys('admin');
         p.remotePasswordInput.sendKeys(p.helper.password);
         p.nextButton.click();
         expect(p.setupDialog.getText()).toContain('System is ready to use');

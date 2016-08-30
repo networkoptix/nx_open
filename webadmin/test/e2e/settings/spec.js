@@ -14,21 +14,22 @@ describe('Settings Page', function () {
     //});
 
     it("Change port: should not allow to set empty or bad port",function(){
+        p.helper.getTab('Server').click();
         p.setPort(100000);
         expect(p.portInput.getAttribute('class')).toMatch('ng-invalid');
-        expect(p.saveButton.isEnabled()).toBe(false);
+        expect(p.changePortButton.isEnabled()).toBe(false);
 
         p.setPort('');
         expect(p.portInput.getAttribute('class')).toMatch('ng-invalid');
-        expect(p.saveButton.isEnabled()).toBe(false);
+        expect(p.changePortButton.isEnabled()).toBe(false);
 
         p.setPort('port');
         expect(p.portInput.getAttribute('class')).toMatch('ng-invalid');
-        expect(p.saveButton.isEnabled()).toBe(false);
+        expect(p.changePortButton.isEnabled()).toBe(false);
 
         p.setPort(7000);
         expect(p.portInput.getAttribute('class')).not.toMatch('ng-invalid');
-        expect(p.saveButton.isEnabled()).toBe(true);
+        expect(p.changePortButton.isEnabled()).toBe(true);
     });
 
     xit("Change port: should not save allocated port",function() {

@@ -6,15 +6,12 @@ var Page = function () {
 
     var p = this;
 
-    this.mediaServersLinks = element.all(by.repeater('server in mediaServers')).all(by.tagName('a'));
-    //this.resetButton = element(by.buttonText('Reset System'));
+    this.mediaServersLinks = element.all(by.repeater("server in mediaServers")).all(by.tagName('a'));
     this.resetButton = element(by.buttonText('Restore factory defaults'));
-    this.resetAndNewButton = element(by.buttonText('Disconnect Server and Create New System'));
 
     this.dialog = element(by.css('.modal-dialog'));
     this.oldPasswordInput = this.dialog.element(by.model('settings.oldPassword'));
     this.cancelButton = this.dialog.element(by.buttonText('Cancel'));
-    //this.detachButton = this.dialog.element(by.buttonText('Create New System'));
     this.detachButton = this.dialog.element(by.buttonText('Restore factory defaults'));
     this.closeButton = this.dialog.element(by.buttonText('Close'));
 
@@ -35,22 +32,19 @@ var Page = function () {
 
     this.mergeWithExisting = this.setupDialog.element(by.linkText('Merge server with existing system'));
     this.remoteSystemInput = this.setupDialog.element(by.model('settings.remoteSystem'));
+    this.remoteLoginInput = this.setupDialog.element(by.model('settings.remoteLogin'));
     this.remotePasswordInput = this.setupDialog.element(by.model('settings.remotePassword'));
 
     this.useCloudAccButton = this.setupDialog.element(by.buttonText('Use existing'));
     this.cloudEmailInput = this.setupDialog.element(by.model('settings.cloudEmail'));
     this.cloudPassInput = this.setupDialog.element(by.model('settings.cloudPassword'));
 
-    this.getCheckboxState = function(checkbox) {
-        checkbox.isSelected().then( function(isSelected) {
-            return isSelected;
-        });
-    };
     this.toggleCheckbox = function(checkbox) {
-        var isSelected = this.getCheckboxState(checkbox);
-        checkbox.click();
-        if(isSelected) expect(checkbox.isSelected()).toBe(false);
-        else expect(checkbox.isSelected()).toBe(true);
+        checkbox.isSelected().then( function(isSelected) { // get the initial state of checkbox
+            checkbox.click();
+            if(isSelected) expect(checkbox.isSelected()).toBe(false);
+            else expect(checkbox.isSelected()).toBe(true);
+        });
     };
 
     this.get = function () {
@@ -58,17 +52,56 @@ var Page = function () {
     };
 
     this.triggerSetupWizard = function() {
+        element(by.model('user.username')).isPresent().then( function(isPresent) {
+            if(isPresent) {
+                // if there's login dialog
+                element(by.model('user.username')).sendKeys('admin');
+                element(by.model('user.password')).sendKeys('admin');
+                element(by.buttonText('Log in')).click();
+                browser.sleep(1500);
+            }
+        });
         this.resetButton.click();
         this.oldPasswordInput.sendKeys(this.helper.password);
         this.detachButton.click();
-
-        // If login dialog appears, reload page.
-        browser.sleep(500);
-        p.helper.checkPresent(element(by.model('user.username'))).then( function() {
-            browser.refresh();
-            browser.sleep(1000);
+        p.dialog.getText().then(function(text) {
+            if(p.helper.isSubstr(text, 'Wrong password')) {
+                p.closeButton.click();
+                browser.sleep(500); // otherwise we look for the button before dialog is closed -> exception
+                p.resetButton.click();
+                p.oldPasswordInput.sendKeys('admin');
+                p.detachButton.click();
+            }
         });
-        this.helper.waitIfNotDisplayed(this.setupDialog, 1000);
+
+        // If login dialog appears, log in.
+        browser.sleep(500);
+        element(by.model('user.username')).isPresent().then( function(isPresent) {
+            if(isPresent) {
+                p.helper.login('admin', 'qweasd123');
+                console.log('Login dialog appeared unexpectedly.');
+                browser.sleep(1000);
+            }
+        });
+        this.helper.waitIfNotPresent(this.setupDialog, 10000);
+        browser.refresh();
+
+        // If login dialog appears, log in.
+        browser.sleep(500);
+        element(by.model('user.username')).isPresent().then( function(isPresent) {
+            if(isPresent) {
+                p.helper.login('admin', 'qweasd123');
+                console.log('Login dialog appeared unexpectedly.');
+                browser.sleep(1000);
+            }
+        });
+        element(by.model('user.username')).isPresent().then( function(isPresent) {
+            if(isPresent) {
+                p.helper.login('admin', 'admin');
+                console.log('Login dialog appeared unexpectedly.');
+                browser.sleep(1000);
+            }
+        });
     }
 };
 

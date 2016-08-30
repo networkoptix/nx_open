@@ -25,15 +25,15 @@ var Helper = function () {
         expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
     };
 
-    //this.isSubstr = function(string, substring) {
-    //    if (string.indexOf(substring) > -1) return true;
-    //};
+    this.isSubstr = function(string, substring) {
+        if (string.indexOf(substring) > -1) return true;
+    };
 
     this.checkPresent = function(elem) {
         var deferred = protractor.promise.defer();
         elem.isPresent().then( function(isPresent) {
             if(isPresent)   deferred.fulfill();
-            else            deferred.reject('Element is not present');
+            else            deferred.reject('(Custom NX message) Element is not present');
         });
 
         return deferred.promise;
@@ -43,7 +43,7 @@ var Helper = function () {
         var deferred = protractor.promise.defer();
         elem.isDisplayed().then( function(isDisplayed) {
             if(isDisplayed)   deferred.fulfill();
-            else            deferred.reject('Element is not displayed');
+            else            deferred.reject('(Custom NX Message) Element is not displayed');
         });
 
         return deferred.promise;
@@ -97,7 +97,8 @@ var Helper = function () {
         var setupDialog = element(by.css('.modal')).element(by.css('.panel'));
         var nextButton = self.setupWizardDialog.element(by.cssContainingText('button', 'Next'));
         var systemNameInput = self.setupWizardDialog.element(by.model('settings.systemName'));
-        var skipCloud = self.setupWizardDialog.element(by.linkText('Skip this step for now'));
+        // skipCloud is sometimes a link, and sometimes a button, so 'by.linkText' won't work
+        var skipCloud = self.setupWizardDialog.element(by.xpath('.//*[.="Skip this step for now"]'));
         var localPasswordInput = self.setupWizardDialog.element(by.model('ngModel'));
         //var localPasswordInput = self.setupWizardDialog.element(by.model('settings.localPassword'));
         var localPasswordConfInput = self.setupWizardDialog.element(by.model('settings.localPasswordConfirmation'));
@@ -114,7 +115,30 @@ var Helper = function () {
         nextButton.click();
         finishButton.click();
         self.checkPresent(setupDialog).then( function(){ finishButton.click() }, function(){});
-    }
+    };
+
+    this.logout = function() {
+        element(by.css('[title=Logout]')).click();
+    };
+
+    this.login = function(login, password) {
+        var username = login || 'admin';
+        var passwd = password || self.password;
+        element(by.model('user.username')).isPresent().then( function(isPresent) {
+            if(isPresent) {
+                // if there's login dialog
+                element(by.model('user.username')).sendKeys(username);
+                element(by.model('user.password')).sendKeys(passwd);
+                element(by.buttonText('Log in')).click();
+
+                browser.sleep(500);
+            }
+        });
+    };
+
+    this.getTab = function(tab) {
+        return element(by.css('li[heading = "' + tab + '"]'));
+    };
 };
 
 module.exports = Helper;
