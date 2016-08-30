@@ -2983,9 +2983,24 @@ QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option,
     switch (iconId)
     {
         case SP_LineEditClearButton:
-            return qnSkin->icon("theme/input_clear.png");
+            return qnSkin->icon("theme/sp_line_edit_clear_button.png");
+        case SP_ArrowBack:
+            return qnSkin->icon("theme/sp_arrow_back.png");
+        case SP_ArrowForward:
+            return qnSkin->icon("theme/sp_arrow_forward.png");
+        case SP_FileDialogToParent:
+            return qnSkin->icon("theme/sp_file_dialog_to_parent.png");
+        case SP_FileDialogListView:
+            return qnSkin->icon("theme/sp_file_dialog_list_view.png");
+        case SP_FileDialogDetailedView:
+            return qnSkin->icon("theme/sp_file_dialog_detailed_view.png");
+        case SP_FileDialogNewFolder:
+            return qnSkin->icon("theme/sp_file_dialog_new_folder.png");
 
         default:
+            auto baseIcon = base_type::standardIcon(iconId, option, widget);
+            if (!baseIcon.isNull())
+                qDebug() << "Requested NOT_NULL standard icon!!!!" << iconId;
             return base_type::standardIcon(iconId, option, widget);
     }
 }
