@@ -81,16 +81,19 @@ Item
                 id: learnMoreLink
                 text: qsTr("Learn more about %1").arg(applicationInfo.cloudName())
                 width: parent.width
+                onClicked: Qt.openUrlExternally(cloudUrlHelper.aboutUrl())
             }
             LinkButton
             {
                 text: qsTr("Create account")
                 width: parent.width
+                onClicked: Qt.openUrlExternally(cloudUrlHelper.createAccountUrl())
             }
             LinkButton
             {
                 text: qsTr("Forgot your password?")
                 width: parent.width
+                onClicked: Qt.openUrlExternally(cloudUrlHelper.restorePasswordUrl())
             }
         }
     }

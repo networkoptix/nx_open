@@ -5,6 +5,7 @@
 #include <utils/common/connective.h>
 
 class QnLoginToCloudDialog;
+class QnCloudUrlHelper;
 
 class QnWorkbenchCloudHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -24,4 +25,5 @@ private:
 private:
     Q_DISABLE_COPY(QnWorkbenchCloudHandler)
     QPointer<QnLoginToCloudDialog> m_loginToCloudDialog;
+    QnCloudUrlHelper* m_cloudUrlHelper;
 };
