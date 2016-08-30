@@ -129,7 +129,7 @@ signals:
 private:
     void connectToLocalSystemImpl(
         const QString& systemId,
-        const QString& serverUrl,
+        const QUrl& serverUrl,
         const QString& userName,
         const QString& password,
         bool storePassword,

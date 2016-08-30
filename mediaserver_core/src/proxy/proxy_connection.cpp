@@ -31,13 +31,38 @@
 #include "http/custom_headers.h"
 #include "api/global_settings.h"
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/aio/pollset.h>
+#include <nx/network/aio/unified_pollset.h>
 
 #include <utils/common/app_info.h>
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int MAX_PROXY_TTL = 8;
+
+// NOTE: MSG_DONTWAIT is not supported for windows, so it makes sense using only when event
+//  is already reported by pullset as they do not lie on windows and may report false positive on
+//  some linux implementations.
+#ifdef Q_OS_WIN
+    static int nonBlockingFlag = 0;
+#else
+    static int nonBlockingFlag = MSG_DONTWAIT;
+#endif
+
+static bool wouldSocketBlock(int returnCode)
+{
+    if (returnCode >= 0)
+        return false;
+
+    auto code = SystemError::getLastOSErrorCode();
+    if (code == SystemError::interrupted ||
+        code == SystemError::wouldBlock ||
+        code == SystemError::again)
+    {
+        return true;
+    }
+
+    return false;
+}
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
@@ -91,11 +116,9 @@ int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol
 
 bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
 {
-    int readed = srcSocket->recv(buffer, bufferSize);
-#ifndef Q_OS_WIN32
-    if( readed == -1 && errno == EINTR )
+    int readed = srcSocket->recv(buffer, bufferSize, nonBlockingFlag);
+    if( wouldSocketBlock(readed) )
         return true;
-#endif
 
     if (readed < 1)
         return false;
@@ -467,9 +490,6 @@ void QnProxyConnectionProcessor::run()
     if (!openProxyDstConnection())
         return;
 
-    //d->pollSet.add( d->socket.data(), aio::etRead );
-    //d->pollSet.add( d->dstSocket.data(), aio::etRead );
-
     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
     if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
     {
@@ -491,13 +511,7 @@ void QnProxyConnectionProcessor::doRawProxy()
     Q_D(QnProxyConnectionProcessor);
     nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
 
-    if (!d->socket->setNonBlockingMode(true))
-        return;
-
-    if (!d->dstSocket->setNonBlockingMode(true))
-        return;
-
-    nx::network::aio::PollSet pollSet;
+    nx::network::aio::UnifiedPollSet pollSet;
     pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
     pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
     while (!m_needStop)
@@ -541,19 +555,12 @@ void QnProxyConnectionProcessor::doSmartProxy()
     nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
     d->clientRequest.clear();
 
-    if (!d->socket->setNonBlockingMode(true))
-        return;
-
-    if (!d->dstSocket->setNonBlockingMode(true))
-        return;
-
-    nx::network::aio::PollSet pollSet;
+    nx::network::aio::UnifiedPollSet pollSet;
     pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
     pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
 
     while (!m_needStop)
     {
-
         int rez = pollSet.poll(IO_TIMEOUT);
         if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;
@@ -572,6 +579,9 @@ void QnProxyConnectionProcessor::doSmartProxy()
             if (it.socket() == d->socket->pollable())
             {
                 int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+                if (wouldSocketBlock(readed))
+                    continue;
+
                 if (readed < 1)
                     return;
 

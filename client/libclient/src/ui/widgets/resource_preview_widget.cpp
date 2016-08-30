@@ -5,13 +5,19 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/geometry.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator.h>
 
+namespace {
+
+    const int kDefaultAspectRatio = 4.0 / 3.0;
+
+} // namespace
 
 QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) :
     base_type(parent),
@@ -19,6 +25,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     m_target(),
     m_cachedSizeHint(),
     m_resolutionHint(),
+    m_aspectRatio(kDefaultAspectRatio),
     m_preview(new QLabel(this)),
     m_placeholder(new QLabel(this)),
     m_indicator(new QnBusyIndicatorWidget(this)),
@@ -41,7 +48,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
 
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, [this](const QnUuid& resourceId, const QPixmap& thumbnail)
     {
-        if (m_target != resourceId)
+        if (!m_target || m_target->getId() != resourceId)
             return;
 
         if (m_status != QnCameraThumbnailManager::Loaded)
@@ -55,7 +62,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
 
     connect(m_thumbnailManager, &QnCameraThumbnailManager::statusChanged, this, [this](const QnUuid& resourceId, QnCameraThumbnailManager::ThumbnailStatus status)
     {
-        if (m_target != resourceId)
+        if (!m_target || m_target->getId() != resourceId)
             return;
 
         m_status = status;
@@ -71,6 +78,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
 
             default:
                 m_pages->setCurrentWidget(m_indicator);
+                break;
         }
     });
 }
@@ -79,26 +87,32 @@ QnResourcePreviewWidget::~QnResourcePreviewWidget()
 {
 }
 
-QnUuid QnResourcePreviewWidget::targetResource() const
+const QnResourcePtr& QnResourcePreviewWidget::targetResource() const
 {
     return m_target;
 }
 
-void QnResourcePreviewWidget::setTargetResource(const QnUuid &target)
+void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
 {
-    if (m_target == target)
+    auto camera = target.dynamicCast<QnVirtualCameraResource>();
+
+    if (camera == m_target)
         return;
 
-    m_target = target;
+    m_target = camera;
     m_resolutionHint = QSize();
+    m_aspectRatio = kDefaultAspectRatio;
 
-    if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(m_target))
+    if (camera)
     {
         m_thumbnailManager->selectResource(camera);
 
         CameraMediaStreams s = camera->mediaStreams();
         if (!s.streams.empty())
+        {
             m_resolutionHint = s.streams[0].getResolution();
+            m_aspectRatio = static_cast<qreal>(m_resolutionHint.width()) / m_resolutionHint.height();
+        }
     }
 
     m_preview->setPixmap(QPixmap());
@@ -116,6 +130,11 @@ void QnResourcePreviewWidget::setThumbnailSize(const QSize &size)
     m_thumbnailManager->setThumbnailSize(size);
     m_cachedSizeHint = QSize();
     updateGeometry();
+}
+
+QnBusyIndicatorWidget* QnResourcePreviewWidget::busyIndicator() const
+{
+    return m_indicator;
 }
 
 void QnResourcePreviewWidget::paintEvent(QPaintEvent *event)
@@ -170,20 +189,23 @@ QSize QnResourcePreviewWidget::sizeHint() const
             }
             else
             {
-                const qreal kDefaultAspectRatio = 4.0 / 3.0;
-                qreal aspectRatio =
-                    m_resolutionHint.isEmpty() ?
-                        kDefaultAspectRatio :
-                        static_cast<qreal>(m_resolutionHint.width()) / m_resolutionHint.height();
-
                 if (m_cachedSizeHint.height() == 0)
-                    m_cachedSizeHint.setHeight(static_cast<int>(m_cachedSizeHint.width() / aspectRatio));
+                    m_cachedSizeHint.setHeight(static_cast<int>(m_cachedSizeHint.width() / m_aspectRatio));
                 else if (m_cachedSizeHint.width() == 0)
-                    m_cachedSizeHint.setWidth(static_cast<int>(m_cachedSizeHint.height() * aspectRatio));
+                    m_cachedSizeHint.setWidth(static_cast<int>(m_cachedSizeHint.height() * m_aspectRatio));
             }
         }
 
         static const QSize kFrameSize(2, 2);
+        const QSize maxSize = maximumSize() - kFrameSize;
+
+        qreal oversizeCoefficient = qMax(
+            static_cast<qreal>(m_cachedSizeHint.width()) / maxSize.width(),
+            static_cast<qreal>(m_cachedSizeHint.height()) / maxSize.height());
+
+        if (oversizeCoefficient > 1.0)
+            m_cachedSizeHint /= oversizeCoefficient;
+
         m_cachedSizeHint += kFrameSize;
     }
 

@@ -35,7 +35,6 @@
 #include <ui/utils/table_export_helper.h>
 
 #include <utils/license_usage_helper.h>
-#include <utils/common/product_features.h>
 #include <utils/common/event_processors.h>
 
 namespace {
@@ -196,7 +195,9 @@ void QnLicenseManagerWidget::updateLicenses()
 
     /* Update license widget. */
     ui->licenseWidget->setHardwareId(qnLicensePool->currentHardwareId());
-    ui->licenseWidget->setFreeLicenseAvailable(!licenseListHelper.haveLicenseKey(qnProductFeatures().freeLicenseKey.toLatin1()) && (qnProductFeatures().freeLicenseCount > 0));
+    ui->licenseWidget->setFreeLicenseAvailable(
+        !licenseListHelper.haveLicenseKey(QnAppInfo::freeLicenseKey().toLatin1())
+        && (QnAppInfo::freeLicenseCount() > 0));
 
     /* Update grid. */
     m_model->updateLicenses(m_licenses);
@@ -258,9 +259,9 @@ void QnLicenseManagerWidget::updateLicenses()
         }
         else
         {
-            QString text = (qnProductFeatures().freeLicenseCount > 0) ?
-                tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.") :
-                tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
+            QString text = (QnAppInfo::freeLicenseCount() > 0)
+                ? tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.")
+                : tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
             ui->infoLabel->setText(text);
             useRedLabel = true;
         }

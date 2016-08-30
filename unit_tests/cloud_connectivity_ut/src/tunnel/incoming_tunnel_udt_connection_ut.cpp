@@ -247,7 +247,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
         promise.get_future().wait();
     }
 
-    // connection was brocken by wrong packet
+    // connection was broken by wrong packet
     runConnectingSockets();
     ASSERT_NE(connectResults.pop(), SystemError::noError);
     ASSERT_EQ(acceptResults.pop(), SystemError::invalidData);

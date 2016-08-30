@@ -195,7 +195,7 @@ void QnUnlinkFromCloudDialogPrivate::showFailure(const QString &message)
     QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             tr("Error"),
-                            tr("Can not unlink the system from the cloud"),
+                            tr("Can not unlink the system from %1").arg(QnAppInfo::cloudName()),
                             QDialogButtonBox::Ok,
                             q);
 

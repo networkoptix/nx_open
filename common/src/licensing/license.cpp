@@ -15,7 +15,6 @@
 #include <utils/common/app_info.h>
 #include <common/common_globals.h>
 #include <utils/common/synctime.h>
-#include <utils/common/product_features.h>
 #include "common/common_module.h"
 
 #include "api/runtime_info_manager.h"
@@ -448,7 +447,7 @@ QString QnLicense::errorMessage(ErrorCode errCode)
 
 Qn::LicenseType QnLicense::type() const
 {
-    if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
+    if (key() == QnAppInfo::freeLicenseKey().toLatin1())
         return Qn::LC_Trial;
 
     if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)

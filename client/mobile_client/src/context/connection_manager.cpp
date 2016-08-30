@@ -297,6 +297,7 @@ void QnConnectionManagerPrivate::doConnect() {
         } else if (errorCode != ec2::ErrorCode::ok) {
             status = QnConnectionManager::NetworkError;
         } else if (!isCompatibleProducts(connectionInfo.brand, QnAppInfo::productNameShort())) {
+            //TODO: #GDM #isCompatibleCustomization VMS-2163
             status = QnConnectionManager::InvalidServer;
         } else if (connectionInfo.version < minimalSupportedVersion) {
             status = QnConnectionManager::InvalidVersion;

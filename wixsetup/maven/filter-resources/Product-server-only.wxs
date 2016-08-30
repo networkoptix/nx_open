@@ -136,6 +136,9 @@
         <CustomAction Id="DeleteRegistryKeys_Cmd" Property="DeleteRegistryKeys" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="DeleteRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="DeleteRegistryKeys" Execute="deferred" Impersonate="no"/>
 
+        <CustomAction Id="DeleteAllRegistryKeys_Cmd" Property="DeleteAllRegistryKeys" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="DeleteAllRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="DeleteAllRegistryKeys" Execute="deferred" Impersonate="no"/>
+
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
 
         <CustomAction Id="FindFreePorts" BinaryKey="CustomActions.dll" DllEntry="FindFreePorts" />
@@ -181,7 +184,7 @@
                       Execute="deferred" Return="check" Impersonate="no" />
 
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="no"
-                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite"/>
+                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}"/>
 
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}TrayToolDir" ExeCommand="[${customization}TrayToolDir]traytool.exe"/>
 
@@ -247,6 +250,8 @@
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
+            <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
+            <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>

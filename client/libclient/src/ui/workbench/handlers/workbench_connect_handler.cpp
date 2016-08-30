@@ -469,8 +469,8 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!
-    QnConnectionDiagnosticsHelper::Result status = silent
-        ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
+    auto status = silent
+        ? QnConnectionValidator::validateConnection(connectionInfo, errCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
 
     const auto systemName = connectionInfo.systemName;
@@ -485,9 +485,9 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     switch (status)
     {
-        case QnConnectionDiagnosticsHelper::Result::Success:
+        case Qn::ConnectionResult::success:
             break;
-        case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+        case Qn::ConnectionResult::compatibilityMode:
             storeConnection();
             menu()->trigger(QnActions::DelayedForcedExitAction);
             return ec2::ErrorCode::ok; // to avoid cycle
@@ -501,19 +501,19 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
 
 
+    QUrl ecUrl = connectionInfo.ecUrl;
+    if (connectionInfo.allowSslConnections)
+        ecUrl.setScheme(lit("https"));
 
     if (connectionInfo.newSystem)
     {
         storeConnection();
         showWelcomeScreen();
         auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setupFactorySystem(connectionInfo.ecUrl.toString());
+        /* Method is called from QML where we are passing QString. */
+        welcomeScreen->setupFactorySystem(ecUrl.toString());
         return ec2::ErrorCode::ok;
     }
-
-    QUrl ecUrl = connectionInfo.ecUrl;
-    if (connectionInfo.allowSslConnections)
-        ecUrl.setScheme(lit("https"));
 
     QnAppServerConnectionFactory::setUrl(ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());

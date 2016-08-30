@@ -1,10 +1,13 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
+
 #include <ui/widgets/common/panel.h>
+
 #include <utils/common/connective.h>
 
 class QLabel;
-class QPlainTextEdit;
+class QnTextEditLabel;
 class QnResourcePreviewWidget;
 
 class QnResourceDetailsWidget : public Connective<QnPanel>
@@ -21,16 +24,11 @@ public:
     QString description() const;
     void setDescription(const QString& description);
 
-    QnUuid targetResource() const;
-    void setTargetResource(const QnUuid& target);
-
-#if 0
-    QSize thumbnailSize() const;
-    void setThumbnailSize(const QSize& size);
-#endif
+    const QnResourcePtr& targetResource() const;
+    void setTargetResource(const QnResourcePtr& target);
 
 private:
     QnResourcePreviewWidget* m_preview;
-    QPlainTextEdit* m_nameTextEdit;
+    QnTextEditLabel* m_nameTextEdit;
     QLabel* m_descriptionLabel;
 };

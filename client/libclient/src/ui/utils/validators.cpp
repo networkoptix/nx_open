@@ -32,8 +32,12 @@ namespace Qn
     {
         return [allowEmpty](const QString& text)
         {
-            if (!allowEmpty && text.trimmed().isEmpty())
-                return Qn::ValidationResult(QnValidatorStrings::tr("E-Mail cannot be empty."));
+            if (text.trimmed().isEmpty())
+            {
+                return allowEmpty
+                    ? kValidResult
+                    : Qn::ValidationResult(QnValidatorStrings::tr("E-Mail cannot be empty."));
+            }
 
             if (!QnEmailAddress::isValid(text)) /* isValid() trims it before checking. */
                 return Qn::ValidationResult(QnValidatorStrings::tr("E-Mail is not valid."));

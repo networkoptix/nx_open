@@ -428,10 +428,6 @@
         }
     },
 
-    "QnMediaResourceWidget": {
-        "palette": { "default": { "window": "dark4" } }
-    },
-
     "QnServerResourceWidget": {
         "colors": {
             "frame": "opaqueSelection",
@@ -453,7 +449,7 @@
     },
 
     "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
+        "colors": ["yellow_core", "green_l2", "red_l2"]
     },
 
     "QnStatusOverlayWidget": {
@@ -651,6 +647,7 @@
     },
 
     "QnMediaResourceWidget": {
+        "palette": { "default": { "window": "dark4" } },
         "motionSensitivityColors": [
             "light16",
             "#627cd6",

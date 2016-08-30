@@ -909,9 +909,7 @@ void initAppServerConnection(QSettings &settings)
     appServerUrl.setPassword(password);
     appServerUrl.setQuery(params);
 
-    QUrl urlNoPassword(appServerUrl);
-    urlNoPassword.setPassword("");
-    NX_LOG(lit("Connect to server %1").arg(urlNoPassword.toString()), cl_logINFO);
+    NX_LOG(lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)), cl_logINFO);
     QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
@@ -2052,6 +2050,13 @@ void MediaServerProcess::run()
     if (connectInfo.nxClusterProtoVersion != QnAppInfo::ec2ProtoVersion())
     {
         NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
+        return;
+    }
+
+    if (connectInfo.cloudHost != QnAppInfo::defaultCloudHost())
+    {
+        NX_LOG(lit("Incompatible Server version detected (cloud host name &1)! Giving up.")
+            .arg(connectInfo.cloudHost), cl_logERROR);
         return;
     }
 
