@@ -2895,7 +2895,7 @@ int QnNxStyle::pixelMetric(
             return dp(8);
 
         case PM_SplitterWidth:
-            return dp(Metrics::kDefaultTopLevelMargin*2 + 1);
+            return dp(5);
 
         case PM_TabBarTabHSpace:
         case PM_TabBarTabVSpace:
