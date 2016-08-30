@@ -26,6 +26,9 @@ public:
 
     void setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
 
+    Qn::CameraSettingsTab currentTab() const;
+    void setCurrentTab(Qn::CameraSettingsTab tab);
+
     virtual void accept() override;
     virtual void reject() override;
 

@@ -55,6 +55,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
+#include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -1302,7 +1303,8 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
     }
 }
 
-Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
+Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
+{
     if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
@@ -1693,9 +1695,12 @@ void QnMediaResourceWidget::processIoEnableRequest()
 void QnMediaResourceWidget::processSettingsRequest()
 {
     context()->statisticsModule()->registerClick(lit("resource_status_overlay_settings"));
+    if (!m_camera)
+        return;
 
-    if (m_camera)
-        menu()->trigger(QnActions::CameraSettingsAction, m_camera);
+    int selectedTab = Qn::GeneralSettingsTab;
+    menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(m_camera)
+        .withArgument(Qn::FocusTabRole, selectedTab));
 }
 
 void QnMediaResourceWidget::processMoreLicensesRequest()
