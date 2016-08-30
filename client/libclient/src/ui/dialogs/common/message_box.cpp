@@ -419,6 +419,7 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
 
     QString pixmapFile;
 
+    //TODO: #vkutin use style()->standardIcon() to avoid code duplication
     switch (icon)
     {
     case Information:
