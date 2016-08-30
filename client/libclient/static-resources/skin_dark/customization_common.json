@@ -453,7 +453,7 @@
     },
 
     "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
+        "colors": ["yellow_core", "green_l2", "red_l2"]
     },
 
     "QnStatusOverlayWidget": {

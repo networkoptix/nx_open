@@ -100,11 +100,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (version < minSupportedVersion())
         return ConnectionResult::incompatibleVersion;
 
-    if (!version.isCompatible(QnSoftwareVersion(QnAppInfo::engineVersion())))
-        return ConnectionResult::compatibilityMode;
-
     if (protoVersion != QnAppInfo::ec2ProtoVersion())
-        return ConnectionResult::updateRequested;
+        return ConnectionResult::compatibilityMode;
 
     return ConnectionResult::success;
 }

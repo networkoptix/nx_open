@@ -13,6 +13,11 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator.h>
 
+namespace {
+
+    const int kDefaultAspectRatio = 4.0 / 3.0;
+
+} // namespace
 
 QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) :
     base_type(parent),
@@ -20,6 +25,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     m_target(),
     m_cachedSizeHint(),
     m_resolutionHint(),
+    m_aspectRatio(kDefaultAspectRatio),
     m_preview(new QLabel(this)),
     m_placeholder(new QLabel(this)),
     m_indicator(new QnBusyIndicatorWidget(this)),
@@ -72,6 +78,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
 
             default:
                 m_pages->setCurrentWidget(m_indicator);
+                break;
         }
     });
 }
@@ -94,6 +101,7 @@ void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
 
     m_target = camera;
     m_resolutionHint = QSize();
+    m_aspectRatio = kDefaultAspectRatio;
 
     if (camera)
     {
@@ -101,7 +109,10 @@ void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
 
         CameraMediaStreams s = camera->mediaStreams();
         if (!s.streams.empty())
+        {
             m_resolutionHint = s.streams[0].getResolution();
+            m_aspectRatio = static_cast<qreal>(m_resolutionHint.width()) / m_resolutionHint.height();
+        }
     }
 
     m_preview->setPixmap(QPixmap());
@@ -178,20 +189,23 @@ QSize QnResourcePreviewWidget::sizeHint() const
             }
             else
             {
-                const qreal kDefaultAspectRatio = 4.0 / 3.0;
-                qreal aspectRatio =
-                    m_resolutionHint.isEmpty() ?
-                        kDefaultAspectRatio :
-                        static_cast<qreal>(m_resolutionHint.width()) / m_resolutionHint.height();
-
                 if (m_cachedSizeHint.height() == 0)
-                    m_cachedSizeHint.setHeight(static_cast<int>(m_cachedSizeHint.width() / aspectRatio));
+                    m_cachedSizeHint.setHeight(static_cast<int>(m_cachedSizeHint.width() / m_aspectRatio));
                 else if (m_cachedSizeHint.width() == 0)
-                    m_cachedSizeHint.setWidth(static_cast<int>(m_cachedSizeHint.height() * aspectRatio));
+                    m_cachedSizeHint.setWidth(static_cast<int>(m_cachedSizeHint.height() * m_aspectRatio));
             }
         }
 
         static const QSize kFrameSize(2, 2);
+        const QSize maxSize = maximumSize() - kFrameSize;
+
+        qreal oversizeCoefficient = qMax(
+            static_cast<qreal>(m_cachedSizeHint.width()) / maxSize.width(),
+            static_cast<qreal>(m_cachedSizeHint.height()) / maxSize.height());
+
+        if (oversizeCoefficient > 1.0)
+            m_cachedSizeHint /= oversizeCoefficient;
+
         m_cachedSizeHint += kFrameSize;
     }
 

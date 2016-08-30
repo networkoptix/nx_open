@@ -4,19 +4,22 @@
 
 #include <ui/models/recent_user_connections_model.h>
 
-QnClientRecentConnectionsManager::QnClientRecentConnectionsManager()
-    : base_type()
-    , m_unbound()
-    , m_bound()
-    , m_dataCache()
+#include <utils/common/scoped_value_rollback.h>
+
+QnClientRecentConnectionsManager::QnClientRecentConnectionsManager():
+    base_type(),
+    m_unbound(),
+    m_bound(),
+    m_dataCache(),
+    m_updating(false)
 {
     NX_ASSERT(qnClientCoreSettings, Q_FUNC_INFO, "Core settings are empty");
 
     const auto coreSettingsHandler = [this](int id)
-    {
-        if (id == QnClientCoreSettings::RecentUserConnections)
-            updateModelsData();
-    };
+        {
+            if (id == QnClientCoreSettings::RecentUserConnections)
+                updateModelsData();
+        };
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this, coreSettingsHandler);
 
@@ -28,10 +31,13 @@ QnClientRecentConnectionsManager::~QnClientRecentConnectionsManager()
 
 void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* model)
 {
-    connect(model, &QnRecentUserConnectionsModel::systemNameChanged, this, [this, model]()
-    {
-        updateModelBinding(model);
-    });
+    NX_ASSERT(!m_updating);
+
+    connect(model, &QnRecentUserConnectionsModel::systemNameChanged, this,
+        [this, model]()
+        {
+            updateModelBinding(model);
+        });
 
     const auto systemName = model->systemName();
     m_unbound.insert(model);
@@ -41,6 +47,9 @@ void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* mo
 
 void QnClientRecentConnectionsManager::removeModel(QnRecentUserConnectionsModel* model)
 {
+    NX_ASSERT(!m_updating);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     if (m_unbound.remove(model))
         return;
 
@@ -58,6 +67,9 @@ void QnClientRecentConnectionsManager::removeModel(QnRecentUserConnectionsModel*
 
 void QnClientRecentConnectionsManager::updateModelBinding(QnRecentUserConnectionsModel* model)
 {
+    NX_ASSERT(!m_updating);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     const bool isCorrectSystemName = !model->systemName().isEmpty();
     NX_ASSERT(isCorrectSystemName, Q_FUNC_INFO
         , "System name for model can't be empty");
@@ -94,6 +106,9 @@ void QnClientRecentConnectionsManager::updateModelBinding(QnRecentUserConnection
 
 void QnClientRecentConnectionsManager::updateModelsData()
 {
+    NX_ASSERT(!m_updating);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     m_dataCache.clear();
     const auto lastConnectionsData = qnClientCoreSettings->recentUserConnections();
     for (const auto connectionDesc : lastConnectionsData)
