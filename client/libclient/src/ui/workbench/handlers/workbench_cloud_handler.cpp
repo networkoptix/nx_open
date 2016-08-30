@@ -4,6 +4,8 @@
 
 #include <api/app_server_connection.h>
 
+#include <client/desktop_client_message_processor.h>
+
 #include <core/resource/user_resource.h>
 
 #include <common/common_module.h>
@@ -66,6 +68,11 @@ void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
     qnSettings->setCloudPassword(QString());
     qnCloudStatusWatcher->setCloudPassword(QString());
+
+    /* Check if we need to logout if logged in under this user. */
+    const auto state = qnDesktopClientMessageProcessor->connectionState();
+    if (state == QnConnectionState::Disconnected)
+        return;
 
     QString currentLogin = QnAppServerConnectionFactory::url().userName();
     if (currentLogin.isEmpty())

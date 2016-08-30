@@ -43,6 +43,7 @@
     (QnConfigureReply) \
     (QnUploadUpdateReply)\
     (QnUpdateFreeSpaceReply)\
+    (QnCloudHostCheckReply)\
     (QnRecordingStatsData)\
     (QnCamRecordingStatsData)\
 

@@ -266,6 +266,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
     qRegisterMetaType<QnUpdateFreeSpaceReply>();
+    qRegisterMetaType<QnCloudHostCheckReply>();
 
     qRegisterMetaType<QnLdapUser>();
     qRegisterMetaType<QnLdapUsers>();

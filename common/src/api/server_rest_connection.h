@@ -81,8 +81,11 @@ namespace rest
             QThread* targetThread = nullptr);
 
         Handle getFreeSpaceForUpdateFiles(
-            bool wholeSystem,
             Result<QnUpdateFreeSpaceReply>::type callback,
+            QThread* targetThread = nullptr);
+
+        Handle checkCloudHost(
+            Result<QnCloudHostCheckReply>::type callback,
             QThread* targetThread = nullptr);
 
         /**

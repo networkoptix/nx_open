@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <network/tcp_listener.h>
+#include <network/module_finder.h>
 
 namespace {
 
@@ -24,7 +25,7 @@ QUrl getServerApiUrl(
     result.setPath(path);
 
     auto modifiedRequest = context->request();
-    modifiedRequest.makeLocal();
+    modifiedRequest.makeLocal(Qn::JsonFormat);
     result.setQuery(modifiedRequest.toUrlQuery());
 
     return result;
@@ -39,40 +40,49 @@ qint64 freeSpaceForUpdate()
     return getDiskFreeSpace(updatesDir);
 }
 
-void loadFreeSpaceRemotely(
+template<typename ReplyType, typename MergeFunction>
+void requestRemotePeers(
     const QString& path,
-    QnUpdateFreeSpaceReply& outputReply,
-    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+    ReplyType& outputReply,
+    QnMultiserverRequestContext<QnEmptyRequestData>* context,
+    const MergeFunction& mergeFunction)
 {
-    const auto moduleGuid = qnCommon->moduleGUID();
+    const auto systemName = qnCommon->moduleInformation().systemName;
 
-    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    auto servers = QSet<QnMediaServerResourcePtr>::fromList(qnResPool->getAllServers(Qn::Online));
+
+    for (const auto& moduleInformation: QnModuleFinder::instance()->foundModules())
     {
-        const auto serverId = server->getId();
-        if (serverId == moduleGuid)
+        if (moduleInformation.systemName != systemName)
             continue;
 
-        const auto completionFunc = [&outputReply, context, &serverId]
-            (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType body)
-            {
-                Q_UNUSED(osErrorCode)
+        const auto server =
+            qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
+        if (!server)
+            continue;
 
-                qint64 freeSpace = -1;
+        servers.insert(server);
+    }
+
+    for (const auto& server: servers)
+    {
+        const auto completionFunc =
+            [&outputReply, context, serverId = server->getId(), &mergeFunction](
+                SystemError::ErrorCode /*osErrorCode*/,
+                int statusCode,
+                nx_http::BufferType body)
+            {
+                ReplyType reply;
+                bool success = false;
 
                 const auto httpCode = static_cast<nx_http::StatusCode::Value>(statusCode);
                 if (httpCode == nx_http::StatusCode::ok)
-                {
-                    QnUpdateFreeSpaceReply reply;
-                    bool success = false;
                     reply = QJson::deserialized(body, reply, &success);
-                    if (success)
-                        freeSpace = reply.freeSpaceByServerId.value(serverId, -1);
-                }
 
                 const auto updateOutputDataCallback =
-                    [freeSpace, &outputReply, context, httpCode, &serverId]()
+                    [&reply, success, &outputReply, context, &serverId, &mergeFunction]()
                     {
-                        outputReply.freeSpaceByServerId[serverId] = freeSpace;
+                        mergeFunction(serverId, success, reply, outputReply);
                         context->requestProcessed();
                     };
 
@@ -83,6 +93,48 @@ void loadFreeSpaceRemotely(
         runMultiserverDownloadRequest(apiUrl, server, completionFunc, context);
         context->waitForDone();
     }
+}
+
+void loadFreeSpaceRemotely(
+    const QString& path,
+    QnUpdateFreeSpaceReply& outputReply,
+    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+{
+    auto mergeFunction =
+        [](
+            const QnUuid& serverId,
+            bool success,
+            const QnUpdateFreeSpaceReply& reply,
+            QnUpdateFreeSpaceReply& outputReply)
+        {
+            if (success)
+            {
+                const auto freeSpace = reply.freeSpaceByServerId.value(serverId, -1);
+                if (freeSpace > 0)
+                    outputReply.freeSpaceByServerId[serverId] = freeSpace;
+            }
+        };
+
+    requestRemotePeers(path, outputReply, context, mergeFunction);
+}
+
+void checkCloudHostRemotely(
+    const QString& path,
+    QnCloudHostCheckReply& outputReply,
+    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+{
+    auto mergeFunction =
+        [](
+            const QnUuid& serverId,
+            bool success,
+            const QnCloudHostCheckReply& reply,
+            QnCloudHostCheckReply& outputReply)
+        {
+            if (success && !reply.cloudHost.isEmpty() && reply.cloudHost != outputReply.cloudHost)
+                outputReply.failedServers.append(serverId);
+        };
+
+    requestRemotePeers(path, outputReply, context, mergeFunction);
 }
 
 } // namespace
@@ -98,7 +150,7 @@ int QnUpdateInformationRestHandler::executeGet(
 
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
-        QnUpdateFreeSpaceReply freeSpaceResult;
+        QnUpdateFreeSpaceReply reply;
 
         auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
         QnMultiserverRequestContext<QnEmptyRequestData> context(
@@ -106,12 +158,27 @@ int QnUpdateInformationRestHandler::executeGet(
 
         const auto moduleGuid = qnCommon->moduleGUID();
 
-        freeSpaceResult.freeSpaceByServerId[moduleGuid] = freeSpaceForUpdate();
+        reply.freeSpaceByServerId[moduleGuid] = freeSpaceForUpdate();
 
         if (!request.isLocal)
-            loadFreeSpaceRemotely(path, freeSpaceResult, &context);
+            loadFreeSpaceRemotely(path, reply, &context);
 
-        QnFusionRestHandlerDetail::serialize(freeSpaceResult, result, contentType, request.format);
+        QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
+    }
+    else if (path.endsWith(lit("/checkCloudHost")))
+    {
+        QnCloudHostCheckReply reply;
+
+        auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
+        QnMultiserverRequestContext<QnEmptyRequestData> context(
+            request, processor->owner()->getPort());
+
+        reply.cloudHost = qnCommon->moduleInformation().cloudHost;
+
+        if (!request.isLocal)
+            checkCloudHostRemotely(path, reply, &context);
+
+        QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
     }
 
     return nx_http::StatusCode::ok;
