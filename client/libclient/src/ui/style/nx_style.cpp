@@ -2983,19 +2983,27 @@ QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option,
     switch (iconId)
     {
         case SP_LineEditClearButton:
-            return qnSkin->icon("theme/sp_line_edit_clear_button.png");
+            return qnSkin->icon("standard_icons/sp_line_edit_clear_button.png");
         case SP_ArrowBack:
-            return qnSkin->icon("theme/sp_arrow_back.png");
+            return qnSkin->icon("standard_icons/sp_arrow_back.png");
         case SP_ArrowForward:
-            return qnSkin->icon("theme/sp_arrow_forward.png");
+            return qnSkin->icon("standard_icons/sp_arrow_forward.png");
         case SP_FileDialogToParent:
-            return qnSkin->icon("theme/sp_file_dialog_to_parent.png");
+            return qnSkin->icon("standard_icons/sp_file_dialog_to_parent.png");
         case SP_FileDialogListView:
-            return qnSkin->icon("theme/sp_file_dialog_list_view.png");
+            return qnSkin->icon("standard_icons/sp_file_dialog_list_view.png");
         case SP_FileDialogDetailedView:
-            return qnSkin->icon("theme/sp_file_dialog_detailed_view.png");
+            return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view.png");
         case SP_FileDialogNewFolder:
-            return qnSkin->icon("theme/sp_file_dialog_new_folder.png");
+            return qnSkin->icon("standard_icons/sp_file_dialog_new_folder.png");
+        case SP_MessageBoxInformation:
+            return qnSkin->icon("standard_icons/sp_message_box_information.png");
+        case SP_MessageBoxQuestion:
+            return qnSkin->icon("standard_icons/sp_message_box_question.png");
+        case SP_MessageBoxWarning:
+            return qnSkin->icon("standard_icons/sp_message_box_warning.png");
+        case SP_MessageBoxCritical:
+            return qnSkin->icon("standard_icons/sp_message_box_critical.png");
 
         default:
             auto baseIcon = base_type::standardIcon(iconId, option, widget);

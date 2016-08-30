@@ -422,16 +422,16 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
     switch (icon)
     {
     case Information:
-        pixmapFile = lit("standard_icons/messagebox_info.png");
+        pixmapFile = lit("standard_icons/sp_message_box_information.png");
         break;
     case Warning:
-        pixmapFile = lit("standard_icons/messagebox_warning.png");
+        pixmapFile = lit("standard_icons/sp_message_box_warning.png");
         break;
     case Critical:
-        pixmapFile = lit("standard_icons/messagebox_critical.png");
+        pixmapFile = lit("standard_icons/sp_message_box_critical.png");
         break;
     case Question:
-        pixmapFile = lit("standard_icons/messagebox_question.png");
+        pixmapFile = lit("standard_icons/sp_message_box_question.png");
         break;
     default:
         break;
