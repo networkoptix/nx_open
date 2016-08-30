@@ -31,7 +31,8 @@ public:
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
 
 private:
-    void registerOnMediator();
+    bool registerOnMediator(bool waitForRegistration = false);
+    std::shared_ptr<ReverseConnectionHolder> getHolder(const String& hostName, bool mayCreate);
 
     const std::shared_ptr<MediatorConnection> m_mediatorConnection;
     std::unique_ptr<ReverseAcceptor> m_acceptor;

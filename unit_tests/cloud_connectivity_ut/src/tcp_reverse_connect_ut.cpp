@@ -5,6 +5,7 @@
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
+#include <nx/network/test_support/socket_test_helper.h>
 
 namespace nx {
 namespace network {
@@ -53,14 +54,14 @@ protected:
     std::unique_ptr<nx::hpm::MediaServerEmulator> m_server;
 };
 
-TEST_F(TcpReverseConnectTest, SimpleClientServer)
+TEST_F(TcpReverseConnectTest, SimpleSyncClientServer)
 {
     // Client binds 1st, meditor resieves indication on listen:
     enableReveseConnectionsOnClient();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
 
     // Wait some time to let reverse connections to be estabilished:
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     network::test::socketSimpleSync(
         [&](){ return std::move(serverSocket); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
@@ -68,15 +69,14 @@ TEST_F(TcpReverseConnectTest, SimpleClientServer)
         SocketAddress(m_server->fullName()));
 }
 
-// TODO: #mux Enable and fix
-TEST_F(TcpReverseConnectTest, DISABLED_SimpleServerClient)
+TEST_F(TcpReverseConnectTest, SimpleSyncServerClient)
 {
     // Meditor starts to listen 1st, client initiates indication by it's bind:
     std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
     enableReveseConnectionsOnClient();
 
     // Wait some time to let reverse connections to be estabilished:
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     network::test::socketSimpleSync(
         [&](){ return std::move(serverSocket); },
         [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
@@ -84,7 +84,72 @@ TEST_F(TcpReverseConnectTest, DISABLED_SimpleServerClient)
         SocketAddress(m_server->fullName()));
 }
 
-// TODO: #mux Make a lot more tests
+TEST_F(TcpReverseConnectTest, SimpleSyncClientSystem)
+{
+    // Client binds 1st, meditor resieves indication on listen:
+    enableReveseConnectionsOnClient();
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
+
+    // Wait some time to let reverse connections to be estabilished:
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    network::test::socketSimpleSync(
+        [&](){ return std::move(serverSocket); },
+        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
+        SocketAddress(HostAddress::localhost, 0),
+        SocketAddress(m_system.id));
+}
+
+TEST_F(TcpReverseConnectTest, SimpleAsyncClientSystem)
+{
+    // Client binds 1st, meditor resieves indication on listen:
+    enableReveseConnectionsOnClient();
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
+
+    // Wait some time to let reverse connections to be estabilished:
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    network::test::socketSimpleAsync(
+        [&](){ return std::move(serverSocket); },
+        [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
+        SocketAddress(HostAddress::localhost, 0),
+        SocketAddress(m_system.id));
+}
+
+// TODO: #mux Enable and fix!
+TEST_F(TcpReverseConnectTest, DISABLED_Load)
+{
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
+    enableReveseConnectionsOnClient();
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    const std::chrono::seconds testDuration(7 * utils::TestOptions::timeoutMultiplier());
+    const int maxSimultaneousConnections = 25;
+    const int bytesToSendThroughConnection = 1024 * 1024;
+
+    network::test::RandomDataTcpServer server(
+        network::test::TestTrafficLimitType::none,
+        bytesToSendThroughConnection,
+        network::test::TestTransmissionMode::pong);
+
+    server.setServerSocket(std::move(serverSocket));
+    ASSERT_TRUE(server.start());
+
+    network::test::ConnectionsGenerator connectionsGenerator(
+        SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
+        maxSimultaneousConnections,
+        network::test::TestTrafficLimitType::incoming,
+        bytesToSendThroughConnection,
+        network::test::ConnectionsGenerator::kInfiniteConnectionCount,
+        network::test::TestTransmissionMode::spam);
+    connectionsGenerator.start();
+
+    std::this_thread::sleep_for(testDuration);
+    connectionsGenerator.pleaseStopSync();
+
+    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
+    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
+    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
+    server.pleaseStopSync();
+}
 
 } // namespace test
 } // namespace cloud
