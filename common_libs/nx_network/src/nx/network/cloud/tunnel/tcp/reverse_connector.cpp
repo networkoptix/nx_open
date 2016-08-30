@@ -35,7 +35,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
 {
     // TODO: use timeout
     QObject::connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
         [this, handler=std::move(handler)](nx_http::AsyncHttpClientPtr)
         {
             if (m_httpClient->failed() || !m_httpClient->response())

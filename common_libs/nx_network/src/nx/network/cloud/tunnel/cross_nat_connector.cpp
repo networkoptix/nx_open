@@ -96,16 +96,14 @@ void CrossNatConnector::connect(
     post(
         [this, timeout, handler = std::move(handler)]() mutable
         {
-            auto holder = SocketGlobals::tcpReversePool().getConnectionHolder(
-                m_targetPeerAddress.host.toString().toUtf8());
-
-            if (!holder->hasConnections())
+            const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
+            if (auto holder = SocketGlobals::tcpReversePool().getConnectionHolder(hostName))
             {
+                NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
                 return handler(
                     SystemError::noError,
                     std::make_unique<tcp::OutgoingReverseTunnelConnection>(
-                        nullptr, //< TODO: find out which aioThread shell be used
-                        std::move(holder)));
+                        getAioThread(), std::move(holder)));
             }
 
             issueConnectRequestToMediator(timeout, std::move(handler));

@@ -188,11 +188,11 @@ void socketSimpleSync(
     nx::utils::thread clientThread(
         [endpointToConnectTo, &testMessage, clientCount, &clientMaker]()
         {
-            for (int i = clientCount; i > 0; --i)
+            for (size_t i = 0; i != clientCount; ++i)
             {
                 auto client = clientMaker();
                 EXPECT_TRUE(client->connect(
-                    endpointToConnectTo, kTestTimeout.count()))
+                    endpointToConnectTo, kTestTimeout.count())) << i << ": "
                         << SystemError::getLastOSErrorText().toStdString();
 
                 ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));

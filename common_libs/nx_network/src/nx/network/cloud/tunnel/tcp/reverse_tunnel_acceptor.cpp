@@ -39,21 +39,21 @@ void ReverseTunnelAcceptor::accept(AcceptHandler handler)
                     m_mediatorConnection->getAioThread(),
                     m_connectionParametes.tcpReverseRetryPolicy,
                     [this, connectionIt](SystemError::ErrorCode code)
-                {
-                    auto connection = std::move(*connectionIt);
-                    m_connections.erase(connectionIt);
-                    NX_LOGX(lm("Connection(%1) result: %2")
-                        .strs(connection, SystemError::toString(code)), cl_logDEBUG1);
-
-                    if (code == SystemError::noError)
                     {
-                        m_connections.clear();
-                        return callAcceptHandler(SystemError::noError, std::move(connection));
-                    }
+                        auto connection = std::move(*connectionIt);
+                        m_connections.erase(connectionIt);
+                        NX_LOGX(lm("Connection(%1) result: %2")
+                            .strs(connection, SystemError::toString(code)), cl_logDEBUG1);
 
-                    if (m_connections.empty())
-                        return callAcceptHandler(code, nullptr);
-                });
+                        if (code == SystemError::noError)
+                        {
+                            m_connections.clear();
+                            return callAcceptHandler(SystemError::noError, std::move(connection));
+                        }
+
+                        if (m_connections.empty())
+                            return callAcceptHandler(code, nullptr);
+                    });
             }
         });
 }

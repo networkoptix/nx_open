@@ -360,6 +360,11 @@ hpm::api::ResultCode CloudServerSocket::registerOnMediatorSync()
     return promise.get_future().get();
 }
 
+void CloudServerSocket::setSupportedConnectionMethods(hpm::api::ConnectionMethods value)
+{
+    m_supportedConnectionMethods = value;
+}
+
 void CloudServerSocket::moveToListeningState()
 {
     if (!m_tunnelPool)
@@ -499,8 +504,9 @@ void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
     m_mediatorRegistrationRetryTimer.dispatch(
-        [this, event = std::move(event)]
+        [this, event = std::move(event)]() mutable
         {
+            event.connectionMethods &= m_supportedConnectionMethods;
             for (const auto& maker : m_acceptorMakers)
             {
                 if (auto acceptor = maker(event))

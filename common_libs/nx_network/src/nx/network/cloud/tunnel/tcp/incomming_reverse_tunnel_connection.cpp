@@ -39,7 +39,7 @@ void IncomingReverseTunnelConnection::accept(AcceptHandler handler)
         [this, handler = std::move(handler)]()
         {
             m_acceptHandler = std::move(handler);
-            NX_LOGX(lm("monitor sockets%1 on accept").container(m_sockets), cl_logDEBUG1);
+            NX_LOGX(lm("monitor sockets(%1) on accept").container(m_sockets), cl_logDEBUG1);
             for (auto it = m_sockets.begin(); it != m_sockets.end(); ++it)
                 monitorSocket(it);
         });
@@ -58,6 +58,9 @@ void IncomingReverseTunnelConnection::pleaseStop(nx::utils::MoveOnlyFunc<void()>
 
 void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 {
+    NX_LOGX(lm("There are %1 connector(s) and %2 socket(s) against %3 pool size")
+        .strs(m_connectors.size(), m_sockets.size(), m_expectedPoolSize), cl_logDEBUG1);
+
     if (m_connectors.size() + m_sockets.size() >= m_expectedPoolSize)
         return;
 
@@ -73,7 +76,7 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
         {
             auto connector = std::move(*connectorIt);
             m_connectors.erase(connectorIt);
-            NX_LOGX(lm("connector(%1) event").arg(connector)
+            NX_LOGX(lm("connector(%1) event: %2").arg(connector)
                 .arg(SystemError::toString(code)), cl_logDEBUG2);
 
             if (code != SystemError::noError
@@ -130,20 +133,19 @@ void IncomingReverseTunnelConnection::monitorSocket(
 
             auto socket = std::move(*socketIt);
             m_sockets.erase(socketIt);
-            NX_LOGX(lm("socket(%1) event:").arg(socket)
+            NX_LOGX(lm("socket(%1) event: %2").arg(socket)
                 .arg(SystemError::toString(code)), cl_logDEBUG1);
 
+            spawnConnectorIfNeeded();
             if (code != SystemError::noError)
-            {
-                if (m_connectors.empty())
-                    spawnConnectorIfNeeded();
-
                 return;
-            }
 
             const auto handler = std::move(m_acceptHandler);
             m_acceptHandler = nullptr;
-            handler(SystemError::noError, std::move(socket));
+            if (socket->setNonBlockingMode(false))
+                handler(SystemError::noError, std::move(socket));
+            else
+                handler(SystemError::getLastOSErrorCode(), nullptr);
         });
 }
 

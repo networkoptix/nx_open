@@ -22,7 +22,7 @@ public:
     typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
     ReverseConnectionPool(std::shared_ptr<MediatorConnection> mediatorConnection);
 
-    bool start(const SocketAddress& address);
+    bool start(const SocketAddress& address, bool waitForRegistration = false);
     std::shared_ptr<ReverseConnectionHolder> getConnectionHolder(const String& hostName);
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
@@ -49,17 +49,16 @@ private:
 class ReverseConnectionHolder
 {
 public:
-    bool hasConnections() const;
-    void takeConnection(std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler);
-    void clearConnectionHandler();
-
-private:
     ReverseConnectionHolder(aio::AbstractAioThread* aioThread);
-    friend class ReverseConnectionPool;
+    size_t connectionsCount() const;
 
     void newSocket(std::unique_ptr<AbstractStreamSocket> socket);
     void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
 
+    void takeConnection(std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler);
+    void clearConnectionHandler();
+
+private:
     aio::AbstractAioThread* const m_aioThread;
     mutable QnMutex m_mutex;
     std::list<std::unique_ptr<AbstractStreamSocket>> m_sockets;

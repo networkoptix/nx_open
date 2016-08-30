@@ -36,7 +36,7 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
     SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
 {
-    NX_LOGX(lm("Request for new socket"), cl_logDEBUG1);
+    NX_LOGX(lm("Request for new socket with timeout: %1").str(timeout), cl_logDEBUG1);
     m_socketAttributes = std::move(socketAttributes);
     m_connectionHandler = std::move(handler);
 

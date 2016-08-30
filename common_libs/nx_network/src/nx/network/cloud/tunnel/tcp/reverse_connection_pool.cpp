@@ -1,6 +1,7 @@
 #include "reverse_connection_pool.h"
 
 #include <nx/network/cloud/data/client_bind_data.h>
+#include <nx/utils/std/future.h>
 
 namespace nx {
 namespace network {
@@ -14,7 +15,8 @@ ReverseConnectionPool::ReverseConnectionPool(
 {
 }
 
-bool ReverseConnectionPool::start(const SocketAddress& address)
+// TODO: this function is monstruous big, need to split!
+bool ReverseConnectionPool::start(const SocketAddress& address, bool waitForRegistration)
 {
     NX_ASSERT(!m_acceptor);
     m_acceptor = std::make_unique<ReverseAcceptor>(
@@ -22,7 +24,20 @@ bool ReverseConnectionPool::start(const SocketAddress& address)
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
             NX_LOGX(lm("New socket(%1) from '%2").args(socket, hostName), cl_logDEBUG1);
-            getConnectionHolder(hostName)->newSocket(std::move(socket));
+            std::map<String, std::shared_ptr<ReverseConnectionHolder>>::iterator it;
+            {
+                QnMutexLocker lk(&m_mutex);
+                it = m_connectionHolders.find(hostName);
+                if (it == m_connectionHolders.end())
+                {
+                    it = m_connectionHolders.emplace(
+                        std::move(hostName),
+                        std::make_shared<ReverseConnectionHolder>(
+                            m_mediatorConnection->getAioThread())).first;
+                }
+            }
+
+            it->second->newSocket(std::move(socket));
         });
 
     if (!m_acceptor->start(address, m_mediatorConnection->getAioThread()))
@@ -33,24 +48,32 @@ bool ReverseConnectionPool::start(const SocketAddress& address)
         return false;
     }
 
+    std::shared_ptr<utils::promise<bool>> registrationPromise;
+    if (waitForRegistration)
+        registrationPromise = std::make_shared<utils::promise<bool>>();
+
     m_mediatorConnection->setOnReconnectedHandler(
-        [this]()
+        [this, registrationPromise]()
         {
             hpm::api::ClientBindRequest request;
             request.originatingPeerID = m_acceptor->selfHostName();
             request.tcpReverseEndpoints.push_back(m_acceptor->address());
             m_mediatorConnection->send(
                 std::move(request),
-                [this](nx::hpm::api::ResultCode code)
+                [this, registrationPromise](nx::hpm::api::ResultCode code)
                 {
-                    if (code != nx::hpm::api::ResultCode::ok)
+                    if (code == nx::hpm::api::ResultCode::ok)
+                    {
+                        NX_LOGX(lm("Registred on mediator by %1 with %2")
+                            .strs(m_acceptor->selfHostName(), m_acceptor->address()), cl_logINFO);
+                    }
+                    else
                     {
                         NX_LOGX(lm("Could not register on mediator: %1").str(code), cl_logWARNING);
-                        return;
                     }
 
-                    NX_LOGX(lm("Registred on mediator by %1 with %2")
-                        .strs(m_acceptor->selfHostName(), m_acceptor->address()), cl_logINFO);
+                    if (registrationPromise)
+                        registrationPromise->set_value(code == nx::hpm::api::ResultCode::ok);
                 });
         });
 
@@ -61,7 +84,21 @@ std::shared_ptr<ReverseConnectionHolder>
     ReverseConnectionPool::getConnectionHolder(const String& hostName)
 {
     QnMutexLocker lk(&m_mutex);
-    return m_connectionHolders[hostName];
+    auto it = m_connectionHolders.find(hostName);
+    if (it == m_connectionHolders.end())
+        return nullptr;
+
+    // TODO: there should be a search by systemId if serverId.systemId has failed
+
+    lk.unlock();
+    const auto connections = it->second->connectionsCount();
+    if (connections == 0)
+        return nullptr;
+
+    NX_LOGX(lm("Returning holder for '%1' with %2 connections(s)")
+        .strs(hostName, connections), cl_logDEBUG1);
+
+    return it->second;
 }
 
 void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -77,6 +114,8 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
 void ReverseConnectionPool::setPoolSize(boost::optional<size_t> value)
 {
     m_acceptor->setPoolSize(std::move(value));
+
+    // TODO: also need to close extra connections in m_connectionHolders
 }
 
 void ReverseConnectionPool::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)
@@ -89,10 +128,10 @@ ReverseConnectionHolder::ReverseConnectionHolder(aio::AbstractAioThread* aioThre
 {
 }
 
-bool ReverseConnectionHolder::hasConnections() const
+size_t ReverseConnectionHolder::connectionsCount() const
 {
     QnMutexLocker lk(&m_mutex);
-    return !m_sockets.empty();
+    return m_sockets.size();
 }
 
 void ReverseConnectionHolder::takeConnection(
@@ -107,9 +146,10 @@ void ReverseConnectionHolder::takeConnection(
 
     auto socket = std::move(m_sockets.front());
     m_sockets.pop_front();
+    lk.unlock();
 
     auto socketPtr = socket.get();
-    socket->cancelIOAsync(
+    socketPtr->cancelIOAsync(
         aio::etNone,
         [this, socket = std::move(socket)]() mutable
         {
