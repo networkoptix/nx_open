@@ -224,11 +224,15 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
             return;
 
         case Pressed:
-            if (m_stateTimer.hasExpired(kDataTimeoutMs) && m_visualizerData.isEmpty())
+            if (m_stateTimer.hasExpired(kDataTimeoutMs))
             {
-                setHint(tr("Input device is not selected"));
-                setState(Error);
-                stopStreaming();
+                auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
+                if (data.isEmpty())
+                {
+                    setHint(tr("Input device is not selected"));
+                    setState(Error);
+                    stopStreaming();
+                }
             }
             return;
 

@@ -24,6 +24,8 @@ public:
 
     QnSpectrumData getSpectrumData() const;
 
+    void reset();
+
     /** Number of bands in the result data. */
     static int bandsCount();
 private:

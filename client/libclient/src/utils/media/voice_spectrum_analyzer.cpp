@@ -246,6 +246,12 @@ QnSpectrumData QnVoiceSpectrumAnalyzer::getSpectrumData() const
     return m_spectrumData;
 }
 
+void QnVoiceSpectrumAnalyzer::reset()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_spectrumData = QnSpectrumData();
+}
+
 int QnVoiceSpectrumAnalyzer::bandsCount()
 {
     return kBands;
