@@ -417,30 +417,30 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
 
     d->icon = icon;
 
-    QString pixmapFile;
-
-    //TODO: #vkutin use style()->standardIcon() to avoid code duplication
-    switch (icon)
-    {
-    case Information:
-        pixmapFile = lit("standard_icons/sp_message_box_information.png");
-        break;
-    case Warning:
-        pixmapFile = lit("standard_icons/sp_message_box_warning.png");
-        break;
-    case Critical:
-        pixmapFile = lit("standard_icons/sp_message_box_critical.png");
-        break;
-    case Question:
-        pixmapFile = lit("standard_icons/sp_message_box_question.png");
-        break;
-    default:
-        break;
-    }
+    auto standardPixmap =
+        [this](QStyle::StandardPixmap pixmapId) -> QPixmap
+        {
+            return qnSkin->maximumSizePixmap(style()->standardIcon(pixmapId));
+        };
 
     QPixmap pixmap;
-    if (!pixmapFile.isEmpty())
-        pixmap = qnSkin->pixmap(pixmapFile);
+    switch (icon)
+    {
+        case Information:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxInformation);
+            break;
+        case Warning:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxWarning);
+            break;
+        case Critical:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxCritical);
+            break;
+        case Question:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxQuestion);
+            break;
+        default:
+            break;
+    }
 
     ui->iconLabel->setVisible(!pixmap.isNull());
     ui->iconLabel->setPixmap(pixmap);
