@@ -48,9 +48,9 @@ namespace nx_ms_conf
     */
     static const QLatin1String HLS_MAX_CHUNK_BUFFER_SIZE("hlsMaxChunkBufferSize");
 #ifdef __arm__
-    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 20*1024*1024;
+    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 2*1024*1024;
 #else
-    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 100*1024*1024;
+    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 10*1024*1024;
 #endif
 
     //!Write block size. This block is always aligned to file system sector size
