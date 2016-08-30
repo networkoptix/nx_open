@@ -745,7 +745,7 @@ int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int 
         if (!getNonBlockingMode(&value))
             return -1;
 
-        if (setNonBlockingMode(true))
+        if (!setNonBlockingMode(true))
             return -1;
 
         bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags ^ MSG_DONTWAIT);
@@ -779,7 +779,7 @@ int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int 
 
 template<typename InterfaceToImplement>
 int CommunicatingSocket<InterfaceToImplement>::send( const void* buffer, unsigned int bufferLen )
-{   
+{
 #ifdef _WIN32
     int sended = ::send(m_fd, (raw_type*) buffer, bufferLen, 0);
 #else
