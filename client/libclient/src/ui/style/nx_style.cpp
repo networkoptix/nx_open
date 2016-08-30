@@ -680,7 +680,7 @@ void QnNxStyle::drawPrimitive(
         * QTreeView draws in PE_PanelItemViewItem:
         *  - selection markers for items (but not branch area)
         *
-        * All views draw in PE_PanelItemViewRow:
+        * All other views draw in PE_PanelItemViewItem:
         *  - hover markers
         *  - selection markers
         */
