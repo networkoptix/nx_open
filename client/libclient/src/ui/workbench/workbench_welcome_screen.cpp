@@ -231,6 +231,11 @@ QString QnWorkbenchWelcomeScreen::softwareVersion() const
     return QnAppInfo::applicationVersion();
 }
 
+QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
+{
+    return QnConnectionValidator::minSupportedVersion().toString();
+}
+
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
 {
     return !extractResources(urls).isEmpty();
@@ -253,12 +258,12 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     bool storePassword,
     bool autoLogin)
 {
-    connectToLocalSystemImpl(systemId, serverUrl, userName, password, storePassword, autoLogin);
+    connectToLocalSystemImpl(systemId, QUrl::fromUserInput(serverUrl), userName, password, storePassword, autoLogin);
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystemImpl(
     const QString& systemId,
-    const QString& serverUrl,
+    const QUrl& serverUrl,
     const QString& userName,
     const QString& password,
     bool storePassword,
@@ -278,8 +283,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystemImpl(
             const auto completionGuard = QnRaiiGuard::createDestructable(
                 [this]() { setConnectingToSystem(QString()); });
 
-            QUrl url = QUrl::fromUserInput(serverUrl);
-            url.setScheme(lit("http"));
+            QUrl url = serverUrl;
             if (!password.isEmpty())
                 url.setPassword(password);
             if (!userName.isEmpty())
@@ -322,35 +326,33 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
         [this]() { setVisibleControls(true); });
 
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
-    {
-        /* We are receiving string with port but without protocol, so we must parse it. */
-        const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
-
-        QUrl targetUrl = QUrl::fromUserInput(serverUrl);
-        targetUrl.setScheme(lit("http"));
-        dialog->setUrl(targetUrl);
-        if (isLoggedInToCloud())
         {
-            dialog->setCloudLogin(qnCloudStatusWatcher->cloudLogin());
-            dialog->setCloudPassword(qnCloudStatusWatcher->cloudPassword());
-        }
+            /* We are receiving string with port but without protocol, so we must parse it. */
+            const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
 
-        if (dialog->exec() != QDialog::Accepted)
-            return;
+            dialog->setUrl(QUrl::fromUserInput(serverUrl));
+            if (isLoggedInToCloud())
+            {
+                dialog->setCloudLogin(qnCloudStatusWatcher->cloudLogin());
+                dialog->setCloudPassword(qnCloudStatusWatcher->cloudPassword());
+            }
 
-        if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
-        {
-            connectToLocalSystemImpl(QString(), serverUrl, dialog->localLogin(),
-                dialog->localPassword(), false, false, controlsGuard);
-        }
-        else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
-        {
-            qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
-            connectToLocalSystemImpl(QString(), serverUrl, dialog->cloudLogin(),
-                dialog->cloudPassword(), false, false, controlsGuard);
-        }
+            if (dialog->exec() != QDialog::Accepted)
+                return;
 
-    };
+            if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
+            {
+                connectToLocalSystemImpl(QString(), serverUrl, dialog->localLogin(),
+                    dialog->localPassword(), false, false, controlsGuard);
+            }
+            else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
+            {
+                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
+                connectToLocalSystemImpl(QString(), serverUrl, dialog->cloudLogin(),
+                    dialog->cloudPassword(), false, false, controlsGuard);
+            }
+
+        };
 
     // Use delayed handling for proper animation
     enum { kNextEventDelay = 100 };

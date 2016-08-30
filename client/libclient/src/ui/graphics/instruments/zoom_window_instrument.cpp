@@ -375,7 +375,18 @@ ZoomWindowInstrument::~ZoomWindowInstrument() {
     ensureUninstalled();
 }
 
-QColor ZoomWindowInstrument::nextZoomWindowColor() const {
+QVector<QColor> ZoomWindowInstrument::colors() const
+{
+    return m_colors;
+}
+
+void ZoomWindowInstrument::setColors(const QVector<QColor>& colors)
+{
+    m_colors = colors;
+}
+
+QColor ZoomWindowInstrument::nextZoomWindowColor() const
+{
     QSet<QColor> colors;
     foreach(QnResourceWidget *widget, display()->widgets())
         colors.insert(widget->frameDistinctionColor());

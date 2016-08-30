@@ -40,6 +40,8 @@ struct QnUpdateResult {
         Cancelled,
         LockFailed,
         AlreadyUpdated,
+        ValidationFailed,
+        ValidationFailed_CloudHostConflict,
         DownloadingFailed,
         DownloadingFailed_NoFreeSpace,
         UploadingFailed,
@@ -79,6 +81,7 @@ Q_DECLARE_METATYPE(QnPeerUpdateStage);
 enum class QnFullUpdateStage {
     Init,               /**< Prepare updater tool. */
     Check,              /**< Check for updates. */
+    Validate,           /**< Check if update is allowed for the system posiible. */
     Download,           /**< Download update packages. */
     Client,             /**< Install client update. */
     CheckFreeSpace,     /**< Check free space for update files on servers. */

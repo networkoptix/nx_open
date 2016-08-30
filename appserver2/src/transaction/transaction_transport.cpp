@@ -1149,7 +1149,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if (nx_ec::EC2_PROTO_VERSION != remotePeerEcProtoVersion) {
             NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
                 "Local peer version: %2, remote peer version: %3").
-                arg(client->url().toString()).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
+                arg(client->url().toString(QUrl::RemovePassword)).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
                 cl_logWARNING );
             cancelConnecting();
             return;

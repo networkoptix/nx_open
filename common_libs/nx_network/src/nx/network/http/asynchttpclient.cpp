@@ -445,7 +445,7 @@ namespace nx_http
             return;
         }
 
-        NX_LOGX(lit("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2);
+        NX_LOGX(lit("Http request has been successfully sent to %1").arg(m_url.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
         const auto requestSequenceBak = m_requestSequence;
         emit requestHasBeenSent(sharedThis, m_authorizationTried);
@@ -521,7 +521,7 @@ namespace nx_http
                 if (m_connectionClosed)
                 {
                     NX_LOGX(lit("Failed to read (1) response from %1. %2").
-                        arg(m_url.toString()).arg(SystemError::connectionReset), cl_logDEBUG1);
+                        arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::connectionReset), cl_logDEBUG1);
                     m_state = sFailed;
                     emit done(sharedThis);
                     return;
@@ -544,7 +544,7 @@ namespace nx_http
 
             //response read
             NX_LOGX(lit("Http response from %1 has been successfully read. Status line: %2(%3)").
-                arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
+                arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                 arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2);
 
             const Response* response = m_httpStreamReader.message().response;
@@ -621,7 +621,11 @@ namespace nx_http
                 m_responseBuffer.resize(0);
                 if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
                 {
-                    NX_LOGX(lit("Failed to read (1) response from %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+                    NX_LOGX(lit("Failed to read (1) response from %1. %2")
+                        .arg(m_url.toString(QUrl::RemovePassword))
+                        .arg(SystemError::getLastOSErrorText()),
+                        cl_logDEBUG1);
+
                     m_state = sFailed;
                     emit done(sharedThis);
                     return;

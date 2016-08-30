@@ -1,4 +1,3 @@
-
 #include "udt_socket.h"
 
 #ifdef _WIN32
@@ -592,7 +591,26 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         return -1;
     }
 
-    int sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    int sz;
+    if (flags & MSG_DONTWAIT)
+    {
+        bool value;
+        if (!getNonBlockingMode(&value))
+            return -1;
+
+        if (setNonBlockingMode(true))
+            return -1;
+
+        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags ^ MSG_DONTWAIT);
+
+        if (!setNonBlockingMode(&value))
+            return -1;
+    }
+    else
+    {
+        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    }
+ 
     if (sz == UDT::ERROR)
     {
         const int udtErrorCode = UDT::getlasterror().getErrorCode();

@@ -18,8 +18,7 @@ enum class ConnectionResult
     temporaryUnauthorized,      /*< LDAP server is not accessible. */
     incompatibleInternal,       /*< Server has incompatible customization or cloud host. */
     incompatibleVersion,        /*< Server version is too low. */
-    compatibilityMode,          /*< Client should be restarted in compatibility mode.*/
-    updateRequested             /*< Updated protocol in the current version. Update is needed. */
+    compatibilityMode           /*< Client should be restarted in compatibility mode.*/
 };
 
 }

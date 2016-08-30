@@ -33,7 +33,6 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
             return Qn::Login_Help;
         case Qn::ConnectionResult::incompatibleVersion:
         case Qn::ConnectionResult::compatibilityMode:
-        case Qn::ConnectionResult::updateRequested:
             return Qn::VersionMismatch_Help;
     }
     NX_ASSERT(false, "Unhandled switch case");
@@ -95,7 +94,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
         return result;
     }
 
-    QString versionDetails =
+    const auto versionDetails =
         tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
         + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
 
@@ -114,40 +113,95 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
         return result;
     }
 
-    bool haveExactVersion = false;
-    bool needExactVersion = false;
+    if (result == ConnectionResult::compatibilityMode)
+        return handleCompatibilityMode(connectionInfo, url, parentWidget);
 
-    if (result == ConnectionResult::updateRequested)
+    NX_ASSERT(false);    //should never get here
+    return ConnectionResult::incompatibleVersion; //just in case
+}
+
+QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelper::validateConnectionTest(
+    const QnConnectionInfo& connectionInfo,
+    ec2::ErrorCode errorCode)
+{
+    using namespace Qn;
+    TestConnectionResult result;
+
+    //TODO #GDM almost same code exists in QnConnectionDiagnosticsHelper::validateConnection
+
+    result.result = base_type::validateConnection(connectionInfo, errorCode);
+    result.helpTopicId = helpTopic(result.result);
+
+    QString versionDetails =
+        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
+        + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
+
+    switch (result.result)
     {
-        needExactVersion = true;
-        QList<QnSoftwareVersion> versions;
-        if (applauncher::getInstalledVersions(&versions) == applauncher::api::ResultType::ok)
+        case ConnectionResult::success:
+            break;
+        case ConnectionResult::unauthorized:
         {
-            haveExactVersion = versions.contains(connectionInfo.version);
+            result.details = tr("The username or password you have entered is incorrect. Please try again.");
+            break;
         }
-        else
+        case ConnectionResult::temporaryUnauthorized:
         {
-            QString olderComponent = connectionInfo.nxClusterProtoVersion < QnAppInfo::ec2ProtoVersion()
-                ? tr("Server")
-                : tr("Client");
-            QString message = tr("You are about to connect to Server which has a different version:") + L'\n'
+            result.details = tr("LDAP Server connection timed out.") + L'\n'
+                + strings(ErrorStrings::ContactAdministrator);
+            break;
+        }
+        case ConnectionResult::networkError:
+        {
+            result.details = tr("Connection to the Server could not be established.") + L'\n'
+                + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
+                + strings(ErrorStrings::ContactAdministrator);
+            break;
+        }
+        case ConnectionResult::incompatibleInternal:
+        {
+            result.details = tr("You are trying to connect to incompatible Server.");
+            break;
+        }
+        case ConnectionResult::incompatibleVersion:
+        {
+            result.details = tr("Server has a different version:") + L'\n'
                 + versionDetails
-                + tr("These versions are not compatible. Please update your %1.").arg(olderComponent);
-#ifdef _DEBUG
-            message += lit("\nClient Proto: %1\nServer Proto: %2").arg(QnAppInfo::ec2ProtoVersion()).arg(connectionInfo.nxClusterProtoVersion);
-#endif
-            QnMessageBox::warning(
-                parentWidget,
-                helpTopicId,
-                strings(ErrorStrings::UnableConnect),
-                message,
-                QDialogButtonBox::Ok
-            );
-            return result;
+                + tr("Compatibility mode for versions lower than %1 is not supported.")
+                .arg(minSupportedVersion().toString());
+            break;
         }
+        case ConnectionResult::compatibilityMode:
+        {
+            result.details = tr("Server has a different version:") + L'\n'
+                + versionDetails
+                + tr("You will be asked to restart the client in compatibility mode.");
+            break;
+        }
+        default:
+            break;
     }
+    return result;
+}
 
-    NX_ASSERT(result == ConnectionResult::compatibilityMode);
+Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
+    const QnConnectionInfo &connectionInfo,
+    const QUrl &url,
+    QWidget* parentWidget)
+{
+    using namespace Qn;
+    int helpTopicId = helpTopic(ConnectionResult::compatibilityMode);
+
+    const auto versionDetails =
+        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString())
+        + L'\n'
+        + tr(" - Server version: %1.").arg(connectionInfo.version.toString())
+        + L'\n';
+
+    bool haveExactVersion = false;
+    QList<QnSoftwareVersion> versions;
+    if (applauncher::getInstalledVersions(&versions) == applauncher::api::ResultType::ok)
+        haveExactVersion = versions.contains(connectionInfo.version);
 
     while (true)
     {
@@ -166,7 +220,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
             return ConnectionResult::incompatibleVersion;
         }
 
-        if (!isInstalled || (needExactVersion && !haveExactVersion))
+        if (!isInstalled || !haveExactVersion)
         {
             QString versionString = connectionInfo.version.toString(
                 CompatibilityVersionInstallationDialog::useUpdate(connectionInfo.version)
@@ -257,82 +311,9 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
 
     } // while(true)
 
-    NX_ASSERT(false);    //should never get here
-    return ConnectionResult::incompatibleVersion; //just in case
-}
-
-QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelper::validateConnectionTest(
-    const QnConnectionInfo& connectionInfo,
-    ec2::ErrorCode errorCode)
-{
-    using namespace Qn;
-    TestConnectionResult result;
-
-    //TODO #GDM almost same code exists in QnConnectionDiagnosticsHelper::validateConnection
-
-    result.result = base_type::validateConnection(connectionInfo, errorCode);
-    result.helpTopicId = helpTopic(result.result);
-
-    QString versionDetails =
-        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
-        + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
-
-    switch (result.result)
-    {
-        case ConnectionResult::success:
-            break;
-        case ConnectionResult::unauthorized:
-        {
-            result.details = tr("The username or password you have entered is incorrect. Please try again.");
-            break;
-        }
-        case ConnectionResult::temporaryUnauthorized:
-        {
-            result.details = tr("LDAP Server connection timed out.") + L'\n'
-                + strings(ErrorStrings::ContactAdministrator);
-            break;
-        }
-        case ConnectionResult::networkError:
-        {
-            result.details = tr("Connection to the Server could not be established.") + L'\n'
-                + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
-                + strings(ErrorStrings::ContactAdministrator);
-            break;
-        }
-        case ConnectionResult::incompatibleInternal:
-        {
-            result.details = tr("You are trying to connect to incompatible Server.");
-            break;
-        }
-        case ConnectionResult::incompatibleVersion:
-        {
-            result.details = tr("Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("Compatibility mode for versions lower than %1 is not supported.")
-                .arg(minSupportedVersion().toString());
-            break;
-        }
-        case ConnectionResult::compatibilityMode:
-        {
-            result.details = tr("Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("You will be asked to restart the client in compatibility mode.");
-            break;
-        }
-        case ConnectionResult::updateRequested:
-        {
-            QString olderComponent = connectionInfo.nxClusterProtoVersion < QnAppInfo::ec2ProtoVersion()
-                ? tr("Server")
-                : tr("Client");
-            result.details = tr("Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("You will be asked to update your %1").arg(olderComponent);
-            break;
-        }
-        default:
-            break;
-    }
-    return result;
+    /* Just in case, should never get here. */
+    NX_ASSERT(false, "Should never get here");
+    return ConnectionResult::incompatibleVersion;
 }
 
 QString QnConnectionDiagnosticsHelper::strings(ErrorStrings id)
