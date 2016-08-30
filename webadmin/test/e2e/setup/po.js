@@ -6,7 +6,8 @@ var Page = function () {
 
     var p = this;
 
-    this.mediaServersLinks = element.all(by.repeater("server in mediaServers")).all(by.tagName('a'));
+    this.logoutButton = element(by.css('[title=Logout]'));
+    this.mediaServersLinks = element.all(by.repeater('server in mediaServers')).all(by.tagName('a'));
     this.resetButton = element(by.buttonText('Restore factory defaults'));
 
     this.dialog = element(by.css('.modal-dialog'));
@@ -15,7 +16,8 @@ var Page = function () {
     this.detachButton = this.dialog.element(by.buttonText('Restore factory defaults'));
     this.closeButton = this.dialog.element(by.buttonText('Close'));
 
-    this.setupDialog = element(by.css('.modal')).element(by.css('.panel'));
+    this.setupDialog = element(by.cssContainingText('.panel-heading', 'Configure new server')).element(by.xpath('../..'));
+
     this.nextButton = this.setupDialog.element(by.cssContainingText('button', 'Next'));
     this.backButton = this.setupDialog.element(by.css('.glyphicon-arrow-left'));
     this.systemNameInput = this.setupDialog.element(by.model('settings.systemName'));

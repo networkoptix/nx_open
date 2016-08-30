@@ -307,26 +307,7 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
-
-    it("Link Learn more visible and works",function(){
-        p.triggerSetupWizard();
-        expect(p.setupDialog.isDisplayed()).toBe(true);
-        p.nextButton.click();
-        p.systemNameInput.sendKeys('autotest-system');
-        p.nextButton.click();
-        p.learnMore.click();
-        p.helper.performAtSecondTab( function(){
-            expect(browser.getCurrentUrl()).toContain('cloud');
-            browser.close();
-        });
-        p.skipCloud.click();
-        p.localPasswordInput.sendKeys(p.helper.password);
-        p.localPasswordConfInput.sendKeys(p.helper.password);
-        expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
-        p.nextButton.click();
-        p.finishButton.click();
-    });
-
+    // TODO repeat for cloud
     it("Run setup again using link (#/setup) - it shows success depending on cloud settings",function(){
         p.triggerSetupWizard();
         p.helper.completeSetup();
@@ -417,6 +398,24 @@ describe('Setup Wizard', function () {
         p.helper.completeSetup();
     });
 
+    it("Merge: remote system is incompatible", function(){
+        p.triggerSetupWizard();
+        expect(p.setupDialog.isDisplayed()).toBe(true);
+        browser.sleep(2000);
+        p.nextButton.click();
+        p.mergeWithExisting.click();
+        p.remoteSystemInput.sendKeys(p.helper.incompatibleSystem);
+        p.remotePasswordInput.sendKeys(p.helper.password);
+        p.nextButton.click();
+        expect(p.setupDialog.getText()).toContain('Selected system has incompatible version.');
+        // Go to the beginning of setup wizard
+        p.backButton.click();
+        p.backButton.click();
+        p.backButton.click();
+
+        p.helper.completeSetup();
+    });
+
     it("Merge works",function(){
         p.triggerSetupWizard();
         expect(p.setupDialog.isDisplayed()).toBe(true);
@@ -431,9 +430,93 @@ describe('Setup Wizard', function () {
         p.finishButton.click();
     });
 
+    // TODO repeat for cloud, and for merge
     it("After finishing - you are still logged in into wedamin under new credentials",function(){
         p.triggerSetupWizard();
         browser.sleep(2000);
         p.helper.completeSetup();
+        p.logoutButton.click();
+
+        element(by.model('user.username')).sendKeys('admin');
+        element(by.model('user.password')).sendKeys(p.helper.password);
+        element(by.buttonText('Log in')).click();
+        browser.sleep(500);
     });
+
+    it("Cloud connect: Link Learn more visible and works",function(){
+        p.triggerSetupWizard();
+        expect(p.setupDialog.isDisplayed()).toBe(true);
+        p.nextButton.click();
+        p.systemNameInput.sendKeys('autotest-system');
+        p.nextButton.click();
+        p.learnMore.click();
+        p.helper.performAtSecondTab( function(){
+            expect(browser.getCurrentUrl()).toContain('cloud');
+            browser.close();
+        });
+        p.skipCloud.click();
+        p.localPasswordInput.sendKeys(p.helper.password);
+        p.localPasswordConfInput.sendKeys(p.helper.password);
+        expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
+        p.nextButton.click();
+        p.finishButton.click();
+    });
+
+    it("Cloud connect: wrong cloud credentials",function(){
+        p.triggerSetupWizard();
+        browser.sleep(2000);
+        p.nextButton.click();
+        p.systemNameInput.sendKeys('autotest-system');
+        p.nextButton.click();
+        p.useCloudAccButton.click();
+        p.cloudEmailInput.sendKeys(p.helper.cloudEmail);
+        p.cloudPassInput.sendKeys('wrongpass');
+        expect(p.setupDialog.isDisplayed()).toBe(true); // without this, exception is thrown. magic.
+        p.nextButton.click();
+        expect(p.setupDialog.getText()).toContain('Login or password are incorrect');
+
+        p.backButton.click();
+        p.backButton.click();
+        p.backButton.click();
+
+        p.helper.completeSetup();
+    });
+
+    it("Cloud connect: wrong cloud credentials",function(){
+
+    });
+
+    //it("Handle: server has no internet connection",function(){
+    //
+    //});
+    //it("Handle: client has no internet connection",function(){
+    //
+    //});
+    //it("Success window with admin's email and some usefull hints",function(){
+    //
+    //});
+    //it("After finishing - you are still logged in into wedamin under new credentials",function(){
+    //
+    //});
+    //it("Disconnect from cloud works",function(){
+    //
+    //});
+    //it("third step has a link or button do not connect to cloud",function(){
+    //
+    //});
+    //it("asks for login,password, password confirmation",function(){
+    //
+    //});
+    //it("Password requirements?",function(){
+    //
+    //});
+    //it("Success window with admin's login and system's url",function(){
+    //
+    //});
+    //it("After finishing - you are still logged in into wedamin under new credentials",function(){
+    //
+    //});
+    //it("Error message if repeated password doesn't match",function(){
+    //
+    //});
 });

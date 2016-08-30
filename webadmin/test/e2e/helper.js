@@ -52,7 +52,7 @@ var Helper = function () {
     this.waitIfNotPresent = function(elem, timeout) {
         var timeoutUsed = timeout || 1000;
         self.checkPresent(elem).then( null, function(err) {
-            console.log(err);
+            console.log(err, 'Waiting until it will be present');
             browser.sleep( timeoutUsed );
         });
     };
