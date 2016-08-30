@@ -2999,9 +2999,10 @@ QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option,
 
         default:
             auto baseIcon = base_type::standardIcon(iconId, option, widget);
+            /* Let leave it here for now to make sure we will not miss important icons. */
             if (!baseIcon.isNull())
                 qDebug() << "Requested NOT_NULL standard icon!!!!" << iconId;
-            return base_type::standardIcon(iconId, option, widget);
+            return baseIcon;
     }
 }
 
