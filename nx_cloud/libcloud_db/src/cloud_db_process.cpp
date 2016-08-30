@@ -36,7 +36,6 @@
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "ec2/connection_manager.h"
-#include "ec2/control_message_processor.h"
 #include "ec2/incoming_transaction_dispatcher.h"
 #include "ec2/outgoing_transaction_dispatcher.h"
 #include "ec2/transaction_log.h"
