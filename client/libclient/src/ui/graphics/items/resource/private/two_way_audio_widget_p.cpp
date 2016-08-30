@@ -361,6 +361,8 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
 
     m_started = false;
     m_requestHandle = 0;
+    QnVoiceSpectrumAnalyzer::instance()->reset();
+    m_visualizerData = VisualizerData();
 
     if (!m_camera)
         return;
