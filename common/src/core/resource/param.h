@@ -94,5 +94,5 @@ namespace Qn
     static const QString SPACE = lit("space");
 
     // User
-    static const QString USER_FULL_NAME = lit("FullUserName");
+    static const QString USER_FULL_NAME = lit("fullUserName");
 }
