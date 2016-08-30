@@ -787,8 +787,8 @@ namespace nx_hls
         else if( acceptEncoding.encodingIsAllowed("identity") )
         {
             //in case of hls enabling caching of full chunk since it may be required by hls client
-            //if (requestIsAPartOfHlsSession)
-            //    m_currentChunk->disableInternalBufferLimit();
+            if (requestIsAPartOfHlsSession)
+                m_currentChunk->disableInternalBufferLimit();
 
             //if chunk exceeds maximum allowed size then proving 
             //  it in streaming mode. That means no Content-Length in response
