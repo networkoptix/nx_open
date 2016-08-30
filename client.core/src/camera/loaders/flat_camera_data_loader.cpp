@@ -31,8 +31,14 @@ namespace {
 QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::TimePeriodContent dataType, QObject *parent):
     QnAbstractCameraDataLoader(camera, dataType, parent)
 {
+    trace(lit("Creating loader"));
     if(!camera)
         qnNullWarning(camera);
+}
+
+QnFlatCameraDataLoader::~QnFlatCameraDataLoader()
+{
+    trace(lit("Deleting loader"));
 }
 
 int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
@@ -69,11 +75,10 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
             startTimeMs = currentSystemTime - minOverlapDuration;
     }
 
-    trace(lit("Loading period since %1 (%2)").arg(startTimeMs).arg(dt(startTimeMs)));
-
     m_loading.clear(); /* Just in case. */
     m_loading.startTimeMs = startTimeMs;
     m_loading.handle = sendRequest(startTimeMs);
+    trace(lit("Loading period since %1 (%2), request %3").arg(startTimeMs).arg(dt(startTimeMs)).arg(m_loading.handle));
     return m_loading.handle;
 }
 
@@ -104,7 +109,9 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     return connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
 }
 
-void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle) {
+void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle)
+{
+    trace(lit("Received answer for req %1").arg(requestHandle));
 
     std::vector<QnTimePeriodList> rawPeriods;
 
@@ -115,7 +122,8 @@ void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServe
     handleDataLoaded(status, data, requestHandle);
 }
 
-void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle) {
+void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle)
+{
     if (m_loading.handle != requestHandle)
         return;
 
@@ -166,7 +174,6 @@ void QnFlatCameraDataLoader::trace(const QString& message)
         return;
 
     QString name = m_resource ? m_resource->getName() : lit("_invalid_camera_");
-    NX_LOG(lit("Chunks: (%1) ").arg(name) + message, cl_logDEBUG1);
     qDebug() << lit("Chunks: (%1)").arg(name) << message;
 }
 

@@ -30,6 +30,7 @@ public:
      * \param parent                    Parent object.
      */
     QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::TimePeriodContent dataType, QObject *parent = NULL);
+    virtual ~QnFlatCameraDataLoader() override;
 
     virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
 
