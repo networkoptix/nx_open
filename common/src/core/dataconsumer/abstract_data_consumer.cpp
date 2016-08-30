@@ -27,6 +27,10 @@ void QnAbstractDataConsumer::clearUnprocessedData()
     m_dataQueue.clear();
 }
 
+void QnAbstractDataConsumer::beforeRun()
+{
+}
+
 void QnAbstractDataConsumer::endOfRun()
 {
     clearUnprocessedData();
@@ -37,6 +41,7 @@ void QnAbstractDataConsumer::run()
 //    const int timeoutMs = 100;
 
     initSystemThreadId();
+    beforeRun();
 
     while(!needToStop())
     {

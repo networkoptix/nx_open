@@ -1,7 +1,20 @@
 .import "../main.js" as Main
 
+function isIpv6Addpress(address)
+{
+    // This is a very simplified check! But this is enough for us.
+    return address.match(/^([\da-fA-F]{0,4}:){2,7}[\da-fA-F]{0,4}$/)
+}
+
 function makeUrl(host, port, login, password) {
-    return "http://" + encodeURIComponent(login) + ":" + encodeURIComponent(password) + "@" + host + ":" + port
+    return "http://"
+        + encodeURIComponent(login)
+        + ":"
+        + encodeURIComponent(password)
+        + "@"
+        + (isIpv6Addpress(host) ? "[%1]".arg(host) : host)
+        + ":"
+        + port
 }
 
 function updateSession(sessionId, host, port, login, password, systemName, moveTop) {

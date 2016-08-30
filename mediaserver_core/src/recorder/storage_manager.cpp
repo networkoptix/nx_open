@@ -1,7 +1,7 @@
 #include "storage_manager.h"
 
+#include <stdio.h>
 #include <QtCore/QDir>
-
 
 #include <utils/fs/file.h>
 #include <utils/common/util.h>
@@ -47,26 +47,108 @@
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
 namespace {
-    static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
-    static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
-    static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
-    static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
-    static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
+static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
+static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
+static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
-    const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
-    const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
+const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
+const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
 
-    const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
+const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 
-    struct TasksQueueInfo {
-        int tasksCount;
-        int currentTask;
+struct TasksQueueInfo {
+    int tasksCount;
+    int currentTask;
 
-        TasksQueueInfo() : tasksCount(0), currentTask(0) {}
-        void reset(int size = 0) {tasksCount = size; currentTask = 0;}
-        bool isEmpty() const { return tasksCount == 0; }
-    };
+    TasksQueueInfo() : tasksCount(0), currentTask(0) {}
+    void reset(int size = 0) {tasksCount = size; currentTask = 0;}
+    bool isEmpty() const { return tasksCount == 0; }
+};
+
+#if defined(Q_OS_WIN)
+const QString& getDevicePath(const QString& path)
+{
+    return path;
 }
+
+const QString& sysDrivePath()
+{
+    static QString deviceString;
+
+    if (!deviceString.isNull())
+        return deviceString;
+
+    const DWORD bufSize = MAX_PATH + 1;
+    TCHAR buf[bufSize];
+    GetWindowsDirectory(buf, bufSize);
+
+    deviceString = QString::fromWCharArray(buf, bufSize).left(2);
+
+    return deviceString;
+}
+
+#elif defined(Q_OS_LINUX)
+
+const QString getDevicePath(const QString& path)
+{
+    QString command = lit("df ") + path;
+    FILE* pipe;
+    char buf[BUFSIZ];
+
+    if (( pipe = popen(command.toLatin1().constData(), "r")) == NULL)
+    {
+        NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        return QString();
+    }
+
+    if (fgets(buf, BUFSIZ, pipe) == NULL) // header line
+    {
+        pclose(pipe);
+        return QString();
+    }
+
+    if (fgets(buf, BUFSIZ, pipe) == NULL) // data
+    {
+        pclose(pipe);
+        return QString();
+    }
+
+    auto dataString = QString::fromUtf8(buf);
+    QString deviceString = dataString.section(QRegularExpression("\\s+"), 0, 0);
+
+    pclose(pipe);
+
+    return deviceString;
+}
+
+const QString& sysDrivePath()
+{
+    static QString devicePath = getDevicePath(lit("/root"));
+    return devicePath;
+}
+
+#else // Unsupported OS so far
+
+const QString& getDevicePath(const QString& path)
+{
+    return path;
+}
+
+const QString& sysDrivePath()
+{
+    return QString();
+}
+
+#endif
+
+bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
+{
+    QString sysPath = sysDrivePath();
+    return sysPath.isNull() ? false : getDevicePath(storage->getUrl()).startsWith(sysDrivePath());
+}
+} // namespace <anonymous>
 
 class ArchiveScanPosition
 {
@@ -1584,6 +1666,30 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
                 result << fileStorage;
         }
     }
+
+    const qint64 kSystemStorageTreshold = 5;
+
+    qint64 totalNonSystemStoragesSpace = 0;
+    qint64 systemStorageSpace = 0;
+    std::vector<QSet<QnStorageResourcePtr>::iterator> systemStorageItVec;
+
+    for (auto it = result.begin(); it != result.end(); ++it)
+    {
+        if (!isStorageOnSystemDrive(*it))
+            totalNonSystemStoragesSpace += (*it)->getTotalSpace();
+        else
+        {
+            systemStorageItVec.push_back(it);
+            systemStorageSpace += (*it)->getTotalSpace();
+        }
+    }
+
+    if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
+    {
+        for (auto it : systemStorageItVec)
+            result.remove(*it);
+    }
+
     if (!result.empty())
         m_isWritableStorageAvail = true;
     else

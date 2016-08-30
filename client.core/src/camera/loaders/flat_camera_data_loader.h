@@ -15,7 +15,7 @@
 #include <recording/time_period_list.h>
 
 /**
- * Per-camera data loader that caches loaded data. 
+ * Per-camera data loader that caches loaded data.
  * Uses flat structure. Data is loaded with the most detailed level.
  * Source data period is solid, no spaces are allowed.
  */
@@ -25,12 +25,13 @@ class QnFlatCameraDataLoader: public QnAbstractCameraDataLoader
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
     QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::TimePeriodContent dataType, QObject *parent = NULL);
-  
+    virtual ~QnFlatCameraDataLoader() override;
+
     virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
@@ -41,8 +42,11 @@ private slots:
 private:
     int sendRequest(qint64 startTimeMs);
     void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
+
+    void trace(const QString& message);
+
 private:
-    struct LoadingInfo 
+    struct LoadingInfo
     {
         /** Real loading handle, provided by the server connection object. */
         int handle;
@@ -60,7 +64,7 @@ private:
     };
 
     QString m_filter;
-    
+
     LoadingInfo m_loading;
 
     /** Loaded data. */

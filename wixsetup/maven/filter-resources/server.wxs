@@ -59,14 +59,6 @@
                     </RegistryKey>
                 </Component>
 
-                <Component Id="ServerConfigurationSysIdTime">
-                    <Condition>SYS_ID_TIME</Condition>
-
-                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
-                        <RegistryValue Type="string" Name="sysIdTime" Value="[SYS_ID_TIME]"/>
-                    </RegistryKey>
-                </Component>
-
                 <Directory Id="ServerPlugins" Name="plugins">
                     <Component Id="ServerRtspPlugin">
                         <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" />
@@ -224,7 +216,6 @@
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
-            <ComponentRef Id='ServerConfigurationSysIdTime'/>
 
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
