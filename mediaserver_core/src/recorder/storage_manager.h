@@ -108,6 +108,8 @@ public:
 
     QnStorageResourceList getStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
+    QSet<QnStorageResourcePtr> getWritableStorages(
+        std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 

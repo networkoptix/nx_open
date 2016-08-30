@@ -217,8 +217,10 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
         if (m_readOnly)
             return QString();
 
-        if (!storageData.isWritable)
+        if (!storageData.isOnline)
             return tr("Inaccessible");
+        else if (!storageData.isWritable)
+            return lit("");
 
         if (!canMoveStorage(storageData))
             return QString();
