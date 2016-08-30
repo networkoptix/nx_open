@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sequence>
-  <set resName="cdb" resValue="{{cloud_db_host}}:3346"/>
-  {% for host in connection_mediator_hosts %}
-  <set resName="hpm" resValue="{{host}}:3345"/>
-  {% endfor %}
-  <set resName="notification_module" resValue="{{cloud_portal_host}}:80"/>
+    <!--  setting default cloud instance  -->
+    <set resName="cloud.instance.name" resValue="{{cloud_portal_host}}"/>
+    <!--  detecting cloud instance depending on VMS version  -->
+    <condition resName="vms.version.build" matchType="range">
+        <set value="0-1000000" resName="cloud.instance.name" resValue="{{cloud_portal_host}}"/>
+    </condition>
+    <!--  overriding for specific build (if needed)  -->
+    <condition resName="vms.version.build">
+        <set value="4728" resName="cloud.instance.name" resValue="{{cloud_portal_host}}"/>
+    </condition>
+    <!--
+     setting cloud module endpoints by instance name. This section needs modifications only if new cloud instance has been added 
+    -->
+    <condition resName="cloud.instance.name">
+        <sequence value="{{cloud_portal_host}}">
+            <set resName="cdb" resValue="{{cloud_db_host}}:3346"/>
+{% for host in connection_mediator_hosts %}
+            <set resName="hpm" resValue="{{host}}:3345"/>
+{% endfor %}
+
+            <set resName="notification_module" resValue="{{cloud_portal_host}}:80"/>
+        </sequence>
+        <sequence value="alpha.nxvms.cloud">
+            <!--  TODO  -->
+        </sequence>
+    </condition>
 </sequence>
