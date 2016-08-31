@@ -19,6 +19,11 @@ public:
     ReverseConnector(
         String selfHostName, String targetHostName, aio::AbstractAioThread* aioThread);
 
+    ReverseConnector(const ReverseConnector&) = delete;
+    ReverseConnector(ReverseConnector&&) = delete;
+    ReverseConnector& operator=(const ReverseConnector&) = delete;
+    ReverseConnector& operator=(ReverseConnector&&) = delete;
+
     void setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts);
 
     // TODO: MoveOnlyFunc when HttpClient supports it
