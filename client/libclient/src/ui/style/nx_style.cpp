@@ -55,6 +55,8 @@ namespace
 
     const char* kLinkHoverProcessorCompanion = "linkHoverProcessor";
 
+    const int kQtHeaderIconMargin = 2; // a margin between item view header's icon and label used by Qt
+
     const int kCompactTabFocusMargin = 2;
 
     void drawArrow(Direction direction,
@@ -2591,9 +2593,9 @@ QRect QnNxStyle::subElementRect(
             if (auto header = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
                 QRect rect = header->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0);
-
                 Qt::Alignment arrowAlignment =
                     static_cast<Qt::Alignment>(styleHint(SH_Header_ArrowAlignment, header, widget));
+
                 if (arrowAlignment.testFlag(Qt::AlignLeft))
                 {
                     int margin = pixelMetric(PM_HeaderMargin, header, widget);
@@ -2603,6 +2605,18 @@ QRect QnNxStyle::subElementRect(
 
                 int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
                 rect = option->fontMetrics.boundingRect(rect, flags, header->text);
+
+                if (!header->icon.isNull())
+                {
+                    /* To match Qt standard drawing: */
+                    int iconSize = proxy()->pixelMetric(QStyle::PM_SmallIconSize, header, widget);
+                    QSize size = header->icon.actualSize(widget->windowHandle(), QSize(iconSize, iconSize),
+                        (header->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled);
+
+                    rect.setWidth(rect.width() + size.width() + kQtHeaderIconMargin);
+                    rect.setHeight(qMax(rect.height(), size.height()));
+                }
+
                 return rect;
             }
             break;
@@ -2747,6 +2761,12 @@ QSize QnNxStyle::sizeFromContents(
                 {
                     width += pixelMetric(PM_HeaderMargin, header, widget);
                     width += pixelMetric(PM_HeaderMarkSize, header, widget);
+                }
+
+                if (!header->icon.isNull())
+                {
+                    int iconSize = proxy()->pixelMetric(QStyle::PM_SmallIconSize, header, widget);
+                    width += iconSize + kQtHeaderIconMargin;
                 }
 
                 return QSize(width, qMax(textSize.height(), Metrics::kHeaderSize));
