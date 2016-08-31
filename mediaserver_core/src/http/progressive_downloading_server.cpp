@@ -304,10 +304,10 @@ private:
     QByteArray toHttpChunk( const char* data, size_t size )
     {
         QByteArray chunk;
-        chunk.reserve( size + 12 );
-        chunk.append(QByteArray::number((int)size,16));
+        chunk.reserve((int) size + 12);
+        chunk.append(QByteArray::number((int) size, 16));
         chunk.append("\r\n");
-        chunk.append(data, size);
+        chunk.append(data, (int) size);
         chunk.append("\r\n");
         return chunk;
     }

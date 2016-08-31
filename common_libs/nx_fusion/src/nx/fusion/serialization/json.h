@@ -193,7 +193,6 @@ bool deserialize(QnJsonContext* ctx, const QByteArray& value, T* outTarget)
     QJsonValue jsonValue;
     if (!QJsonDetail::deserialize_json(value, &jsonValue))
         return false;
-    // TODO mike: If exists T.renameDeprecatedParams(QJsonValue&), call it.
 
     return QJson::deserialize(ctx, jsonValue, outTarget);
 }

@@ -47,8 +47,6 @@
 #include "business/business_event_rule.h"
 #include "settings.h"
 
-using std::nullptr_t;
-
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
 static const QString RES_TYPE_STORAGE = "storage";
@@ -3015,7 +3013,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscDa
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(std::nullptr_t /*dummy*/, ApiResourceParamDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data)
 {
     return readSettings(data);
 }
@@ -3523,7 +3521,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 }
 
 //getUsers
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
     const QString queryStr = R"(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
@@ -3574,13 +3572,13 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& res
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
 {
     result = QnResourceAccessManager::getPredefinedRoles();
     return ErrorCode::ok;
 }
 
-ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
+ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3621,7 +3619,7 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAc
 
 
 //getTransactionLog
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t&, ApiTransactionDataList& tranList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3646,12 +3644,6 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataLi
     }
 
     return ErrorCode::ok;
-}
-
-// getClientInfos
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data)
-{
-    return doQueryNoLock(QnUuid(), data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data)
@@ -4501,7 +4493,7 @@ bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
         case ApiCommand::addLicenses:
         case ApiCommand::removeLicense:
             return true;
-    
+
         case ApiCommand::saveMediaServer:
         case ApiCommand::saveStorage:
         case ApiCommand::saveStorages:
@@ -4512,7 +4504,7 @@ bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
         case ApiCommand::setResourceParams:
             // Allowing minimum set of transactions required for local server to function properly.
             return m_userAccessData == Qn::kSystemAccess;
-    
+
         default:
             return false;
     }

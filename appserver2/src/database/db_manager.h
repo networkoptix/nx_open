@@ -72,7 +72,7 @@ namespace detail
     {
         Q_OBJECT
 
-        friend class ec2::QnDbManagerAccess;
+        friend class QnDbManagerAccess;
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -114,7 +114,7 @@ namespace detail
                 if (!lock.commit())
                 {
                     NX_LOG( QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
-                        arg(ec2::toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
+                        arg(toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
                     return ErrorCode::dbError;
                 }
             }
@@ -132,10 +132,10 @@ namespace detail
         }
 
         //getCurrentTime
-        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+        ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
         //dumpDatabase
-        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
+        ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
         ErrorCode doQuery(const ApiStoredFilePath& path, ApiDatabaseDumpToFileData& dumpFileSize);
 
         // --------- misc -----------------------------
@@ -180,12 +180,12 @@ namespace detail
         };
 
 
-        friend class ec2::QnTransactionLog;
+        friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QnReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ data retrieval --------------------------------------
-        ErrorCode doQueryNoLock(std::nullptr_t /*dummy*/, ApiResourceParamDataList& data);
+        ErrorCode doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -194,14 +194,14 @@ namespace detail
 
         //getStoredFiles
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data);
-        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
+        ErrorCode doQueryNoLock(const nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
 
         ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
         //getResourceTypes
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
 
         //getStorages
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
@@ -210,65 +210,63 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
         //getCameraUserAttributes
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
 
         //getServersEx
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
 
         //getUserGroupList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& groupList);
 
         //getPredefinedRoles
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
 
         //getAccessRights
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 
         //getWebPageList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params);
 
         // ApiFullInfo
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfoData& data);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLicenseDataList& data);
 
         // ApiDiscoveryDataList
-        ErrorCode doQueryNoLock(const QnUuid& id, ec2::ApiDiscoveryDataList& data);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
 
         //getServerUserAttributes
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
 
         //getTransactionLog
-        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
+        ErrorCode doQueryNoLock(const nullptr_t&, ApiTransactionDataList& tranList);
 
         //getClientInfos
-        // TODO: #mike: Remove specialization with nullptr_t.
-        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data);
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
 
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
@@ -596,7 +594,7 @@ namespace detail
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
-        ErrorCode getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database);
+        ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -680,7 +678,7 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        if (!ec2::getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData, t2))
+        if (!getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData, t2))
         {
             errorCode = ErrorCode::forbidden;
             t2 = T2();
@@ -695,7 +693,7 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        ec2::getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
+        getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
         return errorCode;
     }
 
@@ -706,7 +704,7 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
@@ -717,7 +715,7 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         auto outParamContainer = tran.params;
-        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -729,7 +727,7 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
@@ -740,7 +738,7 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         Cont<Param,A> paramCopy = tran.params;
-        ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
         if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -751,7 +749,7 @@ private:
     template<typename T>
     void readData(T& target)
     {
-        ec2::getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
+        getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
     }
 
     Qn::UserAccessData m_userAccessData;
