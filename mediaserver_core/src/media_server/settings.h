@@ -43,6 +43,16 @@ namespace nx_ms_conf
     static const QLatin1String HLS_PLAYLIST_PRE_FILL_CHUNKS("hlsPlaylistPreFillChunks");
     static const unsigned int DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS = 2;
 
+    /** Chunk can be fully cached in memory only it size is not greater then this value.
+        Otherwise, only last \a DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE bytes can be stored in memory
+    */
+    static const QLatin1String HLS_MAX_CHUNK_BUFFER_SIZE("hlsMaxChunkBufferSize");
+#ifdef __arm__
+    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 2*1024*1024;
+#else
+    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 10*1024*1024;
+#endif
+
     //!Write block size. This block is always aligned to file system sector size
     static const QLatin1String IO_BLOCK_SIZE( "ioBlockSize" );
     static const int DEFAULT_IO_BLOCK_SIZE = 4*1024*1024;
