@@ -355,9 +355,9 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 
     if (cloudLogin.isEmpty() || cloudPassword.isEmpty())
     {
-        const auto error = (initial
+        const auto error = (initial || (cloudLogin.isEmpty() && cloudPassword.isEmpty()))
             ? QnCloudStatusWatcher::NoError
-            : QnCloudStatusWatcher::InvalidCredentials);
+            : QnCloudStatusWatcher::InvalidCredentials;
         setStatus(QnCloudStatusWatcher::LoggedOut, error);
         setCloudSystems(QnCloudSystemList());
         return;
