@@ -12,6 +12,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/settings.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/abstract_socket.h>
 
 
 namespace nx {
@@ -68,6 +69,12 @@ public:
     bool replaceHostAddressWithPublicAddress;
     bool allowIpTarget;
     QString fetchPublicIpUrl;
+
+    struct {
+        uint16_t port;
+        size_t poolSize;
+        boost::optional<KeepAliveOptions> keepAlive;
+    } tcpReverse;
 
     CloudConnect();
 };

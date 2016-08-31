@@ -78,6 +78,17 @@ namespace
 
     const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
     const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
+
+    namespace tcp_reverse {
+    const QLatin1String kPort("cloudConnect/tcpReversePort");
+    const uint32_t kDefaultPort(0);
+
+    const QLatin1String kPoolSize("cloudConnect/tcpReversePoolSize");
+    const size_t kDefaultPoolSize(1);
+
+    const QLatin1String kKeepAlive("cloudConnect/tcpReverseKeepAlive");
+    const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
+    } // namespace tcp_reverse
 }
 
 
@@ -262,6 +273,13 @@ void Settings::loadConfiguration()
         m_settings.value(
             kFetchPublicIpUrl,
             kDefaultFetchPublicIpUrl).toString();
+    m_cloudConnect.tcpReverse.port =
+        (uint16_t)m_settings.value(tcp_reverse::kPort, tcp_reverse::kDefaultPort).toInt();
+    m_cloudConnect.tcpReverse.poolSize =
+        (size_t)m_settings.value(tcp_reverse::kPoolSize, (int)tcp_reverse::kDefaultPoolSize).toInt();
+    m_cloudConnect.tcpReverse.keepAlive =
+        KeepAliveOptions::fromString(m_settings.value(
+            tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
 }
 
 }   //namespace conf
