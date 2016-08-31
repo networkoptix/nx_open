@@ -2,6 +2,7 @@
 #define __STORAGE_MANAGER_H__
 
 #include <random>
+#include <functional>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QString>
@@ -107,7 +108,17 @@ public:
     );
 
     QnStorageResourceList getStorages() const;
-    QSet<QnStorageResourcePtr> getWritableStorages() const;
+
+    /*
+     * Return writable storages with checkBox 'usedForWriting'
+     */
+    QSet<QnStorageResourcePtr> getUsedWritableStorages() const;
+
+    /*
+     * Return all storages which can be used for writing
+     */
+    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
@@ -156,6 +167,9 @@ public slots:
     void testOfflineStorages();
 private:
     friend class TestStorageThread;
+
+    QSet<QnStorageResourcePtr> getWritableStorages(
+        std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
 
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnVirtualCameraResourceList &cameras,

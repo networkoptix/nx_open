@@ -125,6 +125,7 @@ extern "C"
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
+#include <platform/bundle_helpers_mac.h>
 #endif
 #include "api/runtime_info_manager.h"
 #include <utils/common/timermanager.h>
@@ -544,6 +545,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         QnAppInfo::beta())
         context->action(QnActions::BetaVersionMessageAction)->trigger();
 
+    const auto devicePixelCustomAspect =
+#if defined(Q_OS_MACX)
+        // Manually set device pixel ratio aspect to 2 on mac os
+        (QnBundleHelpers::isInHiDpiMode(QCoreApplication::applicationDirPath()) ? 1 : 2);
+#else
+        1;
+#endif
 
     for (const auto screen: QApplication::screens())
     {
@@ -554,7 +562,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         const auto pysicalDpi = screen->physicalDotsPerInch();
         const auto logicalDpi = screen->logicalDotsPerInch();
         const auto dpiAspect = (qFuzzyIsNull(pysicalDpi) ? 1 : logicalDpi / pysicalDpi);
-        const auto targetRatio = std::max(dpiAspect, screen->devicePixelRatio());
+        const auto targetRatio = std::max(dpiAspect,
+            screen->devicePixelRatio() * devicePixelCustomAspect);
 
         if ((targetRatio > kMinHiDpiRatio)
             || (pysicalDpi > kMinHiDpi)
