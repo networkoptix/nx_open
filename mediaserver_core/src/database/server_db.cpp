@@ -504,7 +504,7 @@ bool QnServerDb::cleanupEvents()
 
     // cleanup by  record count
     const int kMaxRecords = 100000;
-    const int kMaxOverflowRecords = 150000;
+    const int kMaxOverflowRecords = 120000;
 
     if (kMaxOverflowRecords < m_runtimeActionsTotalRecords)
     {

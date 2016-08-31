@@ -2704,14 +2704,26 @@ ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrGroupId)
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::checkIfUserGroupExists(const QnUuid& groupId)
+{
+    QSqlQuery query(m_sdb);
+    const QString queryStr = "SELECT * FROM vms_user_groups WHERE id = :groupId";
+
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    query.bindValue(":groupId", groupId.toRfc4122());
+    if (!execSQLQuery(&query, Q_FUNC_INFO) || query.size() == 0)
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
-    /*
-    qint32 internalId = getResourceInternalId(tran.params.id);
-    ErrorCode result = checkExistingUser(tran.params.name, internalId);
-    if (result !=ErrorCode::ok)
-        return result;
-    */
+    if (checkIfUserGroupExists(tran.params.groupId) != ErrorCode::ok)
+        ErrorCode::dbError;
+
     qint32 internalId = 0;
     ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
     if (result !=ErrorCode::ok)
