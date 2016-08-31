@@ -916,6 +916,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
         //generating saveUser transaction
         ::ec2::ApiUserData userData;
         ec2::convert(sharing, &userData);
+        userData.fullName = QString::fromStdString(account->fullName);
         result = m_transactionLog->generateTransactionAndSaveToLog<
             ::ec2::ApiCommand::saveUser>(
                 connection,

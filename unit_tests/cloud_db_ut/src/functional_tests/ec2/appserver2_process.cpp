@@ -121,7 +121,7 @@ Appserver2Process::Appserver2Process(int argc, char** argv)
     m_argv(argv),
     m_terminated(false),
     m_ecConnection(nullptr),
-    m_application(argc, argv)
+    m_application(nullptr)
 {
 }
 
@@ -132,7 +132,9 @@ Appserver2Process::~Appserver2Process()
 void Appserver2Process::pleaseStop()
 {
     //m_processTerminationEvent.set_value();
-    m_application.quit();
+    QnMutexLocker lk(&m_mutex);
+    if (m_application)
+        m_application->quit();
 }
 
 void Appserver2Process::setOnStartedEventHandler(
@@ -143,6 +145,13 @@ void Appserver2Process::setOnStartedEventHandler(
 
 int Appserver2Process::exec()
 {
+    QCoreApplication application(m_argc, m_argv);
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_application = &application;
+    }
+
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
         [this, &processStartResult]
@@ -244,13 +253,21 @@ int Appserver2Process::exec()
     triggerOnStartedEventHandlerGuard.fire();
 
     m_ecConnection = ec2Connection.get();
-    m_application.exec();
+    application.exec();
 
+    ec2Connection->stopReceivingNotifications();
     appServerConnectionFactory.setEc2Connection(nullptr);
     appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
 
-    //m_processTerminationEvent.get_future().wait();
     m_ecConnection = nullptr;
+    ec2Connection.reset();
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_application = nullptr;
+    }
+
+    //m_processTerminationEvent.get_future().wait();
 
     //TODO 
     return 0;
@@ -258,7 +275,7 @@ int Appserver2Process::exec()
 
 ec2::AbstractECConnection* Appserver2Process::ecConnection()
 {
-    return m_ecConnection;
+    return m_ecConnection.load();
 }
 
 

@@ -11,9 +11,11 @@ namespace ec2 {
 ////////////////////////////////////////////////////////////
 
 TransactionLog::TransactionLog(
+    const QnUuid& peerId,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
     OutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
 :
+    m_peerId(peerId),
     m_dbManager(dbManager),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher)
 {

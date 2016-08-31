@@ -49,15 +49,19 @@ public:
 
     virtual nx::Buffer serialize(
         Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& /*transportHeader*/) const
+        const TransactionTransportHeader& transportHeader) const
     {
         // TODO:
 
         switch (targetFormat)
         {
             case Qn::UbjsonFormat:
-                // TODO: adding transport header
-                return m_serializedTransaction;
+            {
+                // adding transport header
+                auto serializedTransportHeader = 
+                    QnUbjson::serialized(transportHeader.vmsTransportHeader);
+                return serializedTransportHeader + m_serializedTransaction;
+            }
             default:
                 // TODO:
                 NX_CRITICAL(false);

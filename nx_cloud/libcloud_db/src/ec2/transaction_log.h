@@ -27,6 +27,8 @@ namespace ec2 {
 
 class OutgoingTransactionDispatcher;
 
+static const QnUuid kDbInstanceGuid("{DFD33CCE-92E5-48E4-AB7E-D4F164B2A94E}");
+
 /** 
  * Comment will appear here later during class implementation
  */
@@ -36,6 +38,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
 
     TransactionLog(
+        const QnUuid& peerId,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
@@ -74,9 +77,26 @@ public:
         const nx::String& systemId,
         TransactionDataType transactionData)
     {
+        using namespace std::chrono;
+
+        int tranSequence = 0;
+        {
+            QnMutexLocker lk(&m_mutex);
+            int& currentSequence = m_transactionSequenceBySystemId[systemId];
+            ++currentSequence;
+            tranSequence = currentSequence;
+        }
+
         // Generating transaction.
         ::ec2::QnTransaction<TransactionDataType> transaction;
-        // TODO: Filling transaction header.
+        // Filling transaction header.
+        transaction.command = static_cast<::ec2::ApiCommand::Value>(TransactionCommandValue);
+        transaction.peerID = m_peerId;
+        transaction.transactionType = ::ec2::TransactionType::Cloud;
+        transaction.persistentInfo.dbID = kDbInstanceGuid;
+        transaction.persistentInfo.sequence = tranSequence;
+        transaction.persistentInfo.timestamp = 
+            duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
         transaction.params = std::move(transactionData);
 
         // Serializing transaction.
@@ -112,10 +132,12 @@ private:
         DbTransactionContext& operator=(DbTransactionContext&&) = default;
     };
 
+    const QnUuid m_peerId;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     QnMutex m_mutex;
     std::map<QSqlDatabase*, DbTransactionContext> m_dbTransactionContexts;
+    std::map<nx::String, int> m_transactionSequenceBySystemId;
 };
 
 /** 

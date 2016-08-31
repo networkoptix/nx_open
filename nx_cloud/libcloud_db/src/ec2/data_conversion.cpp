@@ -5,6 +5,7 @@
 #include <nx_ec/data/api_user_data.h>
 #include <nx/fusion/serialization/lexical.h>
 
+#include <utils/common/app_info.h>
 
 namespace nx {
 namespace cdb {
@@ -63,9 +64,15 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
 {
     to->id = QnUuid::fromStringSafe(from.vmsUserId);
     to->email = QString::fromStdString(from.accountEmail);
-    to->permissions = QnLexical::deserialized<Qn::GlobalPermissions>(QString::fromStdString(from.customPermissions));
+    to->name = to->email;
+    to->permissions = 
+        QnLexical::deserialized<Qn::GlobalPermissions>(
+            QString::fromStdString(from.customPermissions));
     to->groupId = QnUuid::fromStringSafe(from.groupID);
     to->isEnabled = from.isEnabled;
+    to->realm = QnAppInfo::realm();
+    to->hash = "password_is_in_cloud";
+    to->digest = "password_is_in_cloud";
     accessRoleToPermissions(from.accessRole, to);
 }
 

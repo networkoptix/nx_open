@@ -1,8 +1,3 @@
-/**********************************************************
-* 11 aug 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
@@ -11,13 +6,13 @@
 
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include <transaction/transaction_transport.h>
 
 #include "ec2/appserver2_process.h"
 #include "test_setup.h"
 #include "transaction_transport.h"
-
 
 namespace nx {
 namespace cdb {
@@ -35,7 +30,9 @@ public:
     {
     }
 
-    /** @return new connection id */
+    /**
+     * @return new connection id
+     */
     int openTransactionConnection(
         const std::string& systemId,
         const std::string& systemAuthKey)
@@ -74,14 +71,14 @@ public:
     {
         const int connectionId = openTransactionConnection(systemId, systemAuthKey);
 
-        //waiting for connection state change
+        // Waiting for connection state change.
         const auto waitUntil = std::chrono::steady_clock::now() + durationToWait;
         std::unique_lock<std::mutex> lk(m_mutex);
         for (;;)
         {
             auto connectionIter = m_connections.find(connectionId);
             if (connectionIter == m_connections.end())
-                return false;   //connection removed
+                return false;   //< Connection has been removed.
             switch (connectionIter->second->getState())
             {
                 case test::TransactionTransport::Connected:
@@ -133,12 +130,12 @@ TEST_F(Ec2MserverCloudSynchronization, establishConnection)
     result = addActivatedAccount(&account1, &account1Password);
     ASSERT_EQ(api::ResultCode::ok, result);
 
-    //adding system1 to account1
+    // Adding system1 to account1.
     api::SystemData system1;
     result = bindRandomSystem(account1.email, account1Password, &system1);
     ASSERT_EQ(api::ResultCode::ok, result);
 
-    //creating transaction connection
+    // Creating transaction connection.
     ASSERT_TRUE(
         openTransactionConnectionAndWaitForResult(
             system1.id, system1.authKey, kWaitTimeout));
@@ -152,9 +149,10 @@ public:
     Ec2MserverCloudSynchronization2()
     {
         const auto tmpDir = 
-            CdbLauncher::temporaryDirectoryPath().isEmpty()
-            ? QDir::homePath()
-            : CdbLauncher::temporaryDirectoryPath() + "/ec2_cloud_sync_ut.data";
+            (CdbLauncher::temporaryDirectoryPath().isEmpty()
+             ? QDir::homePath()
+             : CdbLauncher::temporaryDirectoryPath()) + "/ec2_cloud_sync_ut.data";
+        QDir(tmpDir).removeRecursively();
 
         const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
         m_appserver2.addArg(dbFileArg.toStdString().c_str());
@@ -187,12 +185,12 @@ public:
         if (result != api::ResultCode::ok)
             return result;
 
-        //adding system1 to account1
+        // Adding system1 to account1.
         result = m_cdb.bindRandomSystem(m_account.email, m_accountPassword, &m_system);
         if (result != api::ResultCode::ok)
             return result;
 
-        //saving cloud credentials to vms db
+        // Saving cloud credentials to vms db.
         ec2::ApiUserDataList users;
         if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
                 ->getUsersSync(&users) != ec2::ErrorCode::ok)
@@ -228,6 +226,16 @@ public:
         return api::ResultCode::ok;
     }
 
+    const api::AccountData& account() const
+    {
+        return m_account;
+    }
+
+    const std::string& accountPassword() const
+    {
+        return m_accountPassword;
+    }
+
     const api::SystemData& registeredSystemData() const
     {
         return m_system;
@@ -255,10 +263,63 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
     ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
 
+    nx::utils::SyncQueue<::ec2::ApiUserData> newUsersQueue;
+    QObject::connect(
+        appserver2()->moduleInstance()->ecConnection()->getUserNotificationManager().get(),
+        &ec2::AbstractUserNotificationManager::addedOrUpdated,
+        [&newUsersQueue](const ::ec2::ApiUserData& user)
+        {
+            newUsersQueue.push(user);
+        });
+
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
-    std::this_thread::sleep_for(std::chrono::minutes(100));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    // TODO: #ak Checking connection is there.
+
+    // Sharing system with some account.
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->addActivatedAccount(&account2, &account2Password));
+
+    api::SystemSharing sharingData;
+    sharingData.systemID = registeredSystemData().id;
+    sharingData.accountEmail = account2.email;
+    sharingData.accessRole = api::SystemAccessRole::cloudAdmin;
+    sharingData.groupID = "test_group";
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->shareSystem(account().email, accountPassword(), sharingData));
+
+    // Waiting for new cloud user to arrive to local system.
+    for (;;)
+    {
+        const auto newUser = newUsersQueue.pop(std::chrono::seconds(10));
+        ASSERT_TRUE(newUser);
+        if (newUser->email.toStdString() == account2.email)
+            break;
+    }
+
+    // Validating data.
+    ec2::ApiUserDataList users;
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        appserver2()->moduleInstance()->ecConnection()
+            ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
+
+    ASSERT_EQ(2, users.size());
+    ASSERT_NE(
+        users.end(),
+        std::find_if(
+            users.begin(), users.end(),
+            [email = account2.email](const ec2::ApiUserData& elem)
+            {
+                return elem.email.toStdString() == email;
+            }));
 }
 
-}   //namespace cdb
-}   //namespace nx
+} // namespace cdb
+} // namespace nx

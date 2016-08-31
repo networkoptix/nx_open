@@ -127,6 +127,8 @@ void TransactionTransport::processSpecialTransaction(
     ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
     TransactionProcessedHandler handler)
 {
+    setWriteSync(true);
+
     m_tranStateToSynchronizeTo = m_transactionLogReader->getCurrentState();
     m_remotePeerTranState = std::move(data.params.persistentState);
 

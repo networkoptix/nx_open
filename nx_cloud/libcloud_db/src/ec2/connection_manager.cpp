@@ -233,12 +233,13 @@ void ConnectionManager::dispatchTransaction(
     for (auto connectionIt = connectionBySystemIdAndPeerIdIndex
             .lower_bound(std::make_pair(systemId, nx::String()));
         connectionIt != connectionBySystemIdAndPeerIdIndex.end()
-        && connectionIt->systemIdAndPeerId.first == systemId;
+            && connectionIt->systemIdAndPeerId.first == systemId;
         ++connectionIt)
     {
         if (connectionIt->systemIdAndPeerId.second ==
                 transactionSerializer->transactionHeader().peerID.toByteArray())
         {
+            // Not sending transaction to peer which has generated it.
             continue;
         }
 
@@ -262,8 +263,8 @@ void ConnectionManager::dispatchTransaction(
     }
     else
     {
-        for (auto& connection : connectionsToSendTo)
-            connection->sendTransaction(
+        for (std::size_t i = 0; i < connectionCount; ++i)
+            connectionsToSendTo[i]->sendTransaction(
                 transportHeader,
                 transactionSerializer);
     }

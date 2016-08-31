@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QCoreApplication>
 
 #include <nx/utils/std/future.h>
@@ -40,8 +42,9 @@ private:
     bool m_terminated;
     nx::utils::promise<void> m_processTerminationEvent;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_onStartedEventHandler;
-    AbstractECConnection* m_ecConnection;
-    QCoreApplication m_application;
+    std::atomic<AbstractECConnection*> m_ecConnection;
+    QCoreApplication* m_application;
+    QnMutex m_mutex;
 };
 
 

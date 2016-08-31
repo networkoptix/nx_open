@@ -87,6 +87,8 @@ private:
         TransactionProcessedHandler completionHandler)
     {
         auto it = m_transactionProcessors.find(transaction.command);
+        if (transaction.command == ::ec2::ApiCommand::updatePersistentSequence)
+            return; // TODO: #ak Do something.
         if (it == m_transactionProcessors.end())
         {
             // No handler registered for transaction type.

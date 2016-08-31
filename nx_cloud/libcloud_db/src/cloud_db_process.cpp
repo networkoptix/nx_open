@@ -196,6 +196,7 @@ int CloudDBProcess::exec()
 
         ec2::OutgoingTransactionDispatcher ec2OutgoingTransactionDispatcher;
         ec2::TransactionLog transactionLog(
+            kCdbGuid,
             &dbManager,
             &ec2OutgoingTransactionDispatcher);
         ec2::IncomingTransactionDispatcher incomingTransactionDispatcher(
