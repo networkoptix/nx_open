@@ -69,14 +69,14 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
         std::make_unique<ReverseConnector>(
             m_selfHostName, m_targetHostName, m_timer->getAioThread()));
 
-    NX_LOGX(lm("start connector(%1)").arg(*connectorIt), cl_logDEBUG2);
+    NX_LOGX(lm("Start connector(%1)").arg(*connectorIt), cl_logDEBUG2);
     (*connectorIt)->connect(
         m_targetEndpoint,
         [this, connectorIt](SystemError::ErrorCode code)
         {
             auto connector = std::move(*connectorIt);
             m_connectors.erase(connectorIt);
-            NX_LOGX(lm("connector(%1) event: %2").arg(connector)
+            NX_LOGX(lm("Connector(%1) event: %2").arg(connector)
                 .arg(SystemError::toString(code)), cl_logDEBUG2);
 
             if (code != SystemError::noError
@@ -93,11 +93,11 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
             }
 
             if (code == SystemError::noError)
-                newConnection(std::move(connector));
+                saveConnection(std::move(connector));
         });
 }
 
-void IncomingReverseTunnelConnection::newConnection(
+void IncomingReverseTunnelConnection::saveConnection(
     std::unique_ptr<ReverseConnector> connector)
 {
     if (const auto value = connector->getPoolSize())
@@ -108,12 +108,35 @@ void IncomingReverseTunnelConnection::newConnection(
         if (value != m_keepAliveOptions)
         {
             m_keepAliveOptions = value;
-            for (auto& socket: m_sockets)
-                socket->setKeepAlive(m_keepAliveOptions);
+            NX_LOGX(lm("New keepAliveOptions=%1").str(m_keepAliveOptions), cl_logDEBUG1);
+
+            for (auto it = m_sockets.begin(); it != m_sockets.end(); )
+            {
+                if (!(*it)->setKeepAlive(m_keepAliveOptions))
+                {
+                    NX_LOGX(lm("Could not set keepAliveOptions=%1 to existed socket(%2)")
+                        .arg(m_keepAliveOptions).arg(*it), cl_logWARNING);
+
+                    it = m_sockets.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
         }
     }
 
-    const auto socketIt = m_sockets.insert(m_sockets.end(), connector->takeSocket());
+    auto socket = connector->takeSocket();
+    if (m_keepAliveOptions && !socket->setKeepAlive(m_keepAliveOptions))
+    {
+        NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2)")
+            .arg(m_keepAliveOptions).arg(socket), cl_logWARNING);
+
+        return spawnConnectorIfNeeded();
+    }
+
+    const auto socketIt = m_sockets.insert(m_sockets.end(), std::move(socket));
     if (m_acceptHandler)
     {
         NX_LOGX(lm("monitor socket(%1) from connector(%2)")

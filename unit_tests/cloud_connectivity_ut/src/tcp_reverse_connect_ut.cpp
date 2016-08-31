@@ -43,10 +43,10 @@ protected:
 
     void enableReveseConnectionsOnClient(boost::optional<size_t> poolSize = boost::none)
     {
-        ASSERT_TRUE(SocketGlobals::tcpReversePool()
-            .start(SocketAddress(HostAddress::localhost, 0), true /* waits for registration */));
-
-        SocketGlobals::tcpReversePool().setPoolSize(poolSize);
+        auto& pool = SocketGlobals::tcpReversePool();
+        ASSERT_TRUE(pool.start(SocketAddress(HostAddress::localhost, 0), true));
+        pool.setPoolSize(poolSize);
+        pool.setKeepAliveOptions(KeepAliveOptions(60, 10, 3));
     }
 
     hpm::MediatorFunctionalTest m_mediator;
@@ -114,12 +114,12 @@ TEST_F(TcpReverseConnectTest, SimpleAsyncClientSystem)
         SocketAddress(m_system.id));
 }
 
-// TODO: #mux Enable and fix!
 TEST_F(TcpReverseConnectTest, Load)
 {
+    // Wait for some NXRC connections to be estabilished
     std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket();
     enableReveseConnectionsOnClient();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     const std::chrono::seconds testDuration(7 * utils::TestOptions::timeoutMultiplier());
     const int maxSimultaneousConnections = 25;
@@ -128,7 +128,7 @@ TEST_F(TcpReverseConnectTest, Load)
     network::test::RandomDataTcpServer server(
         network::test::TestTrafficLimitType::none,
         bytesToSendThroughConnection,
-        network::test::TestTransmissionMode::pong);
+        network::test::TestTransmissionMode::spam);
 
     server.setServerSocket(std::move(serverSocket));
     ASSERT_TRUE(server.start());

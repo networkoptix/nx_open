@@ -1,4 +1,5 @@
 #include "outgoing_reverse_tunnel_connection.h"
+#include "reverse_connection_holder.h"
 
 namespace nx {
 namespace network {

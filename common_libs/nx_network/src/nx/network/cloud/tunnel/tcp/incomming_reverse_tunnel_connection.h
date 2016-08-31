@@ -32,7 +32,7 @@ public:
 
 private:
     void spawnConnectorIfNeeded();
-    void newConnection(std::unique_ptr<ReverseConnector> connector);
+    void saveConnection(std::unique_ptr<ReverseConnector> connector);
     void monitorSocket(std::list<std::unique_ptr<BufferedStreamSocket>>::iterator socketIt);
 
     const String m_selfHostName;
