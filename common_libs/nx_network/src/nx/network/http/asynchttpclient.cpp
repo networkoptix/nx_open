@@ -161,7 +161,11 @@ namespace nx_http
 
     SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
     {
-        return m_lastSysErrorCode;
+        if (m_lastSysErrorCode != SystemError::noError)
+            return m_lastSysErrorCode;
+        // Ensuring system error code is always non-zero in case of failure 
+        //  to simplify AsyncHttpClient user's life.
+        return failed() ? SystemError::connectionReset : SystemError::noError;
     }
 
     //!Start request to \a url
