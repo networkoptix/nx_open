@@ -76,6 +76,13 @@ public:
     void insert(const Key &key, const Value &value) {
         base_type::push_back(qMakePair(key, value));
     }
+
+    QHash<Key, Value> toHash() const {
+        QHash<Key, Value> result;
+        for(const QPair<Key, Value> &pair: *this)
+            result.insert(pair.first, pair.second);
+        return result;
+    }
 };
 
 typedef QPair<QString, QString> QnRequestHeader;

@@ -99,11 +99,11 @@ enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 QAtomicInt qn_threadedMergeHandle(1);
 
 
-QnVirtualCameraResourcePtr extractCamera(QnWorkbenchItem *item)
+QnSecurityCamResourcePtr extractCamera(QnWorkbenchItem *item)
 {
     const auto layoutItemData = item->data();
     const auto id = layoutItemData.resource.id;
-    return qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    return qnResPool->getResourceById<QnSecurityCamResource>(id);
 };
 }
 
@@ -168,13 +168,13 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     });
     discardCacheTimer->start();
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this, [this](const QnVirtualCameraResourcePtr &camera)
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this, [this](const QnSecurityCamResourcePtr &camera)
     {
         if (hasWidgetWithCamera(camera))
             updateHistoryForCamera(camera);
     });
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnVirtualCameraResourcePtr &camera)
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnSecurityCamResourcePtr &camera)
     {
         if (auto loader =  m_cameraDataManager->loader(camera))
             loader->discardCachedData();
@@ -216,8 +216,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     updateCameraHistoryTimer->setSingleShot(false);
     connect(updateCameraHistoryTimer, &QTimer::timeout, this, [this]
     {
-        QSet<QnVirtualCameraResourcePtr> localQueue = m_updateHistoryQueue;
-        for (const QnVirtualCameraResourcePtr &camera : localQueue)
+        QSet<QnSecurityCamResourcePtr> localQueue = m_updateHistoryQueue;
+        for (const QnSecurityCamResourcePtr &camera : localQueue)
             if (hasWidgetWithCamera(camera))
                 updateHistoryForCamera(camera);
         m_updateHistoryQueue.clear();
@@ -395,7 +395,7 @@ void QnWorkbenchNavigator::initialize()
         , this, &QnWorkbenchNavigator::updateSliderOptions);
 
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged
-        , this, [this](const QnVirtualCameraResourcePtr & /* camera */)
+        , this, [this](const QnSecurityCamResourcePtr & /* camera */)
     {
         updateHasArchiveState();
     });
@@ -641,7 +641,7 @@ void QnWorkbenchNavigator::updateHasArchiveState()
     const bool newValue = accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
         && boost::algorithm::any_of(m_syncedWidgets, [](QnMediaResourceWidget* widget)
     {
-        auto camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        auto camera = widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>();
         return camera && !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
     });
 
@@ -729,7 +729,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
         updateSyncedPeriods();
-    updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>());
+    updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>());
     updateLines();
 }
 
@@ -752,7 +752,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
      * and is therefore perfectly safe. */
     m_syncedResources.erase(m_syncedResources.find(syncedResource));
     m_motionIgnoreWidgets.remove(widget);
-    m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnVirtualCameraResource>());
+    m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnSecurityCamResource>());
 
     if(auto loader = m_cameraDataManager->loader(syncedResource, false))
     {
@@ -1555,7 +1555,7 @@ void QnWorkbenchNavigator::updateLines()
             for (QnResourceWidget* widget : m_syncedWidgets)
                 resources.insert(widget->resource());
             resources.insert(m_currentWidget->resource());
-            return QnResourceList(resources.toList()).filtered<QnVirtualCameraResource>();
+            return QnResourceList(resources.toList()).filtered<QnSecurityCamResource>();
         }();
 
         m_timeSlider->setLineVisible(CurrentLine, true);
@@ -2218,7 +2218,7 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time)
     }
 }
 
-bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const
+bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnSecurityCamResourcePtr &camera) const
 {
     QnUuid cameraId = camera->getId();
     return std::any_of(m_syncedWidgets.cbegin(), m_syncedWidgets.cend(), [cameraId](const QnMediaResourceWidget *widget)
@@ -2227,7 +2227,7 @@ bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr 
     });
 }
 
-void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr camera)
+void QnWorkbenchNavigator::updateHistoryForCamera(QnSecurityCamResourcePtr camera)
 {
     if (!camera)
         return;

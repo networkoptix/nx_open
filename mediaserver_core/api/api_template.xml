@@ -13,11 +13,10 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>mac/cameraId/physicalId</name>
+                            <name>cameraId</name>
                             <description>
-                                Hardware address (mac) / Identifier of camera (cameraId) / Physical identifier (physicalId).
-                                One of these parameters should be specified to retreive bookmarks
-                            </description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -131,7 +130,9 @@
                         </param>
                         <param>
                             <name>cameraId</name>
-                            <description>Physical id of camera with bookmark</description>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -283,7 +284,9 @@
                         </param>
                         <param>
                             <name>cameraId</name>
-                            <description>Physical id of camera with bookmark</description>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -515,8 +518,10 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>res_id</name>
-                            <description>camera id</description>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -557,13 +562,15 @@
                     <method>POST</method>
                     <params>
                         <param>
-                            <name>res_id</name>
-                            <description>camera unique id</description>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>&lt;any name&gt;</name>
-                            <description>Parameter for camera to set. Request can contains one or
+                            <description>Parameter for camera to set. Request can contain one or
                                 more parameters to set.</description>
                             <optional>true</optional>
                         </param>
@@ -580,13 +587,15 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>res_id</name>
-                            <description>camera unique id</description>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>&lt;any name&gt;</name>
-                            <description>Parameter name to read. Request can contains one or more
+                            <description>Parameter name to read. Request can contain one or more
                                 parameters.</description>
                             <optional>true</optional>
                         </param>
@@ -602,9 +611,11 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>physicalId</name>
-                            <description>camera unique id</description>
+                            <name>cameraId</name>
                             <optional>false</optional>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                         </param>
                         <param>
                             <name>time</name>
@@ -751,8 +762,12 @@
                             <optional>false</optional>
                         </param>
                         <param>
-                            <name>physicalId</name>
-                            <description>Filter events log by a single camera. Camera's 'physicalId' could be obtain via request ec2/getCamerasEx </description>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).
+                                Used to filter events log by a single camera.
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -842,7 +857,7 @@
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique ID.</description>
+                            <description>Process unique id.</description>
                             <optional>false</optional>
                         </param>
                     </params>
@@ -857,7 +872,7 @@
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique ID.</description>
+                            <description>Process unique id.</description>
                             <optional>false</optional>
                         </param>
                     </params>
@@ -902,7 +917,7 @@
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code, error string and module unique ID in case of successful ping.</caption>
+                        <caption>JSON with error code, error string and module unique id in case of successful ping.</caption>
                     </result>
                 </function>
                 <function>
@@ -937,8 +952,10 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>resourceId</name>
-                            <description>Camera unique ID</description>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -1070,9 +1087,10 @@
                     <method>GET</method>
                     <params>
                         <param>
-                            <name>physicalId</name>
-                            <description>Camera unique ID. Parameter can be used several times to
-                                define a list of cameras.</description>
+                            <name>cameraId</name>
+                            <description>Camera id (can be obtained by ec2/getCamerasEx) or
+                                 MAC address (not supported for certain cameras).
+                                 Parameter can be used several times to define a list of cameras.</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -1605,11 +1623,15 @@
             </groupDescription>
             <functions>
                 <function>
-                    <name>&lt;physicalId&gt;</name>
+                    <name>&lt;cameraId&gt;</name>
                     <caption>RTSP Streaming</caption>
                     <description>
-                                        Open RTSP video from a camera. It is not an exact method name. It means that RTSP url may contain any camera unique ID. For instance:
-                                        rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
+                        Open RTSP video stream from a camera.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        supported for certain cameras).
+                        Example:
+                        rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
                     </description>
                     <method>PLAY</method>
                     <params>
@@ -1680,13 +1702,19 @@
                     </result>
                 </function>
                 <function>
-                    <name>media/&lt;physicalId&gt;.&lt;format&gt;</name>
+                    <name>media/&lt;cameraId&gt;.&lt;format&gt;</name>
                     <caption>HTTP Streaming</caption>
                     <description>
-                        Url format for opening camera stream using HTTP protocol. Codec and stream format can be specified in url parameters.
-                        Live stream and archive can be downloaded. If required and possible, media stream transcoding is performed on-the-fly.
-                        Stream format can be one of following: webm, mpegts, mpjpeg (motion jpeg)
-                        Example: http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm
+                        Open HTTP video stream from a camera.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        supported for certain cameras).
+                        Codec and stream format can be specified in URL parameters. Live stream and
+                        archive can be downloaded. If required and possible, media stream
+                        transcoding is performed on-the-fly. Stream format can be one of the
+                        following: webm, mpegts, mpjpeg (motion jpeg).
+                        Example:
+                        http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm
                     </description>
                     <method>GET</method>
                     <params>
@@ -1730,12 +1758,16 @@
                     </result>
                 </function>
                 <function>
-                    <name>hls/&lt;physicalId&gt;.m3u</name>
+                    <name>hls/&lt;cameraId&gt;.m3u</name>
                     <caption>HLS Streaming</caption>
                     <description>
-                            Url format for opening camera stream with Http Live Streaming (HLS).
-                            This protocol is supported by iOS-based devices (iPhone, iPad).
-                            Example: http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.m3u
+                        Open HTTP Live Streaming (HLS) video stream from a camera.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        supported for certain cameras).
+                        This protocol is supported by iOS-based devices (iPhone, iPad).
+                        Example:
+                        http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.m3u
                     </description>
                     <method>GET</method>
                     <params>
@@ -1760,14 +1792,18 @@
                     </result>
                 </function>
                 <function>
-                    <name>hls/&lt;physicalId&gt;.&lt;format&gt;</name>
+                    <name>hls/&lt;cameraId&gt;.&lt;format&gt;</name>
                     <caption>Direct download</caption>
                     <description>
-                        Url format for downloading fragment of archive by specifying fragment start time and duration.
-                        Fragment can be downloaded in mpeg-2/ts (.ts) format or matroska (.mkv).
-                        No transcoding is done.
-                        Stream format can be one of following: ts, mkv
-                        Example: http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.mkv?startDatetime=2015-02-05T19:00&amp;duration=10
+                        Download fragment of a camera archive, identified by its start time and
+                        duration.
+                        It is not exactly an API method but rather a URL format which may contain
+                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        supported for certain cameras).
+                        Fragment can be downloaded in mpeg-2/ts (.ts) or Matroska (.mkv) format.
+                        No transcoding is performed. Stream format can be one of following: ts, mkv.
+                        Example:
+                        http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.mkv?startDatetime=2015-02-05T19:00&amp;duration=10
                     </description>
                     <method>GET</method>
                     <params>

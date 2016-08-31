@@ -85,20 +85,29 @@ bool StreamingChunkTranscoder::transcodeAsync(
     const StreamingChunkCacheKey& transcodeParams,
     StreamingChunkPtr chunk )
 {
-    //searching for resource
-    QnResourcePtr resource = qnResPool->getResourceByUniqueId( transcodeParams.srcResourceUniqueID() );
-    if( !resource )
+    // Searching for resource.
+    const QString& resId = transcodeParams.srcResourceUniqueID();
+    QnResourcePtr resource;
+    const QnUuid uuid = QnUuid::fromStringSafe(resId);
+    if (!uuid.isNull())
+        resource = qnResPool->getResourceById(uuid);
+    if (!resource)
+        resource = qnResPool->getResourceByUniqueId(resId);
+    if (!resource)
+        resource = qnResPool->getResourceByMacAddress(resId);
+    if (!resource)
+        resource = qnResPool->getResourceByUrl(resId);
+    if (!resource)
     {
-        NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found").
-            arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1 );
+        NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found")
+            .arg(resId), cl_logDEBUG1);
         return false;
     }
-
     QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
     if( !cameraResource )
     {
-        NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not media resource").
-            arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1 );
+        NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not a media resource")
+            .arg(resId), cl_logDEBUG1);
         return false;
     }
 
@@ -123,7 +132,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     else
     {
         AbstractOnDemandDataProviderPtr mediaDataProvider;
-        //checking requested time region: 
+        //checking requested time region:
             //whether data is present (in archive or cache)
         if( transcodeParams.live() )
         {
@@ -188,7 +197,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
             archiveReader->start();
         }
 
-        mediaDataProvider = AbstractOnDemandDataProviderPtr( new H264Mp4ToAnnexB( mediaDataProvider ) );    
+        mediaDataProvider = AbstractOnDemandDataProviderPtr( new H264Mp4ToAnnexB( mediaDataProvider ) );
             //TODO #ak this is not always required, and should be done in createTranscoder method
 
         //creating transcoder
@@ -297,7 +306,7 @@ bool StreamingChunkTranscoder::startTranscoding(
     StreamingChunkPtr chunk )
 {
     //selecting least used transcoding thread from pool
-    StreamingChunkTranscoderThread* transcoderThread = *std::max_element( m_transcodeThreads.cbegin(), m_transcodeThreads.cend(), 
+    StreamingChunkTranscoderThread* transcoderThread = *std::max_element( m_transcodeThreads.cbegin(), m_transcodeThreads.cend(),
         [](StreamingChunkTranscoderThread* one, StreamingChunkTranscoderThread* two){
             return one->ongoingTranscodings() < two->ongoingTranscodings();
         } );
@@ -355,7 +364,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
     else
     {
         //AVOutputFormat* requestedVideoFormat = av_guess_format( transcodeParams.videoCodec().toLatin1().data(), NULL, NULL );
-        codecID = 
+        codecID =
             transcodeParams.videoCodec().isEmpty()
             ? resourceVideoStreamCodecID
             : av_guess_codec( NULL, transcodeParams.videoCodec().toLatin1().data(), NULL, NULL, AVMEDIA_TYPE_VIDEO );
@@ -428,9 +437,9 @@ void StreamingChunkTranscoder::onResourceRemoved( const QnResourcePtr& resource 
         return;
 
     auto nextResourceIDStr = resourceIDStr;
-    //we want to remove all cache elements having id resourceIDStr. 
+    //we want to remove all cache elements having id resourceIDStr.
     //  That's why we need to generate next id value
-    //  We can be sure that unicode char will not overflow because nextResourceIDStr 
+    //  We can be sure that unicode char will not overflow because nextResourceIDStr
     //      contains only ascii symbols (guid)
     nextResourceIDStr[nextResourceIDStr.size()-1] =
         QChar(nextResourceIDStr[nextResourceIDStr.size()-1].unicode()+1);

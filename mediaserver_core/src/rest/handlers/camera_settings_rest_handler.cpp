@@ -2,11 +2,9 @@
 
 #include <algorithm>
 
-#include <QtCore/QElapsedTimer>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_advanced_param.h>
 
 #include <nx/utils/log/log.h>
@@ -15,8 +13,12 @@
 
 #include <utils/xml/camera_advanced_param_reader.h>
 #include "http/custom_headers.h"
+#include <api/helpers/camera_id_helper.h>
 
 namespace {
+
+static const QString kCameraIdParam = lit("cameraId");
+static const QString kDeprecatedResIdParam = lit("res_id");
 
 /** Max time (milliseconds) to wait for async operation completion. */
 static const qint64 kMaxWaitTimeoutMs = 15000;
@@ -44,29 +46,24 @@ int QnCameraSettingsRestHandler::executeGet(
     const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    NX_LOG(lit("QnCameraSettingsHandler. Received request %1").arg(path),
-        cl_logDEBUG1);
+    NX_LOG(lit("QnCameraSettingsRestHandler: received request %1").arg(path), cl_logDEBUG1);
 
-    if (!params.contains(lit("res_id")))
-    {
-        NX_LOG(lit("QnCameraSettingsHandler. No res_id param in request %1. Ignoring...")
-            .arg(path), cl_logWARNING);
-        return CODE_BAD_REQUEST;
-    }
-
-    QString cameraPhysicalId = params[lit("res_id")];
-    QnResourcePtr camera = qnResPool->getNetResourceByPhysicalId(cameraPhysicalId);
+    QString notFoundCameraId = QString::null;
+    auto camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        &notFoundCameraId, params, {kCameraIdParam, kDeprecatedResIdParam});
     if (!camera)
     {
-        NX_LOG(lit("QnCameraSettingsHandler. Unknown camera %1 in request %2. Ignoring...")
-            .arg(cameraPhysicalId).arg(path), cl_logWARNING);
-        return CODE_NOT_FOUND;
+        if (notFoundCameraId.isNull())
+            return CODE_BAD_REQUEST;
+        else
+            return CODE_NOT_FOUND;
     }
 
     // Clean params that are not keys.
     QnRequestParams locParams = params;
     locParams.remove(Qn::SERVER_GUID_HEADER_NAME);
-    locParams.remove(lit("res_id"));
+    locParams.remove(kCameraIdParam);
+    locParams.remove(kDeprecatedResIdParam);
 
     // Filter allowed parameters.
     QnCameraAdvancedParams cameraParameters = m_paramsReader->params(camera);
@@ -155,7 +152,8 @@ int QnCameraSettingsRestHandler::executeGet(
     QnCameraAdvancedParamValueList reply = awaitedParams.result;
     result.setReply(reply);
 
-    NX_LOG(lit("QnCameraSettingsHandler. request %1 processed successfully").arg(path),
+    NX_LOG(lit("QnCameraSettingsHandler. Request %1 processed successfully for camera %2")
+        .arg(path).arg(camera->getId().toString()),
         cl_logDEBUG1);
     return CODE_OK;
 }

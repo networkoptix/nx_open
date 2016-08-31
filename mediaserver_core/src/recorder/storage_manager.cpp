@@ -509,7 +509,7 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
 
     for (const auto &camera : camerasToAdd)
     {
-        ec2::ErrorCode errCode = 
+        ec2::ErrorCode errCode =
             QnAppserverResourceProcessor::addAndPropagateCamResource(
                 camera.coreData
             );
@@ -597,7 +597,7 @@ void QnStorageManager::subtractSpaceInfoOccupiedValue(int storageIndex, qint64 v
 	});
 }
 
-qint64 QnStorageManager::getSpaceInfoOccupiedValue(int storageIndex) 
+qint64 QnStorageManager::getSpaceInfoOccupiedValue(int storageIndex)
 {
 	qint64 result = 0;
 	applySpaceInfoAction(storageIndex, [&result] (StorageSpaceInfoMap::iterator it) {
@@ -1255,7 +1255,7 @@ bool QnStorageManager::isArchiveTimeExistsInternal(const QString& cameraUniqueId
     return catalog && catalog->containTime(period);
 }
 
-QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
+QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnSecurityCamResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
                                                       const QList<QnServer::ChunksCatalog> &catalogs, int limit)
 {
     std::vector<QnTimePeriodList> periods;
@@ -1266,12 +1266,12 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
 
 void QnStorageManager::getRecordedPeriodsInternal(
     std::vector<QnTimePeriodList>& periods,
-    const QnVirtualCameraResourceList &cameras,
+    const QnSecurityCamResourceList &cameras,
     qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
     const QList<QnServer::ChunksCatalog> &catalogs,
     int /*limit*/)
 {
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
+    for (const QnSecurityCamResourcePtr &camera: cameras) {
         QString cameraUniqueId = camera->getUniqueId();
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
             QnServer::ChunksCatalog catalog = static_cast<QnServer::ChunksCatalog> (i);
@@ -1892,7 +1892,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
             if (storage->getStatus() == Qn::ResourceStatus::Offline)
                 return false;
         }
-        // reset Chunk 
+        // reset Chunk
         deletedChunk = DeviceFileCatalog::Chunk();
     }
 
@@ -2180,9 +2180,9 @@ void QnStorageManager::updateStorageStatistics()
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
 
         qint64 storageSpace = std::max(
-			qint64(1), 
+			qint64(1),
 			static_cast<qint64>(
-				fileStorage->getFreeSpace() + 
+				fileStorage->getFreeSpace() +
 				getSpaceInfoOccupiedValue(qnStorageDbPool->getStorageIndex(fileStorage))) -
 				fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
@@ -2192,11 +2192,11 @@ void QnStorageManager::updateStorageStatistics()
     {
         QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
 		int storageIndex = qnStorageDbPool->getStorageIndex(fileStorage);
-		
+
         qint64 storageSpace = std::max(
             qint64(1),
             static_cast<qint64>(
-				fileStorage->getFreeSpace() + 
+				fileStorage->getFreeSpace() +
 				getSpaceInfoOccupiedValue(storageIndex) -
 				fileStorage->getSpaceLimit()));
 		setSpaceInfoUsageCoeff(storageIndex, (double)storageSpace / totalSpace);
@@ -2267,7 +2267,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 			int storageIndex = qnStorageDbPool->getStorageIndex(storage);
 			NX_LOG(lit("Selecting storage for recording. Candidate: %1. Usage likeness coeff: %2")
 					   .arg(storage->getUrl())
-					   .arg(getSpaceInfoUsageCoeff(storageIndex)), 
+					   .arg(getSpaceInfoUsageCoeff(storageIndex)),
 				   cl_logDEBUG2);
 
             writedCoeffPartialSum += getSpaceInfoUsageCoeff(storageIndex);

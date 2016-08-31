@@ -223,8 +223,8 @@ protected:
 private:
     QnCachingCameraDataLoaderPtr loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
-    bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
-    void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
+    bool hasWidgetWithCamera(const QnSecurityCamResourcePtr &camera) const;
+    void updateHistoryForCamera(QnSecurityCamResourcePtr camera);
     void updateSliderBookmarks();
 
     void updateHasArchiveState();
@@ -295,7 +295,7 @@ private:
     int m_chunkMergingProcessHandle;
     std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
-    QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
+    QSet<QnSecurityCamResourcePtr> m_updateHistoryQueue;
 
     /** At least one of the synced widgets has archive. */
     bool m_hasArchive;
