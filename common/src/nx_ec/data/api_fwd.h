@@ -126,6 +126,7 @@ namespace ec2 {
     typedef std::vector<ApiCameraHistoryItemData> ApiCameraHistoryItemDataList;
     typedef std::vector<ApiWebPageData> ApiWebPageDataList;
     typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
+    typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\

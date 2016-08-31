@@ -2,6 +2,7 @@
 #define __DB_MANAGER_H_
 
 #include <memory>
+
 #include <QtSql/QSqlError>
 
 #include "nx_ec/ec_api.h"
@@ -126,7 +127,6 @@ namespace detail
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
-            QN_UNUSED(t1, t2);
             QnWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
@@ -228,7 +228,7 @@ namespace detail
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
 
         //getUserGroupList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& groupList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& groupList);
 
         //getPredefinedRoles
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
@@ -258,7 +258,7 @@ namespace detail
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
 
         // ApiDiscoveryDataList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
+        ErrorCode doQueryNoLock(const QnUuid& id, ec2::ApiDiscoveryDataList& data);
 
         //getServerUserAttributes
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
@@ -267,9 +267,16 @@ namespace detail
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
 
         //getClientInfos
+        // TODO: #mike: Remove specialization with nullptr_t.
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data);
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
 
+        // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
+        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
+        {
+            data.clear();
+            return ErrorCode::ok;
+        }
 
         // ------------ transactions --------------------------------------
 
@@ -543,6 +550,7 @@ namespace detail
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         bool isReadOnly() const { return m_dbReadOnly; }
+
     private:
         class QnDbTransactionExt: public QnDbTransaction
         {

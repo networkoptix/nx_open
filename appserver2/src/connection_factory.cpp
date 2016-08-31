@@ -143,7 +143,6 @@ void Ec2DirectConnectionFactory::registerTransactionListener(
 void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 {
     using namespace std::placeholders;
-    namespace Api = ApiCommand;
 
     /**%apidoc GET /ec2/getResourceTypes
      * Read all resource types. Resource type contain object type such as
@@ -709,10 +708,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getUserGroups
      * Return user groups registered in the system.
      * %param[default] format
-     * %return Return object in requested format
+     * %param[opt] id Object unique Id.
+     * %return Object in requested format. If id parameter is specified, the list contains only one
+     * object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUserGroups
      */
-    regGet<nullptr_t, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
+    regGet<QnUuid, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
 
     /**%apidoc GET /ec2/getAccessRights
      * Return list of accessible resources ids for each user in the system.
@@ -1051,7 +1052,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     // AbstractDiscoveryManager::removeDiscoveryInformation
     regUpdate<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
     // AbstractDiscoveryManager::getDiscoveryData
-    regGet<nullptr_t, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
+    regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
     // AbstractMiscManager::changeSystemName
     regUpdate<ApiSystemNameData>(p, ApiCommand::changeSystemName);
 
@@ -1075,7 +1076,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     // ApiClientInfoData
     regUpdate<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
-    regGet<nullptr_t, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
+    regGet<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
