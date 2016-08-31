@@ -1639,7 +1639,7 @@ bool QnStorageManager::isWritableStoragesAvailable() const
     return m_isWritableStorageAvail;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::geAllWritableStorages() const
+QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
 {
     return getWritableStorages(
         [](const QnStorageResourcePtr& storage)
