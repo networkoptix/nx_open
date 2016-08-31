@@ -31,7 +31,7 @@ check_cloud_host()
 
     if [ -n "$INSTALLED_CLOUD_HOST" -a "$INSTALLED_CLOUD_HOST" != "$CLOUD_HOST" ]
     then
-        echo "This beta package is fo another cloud instance. Exiting.." >&2
+        echo "This beta package is for another cloud instance. Exiting.." >&2
         exit 1
     fi
 }
