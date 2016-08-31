@@ -11,7 +11,9 @@ namespace tcp {
 
 /**
  * HTTP Server to accept NXRC/1.0 connections
- * Is is safe to remove this object from any thread
+ *
+ * Is is safe to remove this object from any thread (destructor blocks to wait connection
+ * handlers).
  */
 class ReverseAcceptor
 {
@@ -32,6 +34,9 @@ public:
      * @param aioThread is used to call handler, also removal from this thread will be nonblocking
      */
     bool start(const SocketAddress& address, aio::AbstractAioThread* aioThread = nullptr);
+
+    /** Stops accepting new connections (shell be called from AIO thread) */
+    void stopAccepting();
 
     SocketAddress address() const;
     String selfHostName() const;
@@ -63,7 +68,7 @@ private:
     };
 
     const String m_selfHostName;
-    const ConnectHandler m_connectHandler;
+    ConnectHandler m_connectHandler;
 
     mutable QnMutex m_dataMutex;
     boost::optional<size_t> m_poolSize;

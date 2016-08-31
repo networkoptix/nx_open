@@ -51,6 +51,12 @@ bool ReverseAcceptor::start(const SocketAddress& address, aio::AbstractAioThread
     return m_httpServer->bind(address) && m_httpServer->listen();
 }
 
+void ReverseAcceptor::stopAccepting()
+{
+    m_connectHandler = nullptr;
+    m_httpServer->pleaseStop();
+}
+
 SocketAddress ReverseAcceptor::address() const
 {
     return m_httpServer->address();
@@ -109,7 +115,8 @@ void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnect
         [this, hostName=std::move(hostName),
             socket = std::unique_ptr<AbstractStreamSocket>(rawSocket)]() mutable
         {
-            m_connectHandler(hostName, std::move(socket));
+            if (m_connectHandler)
+                m_connectHandler(hostName, std::move(socket));
         });
 }
 
