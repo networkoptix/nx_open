@@ -508,7 +508,6 @@ namespace detail
         ErrorCode removeUserGroup( const QnUuid& guid );
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
         ErrorCode cleanAccessRights(const QnUuid& userOrGroupId);
-        ErrorCode checkIfUserGroupExists(const QnUuid& groupId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);
