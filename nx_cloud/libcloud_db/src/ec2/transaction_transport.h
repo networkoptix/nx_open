@@ -73,7 +73,7 @@ public:
 
     void sendTransaction(
         TransactionTransportHeader transportHeader,
-        const std::unique_ptr<TransactionSerializer>& transactionSerializer);
+        const std::shared_ptr<const TransactionSerializer>& transactionSerializer);
 
     template<class T>
     void sendTransaction(
@@ -86,7 +86,7 @@ public:
                 .str(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG1);
 
-        std::unique_ptr<TransactionSerializer> transactionSerializer;
+        std::shared_ptr<const TransactionSerializer> transactionSerializer;
         switch (remotePeer().dataFormat)
         {
             case Qn::UbjsonFormat:

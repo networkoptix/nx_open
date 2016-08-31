@@ -25,6 +25,8 @@ class AsyncSqlQueryExecutor;
 namespace cdb {
 namespace ec2 {
 
+class OutgoingTransactionDispatcher;
+
 /** 
  * Comment will appear here later during class implementation
  */
@@ -33,7 +35,9 @@ class TransactionLog
 public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
 
-    TransactionLog(nx::db::AsyncSqlQueryExecutor* const dbManager);
+    TransactionLog(
+        nx::db::AsyncSqlQueryExecutor* const dbManager,
+        OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
     /** 
      * Begins SQL DB transaction and passes that to \a dbOperationsFunc.
@@ -80,11 +84,13 @@ public:
 
         // TODO: Saving transaction to the log.
 
-        auto transactionSerializer = std::make_unique<
+        auto transactionSerializer = std::make_shared<
             typename SerializedUbjsonTransaction<TransactionDataType>>(
                 std::move(transaction),
                 std::move(serializedTransaction));
 
+        // Saving transactions, generated under current DB transaction,
+        //  so that we can send "new transaction" notifications after commit
         QnMutexLocker lk(&m_mutex);
         DbTransactionContext& context = m_dbTransactionContexts[connection];
         context.systemId = systemId;
@@ -94,14 +100,20 @@ public:
     }
 
 private:
-    struct DbTransactionContext
+    class DbTransactionContext
     {
+    public:
         nx::String systemId;
         /** List of transactions, added within this DB transaction. */
-        std::vector<std::unique_ptr<TransactionSerializer>> transactions;
+        std::vector<std::shared_ptr<const TransactionSerializer>> transactions;
+
+        DbTransactionContext() = default;
+        DbTransactionContext(DbTransactionContext&&) = default;
+        DbTransactionContext& operator=(DbTransactionContext&&) = default;
     };
 
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     QnMutex m_mutex;
     std::map<QSqlDatabase*, DbTransactionContext> m_dbTransactionContexts;
 };

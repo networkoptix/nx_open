@@ -170,7 +170,7 @@ void TransactionTransport::processSpecialTransaction(
 
 void TransactionTransport::sendTransaction(
     TransactionTransportHeader transportHeader,
-    const std::unique_ptr<TransactionSerializer>& transactionSerializer)
+    const std::shared_ptr<const TransactionSerializer>& transactionSerializer)
 {
     transportHeader.vmsTransportHeader.fillSequence();
     auto serializedTransaction = transactionSerializer->serialize(

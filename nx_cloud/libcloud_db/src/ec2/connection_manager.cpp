@@ -11,6 +11,7 @@
 #include "access_control/authorization_manager.h"
 #include "stree/cdb_ns.h"
 #include "incoming_transaction_dispatcher.h"
+#include "outgoing_transaction_dispatcher.h"
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
 
@@ -22,16 +23,19 @@ ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
     const conf::Settings& settings,
     TransactionLog* const transactionLog,
-    IncomingTransactionDispatcher* const transactionDispatcher)
+    IncomingTransactionDispatcher* const transactionDispatcher,
+    OutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
 :
     m_settings(settings),
     m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
+    m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_localPeerData(
         moduleGuid,
         QnUuid::createUuid(),
         Qn::PT_CloudServer,
-        Qn::UbjsonFormat)
+        Qn::UbjsonFormat),
+    m_onNewTransactionSubscriptionId(nx::utils::kInvalidSubscriptionId)
 {
     using namespace std::placeholders;
 
@@ -47,10 +51,17 @@ ConnectionManager::ConnectionManager(
         <::ec2::ApiCommand::tranSyncDone, ::ec2::ApiTranSyncDoneData>(
             std::bind(&ConnectionManager::processSpecialTransaction<::ec2::ApiTranSyncDoneData>,
                         this, _1, _2, _3, _4));
+
+    m_outgoingTransactionDispatcher->onNewTransactionSubscription()->subscribe(
+        std::bind(&ConnectionManager::dispatchTransaction, this, _1, _2),
+        &m_onNewTransactionSubscriptionId);
 }
 
 ConnectionManager::~ConnectionManager()
 {
+    m_outgoingTransactionDispatcher->onNewTransactionSubscription()
+        ->removeSubscription(m_onNewTransactionSubscriptionId);
+
     m_startedAsyncCallsCounter.wait();
 }
 
@@ -204,7 +215,7 @@ void ConnectionManager::pushTransaction(
 
 void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
-    std::unique_ptr<TransactionSerializer> transactionSerializer)
+    std::shared_ptr<const TransactionSerializer> transactionSerializer)
 {
     // Generating transport header.
     TransactionTransportHeader transportHeader;

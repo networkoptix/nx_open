@@ -194,15 +194,18 @@ int CloudDBProcess::exec()
         EventManager eventManager(settings);
         m_eventManager = &eventManager;
 
-        ec2::TransactionLog transactionLog(&dbManager);
-        ec2::IncomingTransactionDispatcher transactionDispatcher(&transactionLog);
+        ec2::OutgoingTransactionDispatcher ec2OutgoingTransactionDispatcher;
+        ec2::TransactionLog transactionLog(
+            &dbManager,
+            &ec2OutgoingTransactionDispatcher);
+        ec2::IncomingTransactionDispatcher incomingTransactionDispatcher(
+            &transactionLog);
         ec2::ConnectionManager ec2ConnectionManager(
             kCdbGuid,
             settings,
             &transactionLog,
-            &transactionDispatcher);
-        //ec2::OutgoingTransactionDispatcher ec2OutgoingTransactionDispatcher(&ec2ConnectionManager);
-        //transactionLog.setNewTransactionsHandler(&ec2OutgoingTransactionDispatcher);
+            &incomingTransactionDispatcher,
+            &ec2OutgoingTransactionDispatcher);
 
         SystemManager systemManager(
             settings,
@@ -211,7 +214,7 @@ int CloudDBProcess::exec()
             eventManager,
             &dbManager,
             &transactionLog,
-            &transactionDispatcher);
+            &incomingTransactionDispatcher);
         m_systemManager = &systemManager;
 
         //TODO #ak move following to stree xml

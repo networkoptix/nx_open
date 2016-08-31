@@ -18,6 +18,7 @@
 #include <nx_ec/data/api_tran_state_data.h>
 
 #include <utils/common/counter.h>
+#include <utils/common/subscription.h>
 
 #include "access_control/auth_types.h"
 #include "transaction_processor.h"
@@ -40,6 +41,7 @@ class Settings;
 namespace ec2 {
 
 class IncomingTransactionDispatcher;
+class OutgoingTransactionDispatcher;
 class TransactionLog;
 class TransactionTransport;
 class TransactionTransportHeader;
@@ -54,7 +56,8 @@ public:
         const QnUuid& moduleGuid,
         const conf::Settings& settings,
         TransactionLog* const transactionLog,
-        IncomingTransactionDispatcher* const transactionDispatcher);
+        IncomingTransactionDispatcher* const transactionDispatcher,
+        OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
     virtual ~ConnectionManager();
 
     /**
@@ -81,7 +84,7 @@ public:
      */
     void dispatchTransaction(
         const nx::String& systemId,
-        std::unique_ptr<TransactionSerializer> transactionSerializer);
+        std::shared_ptr<const TransactionSerializer> transactionSerializer);
 
 private:
     struct ConnectionContext
@@ -114,11 +117,13 @@ private:
     const conf::Settings& m_settings;
     TransactionLog* const m_transactionLog;
     IncomingTransactionDispatcher* const m_transactionDispatcher;
+    OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     const ::ec2::ApiPeerData m_localPeerData;
     ConnectionDict m_connections;
     std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
     QnMutex m_mutex;
     QnCounter m_startedAsyncCallsCounter;
+    nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
 
     void addNewConnection(ConnectionContext connectionContext);
     template<int connectionIndexNumber, typename ConnectionKeyType>

@@ -1,25 +1,26 @@
 #include "outgoing_transaction_dispatcher.h"
 
-#include "connection_manager.h"
-
 namespace nx {
 namespace cdb {
 namespace ec2 {
 
-OutgoingTransactionDispatcher::OutgoingTransactionDispatcher(
-    ConnectionManager* const connectionManager)
-:
-    m_connectionManager(connectionManager)
+OutgoingTransactionDispatcher::OutgoingTransactionDispatcher()
 {
 }
 
 void OutgoingTransactionDispatcher::dispatchTransaction(
     const nx::String& systemId,
-    std::unique_ptr<TransactionSerializer> transactionSerializer)
+    std::shared_ptr<const TransactionSerializer> transactionSerializer)
 {
-    m_connectionManager->dispatchTransaction(
+    m_onNewTransactionSubscription.notify(
         systemId,
         std::move(transactionSerializer));
+}
+
+OutgoingTransactionDispatcher::OnNewTransactionSubscription*
+    OutgoingTransactionDispatcher::onNewTransactionSubscription()
+{
+    return &m_onNewTransactionSubscription;
 }
 
 } // namespace ec2

@@ -1,5 +1,7 @@
 #include "transaction_log.h"
 
+#include "outgoing_transaction_dispatcher.h"
+
 namespace nx {
 namespace cdb {
 namespace ec2 {
@@ -8,9 +10,12 @@ namespace ec2 {
 //// class TransactionLog
 ////////////////////////////////////////////////////////////
 
-TransactionLog::TransactionLog(nx::db::AsyncSqlQueryExecutor* const dbManager)
+TransactionLog::TransactionLog(
+    nx::db::AsyncSqlQueryExecutor* const dbManager,
+    OutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
 :
-    m_dbManager(dbManager)
+    m_dbManager(dbManager),
+    m_outgoingTransactionDispatcher(outgoingTransactionDispatcher)
 {
 }
 
@@ -34,13 +39,26 @@ void TransactionLog::startDbTransaction(
         {
             if (dbResult != nx::db::DBResult::ok)
             {
-                // TODO: #ak rolling back transaction log change
+                // TODO: #ak Rolling back transaction log change.
             }
             onDbUpdateCompleted(dbConnection, dbResult);
 
-            // TODO: #ak issuing "new transaction" event
-            QnMutexLocker lk(&m_mutex);
-            m_dbTransactionContexts.erase(dbConnection);
+            DbTransactionContext currentDbTranContext;
+            {
+                QnMutexLocker lk(&m_mutex);
+                auto it = m_dbTransactionContexts.find(dbConnection);
+                if (it != m_dbTransactionContexts.end())
+                {
+                    currentDbTranContext = std::move(it->second);
+                    m_dbTransactionContexts.erase(it);
+                }
+            }
+
+            // Issuing "new transaction" event.
+            for (auto& tran: currentDbTranContext.transactions)
+                m_outgoingTransactionDispatcher->dispatchTransaction(
+                    currentDbTranContext.systemId,
+                    std::move(tran));
         });
 }
 
