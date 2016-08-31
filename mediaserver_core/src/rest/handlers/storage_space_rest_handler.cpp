@@ -56,16 +56,12 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
         }
     };
 
-    auto fiter = [](const QnStorageResourcePtr& storage)
-    {
-        return storage->getStatus() != Qn::Offline;
-    };
     enumerate(
         qnNormalStorageMan->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : qnNormalStorageMan->getWritableStorages(fiter));
+        fastRequest ? QSet<QnStorageResourcePtr>() : qnNormalStorageMan->geAllWritableStorages());
     enumerate(
         qnBackupStorageMan->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : qnBackupStorageMan->getWritableStorages(fiter));
+        fastRequest ? QSet<QnStorageResourcePtr>() : qnBackupStorageMan->geAllWritableStorages());
 
     if (!fastRequest)
     {
