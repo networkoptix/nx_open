@@ -105,13 +105,15 @@ Page
 
     function showWarning(status, info)
     {
-        warningText = LoginUtils.connectionErrorText(status, info)
-        warningVisible = true
-
         if (status === QnConnectionManager.Unauthorized)
+        {
             credentialsEditor.displayUserCredentialsError = true
+        }
         else
+        {
+            credentialsEditor.addressErrorText = LoginUtils.connectionErrorText(status, info)
             credentialsEditor.displayAddressError = true
+        }
 
         if (status === QnConnectionManager.InvalidVersion)
             Workflow.openOldClientDownloadSuggestion()
@@ -119,7 +121,6 @@ Page
 
     function hideWarning()
     {
-        warningVisible = false
         credentialsEditor.displayUserCredentialsError = false
         credentialsEditor.displayAddressError = false
     }

@@ -16,7 +16,7 @@ function makeUrl(address, login, password, cloud)
 function connectionErrorText(status, info)
 {
     if (status == Nx.QnConnectionManager.Unauthorized)
-        return qsTr("Incorrect login or password")
+        return qsTr("Invalid login or password")
     else if (status == Nx.QnConnectionManager.NetworkError)
         return qsTr("Server or network is not available")
     else if (status == Nx.QnConnectionManager.InvalidServer)
