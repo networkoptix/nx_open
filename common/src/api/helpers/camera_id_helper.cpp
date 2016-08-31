@@ -57,7 +57,7 @@ QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleIds(
         return QnSecurityCamResourcePtr(nullptr);
     }
 
-    QString flexibleId = params[flexibleIdParamName];
+    QString flexibleId = params.value(flexibleIdParamName);
     NX_ASSERT(!flexibleId.isNull()); //< NOTE: Can be empty if specified empty in the request.
 
     auto camera = findCameraByFlexibleId(flexibleId);
