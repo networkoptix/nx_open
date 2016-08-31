@@ -2611,7 +2611,7 @@ QRect QnNxStyle::subElementRect(
                     /* To match Qt standard drawing: */
                     int iconSize = proxy()->pixelMetric(QStyle::PM_SmallIconSize, header, widget);
                     QSize size = header->icon.actualSize(widget->windowHandle(), QSize(iconSize, iconSize),
-                        (header->state & State_Enabled) ? QIcon::Normal : QIcon::Disabled);
+                        header->state.testFlag(State_Enabled) ? QIcon::Normal : QIcon::Disabled);
 
                     rect.setWidth(rect.width() + size.width() + kQtHeaderIconMargin);
                     rect.setHeight(qMax(rect.height(), size.height()));
