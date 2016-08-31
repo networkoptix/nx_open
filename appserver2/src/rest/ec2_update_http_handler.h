@@ -24,8 +24,7 @@ namespace ec2 {
  * RestAPI request handler for update requests.
  */
 template<class RequestDataType>
-class UpdateHttpHandler:
-    public QnRestRequestHandler
+class UpdateHttpHandler: public QnRestRequestHandler
 {
 public:
     typedef std::function<void(const QnTransaction<RequestDataType>&)> CustomActionFuncType;
@@ -40,27 +39,24 @@ public:
     }
 
     virtual int executeGet(
-        const QString& path,
-        const QnRequestParamList& params,
-        QByteArray& result,
-        QByteArray& contentType,
-        const QnRestConnectionProcessor* owner) override
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        QByteArray& /*result*/,
+        QByteArray& /*contentType*/,
+        const QnRestConnectionProcessor* /*owner*/) override
     {
-        QN_UNUSED(path, params, result, contentType, owner);
         return nx_http::StatusCode::badRequest;
     }
 
     virtual int executePost(
         const QString& path,
-        const QnRequestParamList& params,
+        const QnRequestParamList& /*params*/,
         const QByteArray& body,
         const QByteArray& srcBodyContentType,
         QByteArray& resultBody,
         QByteArray& contentType,
         const QnRestConnectionProcessor* owner) override
     {
-        QN_UNUSED(params);
-
         QnTransaction<RequestDataType> tran;
         bool success = false;
         QByteArray srcFormat = srcBodyContentType.split(';')[0];
@@ -91,7 +87,7 @@ public:
                     return nx_http::StatusCode::ok;
                 }
 
-                // todo: temporary fix. Revert this check after merge with x_VMS-3408_cloud_sync
+                // TODO: Temporary fix. Revert this check after merge with x_VMS-3408_cloud_sync.
                 if (tran.command == ApiCommand::restoreDatabase)
                     tran.isLocal = true;
 
