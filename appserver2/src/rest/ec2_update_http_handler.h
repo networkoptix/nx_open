@@ -78,7 +78,6 @@ public:
 
         // Replace client GUID to own GUID (take transaction ownership).
         tran.peerID = qnCommon->moduleGUID();
-        tran.deliveryInfo.originatorType = QnTranDeliveryInformation::client;
 
         switch (processUpdateAsync(tran, owner))
         {
@@ -176,7 +175,7 @@ private:
                 lit("Unknown API command %1").arg(commandStr));
             return nx_http::StatusCode::ok;
         }
-    
+
         // TODO: Temporary fix. Revert this check after merge with x_VMS-3408_cloud_sync.
         if (tran->command == ApiCommand::restoreDatabase)
             tran->isLocal = true;
@@ -275,7 +274,7 @@ private:
             commandStr = tmp.last();
             *outCommand = ApiCommand::fromString(commandStr);
         }
-        return commandStr;    
+        return commandStr;
     }
 
     template<typename T = RequestData>
@@ -308,7 +307,7 @@ private:
                 m_cond.wakeAll();
             };
 
-        m_connection->queryProcessor()->getAccess(Qn::UserAccessData(owner->authUserId()))
+        m_connection->queryProcessor()->getAccess(owner->accessRights())
             .template processQueryAsync<QnUuid, RequestDataList, decltype(queryDoneHandler)>(
                 /*unused*/ ApiCommand::NotDefined, uuid, queryDoneHandler);
 
