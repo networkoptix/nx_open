@@ -44,9 +44,9 @@ protected:
     void enableReveseConnectionsOnClient(boost::optional<size_t> poolSize = boost::none)
     {
         auto& pool = SocketGlobals::tcpReversePool();
-        ASSERT_TRUE(pool.start(SocketAddress(HostAddress::localhost, 0), true));
         pool.setPoolSize(poolSize);
         pool.setKeepAliveOptions(KeepAliveOptions(60, 10, 3));
+        ASSERT_TRUE(pool.start(HostAddress::localhost, 0, true));
     }
 
     hpm::MediatorFunctionalTest m_mediator;

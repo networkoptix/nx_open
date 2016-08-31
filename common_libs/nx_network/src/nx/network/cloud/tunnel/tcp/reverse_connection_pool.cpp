@@ -12,22 +12,22 @@ namespace tcp {
 ReverseConnectionPool::ReverseConnectionPool(
     std::shared_ptr<MediatorConnection> mediatorConnection)
 :
-    m_mediatorConnection(std::move(mediatorConnection))
-{
-}
-
-bool ReverseConnectionPool::start(const SocketAddress& address, bool waitForRegistration)
-{
-    NX_ASSERT(!m_acceptor);
-    m_acceptor = std::make_unique<ReverseAcceptor>(
+    m_mediatorConnection(std::move(mediatorConnection)),
+    m_acceptor(
         QnUuid::createUuid().toByteArray(),
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            NX_LOGX(lm("New socket(%1) from '%2").args(socket, hostName), cl_logDEBUG1);
-            getHolder(hostName, true)->saveSocket(std::move(socket));
-        });
+          NX_LOGX(lm("New socket(%1) from '%2").args(socket, hostName), cl_logDEBUG1);
+          getHolder(hostName, true)->saveSocket(std::move(socket));
+        })
+{
+}
 
-    if (!m_acceptor->start(address, m_mediatorConnection->getAioThread()))
+bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool waitForRegistration)
+{
+    m_publicIp = std::move(publicIp);
+    SocketAddress serverAddress(HostAddress::anyHost, port);
+    if (!m_acceptor.start(serverAddress, m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor: %1").arg(SystemError::getLastOSErrorText()),
             cl_logWARNING);
@@ -36,6 +36,11 @@ bool ReverseConnectionPool::start(const SocketAddress& address, bool waitForRegi
     }
 
     return registerOnMediator(waitForRegistration);
+}
+
+uint16_t ReverseConnectionPool::port() const
+{
+    return m_acceptor.address().port;
 }
 
 std::shared_ptr<ReverseConnectionHolder>
@@ -60,7 +65,7 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
     m_mediatorConnection->pleaseStop(
         [this, handler = std::move(completionHandler)]()
         {
-            m_acceptor.reset();
+            m_acceptor.stopAccepting();
             for (auto& holder: m_connectionHolders)
                 holder.second->stopInAioThread();
 
@@ -71,14 +76,14 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
 
 void ReverseConnectionPool::setPoolSize(boost::optional<size_t> value)
 {
-    m_acceptor->setPoolSize(std::move(value));
+    m_acceptor.setPoolSize(std::move(value));
 
     // TODO: also need to close extra connections in m_connectionHolders
 }
 
 void ReverseConnectionPool::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)
 {
-    m_acceptor->setKeepAliveOptions(std::move(value));
+    m_acceptor.setKeepAliveOptions(std::move(value));
 }
 
 bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
@@ -88,8 +93,8 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
         registrationPromise = std::make_shared<utils::promise<bool>>();
 
     hpm::api::ClientBindRequest request;
-    request.originatingPeerID = m_acceptor->selfHostName();
-    request.tcpReverseEndpoints.push_back(m_acceptor->address());
+    request.originatingPeerID = m_acceptor.selfHostName();
+    request.tcpReverseEndpoints.push_back(SocketAddress(m_publicIp, m_acceptor.address().port));
     m_mediatorConnection->send(
         std::move(request),
         [this, registrationPromise](nx::hpm::api::ResultCode code)
@@ -97,7 +102,7 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
             if (code == nx::hpm::api::ResultCode::ok)
             {
                 NX_LOGX(lm("Registred on mediator by %1 with %2")
-                    .strs(m_acceptor->selfHostName(), m_acceptor->address()), cl_logINFO);
+                    .strs(m_acceptor.selfHostName(), m_acceptor.address()), cl_logINFO);
             }
             else
             {
