@@ -27,6 +27,8 @@
     </repositories>
 
     <properties>
+        <cloud.host>cloud-demo.hdw.mx</cloud.host>
+
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <cloud_connect_test_util.guid>{931F412E-DCC2-426B-93CD-1F551CA69D93}</cloud_connect_test_util.guid>
@@ -736,7 +738,7 @@
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
-		<module>plugins/it930x_plugin</module>
+                <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/connection_mediator-deb</module>
