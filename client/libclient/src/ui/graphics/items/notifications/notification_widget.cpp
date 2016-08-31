@@ -161,7 +161,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     base_type(parent, flags),
     m_defaultActionIdx(-1),
     m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
-    m_textLabel(new QnClickableProxyLabel(this)),
+    m_textLabel(new QnProxyLabel(this)),
     m_closeButton(new QnImageButtonWidget(this)),
     m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
     m_imageProvider(nullptr),
