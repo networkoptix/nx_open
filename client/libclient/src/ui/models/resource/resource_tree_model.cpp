@@ -302,6 +302,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureAccessibleResourceNode(con
     auto pos = resources.find(resource);
     if (pos == resources.end())
     {
+        NX_ASSERT(!m_iteratingOverNodesByResource);
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, resource, Qn::AccessibleResourceNode));
         pos = resources.insert(resource, node);
         m_nodesByResource[resource].push_back(*pos);
