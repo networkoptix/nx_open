@@ -10,7 +10,6 @@ Item
     property alias password: passwordField.text
     property alias learnMoreLinkVisible: learnMoreLink.visible
     readonly property bool connecting: d.connecting
-    property WarningPanel warningPanel: null
 
     signal loggedIn()
 
@@ -45,6 +44,15 @@ Item
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
                 inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhPreferLatin
+
+                onActiveFocusChanged:
+                {
+                    if (activeFocus && d.invalidCredentials)
+                    {
+                        d.invalidCredentials = false
+                        hideWarning()
+                    }
+                }
             }
             TextField
             {
@@ -57,6 +65,20 @@ Item
                 activeFocusOnTab: true
                 onAccepted: login()
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
+
+                onActiveFocusChanged:
+                {
+                    if (activeFocus && d.invalidCredentials)
+                    {
+                        d.invalidCredentials = false
+                        hideWarning()
+                    }
+                }
+            }
+            FieldWarning
+            {
+                id: warningPanel
+                width: parent.width
             }
         }
 
@@ -138,7 +160,7 @@ Item
         if (!emailField.text || !passwordField.text)
         {
             d.invalidCredentials = true
-            showWarning(qsTr("Invalid email or password"))
+            showWarning(qsTr("Email and password cannot be empty"))
             return
         }
 
@@ -150,18 +172,12 @@ Item
 
     function showWarning(text)
     {
-        if (!warningPanel)
-            return
-
         warningPanel.text = text
         warningPanel.opened = true
     }
 
     function hideWarning()
     {
-        if (!warningPanel)
-            return
-
         warningPanel.opened = false
     }
 
