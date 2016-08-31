@@ -68,11 +68,11 @@ SystemManager::SystemManager(
     m_transactionDispatcher->registerTransactionHandler
         <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData, data::SystemSharing>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3, _4),
-            std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2));
+            std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2, _3));
     m_transactionDispatcher->registerTransactionHandler
         <::ec2::ApiCommand::removeUser, ::ec2::ApiIdData, data::SystemSharing>(
             std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3, _4),
-            std::bind(&SystemManager::onEc2RemoveUserDone, this, _1, _2));
+            std::bind(&SystemManager::onEc2RemoveUserDone, this, _1, _2, _3));
 }
 
 SystemManager::~SystemManager()
@@ -137,7 +137,7 @@ void SystemManager::authenticateByName(
         systemIter->id,
         std::bind(&SystemManager::systemActivated, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, [](api::ResultCode){}));
+            _1, _2, _3, [](api::ResultCode){}));
 
     result = api::ResultCode::ok;
 }
@@ -178,10 +178,12 @@ void SystemManager::bindSystemToAccount(
             registrationDataWithAccount = std::move(registrationDataWithAccount),
             newSystemData = std::move(newSystemData),
             completionHandler = std::move(completionHandler)](
+                QSqlDatabase* dbConnection,
                 nx::db::DBResult dbResult)
         {
             systemAdded(
                 std::move(locker),
+                dbConnection,
                 dbResult,
                 std::move(*registrationDataWithAccount),
                 std::move(*newSystemData),
@@ -206,7 +208,7 @@ void SystemManager::unbindSystem(
         std::move(systemID.systemID),
         std::bind(&SystemManager::systemMarkedAsDeleted,
                     this, m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, std::move(completionHandler)));
+                    _1, _2, _3, std::move(completionHandler)));
 }
 
 namespace {
@@ -338,10 +340,12 @@ void SystemManager::shareSystem(
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             sharingOHeap = std::move(sharingOHeap),
             completionHandler = std::move(completionHandler)](
+                QSqlDatabase* dbConnection,
                 nx::db::DBResult dbResult)
         {
             sharingUpdated(
                 std::move(locker),
+                dbConnection,
                 dbResult,
                 std::move(*sharingOHeap),
                 std::move(completionHandler));
@@ -382,7 +386,7 @@ void SystemManager::setSystemUserList(
         std::move(sharingDataList),
         std::bind(&SystemManager::userListUpdated,
             this, m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, systemId, _2, std::move(completionHandler)));
+            _1, _2, systemId, _3, std::move(completionHandler)));
 }
 
 void SystemManager::getCloudUsersOfSystem(
@@ -526,13 +530,38 @@ void SystemManager::updateSystemName(
         }
     }
 
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemNameUpdate>(
-        std::bind(&SystemManager::updateSystemNameInDB, this, _1, _2),
-        std::move(data),
-        std::bind(&SystemManager::systemNameUpdated,
-            this, m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, std::move(completionHandler)));
+    auto systemNameDataOnHeap = std::make_unique<data::SystemNameUpdate>(std::move(data));
+    auto systemNameDataOnHeapPtr = systemNameDataOnHeap.get();
+
+    auto dbUpdateFunc =
+        [this, systemNameDataOnHeapPtr](
+            QSqlDatabase* const connection) -> nx::db::DBResult
+    {
+        return updateSystemNameInDB(
+            connection,
+            *systemNameDataOnHeapPtr);
+    };
+
+    auto onDbUpdateCompletedFunc =
+        [this,
+            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            systemNameData = std::move(systemNameDataOnHeap),
+            completionHandler = std::move(completionHandler)](
+                QSqlDatabase* dbConnection,
+                nx::db::DBResult dbResult) mutable
+        {
+            systemNameUpdated(
+                std::move(locker),
+                dbConnection,
+                dbResult,
+                std::move(*systemNameData),
+                std::move(completionHandler));
+        };
+
+    m_transactionLog->startDbTransaction(
+        systemNameDataOnHeap->id.c_str(),
+        std::move(dbUpdateFunc),
+        std::move(onDbUpdateCompletedFunc));
 }
 
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
@@ -653,6 +682,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 
 void SystemManager::systemAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount systemRegistrationData,
     data::SystemData systemData,
@@ -680,6 +710,7 @@ void SystemManager::systemAdded(
 
 void SystemManager::systemSharingAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemSharing systemSharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -746,6 +777,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
 
 void SystemManager::systemMarkedAsDeleted(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
@@ -811,6 +843,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 
 void SystemManager::systemDeleted(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemID systemID,
     std::function<void(api::ResultCode)> completionHandler)
@@ -930,6 +963,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
 
 void SystemManager::sharingUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -990,6 +1024,7 @@ nx::db::DBResult SystemManager::updateUserListInDB(
 
 void SystemManager::userListUpdated(
     QnCounter::ScopedIncrement asyncCallLocker,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     const std::string& systemId,
     data::SystemSharingList sharingList,
@@ -1046,11 +1081,24 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
         return db::DBResult::ioError;
     }
 
+    //TODO #ak figure out what transaction to generate
+    ////generating transaction
+    //::ec2::ApiUserData userData;
+    //ec2::convert(sharing, &userData);
+    //result = m_transactionLog->generateTransactionAndSaveToLog<
+    //    ::ec2::ApiCommand::saveUser>(
+    //        connection,
+    //        sharing.systemID.c_str(),
+    //        std::move(userData));
+    //if (result != db::DBResult::ok)
+    //    return result;
+
     return db::DBResult::ok;
 }
 
 void SystemManager::systemNameUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemNameUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
@@ -1106,6 +1154,7 @@ nx::db::DBResult SystemManager::activateSystem(
 
 void SystemManager::systemActivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
@@ -1179,7 +1228,11 @@ nx::db::DBResult SystemManager::fillCache()
         using namespace std::placeholders;
         m_dbManager->executeSelect<int>(
             std::bind(&SystemManager::fetchSystems, this, _1, _2),
-            [&cacheFilledPromise](db::DBResult dbResult, int /*dummy*/) {
+            [&cacheFilledPromise](
+                QSqlDatabase* /*connection*/,
+                db::DBResult dbResult,
+                int /*dummy*/)
+            {
                 cacheFilledPromise.set_value(dbResult);
             });
         //waiting for completion
@@ -1197,7 +1250,11 @@ nx::db::DBResult SystemManager::fillCache()
         using namespace std::placeholders;
         m_dbManager->executeSelect<int>(
             std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2),
-            [&cacheFilledPromise](db::DBResult dbResult, int /*dummy*/) {
+            [&cacheFilledPromise](
+                QSqlDatabase* /*connection*/,
+                db::DBResult dbResult,
+                int /*dummy*/)
+            {
                 cacheFilledPromise.set_value(dbResult);
             });
         //waiting for completion
@@ -1285,7 +1342,7 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
         std::bind(&SystemManager::deleteExpiredSystemsFromDb, this, _1),
         std::bind(&SystemManager::expiredSystemsDeletedFromDb, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1));
+            _1, _2));
 }
 
 nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(QSqlDatabase* connection)
@@ -1317,6 +1374,7 @@ nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(QSqlDatabase* connect
 
 void SystemManager::expiredSystemsDeletedFromDb(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult dbResult)
 {
     if (dbResult == nx::db::DBResult::ok)
@@ -1360,6 +1418,7 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
 }
 
 void SystemManager::onEc2SaveUserDone(
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing)
 {
@@ -1409,6 +1468,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
 }
 
 void SystemManager::onEc2RemoveUserDone(
+    QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing)
 {

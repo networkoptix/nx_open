@@ -140,7 +140,7 @@ void AccountManager::addAccount(
         std::bind(&AccountManager::accountAdded, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
                     requestSourceSecured,
-                    _1, _2, _3, std::move(completionHandler)) );
+                    _1, _2, _3, _4, std::move(completionHandler)) );
 }
 
 void AccountManager::activate(
@@ -154,7 +154,7 @@ void AccountManager::activate(
         std::move(emailVerificationCode),
         std::bind(&AccountManager::accountVerified, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, _3, std::move(completionHandler)));
+                    _1, _2, _3, _4, std::move(completionHandler)));
 }
 
 void AccountManager::getAccount(
@@ -202,7 +202,7 @@ void AccountManager::updateAccount(
         std::move(updateDataWithEmail),
         std::bind(&AccountManager::accountUpdated, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
-                    authenticatedByEmailCode, _1, _2, std::move(completionHandler)));
+                    authenticatedByEmailCode, _1, _2, _3, std::move(completionHandler)));
 }
 
 void AccountManager::resetPassword(
@@ -241,7 +241,7 @@ void AccountManager::resetPassword(
     data::AccountConfirmationCode confirmationCode;
     auto resetCodeStr = tempPasswordData.password + ":" + accountEmail.email;
     confirmationCode.code = QByteArray::fromRawData(
-        resetCodeStr.data(), resetCodeStr.size()).toBase64().constData();
+        resetCodeStr.data(), (int)resetCodeStr.size()).toBase64().constData();
 
     //adding temporary password
     m_tempPasswordManager->registerTemporaryCredentials(
@@ -288,7 +288,7 @@ void AccountManager::reactivateAccount(
         std::bind(&AccountManager::accountReactivated, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             requestSourceSecured,
-            _1, _2, _3, std::move(completionHandler)));
+            _1, _2, _3, _4, std::move(completionHandler)));
 }
 
 void AccountManager::createTemporaryCredentials(
@@ -380,17 +380,23 @@ db::DBResult AccountManager::fillCache()
     //starting async operation
     using namespace std::placeholders;
     m_dbManager->executeSelect<int>(
-        std::bind( &AccountManager::fetchAccounts, this, _1, _2 ),
-        [&cacheFilledPromise]( db::DBResult dbResult, int /*dummyResult*/ ) {
+        std::bind(&AccountManager::fetchAccounts, this, _1, _2),
+        [&cacheFilledPromise](
+            QSqlDatabase* /*connection*/,
+            db::DBResult dbResult,
+            int /*dummyResult*/ )
+        {
             cacheFilledPromise.set_value( dbResult );
-        } );
+        });
 
     //waiting for completion
     future.wait();
     return future.get();
 }
 
-db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const /*dummyResult*/ )
+db::DBResult AccountManager::fetchAccounts( 
+    QSqlDatabase* connection,
+    int* const /*dummyResult*/ )
 {
     QSqlQuery readAccountsQuery(*connection);
     readAccountsQuery.prepare(
@@ -518,6 +524,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 void AccountManager::accountAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
+    QSqlDatabase* /*connection*/,
     db::DBResult resultCode,
     data::AccountData accountData,
     data::AccountConfirmationCode resultData,
@@ -545,6 +552,7 @@ void AccountManager::accountAdded(
 void AccountManager::accountReactivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     std::string /*email*/,
     data::AccountConfirmationCode resultData,
@@ -614,6 +622,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 
 void AccountManager::accountVerified(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -689,6 +698,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 void AccountManager::accountUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool activateAccountIfNotActive,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)

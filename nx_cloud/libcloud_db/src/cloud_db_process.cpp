@@ -512,7 +512,8 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
     //starting async operation
     using namespace std::placeholders;
     dbManager->executeUpdateWithoutTran(
-        [](QSqlDatabase* connection) ->nx::db::DBResult {
+        [](QSqlDatabase* connection) ->nx::db::DBResult
+        {
             QSqlQuery enableWalQuery(*connection);
             enableWalQuery.prepare("PRAGMA journal_mode = WAL");
             if (!enableWalQuery.exec())
@@ -542,7 +543,8 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
 
             return nx::db::DBResult::ok;
         },
-        [&](nx::db::DBResult dbResult) {
+        [&](QSqlDatabase* /*connection*/, nx::db::DBResult dbResult)
+        {
             cacheFilledPromise.set_value(dbResult);
         });
 

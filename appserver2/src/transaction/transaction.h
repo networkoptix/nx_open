@@ -1314,6 +1314,7 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         };
 
         ApiCommand::Value command;
+        /** Id of peer that generated transaction. */
         QnUuid peerID;
         PersistentInfo persistentInfo;
 

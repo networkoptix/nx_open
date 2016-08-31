@@ -113,7 +113,7 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
         std::move(tmpPasswordDataInternal),
         std::bind(&TemporaryAccountPasswordManager::tempPasswordAddedToDb, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, std::move(completionHandler)));
+            _1, _2, _3, std::move(completionHandler)));
 }
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword()
@@ -155,7 +155,7 @@ bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
             std::move(tmpPasswordID),
             std::bind(&TemporaryAccountPasswordManager::tempPasswordDeleted, this,
                 m_startedAsyncCallsCounter.getScopedIncrement(),
-                _1, _2, std::function<void(api::ResultCode)>()));
+                _1, _2, _3, std::function<void(api::ResultCode)>()));
         return false;
     }
 
@@ -169,7 +169,11 @@ db::DBResult TemporaryAccountPasswordManager::fillCache()
     using namespace std::placeholders;
     m_dbManager->executeSelect<int>(
         std::bind(&TemporaryAccountPasswordManager::fetchTemporaryPasswords, this, _1, _2),
-        [&cacheFilledPromise](db::DBResult dbResult, int /*dummyResult*/) {
+        [&cacheFilledPromise](
+            QSqlDatabase* /*connection*/,
+            db::DBResult dbResult,
+            int /*dummyResult*/)
+        {
             cacheFilledPromise.set_value(dbResult);
         });
 
@@ -245,6 +249,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
 
 void TemporaryAccountPasswordManager::tempPasswordAddedToDb(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     TemporaryAccountCredentialsEx tempPasswordData,
     std::function<void(api::ResultCode)> completionHandler)
@@ -287,6 +292,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
 
 void TemporaryAccountPasswordManager::tempPasswordDeleted(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     std::string /*tempPasswordID*/,
     std::function<void(api::ResultCode)> completionHandler)

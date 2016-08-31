@@ -47,7 +47,7 @@ public:
     UpdateExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&)> dbUpdateFunc,
         InputData&& input,
-        nx::utils::MoveOnlyFunc<void(DBResult, InputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, InputData)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
@@ -60,7 +60,7 @@ public:
         auto completionHandler = std::move(m_completionHandler);
         if (!connection->transaction())
         {
-            completionHandler(lastDBError(connection), std::move(m_input));
+            completionHandler(connection, lastDBError(connection), std::move(m_input));
             return DBResult::ioError;
         }
         auto result = m_dbUpdateFunc(connection, m_input);
@@ -68,7 +68,7 @@ public:
         {
             result = detailResultCode(connection, result);
             connection->rollback();
-            completionHandler(result, std::move(m_input));
+            completionHandler(connection, result, std::move(m_input));
             return result;
         }
 
@@ -76,18 +76,18 @@ public:
         {
             const auto resultCode = lastDBError(connection);
             connection->rollback();
-            completionHandler(resultCode, std::move(m_input));
+            completionHandler(connection, resultCode, std::move(m_input));
             return resultCode;
         }
 
-        completionHandler(DBResult::ok, std::move(m_input));
+        completionHandler(connection, DBResult::ok, std::move(m_input));
         return DBResult::ok;
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&)> m_dbUpdateFunc;
     InputData m_input;
-    nx::utils::MoveOnlyFunc<void(DBResult, InputData)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, InputData)> m_completionHandler;
 };
 
 //!Executor of data update requests with output data
@@ -100,7 +100,7 @@ public:
     UpdateWithOutputExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData&& input,
-        nx::utils::MoveOnlyFunc<void(DBResult, InputData, OutputData&&)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, InputData, OutputData&&)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
@@ -113,7 +113,7 @@ public:
         auto completionHandler = std::move(m_completionHandler);
         if (!connection->transaction())
         {
-            completionHandler(DBResult::ioError, std::move(m_input), OutputData());
+            completionHandler(connection, DBResult::ioError, std::move(m_input), OutputData());
             return DBResult::ioError;
         }
         OutputData output;
@@ -122,7 +122,7 @@ public:
         {
             result = detailResultCode(connection, result);
             connection->rollback();
-            completionHandler(result, std::move(m_input), OutputData());
+            completionHandler(connection, result, std::move(m_input), OutputData());
             return result;
         }
 
@@ -130,11 +130,12 @@ public:
         {
             const auto resultCode = lastDBError(connection);
             connection->rollback();
-            completionHandler(resultCode, std::move(m_input), OutputData());
+            completionHandler(connection, resultCode, std::move(m_input), OutputData());
             return resultCode;
         }
 
         completionHandler(
+            connection,
             DBResult::ok,
             std::move(m_input),
             std::move(output));
@@ -144,7 +145,7 @@ public:
 private:
     nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const, const InputData&, OutputData* const)> m_dbUpdateFunc;
     InputData m_input;
-    nx::utils::MoveOnlyFunc<void(DBResult, InputData, OutputData&&)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, InputData, OutputData&&)> m_completionHandler;
 };
 
 
@@ -155,7 +156,7 @@ class UpdateWithoutAnyDataExecutor
 public:
     UpdateWithoutAnyDataExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_completionHandler(std::move(completionHandler))
@@ -167,7 +168,7 @@ public:
         auto completionHandler = std::move(m_completionHandler);
         if (!connection->transaction())
         {
-            completionHandler(DBResult::ioError);
+            completionHandler(connection, DBResult::ioError);
             return DBResult::ioError;
         }
         auto result = m_dbUpdateFunc(connection);
@@ -175,7 +176,7 @@ public:
         {
             result = detailResultCode(connection, result);
             connection->rollback();
-            completionHandler(result);
+            completionHandler(connection, result);
             return result;
         }
 
@@ -183,17 +184,17 @@ public:
         {
             const auto resultCode = lastDBError(connection);
             connection->rollback();
-            completionHandler(resultCode);
+            completionHandler(connection, resultCode);
             return resultCode;
         }
 
-        completionHandler(DBResult::ok);
+        completionHandler(connection, DBResult::ok);
         return DBResult::ok;
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> m_dbUpdateFunc;
-    nx::utils::MoveOnlyFunc<void(DBResult)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult)> m_completionHandler;
 };
 
 
@@ -204,7 +205,7 @@ class UpdateWithoutAnyDataExecutorNoTran
 public:
     UpdateWithoutAnyDataExecutorNoTran(
         nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult)> completionHandler)
     :
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_completionHandler(std::move(completionHandler))
@@ -218,13 +219,13 @@ public:
         if (result != DBResult::ok)
             connection->rollback();
         result = detailResultCode(connection, result);
-        completionHandler(result);
+        completionHandler(connection, result);
         return result;
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase* const)> m_dbUpdateFunc;
-    nx::utils::MoveOnlyFunc<void(DBResult)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult)> m_completionHandler;
 };
 
 
@@ -237,7 +238,7 @@ class SelectExecutor
 public:
     SelectExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, OutputData* const)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult, OutputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, OutputData)> completionHandler)
     :
         m_dbSelectFunc(std::move(dbSelectFunc)),
         m_completionHandler(std::move(completionHandler))
@@ -250,13 +251,13 @@ public:
         auto completionHandler = std::move(m_completionHandler);
         auto result = m_dbSelectFunc(connection, &output);
         result = detailResultCode(connection, result);
-        completionHandler(result, std::move(output));
+        completionHandler(connection, result, std::move(output));
         return result;
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, OutputData* const)> m_dbSelectFunc;
-    nx::utils::MoveOnlyFunc<void(DBResult, OutputData)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, OutputData)> m_completionHandler;
 };
 
 }   //namespace db

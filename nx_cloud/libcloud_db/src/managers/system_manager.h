@@ -221,6 +221,7 @@ private:
         data::SystemData* const systemData);
     void systemAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
         data::SystemData systemData,
@@ -231,6 +232,7 @@ private:
     //    const data::SystemSharing& systemSharing);
     void systemSharingAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sytemSharing,
         std::function<void(api::ResultCode)> completionHandler);
@@ -240,6 +242,7 @@ private:
         const std::string& systemId);
     void systemMarkedAsDeleted(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
@@ -249,6 +252,7 @@ private:
         const data::SystemID& systemID);
     void systemDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
@@ -261,6 +265,7 @@ private:
         const data::SystemSharing& sharing);
     void sharingUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
         std::function<void(api::ResultCode)> completionHandler);
@@ -271,6 +276,7 @@ private:
         const data::SystemSharingList& sharingList);
     void userListUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         const std::string& systemId,
         data::SystemSharingList sharingList,
@@ -281,6 +287,7 @@ private:
         const data::SystemNameUpdate& data);
     void systemNameUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
@@ -290,6 +297,7 @@ private:
         const std::string& systemId);
     void systemActivated(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
@@ -308,6 +316,7 @@ private:
     nx::db::DBResult deleteExpiredSystemsFromDb(QSqlDatabase* connection);
     void expiredSystemsDeletedFromDb(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult);
 
     /** Processes saveUser transaction received from mediaserver */
@@ -317,6 +326,7 @@ private:
         ::ec2::ApiUserData data,
         data::SystemSharing* const systemSharingData);
     void onEc2SaveUserDone(
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
     nx::db::DBResult processEc2RemoveUser(
@@ -325,6 +335,7 @@ private:
         ::ec2::ApiIdData data,
         data::SystemSharing* const systemSharingData);
     void onEc2RemoveUserDone(
+        QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
 };
