@@ -152,7 +152,7 @@ void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
     layout->setParentId(m_context->user()->getId());
-    layout->setCellSpacing(0, 0);
+    layout->setCellSpacing(0);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, timeStampMs, 1.0)));
     qnResPool->addResource(layout);
 

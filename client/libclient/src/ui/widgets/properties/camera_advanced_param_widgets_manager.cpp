@@ -3,6 +3,7 @@
 #include <boost/range.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 
+#include <ui/style/helper.h>
 #include <ui/widgets/properties/camera_advanced_param_widget_factory.h>
 
 QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent /*= NULL*/):
@@ -10,7 +11,6 @@ QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWi
 	m_groupWidget(groupWidget),
 	m_contentsWidget(contentsWidget)
 {
-
 }
 
 void QnCameraAdvancedParamWidgetsManager::clear() {
@@ -89,34 +89,38 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
         createGroupWidgets(subGroup, item);
 }
 
-
 QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& name, const std::vector<QnCameraAdvancedParameter>& params)
 {
-	QGroupBox* groupBox = new QGroupBox(m_contentsWidget);
+    auto page = new QWidget(m_contentsWidget);
+    auto pageLayout = new QHBoxLayout(page);
+    pageLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargin, 0, 0, 0);
+
+	auto groupBox = new QGroupBox(page);
     groupBox->setFlat(true);
     groupBox->setTitle(name);
 	groupBox->setLayout(new QHBoxLayout(groupBox));
+    pageLayout->addWidget(groupBox);
 
-	QScrollArea* scrollArea = new QScrollArea(groupBox);
+    auto scrollArea = new QScrollArea(groupBox);
 	scrollArea->setWidgetResizable(true);
 	groupBox->layout()->addWidget(scrollArea);
 
-	QWidget* scrollAreaWidgetContents = new QWidget();
+    auto scrollAreaWidgetContents = new QWidget();
     scrollAreaWidgetContents->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 
-	QGridLayout* gridLayout = new QGridLayout(scrollAreaWidgetContents);
+    auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
 	scrollAreaWidgetContents->setLayout(gridLayout);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
     for (const auto& param : params)
     {
-        QnAbstractCameraAdvancedParamWidget* widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
+        auto widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
         if (!widget)
             continue;
 
         if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
         {
-            QLabel* label = new QLabel(scrollAreaWidgetContents);
+            auto label = new QLabel(scrollAreaWidgetContents);
             label->setToolTip(param.description);
             label->setText(lit("%1: ").arg(param.name));
             label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -128,11 +132,16 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
 		m_paramWidgetsById[param.id] = widget;
 
 		/* Widget is disabled until it receives correct value. */
-		if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
-			widget->setEnabled(false);
+        if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
+        {
+            widget->setEnabled(false);
+        }
         else
-            connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this, &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
+        {
+            connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this,
+                &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
+        }
 	}
 
-	return groupBox;
+	return page;
 }

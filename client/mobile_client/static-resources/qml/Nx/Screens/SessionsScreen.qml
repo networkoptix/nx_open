@@ -125,7 +125,9 @@ Page
         {
             id: customConnectionButton
 
-            text: qsTr("Connect to Another Server")
+            text: dummyMessage.visible
+                ? qsTr("Connect to System")
+                : qsTr("Connect to Another System")
 
             anchors.centerIn: parent
             width: getDeviceIsPhone() ? parent.width - 16 : implicitWidth
@@ -141,7 +143,7 @@ Page
         anchors.fill: parent
         anchors.topMargin: -16
         anchors.bottomMargin: -24
-        title: qsTr("No servers found")
+        title: qsTr("No systems found")
         description: qsTr(
              "Check your network connection or press \"%1\" button "
                  + "to enter a known server address.").arg(customConnectionButton.text)

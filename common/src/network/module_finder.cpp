@@ -256,6 +256,15 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) co
     return m_moduleItemById.value(moduleId).moduleInformation;
 }
 
+QnModuleInformation QnModuleFinder::moduleInformation(const QnMediaServerResourcePtr& server) const
+{
+    auto id = server->getOriginalGuid();
+    if (id.isNull())
+        id = server->getId();
+
+    return moduleInformation(id);
+}
+
 QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const
 {
     QnMutexLocker lk(&m_itemsMutex);

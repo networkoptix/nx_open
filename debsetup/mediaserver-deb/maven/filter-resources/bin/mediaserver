@@ -19,5 +19,4 @@ ulimit -n 8192
 ulimit -c unlimited
 
 ARGS="-e --disable-crash-handler"
-exec start-stop-daemon --start -d $VMS_DIR/bin --exec ./mediaserver-bin -- $ARGS
-
+exec start-stop-daemon --start -d $VMS_DIR/bin --exec $VMS_DIR/bin/mediaserver-bin -- $ARGS

@@ -5,45 +5,58 @@
 #include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
 
+using namespace nx::vms::utils;
 
-namespace {
-
-QUrl makeUrl(const QString& path = QString(), bool auth = true)
+QnCloudUrlHelper::QnCloudUrlHelper(
+    SystemUri::ReferralSource source,
+    SystemUri::ReferralContext context,
+    QObject* parent)
+    :
+    QObject(parent),
+    m_source(source),
+    m_context(context)
 {
-    using namespace nx::vms::utils;
-
-    SystemUri uri(QnAppInfo::defaultCloudPortalUrl());
-    if (auth)
-        uri.setAuthenticator(qnCloudStatusWatcher->temporaryLogin(), qnCloudStatusWatcher->temporaryPassword());
-    uri.setReferral(SystemUri::ReferralSource::DesktopClient, SystemUri::ReferralContext::CloudMenu);
-    QUrl result = uri.toUrl();
-    result.setPath(path);
-    return result;
 }
 
-}
-
-QUrl QnCloudUrlHelper::mainUrl()
+QUrl QnCloudUrlHelper::mainUrl() const
 {
     return makeUrl();
 }
 
-QUrl QnCloudUrlHelper::aboutUrl()
+QUrl QnCloudUrlHelper::aboutUrl() const
 {
     return makeUrl(lit("/content/about"), false);
 }
 
-QUrl QnCloudUrlHelper::accountManagementUrl()
+QUrl QnCloudUrlHelper::accountManagementUrl() const
 {
     return makeUrl(lit("/account"));
 }
 
-QUrl QnCloudUrlHelper::createAccountUrl()
+QUrl QnCloudUrlHelper::createAccountUrl() const
 {
     return makeUrl(lit("/register"), false);
 }
 
-QUrl QnCloudUrlHelper::restorePasswordUrl()
+QUrl QnCloudUrlHelper::restorePasswordUrl() const
 {
     return makeUrl(lit("/restore_password"));
+}
+
+QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
+{
+    SystemUri uri(QnAppInfo::defaultCloudPortalUrl());
+
+    if (auth)
+    {
+        uri.setAuthenticator(
+            qnCloudStatusWatcher->temporaryLogin(),
+            qnCloudStatusWatcher->temporaryPassword());
+    }
+
+    uri.setReferral(m_source, m_context);
+
+    QUrl result = uri.toUrl();
+    result.setPath(path);
+    return result;
 }

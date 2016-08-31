@@ -43,7 +43,8 @@ QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
 {
-    QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+    const auto parameters =  menu()->currentParameters(sender());
+    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     if (cameras.isEmpty())
         return;
 
@@ -51,6 +52,12 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     dialogConstructor.setDontFocus(true);
 
     m_cameraSettingsDialog->setCameras(cameras);
+
+    if (parameters.hasArgument(Qn::FocusTabRole))
+    {
+        auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+        m_cameraSettingsDialog->setCurrentTab(static_cast<Qn::CameraSettingsTab>(tab));
+    }
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
