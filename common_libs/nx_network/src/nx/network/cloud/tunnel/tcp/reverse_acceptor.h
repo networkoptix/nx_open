@@ -22,6 +22,11 @@ public:
 
     ReverseAcceptor(String selfHostName, ConnectHandler clientHandler);
 
+    ReverseAcceptor(const ReverseAcceptor&) = delete;
+    ReverseAcceptor(ReverseAcceptor&&) = delete;
+    ReverseAcceptor& operator=(const ReverseAcceptor&) = delete;
+    ReverseAcceptor& operator=(ReverseAcceptor&&) = delete;
+
     /**
      * Starts accepting connections.
      * @param aioThread is used to call handler, also removal from this thread will be nonblocking
@@ -37,7 +42,7 @@ public:
 
 private:
     void fillNxRcHeaders(nx_http::HttpHeaders* headers) const;
-    void newClient(String name, nx_http::HttpServerConnection* connection) const;
+    void saveConnection(String name, nx_http::HttpServerConnection* connection) const;
 
     class NxRcHandler: public nx_http::AbstractHttpRequestHandler
     {

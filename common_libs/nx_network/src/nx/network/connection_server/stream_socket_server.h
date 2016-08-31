@@ -184,6 +184,11 @@ public:
         m_socket->bindToAioThread(aioThread);
     }
 
+    void post(nx::utils::MoveOnlyFunc<void()> handler)
+    {
+        m_socket->post(std::move(handler));
+    }
+
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) = 0;
