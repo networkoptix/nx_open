@@ -2262,22 +2262,17 @@ void QnWorkbenchVideoWallHandler::at_navigator_positionChanged() {
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
-        return;
-
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
     message[positionKey] = QString::number(navigator()->positionUsec());
     sendMessage(message);
 }
 
-void QnWorkbenchVideoWallHandler::at_navigator_speedChanged() {
+void QnWorkbenchVideoWallHandler::at_navigator_speedChanged()
+{
     if (!m_controlMode.active)
         return;
 
     if (display()->isChangingLayout())
-        return;
-
-    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorSpeedChanged);
