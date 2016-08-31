@@ -117,7 +117,7 @@ public:
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> geAllWritableStorages() const;
+    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
