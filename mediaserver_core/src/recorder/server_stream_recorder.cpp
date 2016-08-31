@@ -188,15 +188,18 @@ bool QnServerStreamRecorder::cleanupQueueIfOverflow()
 {
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        // check for global overflow bytes between all recorders
-        const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
-        if (totalAllowedBytes > m_totalQueueSize)
-            return false; //< no need to cleanup
 
-        bool needCleanup = m_queuedSize > m_maxRecordQueueSizeBytes ||
-                           m_dataQueue.size() > m_maxRecordQueueSizeElements;
+        bool needCleanup = m_dataQueue.size() > m_maxRecordQueueSizeElements;
         if (!needCleanup)
-            return false;
+        {
+            // check for global overflow bytes between all recorders
+            const qint64 totalAllowedBytes = m_maxRecordQueueSizeBytes * m_totalRecorders;
+            if (totalAllowedBytes > m_totalQueueSize)
+                return false; //< no need to cleanup
+
+            if (m_queuedSize < m_maxRecordQueueSizeBytes)
+                return false; //< no need to cleanup
+        }
     }
 
     if (!m_recordingContextVector.empty())
