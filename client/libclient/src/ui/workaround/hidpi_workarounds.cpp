@@ -1,6 +1,8 @@
 
 #include "hidpi_workarounds.h"
 
+#include <utils/common/connective.h>
+
 namespace {
 
 QPoint convertScaledToGlobal(const QPoint& scaled)
@@ -37,14 +39,18 @@ QScreen* getScreen(const QPoint& scaled)
 {
     const auto screens = QGuiApplication::screens();
     const auto it = std::find_if(screens.begin(), screens.end(),
-        [scaled](const QScreen *screen) { return screen->geometry().contains(scaled); });
+        [scaled](const QScreen *screen)
+        {
+            const auto geometry = screen->geometry();
+            return geometry.contains(scaled);
+        });
 
     return (it == screens.end() ? nullptr : *it);
 }
 
-class MenuMouseEventsCorrector: public QObject
+class MenuMouseEventsCorrector: public Connective<QObject>
 {
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     MenuMouseEventsCorrector(QMenu* parent):
