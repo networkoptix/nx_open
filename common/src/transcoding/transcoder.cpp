@@ -300,8 +300,8 @@ int QnTranscoder::setVideoCodec(
             m_extraTranscodeParams.setCodec(codec);
             ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
-            if (codec != AV_CODEC_ID_H263P) {
-                // H263P has bug for multi thread encoding in current ffmpeg version
+            if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
+                // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
                     ffmpegTranscoder->setMTMode(true);

@@ -8,12 +8,18 @@
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
 
+namespace {
+
+const qreal kDefaultRoundingRadius = 2.0;
+
+} // namespace
+
 
 QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem* parent):
     base_type(parent),
     m_tailLength(style::Metrics::kStandardPadding)
 {
-    setRoundingRadius(0.0);
+    setRoundingRadius(kDefaultRoundingRadius);
     setTailWidth(m_tailLength * 2.0);
 
     const int margin = style::Metrics::kStandardPadding;

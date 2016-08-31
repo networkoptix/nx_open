@@ -323,16 +323,19 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     try {
-        CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
+        CString dbFolder = GetProperty(hInstall, L"CustomActionData");
 
         CString localAppDataFolder = GetAppDataLocalFolderPath();
-        fileToDelete.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+        dbFolder.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
 
-        WcaLog(LOGMSG_STANDARD, "Deleting %S and -shm,-val.", fileToDelete);
+        WcaLog(LOGMSG_STANDARD, "Deleting ecs and mserver %S with -shm,-val.", dbFolder);
 
-        DeleteFile(fileToDelete);
-        DeleteFile(fileToDelete + L"-shm");
-        DeleteFile(fileToDelete + L"-wal");
+        DeleteFile(dbFolder + L"\\ecs.sqlite");
+        DeleteFile(dbFolder + L"\\ecs.sqlite-shm");
+        DeleteFile(dbFolder + L"\\ecs.sqlite-wal");
+        DeleteFile(dbFolder + L"\\mserver.sqlite");
+        DeleteFile(dbFolder + L"\\mserver.sqlite-shm");
+        DeleteFile(dbFolder + L"\\mserver.sqlite-wal");
     } catch (const Error& e) {
         WcaLog(LOGMSG_STANDARD, "DeleteDatabaseFile(): Error: %S", e.msg());
     }
@@ -365,6 +368,42 @@ UINT __stdcall DeleteRegistryKeys(MSIHANDLE hInstall)
     }
 
     RegKey.DeleteValue(L"sysIdTime");
+
+    RegKey.Close();
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall DeleteAllRegistryKeys(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CRegKey RegKey;
+
+    CAtlString registryPath, keyParent, keyName;
+
+    hr = WcaInitialize(hInstall, "DeleteAllRegistryKeys");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    registryPath = GetProperty(hInstall, L"CustomActionData");
+
+    int lastSlashPos = registryPath.ReverseFind(L'\\');
+
+    keyParent = registryPath.Mid(0, lastSlashPos);
+    keyName = registryPath.Mid(lastSlashPos + 1);
+
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, keyParent, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)keyParent);
+        goto LExit;
+    }
+
+    RegKey.RecurseDeleteKey(keyName);
 
     RegKey.Close();
 

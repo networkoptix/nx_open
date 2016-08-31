@@ -767,7 +767,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         case QnUserType::Ldap:
             return permissions &~ (Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
         case QnUserType::Cloud:
-            return permissions &~ (Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+            return permissions &~ (Qn::WritePasswordPermission | Qn::WriteEmailPermission | Qn::WriteFullNamePermission);
         default:
             break;
         }

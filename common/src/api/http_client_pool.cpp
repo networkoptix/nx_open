@@ -1,5 +1,4 @@
 #include "http_client_pool.h"
-#include <common/common_module.h>
 
 namespace {
     static const std::chrono::minutes kRequestSendTimeout(1);

@@ -405,6 +405,29 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         case QnUpdateResult::AlreadyUpdated:
             QnMessageBox::information(this, tr("Update is not needed."), tr("All servers are already updated."));
             break;
+        case QnUpdateResult::ValidationFailed:
+            QnMessageBox::critical(
+                this,
+                tr("Update unsuccessful."),
+                tr("Could not start update.")
+                    + lit("\n")
+                    + tr("The problem is caused by %n servers:",
+                       "", result.failedServers.size())
+                    + lit("\n")
+                    + serverNamesString(result.failedServers));
+            break;
+        case QnUpdateResult::ValidationFailed_CloudHostConflict:
+            QnMessageBox::critical(
+                this,
+                tr("Update unsuccessful."),
+                tr("Could not start update.")
+                    + lit("\n")
+                    + tr("%n servers have different cloud portal URL:",
+                       "", result.failedServers.size())
+                    + lit("\n")
+                    + serverNamesString(result.failedServers));
+            // TODO: #dklychkov Add a hint for the user about what to do in this case.
+            break;
         case QnUpdateResult::DownloadingFailed:
             QnMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not download updates."));
             break;
@@ -673,6 +696,7 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
 
     switch (stage) {
     case QnFullUpdateStage::Check:
+    case QnFullUpdateStage::Validate:
     case QnFullUpdateStage::Download:
     case QnFullUpdateStage::Client:
     case QnFullUpdateStage::Incompatible:
@@ -711,6 +735,9 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     switch (stage) {
     case QnFullUpdateStage::Check:
         status = tr("Checking for updates... %1%");
+        break;
+    case QnFullUpdateStage::Validate:
+        status = tr("Validating update... %1%");
         break;
     case QnFullUpdateStage::Download:
         status = tr("Downloading updates... %1%");

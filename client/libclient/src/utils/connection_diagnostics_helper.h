@@ -34,6 +34,11 @@ public:
         ec2::ErrorCode errorCode);
 
 private:
+    static Qn::ConnectionResult handleCompatibilityMode(
+        const QnConnectionInfo &connectionInfo,
+        const QUrl &url,
+        QWidget* parentWidget);
+
     //TODO: #GDM move all duplicating strings here
     enum class ErrorStrings
     {

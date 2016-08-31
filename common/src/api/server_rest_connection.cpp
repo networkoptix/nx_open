@@ -140,16 +140,25 @@ Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetTh
 }
 
 Handle ServerConnection::getFreeSpaceForUpdateFiles(
-    bool wholeSystem,
     Result<QnUpdateFreeSpaceReply>::type callback,
     QThread* targetThread)
 {
-    QnRequestParamList params;
-    if (!wholeSystem)
-        params.insert(lit("local"), lit("true"));
-
     return executeGet(
-        lit("/ec2/updateInformation/freeSpaceForUpdateFiles"), params, callback, targetThread);
+        lit("/ec2/updateInformation/freeSpaceForUpdateFiles"),
+        QnRequestParamList(),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::checkCloudHost(
+    Result<QnCloudHostCheckReply>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/ec2/updateInformation/checkCloudHost"),
+        QnRequestParamList(),
+        callback,
+        targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------

@@ -1,4 +1,6 @@
 <Include>
+    <?define cloudHost = "${cloud.host}"?>
+
     <?define arch = "${arch}"?>
     <?define vmax = "${vmax}"?>
 

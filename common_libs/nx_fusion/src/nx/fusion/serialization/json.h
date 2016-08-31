@@ -1,11 +1,9 @@
 #pragma once
 
 #include <cassert>
-#include <type_traits> /* For std::enable_if, std::is_same. */
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QJsonValue>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
@@ -17,10 +15,10 @@ class QnJsonSerializer;
 
 namespace QJsonDetail {
 
-void serialize_json(const QJsonValue& value, QByteArray* target,
+void serialize_json(const QJsonValue& value, QByteArray* outTarget,
     QJsonDocument::JsonFormat format = QJsonDocument::Compact);
 
-bool deserialize_json(const QByteArray& value, QJsonValue* target);
+bool deserialize_json(const QByteArray& value, QJsonValue* outTarget);
 
 struct StorageInstance
 {
@@ -31,6 +29,11 @@ struct StorageInstance
 
 class QnJsonContext: public QnSerializationContext<QnJsonSerializer>
 {
+public:
+    bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
+    void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
+private:
+    bool m_someFieldsNotFound{false};
 };
 
 class QnJsonSerializer:
@@ -49,34 +52,41 @@ class QnDefaultJsonSerializer: public QnDefaultContextSerializer<T, QnJsonSerial
 
 namespace QJson {
 
+inline QByteArray serialize(const QJsonValue &value)
+{
+    QByteArray result;
+    QJsonDetail::serialize_json(value, &result);
+    return result;
+}
+
 /**
  * Serialize the given value into intermediate JSON representation.
  * @param ctx JSON context to use.
  * @param value Value to serialize.
- * @param[out] target Target JSON value, must not be NULL.
+ * @param[out] outTarget Target JSON value, must not be nullptr.
  */
 template<class T>
-void serialize(QnJsonContext* ctx, const T& value, QJsonValue* target)
+void serialize(QnJsonContext* ctx, const T& value, QJsonValue* outTarget)
 {
-    QnSerialization::serialize(ctx, value, target);
+    QnSerialization::serialize(ctx, value, outTarget);
 }
 
 template<class T>
-void serialize(QnJsonContext* ctx, const T& value, QJsonValueRef* target)
+void serialize(QnJsonContext* ctx, const T& value, QJsonValueRef* outTarget)
 {
-    NX_ASSERT(target);
+    NX_ASSERT(outTarget);
 
     QJsonValue jsonValue;
     QnSerialization::serialize(ctx, value, &jsonValue);
-    *target = jsonValue;
+    *outTarget = jsonValue;
 }
 
 template<class T>
-void serialize(QnJsonContext* ctx, const T& value, const QString& key, QJsonObject* target)
+void serialize(QnJsonContext* ctx, const T& value, const QString& key, QJsonObject* outTarget)
 {
-    NX_ASSERT(target);
+    NX_ASSERT(outTarget);
 
-    QJsonValueRef jsonValue = (*target)[key];
+    QJsonValueRef jsonValue = (*outTarget)[key];
     QJson::serialize(ctx, value, &jsonValue);
 }
 
@@ -84,70 +94,68 @@ void serialize(QnJsonContext* ctx, const T& value, const QString& key, QJsonObje
  * Serialize the given value into a JSON string.
  * @param ctx JSON context to use.
  * @param value Value to serialize.
- * @param[out] target Target JSON string, must not be NULL.
+ * @param[out] outTarget Target JSON string, must not be nullptr.
  */
 template<class T>
-void serialize(QnJsonContext* ctx, const T& value, QByteArray* target)
+void serialize(QnJsonContext* ctx, const T& value, QByteArray* outTarget)
 {
-    NX_ASSERT(target);
+    NX_ASSERT(outTarget);
 
     QJsonValue jsonValue;
     QJson::serialize(ctx, value, &jsonValue);
-    QJsonDetail::serialize_json(jsonValue, target);
+    QJsonDetail::serialize_json(jsonValue, outTarget);
 }
 
 template<class T>
-void serialize(const T& value, QJsonValue* target)
+void serialize(const T& value, QJsonValue* outTarget)
 {
     QnJsonContext ctx;
-    QJson::serialize(&ctx, value, target);
+    QJson::serialize(&ctx, value, outTarget);
 }
 
 template<class T>
-void serialize(const T& value, QJsonValueRef* target)
+void serialize(const T& value, QJsonValueRef* outTarget)
 {
     QnJsonContext ctx;
-    QJson::serialize(&ctx, value, target);
+    QJson::serialize(&ctx, value, outTarget);
 }
 
 template<class T>
-void serialize(const T& value, const QString& key, QJsonObject* target)
+void serialize(const T& value, const QString& key, QJsonObject* outTarget)
 {
     QnJsonContext ctx;
-    QJson::serialize(&ctx, value, key, target);
+    QJson::serialize(&ctx, value, key, outTarget);
 }
 
 template<class T>
-void serialize(const T& value, QByteArray* target)
+void serialize(const T& value, QByteArray* outTarget)
 {
     QnJsonContext ctx;
-    QJson::serialize(&ctx, value, target);
+    QJson::serialize(&ctx, value, outTarget);
 }
 
 /**
  * Deserialize the given intermediate representation of a JSON object.
- * Note that std::enable_if is used to prevent implicit conversions in the first argument.
  * @param ctx JSON context to use.
  * @param value Intermediate JSON representation to deserialize.
- * @param[out] target Deserialization target, must not be NULL.
+ * @param[out] outTarget Deserialization target, must not be nullptr.
  * @return Whether the deserialization was successful.
  */
-template<class T, class QJsonValue>
-bool deserialize(QnJsonContext* ctx, const QJsonValue& value, T* target,
-    typename std::enable_if<std::is_same<QJsonValue, ::QJsonValue>::value>::type* = NULL)
+template<class T>
+bool deserialize(QnJsonContext* ctx, const QJsonValue& value, T* outTarget)
 {
-    return QnSerialization::deserialize(ctx, value, target);
+    return QnSerialization::deserialize(ctx, value, outTarget);
 }
 
 template<class T>
-bool deserialize(QnJsonContext* ctx, const QJsonValueRef& value, T* target)
+bool deserialize(QnJsonContext* ctx, const QJsonValueRef& value, T* outTarget)
 {
-    return QnSerialization::deserialize(ctx, static_cast<QJsonValue>(value), target);
+    return QnSerialization::deserialize(ctx, static_cast<QJsonValue>(value), outTarget);
 }
 
 template<class T>
-bool deserialize(QnJsonContext* ctx, const QJsonObject& value, const QString& key, T* target,
-    bool optional = false, bool* found = NULL)
+bool deserialize(QnJsonContext* ctx, const QJsonObject& value, const QString& key, T* outTarget,
+    bool optional = false, bool* found = nullptr)
 {
     QJsonObject::const_iterator pos = value.find(key);
     if(pos == value.end())
@@ -160,7 +168,7 @@ bool deserialize(QnJsonContext* ctx, const QJsonObject& value, const QString& ke
     if(found)
         *found = true;
 
-    bool ok = QJson::deserialize(ctx, *pos, target);
+    bool ok = QJson::deserialize(ctx, *pos, outTarget);
     if (!ok && !optional)
     {
         qCritical() << QString(QLatin1String(
@@ -174,47 +182,72 @@ bool deserialize(QnJsonContext* ctx, const QJsonObject& value, const QString& ke
  * Deserialize a value from a JSON string.
  * @param ctx JSON context to use.
  * @param value JSON string to deserialize.
- * @param[out] target Deserialization target, must not be NULL.
+ * @param outTarget Deserialization target, must not be null.
  * @return Whether the deserialization was successful.
  */
 template<class T>
-bool deserialize(QnJsonContext* ctx, const QByteArray& value, T* target)
+bool deserialize(QnJsonContext* ctx, const QByteArray& value, T* outTarget)
 {
-    NX_ASSERT(target);
+    NX_ASSERT(outTarget);
 
+    QJsonValue jsonValue;
+    if (!QJsonDetail::deserialize_json(value, &jsonValue))
+        return false;
+
+    return QJson::deserialize(ctx, jsonValue, outTarget);
+}
+
+template<class T>
+bool deserialize(const QJsonValue& value, T* outTarget)
+{
+    QnJsonContext ctx;
+    return QJson::deserialize(&ctx, value, outTarget);
+}
+
+template<class T>
+bool deserialize(const QJsonValueRef& value, T* outTarget)
+{
+    QnJsonContext ctx;
+    return QJson::deserialize(&ctx, value, outTarget);
+}
+
+template<class T>
+bool deserialize(const QJsonObject& value, const QString& key, T* outTarget, bool optional = false)
+{
+    QnJsonContext ctx;
+    return QJson::deserialize(&ctx, value, key, outTarget, optional);
+}
+
+template<class T>
+bool deserialize(const QByteArray& value, T* outTarget)
+{
+    QnJsonContext ctx;
+    return QJson::deserialize(&ctx, value, outTarget);
+}
+
+/**
+ * Deserialize a value from a JSON utf-8-encoded string, allowing for omitted values.
+ * @param value JSON string to deserialize.
+ * @param outIncompleteJsonValue Returned when some values were omitted.
+ * @return Whether no deserialization errors occurred, except for possible omitted values.
+ */
+template<class T>
+bool deserializeAllowingOmittedValues(const QByteArray& value, T* target,
+    boost::optional<QJsonValue>* outIncompleteJsonValue)
+{
     QJsonValue jsonValue;
     if(!QJsonDetail::deserialize_json(value, &jsonValue))
         return false;
-    return QJson::deserialize(ctx, jsonValue, target);
-}
-
-template<class T, class QJsonValue>
-bool deserialize(const QJsonValue& value, T* target,
-    typename std::enable_if<std::is_same<QJsonValue, ::QJsonValue>::value>::type* = NULL)
-{
     QnJsonContext ctx;
-    return QJson::deserialize(&ctx, value, target);
-}
 
-template<class T>
-bool deserialize(const QJsonValueRef& value, T* target)
-{
-    QnJsonContext ctx;
-    return QJson::deserialize(&ctx, value, target);
-}
+    bool result = QJson::deserialize(&ctx, jsonValue, target);
 
-template<class T>
-bool deserialize(const QJsonObject& value, const QString& key, T* target, bool optional = false)
-{
-    QnJsonContext ctx;
-    return QJson::deserialize(&ctx, value, key, target, optional);
-}
+    if (ctx.areSomeFieldsNotFound())
+        *outIncompleteJsonValue = jsonValue;
+    else
+        *outIncompleteJsonValue = boost::none;
 
-template<class T>
-bool deserialize(const QByteArray& value, T* target)
-{
-    QnJsonContext ctx;
-    return QJson::deserialize(&ctx, value, target);
+    return result;
 }
 
 /**
@@ -238,7 +271,7 @@ QByteArray serialized(const T& value)
  * @return Deserialization target.
  */
 template<class T>
-T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* success = NULL)
+T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* success = nullptr)
 {
     T target;
     bool result = QJson::deserialize(value, &target);

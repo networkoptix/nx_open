@@ -47,8 +47,6 @@
 #include "business/business_event_rule.h"
 #include "settings.h"
 
-using std::nullptr_t;
-
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
 static const QString RES_TYPE_STORAGE = "storage";
@@ -1487,7 +1485,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     *internalId = getResourceInternalId(data.id);
 
     //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
-    NX_ASSERT(!data.id.isNull(), "Resource ID must not be null");
+    NX_ASSERT(!data.id.isNull(), "Resource id must not be null");
     if (data.id.isNull())
         return ErrorCode::dbError;
 
@@ -3015,7 +3013,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscDa
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(std::nullptr_t /*dummy*/, ApiResourceParamDataList& data)
+ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data)
 {
     return readSettings(data);
 }
@@ -3523,7 +3521,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 }
 
 //getUsers
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
     const QString queryStr = R"(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
@@ -3549,15 +3547,21 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDat
 }
 
 //getUserGroups
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& result)
 {
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE id = %1").arg(guidToSqlString(id));
+
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    const QString queryStr = R"(
+    const QString queryStr = lit(R"(
         SELECT id, name, permissions
         FROM vms_user_groups
+        %1
         ORDER BY id
-    )";
+    )").arg(filterStr);
+
     if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
@@ -3568,13 +3572,13 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGro
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
 {
     result = QnResourceAccessManager::getPredefinedRoles();
     return ErrorCode::ok;
 }
 
-ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
+ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3615,7 +3619,7 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAc
 
 
 //getTransactionLog
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t&, ApiTransactionDataList& tranList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3640,12 +3644,6 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataLi
     }
 
     return ErrorCode::ok;
-}
-
-// getClientInfos
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data)
-{
-    return doQueryNoLock(QnUuid(), data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data)
@@ -3933,14 +3931,14 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     db_load(data.cameras);
     db_load(data.cameraUserAttributesList);
     db_load(data.users);
-    db_load(data.userGroups);
+    db_load_uuid(data.userGroups);
     db_load(data.layouts);
     db_load(data.videowalls);
     db_load(data.webPages);
     db_load(data.rules);
     db_load(data.cameraHistory);
     db_load(data.licenses);
-    db_load(data.discoveryData);
+    db_load_uuid(data.discoveryData);
     db_load_uuid(data.allProperties);
     db_load_uuid(data.storages);
     db_load_uuid(data.resStatusList);
@@ -3952,10 +3950,14 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList &data) {
     QSqlQuery query(m_sdb);
 
-    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery"));
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE server_id = %1").arg(guidToSqlString(id));
+
+    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery %1 ORDER BY server_id").arg(filterStr));
     query.setForwardOnly(true);
     query.prepare(q);
 
@@ -4487,24 +4489,24 @@ bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
 
     switch (tran.command)
     {
-    case ApiCommand::addLicense:
-    case ApiCommand::addLicenses:
-    case ApiCommand::removeLicense:
-        return true;
+        case ApiCommand::addLicense:
+        case ApiCommand::addLicenses:
+        case ApiCommand::removeLicense:
+            return true;
 
-    case ApiCommand::saveMediaServer:
-    case ApiCommand::saveStorage:
-    case ApiCommand::saveStorages:
-    case ApiCommand::saveServerUserAttributes:
-    case ApiCommand::saveServerUserAttributesList:
-    case ApiCommand::setResourceStatus:
-    case ApiCommand::setResourceParam:
-    case ApiCommand::setResourceParams:
-        //allowing minimum set of transactions required for local server to function properly
-        return m_userAccessData == Qn::kSystemAccess;
+        case ApiCommand::saveMediaServer:
+        case ApiCommand::saveStorage:
+        case ApiCommand::saveStorages:
+        case ApiCommand::saveServerUserAttributes:
+        case ApiCommand::saveServerUserAttributesList:
+        case ApiCommand::setResourceStatus:
+        case ApiCommand::setResourceParam:
+        case ApiCommand::setResourceParams:
+            // Allowing minimum set of transactions required for local server to function properly.
+            return m_userAccessData == Qn::kSystemAccess;
 
-    default:
-        return false;
+        default:
+            return false;
     }
 }
 

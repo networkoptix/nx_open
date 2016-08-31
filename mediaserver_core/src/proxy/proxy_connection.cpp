@@ -39,29 +39,24 @@ class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int MAX_PROXY_TTL = 8;
 
-// NOTE: MSG_DONTWAIT is not supported for windows, so it makes sense using only when event
-//  is already reported by pullset as they do not lie on windows and may report false positive on
-//  some linux implementations.
-#ifdef Q_OS_WIN
-    static int nonBlockingFlag = 0;
-#else
-    static int nonBlockingFlag = MSG_DONTWAIT;
-#endif
-
-static bool wouldSocketBlock(int returnCode)
+/** Returns false if socket would block in blocking mode */
+static bool readSocketNonBlock(
+    int* returnValue, AbstractStreamSocket* socket, 
+    void* buffer, int bufferSize)
 {
-    if (returnCode >= 0)
-        return false;
-
-    auto code = SystemError::getLastOSErrorCode();
-    if (code == SystemError::interrupted ||
-        code == SystemError::wouldBlock ||
-        code == SystemError::again)
+    *returnValue = socket->recv(buffer, bufferSize, MSG_DONTWAIT);
+    if (*returnValue < 0)
     {
-        return true;
+        auto code = SystemError::getLastOSErrorCode();
+        if (code == SystemError::interrupted ||
+            code == SystemError::wouldBlock ||
+            code == SystemError::again)
+        {
+            return false;
+        }
     }
 
-    return false;
+    return true;
 }
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
@@ -116,8 +111,8 @@ int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol
 
 bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
 {
-    int readed = srcSocket->recv(buffer, bufferSize, nonBlockingFlag);
-    if( wouldSocketBlock(readed) )
+    int readed;
+    if( !readSocketNonBlock(&readed, srcSocket, buffer, bufferSize) )
         return true;
 
     if (readed < 1)
@@ -578,8 +573,8 @@ void QnProxyConnectionProcessor::doSmartProxy()
 
             if (it.socket() == d->socket->pollable())
             {
-                int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-                if (wouldSocketBlock(readed))
+                int readed;
+                if (!readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
                     continue;
 
                 if (readed < 1)

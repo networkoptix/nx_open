@@ -1253,6 +1253,7 @@ public:
     typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
     std::atomic<AsyncPromise*> recvPromisePtr;
     std::atomic<AsyncPromise*> sendPromisePtr;
+    std::atomic<int> bioReadFlags;
 
     SslSocketPrivate()
     :
@@ -1265,7 +1266,8 @@ public:
         emulateBlockingMode(false),
         shutdown(false),
         recvPromisePtr(nullptr),
-        sendPromisePtr(nullptr)
+        sendPromisePtr(nullptr),
+        bioReadFlags(0)
     {
     }
 };
@@ -1363,8 +1365,8 @@ int SslSocket::bioRead(BIO* b, char* out, int outl)
     int ret = 0;
     if (out != NULL)
     {
-        //clear_socket_error();
-        ret = sslSock->recvInternal(out, outl, 0);
+        //clear_socket_error();-
+        ret = sslSock->recvInternal(out, outl, sslSock->d_ptr->bioReadFlags.exchange(0));
         BIO_clear_retry_flags(b);
         if (ret <= 0)
         {
@@ -1511,7 +1513,7 @@ bool SslSocket::doHandshake()
     return ret == 1;
 }
 
-int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
+int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
     if (d->extraBufferLen > 0)
@@ -1523,13 +1525,13 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
         int readRest = bufferLen - toReadLen;
         // Does this should be readreset ? -- DPENG
         if (toReadLen > 0) {
-            int readed = d->wrappedSocket->recv((char*) buffer + toReadLen, readRest);
+            int readed = d->wrappedSocket->recv((char*) buffer + toReadLen, readRest, flags);
             if (readed > 0)
                 toReadLen += readed;
         }
         return toReadLen;
     }
-    return d->wrappedSocket->recv(buffer, bufferLen);
+    return d->wrappedSocket->recv(buffer, bufferLen, flags);
 }
 
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
@@ -1574,6 +1576,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     if (!SSL_is_init_finished(d->ssl.get()))
         doHandshake();
 
+    d->bioReadFlags = flags;
     return SSL_read(d->ssl.get(), (char*) buffer, bufferLen);
 }
 
@@ -1899,7 +1902,7 @@ int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     if (d->initState)
     {
         if (d->extraBufferLen == 0) {
-            int readed = d->wrappedSocket->recv(d->extraBuffer, 1);
+            int readed = d->wrappedSocket->recv(d->extraBuffer, 1, flags);
             if (readed < 1)
                 return readed;
             d->extraBufferLen += readed;
@@ -1913,7 +1916,7 @@ int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         }
         else if (d->extraBuffer[0] == 0x16)
         {
-            int readed = d->wrappedSocket->recv(d->extraBuffer+1, 1);
+            int readed = d->wrappedSocket->recv(d->extraBuffer + 1, 1, flags);
             if (readed < 1)
                 return readed;
             d->extraBufferLen += readed;
