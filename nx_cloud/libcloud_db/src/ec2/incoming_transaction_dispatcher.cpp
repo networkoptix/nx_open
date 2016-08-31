@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "incoming_transaction_dispatcher.h"
 
 #include <nx/fusion/model_functions.h>

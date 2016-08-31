@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 8, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <list>
@@ -27,12 +22,12 @@
 #include "access_control/auth_types.h"
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
-
+#include "transaction_serializer.h"
 
 namespace nx_http {
 class HttpServerConnection;
 class MessageDispatcher;
-}   // namespace nx_http
+} // namespace nx_http
 
 namespace nx {
 namespace cdb {
@@ -40,7 +35,7 @@ namespace cdb {
 class AuthorizationManager;
 namespace conf {
 class Settings;
-}   //namespace conf
+} // namespace conf
 
 namespace ec2 {
 
@@ -49,7 +44,9 @@ class TransactionLog;
 class TransactionTransport;
 class TransactionTransportHeader;
 
-/** Managers ec2 transaction connections from mediaservers */
+/**
+ * Manages ec2 transaction connections from mediaservers.
+ */
 class ConnectionManager
 {
 public:
@@ -60,14 +57,18 @@ public:
         IncomingTransactionDispatcher* const transactionDispatcher);
     virtual ~ConnectionManager();
 
-    /** mediaserver calls this method to open 2-way transaction exchange channel */
+    /**
+     * Mediaserver calls this method to open 2-way transaction exchange channel.
+     */
     void createTransactionConnection(
         nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::HttpRequestProcessedHandler completionHandler);
-    /** mediaserver uses this method to push transactions */
+    /**
+     * Mediaserver uses this method to push transactions.
+     */
     void pushTransaction(
         nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
@@ -75,70 +76,31 @@ public:
         nx_http::Response* const response,
         nx_http::HttpRequestProcessedHandler completionHandler);
 
-    /** dispatches transaction to the right peers */
-    template<class T>
+    /**
+     * Dispatches transaction to the right peers.
+     */
     void dispatchTransaction(
         const nx::String& systemId,
-        ::ec2::QnTransaction<T> transaction,
-        TransactionTransportHeader transportHeader)
-    {
-        QnMutexLocker lk(&m_mutex);
-        const auto& connectionBySystemIdAndPeerIdIndex =
-            m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
-
-        std::size_t connectionCount = 0;
-        std::array<TransactionTransport*, 7> connectionsToSendTo;
-        auto connectionIt = connectionBySystemIdAndPeerIdIndex
-            .lower_bound(std::make_pair(systemId, nx::String()));
-        for ( ;
-              connectionIt != connectionBySystemIdAndPeerIdIndex.end()
-                  && connectionIt->systemIdAndPeerId.first == systemId;
-             ++connectionIt)
-        {
-            if (connectionIt->systemIdAndPeerId.second == transaction.peerID)
-                continue;
-
-            connectionsToSendTo[connectionCount++] = connectionIt->connection;
-            if (connectionCount < connectionsToSendTo.size())
-                continue;
-
-            for (auto& connection: connectionsToSendTo)
-                connection->sendTransaction(transaction, transportHeader);
-            connectionCount = 0;
-        }
-
-        if (connectionCount == 1)
-        {
-            //minor optimization
-            connectionsToSendTo[0]->sendTransaction(
-                std::move(transaction),
-                std::move(transportHeader));
-        }
-        else
-        {
-            for (auto& connection : connectionsToSendTo)
-                connection->sendTransaction(transaction, transportHeader);
-        }
-    }
+        std::unique_ptr<TransactionSerializer> transactionSerializer);
 
 private:
     struct ConnectionContext
     {
         std::unique_ptr<TransactionTransport> connection;
         nx::String connectionId;
-        //TODO #ak get rid of pair and find out how build multipart inde correctly
+        // TODO: #ak get rid of pair and find out how build multipart inde correctly.
         std::pair<nx::String, nx::String> systemIdAndPeerId;
     };
 
     typedef boost::multi_index::multi_index_container<
         ConnectionContext,
         boost::multi_index::indexed_by<
-            //indexing by connectionId
+            // Iindexing by connectionId.
             boost::multi_index::ordered_unique<boost::multi_index::member<
                 ConnectionContext,
                 nx::String,
                 &ConnectionContext::connectionId>>,
-            //indexing by (systemId, peerId)
+            // Indexing by (systemId, peerId).
             boost::multi_index::ordered_unique<boost::multi_index::member<
                 ConnectionContext,
                 std::pair<nx::String, nx::String>,
@@ -170,7 +132,7 @@ private:
         const QByteArray& data,
         TransactionTransportHeader transportHeader);
     void onTransactionDone(const nx::String& connectionId, api::ResultCode resultCode);
-    void fetchDataFromConnectRequest(
+    bool fetchDataFromConnectRequest(
         const nx_http::Request& request,
         ::ec2::ApiPeerData* const remotePeer,
         nx::String* const contentEncoding);
@@ -183,6 +145,6 @@ private:
         TransactionProcessedHandler handler);
 };
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

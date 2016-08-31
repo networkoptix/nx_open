@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 15, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/buffer.h>
@@ -10,7 +5,6 @@
 #include <nx/utils/log/log_message.h>
 
 #include <transaction/transaction_transport_header.h>
-
 
 namespace nx {
 namespace cdb {
@@ -30,6 +24,6 @@ public:
     }
 };
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

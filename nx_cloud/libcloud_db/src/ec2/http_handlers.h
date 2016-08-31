@@ -1,12 +1,6 @@
-/**********************************************************
-* Aug 8, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/http/server/abstract_http_request_handler.h>
-
 
 namespace nx {
 namespace cdb {
@@ -59,5 +53,5 @@ void registerCustomHttpHandler(
         });
 }
 
-}   // namespace cdb
-}   // namespace nx
+} // namespace cdb
+} // namespace nx

@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/aio/timer.h>
@@ -17,29 +12,32 @@
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
 
-
 namespace nx {
 namespace cdb {
 namespace ec2 {
 
 class TransactionLog;
 
-/** Dispaches transaction received from remote peer to a corresponding processor. */
+/**
+ * Dispaches transaction received from remote peer to a corresponding processor.
+ */
 class IncomingTransactionDispatcher
 {
 public:
     IncomingTransactionDispatcher(TransactionLog* const transactionLog);
 
     /** 
-        \note Method is non-blocking, result is delivered by invoking \a completionHandler
-    */
+     * @note Method is non-blocking, result is delivered by invoking \a completionHandler
+     */
     void dispatchTransaction(
         TransactionTransportHeader transportHeader,
         Qn::SerializationFormat tranFormat,
         const QByteArray& data,
         TransactionProcessedHandler completionHandler);
 
-    /** Register processor function by command type. */
+    /**
+     * Register processor function by command type.
+     */
     template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
     void registerTransactionHandler(
         typename TransactionProcessor<
@@ -58,7 +56,9 @@ public:
                     std::move(onTranProcessedFunc)));
     }
 
-    /** Register processor function that does not need to save data to DB. */
+    /**
+     * Register processor function that does not need to save data to DB.
+     */
     template<int TransactionCommandValue, typename TransactionDataType>
     void registerSpecialCommandHandler(
         typename SpecialCommandProcessor<
@@ -89,7 +89,7 @@ private:
         auto it = m_transactionProcessors.find(transaction.command);
         if (it == m_transactionProcessors.end())
         {
-            //no handler registered for transaction type
+            // No handler registered for transaction type.
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
                 {
@@ -97,7 +97,7 @@ private:
                 });
             return;
         }
-        //TODO should we always call completionHandler in the same thread?
+        // TODO: should we always call completionHandler in the same thread?
         return it->second->processTransaction(
             transportHeader,
             transaction,
@@ -106,6 +106,6 @@ private:
     }
 };
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

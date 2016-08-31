@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/network/aio/timer.h>
@@ -21,7 +16,7 @@
 
 namespace ec2 {
 class QnAbstractTransaction;
-}   // namespace ec2
+} // namespace ec2
 
 namespace nx {
 namespace cdb {
@@ -36,13 +31,17 @@ class AbstractTransactionProcessor
 public:
     virtual ~AbstractTransactionProcessor() {}
 
-    /** Parse and process UbJson-serialized transaction */
+    /**
+     * Parse and process UbJson-serialized transaction.
+     */
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         ::ec2::QnAbstractTransaction transaction,
         QnUbjsonReader<QByteArray>* const stream,
         TransactionProcessedHandler completionHandler) = 0;
-    /** Parse and process Json-serialized transaction */
+    /**
+     * Parse and process Json-serialized transaction.
+     */
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
         ::ec2::QnAbstractTransaction transaction,
@@ -50,9 +49,10 @@ public:
         TransactionProcessedHandler completionHandler) = 0;
 };
 
-/** Does abstract transaction processing logic.
-    Specific transaction logic is implemented by specific manager
-*/
+/**
+ * Does abstract transaction processing logic.
+ * Specific transaction logic is implemented by specific manager.
+ */
 template<int TransactionCommandValue, typename TransactionDataType>
 class BaseTransactionProcessor
     :
@@ -123,8 +123,9 @@ protected:
 };
 
 
-/** Processes special transactions.
-    Those are usually transactions that does not modify business data help in data synchronization
+/**
+ * Processes special transactions.
+ * Those are usually transactions that does not modify business data help in data synchronization.
 */
 template<int TransactionCommandValue, typename TransactionDataType>
 class SpecialCommandProcessor
@@ -161,9 +162,10 @@ private:
     }
 };
 
-/** Does abstract transaction processing logic.
-    Specific transaction logic is implemented by specific manager
-*/
+/**
+ * Does abstract transaction processing logic.
+ * Specific transaction logic is implemented by specific manager
+ */
 template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
 class TransactionProcessor
 :
@@ -172,15 +174,16 @@ class TransactionProcessor
 public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
     typedef nx::utils::MoveOnlyFunc<
-        nx::db::DBResult(QSqlDatabase*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
+        nx::db::DBResult(
+            QSqlDatabase*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
     > ProcessEc2TransactionFunc;
     typedef nx::utils::MoveOnlyFunc<
-        void(nx::db::DBResult, AuxiliaryArgType)
+        void(QSqlDatabase*, nx::db::DBResult, AuxiliaryArgType)
     > OnTranProcessedFunc;
 
     /**
-       @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
-    */
+     * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
+     */
     TransactionProcessor(
         TransactionLog* const transactionLog,
         ProcessEc2TransactionFunc processTranFunc,
@@ -221,9 +224,14 @@ private:
                 TransactionContext{ std::move(transportHeader), std::move(transaction) },
                 auxiliaryArgPtr),
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
+                QSqlDatabase* connection,
                 nx::db::DBResult dbResult) mutable
             {
-                dbProcessingCompleted(dbResult, std::move(*auxiliaryArg), std::move(handler));
+                dbProcessingCompleted(
+                    connection,
+                    dbResult, 
+                    std::move(*auxiliaryArg),
+                    std::move(handler));
             });
     }
 
@@ -232,7 +240,7 @@ private:
         const TransactionContext& transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
-        //DB transaction is created down the stack
+        //DB transaction is created down the stack.
 
         auto dbResultCode =
             m_transactionLog->checkIfNeededAndSaveToLog(
@@ -278,12 +286,13 @@ private:
     }
 
     void dbProcessingCompleted(
+        QSqlDatabase* connection,
         nx::db::DBResult dbResult,
         AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
         if (m_onTranProcessedFunc)
-            m_onTranProcessedFunc(dbResult, std::move(auxiliaryArg));
+            m_onTranProcessedFunc(connection, dbResult, std::move(auxiliaryArg));
 
         switch (dbResult)
         {
@@ -299,6 +308,6 @@ private:
     }
 };
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

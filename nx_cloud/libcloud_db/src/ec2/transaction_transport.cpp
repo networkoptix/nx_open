@@ -1,13 +1,7 @@
-/**********************************************************
-* Aug 10, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "transaction_transport.h"
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-
 
 namespace nx {
 namespace cdb {
@@ -15,7 +9,7 @@ namespace ec2 {
 
 constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
 constexpr static const int kKeepAliveProbeCount = 3;
-/** holding in queue not more then this transaction count */
+/** Holding in queue not more then this transaction count. */
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
 TransactionTransport::TransactionTransport(
@@ -161,7 +155,7 @@ void TransactionTransport::processSpecialTransaction(
     ::ec2::QnTransaction<::ec2::QnTranStateResponse> /*data*/,
     TransactionProcessedHandler /*handler*/)
 {
-    //TODO no need to do anything?
+    // TODO: no need to do anything?
     //NX_ASSERT(false);
 }
 
@@ -170,8 +164,48 @@ void TransactionTransport::processSpecialTransaction(
     ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> /*data*/,
     TransactionProcessedHandler /*handler*/)
 {
-    //TODO no need to do anything?
+    // TODO: no need to do anything?
     //NX_ASSERT(false);
+}
+
+void TransactionTransport::sendTransaction(
+    TransactionTransportHeader transportHeader,
+    const std::unique_ptr<TransactionSerializer>& transactionSerializer)
+{
+    transportHeader.vmsTransportHeader.fillSequence();
+    auto serializedTransaction = transactionSerializer->serialize(
+        remotePeer().dataFormat,
+        std::move(transportHeader));
+
+    post(
+        [this, 
+            serializedTransaction = std::move(serializedTransaction),
+            transactionHeader = transactionSerializer->transactionHeader()]()
+        {
+            // TODO: #ak checking transaction to send queue size
+            //if (isReadyToSend(transaction.command) && queue size is too large)
+            //    setWriteSync(false);
+
+            if (isReadyToSend(transactionHeader.command))
+            {
+                addData(std::move(serializedTransaction));
+                return;
+            }
+
+            NX_LOGX(
+                QnLog::EC2_TRAN_LOG,
+                lm("Postponing send transaction %1 to %2").str(transactionHeader.command)
+                    .str(m_commonTransportHeaderOfRemoteTransaction),
+                cl_logDEBUG1);
+
+            //cannot send transaction right now: updating local transaction sequence
+            const ::ec2::QnTranStateKey tranStateKey(
+                transactionHeader.peerID,
+                transactionHeader.persistentInfo.dbID);
+            m_tranStateToSynchronizeTo.values[tranStateKey] =
+                transactionHeader.persistentInfo.sequence;
+            //transaction will be sent later
+        });
 }
 
 const TransactionTransportHeader& 
@@ -222,7 +256,7 @@ void TransactionTransport::onTransactionsReadFromLog(
     api::ResultCode resultCode,
     std::vector<nx::Buffer> serializedTransactions)
 {
-    //TODO handle api::ResultCode::tryLater result code
+    // TODO: handle api::ResultCode::tryLater result code
 
     if (resultCode != api::ResultCode::ok)
     {
@@ -233,7 +267,7 @@ void TransactionTransport::onTransactionsReadFromLog(
         setState(Closed);   //closing connection
     }
 
-    //TODO posting transactions to send
+    // TODO: posting transactions to send
 }
 
 void TransactionTransport::addTransportHeaderToUbjsonTransaction(
@@ -246,6 +280,6 @@ void TransactionTransport::addTransportHeaderToJsonTransaction(
 {
 }
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

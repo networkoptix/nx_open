@@ -1,10 +1,4 @@
-/**********************************************************
-* Aug 22, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "transaction_log.h"
-
 
 namespace nx {
 namespace cdb {
@@ -23,25 +17,30 @@ TransactionLog::TransactionLog(nx::db::AsyncSqlQueryExecutor* const dbManager)
 void TransactionLog::startDbTransaction(
     const nx::String& /*systemId*/,
     nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbOperationsFunc,
-    nx::utils::MoveOnlyFunc<void(nx::db::DBResult)> onDbUpdateCompleted)
+    nx::utils::MoveOnlyFunc<void(QSqlDatabase*, nx::db::DBResult)> onDbUpdateCompleted)
 {
-    //TODO monitoring request queue size and returning api::ResultCode::retryLater if exceeded
-    //TODO execution of requests to the same system MUST be serialized
+    // TODO: execution of requests to the same system MUST be serialized
+    // TODO: monitoring request queue size and returning api::ResultCode::retryLater if exceeded
 
     m_dbManager->executeUpdate(
-        [dbOperationsFunc = std::move(dbOperationsFunc)]
-            (QSqlDatabase* dbConnection) -> nx::db::DBResult
+        [dbOperationsFunc = std::move(dbOperationsFunc)](
+            QSqlDatabase* dbConnection) -> nx::db::DBResult
         {
             return dbOperationsFunc(dbConnection);
         },
-        [onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
+        [this, onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
+            QSqlDatabase* dbConnection,
             nx::db::DBResult dbResult)
         {
             if (dbResult != nx::db::DBResult::ok)
             {
-                //TODO #ak rolling back transaction log change
+                // TODO: #ak rolling back transaction log change
             }
-            onDbUpdateCompleted(dbResult);
+            onDbUpdateCompleted(dbConnection, dbResult);
+
+            // TODO: #ak issuing "new transaction" event
+            QnMutexLocker lk(&m_mutex);
+            m_dbTransactionContexts.erase(dbConnection);
         });
 }
 
@@ -51,10 +50,10 @@ void TransactionLog::startDbTransaction(
 
 TransactionLogReader::TransactionLogReader(
     TransactionLog* const transactionLog,
-    nx::Buffer systemId,
+    nx::String systemId,
     Qn::SerializationFormat dataFormat)
 {
-    //TODO
+    // TODO:
 }
 
 TransactionLogReader::~TransactionLogReader()
@@ -64,7 +63,7 @@ TransactionLogReader::~TransactionLogReader()
 
 void TransactionLogReader::stopWhileInAioThread()
 {
-    //TODO
+    // TODO:
 }
 
 void TransactionLogReader::getTransactions(
@@ -75,7 +74,7 @@ void TransactionLogReader::getTransactions(
         api::ResultCode /*resultCode*/,
         std::vector<nx::Buffer> /*serializedTransactions*/)> completionHandler)
 {
-    //TODO
+    // TODO:
     post(
         [completionHandler = std::move(completionHandler)]()
         {
@@ -85,7 +84,7 @@ void TransactionLogReader::getTransactions(
 
 ::ec2::QnTranState TransactionLogReader::getCurrentState() const
 {
-    //TODO
+    // TODO:
     return ::ec2::QnTranState();
 }
 
@@ -101,6 +100,6 @@ void TransactionLogReader::setOnJsonTransactionReady(
     m_onJsonTransactionReady = std::move(handler);
 }
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

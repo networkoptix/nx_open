@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 10, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <vector>
@@ -17,7 +12,7 @@
 
 #include "transaction_processor.h"
 #include "transaction_transport_header.h"
-
+#include "transaction_serializer.h"
 
 namespace nx {
 namespace cdb {
@@ -37,7 +32,9 @@ public:
         const QByteArray&,
         TransactionTransportHeader)> GotTransactionEventHandler;
 
-    //!Initializer for incoming connection
+    /**
+     * Initializer for incoming connection.
+     */
     TransactionTransport(
         nx::network::aio::AbstractAioThread* aioThread,
         TransactionLog* const transactionLog,
@@ -53,7 +50,7 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
-    /** Set handler to be executed when tcp connection is closed */
+    /** Set handler to be executed when tcp connection is closed. */
     void setOnConnectionClosed(ConnectionClosedEventHandler handler);
     void setOnGotTransaction(GotTransactionEventHandler handler);
 
@@ -74,6 +71,10 @@ public:
         ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData> data,
         TransactionProcessedHandler handler);
 
+    void sendTransaction(
+        TransactionTransportHeader transportHeader,
+        const std::unique_ptr<TransactionSerializer>& transactionSerializer);
+
     template<class T>
     void sendTransaction(
         ::ec2::QnTransaction<T> transaction,
@@ -85,34 +86,33 @@ public:
                 .str(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG1);
 
-        post([this, transaction = std::move(transaction),
-                transportHeader = std::move(transportHeader)]() mutable
+        std::unique_ptr<TransactionSerializer> transactionSerializer;
+        switch (remotePeer().dataFormat)
+        {
+            case Qn::UbjsonFormat:
             {
-                //if (isReadyToSend(transaction.command) && queue size is too large)  //TODO #ak check transaction to send queue size
-                //    setWriteSync(false);
+                auto serializedTransaction = QnUbjson::serialized(transaction);
+                transactionSerializer = std::make_unique<typename SerializedUbjsonTransaction<T>>(
+                    std::move(transaction),
+                    std::move(serializedTransaction));
+                break;
+            }
 
-                if (isReadyToSend(transaction.command))
-                {
-                    ::ec2::QnTransactionTransportBase::sendTransactionImpl<T>(
-                        std::move(transaction),
-                        std::move(transportHeader.vmsTransportHeader));
-                    return;
-                }
-
-                NX_LOGX(
-                    QnLog::EC2_TRAN_LOG,
-                    lm("Postponing send transaction %1 to %2").str(transaction.command)
-                        .str(m_commonTransportHeaderOfRemoteTransaction),
+            default:
+            {
+                NX_LOGX(lm("Cannot send transaction in unsupported format %1 to %2")
+                    .arg(QnLexical::serialized(remotePeer().dataFormat))
+                    .str(m_commonTransportHeaderOfRemoteTransaction),
                     cl_logDEBUG1);
+                // TODO: #ak close connection
+                NX_ASSERT(false);
+                return;
+            }
+        }
 
-                //cannot send transaction right now: updating local transaction sequence
-                const ::ec2::QnTranStateKey tranStateKey(
-                    transaction.peerID,
-                    transaction.persistentInfo.dbID);
-                m_tranStateToSynchronizeTo.values[tranStateKey] =
-                    transaction.persistentInfo.sequence;
-                //transaction will be sent later
-            });
+        sendTransaction(
+            std::move(transportHeader),
+            transactionSerializer);
     }
 
     const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const;
@@ -130,9 +130,13 @@ private:
     const nx::String m_connectionId;
     const SocketAddress m_connectionOriginatorEndpoint;
     TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
-    /** tran state, we need to synchronize remote side to, before we can mark it write sync */
+    /**
+     * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
+     */
     ::ec2::QnTranState m_tranStateToSynchronizeTo;
-    /** tran state of remote peer. Transactions before this state have been sent to the peer */
+    /** 
+     * Transaction state of remote peer. Transactions before this state have been sent to the peer.
+     */
     ::ec2::QnTranState m_remotePeerTranState;
     bool m_haveToSendSyncDone;
 
@@ -148,6 +152,6 @@ private:
     void addTransportHeaderToJsonTransaction(QJsonObject*);
 };
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 26, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "data_conversion.h"
 
 #include <cdb/system_data.h>
@@ -62,7 +57,7 @@ static void accessRoleToPermissions(
             break;
     }
 }
-}   // namespace
+} // namespace
 
 void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
 {
@@ -92,6 +87,6 @@ void convert(const api::SystemSharing& from, ::ec2::ApiIdData* const to)
     to->id = QnUuid(from.vmsUserId);
 }
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx

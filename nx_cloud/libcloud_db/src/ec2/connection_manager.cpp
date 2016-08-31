@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 8, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "connection_manager.h"
 
 #include <nx/network/http/server/http_message_dispatcher.h>
@@ -18,7 +13,6 @@
 #include "incoming_transaction_dispatcher.h"
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
-
 
 namespace nx {
 namespace cdb {
@@ -67,8 +61,9 @@ void ConnectionManager::createTransactionConnection(
     nx_http::Response* const response,
     nx_http::HttpRequestProcessedHandler completionHandler)
 {
-    // GET ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
-    //TODO #ak
+    // GET ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
+    //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
+    // TODO: #ak
 
     std::string systemId;
     if (!authInfo.get(attr::authSystemID, &systemId))
@@ -97,13 +92,22 @@ void ConnectionManager::createTransactionConnection(
 
     ::ec2::ApiPeerData remotePeer;
     nx::String contentEncoding;
-    fetchDataFromConnectRequest(request, &remotePeer, &contentEncoding);
+    if (!fetchDataFromConnectRequest(request, &remotePeer, &contentEncoding))
+    {
+        NX_LOGX(lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
+            .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
+            cl_logDEBUG1);
+        return completionHandler(
+            nx_http::StatusCode::badRequest,
+            nullptr,
+            nx_http::ConnectionEvents());
+    }
 
     NX_LOGX(lm("Received createTransactionConnection request from (%1.%2; %3)")
         .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
         cl_logDEBUG1);
 
-    //newTransport MUST be ready to accept connections before sending response
+    // newTransport MUST be ready to accept connections before sending response.
     const nx::String systemIdLocal(systemId.c_str());
     auto newTransport = std::make_unique<TransactionTransport>(
         connection->getAioThread(),
@@ -145,7 +149,7 @@ void ConnectionManager::createTransactionConnection(
     response->headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
         m_localPeerData.instanceId.toByteArray());
-    //TODO #ak have to support different proto versions and add runtime conversion between them
+    // TODO: #ak have to support different proto versions and add runtime conversion between them.
     response->headers.emplace(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
         nx::String::number(nx_ec::EC2_PROTO_VERSION));
@@ -177,7 +181,7 @@ void ConnectionManager::pushTransaction(
     const auto connectionId = connectionIdIter->second;
 
     QnMutexLocker lk(&m_mutex);
-    //reporting received transaction(s) to the corresponding connection 
+    // Reporting received transaction(s) to the corresponding connection.
     const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
     auto connectionIter = connectionByIdIndex.find(connectionId);
     if (connectionIter == connectionByIdIndex.end())
@@ -196,6 +200,62 @@ void ConnectionManager::pushTransaction(
         });
 
     completionHandler(nx_http::StatusCode::ok, nullptr, nx_http::ConnectionEvents());
+}
+
+void ConnectionManager::dispatchTransaction(
+    const nx::String& systemId,
+    std::unique_ptr<TransactionSerializer> transactionSerializer)
+{
+    // Generating transport header.
+    TransactionTransportHeader transportHeader;
+    transportHeader.systemId = systemId;
+    transportHeader.vmsTransportHeader.distance = 1;
+    transportHeader.vmsTransportHeader.processedPeers.insert(m_localPeerData.id);
+    // transportHeader.vmsTransportHeader.dstPeers.insert(); TODO:.
+
+    QnMutexLocker lk(&m_mutex);
+    const auto& connectionBySystemIdAndPeerIdIndex =
+        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+
+    std::size_t connectionCount = 0;
+    std::array<TransactionTransport*, 7> connectionsToSendTo;
+    for (auto connectionIt = connectionBySystemIdAndPeerIdIndex
+            .lower_bound(std::make_pair(systemId, nx::String()));
+        connectionIt != connectionBySystemIdAndPeerIdIndex.end()
+        && connectionIt->systemIdAndPeerId.first == systemId;
+        ++connectionIt)
+    {
+        if (connectionIt->systemIdAndPeerId.second ==
+                transactionSerializer->transactionHeader().peerID.toByteArray())
+        {
+            continue;
+        }
+
+        connectionsToSendTo[connectionCount++] = connectionIt->connection.get();
+        if (connectionCount < connectionsToSendTo.size())
+            continue;
+
+        for (auto& connection : connectionsToSendTo)
+            connection->sendTransaction(
+                transportHeader,
+                transactionSerializer);
+        connectionCount = 0;
+    }
+
+    if (connectionCount == 1)
+    {
+        // Minor optimization.
+        connectionsToSendTo[0]->sendTransaction(
+            std::move(transportHeader),
+            std::move(transactionSerializer));
+    }
+    else
+    {
+        for (auto& connection : connectionsToSendTo)
+            connection->sendTransaction(
+                transportHeader,
+                transactionSerializer);
+    }
 }
 
 void ConnectionManager::addNewConnection(ConnectionContext context)
@@ -245,7 +305,7 @@ void ConnectionManager::removeExistingConnection(
             if (existingConnectionIter == connectionIndex.end())
                 return;
 
-            //removing existing connection
+            // Removing existing connection.
             std::unique_ptr<TransactionTransport> existingConnection;
             connectionIndex.modify(
                 existingConnectionIter,
@@ -261,7 +321,7 @@ void ConnectionManager::removeExistingConnection(
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
-    //always called within transport's aio thread
+    // Always called within transport's aio thread.
     NX_LOGX(lm("Removing transaction connection %1").arg(connectionId), cl_logDEBUG1);
 
     QnMutexLocker lk(&m_mutex);
@@ -276,10 +336,10 @@ void ConnectionManager::removeConnection(const nx::String& connectionId)
     index.erase(iter);
     lk.unlock();
 
-    //::ec2::TransactionTransportBase does not support its removal 
-    //  in signal handler, so have to remove it delayed...
-    //TODO #ak have to ensure somehow that no events 
-    //  from connectionContext.connection are delivered
+    // ::ec2::TransactionTransportBase does not support its removal 
+    //  in signal handler, so have to remove it delayed.
+    // TODO: #ak have to ensure somehow that no events from 
+    //  connectionContext.connection are delivered.
     auto connectionPtr = connectionContext.connection.get();
     connectionPtr->pleaseStop(
         [connection = std::move(connectionContext.connection)]() mutable
@@ -311,13 +371,13 @@ void ConnectionManager::onTransactionDone(
 {
     if (resultCode != api::ResultCode::ok)
     {
-        //closing connection in case of failure
+        // Closing connection in case of failure.
         QnMutexLocker lk(&m_mutex);
         removeExistingConnection<kConnectionByIdIndex, nx::String>(&lk, connectionId);
     }
 }
 
-void ConnectionManager::fetchDataFromConnectRequest(
+bool ConnectionManager::fetchDataFromConnectRequest(
     const nx_http::Request& request,
     ::ec2::ApiPeerData* const remotePeer,
     nx::String* const contentEncoding)
@@ -325,8 +385,8 @@ void ConnectionManager::fetchDataFromConnectRequest(
     QUrlQuery query = QUrlQuery(request.requestLine.url.query());
     const bool isClient = query.hasQueryItem("isClient");
     const bool isMobileClient = query.hasQueryItem("isMobile");
-    QnUuid remoteGuid = QnUuid(query.queryItemValue("guid"));
-    QnUuid remoteRuntimeGuid = QnUuid(query.queryItemValue("runtime-guid"));
+    QnUuid remoteGuid = QnUuid::fromStringSafe(query.queryItemValue("guid"));
+    QnUuid remoteRuntimeGuid = QnUuid::fromStringSafe(query.queryItemValue("runtime-guid"));
     if (remoteGuid.isNull())
         remoteGuid = QnUuid::createUuid();
 
@@ -337,9 +397,14 @@ void ConnectionManager::fetchDataFromConnectRequest(
 
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
-        QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
+        if (!QnLexical::deserialize(query.queryItemValue("format"), &dataFormat))
+        {
+            NX_LOGX(lm("Invalid value of \"format\" field: %1")
+                .arg(query.queryItemValue("format")), cl_logDEBUG1);
+            return false;
+        }
 
-    //checking content encoding requested by remote peer
+    // Checking content encoding requested by remote peer.
     auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
     if (acceptEncodingHeaderIter != request.headers.end())
     {
@@ -352,6 +417,7 @@ void ConnectionManager::fetchDataFromConnectRequest(
     }
 
     *remotePeer = ::ec2::ApiPeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+    return true;
 }
 
 template<typename TransactionDataType>
@@ -373,6 +439,6 @@ void ConnectionManager::processSpecialTransaction(
         std::move(handler));
 }
 
-}   // namespace ec2
-}   // namespace cdb
-}   // namespace nx
+} // namespace ec2
+} // namespace cdb
+} // namespace nx
