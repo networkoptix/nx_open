@@ -24,6 +24,12 @@ public:
 
     virtual QSize viewportSizeHint() const override;
 
+    using QTreeView::edit;
+
+    /** Sometimes we need to disable default selection behavior by space key and handle it manually. */
+    bool ignoreDefaultSpace() const;
+    void setIgnoreDefaultSpace(bool value);
+
 signals:
     /**
      * This signal is emitted whenever the user presses enter on one of the
@@ -40,6 +46,7 @@ signals:
      * \param index                     Index of the item. Is guaranteed to be valid.
      */
     void spacePressed(const QModelIndex &index);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
@@ -55,6 +62,8 @@ private:
 
     /* Flag that an element is edited right now. Workaround for Qt bug: state() is not always Editing. */
     bool m_editorOpen;
+
+    bool m_ignoreDefaultSpace;
 };
 
 

@@ -202,9 +202,9 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     else if (const auto localAddress = args.get("local-address"))
     {
         if (args.get("udt"))
-            serverSocket = std::make_unique<UdtStreamServerSocket>();
+            serverSocket = std::make_unique<UdtStreamServerSocket>(AF_INET);
         else
-            serverSocket = std::make_unique<TCPServerSocket>();
+            serverSocket = std::make_unique<TCPServerSocket>(AF_INET);
 
         server.setLocalAddress(SocketAddress(*localAddress));
         std::cout << "listening on local " << (args.get("udt") ? "udt" : "tcp")

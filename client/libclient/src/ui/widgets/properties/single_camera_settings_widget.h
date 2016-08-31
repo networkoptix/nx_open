@@ -16,7 +16,6 @@ class SingleCameraSettingsWidget;
 
 class QVBoxLayout;
 class QnCameraMotionMaskWidget;
-class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
 class CameraAdvancedSettingsWebPage;
 
@@ -45,28 +44,16 @@ public:
     bool hasChanges() const;
 
     /** Checks if user changed schedule controls but not applied them */
-    bool hasScheduleControlsChanges() const
-    {
-        return m_hasScheduleControlsChanges;
-    }
+    bool hasScheduleControlsChanges() const;
 
     /** Clear flag that user changed schedule controls but not applied them */
-    void clearScheduleControlsChanges()
-    {
-        m_hasScheduleControlsChanges = false;
-    }
+    void clearScheduleControlsChanges();
 
     /** Checks if user changed motion controls but not applied them */
-    bool hasMotionControlsChanges() const
-    {
-        return m_hasMotionControlsChanges;
-    }
+    bool hasMotionControlsChanges() const;
 
     /** Clear flag that  user changed motion controls but not applied them */
-    void clearMotionControlsChanges()
-    {
-        m_hasMotionControlsChanges = false;
-    }
+    void clearMotionControlsChanges();
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -74,7 +61,6 @@ public:
     //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
     bool licensedParametersModified() const;
     void updateFromResource(bool silent = false);
-    void reject();
     void submitToResource();
 
     /** Check if motion region is valid */
@@ -94,9 +80,7 @@ protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void hideEvent(QHideEvent *event) override;
 
-    QnCameraSettingsWidgetPrivate* d_ptr;
-
-    private slots:
+private slots:
     void at_tabWidget_currentChanged();
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
@@ -110,7 +94,6 @@ protected:
     void at_motionRegionListChanged();
     void at_fisheyeSettingsChanged();
 
-    void updateMaxFPS();
     void updateMotionWidgetSensitivity();
     void updateIpAddressText();
     void updateWebPageText();
@@ -122,9 +105,7 @@ private:
     void submitMotionWidgetToResource();
 
     void updateMotionWidgetNeedControlMaxRect();
-    void updateMotionAvailability();
     void updateMotionCapabilities();
-    void updateRecordingParamsAvailability();
 
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
@@ -138,7 +119,6 @@ private:
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
-    Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
 
@@ -148,8 +128,6 @@ private:
     bool m_hasDbChanges;
 
     bool m_scheduleEnabledChanged;
-    /** Indicates that schedule was changed */
-    bool m_hasScheduleChanges;
 
     /** Indicates that the user changed schedule controls but not applied them */
     bool m_hasScheduleControlsChanges;
@@ -163,7 +141,6 @@ private:
 
     QnCameraMotionMaskWidget *m_motionWidget;
     QVBoxLayout *m_motionLayout;
-    bool m_inUpdateMaxFps;
 
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
 

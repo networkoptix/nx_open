@@ -344,6 +344,8 @@ private:
 
     void setMarkerSliderPosition(Marker marker, qint64 position);
 
+    void extendSelection(qint64 position);
+
     bool isAnimatingWindow() const;
 
     bool scaleWindow(qreal factor, qint64 anchor);

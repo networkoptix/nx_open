@@ -34,6 +34,9 @@ td{
     vertical-align: top;
     text-align: left;
     padding-right:5px;
+
+    padding-top:3px;
+    padding-bottom:3px;
 }
 th{
     line-height: 30px;
@@ -179,12 +182,14 @@ td.number{
     width:0;
 }
 
-.source-name{
+table.description td:first-child{
     text-overflow: ellipsis;
     overflow: hidden;
-    display: inline-block;
     white-space: nowrap;
-    max-width: 130px;
+    max-width: 200px;
+}
+table.description td:last-child{
+    white-space: nowrap;
 }
 
 .margin-top{

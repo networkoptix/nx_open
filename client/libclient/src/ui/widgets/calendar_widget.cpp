@@ -43,7 +43,7 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
     monthButton->setMenu(NULL);
 
     QWidget *yearEdit = findChild<QWidget *>(QLatin1String("qt_calendar_yearedit"));
-    
+
     QnSingleEventEater *eater = new QnSingleEventEater(Qn::AcceptEvent, this);
     eater->setEventType(QEvent::ContextMenu);
     yearEdit->installEventFilter(eater);
@@ -62,10 +62,10 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
     connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateEnabledPeriod()));
 
     m_navigationBar = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
-    
+
     NX_ASSERT(m_navigationBar, Q_FUNC_INFO, "Navigator bar is nullptr!");
     m_navigationBar->setBackgroundRole(QPalette::Window);
-    
+
     updateEnabledPeriod();
     updateCurrentTime();
     updateEmpty();
@@ -119,7 +119,7 @@ bool QnCalendarWidget::isEmpty() {
 
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
 {
-    QnTimePeriod period(QDateTime(date).toMSecsSinceEpoch(), DAY); 
+    QnTimePeriod period(QDateTime(date).toMSecsSinceEpoch(), DAY);
     if (period.startTimeMs > m_currentTime)
         period = QnTimePeriod();
 
@@ -127,9 +127,9 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     const bool isEnabled = m_enabledPeriod.intersects(localPeriod);
     const bool isSelected = m_selectedPeriod.intersects(localPeriod);
 
-    const QnTimePeriodStorage &primaryPeriods = 
+    const QnTimePeriodStorage &primaryPeriods =
         (m_currentTimePeriodsVisible ? m_currentPeriodStorage : m_emptyPeriodStorage);
-    m_delegate->paintCell(painter, rect, localPeriod, primaryPeriods, m_syncedPeriodStorage, isEnabled, isSelected);
+    m_delegate->paintCell(painter, rect, localPeriod, primaryPeriods, m_syncedPeriodStorage, isSelected);
     m_delegate->paintCellText(painter, palette(), rect, QString::number(date.day()), isEnabled);
 }
 

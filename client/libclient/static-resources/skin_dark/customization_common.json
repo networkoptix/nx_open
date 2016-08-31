@@ -82,7 +82,7 @@
         "timeline_bg":      "#223925",
 
         "opaqueSelection":  "blue10",
-        "ptz":              "opaqueSelection",
+        "ptz":              "blue10",
         "selection":        "opaqueSelection.setAlpha(110)"
     },
 
@@ -327,6 +327,14 @@
         }}
     },
 
+    "QnStyledTooltipWidget": {
+        "palette": { "default": {
+            "window": "dark13",
+            "windowText": "light4",
+            "highlight": "light4.setAlpha(0)"
+        }}
+    },
+
     "QnSliderTooltipWidget": {
         "palette": { "default": {
             "window": "light4",
@@ -420,10 +428,6 @@
         }
     },
 
-    "QnMediaResourceWidget": {
-        "palette": { "default": { "window": "dark4" } }
-    },
-
     "QnServerResourceWidget": {
         "colors": {
             "frame": "opaqueSelection",
@@ -445,19 +449,14 @@
     },
 
     "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
+        "colors": ["yellow_core", "green_l2", "red_l2"]
     },
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
             "window": "dark4.setAlpha(75)",
             "windowText": "#801010c0"
-        }},
-        "#statusOverlayButton": {
-            "windowColor": "#801010c0",
-            "frameColor": "#801010ff",
-            "textColor": "#ffffffff"
-        }
+        }}
     },
 
     "QnIoModuleOverlayWidget": {
@@ -484,20 +483,6 @@
             "background": "dark7",
             "visualizer": "red_core"
         }
-    },
-
-    "QnStyledTooltipWidget": {
-        "windowColor": "QColor(0, 0, 0, 255)",
-        "frameColor": "QColor(203, 210, 233, 128)",
-        "palette": { "default": { "windowText": "opaqueSelection" } }
-    },
-
-    "QnResourceBrowserToolTipWidget": {
-        "palette": { "default": { "windowText": "#f0f0f0" } }
-    },
-
-    "QnNotificationToolTipWidget": {
-        "palette": { "default": { "windowText": "#f0f0f0" } }
     },
 
     "QnGridItem": {
@@ -654,7 +639,7 @@
     },
 
     "QnNotificationWidget" : {
-        "palette": { 
+        "palette": {
             "default": {
                 "dark": "dark6"
             }
@@ -662,6 +647,7 @@
     },
 
     "QnMediaResourceWidget": {
+        "palette": { "default": { "window": "dark4" } },
         "motionSensitivityColors": [
             "light16",
             "#627cd6",

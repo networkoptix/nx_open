@@ -433,13 +433,13 @@ bool QnDwm::widgetEvent(QEvent *event) {
 
 
 bool QnDwm::widgetNativeEvent(const QByteArray &eventType, void *message, long *result) {
+    Q_UNUSED(eventType)
 #ifdef QN_HAS_DWM
     if(d->widget == NULL)
         return false;
 
     return d->winEvent(static_cast<MSG *>(message), result);
 #else
-    Q_UNUSED(eventType)
     Q_UNUSED(message)
     Q_UNUSED(result)
     return false;
@@ -596,6 +596,7 @@ bool QnDwmPrivate::ncPaintEvent(MSG *message, long *result) {
 }
 
 bool QnDwmPrivate::getMinMaxInfoEvent(MSG *message, long *result) {
+    Q_UNUSED(result);
     if(!overrideFrameMargins)
         return false; /* Default codepath is OK. */
 

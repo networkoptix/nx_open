@@ -28,28 +28,37 @@ namespace nx_http
             nx_http::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher,
             bool sslRequired,
-            SocketFactory::NatTraversalType natTraversalRequired )	
+            SocketFactory::NatTraversalType natTraversalRequired )
 		:
 			base_type(sslRequired, natTraversalRequired),
 			m_authenticationManager(authenticationManager),
-			m_httpMessageDispatcher(httpMessageDispatcher)
+			m_httpMessageDispatcher(httpMessageDispatcher),
+            m_forceConnectionClose(false)
 		{
 		}
 
+        // for test purpose
+        void setForceConnectionClose(bool value)
+        {
+            m_forceConnectionClose = value;
+        }
     protected:
         virtual std::shared_ptr<HttpServerConnection> createConnection(
             std::unique_ptr<AbstractStreamSocket> _socket) override
 		{
-			return std::make_shared<HttpServerConnection>(
+			auto result = std::make_shared<HttpServerConnection>(
 				this,
 				std::move(_socket),
 				m_authenticationManager,
 				m_httpMessageDispatcher);
+            result->setForceConnectionClose(m_forceConnectionClose);
+            return result;
 		}
 
     private:
         nx_http::AbstractAuthenticationManager* const m_authenticationManager;
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
+        bool m_forceConnectionClose; //< force connection close for test purpose
     };
 }
 

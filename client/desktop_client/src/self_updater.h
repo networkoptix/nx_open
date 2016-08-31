@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QDir>
+
 #include <nx/utils/software_version.h>
 
 struct QnStartupParameters;
@@ -54,9 +56,10 @@ private:
     Result osCheck(Operation operation, bool result);
     void launchWithAdminPermissions();
 
-    bool isMinilaucherUpdated(const QString& installRoot) const;
+    bool isMinilaucherUpdated(const QDir& installRoot) const;
     bool runMinilaucher() const;
-    bool updateMinilauncherInDir(const QString& installRoot);
+    bool updateMinilauncherInDir(const QDir& installRoot);
+    bool updateApplauncherDesktopIcon();
 
     /** Get all paths where client might be installed. */
     QStringList getClientInstallRoots() const;
@@ -64,6 +67,6 @@ private:
     nx::utils::SoftwareVersion m_clientVersion;
 };
 
-}
-}
-}
+} // namespace client
+} // namespace vms
+} // namespace nx

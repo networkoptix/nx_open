@@ -39,7 +39,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(Qn::PeerType peerType):
     // dbmanager is initialized by direct connection.
     m_dbManager(peerType == Qn::PT_Server ? new detail::QnDbManager() : nullptr),
     m_timeSynchronizationManager(new TimeSynchronizationManager(peerType)),
-    m_transactionMessageBus(new ec2::QnTransactionMessageBus(peerType)),
+    m_transactionMessageBus(new QnTransactionMessageBus(peerType)),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false)
@@ -52,7 +52,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(Qn::PeerType peerType):
     // Registering ec2 types with Qt meta-type system.
     qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
 
-    ec2::QnDistributedMutexManager::initStaticInstance(new ec2::QnDistributedMutexManager());
+    QnDistributedMutexManager::initStaticInstance(new QnDistributedMutexManager());
 
     // TODO: Add comment why this code is commented out.
     //m_transactionMessageBus->start();
@@ -67,7 +67,7 @@ Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     // uses QnTransactionMessageBus.
     m_timeSynchronizationManager->pleaseStop();
 
-    ec2::QnDistributedMutexManager::initStaticInstance(0);
+    QnDistributedMutexManager::initStaticInstance(0);
 }
 
 void Ec2DirectConnectionFactory::pleaseStop()
@@ -152,23 +152,23 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractResourceManager::getResourceTypes
      */
-    registerGetFuncHandler<nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
+    regGet<nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-    //AbstractResourceManager::setResourceStatus
-    registerUpdateFuncHandler<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
+    // AbstractResourceManager::setResourceStatus
+    regUpdate<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
 
     /**%apidoc GET /ec2/getResourceParams
      * Read resource (camera, user or server) additional parameters (camera firmware version, etc).
      * List of parameters depends of resource type.
      * %param[default] format
-     * %param id Resource unique Id
+     * %param id Resource unique id
      * %return Return object in requested format
      * %// AbstractResourceManager::getKvPairs
      */
-    registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
+    regGet<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
 
-    //AbstractResourceManager::save
-    registerUpdateFuncHandler<ApiResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
+    // AbstractResourceManager::save
+    regUpdate<ApiResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
 
     /**%apidoc POST /ec2/removeResource
      * Delete the resource.
@@ -180,7 +180,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param id Unique id of the resource.
      * %// AbstractResourceManager::remove
      */
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeResource);
+    regUpdate<ApiIdData>(p, ApiCommand::removeResource);
 
     /**%apidoc GET /ec2/getStatusList
      * Read current status values for cameras, servers and storages.
@@ -190,12 +190,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * format. If id parameter is specified, the list contains only one
      * object with that id, or nothing, if there is no such object found.
      */
-    registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
+    regGet<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
-    //AbstractMediaServerManager::getServers
-    registerGetFuncHandler<nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
-    //AbstractMediaServerManager::save
-    registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
+    // AbstractMediaServerManager::getServers
+    regGet<nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+    // AbstractMediaServerManager::save
+    regUpdate<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
     /**%apidoc POST /ec2/saveServerUserAttributes
      * Save user attributes of a server.
@@ -231,14 +231,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     value if not limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
-    registerUpdateFuncHandler<ApiMediaServerUserAttributesData>(p, ApiCommand::saveServerUserAttributes);
+    regUpdate<ApiMediaServerUserAttributesData>(p, ApiCommand::saveServerUserAttributes);
 
-    //AbstractCameraManager::saveUserAttributes
-    registerUpdateFuncHandler<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveServerUserAttributesList);
-    //AbstractCameraManager::getUserAttributes
-    registerGetFuncHandler<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getServerUserAttributes);
-    //AbstractMediaServerManager::remove
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeMediaServer);
+    // AbstractCameraManager::saveUserAttributes
+    regUpdate<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveServerUserAttributesList);
+    // AbstractCameraManager::getUserAttributes
+    regGet<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getServerUserAttributes);
+    // AbstractMediaServerManager::remove
+    regUpdate<ApiIdData>(p, ApiCommand::removeMediaServer);
 
     /**%apidoc GET /ec2/getMediaServersEx
      * Return server list
@@ -246,9 +246,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractMediaServerManager::getServersEx
      */
-    registerGetFuncHandler<nullptr_t, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+    regGet<nullptr_t, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
-    registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
+    regUpdate<ApiStorageDataList>(p, ApiCommand::saveStorages);
 
     /**%apidoc POST /ec2/saveStorage
      * Save the storage.
@@ -276,21 +276,21 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value false
      *     %value true
      */
-    registerUpdateFuncHandler<ApiStorageData>(p, ApiCommand::saveStorage);
+    regUpdate<ApiStorageData>(p, ApiCommand::saveStorage);
 
-    registerUpdateFuncHandler<ApiIdDataList>(p, ApiCommand::removeStorages);
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeStorage);
-    registerUpdateFuncHandler<ApiIdDataList>(p, ApiCommand::removeResources);
+    regUpdate<ApiIdDataList>(p, ApiCommand::removeStorages);
+    regUpdate<ApiIdData>(p, ApiCommand::removeStorage);
+    regUpdate<ApiIdDataList>(p, ApiCommand::removeResources);
 
-    //AbstractCameraManager::addCamera
-    registerUpdateFuncHandler<ApiCameraData>(p, ApiCommand::saveCamera);
-    //AbstractCameraManager::save
-    registerUpdateFuncHandler<ApiCameraDataList>(p, ApiCommand::saveCameras);
-    //AbstractCameraManager::getCameras
-    registerGetFuncHandler<nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
+    // AbstractCameraManager::addCamera
+    regUpdate<ApiCameraData>(p, ApiCommand::saveCamera);
+    // AbstractCameraManager::save
+    regUpdate<ApiCameraDataList>(p, ApiCommand::saveCameras);
+    // AbstractCameraManager::getCameras
+    regGet<nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
 
-    //AbstractCameraManager::saveUserAttributes
-    registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
+    // AbstractCameraManager::saveUserAttributes
+    regUpdate<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
 
     /**%apidoc POST /ec2/saveCameraUserAttributes
      * Save additional camera attributes for a single camera.
@@ -317,7 +317,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     future API versions. Currently, this string defines several rectangles separated with
      *     ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
      *     left top corner), width, height.
-     * %param scheduleTasks List of scheduleTask objects which define the camera recording schedule.
+     * %param scheduleTasks List of scheduleTask objects which define the camera recording
+     *     schedule.
      *     %param scheduleTask.startTime Time of day to start backup as
      *         seconds passed from the day's 00:00:00.
      *     %param scheduleTask.endTime: Time of day to end backup as
@@ -385,17 +386,20 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
      *     %value CameraBackup_LowQuality Backup is in low quality.
-     *     %value CameraBackup_Both Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+     *     %value CameraBackup_Both
+     *         Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
      *     %value CameraBackup_Default A default value is used for backup options.
      * %// AbstractCameraManager::saveUserAttributes
      */
-    registerUpdateFuncHandler<ApiCameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
+    regUpdate<ApiCameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
 
     /**%apidoc GET /ec2/getCameraUserAttributes
      * Read additional camera attributes.
      * %// TODO: This function is named inconsistently - should end with 'List'.
      * %param[default] format
-     * %return List of additional camera attributes objects for all cameras in the requested format.
+     * %return List of additional camera attributes objects for all cameras in the requested
+     *     format.
+     *     %// TODO: #mike cameraId
      *     %param cameraID Camera unique id.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
@@ -485,14 +489,15 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.
-     *         %value CameraBackup_Both Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+     *         %value CameraBackup_Both
+     *             Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
      *         %value CameraBackup_Default A default value is used for backup options.
      * %// AbstractCameraManager::getUserAttributes
      */
-    registerGetFuncHandler<nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+    regGet<nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
 
-    //AbstractCameraManager::addCameraHistoryItem
-    registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
+    // AbstractCameraManager::addCameraHistoryItem
+    regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
     /**%apidoc GET /ec2/getCameraHistoryItems
      * Read information about which server hold camera in some time
@@ -502,13 +507,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractCameraManager::getCameraHistoryItems
      */
-    registerGetFuncHandler<nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
+    regGet<nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
      * %param[default] format
      * %return List of objects with camera information formatted in the requested format.
      *     %// From struct ApiResourceData:
+     *     %// TODO: #mike cameraId
      *     %param id Camera unique Id.
      *     %param parentId Unique Id of a camera's server.
      *     %param name Camera name.
@@ -519,7 +525,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         can be obtained via GET /ec2/getResourceTypes request.
      *
      *     %// From struct ApiCameraData (inherited from ApiResourceData):
+     *     %// TODO: #mike cameraId
      *     %param mac Camera MAC address.
+     *     %// TODO: #mike cameraId
      *     %param physicalId Camera unique identifier. This identifier is used in some requests
      *        related to a camera, for instance, in RTSP requests.
      *     %param manuallyAdded Whether the user added the camera manually.
@@ -534,6 +542,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param vendor Camera manufacturer.
      *
      *     %// From struct ApiCameraAttributesData:
+     *     %// TODO: #mike cameraId
      *     %param cameraID Camera unique id.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
@@ -623,7 +632,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.
-     *         %value CameraBackup_Both Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+     *         %value CameraBackup_Both
+     *             Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
      *         %value CameraBackup_Default A default value is used for backup options.
      *     %param status Camera status.
      *         %value Offline
@@ -633,7 +643,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         such information as full ONVIF URL, camera maximum fps, etc.
      * %// AbstractCameraManager::getCamerasEx
      */
-    registerGetFuncHandler<nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+    regGet<nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
@@ -660,12 +670,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value false
      *         %value true
      */
-    registerGetFuncHandler<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
+    regGet<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
 
-    //AbstractLicenseManager::addLicenses
-    registerUpdateFuncHandler<ApiLicenseDataList>(p, ApiCommand::addLicenses);
-    //AbstractLicenseManager::removeLicense
-    registerUpdateFuncHandler<ApiLicenseData>(p, ApiCommand::removeLicense);
+    // AbstractLicenseManager::addLicenses
+    regUpdate<ApiLicenseDataList>(p, ApiCommand::addLicenses);
+    // AbstractLicenseManager::removeLicense
+    regUpdate<ApiLicenseData>(p, ApiCommand::removeLicense);
 
     /**%apidoc GET /ec2/getBusinessRules
      * Return business rules
@@ -673,19 +683,18 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractBusinessEventManager::getBusinessRules
      */
-    registerGetFuncHandler<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
+    regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
 
-    registerGetFuncHandler<nullptr_t, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
+    regGet<nullptr_t, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
-    //AbstractBusinessEventManager::save
-    registerUpdateFuncHandler<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);
-    //AbstractBusinessEventManager::deleteRule
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeBusinessRule);
+    // AbstractBusinessEventManager::save
+    regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);
+    // AbstractBusinessEventManager::deleteRule
+    regUpdate<ApiIdData>(p, ApiCommand::removeBusinessRule);
 
-    registerUpdateFuncHandler<ApiResetBusinessRuleData>(p, ApiCommand::resetBusinessRules);
-    registerUpdateFuncHandler<ApiBusinessActionData>(p, ApiCommand::broadcastBusinessAction);
-    registerUpdateFuncHandler<ApiBusinessActionData>(p, ApiCommand::execBusinessAction);
-
+    regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetBusinessRules);
+    regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastBusinessAction);
+    regUpdate<ApiBusinessActionData>(p, ApiCommand::execBusinessAction);
 
     /**%apidoc GET /ec2/getUsers
      * Return users registered in the system. User's password contain MD5
@@ -694,7 +703,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractUserManager::getUsers
      */
-    registerGetFuncHandler<nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
+    regGet<nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
 
     /**%apidoc GET /ec2/getUserGroups
      * Return user groups registered in the system.
@@ -704,7 +713,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUserGroups
      */
-    registerGetFuncHandler<QnUuid, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
+    regGet<QnUuid, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
 
     /**%apidoc GET /ec2/getAccessRights
      * Return list of accessible resources ids for each user in the system.
@@ -712,7 +721,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractUserManager::getAccessRights
      */
-    registerGetFuncHandler<nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
+    regGet<nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
 
     /**%apidoc POST /ec2/setAccessRights
      * <p>
@@ -724,7 +733,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param resourceIds List of accessible resources ids.
      * %// AbstractUserManager::setAccessRights
      */
-    registerUpdateFuncHandler<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
+    regUpdate<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
 
     /**%apidoc POST /ec2/saveUser
      * <p>
@@ -773,7 +782,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value true
      * %// AbstractUserManager::save
      */
-    registerUpdateFuncHandler<ApiUserData>(p, ApiCommand::saveUser);
+    regUpdate<ApiUserData>(p, ApiCommand::saveUser);
 
     /**%apidoc POST /ec2/removeUser
      * Delete the specified user.
@@ -785,8 +794,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param id User unique id.
      * %// AbstractUserManager::remove
      */
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUser);
-
+    regUpdate<ApiIdData>(p, ApiCommand::removeUser);
 
     /**%apidoc POST /ec2/saveUserGroup
      * <p>
@@ -808,7 +816,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      * %// AbstractUserManager::saveGroup
      */
-    registerUpdateFuncHandler<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
+    regUpdate<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
 
     /**%apidoc POST /ec2/removeUserGroup
      * Delete the specified user group.
@@ -820,16 +828,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param id User unique id.
      * %// AbstractUserManager::removeUserGroup
      */
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUserGroup);
-
+    regUpdate<ApiIdData>(p, ApiCommand::removeUserGroup);
 
     /**%apidoc GET /ec2/getPredefinedRoles
     * Return list of predefined user roles.
     * %param[default] format
     * %return Return object in requested format
     */
-    registerGetFuncHandler<nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
-
+    regGet<nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
 
     /**%apidoc GET /ec2/getVideowalls
      * Return list of video walls
@@ -837,17 +843,17 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractVideowallManager::getVideowalls
      */
-    registerGetFuncHandler<nullptr_t, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
-    //AbstractVideowallManager::save
-    registerUpdateFuncHandler<ApiVideowallData>(p, ApiCommand::saveVideowall);
-    //AbstractVideowallManager::remove
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeVideowall);
-    registerUpdateFuncHandler<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
+    regGet<nullptr_t, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
+    // AbstractVideowallManager::save
+    regUpdate<ApiVideowallData>(p, ApiCommand::saveVideowall);
+    // AbstractVideowallManager::remove
+    regUpdate<ApiIdData>(p, ApiCommand::removeVideowall);
+    regUpdate<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
-    registerGetFuncHandler<nullptr_t, ApiWebPageDataList>(p, ApiCommand::getWebPages);
-    registerUpdateFuncHandler<ApiWebPageData>(p, ApiCommand::saveWebPage);
-    //AbstractWebPageManager::remove
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeWebPage);
+    regGet<nullptr_t, ApiWebPageDataList>(p, ApiCommand::getWebPages);
+    regUpdate<ApiWebPageData>(p, ApiCommand::saveWebPage);
+    // AbstractWebPageManager::remove
+    regUpdate<ApiIdData>(p, ApiCommand::removeWebPage);
 
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
@@ -855,7 +861,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractLayoutManager::getLayouts
      */
-    registerGetFuncHandler<nullptr_t, ApiLayoutDataList>(p, ApiCommand::getLayouts);
+    regGet<nullptr_t, ApiLayoutDataList>(p, ApiCommand::getLayouts);
 
     /**%apidoc POST /ec2/saveLayout
      * Save layout.
@@ -886,7 +892,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param item.bottom Bottom coordinate of the layout item (floating-point).
      * %param item.rotation Degree of image tilt; a positive value rotates
      *     counter-clockwise (floating-point, 0..360).
-     * %param item.resourceId Camera's unique id.
+     * %param item.resourceId Camera unique id.
      * %param item.resourcePath If the item represents a local file - URL of
      *     the file, otherwise is empty.
      * %param item.zoomLeft Left coordinate of the displayed window inside
@@ -921,7 +927,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     0..1).
      * %// AbstractLayoutManager::save
      */
-    registerUpdateFuncHandler<ApiLayoutData>(p, ApiCommand::saveLayout);
+    regUpdate<ApiLayoutData>(p, ApiCommand::saveLayout);
 
     /**%apidoc POST /ec2/saveLayouts
      * Save the list of layouts.
@@ -952,7 +958,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param item.bottom Bottom coordinate of the layout item (floating-point).
      * %param item.rotation Degree of image tilt; a positive value rotates
      *     counter-clockwise (floating-point, 0..360).
-     * %param item.resourceId Camera's unique id.
+     * %param item.resourceId Camera unique id.
      * %param item.resourcePath If the item represents a local file - URL of
      *     the file, otherwise is empty.
      * %param item.zoomLeft Left coordinate of the displayed window inside
@@ -987,7 +993,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     0..1).
      * %// AbstractLayoutManager::save
      */
-    registerUpdateFuncHandler<ApiLayoutDataList>(p, ApiCommand::saveLayouts);
+    regUpdate<ApiLayoutDataList>(p, ApiCommand::saveLayouts);
 
     /**%apidoc POST /ec2/removeLayout
      * Delete the specified layout.
@@ -999,7 +1005,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param id Unique Id of the layout to be deleted.
      * %// AbstractLayoutManager::remove
      */
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeLayout);
+    regUpdate<ApiIdData>(p, ApiCommand::removeLayout);
 
     /**%apidoc GET /ec2/listDirectory
      * Return list of folders and files in a virtual FS stored inside
@@ -1010,7 +1016,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractStoredFileManager::listDirectory
      */
-    registerGetFuncHandler<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
+    regGet<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
 
     /**%apidoc GET /ec2/getStoredFile
      * Read file data from a virtual FS
@@ -1019,39 +1025,39 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractStoredFileManager::getStoredFile
      */
-    registerGetFuncHandler<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
-    //AbstractStoredFileManager::addStoredFile
-    registerUpdateFuncHandler<ApiStoredFileData>(p, ApiCommand::addStoredFile);
-    //AbstractStoredFileManager::updateStoredFile
-    registerUpdateFuncHandler<ApiStoredFileData>(p, ApiCommand::updateStoredFile);
-    //AbstractStoredFileManager::deleteStoredFile
-    registerUpdateFuncHandler<ApiStoredFilePath>(p, ApiCommand::removeStoredFile);
+    regGet<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
+    // AbstractStoredFileManager::addStoredFile
+    regUpdate<ApiStoredFileData>(p, ApiCommand::addStoredFile);
+    // AbstractStoredFileManager::updateStoredFile
+    regUpdate<ApiStoredFileData>(p, ApiCommand::updateStoredFile);
+    // AbstractStoredFileManager::deleteStoredFile
+    regUpdate<ApiStoredFilePath>(p, ApiCommand::removeStoredFile);
 
-    //AbstractUpdatesManager::uploadUpdate
-    registerUpdateFuncHandler<ApiUpdateUploadData>(p, ApiCommand::uploadUpdate);
-    //AbstractUpdatesManager::uploadUpdateResponce
-    registerUpdateFuncHandler<ApiUpdateUploadResponceData>(p, ApiCommand::uploadUpdateResponce);
-    //AbstractUpdatesManager::installUpdate
-    registerUpdateFuncHandler<ApiUpdateInstallData>(p, ApiCommand::installUpdate);
+    // AbstractUpdatesManager::uploadUpdate
+    regUpdate<ApiUpdateUploadData>(p, ApiCommand::uploadUpdate);
+    // AbstractUpdatesManager::uploadUpdateResponce
+    regUpdate<ApiUpdateUploadResponceData>(p, ApiCommand::uploadUpdateResponce);
+    // AbstractUpdatesManager::installUpdate
+    regUpdate<ApiUpdateInstallData>(p, ApiCommand::installUpdate);
 
-    //AbstractDiscoveryManager::discoveredServerChanged
-    registerUpdateFuncHandler<ApiDiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
-    //AbstractDiscoveryManager::discoveredServersList
-    registerUpdateFuncHandler<ApiDiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
+    // AbstractDiscoveryManager::discoveredServerChanged
+    regUpdate<ApiDiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
+    // AbstractDiscoveryManager::discoveredServersList
+    regUpdate<ApiDiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
 
-    //AbstractDiscoveryManager::discoverPeer
-    registerUpdateFuncHandler<ApiDiscoverPeerData>(p, ApiCommand::discoverPeer);
-    //AbstractDiscoveryManager::addDiscoveryInformation
-    registerUpdateFuncHandler<ApiDiscoveryData>(p, ApiCommand::addDiscoveryInformation);
-    //AbstractDiscoveryManager::removeDiscoveryInformation
-    registerUpdateFuncHandler<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
-    //AbstractDiscoveryManager::getDiscoveryData
-    registerGetFuncHandler<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
-    //AbstractMiscManager::changeSystemName
-    registerUpdateFuncHandler<ApiSystemNameData>(p, ApiCommand::changeSystemName);
+    // AbstractDiscoveryManager::discoverPeer
+    regUpdate<ApiDiscoverPeerData>(p, ApiCommand::discoverPeer);
+    // AbstractDiscoveryManager::addDiscoveryInformation
+    regUpdate<ApiDiscoveryData>(p, ApiCommand::addDiscoveryInformation);
+    // AbstractDiscoveryManager::removeDiscoveryInformation
+    regUpdate<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
+    // AbstractDiscoveryManager::getDiscoveryData
+    regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
+    // AbstractMiscManager::changeSystemName
+    regUpdate<ApiSystemNameData>(p, ApiCommand::changeSystemName);
 
-    //AbstractECConnection
-    registerUpdateFuncHandler<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
+    // AbstractECConnection
+    regUpdate<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
     /**%apidoc GET /ec2/getCurrentTime
      * Read current time
@@ -1060,17 +1066,17 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractTimeManager::getCurrentTimeImpl
      */
-    registerGetFuncHandler<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
+    regGet<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
 
-    //AbstractTimeManager::forcePrimaryTimeServer
-    registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
+    // AbstractTimeManager::forcePrimaryTimeServer
+    regUpdate<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
         std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
             m_timeSynchronizationManager.get(), _1));
-    //TODO #ak register AbstractTimeManager::getPeerTimeInfoList
+    // TODO: #ak register AbstractTimeManager::getPeerTimeInfoList
 
-    //ApiClientInfoData
-    registerUpdateFuncHandler<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
-    registerGetFuncHandler<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
+    // ApiClientInfoData
+    regUpdate<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
+    regGet<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
@@ -1078,7 +1084,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[opt] folder File name
      * %return Return object in requested format
      */
-    registerGetFuncHandler<nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
+    regGet<nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
 
     /**%apidoc GET /ec2/getLicenses
      * Read license list
@@ -1086,15 +1092,15 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[opt] folder File name
      * %return Return object in requested format
      */
-    registerGetFuncHandler<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
+    regGet<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
-    registerGetFuncHandler<nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
-    registerGetFuncHandler<ApiStoredFilePath, ApiDatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
+    regGet<nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
+    regGet<ApiStoredFilePath, ApiDatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
-    //AbstractECConnectionFactory
-    registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,
+    // AbstractECConnectionFactory
+    regFunctorWithResponse<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,
         std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
-    registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
+    regFunctorWithResponse<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
         std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
 
     /**%apidoc GET /ec2/getSettings
@@ -1103,11 +1109,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[opt] folder File name
      * %return Return object in requested format
      */
-    registerFunctorHandler<nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
+    regFunctor<nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
         std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2));
 
-    //Ec2StaticticsReporter
-    registerFunctorHandler<nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
+    // Ec2StaticticsReporter
+    regFunctor<nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
         [this](nullptr_t, ApiSystemStatistics* const out)
         {
             if (!m_directConnection)
@@ -1115,7 +1121,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
             return m_directConnection->getStaticticsReporter()->collectReportData(
                 nullptr, out);
         });
-    registerFunctorHandler<nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
+    regFunctor<nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
         [this](nullptr_t, ApiStatisticsServerInfo* const out)
         {
             if (!m_directConnection)
@@ -1142,13 +1148,13 @@ void Ec2DirectConnectionFactory::setConfParams(std::map<QString, QVariant> confP
 int Ec2DirectConnectionFactory::establishDirectConnection(
     const QUrl& url, impl::ConnectHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int reqId = generateRequestID();
 
     ApiLoginData loginInfo;
     QnConnectionInfo connectionInfo;
-    fillConnectionInfo(loginInfo, &connectionInfo); //< TODO: #ak not appropriate here
+    fillConnectionInfo(loginInfo, &connectionInfo); // < TODO: #ak not appropriate here
     connectionInfo.ecUrl = url;
-    ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
+    ErrorCode connectionInitializationResult = ErrorCode::ok;
     {
         QnMutexLocker lk(&m_mutex);
         if (!m_directConnection)
@@ -1157,7 +1163,7 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
                 new Ec2DirectConnection(&m_serverQueryProcessor, connectionInfo, url));
             if (!m_directConnection->initialized())
             {
-                connectionInitializationResult = ec2::ErrorCode::dbError;
+                connectionInitializationResult = ErrorCode::dbError;
                 m_directConnection.reset();
             }
         }
@@ -1167,22 +1173,22 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
         std::bind(
             &impl::ConnectHandler::done,
             handler,
-            reqID,
+            reqId,
             connectionInitializationResult,
             m_directConnection));
-    return reqID;
+    return reqId;
 }
 
 int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
     const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo)
 {
-    const int reqID = generateRequestID();
+    const int reqId = generateRequestID();
 
 #if 0 // TODO: #ak Return existing connection, if any.
     {
         QnMutexLocker lk(&m_mutex);
         auto it = m_urlToConnection.find(addr);
-        if(it != m_urlToConnection.end())
+        if (it != m_urlToConnection.end())
             AbstractECConnectionPtr connection = it->second.second;
     }
 #endif // 0
@@ -1195,24 +1201,24 @@ int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
 
     {
         QnMutexLocker lk(&m_mutex);
-        if(m_terminated)
+        if (m_terminated)
             return INVALID_REQ_ID;
         ++m_runningRequests;
     }
 
     const auto info = QString::fromUtf8(QJson::serialized(clientInfo) );
-    NX_LOG(lit("%1 to %2 with %3").arg(Q_FUNC_INFO).arg(addr.toString()).arg(info),
+    NX_LOG(lit("%1 to %2 with %3").arg(Q_FUNC_INFO).arg(addr.toString(QUrl::RemovePassword)).arg(info),
             cl_logDEBUG1);
 
     auto func =
-        [this, reqID, addr, handler](
+        [this, reqId, addr, handler](
             ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
-            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
+            remoteConnectionFinished(reqId, errorCode, connectionInfo, addr, handler);
         };
     m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
         addr, ApiCommand::connect, loginInfo, func);
-    return reqID;
+    return reqId;
 }
 
 const char oldEcConnectPath[] = "/api/connect/?format=pb&guid&ping=1";
@@ -1222,28 +1228,28 @@ static bool parseOldECConnectionInfo(
 {
     static const char PROTOBUF_FIELD_TYPE_STRING = 0x0a;
 
-    if(oldECConnectResponse.isEmpty())
+    if (oldECConnectResponse.isEmpty())
         return false;
 
     const char* data = oldECConnectResponse.data();
     const char* dataEnd = oldECConnectResponse.data() + oldECConnectResponse.size();
-    if(data + 2 >= dataEnd)
+    if (data + 2 >= dataEnd)
         return false;
-    if(*data != PROTOBUF_FIELD_TYPE_STRING)
+    if (*data != PROTOBUF_FIELD_TYPE_STRING)
         return false;
     ++data;
     const int fieldLen = *data;
     ++data;
-    if(data + fieldLen >= dataEnd)
+    if (data + fieldLen >= dataEnd)
         return false;
     connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
     return true;
 }
 
 template<class Handler>
-void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecURL, Handler completionFunc)
+void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecUrl, Handler completionFunc)
 {
-    QUrl httpsEcUrl = ecURL; // < Old EC supports only https.
+    QUrl httpsEcUrl = ecUrl; // < Old EC supports only https.
     httpsEcUrl.setScheme(lit("https"));
 
     QAuthenticator auth;
@@ -1252,7 +1258,7 @@ void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecURL, Handler compl
     CLSimpleHTTPClient simpleHttpClient(httpsEcUrl, 3000, auth);
     const CLHttpStatus statusCode = simpleHttpClient.doGET(
         QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
-    switch(statusCode)
+    switch (statusCode)
     {
         case CL_HTTP_SUCCESS:
         {
@@ -1261,7 +1267,7 @@ void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecURL, Handler compl
             simpleHttpClient.readAll(oldECResponse);
             QnConnectionInfo oldECConnectionInfo;
             oldECConnectionInfo.ecUrl = httpsEcUrl;
-            if(parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
+            if (parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
             {
                 if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
                 {
@@ -1294,29 +1300,29 @@ void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecURL, Handler compl
 }
 
 void Ec2DirectConnectionFactory::remoteConnectionFinished(
-    int reqID,
+    int reqId,
     ErrorCode errorCode,
     const QnConnectionInfo& connectionInfo,
-    const QUrl& ecURL,
+    const QUrl& ecUrl,
     impl::ConnectHandlerPtr handler)
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
-        "Ec2DirectConnectionFactory::remoteConnectionFinished. errorCode = %1, ecURL = %2")
-        .arg((int)errorCode).arg(ecURL.toString()), cl_logDEBUG2);
+        "Ec2DirectConnectionFactory::remoteConnectionFinished. errorCode = %1, ecUrl = %2")
+        .arg((int)errorCode).arg(ecUrl.toString()), cl_logDEBUG2);
 
-    //TODO #ak async ssl is working now, make async request to old ec here
+    // TODO: #ak async ssl is working now, make async request to old ec here
 
-    if((errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized))
+    if (errorCode != ErrorCode::ok && errorCode != ErrorCode::unauthorized)
     {
-        //checking for old EC
+        // Checking for old EC.
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
-            [this, ecURL, handler, reqID]()
+            [this, ecUrl, handler, reqId]()
             {
                 using namespace std::placeholders;
                 return connectToOldEC(
-                    ecURL,
-                    [reqID, handler](
+                    ecUrl,
+                    [reqId, handler](
                         ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
                     {
                         if (errorCode == ErrorCode::ok
@@ -1325,70 +1331,68 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
                             // Somehow connected to 2.3 server with old ec connection. Returning
                             // error, since could not connect to ec 2.3 during normal connect.
                             handler->done(
-                                reqID,
+                                reqId,
                                 ErrorCode::ioError,
                                 AbstractECConnectionPtr());
                         }
                         else
                         {
                             handler->done(
-                                reqID,
+                                reqId,
                                 errorCode,
                                 errorCode == ErrorCode::ok
                                     ? std::make_shared<OldEcConnection>(oldECConnectionInfo)
                                     : AbstractECConnectionPtr());
                         }
-                    }
-                );
-            }
-        );
+                    });
+            });
         return;
     }
 
     QnConnectionInfo connectionInfoCopy(connectionInfo);
-    connectionInfoCopy.ecUrl = ecURL;
+    connectionInfoCopy.ecUrl = ecUrl;
     connectionInfoCopy.ecUrl.setScheme(
         connectionInfoCopy.allowSslConnections ? lit("https") : lit("http"));
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
-        "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecURL = %2")
+        "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
         .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString()), cl_logDEBUG2);
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         std::make_shared<FixedUrlClientQueryProcessor>(
             &m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
         connectionInfoCopy));
-    handler->done(reqID, errorCode, connection);
+    handler->done(reqId, errorCode, connection);
 
     QnMutexLocker lk(&m_mutex);
     --m_runningRequests;
 }
 
 void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
-    int reqID,
+    int reqId,
     ErrorCode errorCode,
     const QnConnectionInfo& connectionInfo,
-    const QUrl& ecURL,
+    const QUrl& ecUrl,
     impl::TestConnectionHandlerPtr handler)
 {
     if (errorCode == ErrorCode::ok
         || errorCode == ErrorCode::unauthorized
         || errorCode == ErrorCode::temporary_unauthorized)
     {
-        handler->done(reqID, errorCode, connectionInfo);
+        handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);
         --m_runningRequests;
         return;
     }
 
-    //checking for old EC
+    // Checking for old EC.
     QnConcurrent::run(
         Ec2ThreadPool::instance(),
-        [this, ecURL, handler, reqID]()
+        [this, ecUrl, handler, reqId]()
         {
             using namespace std::placeholders;
             connectToOldEC(
-                ecURL, std::bind(&impl::TestConnectionHandler::done, handler, reqID, _1, _2));
+                ecUrl, std::bind(&impl::TestConnectionHandler::done, handler, reqId, _1, _2));
         }
     );
 }
@@ -1402,7 +1406,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
     connectionInfo->systemName = qnCommon->localSystemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
-    #ifdef __arm__
+    #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
@@ -1458,7 +1462,7 @@ int Ec2DirectConnectionFactory::testDirectConnection(
 {
     Q_UNUSED(addr);
 
-    const int reqID = generateRequestID();
+    const int reqId = generateRequestID();
     QnConnectionInfo connectionInfo;
     fillConnectionInfo(ApiLoginData(), &connectionInfo);
     QnConcurrent::run(
@@ -1466,20 +1470,20 @@ int Ec2DirectConnectionFactory::testDirectConnection(
         std::bind(
             &impl::TestConnectionHandler::done,
             handler,
-            reqID,
-            ec2::ErrorCode::ok,
+            reqId,
+            ErrorCode::ok,
             connectionInfo));
-    return reqID;
+    return reqId;
 }
 
 int Ec2DirectConnectionFactory::testRemoteConnection(
     const QUrl& addr, impl::TestConnectionHandlerPtr handler)
 {
-    const int reqID = generateRequestID();
+    const int reqId = generateRequestID();
 
     {
         QnMutexLocker lk(&m_mutex);
-        if(m_terminated)
+        if (m_terminated)
             return INVALID_REQ_ID;
         ++m_runningRequests;
     }
@@ -1489,25 +1493,25 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
     loginInfo.passwordHash = nx_http::calcHa1(
         loginInfo.login.toLower(), QnAppInfo::realm(), addr.password());
     auto func =
-        [this, reqID, addr, handler](ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
+        [this, reqId, addr, handler](ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
-            remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
+            remoteTestConnectionFinished(reqId, errorCode, connectionInfo, addr, handler);
         };
     m_remoteQueryProcessor.processQueryAsync<nullptr_t, QnConnectionInfo>(
         addr, ApiCommand::testConnection, nullptr_t(), func);
-    return reqID;
+    return reqId;
 }
 
 ErrorCode Ec2DirectConnectionFactory::getSettings(
     nullptr_t, ApiResourceParamDataList* const outData)
 {
-    if(!detail::QnDbManager::instance())
+    if (!detail::QnDbManager::instance())
         return ErrorCode::ioError;
     return dbManager(Qn::kSystemAccess).doQuery(nullptr, *outData);
 }
 
 template<class InputDataType>
-void Ec2DirectConnectionFactory::registerUpdateFuncHandler(
+void Ec2DirectConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     Qn::GlobalPermission permission)
@@ -1519,7 +1523,7 @@ void Ec2DirectConnectionFactory::registerUpdateFuncHandler(
 }
 
 template<class InputDataType, class CustomActionType>
-void Ec2DirectConnectionFactory::registerUpdateFuncHandler(
+void Ec2DirectConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     CustomActionType customAction,
@@ -1532,7 +1536,7 @@ void Ec2DirectConnectionFactory::registerUpdateFuncHandler(
 }
 
 template<class InputDataType, class OutputDataType>
-void Ec2DirectConnectionFactory::registerGetFuncHandler(
+void Ec2DirectConnectionFactory::regGet(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     Qn::GlobalPermission permission)
@@ -1544,7 +1548,7 @@ void Ec2DirectConnectionFactory::registerGetFuncHandler(
 }
 
 template<class InputType, class OutputType>
-void Ec2DirectConnectionFactory::registerFunctorHandler(
+void Ec2DirectConnectionFactory::regFunctor(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     std::function<ErrorCode(InputType, OutputType*)> handler, Qn::GlobalPermission permission)
@@ -1559,7 +1563,7 @@ void Ec2DirectConnectionFactory::registerFunctorHandler(
  * Register handler which is able to modify HTTP response.
  */
 template<class InputType, class OutputType>
-void Ec2DirectConnectionFactory::registerFunctorWithResponseHandler(
+void Ec2DirectConnectionFactory::regFunctorWithResponse(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler,

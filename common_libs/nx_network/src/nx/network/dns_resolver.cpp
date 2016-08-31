@@ -15,17 +15,20 @@
 #include <atomic>
 
 namespace nx {
+namespace network {
 
 DnsResolver::ResolveTask::ResolveTask(
     HostAddress _hostAddress,
     std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
     RequestID _reqID,
-    size_t _sequence )
+    size_t _sequence,
+    int _ipVersion)
 :
     hostAddress( std::move( _hostAddress ) ),
     completionHandler( _completionHandler ),
     reqID( _reqID ),
-    sequence( _sequence )
+    sequence( _sequence ),
+    ipVersion(_ipVersion)
 {
 }
 
@@ -53,14 +56,17 @@ void DnsResolver::pleaseStop()
 void DnsResolver::resolveAddressAsync(
     const HostAddress& addressToResolve,
     std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
-    RequestID reqID )
+    int ipVersion, RequestID reqID )
 {
     QnMutexLocker lk( &m_mutex );
-    m_taskQueue.push_back( ResolveTask( addressToResolve, completionHandler, reqID, ++m_currentSequence ) );
+    m_taskQueue.push_back( ResolveTask(
+        addressToResolve, completionHandler, reqID, ++m_currentSequence, ipVersion ) );
+
     m_cond.wakeAll();
 }
 
-bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )
+bool DnsResolver::resolveAddressSync(
+    const QString& hostName, HostAddress* const resolvedAddress, int ipVersion )
 {
     if( hostName.isEmpty() )
     {
@@ -70,22 +76,20 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
 
     addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;    /* Allow only IPv4 */
-    hints.ai_socktype = 0; /* Any socket */
     hints.ai_flags = AI_ALL;    /* For wildcard IP address */
-    hints.ai_protocol = 0;          /* Any protocol */
-    hints.ai_canonname = NULL;
-    hints.ai_addr = NULL;
-    hints.ai_next = NULL;
 
-    addrinfo* resolvedAddressInfo = nullptr;
-    int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+    // Do not serach for IPv6 addresseses on IpV4 sockets
+    if (ipVersion == AF_INET)
+        hints.ai_family = ipVersion;
+
+    addrinfo* addressInfo = nullptr;
+    int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
 
     if (status == EAI_BADFLAGS)
     {
         // if the lookup failed with AI_ALL, try again without it
         hints.ai_flags = 0;
-        status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+        status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
     }
 
     if (status != 0)
@@ -104,21 +108,45 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
             default: code = SystemError::dnsServerFailure; break;
         };
 
-        SystemError::setLastErrorCode( SystemError::dnsServerFailure );
+        SystemError::setLastErrorCode( code );
         return false;
     }
 
-    resolvedAddress->m_sinAddr = ((struct sockaddr_in*)(resolvedAddressInfo->ai_addr))->sin_addr;
-    resolvedAddress->m_addrStr = hostName;
-    resolvedAddress->m_addressResolved = true;
+    std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfoGuard(addressInfo, &freeaddrinfo);
 
-    freeaddrinfo(resolvedAddressInfo);
+    std::vector<HostAddress> ipAddresses;
+    for (addrinfo* info = addressInfo; info; info = info->ai_next)
+    {
+        if (info->ai_family == AF_INET)
+        {
+            ipAddresses.emplace_back(HostAddress(
+                ((sockaddr_in*)(info->ai_addr))->sin_addr));
+        }
+        else if (info->ai_family == AF_INET6)
+        {
+            ipAddresses.emplace_back(HostAddress(
+                ((sockaddr_in6*)(info->ai_addr))->sin6_addr));
+        }
+    }
+
+    if (ipAddresses.empty())
+    {
+        SystemError::setLastErrorCode( SystemError::hostNotFound );
+        return true;
+    }
+
+    // TODO: support multi-address!
+    //  currently we return first v4 address (if any) or first v6
+    std::sort(ipAddresses.begin(), ipAddresses.end(),
+        [](const HostAddress& left, const HostAddress& right)
+    {
+        // The address with IPv4 comes before address without IPv4
+        return (left.m_ipV4) && (!right.m_ipV4);
+    });
+
+    resolvedAddress->m_ipV4 = std::move(ipAddresses.begin()->m_ipV4);
+    resolvedAddress->m_ipV6 = std::move(ipAddresses.begin()->m_ipV6);
     return true;
-}
-
-bool DnsResolver::isAddressResolved( const HostAddress& addr ) const
-{
-    return addr.m_addressResolved;
 }
 
 void DnsResolver::cancel( RequestID reqID, bool waitForRunningHandlerCompletion )
@@ -157,7 +185,7 @@ void DnsResolver::run()
 
         HostAddress resolvedAddress;
         const SystemError::ErrorCode resolveErrorCode =
-            resolveAddressSync( task.hostAddress.toString(), &resolvedAddress )
+            resolveAddressSync( task.hostAddress.toString(), &resolvedAddress, task.ipVersion )
             ? SystemError::noError
             : SystemError::getLastOSErrorCode();
 
@@ -179,4 +207,5 @@ void DnsResolver::run()
     }
 }
 
+} // namespace network
 } // namespace nx

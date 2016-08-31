@@ -39,26 +39,36 @@ const stree::ResourceNameSet& StreeManager::resourceNameSet() const
     return m_attrNameSet;
 }
 
-void StreeManager::loadStree() throw(std::runtime_error)
+std::unique_ptr<stree::AbstractNode> StreeManager::loadStree(
+    QIODevice* const dataSource,
+    const stree::ResourceNameSet& resourceNameSet)
 {
-    stree::SaxHandler xmlHandler(m_attrNameSet);
+    stree::SaxHandler xmlHandler(resourceNameSet);
 
     QXmlSimpleReader reader;
     reader.setContentHandler(&xmlHandler);
     reader.setErrorHandler(&xmlHandler);
 
+    QXmlInputSource input(dataSource);
+    if (!reader.parse(&input))
+    {
+        NX_LOG(lit("Failed to parse stree xml: %1").arg(xmlHandler.errorString()), cl_logWARNING);
+        return nullptr;
+    }
+
+    return xmlHandler.releaseTree();
+}
+
+void StreeManager::loadStree() throw(std::runtime_error)
+{
     QFile xmlFile(m_xmlFilePath);
     if (!xmlFile.open(QIODevice::ReadOnly))
         throw std::runtime_error("Failed to open stree xml file " +
             m_xmlFilePath.toStdString() + ": " + xmlFile.errorString().toStdString());
-
-    QXmlInputSource input(&xmlFile);
     NX_LOG(lit("Parsing stree xml file (%1)").arg(m_xmlFilePath), cl_logDEBUG1);
-    if (!reader.parse(&input))
-        throw std::runtime_error("Failed to parse stree xml file " +
-            m_xmlFilePath.toStdString() + ": " + xmlHandler.errorString().toStdString());
-
-    m_stree = xmlHandler.releaseTree();
+    m_stree = loadStree(&xmlFile, m_attrNameSet);
+    if (!m_stree)
+        throw std::runtime_error("Failed to parse stree xml file " + m_xmlFilePath.toStdString());
 }
 
 }   //namespace stree

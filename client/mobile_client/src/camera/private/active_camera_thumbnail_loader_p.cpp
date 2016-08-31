@@ -34,7 +34,6 @@ QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
     , decompressThread(new QThread(this))
 {
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
-    request.rotation = 0;
 
     screenshotQualityList.append(128);
     screenshotQualityList.append(240);

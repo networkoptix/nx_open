@@ -69,7 +69,6 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
 
     setDiscoveryMode( DiscoveryMode::disabled );
 
-    QThread::Priority oldPriority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
     NX_LOG(lit("Browsing directories..."), cl_logDEBUG1);
@@ -89,7 +88,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
 
     NX_LOG(lit("Done(Browsing directories). Time elapsed = %1.").arg(time.elapsed()), cl_logDEBUG1);
 
-    QThread::currentThread()->setPriority(oldPriority);
+    QThread::currentThread()->setPriority(QThread::LowPriority);
 
     m_resourceReady = true;
 
@@ -269,7 +268,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             {
                 NX_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
-                int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
+                size_t motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
                 if (motionDataSize > 0)
                 {
                     motionData.resize(motionDataSize);

@@ -18,18 +18,19 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
-#include <utils/common/product_features.h>
 #include "core/resource/camera_user_attribute_pool.h"
 #include "core/resource/media_server_user_attributes.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
-#include "utils/common/synctime.h"
 
+#include "utils/common/synctime.h"
+#include <utils/common/app_info.h>
 
 #include <nx/network/socket_global.h>
 
 #include <nx/utils/timer_manager.h>
+#include <api/http_client_pool.h>
 
 
 namespace
@@ -83,7 +84,6 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent)
     QnCommonMetaTypes::initialize();
 
     /* Init statics. */
-    qnProductFeatures();
     store<nx::utils::TimerManager>(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
@@ -101,6 +101,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent)
     instance<QnResourceAccessManager>();
 
     instance<QnGlobalSettings>();
+    instance<nx_http::ClientPool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
@@ -125,7 +126,8 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
 }
 
-void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
+void QnCommonModule::setRemoteGUID(const QnUuid &guid)
+{
     {
         QnMutexLocker lock( &m_mutex );
         if (m_remoteUuid == guid)
@@ -211,13 +213,19 @@ void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QStrin
     NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an NX_ASSERT here? Something is wrong with resource data json file. */
 }
 
-void QnCommonModule::updateModuleInformation() {
+void QnCommonModule::updateModuleInformation()
+{
+    /* This code works only on server side. */
+    NX_ASSERT(!moduleGUID().isNull());
+
     QnMutexLocker lk( &m_mutex );
     QnModuleInformation moduleInformationCopy = m_moduleInformation;
     lk.unlock();
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
-    if (server) {
+    NX_ASSERT(server);
+    if (server)
+    {
         QnModuleInformation moduleInformation = server->getModuleInformation();
         moduleInformationCopy.port = moduleInformation.port;
         moduleInformationCopy.name = moduleInformation.name;

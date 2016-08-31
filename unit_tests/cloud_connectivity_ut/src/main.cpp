@@ -5,5 +5,11 @@
 
 int main(int argc, char **argv)
 {
-    return nx::utils::runTest(argc, argv);
+    return nx::utils::runTest(
+        argc, argv,
+        [](const nx::utils::ArgumentParser&)
+        {
+            nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+                SocketAddress::anyAddress);
+        });
 }

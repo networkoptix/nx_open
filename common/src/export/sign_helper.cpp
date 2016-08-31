@@ -1,7 +1,5 @@
 #include "sign_helper.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QProcess>
 #include <QtCore/QTemporaryFile>
 
@@ -588,7 +586,10 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
     QString command(QLatin1String("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\""));
     QString outFileName(tempName + QLatin1String(".264"));
     command = command.arg(executableName).arg(optionStr).arg(outFileName).arg(frame->width).arg(frame->height).arg(tempName);
-    int execResult = QProcess::execute(command);
+    int execResult = 1;
+    #if !defined(QT_NO_PROCESS)
+        execResult = QProcess::execute(command);
+    #endif
     if (execResult != 0)
         return -1;
 
@@ -785,5 +786,3 @@ void QnSignHelper::setLicensedToStr(const QString& value)
 {
     m_licensedToStr = value;
 }
-
-#endif // ENABLE_DATA_PROVIDERS

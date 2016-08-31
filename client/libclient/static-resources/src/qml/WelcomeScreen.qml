@@ -40,6 +40,7 @@ Rectangle
 
         NxSearchEdit
         {
+            visible: (pageSwitcher.pagesCount > 1);
             visualParent: screenHolder;
 
             anchors.bottom: gridHolder.top;
@@ -153,34 +154,35 @@ Rectangle
 
                 model: QnQmlSortFilterProxyModel
                 {
-                    model: QnSystemsModel {}
+                    model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
                 }
 
                 delegate: Item
                 {
-                    z: tile.z;
-                    width: grid.cellWidth;
-                    height: grid.cellHeight;
+                    z: tile.z
+                    width: grid.cellWidth
+                    height: grid.cellHeight
 
                     SystemTile
                     {
-                        id: tile;
-                        visualParent: screenHolder;
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        anchors.verticalCenter: parent.verticalCenter;
+                        id: tile
+                        visualParent: screenHolder
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
 
-                        systemId: model.systemId;
-                        systemName: model.systemName;
+                        systemId: model.systemId
+                        systemName: model.systemName
                         ownerDescription: model.ownerDescription
 
-                        isFactoryTile: model.isFactorySystem;
-                        isCloudTile: model.isCloudSystem;
+                        isFactoryTile: model.isFactorySystem
+                        isCloudTile: model.isCloudSystem
 
-                        wrongVersion: model.wrongVersion;
-                        wrongCustomization: model.wrongCustomization;
-                        compatibleVersion: model.compatibleVersion;
+                        wrongVersion: model.wrongVersion
+                        wrongCustomization: model.wrongCustomization
+                        isCompatibleCloudHost: model.isCompatibleCloudHost
+                        compatibleVersion: model.compatibleVersion
 
                         Component.onCompleted: { grid.watcher.addItem(this); }
                     }
@@ -225,6 +227,15 @@ Rectangle
             }
         }
 
+        EmptyTilesPlaceholder
+        {
+            id: emptyTilePreloader;
+
+            anchors.centerIn: parent;
+            foundServersCount: grid.count;
+            visible: foundServersCount == 0;
+        }
+
         NxButton
         {
             anchors.bottom: parent.bottom;
@@ -244,7 +255,7 @@ Rectangle
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no internet access. Some cloud features could be unavailable.");
+            textControl.text: qsTr("You have no Internet access. Some cloud features could be unavailable.");
         }
     }
 
@@ -280,4 +291,28 @@ Rectangle
         visible: context.connectingToSystem.length;
     }
 
+    DropArea
+    {
+        anchors.fill: parent;
+        onDropped:
+        {
+            context.makeDrop(drop.urls);
+        }
+
+        onEntered:
+        {
+            drag.accepted = context.isAcceptableDrag(drag.urls);
+        }
+    }
+
+    NxLabel
+    {
+        x: 8;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 8;
+
+        text: context.softwareVersion;
+        standardColor: Style.darkerColor(Style.colors.windowText, 1);
+        font: Qt.font({ pixelSize: 11, weight: Font.Normal})
+    }
 }

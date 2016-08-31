@@ -345,6 +345,16 @@
                     </params>
                     <result/>
                 </function>
+                <function proprietary="true">
+                    <name>updateInformation/freeSpaceForUpdateFiles</name>
+                    <description>Get free space available for downloading and extracting update files.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>Returns the amount of free space available for update files in bytes
+                            for each online server in the system.</caption>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>
@@ -424,21 +434,22 @@
                     </result>
                 </function>
               <function>
-                <name>detachFromSystem</name>
-                <description>Detach media server from a system. Change its system name and admin password to default value.</description>
-                <method>GET</method>
-                <params>
-                  <param>
-                    <name>oldPassword</name>
+                    <name>detachFromCloud</name>
                     <description>
-                      Current password for admin user
-                    </description>
-                    <optional>false</optional>
-                  </param>
-                </params>
-                <result>
-                  <caption>Json result with error code</caption>
-                </result>
+                        Detach media server from cloud. Local admin user is enabled, admin password is changed to new value (if specified), all cloud users are disabled. Cloud link is removed.
+					              Function can be called either via GET or POST method. POST data should be a json object.
+					          </description>
+                    <method>GET, POST</method>
+                    <params>
+                        <param>
+                            <name>password</name>
+                            <description>Set new admin password after detach.</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Json result with error code</caption>
+                    </result>
               </function>
               <function>
                 <name>setupLocalSystem</name>
@@ -1454,6 +1465,25 @@
                     <params/>
                     <result>
                         <caption>JSON data.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>aggregator</name>
+                    <description>This function allows to execute several requests with json content type and returns result as a single Json object</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>exec_cmd</name>
+                            <description>
+                              HTTP url path to execute. This parameter could be repeated several times to execute several nested methods.
+							                All additions parameters after current 'exec_cmd' and before next 'exec_cmd' are passed as parameters
+							                to the nested method.
+							              </description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Merged JSON data from nested methods.</caption>
                     </result>
                 </function>
                 <function>

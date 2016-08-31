@@ -330,7 +330,7 @@ APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
                        CameraNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyCameraAttributesAccess>(), /* Filter save func */ \
+                       ModifyCameraAttributesListAccess(), /* Filter save func */ \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
@@ -340,7 +340,7 @@ APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
                        CameraNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyCameraAttributesAccess>(), /* Filter save func */ \
+                       ModifyCameraAttributesListAccess(), /* Filter save func */ \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadCameraAttributesAccess>()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(313, getCamerasEx, ApiCameraDataExList, \
@@ -543,6 +543,16 @@ APPLY(504, setAccessRights, ApiAccessRightsData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_rights by resource id */ \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        false, \
                        false, \
@@ -568,7 +578,7 @@ APPLY(507, removeUserGroup, ApiIdData, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       RemoveUserGroupAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -718,7 +728,7 @@ APPLY(805, execBusinessAction, ApiBusinessActionData, \
                        false, \
                        InvalidGetHashHelper(), \
                        BusinessEventNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       UserInputAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1158,27 +1168,6 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
 
     }
 
-
-    /*!Contains information on how transaction has been delivered*/
-    class QnTranDeliveryInformation
-    {
-    public:
-        enum TranOriginatorType
-        {
-            localServer,
-            remoteServer,
-            client
-        };
-
-        TranOriginatorType originatorType;
-
-        QnTranDeliveryInformation()
-        :
-            originatorType( TranOriginatorType::localServer )
-        {
-        }
-    };
-
     class QnAbstractTransaction
     {
     public:
@@ -1208,7 +1197,6 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         ApiCommand::Value command;
         QnUuid peerID;
         PersistentInfo persistentInfo;
-        QnTranDeliveryInformation deliveryInfo;
 
         bool isLocal; /* do not propagate transactions to other server peers*/
 

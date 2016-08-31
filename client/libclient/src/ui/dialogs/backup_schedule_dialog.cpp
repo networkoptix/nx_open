@@ -8,13 +8,14 @@
 #include <nx_ec/data/api_media_server_data.h>
 
 #include <ui/common/palette.h>
+#include <ui/common/read_only.h>
 #include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
     const int secsPerDay = 3600 * 24;
     const int daysPerWeek = 7;
-    const int bitsPerMegabit = 1000000;
+    const int bitsPerMegabit = 1024*1024;
     const int bitsPerByte = 8;
 
     /** Default format used all over the app. */
@@ -70,8 +71,6 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
 
     connect(ui->limitBandwithCheckBox, &QCheckBox::stateChanged, this, updateLimitControls);
     updateLimitControls();
-
-
 }
 
 QnBackupScheduleDialog::~QnBackupScheduleDialog()
@@ -113,21 +112,20 @@ void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
     updateDayOfWeekCheckboxes();
 }
 
-void QnBackupScheduleDialog::updateDayOfWeekCheckboxes() {
+void QnBackupScheduleDialog::updateDayOfWeekCheckboxes()
+{
     auto locale = QLocale::system();
 
-    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i) {
-        Qt::DayOfWeek day = indexToDay(i);
+    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i)
+    {
+        Qt::DayOfWeek day = indexToDay(static_cast<int>(i));
         QCheckBox* checkbox = m_dowCheckboxes[i];
 
-        checkbox->setText( locale.dayName(day) );
+        checkbox->setText(locale.dayName(day));
         if (!locale.weekdays().contains(day))
             setPaletteColor(checkbox, QPalette::Foreground, m_colors.weekEnd);
-
     }
 }
-
-
 
 void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
 {
@@ -167,7 +165,7 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
 void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 {
     QList<Qt::DayOfWeek> days;
-    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i) {
         Qt::DayOfWeek day = indexToDay(i);
         QCheckBox* checkbox = m_dowCheckboxes[i];
         if (checkbox->isChecked())
@@ -192,4 +190,15 @@ void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
         value.backupBitrate = -value.backupBitrate;
 }
 
+void QnBackupScheduleDialog::setReadOnlyInternal()
+{
+    base_type::setReadOnlyInternal();
 
+    ::setReadOnly(ui->comboBoxTimeStart, isReadOnly());
+    ::setReadOnly(ui->comboBoxTimeTo, isReadOnly());
+    ::setReadOnly(ui->limitBandwithCheckBox, isReadOnly());
+    ::setReadOnly(ui->spinBoxBandwidth, isReadOnly());
+
+    for (auto checkbox : m_dowCheckboxes)
+        ::setReadOnly(checkbox, isReadOnly());
+}

@@ -26,14 +26,16 @@ namespace
     const QString kIsdFullVendorName("Innovative Security Designs");
     const QString kDwFullVendorName("Digital Watchdog");
     const QString kIsdDefaultResType("ISDcam");
+	const QString kUpnpBasicDeviceType("Basic");
 
-    static const QLatin1String kDefaultIsdUsername( "root" );
-    static const QLatin1String kDefaultIsdPassword( "admin" );
+    const QLatin1String kDefaultIsdUsername( "root" );
+    const QLatin1String kDefaultIsdPassword( "admin" );
 }
 
 QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
+	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
 QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
@@ -116,8 +118,16 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
 
 QnResourceList QnPlISDResourceSearcher::findResources(void)
 {
-    auto upnpResults = QnUpnpResourceSearcherAsync::findResources();
+	
+	QnResourceList upnpResults;
     QnResourceList mdnsResults;
+
+	{
+		QnMutexLocker lock(&m_mutex);
+		upnpResults = m_foundUpnpResources;
+		m_foundUpnpResources.clear();
+		m_alreadFoundMacAddresses.clear();
+	}
 
     auto mdnsDataList = QnMdnsListener::instance()->getData((std::uintptr_t) this);
     for (const auto& response: mdnsDataList)
@@ -399,15 +409,17 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
 }
 
 
-void QnPlISDResourceSearcher::processPacket(
-    const QHostAddress& /*discoveryAddr*/,
+bool QnPlISDResourceSearcher::processPacket(
+    const QHostAddress& discoveryAddr,
     const SocketAddress& deviceEndpoint,
     const nx_upnp::DeviceInfo& devInfo,
-    const QByteArray& /*xmlDevInfo*/,
-    QnResourceList& result )
+    const QByteArray& /*xmlDevInfo*/)
 {
+
+	QN_UNUSED(discoveryAddr);
+
     if (!isDwOrIsd(devInfo.manufacturer, devInfo.modelName))
-        return;
+        return false;
 
     QnMacAddress cameraMAC(devInfo.serialNumber);
     QString model(devInfo.modelName);
@@ -442,7 +454,17 @@ void QnPlISDResourceSearcher::processPacket(
         }
     }
 
-    createResource( devInfo, cameraMAC, cameraAuth, result );
+	{
+		QnMutexLocker lock(&m_mutex);
+
+		if (m_alreadFoundMacAddresses.find(cameraMAC.toString()) == m_alreadFoundMacAddresses.end())
+		{
+			m_alreadFoundMacAddresses.insert(cameraMAC.toString());
+			createResource( devInfo, cameraMAC, cameraAuth, m_foundUpnpResources);
+		}
+	}
+
+	return true;
 }
 
 void QnPlISDResourceSearcher::createResource(

@@ -78,6 +78,18 @@ const int CUDT::m_iVersion = 4;
 const int CUDT::m_iSYNInterval = 10000;
 const int CUDT::m_iSelfClockInterval = 64;
 
+static const int CTRL_HANDSHAKE = 0;            //000 - Handshake
+static const int CTRL_KEEP_ALIVE = 1;           //001 - Keep-alive
+static const int CTRL_ACK = 2;                  //010 - Acknowledgement
+static const int CTRL_LOSS_REPORT = 3;          //011 - Loss Report
+static const int CTRL_CONGESTION_WARNING = 4;   //100 - Congestion Warning
+static const int CTRL_SHUTDOWN = 5;             //101 - Shutdown
+static const int CTRL_ACK2 = 6;                 //110 - Acknowledgement of Acknowledgement
+static const int CTRL_MSG_DROP = 7;             //111 - Msg drop request
+static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer side a special error
+static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
+
+
 
 // Mimimum recv flight flag size is 32 packets
 constexpr const int kMinRecvWindowSize = 32;
@@ -1011,7 +1023,7 @@ void CUDT::close()
    if (m_bConnected)
    {
       if (!m_bShutdown)
-         sendCtrl(5);
+         sendCtrl(CTRL_SHUTDOWN);
 
       m_pCC->close();
 
@@ -1076,7 +1088,7 @@ int CUDT::send(const char* data, int len)
             {
                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
                while (!m_bBroken && m_bConnected && !m_bClosing && (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize()) && m_bPeerHealth && (CTimer::getTime() < exptime))
-                  pthread_cond_wait_time_monotonic(&m_SendBlockCond, &m_SendBlockLock, exptime);
+                  pthread_cond_wait_monotonic_timepoint(&m_SendBlockCond, &m_SendBlockLock, exptime);
             }
             pthread_mutex_unlock(&m_SendBlockLock);
          #else
@@ -1172,7 +1184,7 @@ int CUDT::recv(char* data, int len)
                uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL;
                while (!m_bBroken && m_bConnected && !m_bClosing && (0 == m_pRcvBuffer->getRcvDataSize()))
                {
-                  pthread_cond_wait_time_monotonic(&m_RecvDataCond, &m_RecvDataLock, exptime);
+                  pthread_cond_wait_monotonic_timepoint(&m_RecvDataCond, &m_RecvDataLock, exptime);
                   if (CTimer::getTime() >= exptime)
                      break;
                }
@@ -1265,7 +1277,7 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
             {
                uint64_t exptime = CTimer::getTime() + m_iSndTimeOut * 1000ULL;
                while (!m_bBroken && m_bConnected && !m_bClosing && ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len) && (CTimer::getTime() < exptime))
-                  pthread_cond_wait_time_monotonic(&m_SendBlockCond, &m_SendBlockLock, exptime);
+                  pthread_cond_wait_monotonic_timepoint(&m_SendBlockCond, &m_SendBlockLock, exptime);
             }
             pthread_mutex_unlock(&m_SendBlockLock);
          #else
@@ -1373,7 +1385,7 @@ int CUDT::recvmsg(char* data, int len)
          else
          {
             uint64_t exptime = CTimer::getTime() + m_iRcvTimeOut * 1000ULL;
-            if (pthread_cond_wait_time_monotonic(&m_RecvDataCond, &m_RecvDataLock, exptime) == ETIMEDOUT)
+            if (pthread_cond_wait_monotonic_timepoint(&m_RecvDataCond, &m_RecvDataLock, exptime) == ETIMEDOUT)
                timeout = true;
 
             res = m_pRcvBuffer->readMsg(data, len);           
@@ -1541,7 +1553,7 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
       {
          // send the sender a signal so it will not be blocked forever
          int32_t err_code = CUDTException::EFILE;
-         sendCtrl(8, &err_code);
+         sendCtrl(CTRL_ACK_SPECIAL_ERROR, &err_code);
 
          throw CUDTException(4, 4);
       }
@@ -1744,7 +1756,7 @@ void CUDT::sendCtrl(int pkttype, void* lparam, void* rparam, int size)
 
    switch (pkttype)
    {
-   case 2: //010 - Acknowledgement
+   case CTRL_ACK: //010 - Acknowledgement
       {
       int32_t ack;
 
@@ -1842,14 +1854,14 @@ void CUDT::sendCtrl(int pkttype, void* lparam, void* rparam, int size)
       break;
       }
 
-   case 6: //110 - Acknowledgement of Acknowledgement
+   case CTRL_ACK2: //110 - Acknowledgement of Acknowledgement
       ctrlpkt.pack(pkttype, lparam);
       ctrlpkt.m_iID = m_PeerID;
       m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
 
       break;
 
-   case 3: //011 - Loss Report
+   case CTRL_LOSS_REPORT: //011 - Loss Report
       {
       if (NULL != rparam)
       {
@@ -1903,7 +1915,7 @@ void CUDT::sendCtrl(int pkttype, void* lparam, void* rparam, int size)
       break;
       }
 
-   case 4: //100 - Congestion Warning
+   case CTRL_CONGESTION_WARNING: //100 - Congestion Warning
       ctrlpkt.pack(pkttype);
       ctrlpkt.m_iID = m_PeerID;
       m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
@@ -1912,42 +1924,42 @@ void CUDT::sendCtrl(int pkttype, void* lparam, void* rparam, int size)
 
       break;
 
-   case 1: //001 - Keep-alive
+   case CTRL_KEEP_ALIVE: //001 - Keep-alive
       ctrlpkt.pack(pkttype);
       ctrlpkt.m_iID = m_PeerID;
       m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
  
       break;
 
-   case 0: //000 - Handshake
+   case CTRL_HANDSHAKE: //000 - Handshake
       ctrlpkt.pack(pkttype, NULL, rparam, sizeof(CHandShake));
       ctrlpkt.m_iID = m_PeerID;
       m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
 
       break;
 
-   case 5: //101 - Shutdown
+   case CTRL_SHUTDOWN: //101 - Shutdown
       ctrlpkt.pack(pkttype);
       ctrlpkt.m_iID = m_PeerID;
       m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
 
       break;
 
-   case 7: //111 - Msg drop request
+   case CTRL_MSG_DROP: //111 - Msg drop request
       ctrlpkt.pack(pkttype, lparam, rparam, 8);
       ctrlpkt.m_iID = m_PeerID;
       m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
 
       break;
 
-   case 8: //1000 - acknowledge the peer side a special error
+   case CTRL_ACK_SPECIAL_ERROR: //1000 - acknowledge the peer side a special error
       ctrlpkt.pack(pkttype, lparam);
       ctrlpkt.m_iID = m_PeerID;
       m_pSndQueue->sendto(m_pPeerAddr, ctrlpkt);
 
       break;
 
-   case 32767: //0x7FFF - Resevered for future use
+   case CTRL_RESERVED: //0x7FFF - Resevered for future use
       break;
 
    default:
@@ -1990,7 +2002,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       uint64_t now = CTimer::getTime();
       if ((currtime - m_ullSndLastAck2Time > (uint64_t)m_iSYNInterval) || (ack == m_iSndLastAck2))
       {
-         sendCtrl(6, &ack);
+         sendCtrl(CTRL_ACK2, &ack);
          m_iSndLastAck2 = ack;
          m_ullSndLastAck2Time = now;
       }
@@ -2096,7 +2108,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
          break;
 
       //if increasing delay detected...
-      //   sendCtrl(4);
+      //   sendCtrl(CTRL_CONGESTION_WARNING);
 
       // RTT EWMA
       m_iRTTVar = (m_iRTTVar * 3 + abs(rtt - m_iRTT)) >> 2;
@@ -2208,7 +2220,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
          char* hs = new char [m_iPayloadSize];
          int hs_size = m_iPayloadSize;
          initdata.serialize(hs, hs_size);
-         sendCtrl(0, NULL, hs, hs_size);
+         sendCtrl(CTRL_HANDSHAKE, NULL, hs, hs_size);
          delete [] hs;
       }
 
@@ -2302,7 +2314,7 @@ int CUDT::packData(CPacket& packet, uint64_t& ts)
          int32_t seqpair[2];
          seqpair[0] = packet.m_iSeqNo;
          seqpair[1] = CSeqNo::incseq(seqpair[0], msglen);
-         sendCtrl(7, &packet.m_iMsgNo, seqpair, 8);
+         sendCtrl(CTRL_MSG_DROP, &packet.m_iMsgNo, seqpair, 8);
 
          // only one msg drop request is necessary
          m_pSndLossList->remove(seqpair[1]);
@@ -2437,7 +2449,7 @@ int CUDT::processData(CUnit* unit)
       lossdata[1] = CSeqNo::decseq(packet.m_iSeqNo);
 
       // Generate loss report immediately.
-      sendCtrl(3, NULL, lossdata, (CSeqNo::incseq(m_iRcvCurrSeqNo) == CSeqNo::decseq(packet.m_iSeqNo)) ? 1 : 2);
+      sendCtrl(CTRL_LOSS_REPORT, NULL, lossdata, (CSeqNo::incseq(m_iRcvCurrSeqNo) == CSeqNo::decseq(packet.m_iSeqNo)) ? 1 : 2);
 
       int loss = CSeqNo::seqlen(m_iRcvCurrSeqNo, packet.m_iSeqNo) - 2;
       m_iTraceRcvLoss += loss;
@@ -2559,7 +2571,7 @@ void CUDT::checkTimers(bool forceAck)
    {
       // ACK timer expired or ACK interval is reached
 
-      sendCtrl(2);
+      sendCtrl(CTRL_ACK);
       CTimer::rdtsc(currtime);
       if (m_pCC->m_iACKPeriod > 0)
          m_ullNextACKTime = currtime + m_pCC->m_iACKPeriod * m_ullCPUFrequency;
@@ -2572,7 +2584,7 @@ void CUDT::checkTimers(bool forceAck)
    else if (m_iSelfClockInterval * m_iLightACKCount <= m_iPktCount)
    {
       //send a "light" ACK
-      sendCtrl(2, NULL, NULL, 4);
+      sendCtrl(CTRL_ACK, NULL, NULL, 4);
       ++ m_iLightACKCount;
    }
 
@@ -2580,7 +2592,7 @@ void CUDT::checkTimers(bool forceAck)
    //if ((m_pRcvLossList->getLossLength() > 0) && (currtime > m_ullNextNAKTime))
    //{
    //   // NAK timer expired, and there is loss to be reported.
-   //   sendCtrl(3);
+   //   sendCtrl(CTRL_LOSS_REPORT);
    //
    //   CTimer::rdtsc(currtime);
    //   m_ullNextNAKTime = currtime + m_ullNAKInt;
@@ -2645,7 +2657,7 @@ void CUDT::checkTimers(bool forceAck)
       }
       else
       {
-         sendCtrl(1);
+         sendCtrl(CTRL_KEEP_ALIVE);
       }
 
       ++ m_iEXPCount;

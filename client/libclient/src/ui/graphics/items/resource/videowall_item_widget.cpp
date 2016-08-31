@@ -25,6 +25,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/drag_processor.h>
@@ -91,12 +92,21 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverEnterDelay(50);
     m_hoverProcessor->setHoverLeaveDelay(50);
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered,   this, [&](){ m_frameColorAnimator->animateTo(1.0); setOverlayVisible(true); });
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,      this, [&](){ m_frameColorAnimator->animateTo(0.0); if (!m_infoVisible) setOverlayVisible(false); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this, [&]() { m_frameColorAnimator->animateTo(1.0); setOverlayVisible(true); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this, [&]() { m_frameColorAnimator->animateTo(0.0); if (!m_infoVisible) setOverlayVisible(false); });
 
     /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(m_videowall, this);
-    addOverlayWidget(m_statusOverlayWidget, detail::OverlayParams(UserVisible, true));
+    const auto overlay = new QnStatusOverlayWidget(this);
+    m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay);
+
+    connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
+        [this, overlay, controller = m_statusOverlayController]()
+        {
+            const auto value = (controller->statusOverlay() == Qn::EmptyOverlay ? 0.0 : 1.0);
+            opacityAnimator(overlay)->animateTo(value);
+        });
+
+    addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true));
 
     initInfoOverlay();
 
@@ -208,8 +218,9 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     paintRect.adjust(offset*2, offset*2, -offset*2, -offset*2);
     painter->fillRect(paintRect, palette().color(QPalette::Window));
 
-    if (!m_layout) {
-        updateStatusOverlay(Qn::NoDataOverlay);
+    if (!m_layout)
+    {
+        m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay);
     }
     else {
         //TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
@@ -221,14 +232,14 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             bounding = bounding.united(itemRect);
         }
 
-        if (bounding.isNull()) {
-            updateStatusOverlay(Qn::NoDataOverlay);
+        if (bounding.isNull())
+        {
+            m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay);
             paintFrame(painter, paintRect);
             return;
         }
 
-        qreal xspace = m_layout->cellSpacing().width() * 0.5;
-        qreal yspace = m_layout->cellSpacing().height() * 0.5;
+        qreal space = m_layout->cellSpacing() * 0.5;
 
         qreal cellAspectRatio = m_layout->hasCellAspectRatio()
             ? m_layout->cellAspectRatio()
@@ -261,19 +272,17 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
                 continue;
 
             // cell bounds
-            qreal x1 = (itemRect.left() - bounding.left() + xspace) * xscale + xoffset;
-            qreal y1 = (itemRect.top() - bounding.top() + yspace) * yscale + yoffset;
-            qreal w1 = (itemRect.width() - xspace*2) * xscale;
-            qreal h1 = (itemRect.height() - yspace*2) * yscale;
+            qreal x1 = (itemRect.left() - bounding.left() + space) * xscale + xoffset;
+            qreal y1 = (itemRect.top() - bounding.top() + space) * yscale + yoffset;
+            qreal w1 = (itemRect.width() - space*2) * xscale;
+            qreal h1 = (itemRect.height() - space*2) * yscale;
 
             if (!paintItem(painter, QRectF(x1, y1, w1, h1), data))
                 allItemsAreLoaded = false;
         }
 
-        if (allItemsAreLoaded)
-             updateStatusOverlay(Qn::EmptyOverlay);
-        else
-             updateStatusOverlay(Qn::LoadingOverlay);
+        m_statusOverlayController->setStatusOverlay(allItemsAreLoaded
+            ? Qn::EmptyOverlay : Qn::LoadingOverlay);
     }
 
     paintFrame(painter, paintRect);
@@ -469,18 +478,6 @@ void QnVideowallItemWidget::updateInfo() {
     m_headerLabel->setText(m_videowall->items()->getItem(m_itemUuid).name);
     //TODO: #GDM #VW update layout in case of transition "long name -> short name"
 }
-
-void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overlay) {
-    if (m_statusOverlayWidget->statusOverlay() == overlay)
-        return;
-    m_statusOverlayWidget->setStatusOverlay(overlay);
-
-    if(overlay == Qn::EmptyOverlay)
-        opacityAnimator(m_statusOverlayWidget)->animateTo(0.0);
-    else
-        opacityAnimator(m_statusOverlayWidget)->animateTo(1.0);
-}
-
 
 bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data)
 {

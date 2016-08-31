@@ -9,6 +9,7 @@
 
 #include <QtCore/QObject>
 
+#include <nx/network/cloud/cdb_endpoint_fetcher.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/retry_timer.h>
@@ -35,10 +36,8 @@ class EventConnection
 {
 public:
     EventConnection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
-        std::string login,
-        std::string password);
-    virtual ~EventConnection();
+        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
+        virtual ~EventConnection();
 
     virtual void start(
         api::SystemEventHandlers eventHandlers,
@@ -54,9 +53,9 @@ private:
         failed
     };
 
-    network::cloud::CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
-    const std::string m_login;
-    const std::string m_password;
+    std::unique_ptr<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>
+        m_cdbEndPointFetcher;
+    nx_http::AuthInfo m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;
     api::SystemEventHandlers m_eventHandlers;
     std::function<void(api::ResultCode)> m_connectCompletionHandler;
@@ -70,6 +69,10 @@ private:
         SocketAddress endpoint);
     void initiateConnection();
     void connectionAttemptHasFailed(api::ResultCode result);
+
+    virtual void setCredentials(const std::string& login, const std::string& password) override;
+    virtual void setProxyCredentials(const std::string& login, const std::string& password) override;
+    virtual void setProxyVia(const SocketAddress& proxyEndpoint) override;
 
 private slots:
     void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);

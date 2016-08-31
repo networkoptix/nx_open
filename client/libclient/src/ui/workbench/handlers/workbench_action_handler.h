@@ -61,8 +61,6 @@ public:
     virtual ~QnWorkbenchActionHandler();
 
 protected:
-    ec2::AbstractECConnectionPtr connection2() const;
-
     struct AddToLayoutParams {
         bool usePosition;
         QPointF position;
@@ -179,7 +177,7 @@ protected:
 
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
-    void at_removeLayoutItemAction_triggered();
+
     void at_renameAction_triggered();
     void at_removeFromServerAction_triggered();
 
@@ -243,8 +241,8 @@ private:
 
     bool confirmResourcesDelete(const QnResourceList& resources);
 
-    void sendServerRequest(const QnMediaServerResourcePtr& server, const QString& path);
-    void at_serverRequest_nonceReceived(QnAsyncHttpClientReply* client);
+    void openInBrowser(const QnMediaServerResourcePtr& server, const QString& path);
+    void at_nonceReceived(QnAsyncHttpClientReply* client);
 
 private:
     QPointer<QMenu> m_mainMenu;
@@ -284,11 +282,10 @@ private:
     struct ServerRequest
     {
         QnMediaServerResourcePtr server;
-        QString path;
-        std::unique_ptr<QnAsyncHttpClientReply> reply;
+        QUrl url;
     };
 
-    std::map<QUrl, ServerRequest> m_serverRequests;
+    std::multimap<QUrl, ServerRequest> m_serverRequests;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

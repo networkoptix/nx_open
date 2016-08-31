@@ -16,6 +16,9 @@
 #include <common/common_module.h>
 #include <cloud/cloud_connection_manager.h>
 
+#include <rest/helpers/permissions_helper.h>
+#include <rest/server/rest_connection_processor.h>
+
 
 QnSaveCloudSystemCredentialsHandler::QnSaveCloudSystemCredentialsHandler(
     const CloudConnectionManager& cloudConnectionManager)
@@ -29,34 +32,25 @@ int QnSaveCloudSystemCredentialsHandler::executePost(
     const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor*)
+    const QnRestConnectionProcessor* owner)
 {
     const CloudCredentialsData data = QJson::deserialized<CloudCredentialsData>(body);
-    return execute(data, result);
+    return execute(data, result, owner);
 }
 
 int QnSaveCloudSystemCredentialsHandler::execute(
     const CloudCredentialsData& data,
-    QnJsonRestResult& result)
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
 {
     using namespace nx::cdb;
 
-    NX_LOGX(lm("%1 cloud credentials").arg(data.reset ? "Resetting" : "Saving"),
-        cl_logDEBUG1);
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+        return QnPermissionsHelper::notOwnerError(result);
 
-    if (data.reset)
-    {
-        qnGlobalSettings->resetCloudParams();
-        if (!qnGlobalSettings->synchronizeNowSync())
-        {
-            NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
-            result.setError(
-                QnJsonRestResult::CantProcessRequest,
-                lit("Failed to save cloud credentials to local DB"));
-            return nx_http::StatusCode::internalServerError;
-        }
-        return nx_http::StatusCode::ok;
-    }
+    NX_LOGX(lm("Saving cloud credentials"), cl_logDEBUG1);
 
     if (data.cloudSystemID.isEmpty())
     {
@@ -123,6 +117,9 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     //crash can result in unsynchronized unrecoverable state: there
     //is some system in cloud, but system does not know its credentials
     //and there is no way to find them out
+    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+        (std::function<void(api::ResultCode, api::NonceData)>);
+
     auto cloudConnection = m_cloudConnectionManager.getCloudConnection(
         data.cloudSystemID, data.cloudAuthKey);
     api::ResultCode cdbResultCode = api::ResultCode::ok;
@@ -130,7 +127,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     std::tie(cdbResultCode, nonceData) =
         makeSyncCall<api::ResultCode, api::NonceData>(
             std::bind(
-                &api::AuthProvider::getCdbNonce,
+                static_cast<GetCdbNonceType>(&api::AuthProvider::getCdbNonce),
                 cloudConnection->authProvider(),
                 std::placeholders::_1));
 

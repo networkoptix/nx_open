@@ -44,7 +44,7 @@ NX_UTILS_API QByteArray generate(
  */
 template<typename Type = int>
 Type number(
-    Type min = std::numeric_limits<Type>::min(),
+    Type min = 0,
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
 {
@@ -64,7 +64,7 @@ Type number(
  */
 template<typename Type>
 Type number(
-    Type min = std::numeric_limits<Type>::min(),
+    Type min = 0,
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
 {

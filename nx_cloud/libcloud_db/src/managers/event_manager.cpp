@@ -113,8 +113,7 @@ void EventManager::subscribeToEvents(
             ServerConnectionContext(httpConnection, systemID));
 
         msgBody->setOnBeforeDestructionHandler(
-            std::bind(&EventManager::beforeMsgBodySourceDestruction, this,
-                iterAndInsertionFlag.first));
+            std::bind(&EventManager::beforeMsgBodySourceDestruction, this, httpConnection));
         if (iterAndInsertionFlag.second)
             httpConnection->registerCloseHandler(
                 std::bind(&EventManager::onConnectionToPeerLost, this,
@@ -153,9 +152,18 @@ bool EventManager::isSystemOnline(const std::string& systemId) const
 }
 
 void EventManager::beforeMsgBodySourceDestruction(
-    EventManager::MediaServerConnectionContainer::iterator serverConnectionIter)
+    nx_http::HttpServerConnection* connection)
 {
-    //NOTE it is guaranteed that message body reader is removed before connectionClosed event
+    //element can already be removed, but connection object is still alive
+
+    QnMutexLocker lk(&m_mutex);
+
+    const auto& serverConnectionIndex = 
+        m_activeMediaServerConnections.get<kServerContextByConnectionIndex>();
+    auto serverConnectionIter = serverConnectionIndex.find(connection);
+    if (serverConnectionIter == serverConnectionIndex.end())
+        return;
+
     m_activeMediaServerConnections.modify(
         serverConnectionIter,
         [](ServerConnectionContext& context)

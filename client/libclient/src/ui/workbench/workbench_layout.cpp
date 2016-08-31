@@ -637,16 +637,24 @@ void QnWorkbenchLayout::setCellAspectRatio(float cellAspectRatio) {
     emit dataChanged(Qn::LayoutCellAspectRatioRole);
 }
 
-void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
-    if(cellSpacing.width() < 0.0 || cellSpacing.height() < 0.0) { /* Negative means 'use default value'. */
+const qreal QnWorkbenchLayout::cellSpacing() const
+{
+    return m_cellSpacing;
+}
+
+void QnWorkbenchLayout::setCellSpacing(qreal spacing) {
+    if(spacing < 0.0) //< Negative means 'use default value'
+    {
         setCellSpacing(qnGlobals->defaultLayoutCellSpacing());
         return;
     }
 
-    if(qFuzzyEquals(m_cellSpacing, cellSpacing))
+    static const qreal kMaxCellSpacing = 0.15;
+    spacing = std::min(kMaxCellSpacing, spacing);
+    if(qFuzzyEquals(m_cellSpacing, spacing))
         return;
 
-    m_cellSpacing = cellSpacing;
+    m_cellSpacing = spacing;
 
     emit cellSpacingChanged();
     emit dataChanged(Qn::LayoutCellSpacingRole);
@@ -691,11 +699,11 @@ bool QnWorkbenchLayout::setData(int role, const QVariant &value) {
             return false;
         }
     case Qn::LayoutCellSpacingRole:
-        if(value.canConvert<QSizeF>()) {
-            setCellSpacing(value.toSizeF());
+        if(value.canConvert<qreal>()) {
+            setCellSpacing(value.toReal());
             return true;
         } else {
-            qnWarning("Provided cell spacing value '%1' must be convertible to QSizeF.", value);
+            qnWarning("Provided cell spacing value '%1' must be convertible to qreal.", value);
             return false;
         }
     case Qn::LayoutCellAspectRatioRole: {

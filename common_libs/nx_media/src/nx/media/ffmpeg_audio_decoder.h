@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef DISABLE_FFMPEG
-
 #include <QtCore/QObject>
 
 #include <nx/streaming/audio_data_packet.h>
@@ -32,5 +30,3 @@ private:
 
 } // namespace media
 } // namespace nx
-
-#endif // #DISABLE_FFMPEG

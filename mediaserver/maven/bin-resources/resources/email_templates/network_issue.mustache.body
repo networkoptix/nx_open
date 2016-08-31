@@ -9,12 +9,11 @@
 			</td>
 			{{/sourceIcon}}
 			<td>
-				<b class="source-name">{{source}}</b><br>
-				({{sourceIp}})
+				<b>{{source}}</b> ({{sourceIp}})
 			</td>
 			{{#aggregated}}
 				<td>{{reason}}</td>
-				<td><span class="source-name">{{timestampDate}}</span><br><b>{{timestampTime}}</b></td>
+				<td>{{timestampDate}} <b>{{timestampTime}}</b></td>
 			{{/aggregated}}
 		</tr>
 {{/aggregated}}

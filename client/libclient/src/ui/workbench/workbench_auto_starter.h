@@ -11,7 +11,7 @@ public:
     QnWorkbenchAutoStarter(QObject *parent = NULL);
     virtual ~QnWorkbenchAutoStarter();
 
-    bool isSupported() const;
+    static bool isSupported();
 
     bool isAutoStartEnabled();
     void setAutoStartEnabled(bool autoStartEnabled);

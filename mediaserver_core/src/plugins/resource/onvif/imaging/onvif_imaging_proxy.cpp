@@ -7,6 +7,38 @@
 
 #include <nx/utils/log/assert.h>
 
+#define EXPAND(x) x
+
+#define SPC2(a, b) \
+    (((a) && ((a)->b)) ?    \
+        ((a)->b) : nullptr) \
+
+#define SPC3(a, b, c) \
+    SPC2(SPC2(a, b), c)
+    
+#define SPC4(a, b, c, d) \
+    SPC2(SPC3(a, b, c), d)
+
+#define SPC5(a, b, c, d, e) \
+    SPC2(SPC4(a, b, c, d), e)
+
+#define SAFE_POINTER_CHAIN_SPECIALIZATION(_1, _2, _3, _4, _5, NAME, ...) NAME
+
+#define SAFE_POINTER_CHAIN(...) \
+    EXPAND( \
+        EXPAND(SAFE_POINTER_CHAIN_SPECIALIZATION(__VA_ARGS__, SPC5, SPC4, SPC3, SPC2))(__VA_ARGS__))
+
+#define CPC2(a, b) (a)->b
+#define CPC3(a, b, c) (a)->b->c
+#define CPC4(a, b, c, d) (a)->b->c->d
+#define CPC5(a, b, c, d, e) (a)->b->c->d->e
+
+#define CONCAT_TO_POINTER_CHAIN_SPECIALIZATION(_1, _2, _3, _4, _5, NAME, ...) NAME
+
+#define CONCAT_TO_POINTER_CHAIN(...) \
+    EXPAND( \
+        EXPAND(CONCAT_TO_POINTER_CHAIN_SPECIALIZATION(__VA_ARGS__, CPC5, CPC4, CPC3, CPC2))(__VA_ARGS__))
+
 //
 // class QnOnvifImagingProxy
 //
@@ -72,57 +104,106 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
 
     auto blc = ranges->BacklightCompensation;
     if (blc) {
-        registerEnumParameter(lit("ibcMode"),                                   [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->BacklightCompensation->Mode); });
-        registerFloatParameter(lit("ibcLevel"), blc->Level,                     [](ImagingSettingsResp* settings){ return settings->ImagingSettings->BacklightCompensation->Level; });
+        registerEnumParameter(
+            lit("ibcMode"),
+            [](ImagingSettingsResp* settings) -> int*
+            {
+                if (auto blcPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, BacklightCompensation))
+                    return reinterpret_cast<int*>(&blcPtr->Mode);
+                return nullptr;
+            });
+
+        registerFloatParameter(lit("ibcLevel"), blc->Level,                     [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, BacklightCompensation, Level);});
     }
 
     auto exposure = ranges->Exposure;
     if (exposure) {
-        registerEnumParameter(lit("ieMode"),                                    [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->Exposure->Mode); });
-        registerEnumParameter(lit("iePriority"),                                [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->Exposure->Priority); });
+        registerEnumParameter(
+            lit("ieMode"),                                    
+            [](ImagingSettingsResp* settings) -> int* 
+            {
+                if (auto expPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure))
+                    return reinterpret_cast<int*>(&expPtr->Mode);
+                return nullptr;
+            });
+
+        registerEnumParameter(
+            lit("iePriority"),                                
+            [](ImagingSettingsResp* settings) -> int*
+            {
+                if (auto expPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure))
+                    return reinterpret_cast<int*>(&expPtr->Priority); 
+                return nullptr;
+            });
         
-        registerFloatParameter(lit("ieMinETime"),   exposure->MinExposureTime,  [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MinExposureTime; });
-        registerFloatParameter(lit("ieMaxETime"),   exposure->MaxExposureTime,  [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MaxExposureTime; });
-        registerFloatParameter(lit("ieETime"),      exposure->ExposureTime,     [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->ExposureTime; });
+        registerFloatParameter(lit("ieMinETime"),   exposure->MinExposureTime,  [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MinExposureTime);});
+        registerFloatParameter(lit("ieMaxETime"),   exposure->MaxExposureTime,  [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MaxExposureTime);});
+        registerFloatParameter(lit("ieETime"),      exposure->ExposureTime,     [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, ExposureTime);});
 
-        registerFloatParameter(lit("ieMinGain"),    exposure->MinGain,          [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MinGain; });
-        registerFloatParameter(lit("ieMaxGain"),    exposure->MaxGain,          [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MaxGain; });
-        registerFloatParameter(lit("ieGain"),       exposure->Gain,             [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->Gain; });
+        registerFloatParameter(lit("ieMinGain"),    exposure->MinGain,          [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MinGain);});
+        registerFloatParameter(lit("ieMaxGain"),    exposure->MaxGain,          [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MaxGain);});
+        registerFloatParameter(lit("ieGain"),       exposure->Gain,             [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, Gain);});
 
-        registerFloatParameter(lit("ieMinIris"),    exposure->MinIris,          [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MinIris; });
-        registerFloatParameter(lit("ieMaxIris"),    exposure->MaxIris,          [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MaxIris; });
-        registerFloatParameter(lit("ieIris"),       exposure->Iris,             [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->Iris; });
+        registerFloatParameter(lit("ieMinIris"),    exposure->MinIris,          [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MinIris);});
+        registerFloatParameter(lit("ieMaxIris"),    exposure->MaxIris,          [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, MaxIris);});
+        registerFloatParameter(lit("ieIris"),       exposure->Iris,             [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Exposure, Iris);});
     }
       
     auto focus = ranges->Focus;
     if (focus) {
-        registerEnumParameter(lit("ifAuto"),                                    [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->Focus->AutoFocusMode); });
+        registerEnumParameter(
+            lit("ifAuto"),
+            [](ImagingSettingsResp* settings) -> int*
+            {
+                if (auto focusPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, Focus))
+                    return reinterpret_cast<int*>(&focusPtr->AutoFocusMode); 
+                return nullptr;
+            });
 
-        registerFloatParameter(lit("ifSpeed"),      focus->DefaultSpeed,        [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Focus->DefaultSpeed; });
-        registerFloatParameter(lit("ifNear"),       focus->NearLimit,           [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Focus->NearLimit; });
-        registerFloatParameter(lit("ifFar"),        focus->FarLimit,            [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Focus->FarLimit; });
+        registerFloatParameter(lit("ifSpeed"),      focus->DefaultSpeed,        [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Focus, DefaultSpeed);});
+        registerFloatParameter(lit("ifNear"),       focus->NearLimit,           [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Focus, NearLimit);});
+        registerFloatParameter(lit("ifFar"),        focus->FarLimit,            [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Focus, FarLimit);});
     }
 
     auto wdr = ranges->WideDynamicRange;
     if (wdr) {
-        registerEnumParameter(lit("iwdrMode"),                                  [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->WideDynamicRange->Mode); });
-        registerFloatParameter(lit("iwdrLevel"),    wdr->Level,                 [](ImagingSettingsResp* settings){ return settings->ImagingSettings->WideDynamicRange->Level; });
+        registerEnumParameter(
+            lit("iwdrMode"),
+            [](ImagingSettingsResp* settings) -> int*
+            {
+                if (auto wdrPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, WideDynamicRange))
+                    return reinterpret_cast<int*>(&wdrPtr->Mode);
+                return nullptr;
+            });
+        registerFloatParameter(lit("iwdrLevel"),    wdr->Level,                 [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, WideDynamicRange, Level);});
     }
 
     auto wb = ranges->WhiteBalance;
     if (wb) {
-        registerEnumParameter(lit("iwbMode"),                                   [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->WhiteBalance->Mode); });
-        registerFloatParameter(lit("iwbYrGain"),    wb->YrGain,                 [](ImagingSettingsResp* settings){ return settings->ImagingSettings->WhiteBalance->CrGain; });
-        registerFloatParameter(lit("iwbYbGain"),    wb->YbGain,                 [](ImagingSettingsResp* settings){ return settings->ImagingSettings->WhiteBalance->CbGain; });
+        registerEnumParameter(lit("iwbMode"),
+            [](ImagingSettingsResp* settings) -> int*
+            {
+                if (auto wbPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings, WhiteBalance))
+                    return reinterpret_cast<int*>(&wbPtr->Mode);
+                return nullptr;
+            });
+        registerFloatParameter(lit("iwbYrGain"),    wb->YrGain,                 [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, WhiteBalance, CrGain);});
+        registerFloatParameter(lit("iwbYbGain"),    wb->YbGain,                 [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, WhiteBalance, CbGain);});
     }
 
-    if(!ranges->IrCutFilterModes.empty())
-        registerEnumParameter(lit("iIrCut"),                                    [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->IrCutFilter); });
+    if (!ranges->IrCutFilterModes.empty())
+        registerEnumParameter(lit("iIrCut"),                                    
+            [](ImagingSettingsResp* settings) -> int*
+            {
+                if (auto irPtr = SAFE_POINTER_CHAIN(settings, ImagingSettings))
+                    return reinterpret_cast<int*>(irPtr->IrCutFilter);
+                return nullptr;
+            });
 
-    registerFloatParameter(lit("iBri"),             ranges->Brightness,         [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Brightness; });
-    registerFloatParameter(lit("iCS"),              ranges->ColorSaturation,    [](ImagingSettingsResp* settings){ return settings->ImagingSettings->ColorSaturation; });
-    registerFloatParameter(lit("iCon"),             ranges->Contrast,           [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Contrast; });   
-    registerFloatParameter(lit("iSha"),             ranges->Sharpness,          [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Sharpness; });
+    registerFloatParameter(lit("iBri"),             ranges->Brightness,         [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Brightness);});
+    registerFloatParameter(lit("iCS"),              ranges->ColorSaturation,    [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, ColorSaturation);});
+    registerFloatParameter(lit("iCon"),             ranges->Contrast,           [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Contrast);});   
+    registerFloatParameter(lit("iSha"),             ranges->Sharpness,          [](ImagingSettingsResp* settings){return SAFE_POINTER_CHAIN(settings, ImagingSettings, Sharpness);});
 
 }
 

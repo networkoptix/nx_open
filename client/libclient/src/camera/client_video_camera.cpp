@@ -14,6 +14,7 @@
 #include <recording/time_period.h>
 #include <plugins/resource/avi/thumbnails_stream_reader.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
+#include <utils/common/util.h>
 
 // input video with steps between frames in timeStepUsec translated to output video with 30 fps (kOutputDeltaUsec between frames)
 
@@ -22,9 +23,11 @@ class QnTimeLapseRecorder: public QnStreamRecorder
     static const qint64 kOutputDeltaUsec = 1000000ll / 30; //< 30 fps
 
 public:
-    QnTimeLapseRecorder(const QnResourcePtr& resource, qint64 /*timeStepUsec */):
+    QnTimeLapseRecorder(const QnResourcePtr& resource, qint64 timeStepUsec):
         QnStreamRecorder(resource),
-        m_currentTimeUsec(0)
+        m_currentRelativeTimeUsec(0),
+        m_currentAbsoluteTimeUsec(AV_NOPTS_VALUE),
+        m_timeStepUsec(timeStepUsec)
     {
 
     }
@@ -35,16 +38,35 @@ public:
     }
 
 protected:
+
+    virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override
+    {
+        QnAbstractMediaData* nonConstMd = const_cast<QnAbstractMediaData*> (md.get());
+        // we can use non const object if only 1 consumer
+        Q_ASSERT(nonConstMd->dataProvider->processorsCount() <= 1);
+
+        if (m_currentAbsoluteTimeUsec == AV_NOPTS_VALUE)
+            m_currentAbsoluteTimeUsec = md->timestamp;
+        else
+            m_currentAbsoluteTimeUsec += m_timeStepUsec;
+
+        nonConstMd->timestamp = m_currentAbsoluteTimeUsec;
+        return QnStreamRecorder::saveData(md);
+    }
+
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override
     {
-        qint64 result = m_currentTimeUsec;
-        m_currentTimeUsec += kOutputDeltaUsec;
+        Q_UNUSED(md);
+        qint64 result = m_currentRelativeTimeUsec;
+        m_currentRelativeTimeUsec += kOutputDeltaUsec;
         return result;
     }
 
     virtual bool isUtcOffsetAllowed() const override { return false; }
 private:
-    qint64 m_currentTimeUsec;
+    qint64 m_currentRelativeTimeUsec;
+    qint64 m_currentAbsoluteTimeUsec;
+    qint64 m_timeStepUsec;
 };
 
 
@@ -301,21 +323,24 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     m_exportRecorder->start();
 }
 
-void QnClientVideoCamera::stopExport() {
-    if (m_exportReader) {
+void QnClientVideoCamera::stopExport()
+{
+    if (m_exportReader)
+    {
         if (m_exportRecorder)
             m_exportReader->removeDataProcessor(m_exportRecorder);
         m_exportReader->pleaseStop();  // it will be deleted in finished() signal handle
     }
-    if (m_exportRecorder) {
+    if (m_exportRecorder)
+    {
         // clean signature flag; in other case file will be recreated on writing finish
         //TODO: #vasilenko get rid of this magic
         m_exportRecorder->setNeedCalcSignature(false);
 
-        connect(m_exportRecorder, SIGNAL(finished()), this, SIGNAL(exportStopped()));
+        connect(m_exportRecorder, &QnStreamRecorder::finished, this, &QnClientVideoCamera::exportStopped);
         m_exportRecorder->pleaseStop(); // it will be deleted in finished() signal handle
     }
-    QnMutexLocker lock( &m_exportMutex );
+    QnMutexLocker lock(&m_exportMutex);
     m_exportReader.clear();
     m_exportRecorder.clear();
 }

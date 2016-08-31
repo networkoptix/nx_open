@@ -5,6 +5,8 @@
 
 #include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource/camera_resource.h>
+#include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
 
@@ -151,6 +153,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeCameraUserAttributes:
             return notificationParams.cameraNotificationManager->triggerNotification(tran);
         case ApiCommand::forcePrimaryTimeServer:
+        case ApiCommand::removeAccessRights:
             //#ak no notification needed
             break;
         default:
@@ -426,7 +429,7 @@ struct ModifyResourceAccess
                 .arg(getTransactionDescriptorByParam<Param>()->getName())
                 .arg(!(bool)userResource)
                 .arg(!(bool)target),
-                cl_logDEBUG1);
+                cl_logWARNING);
 
         return result;
     }
@@ -538,7 +541,71 @@ struct ModifyCameraAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission);
+        if (accessData == Qn::kSystemAccess)
+            return true;
+
+        if (!resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission))
+        {
+            qWarning() << "save ApiCameraAttributesData forbidden because no save permissions. id=" << param.cameraID;
+            return false;
+        }
+
+        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnVirtualCameraResourceList cameras;
+
+        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+        {
+            qWarning() << "save ApiCameraAttributesData forbidden because camera object is not exists. id=" << param.cameraID;
+            return false;
+        }
+
+        licenseUsageHelper.propose(camera, param.scheduleEnabled);
+        if (licenseUsageHelper.isOverflowForCamera(camera))
+        {
+            qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraID;
+            return false;
+        }
+
+        return true;
+    }
+};
+
+struct ModifyCameraAttributesListAccess
+{
+    void operator()(const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
+    {
+        if (accessData == Qn::kSystemAccess)
+            return;
+
+        for (const auto& p : param)
+            if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
+
+        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnVirtualCameraResourceList cameras;
+
+        for (const auto& p : param)
+        {
+            auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
+            if (!camera)
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
+            cameras.push_back(camera);
+            licenseUsageHelper.propose(camera, p.scheduleEnabled);
+        }
+
+        for (const auto& camera : cameras)
+            if (licenseUsageHelper.isOverflowForCamera(camera))
+            {
+                param = ApiCameraAttributesDataList();
+                return;
+            }
     }
 };
 
@@ -565,6 +632,20 @@ struct ModifyServerAttributesAccess
     bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(accessData, param.serverID, Qn::SavePermission);
+    }
+};
+
+struct UserInputAccess
+{
+    template<typename Param>
+    bool operator()(const Qn::UserAccessData& accessData, const Param&)
+    {
+        if (hasSystemAccess(accessData))
+            return true;
+
+        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
+        return result;
     }
 };
 
@@ -598,6 +679,29 @@ struct AdminOnlyAccessOut
     }
 };
 
+struct RemoveUserGroupAccess
+{
+    bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
+    {
+        if (!AdminOnlyAccess()(accessData, param))
+        {
+            qWarning() << "Remove user group forbidden because user has no admin access";
+            return false;
+        }
+
+        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        {
+            if (user->userGroup() == param.id)
+            {
+                qWarning() << "Remove user group forbidden because group is still using by user " << user->getName();
+                return false;
+            }
+        }
+
+        return true;
+    }
+};
+
 struct ControlVideowallAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
@@ -611,7 +715,7 @@ struct ControlVideowallAccess
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");
             NX_LOG(lit("Access check for ApiVideoWallControlMessageData failed for user %1")
                 .arg(userName),
-                cl_logDEBUG1);
+                cl_logWARNING);
         }
         return result;
     }
@@ -691,7 +795,7 @@ struct ModifyListAccess
                 .arg(paramContainer.size() - tmpContainer.size())
                 .arg(paramContainer.size())
                 .arg(getTransactionDescriptorByParam<ParamContainer>()->getName()),
-                cl_logDEBUG1);
+                cl_logWARNING);
             return false;
         }
         return true;
@@ -770,15 +874,14 @@ detail::TransactionDescriptorBase *getTransactionDescriptorByValue(ApiCommand::V
     auto it = detail::transactionDescriptors.get<0>().find(v);
     bool isEnd = it == detail::transactionDescriptors.get<0>().end();
     NX_ASSERT(!isEnd, "ApiCommand::Value not found");
-    return (*it).get();
+    return isEnd ? nullptr : (*it).get();
 }
 
-detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString &s)
+detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString& s)
 {
     auto it = detail::transactionDescriptors.get<1>().find(s);
     bool isEnd = it == detail::transactionDescriptors.get<1>().end();
-    NX_ASSERT(!isEnd, "ApiCommand name not found");
-    return (*it).get();
+    return isEnd ? nullptr : (*it).get();
 }
 
 } // namespace ec2

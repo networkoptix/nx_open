@@ -27,9 +27,16 @@ public:
         Question
     };
 
+    /* Positions of custom widgets in the message box. */
+    enum class Layout
+    {
+        Main,
+        Content
+    };
+
 public:
 
-    explicit QnMessageBox(QWidget *parent = nullptr);
+    QnMessageBox(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
     QnMessageBox(
             Icon icon,
@@ -75,10 +82,18 @@ public:
     void setTextFormat(Qt::TextFormat format);
 
     QString informativeText() const;
-    void setInformativeText(const QString &text);
+
+    /** Informative text, that will be split by \n to several paragraphs */
+    void setInformativeText(const QString &text, bool split = true);
 
     /** Delegate widget with custom details. QnMessageBox will take ownership. */
-    void addCustomWidget(QWidget* widget, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
+    void addCustomWidget(QWidget* widget, Layout layout = Layout::Content, int stretch = 0, Qt::Alignment alignment = Qt::Alignment());
+
+    /**
+     * Widget will be removed from layout, but you should manually hide and delete it if required.
+     * Dialog will still retain ownership.
+     */
+    void removeCustomWidget(QWidget* widget);
 
     QString checkBoxText() const;
     void setCheckBoxText(const QString &text);
@@ -146,6 +161,8 @@ public:
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
+
+    virtual bool event(QEvent* event) override;
 
 private:
     QScopedPointer<Ui::MessageBox> ui;

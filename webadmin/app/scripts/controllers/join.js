@@ -65,6 +65,9 @@ angular.module('webadminApp')
                 case 'CONFIGURATION_ERROR':
                     errorToShow = L.join.configError;
                     break;
+                case 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':
+                    errorToShow = L.join.cloudError;
+                    break;
                 case 'STARTER_LICENSE_ERROR':
                     errorToShow = L.join.licenceError;
                     dialogs.alert(errorToShow);
@@ -79,7 +82,7 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            mediaserver.pingSystem($scope.settings.url, Config.defaultLogin, $scope.settings.password).then(function(r){
+            mediaserver.pingSystem($scope.settings.url, $scope.settings.login, $scope.settings.password).then(function(r){
                 if(r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
@@ -100,7 +103,7 @@ angular.module('webadminApp')
 
             // TODO: $scope.settings.currentPassword here
             mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
-                mediaserver.mergeSystems($scope.settings.url, Config.defaultLogin, $scope.settings.password,
+                mediaserver.mergeSystems($scope.settings.url, $scope.settings.login, $scope.settings.password,
                     $scope.settings.keepMySystem).then(function (r) {
                         if (r.data.error !== '0') {
                             var errorToShow = errorHandler(r.data.errorString);
@@ -109,7 +112,7 @@ angular.module('webadminApp')
                                 return;
                             }
                         }
-                        dialogs.alert(L.join.mergeSucceed).then(function () {
+                        dialogs.alert(L.join.mergeSucceed).finally(function () {
                             window.location.reload();
                         });
                     });

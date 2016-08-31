@@ -23,7 +23,6 @@
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
 #include "media_server/settings.h"
-#include "plugins/resource/upnp/upnp_device_searcher.h"
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
@@ -351,11 +350,4 @@ void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)
             ping.ping(rpNetRes->getHostAddress(), 1, 300);
         }
     }
-}
-
-void QnMServerResourceDiscoveryManager::doResourceDiscoverIteration()
-{
-    if( UPNPDeviceSearcher::instance() )
-        UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
-    base_type::doResourceDiscoverIteration();
 }

@@ -117,7 +117,7 @@ bool FileTranscoder::setTagValue(
 
     QDir srcFileDir = QFileInfo(srcFilePath).dir();
     const QString& tempFileName = lit("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch())
-            .arg(nx::utils::random::number(0)).arg(QLatin1String(formatCtx->iformat->name));
+            .arg(nx::utils::random::number()).arg(QLatin1String(formatCtx->iformat->name));
     const QString& tempFilePath = lit("%1/%2").arg(srcFileDir.path()).arg(tempFileName);
 
     //setting audio/video codecID

@@ -1,7 +1,5 @@
 #include "thumbnails_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include "utils/common/util.h"
 #include <core/resource/media_resource.h>
 
@@ -123,7 +121,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             break;
         if (result->dataType == QnAbstractMediaData::VIDEO &&
             result->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey) &&
-            result->channelNumber == m_nextChannelNum)
+            (int)result->channelNumber == m_nextChannelNum)
         {
             m_nextChannelNum = (m_nextChannelNum + 1) % m_channelCount;
             break;
@@ -158,5 +156,3 @@ QnAbstractArchiveDelegate::ArchiveChunkInfo QnThumbnailsArchiveDelegate::getLast
 {
     return m_baseDelegate->getLastUsedChunkInfo();
 }
-
-#endif // ENABLE_ARCHIVE

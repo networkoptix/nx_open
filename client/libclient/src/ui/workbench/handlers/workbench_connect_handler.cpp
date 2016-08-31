@@ -253,7 +253,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
     });
 
 
-    connect(QnAppServerConnectionFactory::getConnection2()->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
+    connect(connection2()->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
         QnSyncTime::instance(), static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
     //connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
@@ -264,10 +264,10 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed()
 {
 
-    if (QnAppServerConnectionFactory::getConnection2())
+    if (connection2())
     {
-        disconnect(QnAppServerConnectionFactory::getConnection2().get(), nullptr, this, nullptr);
-        disconnect(QnAppServerConnectionFactory::getConnection2().get(), nullptr, QnSyncTime::instance(), nullptr);
+        disconnect(connection2().get(), nullptr, this, nullptr);
+        disconnect(connection2().get(), nullptr, QnSyncTime::instance(), nullptr);
     }
 
     disconnect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, NULL);
@@ -469,8 +469,8 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!
-    QnConnectionDiagnosticsHelper::Result status = silent
-        ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
+    auto status = silent
+        ? QnConnectionValidator::validateConnection(connectionInfo, errCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
 
     const auto systemName = connectionInfo.systemName;
@@ -485,9 +485,9 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     switch (status)
     {
-        case QnConnectionDiagnosticsHelper::Result::Success:
+        case Qn::ConnectionResult::success:
             break;
-        case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+        case Qn::ConnectionResult::compatibilityMode:
             storeConnection();
             menu()->trigger(QnActions::DelayedForcedExitAction);
             return ec2::ErrorCode::ok; // to avoid cycle
@@ -501,25 +501,25 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
 
 
+    QUrl ecUrl = connectionInfo.ecUrl;
+    if (connectionInfo.allowSslConnections)
+        ecUrl.setScheme(lit("https"));
 
     if (connectionInfo.newSystem)
     {
         storeConnection();
         showWelcomeScreen();
         auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setupFactorySystem(connectionInfo.ecUrl.toString());
+        /* Method is called from QML where we are passing QString. */
+        welcomeScreen->setupFactorySystem(ecUrl.toString());
         return ec2::ErrorCode::ok;
     }
-
-    QUrl ecUrl = connectionInfo.ecUrl;
-    if (connectionInfo.allowSslConnections)
-        ecUrl.setScheme(lit("https"));
 
     QnAppServerConnectionFactory::setUrl(ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
-    QnClientMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+    QnClientMessageProcessor::instance()->init(connection2());
 
     QnSessionManager::instance()->start();
     QnResource::startCommandProc();
@@ -587,18 +587,18 @@ void QnWorkbenchConnectHandler::clearConnection()
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    QnResourceList resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
+    auto resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    for (const QnLayoutResourcePtr& layout : qnResPool->getResources<QnLayoutResource>())
+    for (const auto& layout : qnResPool->getResources<QnLayoutResource>())
     {
-        if (layout->hasFlags(Qn::local) || !layout->isFile())  //do not remove exported layouts
+        if (layout->hasFlags(Qn::local) && !layout->isFile())  //do not remove exported layouts
             resourcesToRemove.push_back(layout);
     }
 
     QVector<QnUuid> idList;
     idList.reserve(resourcesToRemove.size());
-    foreach(const QnResourcePtr& res, resourcesToRemove)
+    for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
     qnResPool->removeResources(resourcesToRemove);

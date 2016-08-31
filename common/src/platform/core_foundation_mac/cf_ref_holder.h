@@ -10,7 +10,12 @@ template<typename CFRefType>
 class QnCFRefHolder
 {
 public:
+    // Constant only pointer to underline type
     typedef const typename std::remove_pointer<CFRefType>::type* const_cf_ref;
+
+    explicit QnCFRefHolder(CFRefType ref);
+
+    ~QnCFRefHolder();
 
     CFRefType ref();
 
@@ -20,10 +25,6 @@ protected:
     QnCFRefHolder();
 
     QnCFRefHolder(const QnCFRefHolder& other);
-
-    explicit QnCFRefHolder(CFRefType ref);
-
-    ~QnCFRefHolder();
 
     QnCFRefHolder& operator=(const QnCFRefHolder& other);
 

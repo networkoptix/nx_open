@@ -17,14 +17,12 @@ namespace
     const int invalidPage = -1;
 }
 
-QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */, Qt::WindowFlags windowFlags /* = 0 */)
-    : base_type(parent, windowFlags)
-    , m_pages()
-    , m_tabWidget(nullptr)
-    , m_readOnly(false)
-    , m_updating(false)
+QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget* parent, Qt::WindowFlags windowFlags) :
+    base_type(parent, windowFlags),
+    m_pages(),
+    m_tabWidget(nullptr),
+    m_updating(false)
 {
-
 }
 
 int QnGenericTabbedDialog::currentPage() const
@@ -208,13 +206,14 @@ void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled)
     if (!m_tabWidget)
         return;
 
-    for (Page &page: m_pages)
+    for (Page& page : m_pages)
     {
         if (page.key != key)
             continue;
 
         if (page.enabled == enabled)
             return;
+
         page.enabled = enabled;
 
         int index = m_tabWidget->indexOf(page.widget);
@@ -227,38 +226,31 @@ void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled)
     }
 
     qnWarning("QnGenericTabbedDialog '%1' does not contain %2", metaObject()->className(), key);
+    NX_ASSERT(false);
 }
 
-
-void QnGenericTabbedDialog::setTabWidget(QTabWidget *tabWidget)
+void QnGenericTabbedDialog::setTabWidget(QTabWidget* tabWidget)
 {
-    if(m_tabWidget.data() == tabWidget)
-        return;
-
+    NX_ASSERT(!m_tabWidget);
     m_tabWidget = tabWidget;
 }
 
 void QnGenericTabbedDialog::initializeTabWidget()
 {
-    if(m_tabWidget)
+    if (m_tabWidget)
         return; /* Already initialized with a direct call to setTabWidget in derived class's constructor. */
 
-    QList<QTabWidget *> tabWidgets = findChildren<QTabWidget *>();
-    if(tabWidgets.empty()) {
-        qnWarning("QnGenericTabbedDialog '%1' doesn't have a QTabWidget.", metaObject()->className());
+    auto tabWidgets = findChildren<QTabWidget*>();
+    NX_ASSERT(tabWidgets.size() == 1, "Call setTabWidget() from the constructor.");
+    if (tabWidgets.size() != 1)
         return;
-    }
-    if(tabWidgets.size() > 1) {
-        qnWarning("QnGenericTabbedDialog '%1' has several QTabWidgets.", metaObject()->className());
-        return;
-    }
 
     setTabWidget(tabWidgets[0]);
 }
 
 bool QnGenericTabbedDialog::canApplyChanges() const
 {
-    if (m_readOnly)
+    if (isReadOnly())
         return false;
 
     return all_of(m_pages, [](const Page &page)
@@ -269,7 +261,7 @@ bool QnGenericTabbedDialog::canApplyChanges() const
 
 bool QnGenericTabbedDialog::canDiscardChanges() const
 {
-    if (m_readOnly)
+    if (isReadOnly())
         return true;
 
     return all_of(m_pages, [](const Page &page)
@@ -280,7 +272,7 @@ bool QnGenericTabbedDialog::canDiscardChanges() const
 
 bool QnGenericTabbedDialog::hasChanges() const
 {
-    if (m_readOnly)
+    if (isReadOnly())
         return false;
 
     return any_of(m_pages, [](const Page &page)
@@ -303,16 +295,10 @@ QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::modifiedPages() const
     return result;
 }
 
-bool QnGenericTabbedDialog::isReadOnly() const
+void QnGenericTabbedDialog::setReadOnlyInternal()
 {
-    return m_readOnly;
-}
-
-void QnGenericTabbedDialog::setReadOnly( bool readOnly )
-{
-    for(const Page &page: m_pages)
-        page.widget->setReadOnly(readOnly);
-    m_readOnly = readOnly;
+    for (const auto& page : m_pages)
+        page.widget->setReadOnly(isReadOnly());
 }
 
 void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
@@ -336,7 +322,6 @@ void QnGenericTabbedDialog::initializeButtonBox()
     updateButtonBox();
 }
 
-
 void QnGenericTabbedDialog::updateButtonBox()
 {
     if (m_updating || !buttonBox())
@@ -346,10 +331,8 @@ void QnGenericTabbedDialog::updateButtonBox()
     bool canApply = !changesPresent || canApplyChanges();
 
     if (QPushButton *applyButton = buttonBox()->button(QDialogButtonBox::Apply))
-        applyButton->setEnabled(!m_readOnly && changesPresent && canApply);
+        applyButton->setEnabled(!isReadOnly() && changesPresent && canApply);
 
     if (QPushButton *okButton = buttonBox()->button(QDialogButtonBox::Ok))
-        okButton->setEnabled(m_readOnly || canApply);
+        okButton->setEnabled(isReadOnly() || canApply);
 }
-
-

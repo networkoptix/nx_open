@@ -83,9 +83,6 @@ namespace detail
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             if (!tran.isLocal) {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
@@ -104,18 +101,12 @@ namespace detail
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             return executeTransactionInternal(tran);
         }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran.command))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(getTransaction());
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
@@ -276,14 +267,13 @@ namespace detail
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
 
         //getClientInfos
-        // TODO mike: Remove specialization with nullptr_t.
+        // TODO: #mike: Remove specialization with nullptr_t.
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data);
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
 
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUpdateUploadResponceDataList& data)
+        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
         {
-            QN_UNUSED(id);
             data.clear();
             return ErrorCode::ok;
         }
@@ -497,6 +487,7 @@ namespace detail
         ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
         ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
         ErrorCode removeCameraAttributes(const QnUuid& id);
+        ErrorCode removeResourceAccessRights(const QnUuid& id);
         ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
@@ -557,6 +548,9 @@ namespace detail
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
+
+        bool isReadOnly() const { return m_dbReadOnly; }
+
     private:
         class QnDbTransactionExt: public QnDbTransaction
         {
@@ -601,7 +595,6 @@ namespace detail
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
-        bool isTranAllowed(const QnAbstractTransaction& tran) const;
         bool syncLicensesBetweenDB();
         ErrorCode getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database);
     private:
@@ -699,19 +692,20 @@ public:
     ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParam);
-        auto outParamOriginalSize = outParam.size();
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
         ec2::getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
-        if (outParam.size() != outParamOriginalSize && outParam.size() == 0)
-            return ErrorCode::forbidden;
         return errorCode;
     }
+
+    bool isTranAllowed(const QnAbstractTransaction& tran) const;
 
     template <typename Param, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
@@ -720,6 +714,8 @@ public:
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         auto outParamContainer = tran.params;
         ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
@@ -731,6 +727,8 @@ public:
     template <class Param, class SerializedTransaction>
     ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         if (!ec2::getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
@@ -739,6 +737,8 @@ public:
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
     ErrorCode executeTransaction(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
         Cont<Param,A> paramCopy = tran.params;
         ec2::getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
         if (paramCopy.size() != tran.params.size())

@@ -19,7 +19,7 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
+    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
@@ -458,161 +458,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnyComponent
     };
 
-
-    /**
-     * Generic enumeration holding different data roles used in Qn classes.
-     */
-    enum ItemDataRole {
-        FirstItemDataRole   = Qt::UserRole,
-
-        /* Tree-based. */
-        NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
-
-        /* Resource-based. */
-        ResourceRole,                               /**< Role for QnResourcePtr. */
-        UserResourceRole,                           /**< Role for QnUserResourcePtr. */
-        LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
-        MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
-        VideoWallResourceRole,                      /**< Role for QnVideoWallResourcePtr */
-
-        ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
-        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
-        ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
-        ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
-        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
-
-        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
-        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
-        VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
-
-        /* Layout-based. */
-        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
-        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
-        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
-        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
-        LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
-        LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */
-        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
-        LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
-
-        /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
-        ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
-        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
-        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
-        ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
-        ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
-        ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type ImageCorrectionParams. */
-        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type QnItemDewarpingParams. */
-        ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
-        ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
-        ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */
-        ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
-        ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
-        ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
-
-        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
-        ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
-        ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
-        ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
-        ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-        ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-        ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
-        ItemVideowallReviewButtonsRole,             /**< Role for buttons that are checked on each sub-item of the videowall screen widget. Value of type QnVideowallScreenWidget::ReviewButtons. */
-
-        ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
-
-        /* Ptz-based. */
-        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
-        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
-        PtzObjectIdRole,                            /**< Role for PTZ tour/preset id. Value of type QString. */
-        PtzObjectNameRole,                          /**< Role for PTZ tour/preset name. Value of type QString. */
-        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
-
-        /* Context-based. */
-        CurrentLayoutResourceRole,
-        CurrentLayoutMediaItemsRole,
-
-        /* Arguments. */
-        ActionIdRole,
-        SerializedDataRole,
-        ConnectionInfoRole,
-        FocusElementRole,
-        TimePeriodRole,
-        TimePeriodsRole,
-        MergedTimePeriodsRole,
-        FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
-        TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
-        TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
-        ForceRemoveOldConnectionRole,               /**< Role for flag that shows if we have to remove or clean
-                                                         previous connection to specified system using selected user. */
-        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
-                                                        (or to the last system) automatically next time */
-        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
-                                                         Used in QnActions::ConnectAction. */
-        CompletionWatcherRole,                      /**< Role for guard that calls specified handler after action was processed.
-                                                         Used in QnActions::ConnectAction. */
-
-        ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
-        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
-        CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
-        BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
-        UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
-        KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
-
-        /* Others. */
-        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-
-        TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
-
-        ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
-        DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
-        DisplayHtmlHoveredRole,                     /**< Same as DisplayHtmlRole role, but used if mouse over a element */
-
-        ModifiedRole,                               /**< Role for modified state. Value of type bool. */
-        DisabledRole,                               /**< Role for disabled state. Value of type bool. */
-        ValidRole,                                  /**< Role for valid state. Value of type bool. */
-        ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
-        ShortTextRole,                              /**< Role for short text. Value of type QString. */
-        PriorityRole,                               /**< Role for priority value. Value of type quint64. */
-
-        EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
-        EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
-        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
-
-        SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
-
-        StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
-
-        IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
-
-        RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
-        RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-        RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
-
-        AuditRecordDataRole,                        /**< Return QnAuditRecord object */
-        ColumnDataRole,                             /**< convert index col count to column enumerator */
-        DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
-        AlternateColorRole,                         /**< Use alternate color in painting */
-        AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
-
-        StorageInfoDataRole,                        /**< return QnStorageModelInfo object at QnStorageConfigWidget */
-        BackupSettingsDataRole,                     /**< return BackupSettingsData, used in BackupSettings model */
-        TextWidthDataRole,                          /**< used in BackupSettings model */
-
-        ActionEmitterType,                          /** */
-        ActionEmittedBy,                            /** */
-
-        GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
-        UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
-
-        RoleCount
-    };
-
     // TODO: #Elric #EC2 rename
     enum StreamQuality {
         QualityLowest = 0,
@@ -860,17 +705,18 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        ReadEmailPermission             = ReadPermission,
-        WriteEmailPermission            = WritePasswordPermission,
-        WriteFullNamePermission         = WritePasswordPermission,
-        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
-                                            WritePasswordPermission | WriteAccessRightsPermission,
+        WriteEmailPermission            = 0x0800,   /**< Permission to edit user's email. */
+        WriteFullNamePermission         = 0x1000,   /**< Permission to edit user's full name. */
+        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission
+                                            | RemovePermission | WritePasswordPermission
+                                            | WriteAccessRightsPermission
+                                            | WriteFullNamePermission | WriteEmailPermission,
 
         /* Media-specific permissions. */
-        ExportPermission                = 0x1000,   /**< Permission to export video parts. */
+        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
-        WritePtzPermission              = 0x2000,   /**< Permission to use camera's PTZ controls. */
+        WritePtzPermission              = 0x4000,   /**< Permission to use camera's PTZ controls. */
 
         /* Mode-specific permissions. */
         VideoWallLayoutPermissions      = ModifyLayoutPermission,

@@ -9,6 +9,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 
+#include <utils/common/app_info.h>
 
 #ifdef Q_OS_LINUX
 #include <sys/time.h>

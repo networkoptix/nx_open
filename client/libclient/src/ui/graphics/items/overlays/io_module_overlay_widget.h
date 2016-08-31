@@ -19,6 +19,9 @@ public:
     const QnIoModuleColors &colors() const;
     void setColors(const QnIoModuleColors &colors);
 
+    bool inputEnabled() const;
+    void setInputEnabled(bool value);
+
 private:
     QScopedPointer<QnIoModuleOverlayWidgetPrivate> const d_ptr;
     Q_DECLARE_PRIVATE(QnIoModuleOverlayWidget)

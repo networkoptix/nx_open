@@ -37,9 +37,11 @@
 
 #include <nx/vms/utils/system_uri.h>
 
+#include <utils/common/app_info.h>
+
 #include <watchers/cloud_status_watcher.h>
 
-QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject *parent):
+QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
     m_accessController(accessController),
     m_userWatcher(nullptr),
@@ -56,7 +58,13 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
 
     instance<QnWorkbenchDesktopCameraWatcher>();
 
-    connect(m_userWatcher,  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
+    connect(m_userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
+        [this](const QnUserResourcePtr& user)
+        {
+            if (m_accessController)
+                m_accessController->setUser(user);
+            emit userChanged(user);
+        });
 
     /* Create dependent objects. */
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));

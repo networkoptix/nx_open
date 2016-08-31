@@ -31,9 +31,6 @@
      <property name="spacing">
       <number>16</number>
      </property>
-     <property name="sizeConstraint">
-      <enum>QLayout::SetMinAndMaxSize</enum>
-     </property>
      <property name="leftMargin">
       <number>16</number>
      </property>
@@ -81,14 +78,17 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="informativeLabel">
-         <property name="text">
-          <string notr="true"/>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="wordWrap">
-          <bool>true</bool>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>8</height>
+          </size>
          </property>
-        </widget>
+        </spacer>
        </item>
        <item>
         <widget class="QCheckBox" name="checkBox">
@@ -100,6 +100,13 @@
       </layout>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="Line" name="secondaryLine">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="Line" name="line">

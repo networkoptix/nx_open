@@ -16,6 +16,7 @@
 #include <api/runtime_info_manager.h>
 #include <nx_ec/ec2_lib.h>
 #include <common/common_module.h>
+#include <utils/common/app_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/settings_migration.h>
 
@@ -62,7 +63,12 @@ int runUi(QGuiApplication *application) {
     for (const auto& scheme: uriHandler->supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
-    qnCommon->instance<QnLiteClientHandler>()->setUiController(context.uiController());
+    if (qnSettings->isLiteClientModeEnabled())
+    {
+        auto liteClientHandler = new QnLiteClientHandler();
+        liteClientHandler->setUiController(context.uiController());
+        qnCommon->store<QnLiteClientHandler>(liteClientHandler);
+    }
 
     QStringList selectors;
 
@@ -252,14 +258,29 @@ void parseCommandLine(const QCoreApplication& application, QnUuid* outVideowallI
 
     if (parser.isSet(liteModeOption) || conf.forceLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
+    if (conf.forceNonLiteMode)
+        qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeDisabled));
 
     if (parser.isSet(urlOption))
+    {
+        NX_LOG(lit("--url: %1").arg(parser.value(urlOption)), cl_logDEBUG1);
         qnSettings->setLastUsedUrl(parser.value(urlOption));
+    }
+    else
+    {
+        NX_LOG(lit("--url not set"), cl_logDEBUG1);
+    }
 
     if (parser.isSet(videowallInstanceGuidOption) && outVideowallInstanceGuid)
     {
+        NX_LOG(lit("--videowall-instance-guid: %1").arg(parser.value(videowallInstanceGuidOption)),
+            cl_logDEBUG1);
         *outVideowallInstanceGuid = QnUuid::fromStringSafe(
             parser.value(videowallInstanceGuidOption));
+    }
+    else
+    {
+        NX_LOG(lit("--videowall-instance-guid not set"), cl_logDEBUG1);
     }
 
     if (parser.isSet(testOption))

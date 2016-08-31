@@ -249,8 +249,8 @@ public:
     void setIOPorts(const QnIOPortDataList& ports);
 
     virtual bool setProperty(
-		const QString &key, 
-		const QString &value, 
+		const QString &key,
+		const QString &value,
 		PropertyOptions options = DEFAULT_OPTIONS) override;
 
     virtual bool setProperty(
@@ -287,7 +287,6 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    /* All ::changed signals must have the same profile to be dynamically called from base ::updateInner method. */
     void scheduleDisabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
@@ -324,7 +323,7 @@ protected slots:
     virtual void at_motionRegionChanged();
 
 protected:
-    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;

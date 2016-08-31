@@ -25,6 +25,16 @@
 
 namespace nx_http
 {
+    struct AuthInfo
+    {
+        QString username;
+        QString password;
+        QString proxyUsername;
+        QString proxyPassword;
+        SocketAddress proxyEndpoint;
+    };
+
+
     class AsyncHttpClientPtr;
 
     //!Http client. All operations are done asynchronously
@@ -105,15 +115,18 @@ namespace nx_http
         virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
         State state() const;
+
         //!Returns true if no response has been recevied due to transport error
         bool failed() const;
         SystemError::ErrorCode lastSysErrorCode() const;
+
         //!Start GET request to \a url
         /*!
         \return true, if socket is created and async connect is started. false otherwise
         To get error description use SystemError::getLastOSErrorCode()
         */
         void doGet(const QUrl& url);
+
         //!Start POST request to \a url
         /*!
         \todo Infinite POST message body support
@@ -125,11 +138,16 @@ namespace nx_http
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody,
             bool includeContentLength = true);
+
         void doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody);
+
+        void doOptions(const QUrl& url);
+
         const nx_http::Request& request() const;
+
         /*!
         Response is valid only after signal \a responseReceived() has been emitted
         \return Can be NULL if no response has been received yet
@@ -146,8 +164,10 @@ namespace nx_http
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
-        //!Number of total bytes read (including http request line and headers)
-        quint64 totalBytesRead() const;
+        /** Number of bytes read (including http request line and headers)
+         *  via single HTTP request
+         */
+        quint64 bytesRead() const;
 
         //!By default, entity compression is on
         void setUseCompression(bool toggleUseEntityEncoding);
@@ -158,7 +178,9 @@ namespace nx_http
         void setUserPassword(const QString& userPassword);
         void setProxyUserName(const QString& userName);
         void setProxyUserPassword(const QString& userPassword);
+        void setAuth(const AuthInfo& auth);
         void setProxyVia(const SocketAddress& proxyEndpoint);
+        void setConnectionHeader(const StringType& value);
 
         //!If set to \a true client will not try to add Authorization header to the first request. \a false by default
         void setDisablePrecalculatedAuthorization(bool val);
@@ -252,7 +274,8 @@ namespace nx_http
         bool m_proxyAuthorizationTried;
         bool m_ha1RecalcTried;
         bool m_terminated;
-        quint64 m_totalBytesRead;
+        quint64 m_bytesRead; //< total read bytes per request
+        int m_totalRequests; //< total sent requests via single connection
         bool m_contentEncodingUsed;
         unsigned int m_sendTimeoutMs;
         unsigned int m_responseReadTimeoutMs;
@@ -371,6 +394,11 @@ namespace nx_http
             if (m_obj.use_count() == 1)
                 m_obj->terminate();
             m_obj.reset();
+        }
+
+        long use_count() const
+        {
+            return m_obj.use_count();
         }
 
         void swap(AsyncHttpClientPtr& right)

@@ -366,7 +366,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     case NetworkNoFrameReason:
     {
         int msecs = QnNetworkIssueBusinessEvent::decodeTimeoutMsecs(reasonParamsEncoded, 5000);
-        result = tr("No data received during last %n seconds.", 0, msecs / 1000);
+        result = tr("No data received during last %n seconds.", "", msecs / 1000);
         break;
     }
     case NetworkConnectionClosedReason:
@@ -475,15 +475,13 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
 
         result = QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("Recording on devices is disabled:"),
-                    tr("Recording on cameras is disabled:"),
-                    tr("Recording on I/O modules is disabled:")
+                    tr("Not enough licenses. Recording has been disabled on following devices:"),
+                    tr("Not enough licenses. Recording has been disabled on following cameras:"),
+                    tr("Not enough licenses. Recording has been disabled on following I/O modules:")
                 ),
                 disabledCameras
             );
 
-        for (const auto &camera: disabledCameras)
-            result += L'\n' + QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
         break;
     }
     default:

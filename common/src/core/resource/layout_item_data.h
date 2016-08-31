@@ -35,8 +35,6 @@ struct QnLayoutItemData
     ImageCorrectionParams contrastParams;
     QnItemDewarpingParams dewarpingParams;
 
-    QHash<int, QVariant> dataByRole;
-
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) ;
 };
 

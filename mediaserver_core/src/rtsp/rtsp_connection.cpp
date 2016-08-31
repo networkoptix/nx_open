@@ -265,20 +265,6 @@ void QnRtspConnectionProcessor::notifyMediaRangeUsed(qint64 timestampUsec)
     d->lastMediaPacketTime = timestampUsec;
 }
 
-bool QnRtspConnectionProcessor::hasAccessToResource(
-    const QnUuid& authUserId,
-    const QnResourcePtr& mediaResource,
-    Qn::Permission permissions) const
-{
-    if (authUserId == Qn::kSystemAccess.userId)
-        return true;
-
-    auto userResource = qnResPool->getResourceById(authUserId).dynamicCast<QnUserResource>();
-    if (!userResource)
-        return false;
-    return qnResourceAccessManager->hasPermission(userResource, mediaResource, Qn::ReadPermission);
-}
-
 void QnRtspConnectionProcessor::parseRequest()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -302,7 +288,7 @@ void QnRtspConnectionProcessor::parseRequest()
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
 
-        d->peerHasAccess = hasAccessToResource(d->authUserId, resource, Qn::ReadPermission);
+        d->peerHasAccess = qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission);
         if (!d->peerHasAccess)
             return;
     }
@@ -402,7 +388,7 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return QHostAddress(d->socket->getForeignAddress().address.ipv4());
+    return QHostAddress(d->socket->getForeignAddress().toString());
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
@@ -429,8 +415,8 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->sessionId = QString::number(reinterpret_cast<quint32>(d->socket.data()));
-    d->sessionId += QString::number(nx::utils::random::number(0));
+    d->sessionId = QString::number(reinterpret_cast<uintptr_t>(d->socket.data()));
+    d->sessionId += QString::number(nx::utils::random::number());
 }
 
 

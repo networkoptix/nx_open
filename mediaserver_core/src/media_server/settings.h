@@ -17,7 +17,7 @@ namespace nx_ms_conf
     static const qint64 DEFAULT_MIN_STORAGE_SPACE = 5*1024*1024*1024ll; // 5gb
 #endif
 
-    static const QLatin1String MAX_RECORD_QUEUE_SIZE_BYTES( "maxRecordQueueSizeBytes" );
+	static const QLatin1String MAX_RECORD_QUEUE_SIZE_BYTES( "maxRecordQueueSizeBytes" );
     static const int DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES = 1024*1024*20;
 
     static const QLatin1String MAX_RECORD_QUEUE_SIZE_ELEMENTS( "maxRecordQueueSizeElements" );
@@ -54,7 +54,10 @@ namespace nx_ms_conf
         This required to minimize seeks on disk, since ffmpeg sometimes seeks to the left from current file position to fill in some media file structure size
     */
     static const QLatin1String FFMPEG_BUFFER_SIZE( "ffmpegBufferSize" );
-    static const int DEFAULT_FFMPEG_BUFFER_SIZE = 1*1024*1024;
+    static const int DEFAULT_FFMPEG_BUFFER_SIZE = 4*1024*1024;
+
+    static const QLatin1String MAX_FFMPEG_BUFFER_SIZE( "maxFfmpegBufferSize" );
+    static const int DEFAULT_MAX_FFMPEG_BUFFER_SIZE = 4*1024*1024;
 
     static const QLatin1String MEDIA_FILE_DURATION_SECONDS( "mediaFileDuration" );
     static const int DEFAULT_MEDIA_FILE_DURATION_SECONDS = 60;

@@ -1,24 +1,20 @@
-#ifndef QN_WORKBENCH_LICENSE_NOTIFIER_H
-#define QN_WORKBENCH_LICENSE_NOTIFIER_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include "workbench_context_aware.h"
 
-class QnWorkbenchLicenseNotifier: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchLicenseNotifier: public QObject, public QnWorkbenchContextAware
+{
     Q_OBJECT
 public:
-    QnWorkbenchLicenseNotifier(QObject *parent = NULL);
+    QnWorkbenchLicenseNotifier(QObject *parent = nullptr);
     virtual ~QnWorkbenchLicenseNotifier();
 
+private:
     void checkLicenses();
-
-private slots:
-    void at_licensePool_licensesChanged();
     void at_context_userChanged();
 
 private:
     bool m_checked;
 };
-
-#endif // QN_WORKBENCH_LICENSE_NOTIFIER_H

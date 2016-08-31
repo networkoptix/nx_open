@@ -13,6 +13,14 @@
 
 using namespace nx::cdb;
 
+//#define DEBUG_CLOUD_STATUS_WATCHER
+#ifdef DEBUG_CLOUD_STATUS_WATCHER
+#define TRACE(...) qDebug() << "QnCloudStatusWatcher: " << __VA_ARGS__;
+#else
+#define TRACE(...)
+#endif
+
+
 namespace
 {
     const auto kIdTag = lit("id");
@@ -48,11 +56,11 @@ namespace
 
 class QnCloudStatusWatcherPrivate : public QObject
 {
-    QnCloudStatusWatcher *q_ptr;
+    QnCloudStatusWatcher* q_ptr;
     Q_DECLARE_PUBLIC(QnCloudStatusWatcher)
 
 public:
-    QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *parent);
+    QnCloudStatusWatcherPrivate(QnCloudStatusWatcher* parent);
 
     std::string cloudHost;
     int cloudPort;
@@ -67,6 +75,7 @@ public:
         api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
+    std::unique_ptr<api::Connection> temporaryConnection;
 
     QnCloudStatusWatcher::Status status;
     bool loggedIn;
@@ -74,6 +83,7 @@ public:
     QnCloudSystemList cloudSystems;
     QnCloudSystemList recentCloudSystems;
     QnCloudSystem currentSystem;
+    api::TemporaryCredentials temporaryCredentials;
 
 public:
     void updateConnection(bool initial = false);
@@ -84,11 +94,16 @@ private:
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList &newRecentSystems);
     void updateCurrentSystem();
+    void createTemporaryCredentials();
+    void prolongTemporaryCredentials();
+
+private:
+    QTimer* m_pingTimer;
 };
 
-QnCloudStatusWatcher::QnCloudStatusWatcher(QObject *parent)
-    : base_type(parent)
-    , d_ptr(new QnCloudStatusWatcherPrivate(this))
+QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
+    base_type(parent),
+    d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
     const auto correctOfflineState = [this]()
         {
@@ -186,6 +201,18 @@ void QnCloudStatusWatcher::setCloudCredentials(const QString &login, const QStri
     d->updateConnection(initial);
     emit loginChanged();
     emit passwordChanged();
+}
+
+QString QnCloudStatusWatcher::temporaryLogin() const
+{
+    Q_D(const QnCloudStatusWatcher);
+    return QString::fromStdString(d->temporaryCredentials.login);
+}
+
+QString QnCloudStatusWatcher::temporaryPassword() const
+{
+    Q_D(const QnCloudStatusWatcher);
+    return QString::fromStdString(d->temporaryCredentials.password);
 }
 
 QString QnCloudStatusWatcher::cloudEndpoint() const
@@ -288,19 +315,22 @@ QnCloudSystemList QnCloudStatusWatcher::recentCloudSystems() const
     return d->recentCloudSystems;
 }
 
-QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , cloudPort(-1)
-    , cloudLogin()
-    , cloudPassword()
-    , stayConnected(false)
-    , errorCode(QnCloudStatusWatcher::NoError)
-    , updateTimer(new QTimer(this))
-    , connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
-    , status(QnCloudStatusWatcher::LoggedOut)
-    , cloudSystems()
-    , recentCloudSystems(qnClientCoreSettings->recentCloudSystems())
+QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *parent):
+    QObject(parent),
+    q_ptr(parent),
+    cloudPort(-1),
+    cloudLogin(),
+    cloudPassword(),
+    stayConnected(false),
+    errorCode(QnCloudStatusWatcher::NoError),
+    updateTimer(new QTimer(this)),
+    connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
+    status(QnCloudStatusWatcher::LoggedOut),
+    cloudSystems(),
+    recentCloudSystems(qnClientCoreSettings->recentCloudSystems()),
+    currentSystem(),
+    temporaryCredentials(),
+    m_pingTimer(new QTimer(this))
 {
     Q_Q(QnCloudStatusWatcher);
 
@@ -309,6 +339,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     connect(updateTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
+
+    connect(m_pingTimer, &QTimer::timeout, this, &QnCloudStatusWatcherPrivate::prolongTemporaryCredentials);
 }
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
@@ -319,6 +351,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     setStatus(status, QnCloudStatusWatcher::NoError);
 
     cloudConnection.reset();
+    temporaryConnection.reset();
 
     if (cloudLogin.isEmpty() || cloudPassword.isEmpty())
     {
@@ -330,7 +363,9 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         return;
     }
 
-    cloudConnection = connectionFactory->createConnection(cloudLogin.toStdString(), cloudPassword.toStdString());
+    cloudConnection = connectionFactory->createConnection();
+    cloudConnection->setCredentials(cloudLogin.toStdString(), cloudPassword.toStdString());
+    createTemporaryCredentials();
 
     Q_Q(QnCloudStatusWatcher);
     q->updateSystems();
@@ -403,6 +438,82 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
         currentSystem = *it;
         emit q->currentSystemChanged(currentSystem);
     }
+}
+
+void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
+{
+    m_pingTimer->stop();
+    NX_ASSERT(cloudConnection);
+    if (!cloudConnection)
+        return;
+
+    TRACE("Creating temporary credentials");
+    api::TemporaryCredentialsParams params;
+#ifdef DEBUG_CLOUD_STATUS_WATCHER
+    params.timeouts.autoProlongationEnabled = true;
+    params.timeouts.expirationPeriod = std::chrono::seconds(30);
+    params.timeouts.prolongationPeriod = std::chrono::seconds(10);
+#else
+    //TODO: #ak make this constant accessible through API
+    params.type = std::string("short");
+#endif
+    auto callback = [this](api::ResultCode result, api::TemporaryCredentials credentials)
+        {
+            temporaryCredentials = credentials;
+            /* Ping twice as often to make sure temporary credentials will stay alive. */
+            const int keepAliveMs = std::chrono::milliseconds(
+                temporaryCredentials.timeouts.prolongationPeriod).count() / 2;
+            TRACE("Received temporary credentials, prolong after " << keepAliveMs);
+            m_pingTimer->setInterval(keepAliveMs);
+            m_pingTimer->start();
+        };
+    auto targetThread = QThread::currentThread();
+
+    cloudConnection->accountManager()->createTemporaryCredentials(params,
+        [callback, targetThread](api::ResultCode result, api::TemporaryCredentials credentials)
+        {
+            executeDelayed([callback, result, credentials]{ callback(result, credentials); }, 0, targetThread);
+        });
+}
+
+void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
+{
+    TRACE("Prolong temporary credentials");
+    if (temporaryCredentials.login.empty())
+        return;
+
+    if (!temporaryConnection)
+    {
+        TRACE("Creating new temporary connection");
+        temporaryConnection = connectionFactory->createConnection();
+        temporaryConnection->setCredentials(temporaryCredentials.login, temporaryCredentials.password);
+    }
+
+    NX_ASSERT(temporaryConnection);
+    if (!temporaryConnection)
+        return;
+
+    auto callback = [this](api::ResultCode result)
+        {
+            TRACE("Ping result " << QString::fromStdString(api::toString(result)));
+            if (result == api::ResultCode::ok)
+                return;
+
+            if (result == api::ResultCode::notAuthorized)
+            {
+                TRACE("Temporary credentials are invalid, creating new");
+                createTemporaryCredentials();
+            }
+        };
+    auto targetThread = QThread::currentThread();
+
+    TRACE("Ping...");
+    temporaryConnection->ping(
+        [callback, targetThread](api::ResultCode result, api::ModuleInfo info)
+        {
+            Q_UNUSED(info);
+            executeDelayed([callback, result]{ callback(result); }, 0, targetThread);
+        });
 }
 
 bool QnCloudSystem::operator <(const QnCloudSystem &other) const

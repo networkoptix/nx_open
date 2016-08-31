@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rest/server/json_rest_result.h>
+#include <core/resource_management/user_access_data.h>
 
 struct QnPermissionsHelper
 {
@@ -8,7 +9,7 @@ struct QnPermissionsHelper
     static bool isSafeMode();
 
     /** Check if user is system owner. */
-    static bool hasOwnerPermissions(const QnUuid& userId);
+    static bool hasOwnerPermissions(const Qn::UserAccessData& accessRights);
 
     /** Fill result with correct values and return fixed error code. */
     static int safeModeError(QnRestResult& result);
@@ -18,9 +19,6 @@ struct QnPermissionsHelper
 
     /** Fill plain result and contentType with correct values and return fixed error code. */
     static int safeModeError(QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format = Qn::UnsupportedFormat, bool extraFormatting = false);
-
-    /** Check if giver user has enough global access rights. */
-    static bool hasGlobalPermission(const QnUuid& userId, Qn::GlobalPermission required);
 
     /** Fill result with correct values and return fixed error code. */
     static int permissionsError(QnRestResult& result);

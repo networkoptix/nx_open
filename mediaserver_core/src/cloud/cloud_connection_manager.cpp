@@ -5,13 +5,18 @@
 
 #include "cloud_connection_manager.h"
 
-#include <api/global_settings.h>
-#include <common/common_module.h>
 #include <nx/fusion/serialization/lexical.h>
-
 #include <nx/network/socket_global.h>
 
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+
 #include "media_server/settings.h"
+#include "media_server/serverutil.h"
+#include <core/resource/media_server_resource.h>
 
 
 namespace {
@@ -49,6 +54,11 @@ CloudConnectionManager::~CloudConnectionManager()
         stopMonitoringCloudEvents();
 }
 
+void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
+{
+    m_proxyAddress = proxyEndpoint;
+}
+
 boost::optional<nx::hpm::api::SystemCredentials>
     CloudConnectionManager::getSystemCredentials() const
 {
@@ -73,9 +83,21 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     const QString& cloudSystemID,
     const QString& cloudAuthKey) const
 {
-    return m_cdbConnectionFactory->createConnection(
-        cloudSystemID.toStdString(),
-        cloudAuthKey.toStdString());
+    QString proxyLogin;
+    QString proxyPassword;
+
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (server)
+    {
+        proxyLogin = server->getId().toString();
+        proxyPassword = server->getAuthKey();
+    }
+
+    auto result = m_cdbConnectionFactory->createConnection();
+    result->setCredentials(cloudSystemID.toStdString(), cloudAuthKey.toStdString());
+    result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+    result->setProxyVia(m_proxyAddress);
+    return result;
 }
 
 std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection()
@@ -105,8 +127,7 @@ void CloudConnectionManager::processCloudErrorCode(
             .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
 
         //system has been disconnected from cloud: cleaning up cloud credentials...
-        qnGlobalSettings->resetCloudParams();
-        if (!qnGlobalSettings->synchronizeNowSync())
+        if (!cleanupCloudDataInLocalDB())
         {
             NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         }
@@ -128,6 +149,40 @@ void CloudConnectionManager::unsubscribeFromSystemAccessListUpdatedEvent(
     m_systemAccessListUpdatedEventSubscription.removeSubscription(subscriptionId);
 }
 
+bool CloudConnectionManager::cleanupCloudDataInLocalDB()
+{
+    qnGlobalSettings->resetCloudParams();
+    if (!qnGlobalSettings->synchronizeNowSync())
+    {
+        NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
+        return false;
+    }
+
+    // removing cloud users
+    auto usersToRemove = qnResPool->getResources<QnUserResource>().filtered(
+        [](const QnUserResourcePtr& user)
+        {
+            return user->isCloud();
+        });
+    for (const auto& user: usersToRemove)
+    {
+        auto errCode = QnAppServerConnectionFactory::getConnection2()
+            ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
+        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+        if (errCode != ec2::ErrorCode::ok)
+        {
+            NX_LOGX(lit("Error removing cloud user (%1:%2) from local DB: %3")
+                .arg(user->getId().toString()).arg(user->getName()).arg(ec2::toString(errCode)),
+                cl_logWARNING);
+            return false;
+        }
+    }
+
+    qnCommon->updateModuleInformation();
+
+    return true;
+}
+
 bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 {
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
@@ -135,10 +190,20 @@ bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 
 void CloudConnectionManager::monitorForCloudEvents()
 {
-    m_eventConnection =
-        m_cdbConnectionFactory->createEventConnection(
-            m_cloudSystemID.toStdString(),
-            m_cloudAuthKey.toStdString());
+    QString proxyLogin;
+    QString proxyPassword;
+
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (server)
+    {
+        proxyLogin = server->getId().toString();
+        proxyPassword = server->getAuthKey();
+    }
+
+    m_eventConnection = m_cdbConnectionFactory->createEventConnection();
+    m_eventConnection->setCredentials(m_cloudSystemID.toStdString(), m_cloudAuthKey.toStdString());
+    m_eventConnection->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+    m_eventConnection->setProxyVia(m_proxyAddress);
 
     m_eventConnectionRetryTimer = std::make_unique<nx::network::RetryTimer>(
         nx::network::RetryPolicy(

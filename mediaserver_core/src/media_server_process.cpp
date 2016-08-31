@@ -138,6 +138,7 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
+#include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
@@ -232,6 +233,8 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
+#include <nx/network/socket.h>
+#include <rest/helpers/permissions_helper.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -288,12 +291,13 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 
 void addFakeVideowallUser()
 {
-	ec2::ApiUserData fakeUserData;
+    ec2::ApiUserData fakeUserData;
     fakeUserData.permissions = Qn::GlobalVideoWallModePermissionSet;
-	fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
-	auto fakeUser = ec2::fromApiToResource(fakeUserData);
-	fakeUser->setId(Qn::kVideowallUserAccess.userId);
-	qnResPool->addResource(fakeUser);
+    fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
+    auto fakeUser = ec2::fromApiToResource(fakeUserData);
+    fakeUser->setId(Qn::kVideowallUserAccess.userId);
+    fakeUser->setName(lit("Video wall"));
+    qnResPool->addResource(fakeUser);
 }
 
 }
@@ -687,13 +691,14 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
 void setServerNameAndUrls(
     QnMediaServerResourcePtr server,
-    const QString& myAddress, int port, bool isSslAllowed)
+    const SocketAddress& address,
+    bool sslAllowed)
 {
     if (server->getName().isEmpty())
         server->setName(QString("Server ") + getMacFromPrimaryIF());
 
-    const auto apiSheme = isSslAllowed ? QString("https") : QString("https");
-    server->setUrl(QString("rtsp://%1:%2").arg(myAddress).arg(port));
+    server->setSslAllowed(sslAllowed);
+    server->setPrimaryAddress(address);
 }
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
@@ -902,9 +907,7 @@ void initAppServerConnection(QSettings &settings)
     appServerUrl.setPassword(password);
     appServerUrl.setQuery(params);
 
-    QUrl urlNoPassword(appServerUrl);
-    urlNoPassword.setPassword("");
-    NX_LOG(lit("Connect to server %1").arg(urlNoPassword.toString()), cl_logINFO);
+    NX_LOG(lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)), cl_logINFO);
     QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
@@ -1073,9 +1076,7 @@ void MediaServerProcess::updateAddressesList()
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
-        setServerNameAndUrls(
-            m_mediaServer, newAddress.address.toString(), newAddress.port,
-            qnCommon->moduleInformation().sslAllowed);
+        setServerNameAndUrls(m_mediaServer, newAddress, qnCommon->moduleInformation().sslAllowed);
     }
 
     ec2::ApiMediaServerData server;
@@ -1516,7 +1517,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 
 
 bool MediaServerProcess::initTcpListener(
-    const CloudConnectionManager& cloudConnectionManager)
+    CloudConnectionManager* const cloudConnectionManager)
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
@@ -1568,10 +1569,10 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/restoreState", new QnRestoreStateRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), Qn::GlobalAdminPermission);
-    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudConnectionManager), Qn::GlobalAdminPermission);
+    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(*cloudConnectionManager), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), Qn::GlobalAdminPermission);
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
@@ -1586,6 +1587,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
     QnRestProcessorPool::instance()->registerHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
     QnRestProcessorPool::instance()->registerHandler("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("ec2/updateInformation", new QnUpdateInformationRestHandler());
 
     //TODO: #rvasilenko this url is used in 3 different places. Where can we store it? Static member of QnThumbnailRequestData? New common module?
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
@@ -1594,7 +1596,7 @@ bool MediaServerProcess::initTcpListener(
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
-    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudConnectionManager));
+    QnRestProcessorPool::instance()->registerHandler("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(*cloudConnectionManager));
 
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
@@ -1604,7 +1606,7 @@ bool MediaServerProcess::initTcpListener(
 #endif
 
     m_universalTcpListener = new QnUniversalTcpListener(
-        cloudConnectionManager,
+        *cloudConnectionManager,
         QHostAddress::Any,
         rtspPort,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
@@ -2045,6 +2047,13 @@ void MediaServerProcess::run()
         return;
     }
 
+    if (connectInfo.cloudHost != QnAppInfo::defaultCloudHost())
+    {
+        NX_LOG(lit("Incompatible Server version detected (cloud host name &1)! Giving up.")
+            .arg(connectInfo.cloudHost), cl_logERROR);
+        return;
+    }
+
     while (!needToStop() && !initResourceTypes(ec2Connection))
     {
         QnSleep::msleep(1000);
@@ -2067,7 +2076,7 @@ void MediaServerProcess::run()
         new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(cloudConnectionManager))
+    if (!initTcpListener(&cloudConnectionManager))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2115,9 +2124,12 @@ void MediaServerProcess::run()
             isModified = true;
 
         setServerNameAndUrls(
-            server, defaultLocalAddress(appserverHost),
-            m_universalTcpListener->getPort(),
+            server,
+            SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
             qnCommon->moduleInformation().sslAllowed);
+        cloudConnectionManager.setProxyVia(
+            SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+
 
         QList<SocketAddress> serverAddresses;
         const auto port = server->getPort();
@@ -2252,6 +2264,9 @@ void MediaServerProcess::run()
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
 
+    // show our cloud host value in registry in case of installer will check it
+    MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
+
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
         QSet<QnUuid> allowedPeers;
@@ -2308,7 +2323,8 @@ void MediaServerProcess::run()
 	addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
-    if (isNewServerInstance || systemName.isDefault())
+    if (!QnPermissionsHelper::isSafeMode() &&
+        (isNewServerInstance || systemName.isDefault()))
     {
         /* In case of error it will be instantly cleaned by the watcher. */
         qnGlobalSettings->resetCloudParams();
@@ -2821,6 +2837,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     QString engineVersion;
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
+    QString ipVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
@@ -2853,6 +2870,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("Enforces stream socket type (TCP, UDT)"), QString());
     commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
         lit("Enforces mediator address"), QString());
+    commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
+        lit("Force ip version"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
@@ -2888,6 +2907,10 @@ int MediaServerProcess::main(int argc, char* argv[])
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
+    if( ipVersion.isEmpty() )
+        ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
+
+    SocketFactory::setIpVersion( ipVersion );
     QnVideoService service( argc, argv );
 
     if (!engineVersion.isEmpty()) {

@@ -8,11 +8,13 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QSettings>
+#include <QtCore/QFileInfo>
 
 #include <utils/common/app_info.h>
-
+#include <media_server/media_server_app_info.h>
 
 #ifndef _WIN32
+static QString templateConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf.template").arg(QnAppInfo::linuxOrganizationName());
 static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(QnAppInfo::linuxOrganizationName());
 static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(QnAppInfo::linuxOrganizationName());
 #endif
@@ -41,11 +43,25 @@ QSettings* MSSettings::roSettings()
     std::call_once(
         roSettings_onceFlag,
         [](){
+#ifndef _WIN32
+            QFileInfo defaultFileInfo(defaultConfigFileName);
+            if (!defaultFileInfo.exists())
+            {
+                QFileInfo templateInfo(templateConfigFileName);
+                if (templateInfo.exists())
+                {
+                    QFile file(templateConfigFileName);
+                    file.rename(defaultConfigFileName);
+                }
+            }
+#endif
             roSettingsInstance.reset( new QSettings(
 #ifndef _WIN32
                 defaultConfigFileName, QSettings::IniFormat
 #else
-                QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
+                QSettings::SystemScope,
+                QnAppInfo::organizationName(),
+                QnServerAppInfo::applicationName()
 #endif
             ) );
         } );

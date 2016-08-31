@@ -141,10 +141,10 @@ public:
     */
     void resolveAsync(
         const HostAddress& hostName, ResolveHandler handler,
-        bool natTraversal = true, void* requestId = nullptr);
+        bool natTraversal, int ipVersion, void* requestId = nullptr);
 
     std::vector<AddressEntry> resolveSync(
-        const HostAddress& hostName, bool natTraversal);
+        const HostAddress& hostName, bool natTraversal, int ipVersion);
 
     //!Cancels request
     /*!
@@ -168,6 +168,8 @@ public:
      *      DNS is involved only if pattern does not match.
      */
     static const bool kResolveOnMediator = false;
+
+    DnsResolver& dnsResolver() { return m_dnsResolver; }
 
 protected:
     struct NX_NETWORK_API HostAddressInfo
@@ -220,13 +222,13 @@ protected:
     void tryFastDomainResolve(HaInfoIterator info);
 
     void dnsResolve(
-        HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator);
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion);
 
     void mediatorResolve(
-        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
 
     void mediatorResolveImpl(
-        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
 
     std::vector<Guard> grabHandlers(
         SystemError::ErrorCode lastErrorCode, HaInfoIterator info);

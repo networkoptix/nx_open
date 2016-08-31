@@ -15,18 +15,23 @@
 
 #include <ui/workbench/workbench_access_controller.h>
 
-QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject *parent /*= nullptr*/):
+QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
-    , m_cameraSettingsDialog()
-    , m_serverSettingsDialog()
-    , m_userSettingsDialog()
+    QnWorkbenchContextAware(parent),
+    m_cameraSettingsDialog(),
+    m_serverSettingsDialog(),
+    m_userSettingsDialog()
 {
-    connect(action(QnActions::CameraSettingsAction), &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
-    connect(action(QnActions::ServerSettingsAction), &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
-    connect(action(QnActions::NewUserAction),        &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered);
-    connect(action(QnActions::UserSettingsAction),   &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
-    connect(action(QnActions::UserGroupsAction),     &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered);
+    connect(action(QnActions::CameraSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
+    connect(action(QnActions::ServerSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
+    connect(action(QnActions::NewUserAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered);
+    connect(action(QnActions::UserSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
+    connect(action(QnActions::UserRolesAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered);
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
@@ -75,7 +80,6 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
     QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
-    user->setId(QnUuid::createUuid());
     user->addFlags(Qn::local);
 
     QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog, mainWindow());
@@ -105,7 +109,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnUuid groupId = parameters.argument(Qn::ResourceUidRole).value<QnUuid>();
+    QnUuid groupId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
     QScopedPointer<QnUserGroupsDialog> groupsDialog(new QnUserGroupsDialog(mainWindow()));
     if (!groupId.isNull())

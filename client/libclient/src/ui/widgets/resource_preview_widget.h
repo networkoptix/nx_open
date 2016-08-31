@@ -2,12 +2,15 @@
 
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
+
 #include <utils/common/connective.h>
 
 class QLabel;
 class QStackedWidget;
 class QnBusyIndicatorWidget;
 class QnCameraThumbnailManager;
+class QnBusyIndicatorWidget;
 
 class QnResourcePreviewWidget : public Connective<QWidget>
 {
@@ -18,11 +21,13 @@ public:
     explicit QnResourcePreviewWidget(QWidget* parent = nullptr);
     virtual ~QnResourcePreviewWidget();
 
-    QnUuid targetResource() const;
-    void setTargetResource(const QnUuid& target);
+    const QnResourcePtr& targetResource() const;
+    void setTargetResource(const QnResourcePtr& target);
 
     QSize thumbnailSize() const;
     void setThumbnailSize(const QSize& size);
+
+    QnBusyIndicatorWidget* busyIndicator() const;
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -36,12 +41,13 @@ private:
 
 private:
     QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
-    QnUuid m_target;
+    QnResourcePtr m_target;
     mutable QSize m_cachedSizeHint;
     QSize m_resolutionHint;
+    qreal m_aspectRatio;
     QLabel* m_preview;
     QLabel* m_placeholder;
-    QWidget* m_indicator;
+    QnBusyIndicatorWidget* m_indicator;
     QStackedWidget* m_pages;
     int m_status;
 };

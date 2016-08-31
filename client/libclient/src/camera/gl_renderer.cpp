@@ -246,7 +246,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 
         QnMutexLocker lock( &m_mutex );
 
-        if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence())
+        if( (int64_t)picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence())
         {
             if (m_timeChangeEnabled) {
                 m_lastDisplayedTime = picLock->pts();

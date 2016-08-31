@@ -50,6 +50,8 @@ public:
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnUserWatcher* userWatcher() const;
 
+    Q_INVOKABLE void quitApplication();
+
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen();
 

@@ -5,9 +5,17 @@ namespace ec2
 {
 QnMutex detail::ServerQueryProcessor::m_updateDataMutex;
 
+void detail::ServerQueryProcessor::setAuditData(
+    ECConnectionAuditManager* auditManager,
+    const QnAuthSession& authSession)
+{
+    m_auditManager = auditManager;
+    m_authSession = authSession;
+}
+
 ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
-    const QnUuid& id, 
-    ApiCommand::Value command, 
+    const QnUuid& id,
+    ApiCommand::Value command,
     const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend)
 {
@@ -16,13 +24,11 @@ ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
     if (errorCode != ErrorCode::ok)
         return errorCode;
 
-    connection
-        ->notificationManager()
-        ->triggerNotification(removeObjAttrTran);
+    triggerNotification(connection, removeObjAttrTran);
 
     return ErrorCode::ok;
 }
-        
+
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     const QnTransaction<ApiIdData>& tran,
     const AbstractECConnectionPtr& connection,
@@ -34,7 +40,6 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     ErrorCode errorCode = processMultiUpdateSync(
         ApiCommand::removeResourceParam,
         tran.isLocal,
-        tran.deliveryInfo,
         resourceParams,
         transactionsToSend);
 
@@ -46,11 +51,22 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
         QnTransaction<ApiResourceParamWithRefData> removeParamTran(
             ApiCommand::Value::removeResourceParam,
             param);
-        connection
-            ->notificationManager()
-            ->triggerNotification(removeParamTran);
+        triggerNotification(connection, removeParamTran);
     }
 
     return errorCode;
+}
+
+ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
+    const QnUuid& id,
+    const AbstractECConnectionPtr& connection,
+    std::list<std::function<void()>>* const transactionsToSend)
+{
+    QnTransaction<ApiIdData> removeObjAccessRightsTran(ApiCommand::removeAccessRights, ApiIdData(id));
+    ErrorCode errorCode = processUpdateSync(removeObjAccessRightsTran, transactionsToSend, 0);
+    if (errorCode != ErrorCode::ok)
+        return errorCode;
+
+    return ErrorCode::ok;
 }
 } //namespace ec2

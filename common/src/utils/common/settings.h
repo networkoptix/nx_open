@@ -27,7 +27,7 @@ public:
         const QString& fileName,
         QSettings::Format format);
 
-    void parseArgs(int argc, char **argv);
+    void parseArgs(int argc, const char* argv[]);
     QVariant value(
         const QString& key,
         const QVariant& defaultValue = QVariant()) const;

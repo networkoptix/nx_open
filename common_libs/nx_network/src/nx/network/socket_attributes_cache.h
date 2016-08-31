@@ -196,6 +196,16 @@ public:
 
         return m_delegate->getAioThread();
     }
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        NX_CRITICAL(m_delegate, "Not supported");
+        return m_delegate->post(std::move(handler));
+    }
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        NX_CRITICAL(m_delegate, "Not supported");
+        return m_delegate->dispatch(std::move(handler));
+    }
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
         if (!m_delegate)
@@ -337,6 +347,13 @@ public:
             &AbstractStreamSocket::getKeepAlive,
             decltype(this->m_socketAttributes.keepAlive)(),
             val);
+    }
+    virtual void registerTimer(
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        NX_CRITICAL(this->m_delegate, "Not supported");
+        return this->m_delegate->registerTimer(timeoutMs, std::move(handler));
     }
 };
 

@@ -74,10 +74,12 @@ Pane
         visible: connectionsModel.hasConnections && !cloudSystem
         onClicked:
         {
-            Workflow.openSavedSession(systemName,
-                                      informationBlock.address,
-                                      informationBlock.user,
-                                      connectionsModel.getData("password", 0))
+            Workflow.openSavedSession(
+                systemId,
+                systemName,
+                informationBlock.address,
+                informationBlock.user,
+                connectionsModel.getData("password", 0))
         }
     }
 
@@ -110,7 +112,7 @@ Pane
             }
             else
             {
-                Workflow.openDiscoveredSession(systemName, informationBlock.address)
+                Workflow.openDiscoveredSession(systemId, systemName, informationBlock.address)
             }
         }
     }

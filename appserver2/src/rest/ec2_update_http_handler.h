@@ -46,27 +46,24 @@ public:
     }
 
     virtual int executeGet(
-        const QString& path,
-        const QnRequestParamList& params,
-        QByteArray& result,
-        QByteArray& contentType,
-        const QnRestConnectionProcessor* owner) override
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        QByteArray& /*result*/,
+        QByteArray& /*contentType*/,
+        const QnRestConnectionProcessor* /*owner*/) override
     {
-        QN_UNUSED(path, params, result, contentType, owner);
         return nx_http::StatusCode::badRequest;
     }
 
     virtual int executePost(
         const QString& path,
-        const QnRequestParamList& params,
+        const QnRequestParamList& /*params*/,
         const QByteArray& body,
         const QByteArray& srcBodyContentType,
         QByteArray& resultBody,
         QByteArray& contentType,
         const QnRestConnectionProcessor* owner) override
     {
-        QN_UNUSED(params);
-
         const QByteArray srcFormat = srcBodyContentType.split(';')[0];
 
         const Qn::SerializationFormat format =
@@ -172,7 +169,17 @@ private:
                 return httpStatusCode;
         }
 
-        assignCommandFromLastPathItem(&tran->command, path);
+        QString commandStr = assignCommandFromLastPathItem(&tran->command, path);
+        if (tran->command == ApiCommand::NotDefined)
+        {
+            QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::InvalidParameter,
+                lit("Unknown API command %1").arg(commandStr));
+            return nx_http::StatusCode::ok;
+        }
+    
+        // TODO: Temporary fix. Revert this check after merge with x_VMS-3408_cloud_sync.
+        if (tran->command == ApiCommand::restoreDatabase)
+            tran->isLocal = true;
 
         *outSuccess = true;
         return nx_http::StatusCode::ok;
@@ -257,13 +264,18 @@ private:
         return nx_http::StatusCode::ok;
     }
 
-    void assignCommandFromLastPathItem(ApiCommand::Value* outCommand, const QString& path)
+    QString assignCommandFromLastPathItem(ApiCommand::Value* outCommand, const QString& path)
     {
         QStringList tmp = path.split('/');
         while (!tmp.isEmpty() && tmp.last().isEmpty())
             tmp.pop_back();
+        QString commandStr;
         if (!tmp.isEmpty())
-            *outCommand = ApiCommand::fromString(tmp.last());
+        {
+            commandStr = tmp.last();
+            *outCommand = ApiCommand::fromString(commandStr);
+        }
+        return commandStr;    
     }
 
     template<typename T = RequestData>
@@ -324,8 +336,9 @@ private:
                 m_cond.wakeAll();
             };
 
-        m_connection->queryProcessor()->getAccess(Qn::UserAccessData(owner->authUserId()))
-            .processUpdateAsync(tran, queryDoneHandler);
+        auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
+        processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail
+        processor.processUpdateAsync(tran, queryDoneHandler);
 
         {
             QnMutexLocker lk(&m_mutex);
@@ -335,16 +348,6 @@ private:
 
         if (m_customAction)
             m_customAction(tran);
-
-        // Update local data.
-        if (errorCode == ErrorCode::ok)
-        {
-            // Add audit record before notification to ensure removed resource is still alive.
-            m_connection->auditManager()->addAuditRecord(
-                tran.command,
-                tran.params,
-                owner->authSession());
-        }
 
         return errorCode;
     }

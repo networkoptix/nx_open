@@ -6,11 +6,13 @@
 #include <QtQml/QQmlContext>
 
 #include <common/common_module.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 
 #include <watchers/cloud_status_watcher.h>
-
 #include <utils/common/delayed.h>
-#include <nx/utils/raii_guard.h>
+#include <utils/common/app_info.h>
+#include <utils/connection_diagnostics_helper.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
@@ -22,6 +24,7 @@
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
+#include <ui/workbench/workbench_resource.h>
 
 namespace
 {
@@ -75,6 +78,14 @@ namespace
         NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
         return (style ? style->genericPalette() : QnGenericPalette());
     }
+
+
+    QnResourceList extractResources(const UrlsList& urls)
+    {
+        QMimeData data;
+        data.setUrls(urls);
+        return QnWorkbenchResource::deserializeResources(&data);
+    }
 }
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
@@ -100,7 +111,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
 
     //
     m_widget->installEventFilter(this);
-
+    qApp->installEventFilter(this); //< QTBUG-34414 workaround
     connect(action(QnActions::DisconnectAction), &QAction::triggered,
         this, &QnWorkbenchWelcomeScreen::showScreen);
 
@@ -215,6 +226,30 @@ void QnWorkbenchWelcomeScreen::setGlobalPreloaderVisible(bool value)
     emit globalPreloaderVisibleChanged();
 }
 
+QString QnWorkbenchWelcomeScreen::softwareVersion() const
+{
+    return QnAppInfo::applicationVersion();
+}
+
+QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
+{
+    return QnConnectionValidator::minSupportedVersion().toString();
+}
+
+bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
+{
+    return !extractResources(urls).isEmpty();
+}
+
+void QnWorkbenchWelcomeScreen::makeDrop(const UrlsList& urls)
+{
+    const auto resources = extractResources(urls);
+    if (resources.isEmpty())
+        return;
+
+    menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources));
+}
+
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     const QString& systemId,
     const QString& serverUrl,
@@ -223,21 +258,32 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     bool storePassword,
     bool autoLogin)
 {
+    connectToLocalSystemImpl(systemId, QUrl::fromUserInput(serverUrl), userName, password, storePassword, autoLogin);
+}
+
+void QnWorkbenchWelcomeScreen::connectToLocalSystemImpl(
+    const QString& systemId,
+    const QUrl& serverUrl,
+    const QString& userName,
+    const QString& password,
+    bool storePassword,
+    bool autoLogin,
+    const QnRaiiGuardPtr& completionTracker)
+{
     if (!connectingToSystem().isEmpty())
         return; //< Connection process is in progress
 
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, serverUrl, userName, password, storePassword, autoLogin, systemId]()
+        [this, serverUrl, userName, password, storePassword, autoLogin, systemId, completionTracker]()
         {
             setConnectingToSystem(systemId);
 
             const auto completionGuard = QnRaiiGuard::createDestructable(
                 [this]() { setConnectingToSystem(QString()); });
 
-            QUrl url = QUrl::fromUserInput(serverUrl);
-            url.setScheme(lit("http"));
+            QUrl url = serverUrl;
             if (!password.isEmpty())
                 url.setPassword(password);
             if (!userName.isEmpty())
@@ -280,33 +326,33 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
         [this]() { setVisibleControls(true); });
 
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
-    {
-        /* We are receiving string with port but without protocol, so we must parse it. */
-        const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
-
-        QUrl targetUrl = QUrl::fromUserInput(serverUrl);
-        targetUrl.setScheme(lit("http"));
-        dialog->setUrl(targetUrl);
-        if (isLoggedInToCloud())
         {
-            dialog->setCloudLogin(qnCloudStatusWatcher->cloudLogin());
-            dialog->setCloudPassword(qnCloudStatusWatcher->cloudPassword());
-        }
+            /* We are receiving string with port but without protocol, so we must parse it. */
+            const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
 
-        if (dialog->exec() != QDialog::Accepted)
-            return;
+            dialog->setUrl(QUrl::fromUserInput(serverUrl));
+            if (isLoggedInToCloud())
+            {
+                dialog->setCloudLogin(qnCloudStatusWatcher->cloudLogin());
+                dialog->setCloudPassword(qnCloudStatusWatcher->cloudPassword());
+            }
 
-        if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
-        {
-            connectToLocalSystem(QString(), serverUrl, dialog->localLogin(), dialog->localPassword(), false, false);
-        }
-        else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
-        {
-            qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
-            connectToLocalSystem(QString(), serverUrl, dialog->cloudLogin(), dialog->cloudPassword(), false, false);
-        }
+            if (dialog->exec() != QDialog::Accepted)
+                return;
 
-    };
+            if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
+            {
+                connectToLocalSystemImpl(QString(), serverUrl, dialog->localLogin(),
+                    dialog->localPassword(), false, false, controlsGuard);
+            }
+            else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
+            {
+                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
+                connectToLocalSystemImpl(QString(), serverUrl, dialog->cloudLogin(),
+                    dialog->cloudPassword(), false, false, controlsGuard);
+            }
+
+        };
 
     // Use delayed handling for proper animation
     enum { kNextEventDelay = 100 };
@@ -365,14 +411,23 @@ void QnWorkbenchWelcomeScreen::showScreen()
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
 {
+    if (obj != m_widget)
+        return base_type::eventFilter(obj, event);
+
     switch(event->type())
     {
-    case QEvent::Resize:
-        if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
-            setPageSize(resizeEvent->size());
-        break;
+        case QEvent::Resize:
+            if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
+                setPageSize(resizeEvent->size());
+            break;
+#if defined(Q_OS_MACX)
+        case QEvent::WindowActivate:
+            m_widget->activateWindow(); //< QTBUG-34414 workaround
+            break;
+#endif
+        default:
+            break;
     }
-
 
     return base_type::eventFilter(obj, event);
 }

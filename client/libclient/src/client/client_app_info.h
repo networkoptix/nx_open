@@ -27,4 +27,9 @@ struct QnClientAppInfo
     static QString macOsBundleName();
 
     static QString launcherVersionFile();
+
+    /** bin directory location relative to client package root. */
+    static QString binDirSuffix();
+    /** lib directory location relative to client package root. */
+    static QString libDirSuffix();
 };

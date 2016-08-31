@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_NAVIGATOR_H
-#define QN_WORKBENCH_NAVIGATOR_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
@@ -32,8 +31,9 @@ class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveStreamReader;
 class QnThumbnailsLoader;
-class QnCameraDataManager;
 class QnCachingCameraDataLoader;
+typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
+class QnCameraDataManager;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
@@ -43,14 +43,16 @@ class QnThreadedChunksMergeTool;
 class QnPendingOperation;
 class VariantAnimator;
 
-class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
+class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider
+{
     Q_OBJECT;
 
     typedef Connective<QObject> base_type;
 
     Q_PROPERTY(bool hasArchive READ hasArchive NOTIFY hasArchiveChanged)
 public:
-    enum WidgetFlag {
+    enum WidgetFlag
+    {
         WidgetUsesUTC = 0x1,
         WidgetSupportsLive = 0x2,
         WidgetSupportsPeriods = 0x4,
@@ -129,7 +131,8 @@ signals:
     void bookmarksModeEnabledChanged();
 
 protected:
-    enum SliderLine {
+    enum SliderLine
+    {
         CurrentLine,
         SyncedLine,
         SliderLineCount
@@ -150,7 +153,7 @@ protected:
     QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
 
-protected slots:
+    protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader(bool keepInWindow = true);
@@ -187,7 +190,7 @@ protected slots:
 
     void setAutoPaused(bool autoPaused);
 
-protected slots:
+    protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
@@ -218,7 +221,7 @@ protected slots:
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
-    QnCachingCameraDataLoader* loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
+    QnCachingCameraDataLoaderPtr loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
@@ -308,5 +311,3 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);
-
-#endif // QN_WORKBENCH_NAVIGATOR_H

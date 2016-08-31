@@ -30,7 +30,7 @@ void QnMdnsPacket::toDatagram(QByteArray& datagram)
 bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 {
     const auto bufferStart = message.constData();
-    const auto bufferSize = message.size();
+    const auto bufferSize = (size_t)message.size();
 
     const size_t kHeaderLength =
         sizeof(decltype(transactionId)) +
@@ -92,7 +92,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
         authorityRRCount +
         additionalRRCount;
 
-    for (int i = 0; i < recordCount; i++)
+    for (size_t i = 0; i < recordCount; i++)
     {
         ResourceRecord record;
 
@@ -188,7 +188,7 @@ void QnMdnsPacket::parseNameInternal(
 
         nameStart++;
 
-        if (nameOffset + nameSize > bufferSize)
+        if (nameOffset + nameSize > (int)bufferSize)
         {
             nameSize = -1;
             return;

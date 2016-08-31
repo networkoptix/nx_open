@@ -52,6 +52,12 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
+// Player will go invalid state if no data during timeout
+static const int kGotDataTimeoutMs = 1000 * 10;
+
+// Periodic tasks timer interval
+static const int kPeriodicTasksTimeoutMs = 1000;
+
 struct NxMediaFlagConfig: public nx::utils::FlagConfig
 {
     using nx::utils::FlagConfig::FlagConfig;
@@ -92,6 +98,9 @@ public:
 
     // Either media is on live or archive position. Holds QT property value.
     bool liveMode;
+
+    // Video aspect ratio
+    double aspectRatio;
 
     // Auto reconnect if network error
     bool reconnectOnPlay;
@@ -134,6 +143,9 @@ public:
     // Timer for delayed call to presentNextFrame().
     QTimer* execTimer;
 
+    // Timer for miscs periodic tasks
+    QTimer* miscTimer;
+
     // Last seek position. UTC time in msec.
     qint64 lastSeekTimeMs;
 
@@ -165,6 +177,9 @@ public:
     // Protects access to videoGeometry.
     mutable QMutex videoGeometryMutex;
 
+    // Interval since last time player got some data
+    QElapsedTimer gotDataTimer;
+
     void applyVideoQuality();
 
 private:
@@ -183,6 +198,7 @@ private:
     void setState(Player::State state);
     void setMediaStatus(Player::MediaStatus status);
     void setLiveMode(bool value);
+    void setAspectRatio(double value);
     void setPosition(qint64 value);
 
     void resetLiveBufferState();
@@ -197,6 +213,10 @@ private:
 
     void doApplyVideoQuality(const QnVirtualCameraResourcePtr& camera,
         QSize highResolution, AVCodecID highCodec, QSize lowResolution, AVCodecID lowCodec);
+
+    void doPeriodicTasks();
+
+    void log(const QString& message) const;
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -205,12 +225,14 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
     liveMode(true),
+    aspectRatio(1.0),
     reconnectOnPlay(false),
     positionMs(0),
     videoSurface(0),
     maxTextureSize(kDefaultMaxTextureSize),
     ptsTimerBaseMs(0),
     execTimer(new QTimer(this)),
+    miscTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
@@ -220,6 +242,9 @@ PlayerPrivate::PlayerPrivate(Player *parent):
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
+
+    connect(miscTimer, &QTimer::timeout, this, &PlayerPrivate::doPeriodicTasks);
+    miscTimer->start(kPeriodicTasksTimeoutMs);
 }
 
 void PlayerPrivate::setState(Player::State state)
@@ -227,10 +252,21 @@ void PlayerPrivate::setState(Player::State state)
     if (state == this->state)
         return;
 
+    gotDataTimer.restart();
     this->state = state;
 
     Q_Q(Player);
     emit q->playbackStateChanged();
+}
+
+void PlayerPrivate::doPeriodicTasks()
+{
+    Q_Q(Player);
+    if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
+    {
+        setMediaStatus(Player::MediaStatus::NoMedia);
+        q->stop();
+    }
 }
 
 void PlayerPrivate::setMediaStatus(Player::MediaStatus status)
@@ -252,6 +288,16 @@ void PlayerPrivate::setLiveMode(bool value)
     liveMode = value;
     Q_Q(Player);
     emit q->liveModeChanged();
+}
+
+void PlayerPrivate::setAspectRatio(double value)
+{
+    if (qFuzzyCompare(aspectRatio, value))
+        return;
+
+    aspectRatio = value;
+    Q_Q(Player);
+    emit q->aspectRatioChanged();
 }
 
 void PlayerPrivate::setPosition(qint64 value)
@@ -366,6 +412,7 @@ void PlayerPrivate::presentNextFrame()
         return;
 
     setMediaStatus(Player::MediaStatus::Loaded);
+    gotDataTimer.restart();
 
     // Update video surface's pixel format if needed.
     if (videoSurface)
@@ -386,18 +433,21 @@ void PlayerPrivate::presentNextFrame()
         }
     }
 
-    if (videoSurface && videoSurface->isActive())
+    auto metadata = FrameMetadata::deserialize(videoFrameToRender);
+    bool isLivePacket = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
+    bool isPacketOK = (isLivePacket == liveMode);
+
+    if (videoSurface && videoSurface->isActive() && isPacketOK)
     {
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
-            dataConsumer->setDisplayedTimeUs(videoFrameToRender->startTime() * 1000);
+        {
+            qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
+            dataConsumer->setDisplayedTimeUs(timeUs);
+        }
+        setPosition(videoFrameToRender->startTime());
+        setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
     }
-
-    setPosition(videoFrameToRender->startTime());
-
-    auto metadata = FrameMetadata::deserialize(videoFrameToRender);
-    setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
-
     videoFrameToRender.reset();
 
     // Calculate next time to render.
@@ -711,21 +761,13 @@ bool PlayerPrivate::createArchiveReader()
     if (!resource)
         return false;
 
-#ifdef ENABLE_ARCHIVE
     archiveReader.reset(new QnArchiveStreamReader(resource));
-#endif
 
     QnAbstractArchiveDelegate* archiveDelegate;
     if (isLocalFile)
-    {
-#ifdef ENABLE_ARCHIVE
         archiveDelegate = new QnAviArchiveDelegate();
-#endif
-    }
     else
-    {
         archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
-    }
 
     archiveReader->setArchiveDelegate(archiveDelegate);
     return true;
@@ -791,7 +833,7 @@ bool PlayerPrivate::isTranscodingSupported(const QnVirtualCameraResourcePtr& cam
     if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
         return false;
 
-    QnMediaServerResourcePtr server = liveMode 
+    QnMediaServerResourcePtr server = liveMode
         ? camera->getParentServer()
         : qnCameraHistoryPool->getMediaServerOnTime(camera, positionMs);
 
@@ -801,20 +843,31 @@ bool PlayerPrivate::isTranscodingSupported(const QnVirtualCameraResourcePtr& cam
     return server->getServerFlags() & Qn::SF_SupportsTranscoding;
 }
 
+void PlayerPrivate::log(const QString& message) const
+{
+    NX_LOG(lit("[media_player @%1] %2")
+        .arg(reinterpret_cast<uintptr_t>(this), 8, 16, QLatin1Char('0'))
+        .arg(message), cl_logDEBUG1);
+}
+
 //-------------------------------------------------------------------------------------------------
 // Player
 
-Player::Player(QObject *parent)
-:
+Player::Player(QObject *parent):
     QObject(parent),
     d_ptr(new PlayerPrivate(this))
 {
+    Q_D(const Player);
+    d->log(lit("Player()"));
     conf.reload();
 }
 
 Player::~Player()
 {
+    Q_D(const Player);
+    d->log(lit("~Player() BEGIN"));
     stop();
+    d->log(lit("~Player() END"));
 }
 
 Player::State Player::playbackState() const
@@ -850,6 +903,8 @@ qint64 Player::position() const
 void Player::setPosition(qint64 value)
 {
     Q_D(Player);
+    d->log(lit("setPosition(%1)").arg(value));
+
     d->lastSeekTimeMs = value;
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
@@ -876,6 +931,7 @@ void Player::setMaxTextureSize(int value)
 void Player::play()
 {
     Q_D(Player);
+    d->log(lit("play()"));
 
     if (d->state == State::Playing)
         return;
@@ -893,18 +949,26 @@ void Player::play()
 void Player::pause()
 {
     Q_D(Player);
+    d->log(lit("pause()"));
     d->setState(State::Paused);
 }
 
 void Player::stop()
 {
     Q_D(Player);
+    d->log(lit("stop()"));
 
     if (d->archiveReader && d->dataConsumer)
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
 
+    if (d->dataConsumer)
+	    d->dataConsumer->pleaseStop();
+    if (d->archiveReader)
+	    d->archiveReader->pleaseStop();
+
     d->dataConsumer.reset();
     d->archiveReader.reset();
+    d->videoFrameToRender.reset();
     d->setState(State::Stopped);
 }
 
@@ -914,27 +978,35 @@ void Player::setSource(const QUrl& url)
 
     const QUrl& newUrl = *conf.substitutePlayerUrl ? QUrl(conf.substitutePlayerUrl) : url;
 
-    if (newUrl != d->url)
+    if (newUrl == d->url)
     {
-        stop();
-        d->url = newUrl;
-
-        const QString path(d->url.path().mid(1));
-        d->isLocalFile = d->url.scheme() == lit("file");
-        if (d->isLocalFile)
-        {
-#ifdef ENABLE_ARCHIVE
-            d->resource.reset(new QnAviResource(path));
-            d->resource->setStatus(Qn::Online);
-#else
-            d->resource.reset();
-#endif
-        }
-        else
-        {
-            d->resource = qnResPool->getResourceById(QnUuid(path));
-        }
+        d->log(lit("setSource(\"%1\"): no change, ignoring").arg(newUrl.toString()));
+        return;
     }
+
+    d->log(lit("setSource(\"%1\") BEGIN").arg(newUrl.toString()));
+
+    const State currentState = d->state;
+
+    stop();
+    d->url = newUrl;
+
+    const QString path(d->url.path().mid(1));
+    d->isLocalFile = d->url.scheme() == lit("file");
+    if (d->isLocalFile)
+    {
+        d->resource.reset(new QnAviResource(path));
+        d->resource->setStatus(Qn::Online);
+    }
+    else
+    {
+        d->resource = qnResPool->getResourceById(QnUuid(path));
+    }
+
+    if (d->resource && currentState == State::Playing)
+        play();
+
+    d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));
 }
 
 void Player::setVideoSurface(QAbstractVideoSurface* videoSurface)
@@ -953,6 +1025,12 @@ bool Player::liveMode() const
 {
     Q_D(const Player);
     return d->liveMode;
+}
+
+double Player::aspectRatio() const
+{
+    Q_D(const Player);
+    return d->aspectRatio;
 }
 
 bool Player::reconnectOnPlay() const
@@ -977,10 +1055,15 @@ void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
     if (d->videoQuality == videoQuality)
+    {
+        d->log(lit("setVideoQuality(%1): no change, ignoring").arg(videoQuality));
         return;
+    }
+    d->log(lit("setVideoQuality(%1) BEGIN").arg(videoQuality));
     d->videoQuality = videoQuality;
     d->applyVideoQuality();
     emit videoQualityChanged();
+    d->log(lit("setVideoQuality(%1) END").arg(videoQuality));
 }
 
 QSize Player::currentResolution() const

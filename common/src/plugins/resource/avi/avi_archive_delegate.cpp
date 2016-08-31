@@ -1,7 +1,5 @@
 #include "avi_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QSharedPointer>
 
 #include "stdint.h"
@@ -257,7 +255,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
     while (packet.stream_index >= m_lastPacketTimes.size())
         m_lastPacketTimes << m_startTime;
-    if ((quint64)data->timestamp == AV_NOPTS_VALUE) {
+    if (data->timestamp == AV_NOPTS_VALUE) {
         /*
         AVStream* stream = m_formatContext->streams[packet.stream_index];
         if (stream->r_frame_rate.num)
@@ -605,7 +603,7 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
         video->timestamp = AV_NOPTS_VALUE;
     else
         video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
-    if ((quint64)packet.pts != AV_NOPTS_VALUE) {
+    if (packet.pts != AV_NOPTS_VALUE) {
         video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTime;
     }
 }
@@ -736,5 +734,3 @@ void QnAviArchiveDelegate::setMotionConnection(QnAbstractMotionArchiveConnection
     m_motionConnections[channel] = connection;
 }
 */
-
-#endif // ENABLE_ARCHIVE

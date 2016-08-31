@@ -162,7 +162,6 @@ bool handleTransaction(
     if (tranFormat == Qn::UbjsonFormat)
     {
         QnAbstractTransaction transaction;
-        transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
         QnUbjsonReader<QByteArray> stream(&serializedTransaction);
         if (!QnUbjson::deserialize(&stream, &transaction))
         {
@@ -180,7 +179,6 @@ bool handleTransaction(
     else if (tranFormat == Qn::JsonFormat)
     {
         QnAbstractTransaction transaction;
-        transaction.deliveryInfo.originatorType = QnTranDeliveryInformation::remoteServer;
         QJsonObject tranObject;
         //TODO #ak take tranObject from cache
         if (!QJson::deserialize(serializedTransaction, &tranObject))
@@ -797,15 +795,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                 {	// Transactions listed here should not go to the DbManager.
                     // We are only interested in relevant notifications triggered.
                     // Also they are allowed only if sender is Admin.
-                    auto userResource = qnResPool->getResourceById<QnUserResource>(
-                        sender->getUserAccessData().userId);
-                    bool userHasAdminRights =
-                        userResource &&
-                        qnResourceAccessManager->hasGlobalPermission(
-                            userResource,
-                            Qn::GlobalAdminPermission
-                        );
-                    if (!userHasAdminRights)
+                    if (!qnResourceAccessManager->hasGlobalPermission(
+                        sender->getUserAccessData(),
+                        Qn::GlobalAdminPermission))
                     {
                         NX_LOG(
                             QnLog::EC2_TRAN_LOG,
@@ -1512,6 +1504,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
+    ConnectionLockGuard connectionLockGuard,
     QSharedPointer<AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const ApiPeerData& remotePeer,
@@ -1532,6 +1525,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
 
     QnTransactionTransport* transport = new QnTransactionTransport(
         connectionGuid,
+        std::move(connectionLockGuard),
         localPeer(),
         remotePeer,
         std::move(socket),

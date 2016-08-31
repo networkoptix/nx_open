@@ -17,6 +17,8 @@ class AddressResolverTest
 public:
     static void SetUpTestCase()
     {
+        // TODO: Test 2 cases: with and without mediator address
+
         s_stunClient = std::make_shared<stun::test::AsyncClientMock>();
         s_stunClient->emulateRequestHandler(
             stun::cc::methods::resolvePeer,
@@ -102,7 +104,9 @@ public:
                     }
 
                     syncQueue.push(true);
-                });
+                },
+                true,
+                AF_INET);
         }
 
         for (size_t counter = kSimultaneousQueries; counter; --counter)
@@ -343,7 +347,7 @@ TEST(AddressResolverRealTest, Cancel)
     {
         for (const auto& address : kTestAddresses)
         {
-            SocketGlobals::addressResolver().resolveAsync(address, doNone, true, this);
+            SocketGlobals::addressResolver().resolveAsync(address, doNone, true, AF_INET, this);
             if (timeout) std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
             SocketGlobals::addressResolver().cancel(this);
             if (!timeout) timeout = 10;

@@ -6,6 +6,8 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <api/global_settings.h>
+#include <utils/common/app_info.h>
+
 
 namespace {
     static const QByteArray kContentType = "application/xml";
@@ -69,7 +71,7 @@ void QnCrossdomainConnectionProcessor::run()
         else if (lines[i].contains(kCrossdomainPattern))
         {
             lines.removeAt(i);
-            const QString portalUrl = QUrl(qnGlobalSettings->cloudPortalUrl()).host();
+            const QString portalUrl = QUrl(QnAppInfo::defaultCloudModulesXmlUrl()).host();
             if (!portalUrl.isEmpty())
                 lines.insert(i, pattern.replace(kCrossdomainPattern, portalUrl.toUtf8()));
         }

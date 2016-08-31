@@ -1,11 +1,9 @@
-
 #include "user_resource.h"
 
-#include <nx/network/http/auth_tools.h>
-#include <nx/utils/random.h>
-#include <utils/common/app_info.h>
+#include <api/model/password_data.h>
+
 #include <utils/common/synctime.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/network/http/auth_tools.h>
 
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
@@ -40,6 +38,41 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_fullName(right.m_fullName),
     m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
 {
+}
+
+Qn::UserRole QnUserResource::role() const
+{
+    if (!resourcePool())
+        return Qn::UserRole::CustomPermissions;
+
+    if (isOwner())
+        return Qn::UserRole::Owner;
+
+    QnUuid groupId = userGroup();
+    if (!groupId.isNull())
+        return Qn::UserRole::CustomUserGroup;
+
+    auto permissions = getRawPermissions();
+
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return Qn::UserRole::Administrator;
+
+    switch (permissions)
+    {
+        case Qn::GlobalAdvancedViewerPermissionSet:
+            return Qn::UserRole::AdvancedViewer;
+
+        case Qn::GlobalViewerPermissionSet:
+            return Qn::UserRole::Viewer;
+
+        case Qn::GlobalLiveViewerPermissionSet:
+            return Qn::UserRole::LiveViewer;
+
+        default:
+            break;
+    };
+
+    return Qn::UserRole::CustomPermissions;
 }
 
 QByteArray QnUserResource::getHash() const
@@ -83,24 +116,12 @@ void QnUserResource::generateHash()
     if (password.isEmpty())
         return;
 
-    QByteArray salt = QByteArray::number(nx::utils::random::number(0), 16);
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(salt);
-    md5.addData(password.toUtf8());
-    QByteArray hash = "md5$";
-    hash.append(salt);
-    hash.append("$");
-    hash.append(md5.result().toHex());
+    auto hashes = PasswordData::calculateHashes(getName(), password);
 
-    QByteArray digest = nx_http::calcHa1(
-        getName().toLower(),
-        QnAppInfo::realm(),
-        password);
-
-    setRealm(QnAppInfo::realm());
-    setHash(hash);
-    setDigest(digest);
-    setCryptSha512Hash(linuxCryptSha512(password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH)));
+    setRealm(hashes.realm);
+    setHash(hashes.passwordHash);
+    setDigest(hashes.passwordDigest);
+    setCryptSha512Hash(hashes.cryptSha512Hash);
 }
 
 bool QnUserResource::checkLocalUserPassword(const QString &password)
@@ -108,23 +129,19 @@ bool QnUserResource::checkLocalUserPassword(const QString &password)
     QnMutexLocker locker(&m_mutex);
 
     if (!m_digest.isEmpty())
-    {
         return nx_http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
-    }
-    else
-    {
-        //hash is obsolete. Cannot remove it to maintain update from version < 2.3
-        //  hash becomes empty after changing user's realm
-        QList<QByteArray> values = m_hash.split(L'$');
-        if (values.size() != 3)
-            return false;
 
-        QByteArray salt = values[1];
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(salt);
-        md5.addData(password.toUtf8());
-        return md5.result().toHex() == values[2];
-    }
+    //hash is obsolete. Cannot remove it to maintain update from version < 2.3
+    //hash becomes empty after changing user's realm
+    QList<QByteArray> values = m_hash.split(L'$');
+    if (values.size() != 3)
+        return false;
+
+    QByteArray salt = values[1];
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(password.toUtf8());
+    return md5.result().toHex() == values[2];
 }
 
 void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)
@@ -287,9 +304,9 @@ void QnUserResource::setFullName(const QString& value)
     emit fullNameChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
-    base_type::updateInner(other, modifiedFields);
+    base_type::updateInternal(other, notifiers);
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if (localOther)
@@ -299,67 +316,68 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         if (m_password != localOther->m_password)
         {
             m_password = localOther->m_password;
-            modifiedFields << "passwordChanged";
+            notifiers << [r = toSharedPointer(this)]{emit r->passwordChanged(r);};
         }
 
         if (m_hash != localOther->m_hash)
         {
             m_hash = localOther->m_hash;
-            modifiedFields << "hashChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->hashChanged(r); };
         }
 
         if (m_digest != localOther->m_digest)
         {
             m_digest = localOther->m_digest;
-            modifiedFields << "digestChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->digestChanged(r); };
         }
 
         if (m_cryptSha512Hash != localOther->m_cryptSha512Hash)
         {
             m_cryptSha512Hash = localOther->m_cryptSha512Hash;
-            modifiedFields << "cryptSha512HashChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->cryptSha512HashChanged(r); };
         }
 
         if (m_permissions != localOther->m_permissions)
         {
             m_permissions = localOther->m_permissions;
-            modifiedFields << "permissionsChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
         }
 
         if (m_userGroup != localOther->m_userGroup)
         {
             m_userGroup = localOther->m_userGroup;
-            modifiedFields << "userGroupChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->userGroupChanged(r); };
         }
 
         if (m_isOwner != localOther->m_isOwner)
         {
+            NX_ASSERT(false, "'Owner' field should not be changed.");
             m_isOwner = localOther->m_isOwner;
-            modifiedFields << "permissionsChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
         }
 
         if (m_email != localOther->m_email)
         {
             m_email = localOther->m_email;
-            modifiedFields << "emailChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->emailChanged(r); };
         }
 
         if (m_fullName != localOther->m_fullName)
         {
             m_fullName = localOther->m_fullName;
-            modifiedFields << "fullNameChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->fullNameChanged(r); };
         }
 
 		if (m_realm != localOther->m_realm)
         {
             m_realm = localOther->m_realm;
-            modifiedFields << "realmChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->realmChanged(r); };
         }
 
         if (m_isEnabled != localOther->m_isEnabled)
         {
             m_isEnabled = localOther->m_isEnabled;
-            modifiedFields << "enabledChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->enabledChanged(r); };
         }
     }
 }
@@ -390,4 +408,11 @@ bool QnUserResource::passwordExpired() const
         return false;
 
     return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
+}
+
+void QnUserResource::fillId()
+{
+    NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
+    QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
+    setId(id);
 }

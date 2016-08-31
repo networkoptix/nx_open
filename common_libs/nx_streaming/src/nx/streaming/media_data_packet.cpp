@@ -11,6 +11,21 @@
 #include <smmintrin.h>
 #endif
 
+
+const char* mediaQualityToString(MediaQuality value)
+{
+    switch (value)
+    {
+        case MEDIA_Quality_High: return "MEDIA_Quality_High";
+        case MEDIA_Quality_Low: return "MEDIA_Quality_Low";
+        case MEDIA_Quality_ForceHigh: return "MEDIA_Quality_ForceHigh";
+        case MEDIA_Quality_Auto: return "MEDIA_Quality_Auto";
+        case MEDIA_Quality_CustomResolution: return "MEDIA_Quality_CustomResolution";
+        case MEDIA_Quality_None: return "MEDIA_Quality_None";
+        default: return "(INTERNAL ERROR) MediaQuality UNKNOWN";
+    }
+}
+
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
 :
     dataType(_dataType),
@@ -274,7 +289,7 @@ void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration )
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
-    if ((quint64)m_firstTimestamp == AV_NOPTS_VALUE)
+    if (m_firstTimestamp == AV_NOPTS_VALUE)
         m_firstTimestamp = timestamp;
     else
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);

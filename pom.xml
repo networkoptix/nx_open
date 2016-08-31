@@ -27,6 +27,8 @@
     </repositories>
 
     <properties>
+        <cloud.host>cloud-demo.hdw.mx</cloud.host>
+
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <cloud_connect_test_util.guid>{931F412E-DCC2-426B-93CD-1F551CA69D93}</cloud_connect_test_util.guid>
@@ -59,7 +61,7 @@
         <mediaserver.guid>{ee61c3cc-791c-4f9f-9917-9e7c9ce9e907}</mediaserver.guid>
         <mobile_client.guid>{4d58c9a4-8dbe-480c-a974-634a7e2862ef}</mobile_client.guid>
         <applauncher.guid>{75b8ee80-e089-4de2-b7a1-d1464a9b4351}</applauncher.guid>
-        <client_core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</client_core.guid>
+        <libclient_core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</libclient_core.guid>
         <desktop_client.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</desktop_client.guid>
         <libclient.guid>{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}</libclient.guid>
         <axclient.guid>{d3f564c6-315b-426b-8ed3-890d91300374}</axclient.guid>
@@ -233,6 +235,8 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <projectType>generic</projectType>
     </properties>
 
     <build>
@@ -699,8 +703,10 @@
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
                 <client.binary.name>${display.product.name}</client.binary.name>
-                <minilauncher.binary.name>${display.product.name} Launcher</minilauncher.binary.name>
-                <applauncher.binary.name>applauncher</applauncher.binary.name>
+                <minilauncher.binary.name>applauncher</minilauncher.binary.name>
+                <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+                <installation.root>/Applications/</installation.root>
+
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -732,6 +738,7 @@
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/connection_mediator-deb</module>
@@ -1099,7 +1106,7 @@
                 <android.platform>android-16</android.platform>
                 <qt.spec/>
                 <openal.version>1.17.2</openal.version>
-                <openssl.version>1.0.2d</openssl.version>
+                <openssl.version>1.0.2g</openssl.version>
                 <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>

@@ -11,11 +11,11 @@
 #include <utils/common/checked_cast.h>
 #include <utils/math/color_transformations.h>
 
+#include <ui/style/nx_style.h>
 #include <ui/common/geometry.h>
 #include <ui/common/color_to_vector_converter.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/animation/variant_animator.h>
-
 #include "grid_highlight_item.h"
 
 namespace {
@@ -25,7 +25,8 @@ namespace {
 
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     base_type(parent),
-    m_lineWidth(0.0)
+    m_lineWidth(0.0),
+    m_scaleWatcher()
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
@@ -34,8 +35,16 @@ QnGridItem::QnGridItem(QGraphicsItem *parent):
     setStateColor(Disallowed, QColor(255, 0, 0, 64));
 
     setAcceptedMouseButtons(0);
-    
-    /* Don't disable this item here. When disabled, it starts accepting wheel events 
+
+
+    connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
+        [this]()
+        {
+            static const auto kPixelLineWidth = 1;
+            m_lineWidth = kPixelLineWidth * m_scaleWatcher.scale();
+        });
+
+    /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
 
@@ -64,14 +73,6 @@ void QnGridItem::setColors(const QnGridColors &colors) {
 
     setStateColor(Allowed, colors.allowed);
     setStateColor(Disallowed, colors.disallowed);
-}
-
-qreal QnGridItem::lineWidth() const {
-    return m_lineWidth;
-}
-
-void QnGridItem::setLineWidth(qreal lineWidth) {
-    m_lineWidth = lineWidth;
 }
 
 QColor QnGridItem::stateColor(int cellState) const {
@@ -113,7 +114,7 @@ void QnGridItem::setCellState(const QPoint &cell, int cellState) {
     if(data.item == NULL) {
         data.item = newHighlightItem();
 
-        qreal d =  m_lineWidth / 2; 
+        qreal d =  m_lineWidth / 2;
         data.item->setRect(QnGeometry::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
         setItemCell(data.item, cell);
     }
@@ -135,8 +136,8 @@ void QnGridItem::setCellState(const QSet<QPoint> &cells, int cellState) {
 }
 
 void QnGridItem::setCellState(const QRect &cells, int cellState) {
-    for (int r = cells.top(); r <= cells.bottom(); r++) 
-        for (int c = cells.left(); c <= cells.right(); c++) 
+    for (int r = cells.top(); r <= cells.bottom(); r++)
+        for (int c = cells.left(); c <= cells.right(); c++)
             setCellState(QPoint(c, r), cellState);
 }
 
@@ -167,9 +168,10 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     );
 
     /* Draw! */
-    QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.grid, m_lineWidth));
+    const QPen pen(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(7).color(), m_lineWidth);
+    QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QnGeometry::toPoint(mapper()->spacing()) / 2;
+    QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QPointF(mapper()->spacing() / 2, mapper()->spacing() / 2);
     QPointF delta = QnGeometry::toPoint(mapper()->step());
 
     /* Vertical lines. */
@@ -233,5 +235,15 @@ void QnGridItem::at_itemAnimator_finished() {
         setItemCell(item, QPoint(0, 0));
     }
 }
+
+QVariant QnGridItem::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+    if (change == QGraphicsItem::ItemSceneHasChanged)
+        m_scaleWatcher.initialize(scene());
+
+    return base_type::itemChange(change, value);
+}
+
+
 
 

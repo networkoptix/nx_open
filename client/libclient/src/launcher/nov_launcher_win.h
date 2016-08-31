@@ -1,14 +1,16 @@
-#ifndef __NOV_LAUNCHER_H__
-#define __NOV_LAUNCHER_H__
+#pragma once
 
 class QnNovLauncher
 {
 public:
-    static int createLaunchingFile(const QString& dstName, const QString& novFileName = QString());
-private:
-    static int appendFile(QFile& dstFile, const QString& srcFileName);
-    static int writeIndex(QFile& dstFile, const QVector<qint64>& filePosList, QVector<QString>& fileNameList);
-    static void getSrcFileList(QVector<QString>& result, const QString& srcDataFolder, const QString& root);
-};
+    enum class ErrorCode
+    {
+        Ok,
+        NoTargetFileAccess,
+        WriteFileError,
+        WriteMediaError,
+        WriteIndexError
+    };
 
-#endif // __NOV_LAUNCHER_H__
+    static ErrorCode createLaunchingFile(const QString& dstName, const QString& novFileName = QString());
+};

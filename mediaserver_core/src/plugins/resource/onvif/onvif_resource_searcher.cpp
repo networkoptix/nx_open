@@ -120,7 +120,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     if (rpResource)
     {
         int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
-        
+
         if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
             resource->calcTimeDrift();
             if (!resource->readDeviceInformation())
@@ -130,7 +130,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             return resList; // do not add 1..N channels if resource is offline
 
         resource->setPhysicalId(rpResource->getPhysicalId());
-        resource->update(rpResource, true);
+        resource->update(rpResource);
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
@@ -153,7 +153,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     resource->calcTimeDrift();
     if (shouldStop())
         return QList<QnResourcePtr>();
-    
+
     if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
         if (resource->getMAC().isNull())
@@ -168,7 +168,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             shortModel = modelName.mid(manufacturer.length()).trimmed();
         QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, shortModel);
         const bool forceOnvif = resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME);
-        if (!forceOnvif) 
+        if (!forceOnvif)
         {
             if (NameHelper::instance().isSupported(modelName))
                 return resList;
@@ -199,7 +199,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         resource->setVendor( manufacturer );
         resource->setName( modelName );
         //QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
-        if (!rt.isNull() && rt != resource->getTypeId()) 
+        if (!rt.isNull() && rt != resource->getTypeId())
         {
             QnPlOnvifResourcePtr updatedResource = createResource(rt, QnResourceParams()).dynamicCast<QnPlOnvifResource>();
             updatedResource->update(resource);
@@ -217,7 +217,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             //if (channel > 0)
             //    resource->updateToChannel(channel-1);
             resList << resource;
-            
+
             bool shouldAppearAsSingleChannel = resData
                 .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
@@ -230,21 +230,21 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                     resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
                 }
 
-                for (int i = 1; i < resource->getMaxChannels(); ++i) 
+                for (int i = 1; i < resource->getMaxChannels(); ++i)
                 {
                     QnPlOnvifResourcePtr res = createResource(resource->getTypeId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
                     res->setGroupId(resource->getPhysicalId());
                     res->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
                     res->setVendor( manufacturer );
                     res->setPhysicalId(resource->getPhysicalId());
-                    res->update(resource, true);
+                    res->update(resource);
                     res->updateToChannel(i);
                     resList << res;
                 }
             }
         }
     }
-    
+
     return resList;
 }
 

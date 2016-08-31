@@ -1,55 +1,47 @@
-#ifndef __CONNECTION_DIAGNOSTICS_HELPER_H__
-#define __CONNECTION_DIAGNOSTICS_HELPER_H__
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api_fwd.h>
-#include <api/model/compatibility_item.h>
 
-struct QnConnectionInfo;
-class QnSoftwareVersion;
+#include <network/connection_validator.h>
 
-class QnConnectionDiagnosticsHelper: public QObject
+class QnConnectionDiagnosticsHelper: public QnConnectionValidator
 {
     Q_OBJECT
+    using base_type = QnConnectionValidator;
 public:
-    enum class Result {
-        Success,
-        RestartRequested,
-        IncompatibleBrand,
-        IncompatibleVersion,
-        IncompatibleProtocol,
-        Unauthorized,
-        TemporaryUnauthorized,
-        ServerError
-    };
+    QnConnectionDiagnosticsHelper(QObject* parent = nullptr);
 
-#ifdef _DEBUG
-    static QString resultToString(Result value);
-#endif //  _DEBUG
-
-    struct TestConnectionResult {
-        Result result;
+    struct TestConnectionResult
+    {
+        Qn::ConnectionResult result;
         QString details;
         int helpTopicId;
     };
 
-    /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
-    static Result validateConnectionLight(const QString &brand, int protoVersion);
-
-    /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
-    static Result validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode);
-
     /** Full check of the connection. Displays message boxes, suggests to restart client, etc. */
-    static Result validateConnection(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode, const QUrl &url, QWidget* parentWidget);
+    static Qn::ConnectionResult validateConnection(
+        const QnConnectionInfo &connectionInfo,
+        ec2::ErrorCode errorCode,
+        const QUrl &url,
+        QWidget* parentWidget);
 
     //TODO: #GDM think about refactoring
     /** Another check of connection, used from 'Test connection' dialog. */
-    static TestConnectionResult validateConnectionTest(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode);
+    static TestConnectionResult validateConnectionTest(
+        const QnConnectionInfo &connectionInfo,
+        ec2::ErrorCode errorCode);
 
 private:
+    static Qn::ConnectionResult handleCompatibilityMode(
+        const QnConnectionInfo &connectionInfo,
+        const QUrl &url,
+        QWidget* parentWidget);
+
     //TODO: #GDM move all duplicating strings here
-    enum class ErrorStrings {
+    enum class ErrorStrings
+    {
         ContactAdministrator,
         UnableConnect
     };
@@ -57,5 +49,3 @@ private:
     static QString strings(ErrorStrings id);
 
 };
-
-#endif // __CONNECTION_DIAGNOSTICS_HELPER_H__

@@ -1,8 +1,3 @@
-/**********************************************************
-* 2 oct 2014
-* akolesnikov
-***********************************************************/
-
 #include "api_camera_attributes_data.h"
 
 #include <nx/fusion/model_functions.h>

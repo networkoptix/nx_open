@@ -20,6 +20,9 @@ public:
      */
     int toLexActionType(QnBusiness::ActionType actionType) const;
 
+    QList<QnBusiness::EventType> lexSortedEvents() const;
+    QList<QnBusiness::ActionType> lexSortedActions() const;
+
 private:
     void initLexOrdering();
 

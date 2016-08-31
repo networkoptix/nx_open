@@ -12,6 +12,7 @@
 #include <api/runtime_info_manager.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_message_processor.h>
@@ -296,6 +297,7 @@ void QnConnectionManagerPrivate::doConnect() {
         } else if (errorCode != ec2::ErrorCode::ok) {
             status = QnConnectionManager::NetworkError;
         } else if (!isCompatibleProducts(connectionInfo.brand, QnAppInfo::productNameShort())) {
+            //TODO: #GDM #isCompatibleCustomization VMS-2163
             status = QnConnectionManager::InvalidServer;
         } else if (connectionInfo.version < minimalSupportedVersion) {
             status = QnConnectionManager::InvalidVersion;
@@ -441,6 +443,7 @@ void QnConnectionManagerPrivate::storeConnection(
     lastConnections.prepend(connectionInfo);
 
     qnClientCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->save();
 }
 
 void QnConnectionManagerPrivate::setInitialResourcesReceived(bool received)

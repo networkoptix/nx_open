@@ -12,7 +12,8 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
-namespace {
+namespace
+{
     const auto kStereoChannelCount = 2;
     const auto kBitsInByte = 8;
     const auto kDefaultSampleRate = 44100;
@@ -20,7 +21,7 @@ namespace {
     const auto kDefaultChannelCount = 1;
     const auto kDefaultCodec = lit("audio/pcm");
     const auto kEncoderCodecName = lit("mp2"); // libmp3lame
-
+    const auto kSingleChannelBitrate = 64000;
 }
 
 QnDesktopAudioOnlyDataProvider::QnDesktopAudioOnlyDataProvider(QnResourcePtr ptr) :
@@ -154,7 +155,6 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
         return false;
     }
 
-
     auto encoderCtx = avcodec_alloc_context3(audioCodec);
     const auto format = m_audioSourcesInfo.at(0)->format;
 
@@ -174,13 +174,10 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
         timeBase.den = encoderCtx->sample_rate;
 
     encoderCtx->time_base = timeBase;
-    encoderCtx->bit_rate =
-        encoderCtx->sample_rate *
-        encoderCtx->channels *
-        format.sampleSize() / kBitsInByte;
+    encoderCtx->bit_rate = kSingleChannelBitrate * encoderCtx->channels;
 
     m_encoderCtxPtr.reset(new QnAvCodecMediaContext(encoderCtx));
-    if ( avcodec_open2(encoderCtx, audioCodec, nullptr) < 0)
+    if (avcodec_open2(m_encoderCtxPtr->getAvCodecContext(), audioCodec, nullptr) < 0)
     {
         m_lastErrorStr = tr("Could not initialize audio encoder.");
         return false;
@@ -272,7 +269,7 @@ void QnDesktopAudioOnlyDataProvider::processData()
         preprocessAudioBuffers(m_audioSourcesInfo);
         auto firstBuffer = m_audioSourcesInfo.at(0)->frameBuffer;
         analyzeSpectrum(firstBuffer);
-        auto packet = encodePacket(firstBuffer, kFrameSizeInBytes);
+        auto packet = encodePacket(firstBuffer, static_cast<int>(kFrameSizeInBytes));
         if(packet && dataCanBeAccepted())
             putData(packet);
     }
@@ -281,9 +278,7 @@ void QnDesktopAudioOnlyDataProvider::processData()
 void QnDesktopAudioOnlyDataProvider::preprocessAudioBuffers(
     std::vector<AudioSourceInfoPtr>& preprocessList)
 {
-    Q_ASSERT(!preprocessList.empty());
-
-    auto ctx = m_encoderCtxPtr->getAvCodecContext();
+    NX_ASSERT(!preprocessList.empty());
 
     const auto kSampleSizeInBytes =
         preprocessList.at(0)->format.sampleSize() / kBitsInByte;
@@ -298,9 +293,7 @@ void QnDesktopAudioOnlyDataProvider::preprocessAudioBuffers(
 
     for( auto& preprocessItem: preprocessList)
     {
-        Q_ASSERT(
-            preprocessItem->buffer.size() >=
-            kFrameSizeInBytes);
+        NX_ASSERT(preprocessItem->buffer.size() >= static_cast<int>(kFrameSizeInBytes));
 
         auto frameBufferPtr = preprocessItem->frameBuffer;
         memcpy(
@@ -354,6 +347,7 @@ void QnDesktopAudioOnlyDataProvider::analyzeSpectrum(char *buffer)
 
 QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(char *buffer, int inputFrameSize)
 {
+    Q_UNUSED(inputFrameSize);
     QnWritableCompressedAudioDataPtr audio(nullptr);
     auto ctx = m_encoderCtxPtr->getAvCodecContext();
 

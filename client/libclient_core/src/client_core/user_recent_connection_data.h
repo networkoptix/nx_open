@@ -33,7 +33,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QnUserRecentConnectionData, (datastream)(metatype)(e
 
 struct QnUserRecentConnectionDataList : public QList<QnUserRecentConnectionData>
 {
-    typedef QList<QnUserRecentConnectionData> base_type;
+    using base_type = QList<QnUserRecentConnectionData>;
 
 public:
     QnUserRecentConnectionDataList();
@@ -48,7 +48,7 @@ public:
     bool contains(const QString& name) const;
 
     QString generateUniqueName(const QString &base) const;
-    
+
     bool remove(const QString &name);
 
     void updateStorePasswordState(const QString &name, bool isPassword);

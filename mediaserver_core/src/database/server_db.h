@@ -87,6 +87,7 @@ protected:
 private:
     bool createDatabase();
     bool cleanupEvents();
+    int getRuntimeActionsRecordCount();
     bool migrateBusinessParamsUnderTransaction();
     bool createBookmarkTagTriggersUnderTransaction();
     bool cleanupAuditLog();
@@ -100,6 +101,7 @@ private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;
     qint64 m_eventKeepPeriod;
+    int m_runtimeActionsTotalRecords;
     QnDbTransaction m_tran;
     std::function<void(size_t)> m_updateBookmarkCount;
 };

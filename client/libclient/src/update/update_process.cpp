@@ -11,10 +11,13 @@
 #include <core/resource/media_server_resource.h>
 
 #include <update/task/check_update_peer_task.h>
+#include <update/task/validate_update_peer_task.h>
 #include <update/task/download_updates_peer_task.h>
 #include <update/task/rest_update_peer_task.h>
+#include <update/task/check_free_space_peer_task.h>
 #include <update/task/upload_updates_peer_task.h>
 #include <update/task/install_updates_peer_task.h>
+#include <update/low_free_space_warning.h>
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/sleep.h>
@@ -270,9 +273,8 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
 
     clearUpdatesCache(m_target.version);
 
-    downloadUpdates();
+    validateUpdate();
 }
-
 
 void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode) {
     if (errorCode != 0) {
@@ -298,6 +300,52 @@ void QnUpdateProcess::finishUpdate(QnUpdateResult::Value value) {
     stop();
 }
 
+void QnUpdateProcess::checkFreeSpace()
+{
+    setStage(QnFullUpdateStage::CheckFreeSpace);
+
+    for (const auto& targetId: m_targetPeerIds)
+    {
+        const auto server = qnResPool->getResourceById<QnMediaServerResource>(targetId);
+        if (!server || server->getStatus() != Qn::Online)
+            m_failedPeerIds.insert(targetId);
+    }
+
+    if (!m_failedPeerIds.isEmpty())
+    {
+        finishUpdate(QnUpdateResult::UploadingFailed_Offline);
+        return;
+    }
+
+    QHash<QnSystemInformation, QString> fileBySystemInformation;
+    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it)
+        fileBySystemInformation[it.key()] = it.value()->fileName;
+
+    setAllPeersStage(QnPeerUpdateStage::Push);
+
+    auto checkFreeSpacePeerTask = new QnCheckFreeSpacePeerTask();
+    checkFreeSpacePeerTask->setUpdateFiles(fileBySystemInformation);
+    connect(checkFreeSpacePeerTask, &QnNetworkPeerTask::finished,
+        this, &QnUpdateProcess::at_checkFreeSpaceTask_finished);
+    connect(checkFreeSpacePeerTask, &QnNetworkPeerTask::finished,
+        checkFreeSpacePeerTask, &QObject::deleteLater);
+    m_currentTask = checkFreeSpacePeerTask;
+    checkFreeSpacePeerTask->start(m_targetPeerIds + m_incompatiblePeerIds);
+}
+
+void QnUpdateProcess::validateUpdate()
+{
+    setStage(QnFullUpdateStage::Validate);
+
+    auto validateTask = new QnValidateUpdatePeerTask();
+    connect(validateTask, &QnNetworkPeerTask::finished,
+        this, &QnUpdateProcess::at_validateTask_finished);
+    connect(validateTask, &QnNetworkPeerTask::finished,
+        validateTask, &QObject::deleteLater);
+    m_currentTask = validateTask;
+    validateTask->start(m_targetPeerIds + m_incompatiblePeerIds);
+}
+
 void QnUpdateProcess::installClientUpdate() {
     /* Check if we skip this step. */
     if (m_clientRequiresInstaller
@@ -306,7 +354,7 @@ void QnUpdateProcess::installClientUpdate() {
         || m_clientUpdateFile->version == qnCommon->engineVersion())
     {
             NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);
-            prepareToUpload();
+            checkFreeSpace();
             return;
     }
 
@@ -340,7 +388,7 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
 
     NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logINFO);
 
-    prepareToUpload();
+    checkFreeSpace();
 }
 
 void QnUpdateProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo &data) {
@@ -394,6 +442,46 @@ void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
     }
 
     installUpdatesToServers();
+}
+
+void QnUpdateProcess::at_validateTask_finished(int errorCode, const QSet<QnUuid>& failedPeers)
+{
+    if (errorCode != 0)
+    {
+        setAllPeersStage(QnPeerUpdateStage::Init);
+
+        auto resultCode = QnUpdateResult::ValidationFailed;
+        if (errorCode == QnValidateUpdatePeerTask::CloudHostConflict)
+            resultCode = QnUpdateResult::ValidationFailed_CloudHostConflict;
+
+        m_failedPeerIds = failedPeers;
+        finishUpdate(resultCode);
+        return;
+    }
+
+    downloadUpdates();
+}
+
+void QnUpdateProcess::at_checkFreeSpaceTask_finished(
+    int errorCode, const QSet<QnUuid>& failedPeers)
+{
+    if (errorCode == QnCheckFreeSpacePeerTask::NotEnoughFreeSpaceError)
+    {
+        QnLowFreeSpaceWarning warning;
+        warning.failedPeers = failedPeers;
+
+        emit lowFreeSpaceWarning(warning);
+
+        if (!warning.ignore)
+        {
+            setAllPeersStage(QnPeerUpdateStage::Init);
+            m_failedPeerIds = failedPeers;
+            finishUpdate(QnUpdateResult::UploadingFailed_NoFreeSpace);
+            return;
+        }
+    }
+
+    prepareToUpload();
 }
 
 void QnUpdateProcess::prepareToUpload() {

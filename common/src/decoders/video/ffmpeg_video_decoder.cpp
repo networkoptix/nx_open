@@ -28,6 +28,7 @@
 #include "utils/media/frame_type_extractor.h"
 
 #include <nx/streaming/av_codec_media_context.h>
+#include <utils/media/utils.h>
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -202,9 +203,8 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
-    if (m_passedContext) {
-        avcodec_copy_context(m_context, m_passedContext);
-    }
+    if (m_passedContext)
+        QnFfmpegHelper::copyAvCodecContex(m_context, m_passedContext);
 
     m_frameTypeExtractor = new FrameTypeExtractor(QnConstMediaContextPtr(new QnAvCodecMediaContext(m_context)));
 
@@ -273,9 +273,9 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     m_context = 0;
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
-    if (m_passedContext) {
-        avcodec_copy_context(m_context, m_passedContext);
-    }
+    if (m_passedContext)
+        QnFfmpegHelper::copyAvCodecContex(m_context, m_passedContext);
+    
     determineOptimalThreadType(data);
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
@@ -599,7 +599,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                     av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
                 }
                 // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
-                outFrame->pkt_dts = (quint64)m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
+                outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
             }
         }
 
@@ -645,30 +645,15 @@ double QnFfmpegVideoDecoder::getSampleAspectRatio() const
         return m_prevSampleAspectRatio;
 
     double result = av_q2d(m_context->sample_aspect_ratio);
-
-    if (qAbs(result)< 1e-7)
+    if (qAbs(result) >= 1e-7)
     {
-        result = 1.0;
-        if (m_context->width == 720) { // TODO: #vasilenko add a table!
-            if (m_context->height == 480)
-                result = (4.0/3.0) / (720.0/480.0);
-            else if (m_context->height == 576)
-                result = (4.0/3.0) / (720.0/576.0);
-            else if (m_context->height == 240)
-                result = (4.0/3.0) / (720.0/240.0);
-        } else if(m_context->width == 704) {
-            if (m_context->height == 480)
-                result = (4.0/3.0) / (704.0/480.0);
-            else if (m_context->height == 576)
-                result = (4.0/3.0) / (704.0/576.0);
-            else if (m_context->height == 240)
-                result = (4.0/3.0) / (704.0/240.0);
-        }
+        m_prevSampleAspectRatio = result;
+        return result;
     }
 
-    m_prevSampleAspectRatio = result;
-
-    return result;
+    QSize srcSize(m_context->width, m_context->height);
+    m_prevSampleAspectRatio = nx::media::getDefaultSampleAspectRatio(srcSize);
+    return m_prevSampleAspectRatio;
 }
 
 AVPixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const

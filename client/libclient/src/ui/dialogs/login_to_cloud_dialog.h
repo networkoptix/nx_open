@@ -2,24 +2,22 @@
 
 #include <ui/dialogs/common/dialog.h>
 
-namespace Ui
-{
+namespace Ui {
     class QnLoginToCloudDialog;
-}
+} // namespace Ui
 
 class QnLoginToCloudDialogPrivate;
 
 class QnLoginToCloudDialog : public QnDialog
 {
     Q_OBJECT
-
-    typedef QnDialog base_type;
+    using base_type = QnDialog;
 
 public:
-    explicit QnLoginToCloudDialog(QWidget *parent = nullptr);
-    ~QnLoginToCloudDialog();
+    explicit QnLoginToCloudDialog(QWidget* parent = nullptr);
+    virtual ~QnLoginToCloudDialog();
 
-    void setLogin(const QString &login);
+    void setLogin(const QString& login);
 
 private:
     QScopedPointer<Ui::QnLoginToCloudDialog> ui;

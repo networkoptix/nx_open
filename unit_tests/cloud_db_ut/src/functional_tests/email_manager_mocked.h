@@ -21,7 +21,7 @@ public:
         void(QByteArray serializedNotification));
 
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        QByteArray /*serializedNotification*/,
         std::function<void(bool)> completionHandler) override
     {
         //sendAsyncMocked(std::move(serializedNotification));

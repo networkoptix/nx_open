@@ -29,7 +29,9 @@ namespace style
         static const QSize kSeparatorSize;              /**< Default separator item size. */
         static const qreal kCheckboxCornerRadius;       /**< Checkbox corner rounding radius */
         static const int kDefaultTopLevelMargin;        /**< Default layout margin for top-level widgets */
+        static const QMargins kDefaultTopLevelMargins;  /**< For convenience, kDefaultTopLevelMargin X 4 */
         static const int kDefaultChildMargin;           /**< Default layout margin for child widgets */
+        static const QMargins kDefaultChildMargins;     /**< For convenience, kDefaultChildMargin X 4 */
         static const QSize kDefaultLayoutSpacing;       /**< Default layout horizontal and vertical spacing */
         static const int kPanelHeaderHeight;            /**< Height of a panel header, underline excluded */
         static const QMargins kPanelContentMargins;     /**< Panel content margins, underline included, header excluded */
@@ -37,6 +39,12 @@ namespace style
         static const QMargins kGroupBoxContentMargins;  /**< Group box content margins, frame width included */
         static const qreal kGroupBoxCornerRadius;       /**< Group box corner rounding radius */
         static const int kDefaultIconSize;              /**< Default size of UI icon */
+    };
+
+    class Hints
+    {
+    public:
+        static const qreal kDisabledItemOpacity;        /**< Default disabled item opacity */
     };
 
     class Properties
@@ -52,6 +60,7 @@ namespace style
         static const char* kSuppressHoverPropery;   /**< Name of a property to suppress hovering of itemview items (bool). */
         static const char* kSideIndentation;        /**< Name of a property to hold overridden leftmost and rightmost itemview item margins (QnIndentation). */
         static const char* kCheckBoxAsButton;       /**< Name of a property to change checkbox appearance to switch button (bool). */
+        static const char* kButtonMarginProperty;   /**< Name of a property to hold a custom push button margin (int). Buttons with this property are left-aligned. */
     };
 
     /** Flags of additional slider features */

@@ -508,14 +508,6 @@ to view more bookmarks</source>
         <translation>Restore Down</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>メッセージを表示する</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>バージョン違いのメッセージを表示する</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>ブラウザで開く...</translation>
     </message>
@@ -706,10 +698,6 @@ to view more bookmarks</source>
     <message>
         <source>Activate PTZ Tour</source>
         <translation>PTZツアー有効</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>ベータバージョン警告メッセージ表示</translation>
     </message>
     <message>
         <source>Manage...</source>
@@ -1215,6 +1203,10 @@ to view more bookmarks</source>
         <source>Add Bookmark...</source>
         <translation>ブックマーク追加...</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1675,14 +1667,6 @@ to view more bookmarks</source>
         <translation>全てのユーザー</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>サウンド選択</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>テキスト入力</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;全デバイス&gt;</translation>
     </message>
@@ -2007,6 +1991,19 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation>変更の適応中...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2687,6 +2684,25 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished">オーディオエンコーダー%1を検出できません.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished">オーディオエンコーダーをイニシャライズできません.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2876,9 +2892,11 @@ to view more bookmarks</source>
             <numerusform>%1 (%n 回)</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation> %1 ユーザー以上...</translation>
+        <translation type="unfinished">
+            <numerusform> %1 ユーザー以上...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2909,6 +2927,55 @@ to view more bookmarks</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>幾つかのデバイスでスケジュール設定の互換性がありません.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished">秒</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation type="unfinished">分</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation type="unfinished">時</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished">日</translation>
+    </message>
+    <message numerus="yes">
+        <source>%nms</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%ns</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nm</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nh</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%nd</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3301,10 +3368,6 @@ to view more bookmarks</source>
         <translation>テストを実行できません.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>どのサーバーもインターネットに接続されていません.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>タイムアウト</translation>
     </message>
@@ -3353,10 +3416,6 @@ to view more bookmarks</source>
     <message>
         <source>No new users found.</source>
         <translation>新規ユーザーは検出されませんでした.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>どのサーバーもインターネットに接続されていません.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3692,10 +3751,6 @@ to view more bookmarks</source>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>: %1との接続を削除しますか?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>無効なパラメーター</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -4225,6 +4280,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>設定は保存されません　システム管理者にお問合せください.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4606,6 +4665,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Archived duration in calendar days since the first recording</source>
         <translation>最初の記録からアーカイブする期間</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4755,10 +4818,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>ブックマークのエクスポート...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>名前、タグ、説明等でブックマークを検索</translation>
     </message>
@@ -4803,6 +4862,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">
             <numerusform>&lt;%n IOモジュール&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation type="unfinished">ブックマークのエクスポート...</translation>
     </message>
 </context>
 <context>
@@ -5370,12 +5433,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>成功</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>テストを実行できません　どのサーバーもインターネットに接続されていません.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>パラメーター設定が無効です　テストが実行できません.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation type="unfinished">テストを実行できません.</translation>
     </message>
 </context>
 <context>
@@ -5414,10 +5477,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Activate analog license to remove this message</source>
         <translation>このメッセージを削除するにはアナログライセンスをアクティベートしてください</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>ビデオストリームなし</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -5991,6 +6050,25 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Select file...</source>
         <translation>ファイル選択...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6570,6 +6648,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>デバイス追加中ですがキャンセルしますか?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6858,6 +6952,10 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>合計30分超のビデオをエクスポートしようとしています.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7043,10 +7141,6 @@ If you understand this and would like to proceed please click Merge to continue.
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZキャリブレーション_%1.jpg</translation>
-    </message>
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>カメラがオンラインになるまでお待ちください.</translation>

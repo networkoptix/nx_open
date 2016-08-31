@@ -5,82 +5,18 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
 
-QnDirectoryBackup::QnDirectoryBackup(const QString& originalDirectory, const QString& backupDirectory) :
-    QnDirectoryBackup(originalDirectory, QStringList(), backupDirectory)
-{}
+namespace {
 
-QnDirectoryBackup::QnDirectoryBackup(const QString& originalDirectory, const QStringList& nameFilters, const QString& backupDirectory) :
-    m_originalDirectory(originalDirectory),
-    m_backupDirectory(backupDirectory),
-    m_filenames(calculateFilenames(originalDirectory, nameFilters))
-{}
-
-bool QnDirectoryBackup::backup(Behavior behavior) const
+enum class OverwritePolicy
 {
-    if (!QDir().mkpath(m_backupDirectory))
-        return false;
+    Skip,       /*< Files with same names will not be overridden. */
+    CheckSize,  /*< Files with different size will be overridden.  */
+    CheckDate,  /*< Older files will be overridden. */
+    Forced      /*< All files will be overridden. */
+};
 
-    if (!deleteFiles(m_backupDirectory))
-    {
-        NX_LOG(lit("Could not cleanup backup directory %1.").arg(m_backupDirectory), cl_logERROR);
-        return false;
-    }
-
-    bool copyResult = copyFiles(m_originalDirectory, m_backupDirectory, OverwritePolicy::Forced);
-    if (behavior == Behavior::Copy)
-        return copyResult;
-
-    NX_ASSERT(behavior == Behavior::Move);
-
-    /* Copy files first and only then delete originals. */
-    if (!copyResult)
-        return false;
-
-    if (!deleteFiles(m_originalDirectory))
-    {
-        /* If deleting was not successful, try restore backup. */
-        NX_LOG(lit("Could not cleanup original directory %1, trying to restore backup.").arg(m_originalDirectory), cl_logERROR);
-        if (!copyFiles(m_backupDirectory, m_originalDirectory, OverwritePolicy::Skip))
-        {
-            NX_LOG(lit("Could not restore backup. System is is invalid state."), cl_logERROR);
-        }
-        return false;
-    }
-
-    return true;
-}
-
-bool QnDirectoryBackup::restore(Behavior behavior) const
-{
-    if (!QDir().mkpath(m_originalDirectory))
-        return false;
-
-    if (!deleteFiles(m_originalDirectory))
-    {
-        NX_LOG(lit("Could not cleanup original directory %1.").arg(m_originalDirectory), cl_logERROR);
-        return false;
-    }
-
-    bool copyResult = copyFiles(m_backupDirectory, m_originalDirectory, OverwritePolicy::Forced);
-    if (behavior == Behavior::Copy)
-        return copyResult;
-
-    NX_ASSERT(behavior == Behavior::Move);
-
-    /* Copy files first and only then delete originals. */
-    if (!copyResult)
-        return false;
-
-    /* Do nothing if cannot clear backup folder correctly. */
-    return deleteFiles(m_backupDirectory);
-}
-
-QStringList QnDirectoryBackup::calculateFilenames(const QString& originalDirectory, const QStringList& nameFilters) const
-{
-    return QDir(originalDirectory).entryList(nameFilters, QDir::NoDotAndDotDot | QDir::Files);
-}
-
-bool QnDirectoryBackup::copyFiles(const QString& sourceDirectory, const QString& targetDirectory, OverwritePolicy overwritePolicy) const
+bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory,
+    const QStringList& fileNames, OverwritePolicy overwritePolicy)
 {
 
     /* Check if target file must be overridden by source file. */
@@ -110,7 +46,7 @@ bool QnDirectoryBackup::copyFiles(const QString& sourceDirectory, const QString&
 
     /* Always try to copy as much files as possible even if we have failed some. */
     bool success = true;
-    for (const QString& filename : m_filenames)
+    for (const QString& filename : fileNames)
     {
         const QString sourceFilename = sourceDirectory + L'/' + filename;
         const QString targetFilename = targetDirectory + L'/' + filename;
@@ -123,7 +59,7 @@ bool QnDirectoryBackup::copyFiles(const QString& sourceDirectory, const QString&
             if (!QFile::remove(targetFilename))
             {
                 NX_LOG(lit("Could not overwrite file %1")
-                       .arg(targetFilename), cl_logERROR);
+                    .arg(targetFilename), cl_logERROR);
                 success = false;
                 continue;
             }
@@ -132,19 +68,76 @@ bool QnDirectoryBackup::copyFiles(const QString& sourceDirectory, const QString&
         if (!QFile(sourceFilename).copy(targetFilename))
         {
             NX_LOG(lit("Could not copy file %1 to %2")
-                   .arg(sourceFilename)
-                   .arg(targetFilename), cl_logERROR);
+                .arg(sourceFilename)
+                .arg(targetFilename), cl_logERROR);
             success = false;
         }
     }
     return success;
 }
 
-bool QnDirectoryBackup::deleteFiles(const QString& targetDirectory) const
+template<typename BackupsList>
+bool rollback(QnDirectoryBackupBehavior behavior
+    , const BackupsList& backups)
+{
+    for (auto it = backups.rbegin(); it != backups.rend(); ++it)
+    {
+        const auto backup = *it;
+        if (!backup->backup(behavior))
+            return false;
+    }
+    return true;
+}
+
+template<typename RestoreType>
+bool restoreImpl(const QString& original, const QString& backup,
+    const QStringList& filters, QnDirectoryBackupBehavior behavior)
+{
+    const auto restoreInstance = RestoreType(backup, filters, original);
+    return restoreInstance.backup(behavior);
+}
+
+typedef QSharedPointer<QnDirectoryBackup> SingleDirectoryBackupPtr;
+typedef QList<SingleDirectoryBackupPtr> BackupsList;
+
+template<typename BackupsStack>
+bool recursiveBackupImpl(const QString& sourceDirectory, const QString& targetDirectory,
+    const QStringList& filters, QnDirectoryBackupBehavior behavior, BackupsStack& successfulBackups)
+{
+    const auto original = QDir(sourceDirectory);
+    auto entries = original.entryList(QDir::AllDirs);
+
+    // Bakups files in current firectory
+    const auto filesBackup = SingleDirectoryBackupPtr(
+        new QnDirectoryBackup(sourceDirectory, filters, targetDirectory));
+    if (!filesBackup->backup(behavior))
+        return false;
+    successfulBackups.append(filesBackup);
+
+    static const QStringList kFakeDirectories = QStringList() << lit(".") << lit("..");
+    if (entries.size() == kFakeDirectories.size())
+        return true;
+
+    for (const auto entry : entries)
+    {
+        if (kFakeDirectories.contains(entry))
+            continue;
+
+        static const auto kDirTemplate = lit("%1/%2");
+        const auto source = kDirTemplate.arg(sourceDirectory, entry);
+        const auto target = kDirTemplate.arg(targetDirectory, entry);
+        if (!recursiveBackupImpl(source, target, filters, behavior, successfulBackups))
+            return false;
+    }
+
+    return true;
+}
+
+bool deleteFiles(const QString& targetDirectory, const QStringList& fileNames)
 {
     /* Always try to delete as much files as possible even if we have failed some. */
     bool success = true;
-    for (const QString& filename : m_filenames)
+    for (const QString& filename : fileNames)
     {
         const QString filePath = targetDirectory + L'/' + filename;
         if (!QFileInfo::exists(filePath))
@@ -157,4 +150,168 @@ bool QnDirectoryBackup::deleteFiles(const QString& targetDirectory) const
         }
     }
     return success;
+}
+
+bool makeFilesBackup(QnDirectoryBackupBehavior behavior, const QString& from, const QString& to,
+    const QStringList& fileNames)
+{
+    if (!QDir().mkpath(to))
+        return false;
+
+    if (!deleteFiles(to, fileNames))
+    {
+        NX_LOG(lit("Could not cleanup backup directory %1.").arg(to), cl_logERROR);
+        return false;
+    }
+
+    bool copyResult = copyFiles(from, to,
+        fileNames, OverwritePolicy::Forced);
+    if (behavior == QnDirectoryBackupBehavior::Copy)
+        return copyResult;
+
+    NX_ASSERT(behavior == QnDirectoryBackupBehavior::Move);
+
+    /* Copy files first and only then delete originals. */
+    if (!copyResult)
+        return false;
+
+    return deleteFiles(from, fileNames);
+}
+
+QStringList calculateFilenames(const QString& directory, const QStringList& nameFilters)
+{
+    return QDir(directory).entryList(nameFilters, QDir::NoDotAndDotDot | QDir::Files);
+}
+
+} // Unnamed namespace
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+QnBaseDirectoryBackup::QnBaseDirectoryBackup(const QString& originalDirectory, const QStringList& nameFilters,
+    const QString& backupDirectory)
+    :
+    m_originalDirectory(originalDirectory),
+    m_backupDirectory(backupDirectory),
+    m_filters(nameFilters)
+{
+}
+
+const QString& QnBaseDirectoryBackup::originalDirectory() const
+{
+    return m_originalDirectory;
+}
+
+const QString& QnBaseDirectoryBackup::backupDirectory() const
+{
+    return m_backupDirectory;
+}
+const QStringList& QnBaseDirectoryBackup::filters() const
+{
+    return m_filters;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+QnDirectoryBackup::QnDirectoryBackup(const QString& originalDirectory, const QString& backupDirectory)
+    :
+    QnBaseDirectoryBackup(originalDirectory, QStringList(), backupDirectory),
+    m_fileNames(calculateFilenames(originalDirectory, filters()))
+{}
+
+QnDirectoryBackup::QnDirectoryBackup(const QString& originalDirectory, const QStringList& nameFilters, const QString& backupDirectory)
+    :
+    QnBaseDirectoryBackup(originalDirectory, nameFilters, backupDirectory),
+    m_fileNames(calculateFilenames(originalDirectory, filters()))
+{}
+
+bool QnDirectoryBackup::backup(QnDirectoryBackupBehavior behavior) const
+{
+    if (!makeFilesBackup(behavior, originalDirectory(), backupDirectory(), m_fileNames))
+    {
+        /* If deleting was not successful, try restore backup. */
+        NX_LOG(lit("Could not cleanup original directory %1, trying to restore backup.")
+            .arg(originalDirectory()), cl_logERROR);
+
+        if (!copyFiles(backupDirectory(), originalDirectory(), m_fileNames, OverwritePolicy::Skip))
+        {
+            NX_LOG(lit("Could not restore backup. System is is invalid state."), cl_logERROR);
+        }
+        return false;
+    }
+
+    return true;
+}
+
+bool QnDirectoryBackup::restore(QnDirectoryBackupBehavior behavior) const
+{
+    return restoreImpl<QnDirectoryBackup>(originalDirectory(),
+        backupDirectory(), filters(), behavior);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+QnDirectoryRecursiveBackup::QnDirectoryRecursiveBackup(const QString& originalDirectory,
+    const QString& backupDirectory)
+    :
+    QnBaseDirectoryBackup(originalDirectory, QStringList(), backupDirectory)
+{
+}
+
+QnDirectoryRecursiveBackup::QnDirectoryRecursiveBackup(const QString& originalDirectory,
+    const QStringList& nameFilters, const QString& backupDirectory)
+    :
+    QnBaseDirectoryBackup(originalDirectory, nameFilters, backupDirectory)
+{
+}
+
+bool QnDirectoryRecursiveBackup::backup(QnDirectoryBackupBehavior behavior) const
+{
+    BackupsList backups;
+    if (recursiveBackupImpl(originalDirectory(), backupDirectory(), filters(), behavior, backups))
+        return true;
+
+    rollback(behavior, backups);
+    return false;
+}
+
+bool QnDirectoryRecursiveBackup::restore(QnDirectoryBackupBehavior behavior) const
+{
+    return restoreImpl<QnDirectoryRecursiveBackup>(originalDirectory(),
+        backupDirectory(), filters(), behavior);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+QnMultipleDirectoriesBackup::QnMultipleDirectoriesBackup()
+    :
+    QnBaseDirectoryBackup(QString(), QStringList(), QString()),
+    m_backups()
+{
+}
+
+void QnMultipleDirectoriesBackup::addDirectoryBackup(const SingleDirectoryBackupPtr& backup)
+{
+    m_backups.append(backup);
+}
+
+bool QnMultipleDirectoriesBackup::backup(QnDirectoryBackupBehavior behavior) const
+{
+    BackupsList successfulBackups;
+    for (const auto backup : m_backups)
+    {
+        if (backup->backup(behavior))
+        {
+            successfulBackups.append(backup);
+            continue;
+        }
+
+        rollback(behavior, successfulBackups);
+        return false;
+    }
+    return true;
+}
+
+bool QnMultipleDirectoriesBackup::restore(QnDirectoryBackupBehavior behavior) const
+{
+    return rollback(behavior, m_backups);
 }

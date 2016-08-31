@@ -95,6 +95,18 @@ angular.module('webadminApp')
         }
 
 
+        function stringifyValues(object){
+            if(!jQuery.isPlainObject(object) && !jQuery.isArray(object)){
+                return object;
+            }
+            var result = jQuery.isPlainObject(object)?{}:[];
+            for(var key in object){
+                result[key] =  String(object[key]);
+            }
+            return result;
+        }
+
+
         return {
             checkCurrentPassword:function(password){
                 var login = $localStorage.login;
@@ -107,16 +119,23 @@ angular.module('webadminApp')
                 }
                 return $q.reject();
             },
-            getNonce:function(login){
-               return $http.get(proxy + '/web/api/getNonce?userName=' + login);
+            getNonce:function(login, url){
+                var proxy1 = proxy;
+                if(url){
+                    if(url.indexOf("http:")==0 || url.indexOf("https:")==0){
+                        url = url.substring(url.indexOf("//") + 2);
+                    }
+                    proxy1 += '/proxy/https/' + url;
+                }
+                return $http.get(proxy1 + '/web/api/getNonce?userName=' + login);
             },
             logout:function(){
                 $localStorage.$reset();
                 return $http.post(proxy + '/web/api/cookieLogout');
             },
-            digest:function(login,password,realm,nonce){
+            digest:function(login,password,realm,nonce,post){
                 var digest = md5(login + ':' + realm + ':' + password);
-                var method = md5('GET:');
+                var method = md5(post?'POST:':'GET:');
                 var authDigest = md5(digest + ':' + nonce + ':' + method);
                 var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
@@ -132,15 +151,16 @@ angular.module('webadminApp')
                         var nonce = data.data.reply.nonce;
 
                         var auth = self.digest(login, password, realm, nonce);
-
-                        $localStorage.login = login;
-                        $localStorage.nonce = nonce;
-                        $localStorage.realm = realm;
-                        $localStorage.auth = auth;
+                        $localStorage.$reset();
 
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
+                        }).then(function(){
+                            $localStorage.login = login;
+                            $localStorage.nonce = nonce;
+                            $localStorage.realm = realm;
+                            $localStorage.auth = auth;
                         });
                     });
                 }
@@ -253,7 +273,14 @@ angular.module('webadminApp')
                 });
                 return deferred.promise;
             },
+            disconnectFromCloud:function(ownerLogin,ownerPassword){
+                var params = ownerPassword ? {
+                    password: ownerPassword,
+                    login: ownerLogin
+                }: null;
+                return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
+            },
             restoreFactoryDefaults:function(){
                 return wrapPost(proxy + '/web/api/restoreState');
             },
@@ -263,7 +290,7 @@ angular.module('webadminApp')
                     cloudSystemID: systemId,
                     cloudAuthKey: authKey,
                     cloudAccountName: cloudAccountName,
-                    systemSettings: systemSettings
+                    systemSettings: stringifyValues(systemSettings)
                 });
             },
 
@@ -272,14 +299,15 @@ angular.module('webadminApp')
                     systemName: systemName,
                     adminAccount: adminAccount,
                     password: adminPassword,
-                    systemSettings: systemSettings
+                    systemSettings: stringifyValues(systemSettings)
                 });
             },
 
 
             changeSystemName:function(systemName){
                 return wrapPost(proxy + '/web/api/configure', {
-                    systemName:systemName
+                    wholeSystem: true,
+                    systemName: systemName
                 });
             },
 
@@ -299,25 +327,45 @@ angular.module('webadminApp')
 
 
             mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
-                if(url.indexOf('http')!=0){
-                    url = 'http://' + url;
-                }
-                return wrapPost(proxy + '/web/api/mergeSystems?' + $.param({
-                    login: remoteLogin,
-                    password: remotePassword,
-                    url: url,
-                    takeRemoteSettings: !keepMySystem
-                }));
+                // 1. get remote nonce
+                // /proxy/http/{url}/api/getNonce
+                var self = this;
+                return self.getNonce(remoteLogin, url).then(function(data){
+                    // 2. calculate digest
+                    var realm = data.data.reply.realm;
+                    var nonce = data.data.reply.nonce;
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+
+                    // 3. pass it to merge request
+                    if(url.indexOf('http')!=0){
+                        url = 'https://' + url;
+                    }
+                    return wrapPost(proxy + '/web/api/mergeSystems?',{
+                        getKey: getKey,
+                        postKey: postKey,
+                        url: url,
+                        takeRemoteSettings: !keepMySystem
+                    });
+                });
             },
-            pingSystem: function(url,login,password){
-                if(url.indexOf('http')!=0){
-                    url = 'http://' + url;
-                }
-                return wrapPost(proxy + '/web/api/pingSystem?' + $.param({
-                    password:password,
-                    login:login,
-                    url:url
-                }));
+            pingSystem: function(url, remoteLogin, remotePassword){
+                var self = this;
+                return self.getNonce(remoteLogin, url).then(function(data) {
+                    var realm = data.data.reply.realm;
+                    var nonce = data.data.reply.nonce;
+                    var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, false);
+                    var postKey = self.digest(remoteLogin, remotePassword, realm, nonce, true);
+
+                    if (url.indexOf('http') != 0) {
+                        url = 'http://' + url;
+                    }
+                    return wrapPost(proxy + '/web/api/pingSystem?' + $.param({
+                        getKey: getKey,
+                        postKey: postKey,
+                        url: url
+                    }));
+                });
             },
             restart: function() { return wrapPost(proxy + '/web/api/restart'); },
             getStorages: function(){ return wrapGet(proxy + '/web/api/storageSpace'); },
@@ -328,6 +376,7 @@ angular.module('webadminApp')
             getResourceTypes:function(){return wrapGet(proxy + '/web/ec2/getResourceTypes'); },
 
             getLayouts:function(){return wrapGet(proxy + '/web/ec2/getLayouts'); },
+            getUsers:function(){return wrapGet(proxy + '/web/ec2/getUsers'); },
 
             getCameras:function(id){
                 if(typeof(id)!=='undefined'){
@@ -379,11 +428,14 @@ angular.module('webadminApp')
                     cloudAccountName: cloudAccountName
                 });
             },
+            /*
+            // This method is not used anymore
             clearCloudSystemCredentials: function(){
                 return wrapPost(proxy + '/web/api/saveCloudSystemCredentials',{
                     reset: true
                 });
             },
+            */
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);

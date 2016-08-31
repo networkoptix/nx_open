@@ -129,13 +129,19 @@ const size_t kDefaultMaxTimeoutsInARow(5);
 
 void TestConnection::start()
 {
+    if (!m_socket->setNonBlockingMode(true) ||
+        !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
+        !m_socket->setRecvTimeout(kDefaultRecvTimeout.count()))
+    {
+        return m_socket->post(std::bind(
+            &TestConnection::onConnected, this,
+            SystemError::getLastOSErrorCode()));
+    }
+        
     if( m_connected )
         return startIO();
 
-    if (!m_socket->setNonBlockingMode(true) || 
-        !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
-        !m_socket->setRecvTimeout(kDefaultRecvTimeout.count()) ||
-        (m_localAddress && !m_socket->bind(*m_localAddress)))
+    if (m_localAddress && !m_socket->bind(*m_localAddress))
     {
         return m_socket->post(std::bind(
             &TestConnection::onConnected, this,
@@ -910,7 +916,7 @@ boost::optional<SocketAddress> AddressBinder::random(const SocketAddress& key) c
 
 MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBinder)
 :
-    TCPSocket(),
+    TCPSocket(false, AF_INET),
     m_addressBinder(addressBinder)
 {
 }

@@ -37,24 +37,32 @@ QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaSer
 QnClientStorageResource::~QnClientStorageResource()
 {}
 
-void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByteArray>& modifiedFields ) {
-    base_type::updateInner(other, modifiedFields);
+void QnClientStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
+{
+    base_type::updateInternal(other, notifiers);
 
     QnClientStorageResource* localOther = dynamic_cast<QnClientStorageResource*>(other.data());
 
     /* Do not overwrite space info data with invalid values. */
-    if(localOther && localOther->isSpaceInfoAvailable()) {
+    if (localOther && localOther->isSpaceInfoAvailable())
+    {
         if (m_freeSpace != localOther->m_freeSpace)
-            modifiedFields << "freeSpaceChanged";
-        m_freeSpace = localOther->m_freeSpace;
+        {
+            m_freeSpace = localOther->m_freeSpace;
+            notifiers << [r = toSharedPointer(this)]{emit r->freeSpaceChanged(r); };
+        }
 
         if (m_totalSpace != localOther->m_totalSpace)
-            modifiedFields << "totalSpaceChanged";
-        m_totalSpace = localOther->m_totalSpace;
+        {
+            m_totalSpace = localOther->m_totalSpace;
+            notifiers << [r = toSharedPointer(this)]{ emit r->totalSpaceChanged(r); };
+        }
 
         if (m_writable != localOther->m_writable)
-            modifiedFields << "isWritableChanged";
-        m_writable = localOther->m_writable;
+        {
+            m_writable = localOther->m_writable;
+            notifiers << [r = toSharedPointer(this)]{ emit r->isWritableChanged(r); };
+        }
     }
 }
 

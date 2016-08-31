@@ -223,6 +223,8 @@ namespace nx_http
             {
                 case _continue:
                     return StringType("Continue");
+                case upgrade:
+                    return StringType("Switching Protocols");
                 case ok:
                     return StringType("OK");
                 case noContent:
@@ -293,6 +295,7 @@ namespace nx_http
     const StringType Method::HEAD( "HEAD" );
     const StringType Method::POST( "POST" );
     const StringType Method::PUT( "PUT" );
+    const StringType Method::OPTIONS( "OPTIONS" );
 
     //namespace Version
     //{

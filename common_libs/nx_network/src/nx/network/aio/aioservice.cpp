@@ -145,6 +145,21 @@ AbstractAioThread* AIOService::getRandomAioThread() const
     return nx::utils::random::choice(m_systemSocketAIO.aioThreadPool).get();
 }
 
+bool AIOService::isInAnyAioThread() const
+{
+    QnMutexLocker lk(&m_mutex);
+    const auto thisThread = QThread::currentThread();
+    const auto it = std::find_if(
+        m_systemSocketAIO.aioThreadPool.begin(),
+        m_systemSocketAIO.aioThreadPool.end(),
+        [thisThread](const std::unique_ptr<AIOThread>& aioThread)
+        {
+            return thisThread == aioThread.get();
+        });
+
+    return it != m_systemSocketAIO.aioThreadPool.end();
+}
+
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
 {
     const auto desiredThread = static_cast<aio::AIOThread*>(aioThread);

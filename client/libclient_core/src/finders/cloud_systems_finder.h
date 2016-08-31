@@ -11,7 +11,6 @@
 #include <watchers/cloud_status_watcher.h>
 
 class QTimer;
-struct QnConnectionInfo;
 
 class QnCloudSystemsFinder : public Connective<QnAbstractSystemsFinder>
 {
@@ -45,8 +44,7 @@ private:
 
     void updateSystems();
 
-    void tryRemoveAlienServer(const QnModuleInformation &serverInfo
-        , const QString &supposedSystemId);
+    void tryRemoveAlienServer(const QnModuleInformation &serverInfo);
 
 private:
     typedef QScopedPointer<QTimer> QTimerPtr;

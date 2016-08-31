@@ -12,23 +12,24 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-// TODO #mux comment
+/**
+ * Sends connectionAck to mediator over UDT, then creates IncomingControlConnection to return it
+ * wrapped into IncomingTunnelConnection. In case if control connection can not be estabilished
+ * the error is returned.
+ */
 class NX_NETWORK_API TunnelAcceptor
 :
     public AbstractTunnelAcceptor
 {
 public:
-    explicit TunnelAcceptor(
+    TunnelAcceptor(
         std::list<SocketAddress> peerAddresses,
         nx::hpm::api::ConnectionParameters connectionParametes);
 
     void setUdpRetransmissionTimeout(std::chrono::milliseconds timeout);
     void setUdpMaxRetransmissions(int count);
 
-    void accept(std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) override;
-
+    void accept(AcceptHandler handler) override;
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
@@ -51,9 +52,7 @@ private:
     std::list<std::unique_ptr<UdtStreamSocket>> m_sockets;
     std::list<std::unique_ptr<IncomingControlConnection>> m_connections;
 
-    std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractIncomingTunnelConnection>)> m_acceptHandler;
+    AcceptHandler m_acceptHandler;
 };
 
 } // namespace udp

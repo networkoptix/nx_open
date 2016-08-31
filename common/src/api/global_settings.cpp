@@ -82,12 +82,15 @@ namespace
     const QString kServerDiscoveryPingTimeout(lit("serverDiscoveryPingTimeoutSec"));
     const int kServerDiscoveryPingTimeoutDefault = 60;
 
-    const QString kCloudPortalUrl(lit("cloudPortalUrl"));
-
     const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
     const bool kArecontRtspEnabledDefault = false;
     const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
     const int kProxyConnectTimeoutDefault = 5;
+
+    const QString kMaxRecorderQueueSizeBytesName(lit("maxRecordQueueSizeBytes"));
+    const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 42;
+    const QString kMaxRecorderQueueSizePacketsName(lit("maxRecordQueueSizeElements"));
+    const int kMaxRecorderQueueSizePacketsDefault = 1000;
 
     const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
     const int kTakeCameraOwnershipWithoutLockDefault = false;
@@ -265,14 +268,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 {
-    m_cloudPortalUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kCloudPortalUrl, QnAppInfo::defaultCloudPortalUrl(), this);
     m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAccountName, QString(), this);
     m_cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemID, QString(), this);
     m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAuthKey, QString(), this);
 
     QnGlobalSettings::AdaptorList result;
     result
-        << m_cloudPortalUrlAdaptor
         << m_cloudAccountNameAdaptor
         << m_cloudSystemIDAdaptor
         << m_cloudAuthKeyAdaptor
@@ -301,6 +302,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kArecontRtspEnabledDefault,
         this);
 
+    m_maxRecorderQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxRecorderQueueSizeBytesName,
+        kMaxRecorderQueueSizeBytesDefault,
+        this);
+
+    m_maxRecorderQueueSizePackets = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxRecorderQueueSizePacketsName,
+        kMaxRecorderQueueSizePacketsDefault,
+        this);
+
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
@@ -321,6 +332,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_upnpPortMappingEnabledAdaptor
         << m_newSystemAdaptor
         << m_arecontRtspEnabledAdaptor
+        << m_maxRecorderQueueSizeBytes
+        << m_maxRecorderQueueSizePackets
         ;
 
     return result;
@@ -711,16 +724,6 @@ void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInt
     m_serverDiscoveryPingTimeoutAdaptor->setValue(newInterval.count());
 }
 
-QString QnGlobalSettings::cloudPortalUrl() const
-{
-    return m_cloudPortalUrlAdaptor->value();
-}
-
-void QnGlobalSettings::setCloudPortalUrl(const QString& url)
-{
-    m_cloudPortalUrlAdaptor->setValue(url);
-}
-
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 {
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
@@ -792,6 +795,16 @@ bool QnGlobalSettings::arecontRtspEnabled() const
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
     m_arecontRtspEnabledAdaptor->setValue(newVal);
+}
+
+int QnGlobalSettings::maxRecorderQueueSizeBytes() const
+{
+    return m_maxRecorderQueueSizeBytes->value();
+}
+
+int QnGlobalSettings::maxRecorderQueueSizePackets() const
+{
+    return m_maxRecorderQueueSizePackets->value();
 }
 
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const

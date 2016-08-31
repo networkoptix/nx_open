@@ -30,7 +30,7 @@ public:
         size_t clientsLimit)
     :
         m_clientsLimit(clientsLimit),
-        m_server(new TCPServerSocket),
+        m_server(new TCPServerSocket(AF_INET)),
         m_addressManager(std::move(addressManager))
     {
         m_server->bindToAioThread(thread);
@@ -51,9 +51,7 @@ public:
         NX_LOGX(lm("removed, %1 sockets left").arg(m_clientsLimit), cl_logDEBUG1);
     }
 
-    void accept(std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractStreamSocket>)> handler) override
+    void accept(AcceptHandler handler) override
     {
         if (m_clientsLimit == 0)
         {
@@ -97,7 +95,7 @@ struct FakeTcpTunnelAcceptor
         size_t clientsLimit = 5)
     :
         m_designatedAioThread(designatedAioThread),
-        m_ioThreadSocket(new TCPSocket),
+        m_ioThreadSocket(new TCPSocket(false, AF_INET)),
         m_addressManager(std::move(addressManager)),
         m_hasConnection(hasConnection),
         m_clientsLimit(clientsLimit)
@@ -115,9 +113,7 @@ struct FakeTcpTunnelAcceptor
         NX_LOGX(lm("removed, c=%1").str(m_hasConnection), cl_logDEBUG1);
     }
 
-    void accept(std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) override
+    void accept(AcceptHandler handler) override
     {
         if (!m_designatedAioThread)
         {
@@ -227,7 +223,7 @@ struct CloudServerSocketTcpTester
                     startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
                         m_addressManager, getAioThread(), true, 0));
 
-                    // brocken acceptor
+                    // broken acceptor
                     startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
                         m_addressManager, getAioThread(), false));
                 }
@@ -311,7 +307,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto list = addressBinder.get(addressManager.key);
     ASSERT_EQ(list.size(), 1);
 
-    auto client = std::make_unique<TCPSocket>(false);
+    auto client = std::make_unique<TCPSocket>(false, AF_INET);
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(500));
 
@@ -420,7 +416,7 @@ protected:
 
     void startClient(const SocketAddress& peer)
     {
-        auto socketPtr = std::make_unique<TCPSocket>();
+        auto socketPtr = std::make_unique<TCPSocket>(false, AF_INET);
         auto socket = socketPtr.get();
         const auto timeout = 3000 * utils::TestOptions::timeoutMultiplier();
         ASSERT_TRUE(socketPtr->setSendTimeout(timeout));

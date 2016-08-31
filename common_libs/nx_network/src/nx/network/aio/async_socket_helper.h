@@ -55,7 +55,7 @@ public:
 
         nx::network::SocketGlobals::aioService().dispatch( m_socket, std::move(handler) );
     }
-    
+
     //!This call stops async I/O on socket and it can never be resumed!
     void terminateAsyncIO()
     {
@@ -77,7 +77,8 @@ public:
     AsyncSocketImplHelper(
         SocketType* _socket,
         AbstractCommunicatingSocket* _abstractSocketPtr,
-        bool _natTraversalEnabled )
+        bool _natTraversalEnabled,
+        int _ipVersion )
     :
         BaseAsyncSocketImplHelper<SocketType>( _socket ),
         m_abstractSocketPtr( _abstractSocketPtr ),
@@ -93,7 +94,8 @@ public:
         m_threadHandlerIsRunningIn( NULL ),
         m_natTraversalEnabled( _natTraversalEnabled ),
         m_asyncSendIssued( false ),
-        m_addressResolverIsInUse( false )
+        m_addressResolverIsInUse( false ),
+        m_ipVersion( _ipVersion )
     {
         NX_ASSERT( this->m_socket );
         NX_ASSERT( m_abstractSocketPtr );
@@ -102,7 +104,7 @@ public:
     virtual ~AsyncSocketImplHelper()
     {
         //synchronization may be required here in case if recv handler and send/connect handler called simultaneously in different aio threads,
-        //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing 
+        //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing
         //async I/O and wait for completion. That is, wait for eventTriggered to return.
         //So, socket can only be removed from handler called in aio thread. So, eventTriggered is down the stack if m_*TerminatedFlag is not nullptr
 
@@ -196,10 +198,11 @@ public:
         }
 
         m_addressResolverIsInUse = true;
-        nx::network::SocketGlobals::addressResolver().resolveAsync(
-            addr.address,
-            [this, addr]( SystemError::ErrorCode errorCode,
-                          std::vector< nx::network::cloud::AddressEntry > addresses )
+
+        auto resolveHandler =
+            [this, addr](
+                SystemError::ErrorCode errorCode,
+                std::vector< nx::network::cloud::AddressEntry > addresses )
             {
                 //always calling m_connectHandler within aio thread socket is bound to
                 if( addresses.empty() )
@@ -241,9 +244,10 @@ public:
                     {
                         handler(errorCode);
                     });
-            },
-            m_natTraversalEnabled,
-            this );
+            };
+
+        nx::network::SocketGlobals::addressResolver().resolveAsync(
+            addr.address, std::move(resolveHandler), false, m_ipVersion, this);
     }
 
     void readSomeAsync( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -253,7 +257,7 @@ public:
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
-        //this NX_ASSERT is not critical but is a signal of possible 
+        //this assert is not critical but is a signal of possible 
             //ineffective memory usage in calling code
         NX_ASSERT( buf->capacity() > buf->size() );
 
@@ -384,6 +388,7 @@ private:
     const bool m_natTraversalEnabled;
     std::atomic<bool> m_asyncSendIssued;
     std::atomic<bool> m_addressResolverIsInUse;
+    const int m_ipVersion;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {

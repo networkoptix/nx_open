@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rest/server/json_rest_handler.h>
+#include <core/resource_management/user_access_data.h>
 
 struct SetupLocalSystemData;
 
@@ -11,5 +12,5 @@ public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*owner) override;
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*owner) override;
 private:
-    int execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result);
+    int execute(SetupLocalSystemData data, const QnRestConnectionProcessor* owner, QnJsonRestResult &result);
 };

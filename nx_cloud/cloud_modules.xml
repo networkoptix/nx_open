@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<modules>
-<cdb>
-<endpoint>10.0.2.95:3346</endpoint>
-</cdb>
-<hpm>
-<!--AK's old PC-->
-<endpoint>10.0.2.175:3345</endpoint>
-</hpm>
-</modules>
+
+<sequence>
+    <set resName="cdb" resValue="cloud-demo.hdw.mx:3346"/>
+    <set resName="hpm" resValue="cloud-demo.hdw.mx:3345"/>
+    <set resName="notification_module" resValue="cloud-demo.hdw.mx:80"/>
+</sequence>

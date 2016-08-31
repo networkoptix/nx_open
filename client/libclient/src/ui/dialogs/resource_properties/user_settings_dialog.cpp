@@ -26,7 +26,7 @@ namespace
     static std::map<QnResourceAccessFilter::Filter, QString> kCategoryNameByFilter
     {
         { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Media Resources") },
-        { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Layouts") }
+        { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Shared Layouts") }
     };
 
     static const QString kHtmlTableTemplate(lit("<table>%1</table>"));
@@ -52,6 +52,12 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
+
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this, [this](const QSet<QnUuid>& resourceIds)
+    {
+        if (m_user && resourceIds.contains(m_user->getId()))
+            permissionsChanged();
+    });
 
     connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
     connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
@@ -101,11 +107,15 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     });
 
     ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
-    connect(m_editGroupsButton, &QPushButton::clicked, this, [this]
-    {
-        QnUuid groupId = isPageVisible(ProfilePage) ? m_user->userGroup() : m_settingsPage->selectedUserGroup();
-        menu()->trigger(QnActions::UserGroupsAction, QnActionParameters().withArgument(Qn::ResourceUidRole, groupId));
-    });
+    connect(m_editGroupsButton, &QPushButton::clicked, this,
+        [this]
+        {
+            QnUuid groupId = isPageVisible(ProfilePage)
+                ? m_user->userGroup()
+                : m_settingsPage->selectedUserGroup();
+            menu()->trigger(QnActions::UserRolesAction,
+                QnActionParameters().withArgument(Qn::UuidRole, groupId));
+        });
 
     m_editGroupsButton->setVisible(false);
 
@@ -177,7 +187,7 @@ void QnUserSettingsDialog::permissionsChanged()
 
     if (isPageVisible(ProfilePage))
     {
-        Qn::UserRole roleType = qnResourceAccessManager->userRole(m_user);
+        Qn::UserRole roleType = m_user->role();
         QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
 
         if (roleType == Qn::UserRole::CustomUserGroup)
@@ -228,6 +238,11 @@ void QnUserSettingsDialog::permissionsChanged()
             permissionsText += kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_camerasPage)) +
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_layoutsPage)));
+
+            m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
+
+            m_layoutsPage->indirectAccessChanged();
+            m_camerasPage->indirectAccessChanged();
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);
@@ -336,15 +351,17 @@ void QnUserSettingsDialog::applyChanges()
 
     //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
     //TODO: #GDM #access SafeMode what to rollback if we were creating new user
-    qnResourcesChangesManager->saveUser(m_user, [this, mode](const QnUserResourcePtr& user)
-    {
-        Q_UNUSED(user);
-        for (const auto& page : allPages())
+    qnResourcesChangesManager->saveUser(m_user,
+        [this, mode](const QnUserResourcePtr& user)
         {
-            if (page.enabled && page.visible)
-                page.widget->applyChanges();
-        }
-    });
+            for (const auto& page : allPages())
+            {
+                if (page.enabled && page.visible)
+                    page.widget->applyChanges();
+            }
+            if (m_user->getId().isNull())
+                m_user->fillId();
+        });
     /* We may fill password field to change current user password. */
     m_user->setPassword(QString());
 
@@ -360,6 +377,13 @@ void QnUserSettingsDialog::applyChanges()
     }
 
     updateButtonBox();
+    loadDataToUi();
+}
+
+void QnUserSettingsDialog::showEvent(QShowEvent* event)
+{
+    loadDataToUi();
+    base_type::showEvent(event);
 }
 
 void QnUserSettingsDialog::updateControlsVisibility()

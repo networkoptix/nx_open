@@ -31,11 +31,33 @@
 #include "http/custom_headers.h"
 #include "api/global_settings.h"
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/aio/pollset.h>
+#include <nx/network/aio/unified_pollset.h>
+
+#include <utils/common/app_info.h>
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int MAX_PROXY_TTL = 8;
+
+/** Returns false if socket would block in blocking mode */
+static bool readSocketNonBlock(
+    int* returnValue, AbstractStreamSocket* socket, 
+    void* buffer, int bufferSize)
+{
+    *returnValue = socket->recv(buffer, bufferSize, MSG_DONTWAIT);
+    if (*returnValue < 0)
+    {
+        auto code = SystemError::getLastOSErrorCode();
+        if (code == SystemError::interrupted ||
+            code == SystemError::wouldBlock ||
+            code == SystemError::again)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
@@ -89,11 +111,9 @@ int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol
 
 bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
 {
-    int readed = srcSocket->recv(buffer, bufferSize);
-#ifndef Q_OS_WIN32
-    if( readed == -1 && errno == EINTR )
+    int readed;
+    if( !readSocketNonBlock(&readed, srcSocket, buffer, bufferSize) )
         return true;
-#endif
 
     if (readed < 1)
         return false;
@@ -201,8 +221,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     nx_http::header::DigestAuthorization originalAuthHeader;
     if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
         return false;
-    if (originalAuthHeader.authScheme != nx_http::header::AuthScheme::digest ||
-        originalAuthHeader.digest->params["realm"] != QnAppInfo::realm().toUtf8())
+    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
     {
         return true; //< no need to update, it is non server proxy request
     }
@@ -245,60 +264,67 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 {
     Q_D(QnProxyConnectionProcessor);
 
-    QUrl url = d->request.requestLine.url;
-    QString host = url.host();
-    QString urlPath = url.path();
-
-    // todo: this code is deprecated and isn't compatible with WEB client
-    // It never used for WEB client purpose
-    if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
+    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
     {
-        int proxyEndPos = urlPath.indexOf('/', 2); // remove proxy prefix
-        int protocolEndPos = urlPath.indexOf('/', proxyEndPos+1); // remove proxy prefix
-        if (protocolEndPos == -1)
-            return false;
+        dstUrl = d->request.requestLine.url;
+    }
+    else
+	{
+        QUrl url = d->request.requestLine.url;
+        QString host = url.host();
+        QString urlPath = url.path();
 
-        QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
-        if (!isProtocol(protocol)) {
-            protocol = dstUrl.scheme();
-            if (protocol.isEmpty())
-                protocol = "http";
-            protocolEndPos = proxyEndPos;
+        // todo: this code is deprecated and isn't compatible with WEB client
+        // It never used for WEB client purpose
+        if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
+        {
+            int proxyEndPos = urlPath.indexOf('/', 2); // remove proxy prefix
+            int protocolEndPos = urlPath.indexOf('/', proxyEndPos + 1); // remove proxy prefix
+            if (protocolEndPos == -1)
+                return false;
+
+            QString protocol = urlPath.mid(proxyEndPos + 1, protocolEndPos - proxyEndPos - 1);
+            if (!isProtocol(protocol)) {
+                protocol = url.scheme();
+                if (protocol.isEmpty())
+                    protocol = "http";
+                protocolEndPos = proxyEndPos;
+            }
+
+            int hostEndPos = urlPath.indexOf('/', protocolEndPos + 1); // remove proxy prefix
+            if (hostEndPos == -1)
+                hostEndPos = urlPath.size();
+
+            host = urlPath.mid(protocolEndPos + 1, hostEndPos - protocolEndPos - 1);
+            if (host.startsWith("{"))
+                dstRoute.id = QnUuid::fromStringSafe(host);
+
+            urlPath = urlPath.mid(hostEndPos);
+
+            // get dst ip and port
+            QStringList hostAndPort = host.split(':');
+            int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
+
+            dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+        }
+        else {
+            QString scheme = url.scheme();
+            if (scheme.isEmpty())
+                scheme = lit("http");
+
+            int defaultPort = getDefaultPortByProtocol(scheme);
+            dstUrl = QUrl(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
         }
 
-        int hostEndPos = urlPath.indexOf('/', protocolEndPos+1); // remove proxy prefix
-        if (hostEndPos == -1)
-            hostEndPos = urlPath.size();
-
-        host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
-        if (host.startsWith("{"))
-            dstRoute.id = QnUuid::fromStringSafe(host);
-
-        urlPath = urlPath.mid(hostEndPos);
-
-        // get dst ip and port
-        QStringList hostAndPort = host.split(':');
-        int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
-
-        dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+        if (urlPath.isEmpty())
+            urlPath = "/";
+        QString query = url.query();
+        if (!query.isEmpty()) {
+            urlPath += lit("?");
+            urlPath += query;
+        }
+        d->request.requestLine.url = urlPath;
     }
-    else {
-        QString scheme = url.scheme();
-        if (scheme.isEmpty())
-            scheme = lit("http");
-
-        int defaultPort = getDefaultPortByProtocol(scheme);
-        dstUrl = QUrl(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
-    }
-
-    if (urlPath.isEmpty())
-        urlPath = "/";
-    QString query = url.query();
-    if (!query.isEmpty()) {
-        urlPath += lit("?");
-        urlPath += query;
-    }
-    d->request.requestLine.url = urlPath;
 
     nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     QnUuid cameraGuid;
@@ -315,11 +341,18 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     if (itr != d->request.headers.end())
         dstRoute.id = QnUuid::fromStringSafe(itr->second);
 
-    if (dstRoute.id == qnCommon->moduleGUID()) {
+    if (dstRoute.id == qnCommon->moduleGUID())
+    {
         if (!cameraGuid.isNull())
         {
             if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
                 dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+        }
+        else if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+        {
+            QUrl url = d->request.requestLine.url;
+            int defaultPort = getDefaultPortByProtocol(url.scheme());
+            dstRoute.addr = SocketAddress(url.host(), url.port(defaultPort));
         }
         else
         {
@@ -357,7 +390,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             if (existAuthSession.isEmpty())
                 nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
 
-            QString path = urlPath;
+            QString path = d->request.requestLine.url.path();
             if (!path.startsWith(QLatin1Char('/')))
                 path.prepend(QLatin1Char('/'));
             if (dstRoute.id.isNull())
@@ -452,9 +485,6 @@ void QnProxyConnectionProcessor::run()
     if (!openProxyDstConnection())
         return;
 
-    //d->pollSet.add( d->socket.data(), aio::etRead );
-    //d->pollSet.add( d->dstSocket.data(), aio::etRead );
-
     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
     if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
     {
@@ -476,13 +506,7 @@ void QnProxyConnectionProcessor::doRawProxy()
     Q_D(QnProxyConnectionProcessor);
     nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
 
-    if (!d->socket->setNonBlockingMode(true))
-        return;
-
-    if (!d->dstSocket->setNonBlockingMode(true))
-        return;
-
-    nx::network::aio::PollSet pollSet;
+    nx::network::aio::UnifiedPollSet pollSet;
     pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
     pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
     while (!m_needStop)
@@ -526,15 +550,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
     nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
     d->clientRequest.clear();
 
-    if (!d->socket->setNonBlockingMode(true))
-        return;
-
-    if (!d->dstSocket->setNonBlockingMode(true))
-        return;
-
-    nx::network::aio::PollSet pollSet;
+    nx::network::aio::UnifiedPollSet pollSet;
     pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
     pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
+
     while (!m_needStop)
     {
         int rez = pollSet.poll(IO_TIMEOUT);
@@ -554,7 +573,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
 
             if (it.socket() == d->socket->pollable())
             {
-                int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+                int readed;
+                if (!readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
+                    continue;
+
                 if (readed < 1)
                     return;
 
@@ -584,6 +606,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     else
                     {
                         // new server
+                        pollSet.remove(d->dstSocket->pollable(), nx::network::aio::etRead);
                         d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
                         if (d->lastConnectedUrl.isEmpty())
                         {
@@ -598,6 +621,9 @@ void QnProxyConnectionProcessor::doSmartProxy()
                             doRawProxy(); // switch to binary mode
                             return;
                         }
+                        pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
+                        d->clientRequest.clear();
+                        break;
                     }
                     d->clientRequest.clear();
                 }

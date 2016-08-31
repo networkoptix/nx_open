@@ -36,6 +36,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
@@ -52,7 +53,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
-#include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -60,6 +60,7 @@
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/widgets/views/resource_list_view.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -151,6 +152,17 @@ static QByteArray debugRole(int role)
 }
 #endif
 
+QnVideoWallItemIndexList getIndices(const QnLayoutItemData& data)
+{
+    return qnResourceRuntimeDataManager->layoutItemData(data.uuid, Qn::VideoWallItemIndicesRole)
+        .value<QnVideoWallItemIndexList>();
+}
+
+void setIndices(const QnLayoutItemData& data, const QnVideoWallItemIndexList& value)
+{
+    qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::VideoWallItemIndicesRole, value);
+}
+
 void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemIndexList& indices)
 {
     if (indices.isEmpty())
@@ -191,7 +203,7 @@ void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemInd
         itemData.flags = Qn::PendingGeometryAdjustment;
     itemData.resource.id = firstIdx.videowall()->getId();
     itemData.resource.uniqueId = firstIdx.videowall()->getUniqueId();
-    itemData.dataByRole[Qn::VideoWallItemIndicesRole] = qVariantFromValue<QnVideoWallItemIndexList>(indices);
+    setIndices(itemData, indices);
     layout->addItem(itemData);
 }
 
@@ -271,7 +283,7 @@ public:
     {
         addFlags(Qn::local);
         setName(videowall->getName());
-        setCellSpacing(0.1, 0.1);
+        setCellSpacing(0.1);
         setCellAspectRatio(defaultReviewAR);
         setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
         setData(Qn::VideoWallResourceRole, qVariantFromValue(videowall));
@@ -392,6 +404,14 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
         QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
+        connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+            [this]
+            {
+                if (m_videoWallMode.ready)
+                    return;
+                m_videoWallMode.ready = true;
+                submitDelayedItemOpen();
+            });
         connect(clientMessageProcessor, &QnCommonMessageProcessor::videowallControlMessageReceived,
             this, &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
 
@@ -453,7 +473,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
     if (items.isEmpty())
         return;
 
-    layout->setCellSpacing(QSizeF(0.0, 0.0));
+    layout->setCellSpacing(0.0);
 
     auto reset = [this](const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout)
     {
@@ -753,7 +773,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             {
                 case Qn::LayoutCellSpacingRole:
                 {
-                    QSizeF data = QJson::deserialized<QSizeF>(value);
+                    auto data = QJson::deserialized<qreal>(value);
                     workbench()->currentLayout()->setData(role, data);
                     break;
                 }
@@ -809,17 +829,18 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         {
             QByteArray value = message[valueKey].toUtf8();
             QnUuid uuid = QnUuid(message[uuidKey]);
-            if (!workbench()->currentLayout()->item(uuid))
+            auto item = workbench()->currentLayout()->item(uuid);
+            if (!item)
                 return;
 
-            int role = message[roleKey].toInt();
+            Qn::ItemDataRole role = static_cast<Qn::ItemDataRole>(message[roleKey].toInt());
 
             switch (role)
             {
                 case Qn::ItemGeometryRole:
                 {
                     QRect data = QJson::deserialized<QRect>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
 #ifdef RECEIVER_DEBUG
                     qDebug() << "RECEIVER: Item" << uuid << "geometry changed to" << data;
 #endif
@@ -830,7 +851,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
                 case Qn::ItemZoomRectRole:
                 {
                     QRectF data = QJson::deserialized<QRectF>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
 #ifdef RECEIVER_DEBUG
                     qDebug() << "RECEIVER: Item" << uuid << debugRole(role) << "changed to" << data;
 #endif
@@ -839,7 +860,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
                 case Qn::ItemPositionRole:
                 {
                     QPointF data = QJson::deserialized<QPointF>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemRotationRole:
@@ -847,7 +868,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
                 {
                     qreal data;
                     QJson::deserialize(value, &data);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemFlipRole:
@@ -855,45 +876,45 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
                 {
                     bool data;
                     QJson::deserialize(value, &data);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemCheckedButtonsRole:
                 {
                     int data;
                     QJson::deserialize(value, &data);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemFrameDistinctionColorRole:
                 {
                     QColor data = QJson::deserialized<QColor>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemSliderWindowRole:
                 case Qn::ItemSliderSelectionRole:
                 {
                     QnTimePeriod data = QJson::deserialized<QnTimePeriod>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemImageEnhancementRole:
                 {
                     ImageCorrectionParams data = QJson::deserialized<ImageCorrectionParams>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemImageDewarpingRole:
                 {
                     QnItemDewarpingParams data = QJson::deserialized<QnItemDewarpingParams>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
                 case Qn::ItemHealthMonitoringButtonsRole:
                 {
                     QnServerResourceWidget::HealthMonitoringButtons data = QJson::deserialized<QnServerResourceWidget::HealthMonitoringButtons>(value);
-                    workbench()->currentLayout()->item(uuid)->setData(role, data);
+                    item->setData(role, data);
                     break;
                 }
 
@@ -1307,7 +1328,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
                 desiredAspectRatio = ar;
         }
 
-        layout->setCellSpacing(0, 0);
+        layout->setCellSpacing(0);
         layout->setCellAspectRatio(desiredAspectRatio);
 
         /* Calculate size of the resulting matrix. */
@@ -1406,7 +1427,11 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     videoWall->setId(QnUuid::createUuid());
     videoWall->setName(proposedName);
 
-    qnResourcesChangesManager->saveVideoWall(videoWall, [](const QnVideoWallResourcePtr &videoWall) {});
+    qnResourcesChangesManager->saveVideoWall(videoWall,
+        [](const QnVideoWallResourcePtr &videoWall)
+        {
+            Q_UNUSED(videoWall);
+        });
 }
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
@@ -1472,10 +1497,11 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
     QnVideoWallItemIndexList items = parameters.videoWallItems();
 
     QnResourceList resources;
-    foreach(const QnVideoWallItemIndex &index, items)
+    for (const auto& index: items)
     {
         if (!index.isValid())
             continue;
+
         QnResourcePtr proxyResource(new QnResource());
         proxyResource->setId(index.uuid());
         proxyResource->setName(index.item().name);
@@ -1483,21 +1509,30 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         resources.append(proxyResource);
     }
 
-    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
+    const auto question = tr("Are you sure you want to permanently delete these %n item(s)?",
+        "", resources.size());
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
         tr("Delete Items"),
-        tr("Are you sure you want to permanently delete these %n item(s)?", "", resources.size()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No
-    );
-    if (button != QDialogButtonBox::Yes)
+        tr("Confirm items deleting"),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox.setInformativeText(question);
+    messageBox.addCustomWidget(new QnResourceListView(resources));
+    auto result = messageBox.exec();
+
+    if (result != QDialogButtonBox::Yes)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
-    foreach(const QnVideoWallItemIndex &index, items)
+    for (const auto& index: items)
     {
         if (!index.isValid())
             continue;
+
         index.videowall()->items()->removeItem(index.uuid());
         videoWalls << index.videowall();
     }
@@ -1975,32 +2010,42 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
     QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
 
     QnResourceList resources;
-    foreach(const QnVideoWallMatrixIndex &index, matrices)
+    for (const auto& matrix: matrices)
     {
-        if (!index.videowall() || !index.videowall()->matrices()->hasItem(index.uuid()))
+        if (!matrix.videowall() || !matrix.videowall()->matrices()->hasItem(matrix.uuid()))
             continue;
+
         QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setId(index.uuid());
-        proxyResource->setName(index.videowall()->matrices()->getItem(index.uuid()).name);
+        proxyResource->setId(matrix.uuid());
+        proxyResource->setName(matrix.videowall()->matrices()->getItem(matrix.uuid()).name);
         qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallMatrix);
         resources.append(proxyResource);
     }
 
-    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-        mainWindow(),
-        resources,
+    const auto question = tr("Are you sure you want to permanently delete these %n matrices?",
+        "", resources.size());
+
+    QnMessageBox messageBox(
+        QnMessageBox::Warning,
+        Qn::Empty_Help,
         tr("Delete Matrices"),
-        tr("Are you sure you want to permanently delete these %n matrices?", "", resources.size()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No
-    );
-    if (button != QDialogButtonBox::Yes)
+        tr("Confirm matrices deleting"),
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        mainWindow());
+    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox.setInformativeText(question);
+    messageBox.addCustomWidget(new QnResourceListView(resources));
+    auto result = messageBox.exec();
+
+    if (result != QDialogButtonBox::Yes)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
-    foreach(const QnVideoWallMatrixIndex &matrix, matrices)
+    for (const auto& matrix: matrices)
     {
         if (!matrix.videowall())
             continue;
+
         matrix.videowall()->matrices()->removeItem(matrix.uuid());
         videoWalls << matrix.videowall();
     }
@@ -2039,26 +2084,16 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
     });
 
-    if (m_videoWallMode.active)
+    if (!m_videoWallMode.active)
     {
-        if (resource->getId() != m_videoWallMode.guid)
-            return;
+        connect(videoWall, &QnVideoWallResource::pcAdded,       this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
+        connect(videoWall, &QnVideoWallResource::pcChanged,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
+        connect(videoWall, &QnVideoWallResource::pcRemoved,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);
+        connect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
+        connect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
+        connect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
 
-        if (m_videoWallMode.ready)
-            return;
-        m_videoWallMode.ready = true;
-        submitDelayedItemOpen();
-    }
-    else
-    {
-        connect(videoWall, &QnVideoWallResource::pcAdded, this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
-        connect(videoWall, &QnVideoWallResource::pcChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
-        connect(videoWall, &QnVideoWallResource::pcRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);
-        connect(videoWall, &QnVideoWallResource::itemAdded, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
-        connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
-        connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
-
-        foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
+        foreach (const QnVideoWallItem &item, videoWall->items()->getItems())
             at_videoWall_itemAdded(videoWall, item);
     }
 }
@@ -2121,7 +2156,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResour
     foreach(QnWorkbenchItem *workbenchItem, layout->items())
     {
         QnLayoutItemData data = workbenchItem->data();
-        QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+        auto indices = getIndices(data);
         if (indices.isEmpty())
             continue;
         if (indices.first().item().pcUuid != pc.uuid)
@@ -2419,9 +2454,8 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_dataChanged(int role)
     sendMessage(message);
 }
 
-void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role)
+void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role)
 {
-
     if (!m_controlMode.active)
         return;
 
@@ -2623,7 +2657,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(QnWorkbenchLayout *layout, st
     for (QnWorkbenchItem* workbenchItem : layout->items())
     {
         QnLayoutItemData data = workbenchItem->data();
-        QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+        auto indices = getIndices(data);
         if (indices.isEmpty())
             continue;
         QnVideoWallItemIndex firstIdx = indices.first();
@@ -2797,7 +2831,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
         foreach(QnWorkbenchItem *workbenchItem, layout->items())
         {
             QnLayoutItemData data = workbenchItem->data();
-            QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+            auto indices = getIndices(data);
             if (indices.isEmpty())
                 continue;
 
@@ -2818,7 +2852,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
         foreach(QnWorkbenchItem *workbenchItem, layout->items())
         {
             QnLayoutItemData data = workbenchItem->data();
-            QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+            auto indices = getIndices(data);
             if (indices.isEmpty())
                 continue;
 
@@ -2844,21 +2878,23 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
         if (!workbenchItem)
             return;
 
-        QnVideoWallItemIndexList indices = workbenchItem->data().dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+        auto data = workbenchItem->data();
+        auto indices = getIndices(data);
         indices.removeAll(QnVideoWallItemIndex(videowall, item.uuid));
         if (indices.isEmpty())
             layout->removeItem(workbenchItem);
         else
-            workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
+            setIndices(data, indices);
     };
 
-    auto addToWorkbenchItem = [layout, &videowall, &item](QnWorkbenchItem* workbenchItem)
+    auto addToWorkbenchItem = [this, layout, &videowall, &item](QnWorkbenchItem* workbenchItem)
     {
         if (workbenchItem)
         {
-            QnVideoWallItemIndexList indices = workbenchItem->data().dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+            auto data = workbenchItem->data();
+            auto indices = getIndices(data);
             indices << QnVideoWallItemIndex(videowall, item.uuid);
-            workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
+            setIndices(data, indices);
         }
         else
         {
@@ -2919,7 +2955,6 @@ QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid &layoutId)
     }
     return QnUuid();
 }
-
 
 void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWallResourcePtr& videowall, const QnLayoutResourcePtr &layout)
 {

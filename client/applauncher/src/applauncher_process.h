@@ -84,7 +84,7 @@ private:
     std::map<qint64, KillProcessTask> m_killProcessTasks;
     QString m_devModeKey;
 
-    void launchMostRecentClient();
+    void launchNewestClient();
     bool sendTaskToRunningLauncherInstance();
     bool getVersionToLaunch(QnSoftwareVersion* const versionToLaunch);
     bool addTaskToThePipe(const QByteArray& serializedTask);

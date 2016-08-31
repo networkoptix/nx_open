@@ -95,32 +95,66 @@ Page
         displayMarginBeginning: 16
         displayMarginEnd: 16 + mainWindow.bottomPadding
 
-        footer: Item
-        {
-            width: parent.width
-            height: customConnectionButton.y + customConnectionButton.height
-
-            Button
-            {
-                id: customConnectionButton
-
-                text: qsTr("Connect to Another Server")
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: getDeviceIsPhone() ? parent.availableWidth : implicitWidth
-                y: 10
-
-                onClicked: Workflow.openNewSessionScreen()
-            }
-        }
-
         focus: true
 
         Keys.onPressed:
         {
             // TODO: #dklychkov Implement transparent navigation to the footer item.
             if (event.key == Qt.Key_C)
+            {
                 Workflow.openNewSessionScreen()
+                event.accepted = true
+            }
+        }
+    }
+
+    footer: Rectangle
+    {
+        implicitHeight: customConnectionButton.implicitHeight + 16
+        color: ColorTheme.windowBackground
+
+        Rectangle
+        {
+            width: parent.width
+            height: 1
+            anchors.top: parent.top
+            color: ColorTheme.base4
+        }
+
+        Button
+        {
+            id: customConnectionButton
+
+            text: qsTr("Connect to Another Server")
+
+            anchors.centerIn: parent
+            width: getDeviceIsPhone() ? parent.width - 16 : implicitWidth
+
+            onClicked: Workflow.openNewSessionScreen()
+        }
+    }
+
+    DummyMessage
+    {
+        id: dummyMessage
+
+        anchors.fill: parent
+        anchors.topMargin: -16
+        anchors.bottomMargin: -24
+        title: qsTr("No servers found")
+        description: qsTr(
+             "Check your network connection or press \"%1\" button "
+                 + "to enter a known server address.").arg(customConnectionButton.text)
+        visible: false
+
+        Timer
+        {
+            interval: 1000
+            running: true
+            onTriggered:
+            {
+                dummyMessage.visible = Qt.binding(function() { return sessionsList.count == 0 })
+            }
         }
     }
 

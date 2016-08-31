@@ -63,6 +63,18 @@ struct OnvifResExtInfo
     QString mac;
 };
 
+struct QnOnvifServiceUrls
+{
+	QString deviceServiceUrl;
+	QString mediaServiceUrl;
+	QString ptzServiceUrl;
+	QString imagingServiceUrl;
+	QString anlyticsServiceUrl;
+	QString eventsServiceUrl;
+	QString thermalServiceUrl;
+
+};
+
 class QnPlOnvifResource
 :
     public QnPhysicalCameraResource
@@ -242,7 +254,7 @@ public:
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
+    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const override;
 
     QnMutex* getStreamConfMutex();
     void beforeConfigureStream();
@@ -255,7 +267,7 @@ public:
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 protected:
-    int strictBitrate(int bitrate) const;
+    int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
@@ -534,6 +546,8 @@ private:
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
+	mutable QnOnvifServiceUrls m_serviceUrls;
+
 protected:
     QnCameraAdvancedParams m_advancedParameters;
     int m_onvifRecieveTimeout;

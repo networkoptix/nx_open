@@ -210,7 +210,7 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
         return;
 
     //connecting to the originating peer
-    auto udtStreamSocket = std::make_unique<nx::network::UdtStreamSocket>();
+    auto udtStreamSocket = std::make_unique<nx::network::UdtStreamSocket>(AF_INET);
     udtStreamSocket->bindToAioThread(m_timer.getAioThread());
     auto mediatorUdpClientSocket = m_mediatorUdpClient->takeSocket();
     m_mediatorUdpClient.reset();
@@ -221,7 +221,7 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
         return;
     }
 
-    auto udtStreamServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
+    auto udtStreamServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>(AF_INET);
     udtStreamServerSocket->bindToAioThread(m_timer.getAioThread());
     if (!udtStreamServerSocket->setReuseAddrFlag(true) ||
         !udtStreamServerSocket->bind(udtStreamSocket->getLocalAddress()) ||

@@ -409,7 +409,7 @@ void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
     fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
 
     dst->setCellAspectRatio(src.cellAspectRatio);
-    dst->setCellSpacing(src.horizontalSpacing, src.verticalSpacing);
+    dst->setCellSpacing(src.horizontalSpacing);
     dst->setLocked(src.locked);
     dst->setBackgroundImageFilename(src.backgroundImageFilename);
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
@@ -429,8 +429,8 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, ApiLayoutData& dst)
     fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
 
     dst.cellAspectRatio = src->cellAspectRatio();
-    dst.horizontalSpacing = src->cellSpacing().width();
-    dst.verticalSpacing = src->cellSpacing().height();
+    dst.horizontalSpacing = src->cellSpacing();
+    dst.verticalSpacing = src->cellSpacing(); // TODO: #ynikitenkov Remove vertical spacing?
     dst.locked = src->locked();
     dst.backgroundImageFilename = src->backgroundImageFilename();
     dst.backgroundWidth = src->backgroundSize().width();
@@ -679,7 +679,7 @@ void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaS
 
 void fromResourceToApi(const QnResourcePtr& src, ApiResourceData& dst)
 {
-    NX_ASSERT(!src->getId().isNull());
+    //NX_ASSERT(!src->getId().isNull());
     NX_ASSERT(!src->getTypeId().isNull());
 
     dst.id = src->getId();

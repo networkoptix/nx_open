@@ -10,8 +10,6 @@ ToolBar
 
     implicitWidth: parent ? parent.width : 200
     implicitHeight: 56
-    anchors.top: parent ? parent.top : undefined
-    anchors.topMargin: statusBarHeight
     contentItem.clip: true
 
     background: Rectangle

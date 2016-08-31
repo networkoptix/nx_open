@@ -10,10 +10,13 @@
 #include "connection_info.h"
 #include "test_email_settings_reply.h"
 #include "ping_reply.h"
+#include "getnonce_reply.h"
+#include "system_settings_reply.h"
 #include "recording_stats_reply.h"
 #include "camera_list_reply.h"
 #include "configure_reply.h"
 #include "upload_update_reply.h"
+#include "update_information_reply.h"
 #include "rebuild_archive_reply.h"
 #include "api_ioport_data.h"
 #include "audit/audit_record.h"
@@ -34,9 +37,13 @@
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\
+    (QnGetNonceReply)\
+    (QnSystemSettingsReply)\
     (QnCameraListReply)\
     (QnConfigureReply) \
     (QnUploadUpdateReply)\
+    (QnUpdateFreeSpaceReply)\
+    (QnCloudHostCheckReply)\
     (QnRecordingStatsData)\
     (QnCamRecordingStatsData)\
 

@@ -4,6 +4,12 @@
 #include <nx/utils/log/log.h>
 
 //#define STRICT_STATE_CONTROL
+#define DEBUG_CLIENT_CONNECTION_STATUS
+#ifdef DEBUG_CLIENT_CONNECTION_STATUS
+#define TRACE(...) qDebug() << "QnClientConnectionStatus: " << __VA_ARGS__;
+#else
+#define TRACE(...)
+#endif
 
 namespace {
 
@@ -56,10 +62,7 @@ QnConnectionState QnClientConnectionStatus::state() const
 
 void QnClientConnectionStatus::setState(QnConnectionState state)
 {
-#ifdef STRICT_STATE_CONTROL
-    qDebug() << "QnClientConnectionStatus::setState" << stateToString[m_state];
-#endif
-
+    TRACE("setState" << stateToString[m_state]);
     if (!m_allowedTransactions.values(m_state).contains(state))
         warn(lit("Invalid state transaction %1 -> %2").arg(stateToString[m_state]).arg(stateToString[state]));
 
@@ -69,10 +72,9 @@ void QnClientConnectionStatus::setState(QnConnectionState state)
 void QnClientConnectionStatus::warn(const QString &message) const
 {
     NX_LOG(message, cl_logWARNING);
+    TRACE(message);
 #ifdef STRICT_STATE_CONTROL
     NX_EXPECT(false, Q_FUNC_INFO, message.toUtf8());
-#else
-    qWarning() << message;
 #endif
 }
 

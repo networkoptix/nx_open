@@ -20,18 +20,18 @@ int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &
     return executePost(path, params, QByteArray(), result, processor);
 }
 
-int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* processor)
+int QnUpdateRestHandler::executePost(
+    const QString &path,
+    const QnRequestParams &params,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* processor)
 {
     Q_UNUSED(path)
 
-    bool remotePeerHasAdminRights = false;
-    auto resource = qnResPool->getResourceById(processor->authUserId());
-    if (resource)
-    {
-        auto userResource = resource.dynamicCast<QnUserResource>();
-        if (userResource)
-            remotePeerHasAdminRights = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission);
-    }
+    bool remotePeerHasAdminRights = qnResourceAccessManager->hasGlobalPermission(
+        processor->accessRights(),
+        Qn::GlobalAdminPermission);
 
     if (!remotePeerHasAdminRights)
     {

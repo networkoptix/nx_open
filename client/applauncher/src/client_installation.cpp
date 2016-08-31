@@ -92,7 +92,7 @@ QString targetBinaryPath(QString binaryPath)
 #ifdef Q_OS_LINUX
     static const auto kPrefix = "bin/";
 #elif defined Q_OS_MAC
-    static const auto kPrefix = "Contents/MacOS/";
+    static const auto kPrefix = QnApplauncherAppInfo::bundleName() +  "/Contents/MacOS/";
 #else
     static const auto kPrefix = "";
 #endif

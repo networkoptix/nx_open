@@ -2,7 +2,7 @@
 
 #include "pulse_searcher_helper.h"
 #include <nx/network/nettools.h>
-#include <nx/network/system_socket.h>
+#include <nx/network/socket.h>
 #include "utils/common/sleep.h"
 #include <nx/network/mac_address.h>
 #include "../pulse/pulse_resource.h"
@@ -15,7 +15,7 @@ QnPlPulseSearcherHelper::QnPlPulseSearcherHelper()
 
 QnPlPulseSearcherHelper::~QnPlPulseSearcherHelper()
 {
-    
+
 }
 
 QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources()
@@ -30,7 +30,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             continue;
 
         QString groupAddress(QLatin1String("224.111.111.1"));
-        if (!socket->joinGroup(groupAddress, iface.address.toString())) 
+        if (!socket->joinGroup(groupAddress, iface.address.toString()))
             continue;
 
         QByteArray requestDatagram;
@@ -53,7 +53,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             int readed = socket->recvFrom(reply.data(), reply.size(), &senderEndpoint);
             if (readed < 1)
                 continue;
-                        
+
             WSResult res = parseReply(reply.left(readed));
             if (!res.mac.isEmpty())
             {
@@ -66,8 +66,8 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
         socket->leaveGroup( groupAddress );
     }
 
-    
-    
+
+
 
     return result.values();
 }
@@ -101,7 +101,7 @@ QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(const QByt
 
     result.mac = mac.toString();
 
-    
+
     result.name = QLatin1String("PFD-2000DV");
 
     return result;

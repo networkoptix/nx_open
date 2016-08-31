@@ -8,3 +8,5 @@ struct QnUpdateBookmarkRequestData;
 struct QnDeleteBookmarkRequestData;
 struct QnThumbnailRequestData;
 struct QnSendStatisticsRequestData;
+struct QnUpdateFreeSpaceReply;
+struct QnCloudHostCheckReply;

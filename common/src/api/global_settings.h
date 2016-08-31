@@ -117,9 +117,6 @@ public:
     std::chrono::seconds serverDiscoveryPingTimeout() const;
     void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
 
-    QString cloudPortalUrl() const;
-    void setCloudPortalUrl(const QString&);
-
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
     bool takeCameraOwnershipWithoutLock() const;
@@ -158,6 +155,9 @@ public:
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
     bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const;
+	
+    int maxRecorderQueueSizeBytes() const;
+    int maxRecorderQueueSizePackets() const;
 
 signals:
     void initialized();
@@ -240,7 +240,6 @@ private:
     QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
 
     // set of cloud adaptors
-    QnResourcePropertyAdaptor<QString>* m_cloudPortalUrlAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudSystemIDAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
@@ -248,6 +247,9 @@ private:
     // misc adaptors
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
+
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
+    QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
 
     AdaptorList m_allAdaptors;
 

@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include <nx/utils/log/log.h>
+#include <cdb/cloud_nonce.h>
 
 #include "cloud/cloud_connection_manager.h"
 
@@ -113,15 +114,13 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
             kMagicBytes,
             sizeof(kMagicBytes)) == 0))
     {
-        QnMutexLocker lk(&m_mutex);
-        removeInvalidNonce(&m_cdbNonceQueue, m_monotonicClock.elapsed());
-        if (!m_cdbNonceQueue.empty())
-        {
-            const auto cdbNonce = nonce.mid(0, nonce.size() - kNonceTrailerLength);
-            for (const auto& nonceCtx : m_cdbNonceQueue)
-                if (nonceCtx.nonce == cdbNonce)
-                    return true;
-        }
+        const std::string cloudNonceBase(nonce.constData(), nonce.size() - kNonceTrailerLength);
+        const auto cloudSystemCredentials = m_cloudConnectionManager->getSystemCredentials();
+        if (!cloudSystemCredentials)
+            return false;   //we can't say if that nonce is ok for us
+        return nx::cdb::api::isValidCloudNonceBase(
+            cloudNonceBase,
+            cloudSystemCredentials->systemId.constData());
     }
     return false;
 }

@@ -8,4 +8,11 @@ struct QnApplauncherAppInfo
 
     /** Directory where all software is installed by default. */
     static QString installationRoot();
+
+#if defined(Q_OS_MACX)
+    static QString productName();
+
+    static QString bundleName();
+#endif
+
 };

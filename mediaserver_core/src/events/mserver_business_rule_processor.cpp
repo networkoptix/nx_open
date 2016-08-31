@@ -7,12 +7,16 @@
 #include "business/actions/panic_business_action.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_history.h>
+
+#include <plugins/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
 
@@ -23,10 +27,8 @@
 
 #include <media_server/serverutil.h>
 
-#include <utils/math/math.h>
 #include <nx/utils/log/log.h>
 #include "camera/get_image_helper.h"
-#include "core/resource_management/resource_properties.h"
 
 #include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
@@ -39,8 +41,7 @@
 #include "business/business_strings_helper.h"
 #include <business/actions/system_health_business_action.h>
 #include "business/events/mserver_conflict_business_event.h"
-#include "core/resource/camera_history.h"
-#include <utils/common/synctime.h>
+
 #include <common/common_module.h>
 
 #include <core/ptz/ptz_controller_pool.h>
@@ -54,10 +55,14 @@
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
-#include <utils/common/systemerror.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <plugins/resource/avi/avi_resource.h>
+
 #include <nx/streaming/abstract_archive_stream_reader.h>
+
+#include <utils/common/app_info.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -93,6 +98,7 @@ namespace {
 	static const QString tpTimestampDate(lit("timestampDate"));
 	static const QString tpTimestampTime(lit("timestampTime"));
     static const QString tpReason(lit("reason"));
+    static const QString tpReasonContext(lit("reasonContext"));
     static const QString tpAggregated(lit("aggregated"));
     static const QString tpInputPort(lit("inputPort"));
     static const QString tpHasCameras(lit("hasCameras"));
@@ -548,7 +554,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
 {
     QnEmailAttachmentList attachments;
-    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
+	QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 	QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
@@ -657,14 +663,14 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
     m_aggregatedEmails.erase( aggregatedActionIter );
 }
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
+QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
                                                                  const QnBusinessAggregationInfo &aggregationInfo,
                                                                  QnEmailAttachmentList& attachments)
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    QVariantHash contextMap;
+	QVariantMap contextMap;
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
@@ -760,7 +766,7 @@ QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
 }
 
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
+QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QnInfoDetail& aggregationData,
     Qn::ResourceInfoLevel detailLevel,
@@ -771,7 +777,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnBusinessEventParameters& params = aggregationData.runtimeParams();
     const int aggregationCount = aggregationData.count();
 
-    QVariantHash detailsMap;
+	QVariantMap detailsMap;
 
     if( addSubAggregationData )
     {
@@ -809,6 +815,22 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     case BackupFinishedEvent:
         {
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+
+            // Fill event-specific reason context here
+            QVariantMap reasonContext;
+
+            if (params.reasonCode == LicenseRemoved)
+            {
+                QVariantList disabledCameras;
+
+                for (const QString &id: params.description.split(L';'))
+                    if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                        disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
+
+                reasonContext[lit("disabledCameras")] = disabledCameras;
+            }
+            detailsMap[tpReasonContext] = reasonContext;
+
             break;
         }
     case CameraIpConflictEvent: {
@@ -816,7 +838,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         QVariantList conflicts;
         int n = 0;
         foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
-            QVariantHash conflict;
+			QVariantMap conflict;
             conflict[lit("number")] = ++n;
             conflict[lit("mac")] = mac;
             conflicts << conflict;
@@ -835,7 +857,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
             const QString &server = itr.key();
             foreach (const QString &camera, conflicts.camerasByServer[server]) {
-                QVariantHash conflict;
+                QVariantMap conflict;
                 conflict[lit("number")] = ++n;
                 conflict[lit("ip")] = server;
                 conflict[lit("mac")] = camera;

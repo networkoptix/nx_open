@@ -1,5 +1,3 @@
-#ifndef DISABLE_FFMPEG
-
 #include "av_codec_media_context.h"
 
 #include <utils/media/ffmpeg_helper.h>
@@ -157,5 +155,3 @@ int QnAvCodecMediaContext::getFrameSize() const
 {
     return m_context->frame_size;
 }
-
-#endif // DISABLE_FFMPEG

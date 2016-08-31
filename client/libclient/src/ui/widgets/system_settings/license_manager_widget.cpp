@@ -35,7 +35,6 @@
 #include <ui/utils/table_export_helper.h>
 
 #include <utils/license_usage_helper.h>
-#include <utils/common/product_features.h>
 #include <utils/common/event_processors.h>
 
 namespace {
@@ -100,6 +99,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     ui->gridLicenses->setModel(sortModel);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::LicenseStatusColumn, QHeaderView::Interactive);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
@@ -195,7 +195,9 @@ void QnLicenseManagerWidget::updateLicenses()
 
     /* Update license widget. */
     ui->licenseWidget->setHardwareId(qnLicensePool->currentHardwareId());
-    ui->licenseWidget->setFreeLicenseAvailable(!licenseListHelper.haveLicenseKey(qnProductFeatures().freeLicenseKey.toLatin1()) && (qnProductFeatures().freeLicenseCount > 0));
+    ui->licenseWidget->setFreeLicenseAvailable(
+        !licenseListHelper.haveLicenseKey(QnAppInfo::freeLicenseKey().toLatin1())
+        && (QnAppInfo::freeLicenseCount() > 0));
 
     /* Update grid. */
     m_model->updateLicenses(m_licenses);
@@ -257,9 +259,9 @@ void QnLicenseManagerWidget::updateLicenses()
         }
         else
         {
-            QString text = (qnProductFeatures().freeLicenseCount > 0) ?
-                tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.") :
-                tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
+            QString text = (QnAppInfo::freeLicenseCount() > 0)
+                ? tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.")
+                : tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
             ui->infoLabel->setText(text);
             useRedLabel = true;
         }
@@ -395,7 +397,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
             Q_UNUSED(reqID);
             at_licensesReceived(licenseKey, errorCode, licensesToUpdate);
         };
-        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
+        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
             licensesToUpdate, this, addLisencesHandler);
     }
 

@@ -1,7 +1,5 @@
 #include "ffmpeg_helper.h"
 
-#if !defined(DISABLE_FFMPEG)
-
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
@@ -47,7 +45,7 @@ void QnFfmpegHelper::mediaContextToAvCodecContext(
     auto avCodecMediaContext = std::dynamic_pointer_cast<const QnAvCodecMediaContext>(media);
     if (avCodecMediaContext)
     {
-        int r = avcodec_copy_context(av, avCodecMediaContext->getAvCodecContext());
+        int r = QnFfmpegHelper::copyAvCodecContex(av, avCodecMediaContext->getAvCodecContext());
         NX_ASSERT(r == 0);
         return;
     }
@@ -130,7 +128,7 @@ AVCodecContext* QnFfmpegHelper::createAvCodecContext(const AVCodecContext* conte
 
     AVCodecContext* newContext = avcodec_alloc_context3(nullptr);
     NX_ASSERT(newContext);
-    int r = avcodec_copy_context(newContext, context);
+    int r = QnFfmpegHelper::copyAvCodecContex(newContext, context);
     NX_ASSERT(r == 0);
     return newContext;
 }
@@ -392,6 +390,24 @@ void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
     }
 }
 
+int QnFfmpegHelper::copyAvCodecContex(AVCodecContext* dst, const AVCodecContext* src)
+{
+    // TODO: #dmishin avcodec_copy_context is deprecated now.
+    // It would be better to reimplement this method using AVCodecParameters API.
+
+    int result = avcodec_copy_context(dst, src);
+
+    if (!result)
+    {
+        // To avoid double free since avcodec_copy_context does not copy these fields.
+        dst->stats_out = nullptr;   
+        dst->coded_side_data = nullptr;
+        dst->nb_coded_side_data = 0;
+    }
+
+    return result;
+}
+
 QString QnFfmpegHelper::getErrorStr(int errnum)
 {
     QByteArray result(AV_ERROR_MAX_STRING_SIZE, '\0');
@@ -432,5 +448,3 @@ void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src)
         tmpData, src->nb_samples,
         (const quint8**) src->data, src->nb_samples);
 }
-
-#endif // !defined(DISABLE_FFMPEG)

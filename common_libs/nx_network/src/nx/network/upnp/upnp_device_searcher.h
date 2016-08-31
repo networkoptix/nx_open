@@ -16,6 +16,8 @@
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
+
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/network/aio/aioeventhandler.h>
 #include <nx/network/http/httptypes.h>
@@ -100,6 +102,7 @@ public:
 
     static DeviceSearcher* instance();
     static int cacheTimeout();
+
 private:
     class DiscoveredDeviceInfo
     {
@@ -141,6 +144,7 @@ private:
     const unsigned int m_discoverTryTimeoutMS;
     mutable QMutex m_mutex;
     quint64 m_timerID;
+    nx::utils::AsyncOperationGuard m_handlerGuard;
     std::map< QString, std::map< SearchHandler*, uint > > m_handlers;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
@@ -177,11 +181,7 @@ private:
     /*!
         \note MUST be called with \a m_mutex locked
     */
-    void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
-    bool processPacket( const QHostAddress& localInterfaceAddress,
-                        const SocketAddress& discoveredDevAddress,
-                        const DeviceInfo& devInfo,
-                        const QByteArray& xmlDevInfo );
+    void updateItemInCache( DiscoveredDeviceInfo devInfo );
 
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );

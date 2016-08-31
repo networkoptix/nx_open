@@ -11,6 +11,8 @@
 #include "rest/server/rest_connection_processor.h"
 #include <api/resource_property_adaptor.h>
 #include <rest/helpers/permissions_helper.h>
+#include <core/resource_management/resource_pool.h>
+#include "system_settings_handler.h"
 
 namespace
 {
@@ -29,7 +31,7 @@ struct SetupLocalSystemData: public PasswordData
     }
 
     QString systemName;
-    QMap<QString, QString> systemSettings;
+    QHash<QString, QString> systemSettings;
 };
 
 #define SetupLocalSystemData_Fields PasswordData_Fields (systemName)(systemSettings)
@@ -42,7 +44,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupLocalSystemData(params)), owner->authUserId(), result);
+    return execute(std::move(SetupLocalSystemData(params)), owner, result);
 }
 
 int QnSetupLocalSystemRestHandler::executePost(
@@ -54,14 +56,17 @@ int QnSetupLocalSystemRestHandler::executePost(
 {
     Q_UNUSED(path);
     SetupLocalSystemData data = QJson::deserialized<SetupLocalSystemData>(body);
-    return execute(std::move(data), owner->authUserId(), result);
+    return execute(std::move(data), owner, result);
 }
 
-int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result)
+int QnSetupLocalSystemRestHandler::execute(
+    SetupLocalSystemData data,
+    const QnRestConnectionProcessor* owner,
+    QnJsonRestResult &result)
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(userId))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
     if (!qnGlobalSettings->isNewSystem())
@@ -82,8 +87,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
         return nx_http::StatusCode::ok;
     }
 
+    ConfigureSystemData configSystemData;
+    configSystemData.systemName = data.systemName;
+    configSystemData.wholeSystem = false;
+
     const auto systemNameBak = qnCommon->localSystemName();
-    if (!changeSystemName(data.systemName, 0, 0, true, Qn::UserAccessData(userId)))
+    if (!changeSystemName(configSystemData))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::ok;
@@ -91,10 +100,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
 
     qnGlobalSettings->resetCloudParams();
     qnGlobalSettings->setNewSystem(false);
+
+    configSystemData.systemName = systemNameBak;
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
@@ -105,27 +116,21 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     if (data.systemName.isEmpty())
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
+        changeSystemName(configSystemData);
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
 
-    QString errString;
-    if (!updateAdminUser(data, QnOptionalBool(true), userId, &errString))
+    if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
         //changing system name back
-        changeSystemName(systemNameBak, 0, 0, true, Qn::UserAccessData(userId));
-        result.setError(QnJsonRestResult::CantProcessRequest, errString);
+        changeSystemName(configSystemData);
+        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
 
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
-    for (QnAbstractResourcePropertyAdaptor* setting : settings)
-    {
-        auto paramIter = data.systemSettings.find(setting->key());
-        if (paramIter != data.systemSettings.end())
-            setting->setValue(paramIter.value());
-    }
+    QnSystemSettingsHandler subHandler;
+    subHandler.executeGet(QString(), data.systemSettings, result, owner);
 
     return nx_http::StatusCode::ok;
 }

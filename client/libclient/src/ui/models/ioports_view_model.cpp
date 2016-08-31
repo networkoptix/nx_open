@@ -1,10 +1,18 @@
 #include "ioports_view_model.h"
+#include <nx/utils/string.h>
+
+namespace
+{
+    static const int kMaxIdLength = 20;
+}
+
+#include <client/client_globals.h>
 
 QnIOPortsViewModel::QnIOPortsViewModel(QObject *parent) :
     base_type(parent)
 {}
 
-QnIOPortsViewModel::~QnIOPortsViewModel() 
+QnIOPortsViewModel::~QnIOPortsViewModel()
 {}
 
 int QnIOPortsViewModel::rowCount(const QModelIndex &parent) const {
@@ -26,7 +34,7 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
     switch(index.column())
     {
     case IdColumn:
-        return value.id;
+        return nx::utils::elideString(value.id, kMaxIdLength);
     case TypeColumn:
         return portTypeToString(value.portType);
     case DefaultStateColumn:
@@ -61,7 +69,7 @@ QVariant QnIOPortsViewModel::editData(const QModelIndex &index) const
     }
 }
 
-QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const 
+QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
 {
     /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
@@ -70,11 +78,12 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
         return false;
 
 
-    switch(role) {
+    switch(role)
+    {
     case Qn::IOPortDataRole:
         return QVariant::fromValue<QnIOPortData>(m_data.at(index.row()));
     case Qt::DisplayRole:
-        return QVariant(textData(index));
+        return textData(index);
     case Qt::EditRole:
         return editData(index);
     case Qt::TextColorRole:
@@ -131,7 +140,7 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
         }
         break;
     case NameColumn:
-        switch (ioPort.portType) 
+        switch (ioPort.portType)
         {
         case Qn::PT_Input:
             ioPort.inputName = value.toString();
@@ -153,7 +162,7 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
     return true;
 }
 
-QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation, int role) const 
+QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < ColumnCount) {
         switch(section) {
@@ -169,14 +178,14 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
     return base_type::headerData(section, orientation, role);
 }
 
-Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const 
+Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = base_type::flags(index);
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return flags;
     const QnIOPortData& value = m_data.at(index.row());
 
-    switch (index.column()) 
+    switch (index.column())
     {
         case IdColumn:
             break;
@@ -196,13 +205,13 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
     return flags;
 }
 
-bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const 
+bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const
 {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
     const QnIOPortData& value = m_data.at(index.row());
 
-    switch (index.column()) 
+    switch (index.column())
     {
     case IdColumn:
     case TypeColumn:

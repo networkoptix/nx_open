@@ -20,7 +20,11 @@ namespace {
 
 /*! Since 3.0 client-bin uses relative rpath to specify its libs location.
     Thus we don't have to put it into LD_LIBRARY_PATH. */
-const QnSoftwareVersion rpathIncludedVersion(3, 0);
+const QnSoftwareVersion kRpathIncludedVersion(3, 0);
+
+#if defined(Q_OS_LINUX)
+const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
+#endif
 
 } // namespace
 
@@ -127,7 +131,7 @@ void ApplauncherProcess::processRequest(
     }
 }
 
-void ApplauncherProcess::launchMostRecentClient()
+void ApplauncherProcess::launchNewestClient()
 {
     QnSoftwareVersion versionToLaunch;
     if (!getVersionToLaunch(&versionToLaunch))
@@ -149,7 +153,8 @@ void ApplauncherProcess::launchMostRecentClient()
 
 int ApplauncherProcess::run()
 {
-    if (!m_taskServer.listen(launcherPipeName))
+    const bool clientIsRunAlready = !m_taskServer.listen(launcherPipeName);
+    if (clientIsRunAlready)
     {
         if (m_mode == Mode::Quit)
         {
@@ -157,15 +162,9 @@ int ApplauncherProcess::run()
             return addTaskToThePipe(applauncher::api::QuitTask().serialize());
         }
 
-        if (m_mode == Mode::Default)
-        {
-            //another instance already running?
-#ifdef Q_OS_WIN
-            launchMostRecentClient();
-#else
-            sendTaskToRunningLauncherInstance();
-#endif
-        }
+        if (m_mode == Mode::Default) //< another instance already running?
+            launchNewestClient();
+
         return 0;
     }
 
@@ -174,7 +173,7 @@ int ApplauncherProcess::run()
         return 0;
 
     if (m_mode == Mode::Default)
-        launchMostRecentClient();
+        launchNewestClient();
 
     std::unique_lock<std::mutex> lk(m_mutex);
     m_cond.wait(lk, [this]() { return m_terminated; });
@@ -372,26 +371,25 @@ bool ApplauncherProcess::startApplication(
 
     QStringList environment = QProcess::systemEnvironment();
 #ifdef Q_OS_LINUX
-    if (installation->version() < rpathIncludedVersion)
+    if (installation->version() < kRpathIncludedVersion)
     {
-        QString variableValue = installation->libraryPath();
-        if (!variableValue.isEmpty() && QFile::exists(variableValue))
+        QString ldLibraryPath = installation->libraryPath();
+        if (!ldLibraryPath.isEmpty() && QFile::exists(ldLibraryPath))
         {
-            const QString variableName = "LD_LIBRARY_PATH";
-
-            QRegExp varRegExp(QString("%1=(.+)").arg(variableName));
+            QRegExp varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
 
             auto it = environment.begin();
             for (; it != environment.end(); ++it)
             {
                 if (varRegExp.exactMatch(*it))
                 {
-                    *it = QString("%1=%2:%3").arg(variableName, variableValue, varRegExp.cap(1));
+                    *it = QString("%1=%2:%3").arg(
+                        kLdLibraryPathVariable, ldLibraryPath, varRegExp.cap(1));
                     break;
                 }
             }
             if (it == environment.end())
-                environment.append(QString("%1=%2").arg(variableName, variableValue));
+                environment.append(QString("%1=%2").arg(kLdLibraryPathVariable, ldLibraryPath));
         }
     }
 #endif
@@ -592,7 +590,8 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
     }
 
     //stopping process if needed
-    nx::killProcessByPid(task.processID);
+    SystemError::ErrorCode code = nx::killProcessByPid(task.processID);
+    code = 0;
 }
 
 void ApplauncherProcess::onInstallationDone(InstallationProcess* installationProcess)

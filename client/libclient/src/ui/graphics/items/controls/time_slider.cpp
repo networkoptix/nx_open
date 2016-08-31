@@ -1266,6 +1266,26 @@ void QnTimeSlider::setMarkerSliderPosition(Marker marker, qint64 position) {
     }
 }
 
+void QnTimeSlider::extendSelection(qint64 position)
+{
+    if (m_selectionValid)
+    {
+        if (position < m_selectionStart)
+            setSelectionStart(position);
+        else if (position > m_selectionEnd)
+            setSelectionEnd(position);
+    }
+    else
+    {
+        qint64 start = sliderPosition();
+        qint64 end = position;
+        if (start > end)
+            std::swap(start, end);
+        setSelection(start, end);
+        setSelectionValid(true);
+    }
+}
+
 qreal QnTimeSlider::effectiveLineStretch(int line) const
 {
     return m_lineData[line].visible ? m_lineData[line].stretch : 0.0;
@@ -2141,6 +2161,9 @@ bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
         case QEvent::GraphicsSceneMouseMove:
             dragProcessor()->mouseMoveEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event));
             return true;
+
+        default:
+            break;
         }
     }
 
@@ -2995,18 +3018,31 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
     bool immediateDrag = true;
     m_dragDelta = QPointF();
 
+    /* Modify current selection with Shift or Control. */
+    bool extendSelectionRequested = event->modifiers().testFlag(Qt::ShiftModifier)
+        || event->modifiers().testFlag(Qt::ControlModifier);
+
+    bool canSelect = m_options.testFlag(SelectionEditable);
+    if (event->button() == Qt::LeftButton)
+        canSelect &= m_options.testFlag(LeftButtonSelection);
+    else if (event->button() == Qt::RightButton)
+        canSelect &= !m_options.testFlag(LeftButtonSelection);
+
+    if (canSelect && extendSelectionRequested)
+        extendSelection(valueFromPosition(event->pos()));
+
     switch (event->button())
     {
     case Qt::LeftButton:
         m_dragMarker = markerFromPosition(event->pos(), kHoverEffectDistance);
-        if (m_options.testFlag(SelectionEditable) && m_options.testFlag(LeftButtonSelection) && m_dragMarker == NoMarker)
+        if (canSelect && m_dragMarker == NoMarker && !extendSelectionRequested)
             m_dragMarker = CreateSelectionMarker;
-        immediateDrag = m_dragMarker == NoMarker;
+        immediateDrag = (m_dragMarker == NoMarker) && !extendSelectionRequested;
         break;
 
     case Qt::RightButton:
         immediateDrag = false;
-        m_dragMarker = (m_options.testFlag(SelectionEditable) && !m_options.testFlag(LeftButtonSelection)) ?
+        m_dragMarker = canSelect ?
             CreateSelectionMarker :
             NoMarker;
         break;
@@ -3084,6 +3120,8 @@ void QnTimeSlider::changeEvent(QEvent* event)
     case QEvent::FontChange:
     case QEvent::PaletteChange:
         updatePixmapCache(); // - to update when standard palette is customized (not at the same moment as setColors)
+        break;
+    default:
         break;
     }
 }

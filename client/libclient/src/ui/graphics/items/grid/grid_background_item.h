@@ -55,8 +55,8 @@ private:
 
     Q_DECLARE_PRIVATE(QnGridBackgroundItem)
     QPointer<QnWorkbenchGridMapper> m_mapper;
-    std::auto_ptr<DecodedPictureToOpenGLUploader> m_imgUploader;
-    std::auto_ptr<QnGLRenderer> m_renderer;
+    QScopedPointer<DecodedPictureToOpenGLUploader> m_imgUploader;
+    QScopedPointer<QnGLRenderer> m_renderer;
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;
 };
 

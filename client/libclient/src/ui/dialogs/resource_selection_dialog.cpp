@@ -15,10 +15,12 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/globals.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace
@@ -62,24 +64,45 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWi
 
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->treeWidget);
+    scrollBar->setUseItemViewPaddingWhenVisible(false);
+    scrollBar->setUseMaximumSpace(true);
+    ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
+    auto showHideSignalizer = new QnMultiEventSignalizer(this);
+    showHideSignalizer->addEventType(QEvent::Show);
+    showHideSignalizer->addEventType(QEvent::Hide);
+    scrollBar->installEventFilter(showHideSignalizer);
+    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+        [this](QObject* watched, QEvent* event)
+        {
+            Q_UNUSED(watched);
+            int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
+            if (event->type() == QEvent::Hide)
+                margin -= style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+
+            ui->treeWidget->setContentsMargins(0, 0, margin, 0);
+        });
+
     switch (m_target)
     {
-    case UserResourceTarget:
-        setWindowTitle(tr("Select Users..."));
-        ui->detailsWidget->hide();
-        resize(minimumSize());
-        break;
-    case CameraResourceTarget:
-        setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("Select Devices..."),
-            tr("Select Cameras...")
-            ));
-        break;
-    default:
-        setWindowTitle(tr("Select Resources..."));
-        ui->detailsWidget->hide();
-        resize(minimumSize());
-        break;
+        case UserResourceTarget:
+            setWindowTitle(tr("Select Users..."));
+            ui->detailsWidget->hide();
+            resize(minimumSize());
+            break;
+
+        case CameraResourceTarget:
+            setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Select Devices..."),
+                tr("Select Cameras...")));
+            break;
+
+        default:
+            setWindowTitle(tr("Select Resources..."));
+            ui->detailsWidget->hide();
+            resize(minimumSize());
+            break;
     }
 
     initModel();
@@ -247,23 +270,11 @@ QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const
 
 void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index)
 {
-    QModelIndex baseIndex = index.column() == Qn::NameColumn
-        ? index
-        : index.sibling(index.row(), Qn::NameColumn);
-
+    QModelIndex baseIndex = index.sibling(index.row(), Qn::NameColumn);
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
-    ui->detailsLabel->setText(toolTip);
-
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-    {
-        ui->previewWidget->setTargetResource(camera->getId());
-        ui->previewWidget->show();
-    }
-    else
-    {
-        ui->previewWidget->hide();
-    }
+    ui->detailsWidget->setName(toolTip);
+    ui->detailsWidget->setTargetResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+    ui->detailsWidget->layout()->activate();
 }
 
 void QnResourceSelectionDialog::at_resourceModel_dataChanged()

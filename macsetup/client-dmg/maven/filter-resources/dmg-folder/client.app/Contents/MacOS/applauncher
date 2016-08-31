@@ -1,0 +1,17 @@
+#!/bin/bash
+
+USER_APPLAUNCHER_DIR="$HOME/Library/Application Support/${company.name}/applauncher/${customization}/Contents/MacOS"
+
+if [ -x "$USER_APPLAUNCHER_DIR/applauncher-bin" ]
+then
+    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/"
+else
+    APPLAUNCHER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    if [ ! -x "$APPLAUNCHER_DIR/applauncher-bin" ]
+    then
+        echo "Error: applauncher-bin is not found."
+        exit 1
+    fi
+fi
+
+"$APPLAUNCHER_DIR/applauncher-bin" $@

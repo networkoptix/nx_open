@@ -8,6 +8,8 @@
 #include <client/client_color_types.h>
 
 #include <utils/common/connective.h>
+#include <ui/utils/viewport_scale_watcher.h>
+#include <ui/graphics/painters/frame_painter.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -28,7 +30,7 @@ class QGraphicsLinearLayout;
 class QnViewportBoundWidget;
 class QnResourceVideoLayout;
 class QnWorkbenchItem;
-class QnStatusOverlayWidget;
+class QnStatusOverlayController;
 class QnImageButtonWidget;
 class QnImageButtonBar;
 class QnProxyLabel;
@@ -40,8 +42,6 @@ class GraphicsLabel;
 class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
-    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
-    Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
@@ -124,23 +124,8 @@ public:
         m_frameOpacity = frameOpacity;
     }
 
-    /**
-     * \returns                         Frame width of this widget.
-     */
-    qreal frameWidth() const {
-        return m_frameWidth;
-    }
-
-    /**
-     * \param frameWidth                New frame width for this widget.
-     */
-    void setFrameWidth(qreal frameWidth);
-
     QColor frameDistinctionColor() const;
     void setFrameDistinctionColor(const QColor &frameColor);
-
-    const QnResourceWidgetFrameColors &frameColors() const;
-    void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
 
     /**
      * \returns                         Aspect ratio of this widget.
@@ -299,8 +284,6 @@ protected:
 
     virtual bool isHovered() const;
 
-    Qn::ResourceStatusOverlay statusOverlay() const;
-    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate = true);
     Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus, bool hasVideo) const;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
     Q_SLOT void updateStatusOverlay();
@@ -319,7 +302,7 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
-    QnStatusOverlayWidget *statusOverlayWidget() const;
+    QnStatusOverlayController *statusOverlayController() const;
 
     virtual int calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
@@ -359,9 +342,15 @@ protected:
     OverlayWidgets* overlayWidgets() const;
 
 private:
+    void updateFrameWidth();
+
+    void updateFrameGeometry();
+
+    QColor calculateFrameColor() const;
+
+    qreal calculateFrameWidth() const;
+
     void createButtons();
-    void createHeaderOverlay();
-    void createFooterOverlay();
 
     void setTitleTextInternal(const QString &titleText);
 
@@ -377,6 +366,22 @@ private:
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
+
+private:
+    enum class SelectionState
+    {
+        invalid,
+        notSelected,
+        inactiveFocused,
+        focused,
+        selected,
+        focusedAndSelected,
+    };
+
+    void updateSelectedState();
+
+    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+
 private:
     friend class QnWorkbenchDisplay;
 
@@ -407,20 +412,15 @@ private:
     /** Frame opacity. */
     qreal m_frameOpacity;
 
-    /** Frame width. */
-    qreal m_frameWidth;
-
     /** Base frame color */
     QColor m_frameDistinctionColor;
-
-    QnResourceWidgetFrameColors m_frameColors;
 
     QString m_titleTextFormat;
     bool m_titleTextFormatHasPlaceholder;
 
     /* Widgets for overlaid stuff. */
 
-    QnStatusOverlayWidget *m_statusOverlayWidget;
+    QnStatusOverlayController* m_statusController;
 
     QScopedPointer<OverlayWidgets> m_overlayWidgets;
 
@@ -433,11 +433,14 @@ private:
     QRectF m_zoomRect;
 
     /** Current overlay. */
-    Qn::ResourceStatusOverlay m_statusOverlay;
-
     Qn::RenderStatus m_renderStatus;
 
     qint64 m_lastNewFrameTimeMSec;
+
+    SelectionState m_selectionState;
+
+    QnViewportScaleWatcher m_scaleWatcher;
+    QnFramePainter m_framePainter;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

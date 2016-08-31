@@ -62,30 +62,33 @@ written by
 #include "common.h"
 
 #ifndef _WIN32
-    int pthread_cond_init_monotonic(pthread_cond_t* cond)
+    int pthread_cond_init_monotonic(pthread_cond_t* condition)
     {
-        pthread_condattr_t attr;
-        if (auto r = pthread_condattr_init(&attr))
-            return r;
+        #if !defined(__APPLE__) && !defined(__ANDROID__)
+            pthread_condattr_t attr;
+            if (auto r = pthread_condattr_init(&attr))
+                return r;
 
-        #ifndef __APPLE__
             if (auto r = pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
                 return r;
-        #endif
 
-        auto r = pthread_cond_init(cond, &attr);
-        pthread_condattr_destroy(&attr);
-        return r;
+            auto r = pthread_cond_init(condition, &attr);
+            pthread_condattr_destroy(&attr);
+            return r;
+        #else
+            return pthread_cond_init(condition, NULL);
+        #endif
     }
 
-    int pthread_cond_wait_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t timeoutMks)
+    int pthread_cond_wait_monotonic_timeout(
+        pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeoutMks)
     {
         timespec timeout;
         #ifdef __APPLE__
-            timeout.tv_sec = (timeoutMks / 1000);
-            timeout.tv_nsec = (timeoutMks % 1000) * 1000000;
+            timeout.tv_sec = (timeoutMks / 1000000);
+            timeout.tv_nsec = (timeoutMks % 1000000) * 1000;
 
-            return pthread_cond_timedwait_relative_np(cond, mutex, &timeout);
+            return pthread_cond_timedwait_relative_np(condition, mutex, &timeout);
         #else
             if (auto t = clock_gettime(CLOCK_MONOTONIC, &timeout))
                 return t;
@@ -98,24 +101,33 @@ written by
                 timeout.tv_nsec -= 1000000000;
             }
 
-            return pthread_cond_timedwait(cond, mutex, &timeout);
+            #ifdef __ANDROID__
+                return pthread_cond_timedwait_monotonic(condition, mutex, &timeout);
+            #else
+                return pthread_cond_timedwait(condition, mutex, &timeout);
+            #endif
         #endif
     }
 
-    int pthread_cond_wait_time_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t timeMks)
+    int pthread_cond_wait_monotonic_timepoint(
+        pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeMks)
     {
         #ifdef __APPLE__
             const auto now = CTimer::getTime();
             if (now > timeMks)
                 return ETIMEDOUT;
 
-            return pthread_cond_wait_monotonic(cond, mutex, timeMks - now);
+            return pthread_cond_wait_monotonic_timeout(condition, mutex, timeMks - now);
         #else
             timespec locktime;
             locktime.tv_sec = timeMks / 1000000;
             locktime.tv_nsec = (timeMks % 1000000) * 1000;
 
-            return pthread_cond_timedwait(cond, mutex, &locktime);
+            #ifdef __ANDROID__
+                return pthread_cond_timedwait_monotonic(condition, mutex, &locktime);
+            #else
+                return pthread_cond_timedwait(condition, mutex, &locktime);
+            #endif
         #endif
     }
 #endif
@@ -184,8 +196,8 @@ void CTimer::rdtsc(uint64_t &x)
       x = hval;
       x = (x << 32) | lval;
    #elif defined(_WIN32)
-      //HANDLE hCurThread = ::GetCurrentThread(); 
-      //DWORD_PTR dwOldMask = ::SetThreadAffinityMask(hCurThread, 1); 
+      //HANDLE hCurThread = ::GetCurrentThread();
+      //DWORD_PTR dwOldMask = ::SetThreadAffinityMask(hCurThread, 1);
       BOOL ret = QueryPerformanceCounter((LARGE_INTEGER *)&x);
       //SetThreadAffinityMask(hCurThread, dwOldMask);
       if (!ret)
@@ -268,7 +280,7 @@ void CTimer::sleepto(uint64_t nexttime)
       #else
          #ifndef _WIN32
             pthread_mutex_lock(&m_TickLock);
-            pthread_cond_wait_monotonic(&m_TickCond, &m_TickLock, 10 * 1000); // 10ms
+            pthread_cond_wait_monotonic_timeout(&m_TickCond, &m_TickLock, 10 * 1000); // 10ms
             pthread_mutex_unlock(&m_TickLock);
          #else
             WaitForSingleObject(m_TickCond, 1);
@@ -320,7 +332,7 @@ uint64_t CTimer::getTime()
       return (uint64_t)t.tv_sec * (uint64_t)1000000 + (uint64_t)(t.tv_nsec / 1000);
    #else
       LARGE_INTEGER ccf;
-      HANDLE hCurThread = ::GetCurrentThread(); 
+      HANDLE hCurThread = ::GetCurrentThread();
       //DWORD_PTR dwOldMask = 0;
       //if (m_winVersion.dwMajorVersion < 6)
       //  dwOldMask = ::SetThreadAffinityMask(hCurThread, 1);
@@ -354,7 +366,7 @@ void CTimer::waitForEvent()
 {
    #ifndef _WIN32
       pthread_mutex_lock(&m_EventLock);
-      pthread_cond_wait_monotonic(&m_EventCond, &m_EventLock, 10 * 1000); // 10ms
+      pthread_cond_wait_monotonic_timeout(&m_EventCond, &m_EventLock, 10 * 1000); // 10ms
       pthread_mutex_unlock(&m_EventLock);
    #else
       WaitForSingleObject(m_EventCond, 1);
@@ -580,7 +592,7 @@ const char* CUDTException::getErrorMessage()
 
       case 5:
         m_strMsg = "Operation not supported";
- 
+
         switch (m_iMinor)
         {
         case 1:

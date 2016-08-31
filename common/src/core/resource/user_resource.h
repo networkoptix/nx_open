@@ -28,6 +28,8 @@ public:
     bool isCloud() const { return userType() == QnUserType::Cloud; }
     bool isLocal() const { return userType() == QnUserType::Local; }
 
+    Qn::UserRole role() const;
+
     QByteArray getHash() const;
     void setHash(const QByteArray& hash);
 
@@ -76,6 +78,11 @@ public:
     static const qint64 PasswordProlongationAuto = -1;
     void prolongatePassword(qint64 value = PasswordProlongationAuto);
 
+    /*
+     * Fill ID field.
+     * For regular users it is random value, for cloud users it's md5 hash from email address.
+     */
+    void fillId();
 signals:
     void hashChanged(const QnResourcePtr& user);
     void passwordChanged(const QnResourcePtr& user);
@@ -89,7 +96,7 @@ signals:
     void enabledChanged(const QnResourcePtr& user);
 
 protected:
-    virtual void updateInner(const QnResourcePtr& other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 private:
     QnUserType m_userType;

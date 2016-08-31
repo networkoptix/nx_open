@@ -313,6 +313,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 
     /* AccessibleResources are also updated here. */
     applyChanges(user);
+    NX_ASSERT(!(user->isCloud() && user->getEmail().isEmpty()));
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(user, apiUser);
@@ -363,25 +364,27 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     });
 }
 
-void QnResourcesChangesManager::saveAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& accessibleResources)
+void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,
+    const QSet<QnUuid>& accessibleResources)
 {
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;
 
+    auto key = subject.sharedResourcesKey();
     auto sessionGuid = qnCommon->runningInstanceGUID();
-    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(userId);
+    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(key);
     if (accessibleResourcesBackup == accessibleResources)
         return;
 
-    qnResourceAccessManager->setAccessibleResources(userId, accessibleResources);
+    qnResourceAccessManager->setAccessibleResources(key, accessibleResources);
 
     ec2::ApiAccessRightsData accessRights;
-    accessRights.userId = userId;
+    accessRights.userId = key;
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
-        [this,userId, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
+        [this, key, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -393,7 +396,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnUuid& userId, co
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->setAccessibleResources(userId, accessibleResourcesBackup);
+        qnResourceAccessManager->setAccessibleResources(key, accessibleResourcesBackup);
     });
 }
 

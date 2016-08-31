@@ -17,7 +17,6 @@
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_access_manager.h>
-#include <utils/license_usage_helper.h>
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
@@ -1169,34 +1168,6 @@ bool QnDbManager::fixBusinessRules()
     return true;
 }
 
-bool QnDbManager::isTranAllowed(const QnAbstractTransaction& tran) const
-{
-    if( !m_dbReadOnly )
-        return true;
-
-    switch( tran.command )
-    {
-        case ApiCommand::addLicense:
-        case ApiCommand::addLicenses:
-        case ApiCommand::removeLicense:
-            return true;
-
-        case ApiCommand::saveMediaServer:
-        case ApiCommand::saveStorage:
-        case ApiCommand::saveStorages:
-        case ApiCommand::saveServerUserAttributes:
-        case ApiCommand::saveServerUserAttributesList:
-        case ApiCommand::setResourceStatus:
-        case ApiCommand::setResourceParam:
-        case ApiCommand::setResourceParams:
-            //allowing minimum set of transactions required for local server to function properly
-            return tran.deliveryInfo.originatorType == QnTranDeliveryInformation::localServer;
-
-        default:
-            return false;
-    }
-}
-
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql"))
@@ -1516,7 +1487,9 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     *internalId = getResourceInternalId(data.id);
 
     //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
-    NX_ASSERT(!data.id.isNull(), "Resource ID must not be null");
+    NX_ASSERT(!data.id.isNull(), "Resource id must not be null");
+    if (data.id.isNull())
+        return ErrorCode::dbError;
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
@@ -1958,24 +1931,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraA
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran)
 {
-    QnCamLicenseUsageHelper licenseUsageHelper;
-    QnVirtualCameraResourceList cameras;
-
-    for (const auto &param : tran.params)
-    {
-        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-            return ErrorCode::serverError;
-        cameras.push_back(camera);
-        licenseUsageHelper.propose(camera, param.scheduleEnabled);
-    }
-
-    for (const auto &camera : cameras)
-    {
-        if (licenseUsageHelper.isOverflowForCamera(camera))
-            return ErrorCode::forbidden;
-    }
-
     for(const ApiCameraAttributesData& attrs: tran.params)
     {
         const ErrorCode result = saveCameraUserAttributes(attrs);
@@ -2955,9 +2910,28 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
         return removeWebPage(tran.params.id);
     case ApiCommand::removeCameraUserAttributes:
         return removeCameraAttributes(tran.params.id);
+    case ApiCommand::removeAccessRights:
+        return removeResourceAccessRights(tran.params.id);
     default:
         return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
+}
+
+ErrorCode QnDbManager::removeResourceAccessRights(const QnUuid& id)
+{
+    auto internalResourceId = getResourceInternalId(id);
+
+    QSqlQuery removeQuery(m_sdb);
+    QString removeQueryStr("DELETE FROM vms_access_rights WHERE resource_ptr_id = :resourceId;");
+
+    if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    removeQuery.bindValue(":resourceId", internalResourceId);
+    if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
@@ -4515,4 +4489,33 @@ void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiRes
 {
     detail::QnDbManager::instance()->doQueryNoLock(resourceId, resourceParams);
 }
+
+bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
+{
+    if (!detail::QnDbManager::instance()->isReadOnly())
+        return true;
+
+    switch (tran.command)
+    {
+        case ApiCommand::addLicense:
+        case ApiCommand::addLicenses:
+        case ApiCommand::removeLicense:
+            return true;
+    
+        case ApiCommand::saveMediaServer:
+        case ApiCommand::saveStorage:
+        case ApiCommand::saveStorages:
+        case ApiCommand::saveServerUserAttributes:
+        case ApiCommand::saveServerUserAttributesList:
+        case ApiCommand::setResourceStatus:
+        case ApiCommand::setResourceParam:
+        case ApiCommand::setResourceParams:
+            // Allowing minimum set of transactions required for local server to function properly.
+            return m_userAccessData == Qn::kSystemAccess;
+    
+        default:
+            return false;
+    }
+}
+
 } // namespace ec2

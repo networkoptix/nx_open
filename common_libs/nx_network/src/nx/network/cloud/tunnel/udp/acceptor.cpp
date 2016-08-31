@@ -33,9 +33,7 @@ void TunnelAcceptor::setUdpMaxRetransmissions(int count)
     m_udpMaxRetransmissions = count;
 }
 
-void TunnelAcceptor::accept(std::function<void(
-    SystemError::ErrorCode,
-    std::unique_ptr<AbstractIncomingTunnelConnection>)> handler)
+void TunnelAcceptor::accept(AcceptHandler handler)
 {
     NX_ASSERT(!m_acceptHandler);
     NX_ASSERT(!m_udpMediatorConnection);
@@ -105,7 +103,7 @@ void TunnelAcceptor::connectionAckResult(
     auto timeout = m_connectionParameters.rendezvousConnectTimeout.count();
     for (const auto& address : m_peerAddresses)
     {
-        auto udtSocket = std::make_unique<UdtStreamSocket>();
+        auto udtSocket = std::make_unique<UdtStreamSocket>(AF_INET);
         udtSocket->bindToAioThread(m_mediatorConnection->getAioThread());
 
         if ((udpSocket

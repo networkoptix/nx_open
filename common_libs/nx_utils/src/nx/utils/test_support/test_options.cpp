@@ -33,11 +33,12 @@ void TestOptions::setLoadMode(const QString& mode)
 {
     qWarning() << ">>> TestOptions::setLoadMode(" << mode << ") <<<";
 
-    if (mode == QLatin1String("light")) s_loadMode = LoadMode::light;
-    else
-    if (mode == QLatin1String("normal")) s_loadMode = LoadMode::normal;
-    else
-    if (mode == QLatin1String("stress")) s_loadMode = LoadMode::stress;
+    if (mode == QLatin1String("light"))
+        s_loadMode = LoadMode::light;
+    else if (mode == QLatin1String("normal"))
+        s_loadMode = LoadMode::normal;
+    else if (mode == QLatin1String("stress"))
+        s_loadMode = LoadMode::stress;
     else
         NX_CRITICAL(false, lm("Unrecognized load mode: %1").arg(mode));
 }

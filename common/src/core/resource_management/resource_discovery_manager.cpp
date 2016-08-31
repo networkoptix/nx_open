@@ -175,7 +175,8 @@ void QnResourceDiscoveryManager::run()
     m_timer.reset( new QTimer() );
     m_timer->setSingleShot( true );
     QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate( this );
-    connect( m_timer.get(), SIGNAL(timeout()), &timoutDelegate, SLOT(onTimeout()) );
+    connect(m_timer, &QTimer::timeout,
+        &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onTimeout);
     m_timer->start( 0 );    //immediate execution
     m_state = InitialSearch;
 
@@ -557,6 +558,7 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
     int added = 0;
     for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
     {
+		bool resourceHasBeenAdded = false;
         for (QnAbstractResourceSearcher* searcher: m_searchersList)
         {
             if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
@@ -564,9 +566,11 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
 
             QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
             inserted.value().searcher = searcher;
-            ++added;
-            break;
+			resourceHasBeenAdded = true;
         }
+
+		if (resourceHasBeenAdded)
+			++added;
     }
 
     return added;

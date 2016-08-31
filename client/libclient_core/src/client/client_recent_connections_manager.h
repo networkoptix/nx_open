@@ -32,4 +32,5 @@ private:
     UnboundModelsSet m_unbound;
     BoundModelsHash m_bound;
     DataCache m_dataCache;
+    bool m_updating;
 };

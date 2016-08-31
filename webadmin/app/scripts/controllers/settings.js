@@ -4,6 +4,21 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
 
 
+        $scope.active={
+            system: $location.path() === '/settings/system',
+            server: $location.path() === '/settings/server'
+        };
+        $scope.$watch("active.system",function(){
+            if( $scope.active.system){
+                $location.path('/settings/system');
+            }
+        });
+        $scope.$watch("active.server",function(){
+            if( $scope.active.server){
+                $location.path('/settings/server');
+            }
+        });
+
         mediaserver.getModuleInformation().then(function (r) {
 
             if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
@@ -34,7 +49,6 @@ angular.module('webadminApp')
                 getCloudInfo();
                 readPortalUrl();
                 requestScripts();
-                pingServers();
             });
         }
         $scope.Config = Config;
@@ -194,51 +208,6 @@ angular.module('webadminApp')
             });
         };
 
-        function checkServersIp(server,i){
-            var ips = server.networkAddresses.split(';');
-
-            var port = '';
-            if(ips[i].indexOf(':') < 0){
-                port = server.apiUrl.substring(server.apiUrl.lastIndexOf(':'));
-            }
-
-            var url = window.location.protocol + '//' + ips[i] + port;
-
-            mediaserver.getModuleInformation(url).then(function(){
-                server.apiUrl = url;
-            },function(error){
-                if(i < ips.length-1) {
-                    checkServersIp(server, i + 1);
-                }
-                else {
-                    server.status = L.settings.unavailable;
-
-                    $scope.mediaServers = _.sortBy($scope.mediaServers,function(server){
-                        return (server.status==='Online'?'0':'1') + server.Name + server.id;
-                        // Сортировка: online->name->id
-                    });
-
-                }
-                return false;
-            });
-        }
-
-        function pingServers() {
-            return mediaserver.getMediaServers().then(function (data) {
-                $scope.mediaServers = _.sortBy(data.data, function (server) {
-                    // Set active state for server
-                    server.active = $scope.settings.id.replace('{', '').replace('}', '') === server.id.replace('{', '').replace('}', '');
-                    return (server.status === 'Online' ? '0' : '1') + server.Name + server.id;
-                    // Sorting: online->name->id
-                });
-                $timeout(function () {
-                    _.each($scope.mediaServers, function (server) {
-                        var i = 0;//1. Опрашиваем айпишники подряд
-                        checkServersIp(server, i);
-                    });
-                }, 1000);
-            });
-        }
 
         function getCloudInfo() {
             return mediaserver.systemCloudInfo().then(function (data) {
@@ -292,7 +261,52 @@ angular.module('webadminApp')
         }
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
             //Open Disconnect Dialog
-            openCloudDialog(false);
+
+            function doDisconnect(localLogin,localPassword){
+                // 2. Send request to the system only
+                return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
+                    window.location.reload();
+                }, function(error){
+                    console.error(error);
+                    dialogs.alert(L.settings.unexpectedError);
+                });
+
+                /*
+
+                 // Old code: request to cloud and to the system
+
+                 cloudAPI.disconnect(cloudSystemID, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
+                 function () {
+                 //2. Save settings to local server
+                 mediaserver.clearCloudSystemCredentials().then(successHandler, errorHandler);
+                 }, cloudErrorHandler);
+                 */
+            }
+            dialogs.confirmWithPassword(
+                L.settings.confirmDisconnectFromCloudTitle,
+                L.settings.confirmDisconnectFromCloud,
+                L.settings.confirmDisconnectFromCloudAction,
+                'danger').then(function (oldPassword) {
+                //1. Check password
+                return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                    // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
+                    mediaserver.getUsers().then(function(result){
+                        var localAdmin = _.find(result.data,function(user){
+                            return user.isAdmin && user.isEnabled && !user.isCloud;
+                        });
+                        if(!localAdmin){
+                            // Request for login and password
+                            dialogs.createUser(L.settings.createLocalOwner, L.settings.createLocalOwnerTitle).then(function(data){
+                                doDisconnect(data.login,data.password);
+                            })
+                        }else{
+                            doDisconnect();
+                        }
+                    });
+                },function(){
+                    dialogs.alert(L.settings.wrongPassword);
+                });
+            });
         };
 
         $scope.connectToCloud = function() { // Connect to Cloud

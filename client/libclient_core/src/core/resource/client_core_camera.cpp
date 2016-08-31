@@ -4,8 +4,8 @@
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 
-QnClientCoreCamera::QnClientCoreCamera(const QnUuid& resourceTypeId)
-    : QnVirtualCameraResource()
+QnClientCoreCamera::QnClientCoreCamera(const QnUuid& resourceTypeId):
+    base_type()
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam | Qn::depend_on_parent_status);
@@ -66,9 +66,10 @@ void QnClientCoreCamera::setParentId(const QnUuid& parent) {
     }
 }
 
-void QnClientCoreCamera::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnClientCoreCamera::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
+{
     if (other->getParentId() != m_parentId)
-        modifiedFields << "statusChanged";
-    QnVirtualCameraResource::updateInner(other, modifiedFields);
+        notifiers << [r = toSharedPointer(this)]{emit r->statusChanged(r);};
+    base_type::updateInternal(other, notifiers);
 }
 

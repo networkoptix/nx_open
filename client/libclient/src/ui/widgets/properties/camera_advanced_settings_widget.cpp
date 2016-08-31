@@ -201,6 +201,7 @@ void QnCameraAdvancedSettingsWidget::submitToResource()
 
 void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 {
+    Q_UNUSED(event);
     if (m_page != Page::Web)
         return;
 
@@ -267,6 +268,8 @@ void QnCameraAdvancedSettingsWidget::initWebView()
         this, &QnCameraAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection);
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
         this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
+
+    
 }
 
 void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator)

@@ -16,34 +16,7 @@ extern "C" {
     #include <libavcodec/avcodec.h>
 }
 
-#ifndef DWM_EC_DISABLECOMPOSITION
-#  define DWM_EC_DISABLECOMPOSITION 0
-#endif
-#ifndef DWM_EC_ENABLECOMPOSITION
-#  define DWM_EC_ENABLECOMPOSITION 1
-#endif
-
-typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *fn_DwmEnableComposition) (UINT uCompositionAction);
-static fn_DwmEnableComposition DwmEnableComposition = 0;
 static const int LOGO_CORNER_OFFSET = 8;
-
-static void toggleAero(bool enable)
-{
-    static bool resolved = false;
-    if (!resolved) {
-        QLibrary lib(QLatin1String("Dwmapi"));
-        if (lib.load())
-            DwmEnableComposition = (fn_DwmEnableComposition)lib.resolve("DwmEnableComposition");
-        resolved = true;
-    }
-
-    if (DwmEnableComposition)
-        DwmEnableComposition(enable ? DWM_EC_ENABLECOMPOSITION : DWM_EC_DISABLECOMPOSITION);
-}
-
-
-QnMutex QnScreenGrabber::m_instanceMutex;
-int QnScreenGrabber::m_aeroInstanceCounter;
 
 QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
     m_pD3D(0),
@@ -68,12 +41,6 @@ QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMod
 
     memset(&m_rect, 0, sizeof(m_rect));
 
-    if (m_mode == Qn::FullScreenNoAeroMode)
-    {
-        QnMutexLocker locker( &m_instanceMutex );
-        if (++m_aeroInstanceCounter == 1)
-            toggleAero(false);
-    }
     m_needRescale = captureResolution.width() != 0 || mode == Qn::WindowMode;
     if (mode == Qn::WindowMode)
         m_displayNumber = 0;
@@ -108,12 +75,6 @@ QnScreenGrabber::~QnScreenGrabber()
     {
         m_pD3D->Release();
         m_pD3D=NULL;
-    }
-    if (m_mode == Qn::FullScreenNoAeroMode)
-    {
-        QnMutexLocker locker( &m_instanceMutex );
-        if (--m_aeroInstanceCounter == 0)
-            toggleAero(true);
     }
     DeleteDC(m_cursorDC);
 

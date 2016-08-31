@@ -16,11 +16,15 @@
 #include <utils/common/app_info.h>
 #include <utils/update/zip_utils.h>
 
+#if defined(Q_OS_MACX)
+#include <platform/core_foundation_mac/cf_url.h>
+#include <platform/core_foundation_mac/cf_string.h>
+#endif
 
 namespace {
     QRegExp versionDirRegExp("\\d+\\.\\d+(?:\\.\\d+\\.\\d+){0,1}");
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     QString installationPathPrefix = ".local/share";
 #else
     QString installationPathPrefix = "AppData/Local";
@@ -32,6 +36,24 @@ namespace {
         else
             return version.toString();
     }
+
+
+#if defined(Q_OS_MACX)
+    QString extractVersion(const QString& fullPath)
+    {
+        const auto url = cf::QnCFUrl::createFileUrl(fullPath);
+        const cf::QnCFRefHolder<CFBundleRef> bundle(
+            CFBundleCreate(kCFAllocatorDefault, url.ref()));
+
+        static const auto kShortVersionTag = cf::QnCFString(lit("CFBundleShortVersionString"));
+        static const auto kBundleVersionTag = cf::QnCFString(lit("CFBundleVersion"));
+        const auto shortVersion = cf::QnCFString(static_cast<CFStringRef>(
+            CFBundleGetValueForInfoDictionaryKey(bundle.ref(), kShortVersionTag.ref()))).toString();
+        const auto bundleVersion = cf::QnCFString(static_cast<CFStringRef>(
+            CFBundleGetValueForInfoDictionaryKey(bundle.ref(), kBundleVersionTag.ref()))).toString();
+        return lit("%1.%2").arg(shortVersion, bundleVersion);
+    }
+#endif
 
 } // anonymous namespace
 
@@ -84,36 +106,56 @@ void InstallationManager::updateInstalledVersionsInformation()
         NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(QCoreApplication::applicationDirPath()), cl_logWARNING);
     }
 
-    auto fillInstallationsFromDir = [this, &installations](const QDir& root, bool verify)
-    {
-        QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-
-        for (const QString &entry : entries)
+    const auto fillInstallationFromDir =
+        [this, &installations](const QString& path, bool verify, const QString& version)
         {
-            if (!versionDirRegExp.exactMatch(entry))
-                continue;
+            const QnClientInstallationPtr installation =
+                QnClientInstallation::installationForPath(path);
 
-            QnClientInstallationPtr installation = QnClientInstallation::installationForPath(root.absoluteFilePath(entry));
             if (installation.isNull())
-                continue;
+                return;
 
             installation->setNeedsVerification(verify);
 
             if (verify && !installation->verify())
-                continue;
+                return;
 
-            installation->setVersion(QnSoftwareVersion(entry));
+            installation->setVersion(QnSoftwareVersion(version));
             installations.insert(installation->version(), installation);
 
-            NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
-        }
-    };
+            NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(version), cl_logDEBUG1);
+        };
+
+    const auto fillInstallationsFromDir =
+        [fillInstallationFromDir](const QDir& root, bool verify)
+        {
+            const QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+            for (const QString &entry : entries)
+            {
+                if (versionDirRegExp.exactMatch(entry))
+                {
+                    const auto fullPath = root.absoluteFilePath(entry);
+                    fillInstallationFromDir(fullPath, verify, entry);
+                }
+            }
+        };
 
     // find other versions
-    QString baseRoot = QnApplauncherAppInfo::installationRoot() + lit("/client/"); /*< Default client install location. */
+#if defined(Q_OS_MACX)
+    static const auto kPathPostfix = QString();
+#else
+    static const auto kPathPostfix = lit("/client/"); /*< Default client install location. */
+#endif
+    QString baseRoot = QnApplauncherAppInfo::installationRoot() + kPathPostfix;
     fillInstallationsFromDir(m_installationsDir, true);
-    fillInstallationsFromDir(baseRoot, false);             /*< We should verify downloaded installations only. */
 
+    // We should verify downloaded installations only.
+#if defined(Q_OS_MACX)
+    const auto version = extractVersion(baseRoot + QnApplauncherAppInfo::bundleName());
+    fillInstallationFromDir(baseRoot, false, version);
+#else
+    fillInstallationsFromDir(baseRoot, false);             /*< We should verify downloaded installations only. */
+#endif
     std::unique_lock<std::mutex> lk(m_mutex);
     m_installationByVersion = std::move(installations);
     lk.unlock();

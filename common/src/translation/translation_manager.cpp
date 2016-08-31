@@ -6,7 +6,6 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
-#include <common/common_globals.h>
 
 namespace {
     const QString defaultSearchPath(lit(":/translations"));

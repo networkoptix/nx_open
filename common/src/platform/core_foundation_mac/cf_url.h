@@ -20,4 +20,4 @@ private:
     QnCFUrl();
 };
 
-}
+} // namespace cf

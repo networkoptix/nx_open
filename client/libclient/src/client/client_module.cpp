@@ -34,6 +34,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
@@ -168,7 +169,8 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
 QnClientModule::~QnClientModule()
 {
-    QnResourceDiscoveryManager::instance()->stop();
+    if (QnResourceDiscoveryManager::instance())
+        QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
 
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
@@ -243,6 +245,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     QnCommonModule *common = new QnCommonModule(this);
 
+    common->store<QnResourceRuntimeDataManager>(new QnResourceRuntimeDataManager());
     common->store<QnTranslationManager>(translationManager.release());
     common->store<QnClientCoreSettings>(new QnClientCoreSettings());
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
@@ -472,7 +475,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 

@@ -93,6 +93,7 @@ public:
     virtual bool isPaused() const override;
 
     virtual bool isRealTimeSource() const override;
+    virtual void pleaseStop();
 protected:
     virtual bool init();
 
@@ -100,7 +101,6 @@ protected:
     bool initCodecs();
     bool openFormatContext();
     void setCurrentTime(qint64 value);
-    virtual void pleaseStop();
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
     void beforeJumpInternal(qint64 mksec);
 

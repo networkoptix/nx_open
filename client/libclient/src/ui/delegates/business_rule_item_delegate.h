@@ -10,6 +10,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 typedef QVector<QnUuid> IDList;
+class QnBusinessTypesComparator;
 
 class QnSelectResourcesDialogButton: public QPushButton {
     Q_OBJECT
@@ -60,6 +61,9 @@ protected:
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 private slots:
     void at_editor_commit();
+
+private:
+    QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
 };
 
 #endif // BUSINESS_RULE_ITEM_DELEGATE_H

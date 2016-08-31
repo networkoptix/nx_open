@@ -300,8 +300,8 @@ int QnTranscoder::setVideoCodec(
             m_extraTranscodeParams.setCodec(codec);
             ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
-            if (codec != AV_CODEC_ID_H263P) {
-                // H263P has bug for multi thread encoding in current ffmpeg version
+            if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
+                // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
                     ffmpegTranscoder->setMTMode(true);
@@ -375,7 +375,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
 
     m_eofCounter = 0;
 
-    if ((quint64)m_firstTime == AV_NOPTS_VALUE)
+    if (m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;
 
     bool doTranscoding = true;
@@ -389,12 +389,12 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
             m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
         if (m_videoCodec != AV_CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
-                                          && m_delayedAudioQueue.size() < kMaxDelayedQueueSize)
+            && m_delayedAudioQueue.size() < (int)kMaxDelayedQueueSize)
         {
             return 0; // not ready to init
         }
         if (m_audioCodec != AV_CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
-                                          && m_delayedVideoQueue.size() < kMaxDelayedQueueSize)
+            && m_delayedVideoQueue.size() < (int)kMaxDelayedQueueSize)
         {
             return 0; // not ready to init
         }

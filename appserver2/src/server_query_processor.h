@@ -15,6 +15,7 @@
 #include <transaction/binary_transaction_serializer.h>
 #include <api/app_server_connection.h>
 #include <ec_connection_notification_manager.h>
+#include "ec_connection_audit_manager.h"
 
 namespace ec2 {
 
@@ -47,7 +48,8 @@ public:
     virtual ~ServerQueryProcessor() {}
 
     ServerQueryProcessor(const Qn::UserAccessData &userAccessData):
-        m_userAccessData(userAccessData)
+        m_userAccessData(userAccessData),
+        m_auditManager(nullptr)
     {
     }
 
@@ -251,6 +253,8 @@ public:
             });
     }
 
+    void setAuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession);
+
 private:
     /**
      * @param syncFunction ErrorCode(QnTransaction<QueryDataType>&,
@@ -327,6 +331,11 @@ private:
         const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
+    ErrorCode removeObjAccessRightsHelper(
+        const QnUuid& id,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend);
+
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
@@ -381,7 +390,6 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeResource,
                         tran.isLocal,
-                        tran.deliveryInfo,
                         dbManager(m_userAccessData)
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
@@ -403,6 +411,13 @@ private:
                 NX_ASSERT(0);
         }
 
+        RUN_AND_CHECK_ERROR(
+            removeObjAccessRightsHelper(
+                tran.params.id,
+                connection,
+                transactionsToSend),
+            lit("Remove resource access rights failed"));
+
         if(errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -419,7 +434,6 @@ private:
         ErrorCode errorCode = processMultiUpdateSync(
             ApiCommand::removeBusinessRule,
             tran.isLocal,
-            tran.deliveryInfo,
             dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsToSend);
         if(errorCode != ErrorCode::ok)
@@ -428,7 +442,6 @@ private:
         return processMultiUpdateSync(
             ApiCommand::saveBusinessRule,
             tran.isLocal,
-            tran.deliveryInfo,
             tran.params.defaultRules,
             transactionsToSend);
     }
@@ -451,9 +464,7 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        QnAppServerConnectionFactory::getConnection2()
-            ->notificationManager()
-            ->triggerNotification(tran);
+        triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
 
         transactionsToSend->push_back(std::bind(SendTransactionFunction(), tran));
 
@@ -515,7 +526,6 @@ private:
     ErrorCode processMultiUpdateSync(
         ApiCommand::Value command,
         bool isLocal,
-        const QnTranDeliveryInformation& tranDeliverInfo,
         const std::vector<SubDataType>& nestedList,
         std::list<std::function<void()>>* const transactionsToSend)
     {
@@ -523,7 +533,6 @@ private:
         {
             QnTransaction<SubDataType> subTran(command, data);
             subTran.isLocal = isLocal;
-            subTran.deliveryInfo = tranDeliverInfo;
             ErrorCode errorCode = processUpdateSync(subTran, transactionsToSend);
             if (errorCode != ErrorCode::ok)
                 return errorCode;
@@ -547,14 +556,35 @@ private:
                 std::list<std::function<void()>>* const transactionsToSend) -> ErrorCode
             {
                 return processMultiUpdateSync(
-                    subCommand, multiTran.isLocal, multiTran.deliveryInfo, multiTran.params,
+                    subCommand, multiTran.isLocal, multiTran.params,
                     transactionsToSend);
             });
+    }
+
+    template<class DataType>
+    void triggerNotification(
+        const AbstractECConnectionPtr& connection,
+        const QnTransaction<DataType>& tran)
+    {
+        // Add audit record before notification to ensure removed resource is still alive.
+        if (m_auditManager)
+        {
+            m_auditManager->addAuditRecord(
+                tran.command,
+                tran.params,
+                m_authSession);
+        }
+
+        connection->notificationManager()->triggerNotification(tran);
     }
 
 private:
     static QnMutex m_updateDataMutex;
     Qn::UserAccessData m_userAccessData;
+
+
+    ECConnectionAuditManager* m_auditManager;
+    QnAuthSession m_authSession;
 };
 
 } // namespace detail

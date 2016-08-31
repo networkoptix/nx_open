@@ -62,9 +62,14 @@ written by
 #endif
 
 #ifndef _WIN32
-    int pthread_cond_init_monotonic(pthread_cond_t* cond);
-    int pthread_cond_wait_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t timeoutMks);
-    int pthread_cond_wait_time_monotonic(pthread_cond_t* cond, pthread_mutex_t* mutex, uint64_t timeMks);
+    // Use these functions intead of POSIX to ensure monotonic waits on every UNIX platform:
+    int pthread_cond_init_monotonic(pthread_cond_t* condition);
+
+    int pthread_cond_wait_monotonic_timeout(
+        pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeoutMks);
+
+    int pthread_cond_wait_monotonic_timepoint(
+        pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeMks);
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

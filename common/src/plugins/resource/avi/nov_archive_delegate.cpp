@@ -1,7 +1,5 @@
 #include "nov_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
 QnNovArchiveDelegate::QnNovArchiveDelegate(): 
@@ -56,5 +54,3 @@ QnAbstractMediaDataPtr QnNovArchiveDelegate::getNextData()
 
     return QnAbstractMediaDataPtr();
 }
-
-#endif // ENABLE_ARCHIVE

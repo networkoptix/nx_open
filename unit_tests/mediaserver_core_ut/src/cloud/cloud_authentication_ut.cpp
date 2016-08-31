@@ -1,235 +1,142 @@
 
-#include <fstream>
-
 #include <gtest/gtest.h>
 
-#include <QtCore/QString>
-
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
+#include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/literal.h>
 #include <nx/utils/random.h>
 #include <utils/common/sync_call.h>
 #include <utils/common/util.h>
 
 #include <media_server/media_server_module.h>
-#include <media_server_process.h>
-#include <platform/platform_abstraction.h>
-#include <test_support/cdb_launcher.h>
 #include <utils/common/long_runnable.h>
 
 #include "media_server/serverutil.h"
-#include "mediaserver_client.h"
-#include "utils.h"
+#include "mediaserver_launcher.h"
+#include "mediaserver_cloud_integration_test_setup.h"
 
-
-class MediaServerLauncher
-{
-public:
-    MediaServerLauncher(const QString& tmpDir = QString())
-    :
-        m_workDirResource(tmpDir),
-        m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000))
-        //m_platform(new QnPlatformAbstraction()),
-        //m_runnablePool(new QnLongRunnablePool()),
-        //m_module(new QnMediaServerModule())
-    {
-        //ASSERT_TRUE((bool)m_workDirResource.getDirName());
-
-        m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
-
-        m_configFile.open(m_configFilePath.toUtf8().constData());
-        //ASSERT_TRUE(m_configFile.is_open());
-
-        m_configFile<<"serverGuid = "<< QnUuid::createUuid().toString().toStdString()<<std::endl;
-        m_configFile<<"removeDbOnStartup = 1"<<std::endl;
-        m_configFile<<"dataDir = "<< m_workDirResource.getDirName()->toStdString()<<std::endl;
-        m_configFile<<"varDir = "<< m_workDirResource.getDirName()->toStdString()<<std::endl;
-        //m_configFile<<"eventsDBFilePath = "<< closeDirPath(getDataDirectory()).toStdString()<<std::endl;
-        m_configFile<<"systemName = "<< QnUuid::createUuid().toString().toStdString()<<std::endl;
-        m_configFile<<"port = "<< m_serverEndpoint.port<<std::endl;
-    }
-
-    ~MediaServerLauncher()
-    {
-        //if (m_mserverProcess)
-            stop();
-    }
-
-    SocketAddress endpoint() const
-    {
-        return m_serverEndpoint;
-    }
-
-    void addSetting(const QString& name, const QString& value)
-    {
-        m_configFile<<name.toStdString()<<" = "<<value.toStdString()<<std::endl;
-    }
-
-    bool start()
-    {
-        QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
-        char* argv[] = { "", "-e", configFileOption.data() };
-        const int argc = 3;
-
-        //m_mserverProcess = std::make_unique<MediaServerProcess>(argc, argv);
-        m_configFile.flush();
-        m_configFile.close();
-        m_mediaServerProcessThread = std::thread(
-            [this, argc, argv = argv]() mutable
-            {
-                MediaServerProcess::main(argc, argv);
-                //m_mserverProcess->run();
-            });
-
-        //waiting for server to come up
-        const auto startTime = std::chrono::steady_clock::now();
-        constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
-        while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
-        {
-            nx_http::HttpClient httpClient;
-            if (httpClient.doGet(
-                    lit("http://%1/api/moduleInformation").arg(m_serverEndpoint.toString())))
-                break;  //server is alive
-        }
-
-        return std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart;
-    }
-
-    bool stop()
-    {
-        nx_http::HttpClient httpClient;
-        httpClient.setUserName(lit("admin"));
-        httpClient.setUserPassword(lit("admin"));
-        if (!httpClient.doGet(lit("http://%1/api/restart").arg(m_serverEndpoint.toString())))
-            return false;
-        //m_mserverProcess->pleaseStop();
-        m_mediaServerProcessThread.join();
-        return true;
-    }
-
-private:
-    std::ofstream m_configFile;
-    nx::ut::utils::WorkDirResource m_workDirResource;
-    std::unique_ptr<MediaServerProcess> m_mserverProcess;
-    SocketAddress m_serverEndpoint;
-    QString m_configFilePath;
-    std::thread m_mediaServerProcessThread;
-
-    QScopedPointer<QnPlatformAbstraction> m_platform;
-    QScopedPointer<QnLongRunnablePool> m_runnablePool;
-    QScopedPointer<QnMediaServerModule> m_module;
-};
 
 using namespace nx::cdb;
 
-class MediaServerCloudTest
-{
-public:
-    MediaServerCloudTest()
-    {
-    }
-
-    virtual ~MediaServerCloudTest()
-    {
-    }
-
-    MediaServerLauncher* mediaServerLauncher()
-    {
-    }
-
-    bool startCloudDB()
-    {
-        return m_cdb.startAndWaitUntilStarted();
-    }
-
-    bool startMediaServer()
-    {
-        m_mediaServerLauncher.addSetting(lit("cdbEndpoint"), m_cdb.endpoint().toString());
-
-        if (!m_mediaServerLauncher.start())
-            return false;
-
-        m_mserverClient = std::make_unique<MediaServerClient>(
-            m_mediaServerLauncher.endpoint());
-        m_mserverClient->setUserName(lit("admin"));
-        m_mserverClient->setPassword(lit("admin"));
-        return true;
-    }
-
-    bool registerRandomCloudAccount(
-        std::string* const accountEmail,
-        std::string* const accountPassword)
-    {
-        api::AccountData accountData;
-        if (m_cdb.addActivatedAccount(&accountData, accountPassword) != api::ResultCode::ok)
-            return false;
-        *accountEmail = accountData.email;
-        return true;
-    }
-
-    bool bindSystemToCloud(
-        const std::string& accountEmail,
-        const std::string& accountPassword)
-    {
-        api::SystemData system1;
-        const auto result = m_cdb.bindRandomSystem(accountEmail, accountPassword, &system1);
-        if (result != api::ResultCode::ok)
-            return false;
-
-        CloudCredentialsData cloudData;
-        cloudData.cloudSystemID = QString::fromStdString(system1.id);
-        cloudData.cloudAuthKey = QString::fromStdString(system1.authKey);
-        cloudData.cloudAccountName = QString::fromStdString(accountEmail);
-        QnJsonRestResult resultCode;
-        std::tie(resultCode) =
-            makeSyncCall<QnJsonRestResult>(
-                std::bind(
-                    &MediaServerClient::saveCloudSystemCredentials,
-                    m_mserverClient.get(),
-                    std::move(cloudData),
-                    std::placeholders::_1));
-        return resultCode.error == QnJsonRestResult::NoError;
-    }
-
-    SocketAddress mediaServerEndpoint() const
-    {
-        return m_mediaServerLauncher.endpoint();
-    }
-
-private:
-    nx::cdb::CdbLauncher m_cdb;
-    MediaServerLauncher m_mediaServerLauncher;
-    std::unique_ptr<MediaServerClient> m_mserverClient;
-};
-
 class CloudAuthentication
 :
-    public MediaServerCloudTest,
+    public MediaServerCloudIntegrationTest,
     public ::testing::Test
 {
+public:
+    std::string accountEmail;
+    std::string accountPassword;
+    std::string cloudSystemId;
+    std::string cloudSystemAuthKey;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(startCloudDB());
+        ASSERT_TRUE(startMediaServer());
+
+        ASSERT_TRUE(registerRandomCloudAccount(&accountEmail, &accountPassword));
+        ASSERT_TRUE(bindSystemToCloud(
+            accountEmail, accountPassword,
+            &cloudSystemId, &cloudSystemAuthKey));
+    }
+
+    void doGeneralTest()
+    {
+        //const auto cdbConnection = getCdbConnection();
+
+        nx_http::HttpClient httpClient;
+        httpClient.setUserName(QString::fromStdString(accountEmail));
+        httpClient.setUserPassword(QString::fromStdString(accountPassword));
+        ASSERT_TRUE(httpClient.doGet(
+            lit("http://%1/ec2/getSettings").arg(mediaServerEndpoint().toString())));
+        ASSERT_NE(nullptr, httpClient.response());
+        ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+    }
+
+    void doNonceFromCloudDbTest()
+    {
+        typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+            (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
+
+        //fetching nonce from cloud_db
+        auto cdbConnection =
+            cdb()->connectionFactory()->createConnection(
+                accountEmail,
+                accountPassword);
+        api::ResultCode resultCode = api::ResultCode::ok;
+        api::NonceData nonceData;
+        std::tie(resultCode, nonceData) =
+            makeSyncCall<api::ResultCode, api::NonceData>(
+                std::bind(
+                    static_cast<GetCdbNonceType>(&api::AuthProvider::getCdbNonce),
+                    cdbConnection->authProvider(),
+                    cloudSystemId,
+                    std::placeholders::_1));
+        ASSERT_EQ(api::ResultCode::ok, resultCode);
+
+        //preparing request
+        nx_http::Message requestMsg(nx_http::MessageType::request);
+        requestMsg.request->requestLine.url = lit("/ec2/getUsers");
+        requestMsg.request->requestLine.method = nx_http::Method::GET;
+        requestMsg.request->requestLine.version = nx_http::http_1_1;
+
+        nx_http::header::WWWAuthenticate wwwAuthenticate;
+        wwwAuthenticate.authScheme = nx_http::header::AuthScheme::digest;
+        wwwAuthenticate.params.insert("nonce", nonceData.nonce.c_str());
+        wwwAuthenticate.params.insert("realm", "VMS");
+
+        nx_http::header::DigestAuthorization digestAuthorization;
+
+        nx_http::calcDigestResponse(
+            requestMsg.request->requestLine.method,
+            accountEmail.c_str(),
+            nx_http::StringType(accountPassword.c_str()),
+            boost::none,
+            requestMsg.request->requestLine.url.toString().toUtf8(),
+            wwwAuthenticate,
+            &digestAuthorization);
+
+        requestMsg.request->headers.emplace(
+            nx_http::header::Authorization::NAME,
+            digestAuthorization.serialized());
+
+        //issuing request to mediaserver using that nonce
+        auto tcpSocket = std::make_unique<nx::network::TCPSocket>(false, AF_INET);
+        ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), 3000));
+        ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
+        auto httpMsgPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
+            nullptr,
+            std::move(tcpSocket));
+        httpMsgPipeline->startReadingConnection();
+
+        nx::utils::promise<nx_http::Message> responseReceivedPromise;
+        httpMsgPipeline->setMessageHandler(
+            [&responseReceivedPromise](nx_http::Message msg)
+            {
+                responseReceivedPromise.set_value(std::move(msg));
+            });
+        httpMsgPipeline->sendMessage(std::move(requestMsg), [](SystemError::ErrorCode){});
+
+        auto responseReceivedFuture = responseReceivedPromise.get_future();
+        ASSERT_EQ(
+            std::future_status::ready,
+            responseReceivedFuture.wait_for(std::chrono::seconds(10)));
+        const auto responseMsg = std::move(responseReceivedFuture.get());
+        ASSERT_EQ(nx_http::MessageType::response, responseMsg.type);
+        ASSERT_EQ(nx_http::StatusCode::ok, responseMsg.response->statusLine.statusCode);
+
+        httpMsgPipeline->pleaseStopSync();
+    }
 };
 
 #ifdef ENABLE_CLOUD_TEST
-TEST_F(CloudAuthentication, general)
+TEST_F(CloudAuthentication, all)
 #else
-TEST_F(CloudAuthentication, DISABLED_general)
+TEST_F(CloudAuthentication, DISABLED_all)
 #endif
 {
-    ASSERT_TRUE(startCloudDB());
-    ASSERT_TRUE(startMediaServer());
-
-    std::string accountEmail;
-    std::string accountPassword;
-    ASSERT_TRUE(registerRandomCloudAccount(&accountEmail, &accountPassword));
-    ASSERT_TRUE(bindSystemToCloud(accountEmail, accountPassword));
-
-    //const auto cdbConnection = getCdbConnection();
-
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(QString::fromStdString(accountEmail));
-    httpClient.setUserPassword(QString::fromStdString(accountPassword));
-    ASSERT_TRUE(httpClient.doGet(
-        lit("http://%1/ec2/getSettings").arg(mediaServerEndpoint().toString())));
-    ASSERT_NE(nullptr, httpClient.response());
-    ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+    doGeneralTest();
+    doNonceFromCloudDbTest();
 }

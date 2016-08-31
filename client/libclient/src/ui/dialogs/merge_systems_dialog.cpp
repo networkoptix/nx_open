@@ -22,6 +22,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/merge_systems_tool.h>
 #include <utils/common/util.h>
+#include <utils/common/app_info.h>
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     base_type(parent),
@@ -78,9 +79,12 @@ void QnMergeSystemsDialog::done(int result)
     {
         m_successfullyFinished = false;
 
-        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_adminPassword);
+        context()->instance<QnWorkbenchUserWatcher>()->setUserName(m_remoteOwnerCredentials.user());
+        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_remoteOwnerCredentials.password());
+
         QUrl url = QnAppServerConnectionFactory::url();
-        url.setPassword(m_adminPassword);
+        url.setUserName(m_remoteOwnerCredentials.user());
+        url.setPassword(m_remoteOwnerCredentials.password());
         QnAppServerConnectionFactory::setUrl(url);
 
         menu()->trigger(QnActions::ReconnectAction);
@@ -150,22 +154,30 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
     ui->urlComboBox->setCurrentText(url.toString());
 }
 
-void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
+void QnMergeSystemsDialog::at_testConnectionButton_clicked()
+{
     NX_ASSERT(context()->user()->isOwner());
     if (!context()->user()->isOwner())
         return;
 
     m_discoverer.clear();
     m_url.clear();
-    m_adminPassword.clear();
+    m_remoteOwnerCredentials = QAuthenticator();
     m_successfullyFinished = false;
     updateConfigurationBlock();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
+    QString login = ui->loginEdit->text();
     QString password = ui->passwordEdit->text();
 
     if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
         updateErrorLabel(tr("The URL is invalid."));
+        updateConfigurationBlock();
+        return;
+    }
+
+    if (login.isEmpty()) {
+        updateErrorLabel(tr("The login cannot be empty."));
         updateConfigurationBlock();
         return;
     }
@@ -177,8 +189,9 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
-    m_adminPassword = password;
-    m_mergeTool->pingSystem(m_url, m_adminPassword);
+    m_remoteOwnerCredentials.setUser(login);
+    m_remoteOwnerCredentials.setPassword(password);
+    m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -196,7 +209,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     if (!ownSettings)
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
 
-    m_mergeTool->mergeSystem(m_discoverer, m_url, m_adminPassword, ownSettings);
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_remoteOwnerCredentials, ownSettings);
     ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
@@ -230,10 +243,16 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
         break;
     }
     case QnMergeSystemsTool::AuthentificationError:
-        updateErrorLabel(tr("The password is invalid."));
+        updateErrorLabel(tr("The password or user name is invalid."));
+        break;
+    case QnMergeSystemsTool::ForbiddenError:
+        updateErrorLabel(tr("This user have not permissions for requested operation."));
         break;
     case QnMergeSystemsTool::VersionError:
         updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
+        break;
+    case QnMergeSystemsTool::notLocalOwner:
+        updateErrorLabel(tr("Can't connect to the other system because current system is already attached to the cloud."));
         break;
     case QnMergeSystemsTool::SafeModeError:
         updateErrorLabel(tr("The discovered system %1 is in safe mode.").arg(moduleInformation.systemName));
@@ -276,7 +295,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         switch (errorCode)
         {
         case QnMergeSystemsTool::AuthentificationError:
-            message = tr("The password is invalid.");
+            message = tr("The password or user name is invalid.");
             break;
         case QnMergeSystemsTool::VersionError:
             message = tr("System has an incompatible version.");
@@ -297,10 +316,16 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
             message = tr("System is in safe mode.");
             break;
         case QnMergeSystemsTool::ConfigurationError:
-            message = tr("Cloud not configure remote system.");
+            message = tr("Could not configure remote system.");
             break;
         case QnMergeSystemsTool::DependentSystemBoundToCloudError:
-            message = tr("System being merged cannot be bound to the cloud.");
+            message = tr("System being merged cannot be bound to the %1.").arg(QnAppInfo::cloudName());
+            break;
+        case QnMergeSystemsTool::BothSystemBoundToCloudError:
+            message = tr("Both systems are bound to the %1. Merge is not allowed.").arg(QnAppInfo::cloudName());
+            break;
+        case QnMergeSystemsTool::differentCloudHostError:
+            message = tr("These systems are built with different %1 URL. Merge is not allowed.").arg(QnAppInfo::cloudName());
             break;
         case QnMergeSystemsTool::UnconfiguredSystemError:
             message = tr("System name is not configured yet.");

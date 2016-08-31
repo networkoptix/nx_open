@@ -89,8 +89,8 @@ void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarni
                  .arg( address.toString() ), cl_logWARNING );
     }
 
-    m_mediatorAddress = std::move(address);
-    m_stunClient->connect( address );
+    m_mediatorAddress = address;
+    m_stunClient->connect( std::move( address ) );
     m_promise->set_value( true );
 }
 
@@ -134,6 +134,7 @@ void MediatorConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 
 boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const
 {
+    QnMutexLocker lk(&m_mutex);
     return m_mediatorAddress;
 }
 
@@ -167,8 +168,11 @@ void MediatorConnector::fetchEndpoint()
             NX_LOGX( lit( "Fetched mediator address: %1" )
                      .arg( address.toString() ), cl_logALWAYS );
 
-            m_mediatorAddress = std::move(address);
-            m_stunClient->connect( address );
+            {
+                QnMutexLocker lk(&m_mutex);
+                m_mediatorAddress = address;
+            }
+            m_stunClient->connect( std::move( address ) );
             if (!isReady(*m_future))
                 m_promise->set_value( true );
         }

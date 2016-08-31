@@ -417,6 +417,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation>Enregistrement sur module I/O est désactivé:</translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

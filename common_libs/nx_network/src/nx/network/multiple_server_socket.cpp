@@ -184,9 +184,17 @@ AbstractStreamSocket* MultipleServerSocket::accept()
 
     nx::utils::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
     acceptAsync(
-        [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+        [this, &promise](SystemError::ErrorCode code, AbstractStreamSocket* rawSocket)
         {
-            promise.set_value(std::make_pair(code, socket));
+            std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
+
+            // Here we have to post, to make all of m_serverSockets good to remove
+            // right after sync accept is returned.
+            m_timerSocket.post(
+                [&promise, code, socket = std::move(socket)]() mutable
+                {
+                    promise.set_value(std::make_pair(code, socket.release()));
+                });
         });
 
     const auto result = promise.get_future().get();

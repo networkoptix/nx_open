@@ -30,9 +30,16 @@ angular.module('webadminApp', [
     });
 
     customRouteProvider
-        .when('/settings', {
+        .when('/settings/system', {
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
+        })
+        .when('/settings/server', {
+            templateUrl: 'views/settings.html',
+            controller: 'SettingsCtrl'
+        })
+        .when('/settings/', {
+            redirectTo: '/settings/server'
         })
         .when('/join', {
             templateUrl: 'views/join.html',
@@ -86,16 +93,12 @@ angular.module('webadminApp', [
             templateUrl: 'views/sdkeula.html',
             controller: 'SdkeulaCtrl'
         })
-        .when('/log', {
-            templateUrl: 'views/log.html',
-            controller: 'LogCtrl'
-        })
         .when('/setup', {
             templateUrl: 'views/dialogs/setup.html',
             controller: 'SetupCtrl'
         })
         .otherwise({
-            redirectTo: '/view'
+            redirectTo: '/settings'
         });
 }).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
     var original = $location.path;

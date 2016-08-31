@@ -1,6 +1,6 @@
 #include "switch_item_delegate.h"
 
-#include <common/common_globals.h>
+#include <client/client_globals.h>
 
 #include <ui/style/helper.h>
 #include <ui/style/nx_style.h>

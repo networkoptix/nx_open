@@ -119,6 +119,7 @@
 <script src="scripts/directives/disableAutocomplete.js"></script>
 <script src="scripts/directives/passwordInput.js"></script>
 <script src="scripts/directives/validateEmail.js"></script>
+<script src="scripts/directives/systemInfo.js"></script>
 
 
 <script src="scripts/controllers/main.js"></script>
@@ -135,7 +136,6 @@
 <script src="scripts/controllers/webclient.js"></script>
 <script src="scripts/controllers/view.js"></script>
 <script src="scripts/controllers/health.js"></script>
-<script src="scripts/controllers/log.js"></script>
 <script src="scripts/controllers/dialogs/cloudDialog.js"></script>
 <script src="scripts/controllers/dialogs/setup.js"></script>
 <!-- endbuild -->
@@ -152,11 +152,7 @@
         <div class="modal-body" class="col-sm-12">
             <p>Server can't handle requests now. Trying to reach it again.</p>
             <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
-            <p>If nothing happens for a while - you could check server condition manually</p>
-        </div>
-
-        <div class="modal-footer">
-            <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Refresh page</button>
+            <p>If nothing happens for a while - you could check server condition manually or refresh the page</p>
         </div>
     </form>
 </script>

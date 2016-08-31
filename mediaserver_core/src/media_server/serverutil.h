@@ -4,9 +4,12 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/fusion/fusion/fusion_fwd.h>
+//#include <nx/fusion/fusion/fusion_fwd.h>
 #include <core/resource_management/user_access_data.h>
 #include <utils/common/optional.h>
+#include <nx_ec/data/api_media_server_data.h>
+#include <nx_ec/data/api_user_data.h>
+#include <api/model/password_data.h>
 
 // TODO: #Elric this belongs together with server_settings
 
@@ -56,42 +59,60 @@ namespace nx
     };
 }
 
+
+void resetTransactionTransportConnections();
+
+bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString = nullptr);
+bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
+
+
+bool isLocalAppServer(const QString &host);
+
+
+struct ConfigureSystemData : public PasswordData
+{
+    ConfigureSystemData():
+        PasswordData(),
+        wholeSystem(false),
+        sysIdTime(0),
+        tranLogTime(0),
+        port(0)
+    {
+    }
+
+    ConfigureSystemData(const QnRequestParams& params) :
+        PasswordData(params),
+        systemName(params.value(lit("systemName"))),
+        wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
+        sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
+        tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
+        port(params.value(lit("port")).toInt())
+    {
+    }
+
+    QString systemName;
+    bool wholeSystem;
+    qint64 sysIdTime;
+    qint64 tranLogTime;
+    int port;
+    ec2::ApiMediaServerData foreignServer;
+    ec2::ApiUserData foreignUser;
+    ec2::ApiResourceParamDataList foreignSettings;
+};
+
 /*
 * @param systemName - new system name
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections, const Qn::UserAccessData &userAccessData);
-
-void resetTransactionTransportConnections();
+bool changeSystemName(const ConfigureSystemData& data);
 
 
-struct PasswordData
-{
-    PasswordData() {}
-    PasswordData(const QnRequestParams& params);
-
-    bool hasPassword() const;
-
-    QString password;
-    QByteArray realm;
-    QByteArray passwordHash;
-    QByteArray passwordDigest;
-    QByteArray cryptSha512Hash;
-};
-
-#define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)
+#define ConfigureSystemData_Fields PasswordData_Fields (systemName)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUser)(foreignSettings)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (PasswordData),
+    (ConfigureSystemData),
     (json));
-
-
-bool updateAdminUser(PasswordData data, QnOptionalBool isEnabled, const QnUuid &userId, QString* errString = nullptr);
-bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
-
-
-bool isLocalAppServer(const QString &host);
 
 
 #endif // _SERVER_UTIL_H

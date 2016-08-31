@@ -5,15 +5,17 @@
 #include <QtWidgets/QApplication>
 
 namespace {
-    struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *item) const {
-            return item->acceptedMouseButtons() & Qt::LeftButton;
-        }
+
+const auto isNonProxyLeftClickableItem =
+    [](QGraphicsItem *item)
+    {
+        return ((item->acceptedMouseButtons() & Qt::LeftButton) &&
+            !dynamic_cast<QGraphicsProxyWidget*>(item));
     };
 
 } // anonymous namespace
 
-MoveInstrument::MoveInstrument(QObject *parent): 
+MoveInstrument::MoveInstrument(QObject *parent):
     DragProcessingInstrument(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_moveStartedEmitted(true)
 {}
@@ -24,8 +26,8 @@ MoveInstrument::~MoveInstrument() {
 
 void MoveInstrument::moveItem(QGraphicsItem *item, const QPointF &sceneDeltaPos) const {
     item->setPos(
-        item->pos() + 
-        item->mapToParent(item->mapFromScene(sceneDeltaPos)) - 
+        item->pos() +
+        item->mapToParent(item->mapFromScene(sceneDeltaPos)) -
         item->mapToParent(item->mapFromScene(QPointF()))
     );
 }
@@ -42,7 +44,7 @@ bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
         return false;
 
     /* Find the item to drag. */
-    QGraphicsItem *draggedItem = item(view, event->pos(), ItemAcceptsLeftMouseButton());
+    QGraphicsItem *draggedItem = item(view, event->pos(), isNonProxyLeftClickableItem);
     if (draggedItem == NULL || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable) || !satisfiesItemConditions(draggedItem))
         return false;
     m_draggedItem = draggedItem;

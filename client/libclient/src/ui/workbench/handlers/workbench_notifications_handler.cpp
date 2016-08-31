@@ -288,21 +288,13 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 
 void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid)
 {
-    bool visible = !isValid;
-    if (context()->user() == user)
-    {
-        setSystemHealthEventVisible(QnSystemHealth::EmailIsEmpty, user, visible);
-    }
-    else
-    {
-        /* Checking that we are allowed to see this message */
-        if (visible)
-        {
-            if (accessController()->permissions(user).testFlag(Qn::WriteEmailPermission))
-                visible = false;
-        }
-        setSystemHealthEventVisible(QnSystemHealth::UsersEmailIsEmpty, user, visible);
-    }
+    /* Checking that we are allowed to see this message */
+    bool visible = !isValid && accessController()->hasPermissions(user, Qn::WriteEmailPermission);
+    auto message = context()->user() == user
+        ? QnSystemHealth::EmailIsEmpty
+        : QnSystemHealth::UsersEmailIsEmpty;
+
+    setSystemHealthEventVisible(message, user, visible);
 }
 
 
@@ -390,6 +382,5 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
 void QnWorkbenchNotificationsHandler::at_emailSettingsChanged()
 {
     QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
-    bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
-    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && isInvalid);
+    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && !settings.isValid());
 }

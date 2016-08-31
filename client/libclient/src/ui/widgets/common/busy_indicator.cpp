@@ -304,10 +304,15 @@ void QnBusyIndicatorPainter::paintIndicator(QPainter* painter, const QPointF& or
 
     int timeMs = d->currentTimeMs;
 
+    //TODO: #common Will not work with cosmetic pens in scaled painter
+    qreal radius = d->dotRadius;
+    if (painter->pen().style() != Qt::NoPen)
+        radius -= qMax(painter->pen().widthF(), 1.0) * 0.5;
+
     for (unsigned int i = 0; i != d->dotCount; ++i)
     {
         painter->setOpacity(d->opacityFromTime(timeMs));
-        painter->drawEllipse(center, d->dotRadius, d->dotRadius);
+        painter->drawEllipse(center, radius, radius);
 
         center.setX(center.x() + centerDistance);
         timeMs -= d->dotLagMs;
@@ -337,13 +342,43 @@ void QnBusyIndicatorPainter::tick(int deltaMs)
 */
 
 QnBusyIndicatorWidget::QnBusyIndicatorWidget(QWidget* parent) :
-    QWidget(parent)
+    QWidget(parent),
+    m_indicatorRole(QPalette::Foreground),
+    m_borderRole(QPalette::NoRole)
 {
     setFocusPolicy(Qt::NoFocus);
 
     QAnimationTimer* animationTimer = new QAnimationTimer(this);
     setTimer(animationTimer);
     startListening();
+}
+
+QPalette::ColorRole QnBusyIndicatorWidget::indicatorRole() const
+{
+    return m_indicatorRole;
+}
+
+void QnBusyIndicatorWidget::setIndicatorRole(QPalette::ColorRole role)
+{
+    if (m_indicatorRole == role)
+        return;
+
+    m_indicatorRole = role;
+    updateIndicator();
+}
+
+QPalette::ColorRole QnBusyIndicatorWidget::borderRole() const
+{
+    return m_borderRole;
+}
+
+void QnBusyIndicatorWidget::setBorderRole(QPalette::ColorRole role)
+{
+    if (m_borderRole == role)
+        return;
+
+    m_borderRole = role;
+    updateIndicator();
 }
 
 QSize QnBusyIndicatorWidget::minimumSizeHint() const
@@ -364,8 +399,16 @@ void QnBusyIndicatorWidget::paintEvent(QPaintEvent* event)
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setBrush(palette().color(foregroundRole()));
-    painter.setPen(Qt::NoPen);
+
+    if (m_indicatorRole != QPalette::NoRole)
+        painter.setBrush(palette().color(m_indicatorRole));
+    else
+        painter.setBrush(Qt::NoBrush);
+
+    if (m_borderRole != QPalette::NoRole)
+        painter.setPen(palette().color(m_borderRole));
+    else
+        painter.setPen(Qt::NoPen);
 
     paintIndicator(&painter, indicatorRect().topLeft());
 }
@@ -390,7 +433,9 @@ QRect QnBusyIndicatorWidget::indicatorRect() const
 */
 
 QnBusyIndicatorGraphicsWidget::QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags) :
-    base_type(parent, windowFlags)
+    base_type(parent, windowFlags),
+    m_indicatorColor(palette().color(QPalette::Foreground)),
+    m_borderColor(QColor())
 {
     setFocusPolicy(Qt::NoFocus);
 
@@ -404,10 +449,44 @@ void QnBusyIndicatorGraphicsWidget::paint(QPainter* painter, const QStyleOptionG
     Q_UNUSED(widget);
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterBrushRollback brushRollback(painter, palette().color(QPalette::WindowText));
-    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+
+    QnScopedPainterBrushRollback brushRollback(painter, m_indicatorColor.isValid()
+        ? QBrush(m_indicatorColor)
+        : QBrush(Qt::NoBrush));
+
+    QnScopedPainterPenRollback penRollback(painter, m_borderColor.isValid()
+        ? QPen(m_borderColor)
+        : QPen(Qt::NoPen));
 
     paintIndicator(painter, indicatorRect().topLeft());
+}
+
+QColor QnBusyIndicatorGraphicsWidget::indicatorColor() const
+{
+    return m_indicatorColor;
+}
+
+void QnBusyIndicatorGraphicsWidget::setIndicatorColor(QColor color)
+{
+    if (m_indicatorColor == color)
+        return;
+
+    m_indicatorColor = color;
+    updateIndicator();
+}
+
+QColor QnBusyIndicatorGraphicsWidget::borderColor() const
+{
+    return m_borderColor;
+}
+
+void QnBusyIndicatorGraphicsWidget::setBorderColor(QColor color)
+{
+    if (m_borderColor == color)
+        return;
+
+    m_borderColor = color;
+    updateIndicator();
 }
 
 QSizeF QnBusyIndicatorGraphicsWidget::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const

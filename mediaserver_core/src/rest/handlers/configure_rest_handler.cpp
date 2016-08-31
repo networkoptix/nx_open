@@ -40,42 +40,6 @@ namespace
 
 }
 
-struct ConfigureSystemData: public PasswordData
-{
-    ConfigureSystemData():
-        PasswordData(),
-        wholeSystem(false),
-        sysIdTime(0),
-        tranLogTime(0),
-        port(0)
-    {
-    }
-
-    ConfigureSystemData(const QnRequestParams& params):
-        PasswordData(params),
-        systemName(params.value(lit("systemName"))),
-        wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
-        sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
-        tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
-        port(params.value(lit("port")).toInt())
-    {
-    }
-
-    QString systemName;
-    bool wholeSystem;
-    qint64 sysIdTime;
-    qint64 tranLogTime;
-    int port;
-};
-
-#define ConfigureSystemData_Fields PasswordData_Fields (systemName)(wholeSystem)(sysIdTime)(tranLogTime)(port)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ConfigureSystemData),
-    (json),
-    _Fields,
-    (optional, true));
-
 int QnConfigureRestHandler::executeGet(
     const QString &path,
     const QnRequestParams &params,
@@ -106,7 +70,7 @@ int QnConfigureRestHandler::execute(
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->authUserId()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;
@@ -126,12 +90,7 @@ int QnConfigureRestHandler::execute(
             return CODE_OK;
         }
 
-        if (!changeSystemName(
-            data.systemName,
-            data.sysIdTime,
-            data.tranLogTime,
-            !data.wholeSystem,
-            Qn::UserAccessData(owner->authUserId())))
+        if (!changeSystemName(data))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;
@@ -139,7 +98,7 @@ int QnConfigureRestHandler::execute(
         if (data.wholeSystem)
         {
             auto connection = QnAppServerConnectionFactory::getConnection2();
-            auto manager = connection->getMiscManager(Qn::UserAccessData(owner->authUserId()));
+            auto manager = connection->getMiscManager(owner->accessRights());
             manager->changeSystemName(
                 data.systemName,
                 data.sysIdTime,
@@ -156,14 +115,14 @@ int QnConfigureRestHandler::execute(
     }
 
     /* set port */
-    int changePortResult = changePort(owner->authUserId(), data.port);
+    int changePortResult = changePort(owner->accessRights(), data.port);
     if (changePortResult == ResultFail)
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Port is busy"));
 
     /* set password */
     if (data.hasPassword())
     {
-        if (!updateAdminUser(data, QnOptionalBool(), owner->authUserId()))
+        if (!updateUserCredentials(data, QnOptionalBool(), qnResPool->getAdministrator()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
@@ -192,7 +151,7 @@ int QnConfigureRestHandler::execute(
     return CODE_OK;
 }
 
-int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
+int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, int port)
 {
     int sPort = MSSettings::roSettings()->value(
         nx_ms_conf::SERVER_PORT,
@@ -225,7 +184,7 @@ int QnConfigureRestHandler::changePort(const QnUuid &userId, int port)
     ec2::ApiMediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
     auto connection = QnAppServerConnectionFactory::getConnection2();
-    auto manager = connection->getMediaServerManager(Qn::UserAccessData(userId));
+    auto manager = connection->getMediaServerManager(accessRights);
     auto errCode = manager->saveSync(apiServer);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)

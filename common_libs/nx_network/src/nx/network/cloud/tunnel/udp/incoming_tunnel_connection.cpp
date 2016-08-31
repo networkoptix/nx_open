@@ -13,7 +13,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
 :
     m_state(SystemError::noError),
     m_controlConnection(std::move(controlConnection)),
-    m_serverSocket(new UdtStreamServerSocket)
+    m_serverSocket(new UdtStreamServerSocket(AF_INET))
 {
     m_controlConnection->setErrorHandler(
         [this](SystemError::ErrorCode code)
@@ -54,9 +54,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
     }
 }
 
-void IncomingTunnelConnection::accept(std::function<void(
-    SystemError::ErrorCode,
-    std::unique_ptr<AbstractStreamSocket>)> handler)
+void IncomingTunnelConnection::accept(AcceptHandler handler)
 {
     NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
     m_serverSocket->dispatch(

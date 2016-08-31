@@ -9,19 +9,21 @@ BusyIndicator
 
     property color color: Style.colors.mid;
 
-    implicitWidth: childrenRect.width;
-    implicitHeight: childrenRect.height;
+    implicitWidth: (repeater.count > 0 ? radiusByIndex(repeater.count - 1) * 2 : 30);
+    implicitHeight: implicitWidth;
     contentItem: null;
 
     Repeater
     {
+        id: repeater;
+
         model: 3;
         delegate: NxCircle
         {
             id: circleRectangle;
 
             anchors.centerIn: parent;
-            radius: 20 + index * 16;
+            radius: control.radiusByIndex(index)
             border.width: 2;
             border.color: control.color;
             color: "transparent";
@@ -64,6 +66,11 @@ BusyIndicator
                 }
             }
         }
+    }
+
+    function radiusByIndex(index)
+    {
+        return (20 + index * 16);
     }
 }
 

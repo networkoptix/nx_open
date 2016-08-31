@@ -40,6 +40,7 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench.h>
@@ -50,20 +51,13 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/style/nx_style.h>
 #include <utils/aspect_ratio.h>
 #include <utils/license_usage_helper.h>
 #include <nx/utils/string.h>
 
 namespace {
 const qreal kButtonsSize = 24.0;
-
-
-/** Frame extension multiplier determines the width of frame extension relative
- * to frame width.
- *
- * Frame events are processed not only when hovering over the frame itself,
- * but also over its extension. */
-const qreal frameExtensionMultiplier = 1.0;
 
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -128,25 +122,26 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_options(DisplaySelection),
     m_localActive(false),
     m_frameOpacity(1.0),
-    m_frameWidth(-1.0),
+    m_frameDistinctionColor(),
     m_titleTextFormat(lit("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_overlayWidgets(new OverlayWidgets()),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_statusOverlay(Qn::EmptyOverlay),
     m_renderStatus(Qn::NothingRendered),
-    m_lastNewFrameTimeMSec(0)
+    m_lastNewFrameTimeMSec(0),
+    m_selectionState(SelectionState::invalid),
+    m_scaleWatcher(),
+    m_framePainter()
 {
+    updateSelectedState();
+
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
-
-    /* Set up frame. */
-    setFrameWidth(0.0);
 
     /* Set up overlay widgets. */
     QFont font = this->font();
@@ -164,10 +159,18 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
-    addOverlayWidget(m_statusOverlayWidget
-                     , detail::OverlayParams(UserVisible, true, false, StatusLayer));
+    const auto overlay = new QnStatusOverlayWidget(this);
+    m_statusController = new QnStatusOverlayController(m_resource, overlay);
 
+    connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
+        [this, overlay, controller = m_statusController]()
+        {
+            const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
+            setOverlayWidgetVisible(overlay, !isEmptyOverlay, false);
+        });
+
+    addOverlayWidget(overlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
+    setOverlayWidgetVisible(overlay, false, false);
 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
@@ -193,6 +196,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         if (m_enclosingGeometry.isValid())
             setGeometry(calculateGeometry(m_enclosingGeometry));
     });
+
+    connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged,
+        this, &QnResourceWidget::updateFrameWidth);
+
+    connect(this, &QnResourceWidget::geometryChanged,
+        this, &QnResourceWidget::updateFrameGeometry);
+
+    connect(this, &QnResourceWidget::frameDistinctionColorChanged, this,
+        [this]() { m_framePainter.setColor(calculateFrameColor()); });
 }
 
 QnResourceWidget::~QnResourceWidget()
@@ -240,8 +252,6 @@ void QnResourceWidget::addInfoOverlay()
 //TODO: #ynikitenkov #high emplace back headerLayout->setContentsMargins(0, 0, 0, 1);
 void QnResourceWidget::addMainOverlay()
 {
-    m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
-
     m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
     addOverlayWidget(m_overlayWidgets->buttonsOverlay
                      , detail::OverlayParams(UserVisible, true, true, InfoLayer));
@@ -317,18 +327,6 @@ QnResourceWidget *QnResourceWidget::zoomTargetWidget() const
     return QnWorkbenchContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
 }
 
-void QnResourceWidget::setFrameWidth(qreal frameWidth)
-{
-    if (qFuzzyCompare(m_frameWidth, frameWidth))
-        return;
-
-    prepareGeometryChange();
-
-    m_frameWidth = frameWidth;
-    qreal extendedFrameWidth = m_frameWidth * (1.0 + frameExtensionMultiplier);
-    setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
-}
-
 QColor QnResourceWidget::frameDistinctionColor() const
 {
     return m_frameDistinctionColor;
@@ -342,16 +340,6 @@ void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor)
     m_frameDistinctionColor = frameColor;
 
     emit frameDistinctionColorChanged();
-}
-
-const QnResourceWidgetFrameColors &QnResourceWidget::frameColors() const
-{
-    return m_frameColors;
-}
-
-void QnResourceWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors)
-{
-    m_frameColors = frameColors;
 }
 
 void QnResourceWidget::setAspectRatio(float aspectRatio)
@@ -519,9 +507,9 @@ void QnResourceWidget::updateCursor()
         setCursor(newCursor);
 }
 
-QnStatusOverlayWidget * QnResourceWidget::statusOverlayWidget() const
+QnStatusOverlayController *QnResourceWidget::statusOverlayController() const
 {
-    return m_statusOverlayWidget;
+    return m_statusController;
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const
@@ -556,6 +544,17 @@ void QnResourceWidget::updateCheckedButtons()
 
     const auto checkedButtons = item()->data(Qn::ItemCheckedButtonsRole).toInt();
     buttonsOverlay()->rightButtonsBar()->setCheckedButtons(checkedButtons);
+}
+
+QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemSelectedHasChanged)
+        updateSelectedState();
+
+    if (change == QGraphicsItem::ItemSceneHasChanged)
+        m_scaleWatcher.initialize(scene());
+
+    return base_type::itemChange(change, value);
 }
 
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
@@ -646,7 +645,11 @@ bool QnResourceWidget::isLocalActive() const
 
 void QnResourceWidget::setLocalActive(bool localActive)
 {
+    if (m_localActive == localActive)
+        return;
+
     m_localActive = localActive;
+    updateSelectedState();
 }
 
 QnButtonsOverlay *QnResourceWidget::buttonsOverlay() const
@@ -764,29 +767,6 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate)
     updateHud(animate);
 }
 
-Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const
-{
-    return m_statusOverlay;
-}
-
-void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate)
-{
-    if (m_statusOverlay == statusOverlay)
-        return;
-
-    m_statusOverlay = statusOverlay;
-    m_statusOverlayWidget->setStatusOverlay(statusOverlay);
-
-    qreal opacity = statusOverlay == Qn::EmptyOverlay
-        ? 0.0
-        : 1.0;
-
-    if (animate)
-        opacityAnimator(m_statusOverlayWidget)->animateTo(opacity);
-    else
-        m_statusOverlayWidget->setOpacity(opacity);
-}
-
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus, bool hasVideo) const
 {
     if (resourceStatus == Qn::Offline)
@@ -828,7 +808,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const
 
 void QnResourceWidget::updateStatusOverlay()
 {
-    setStatusOverlay(calculateStatusOverlay());
+    m_statusController->setStatusOverlay(calculateStatusOverlay());
 }
 
 void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout)
@@ -945,50 +925,95 @@ void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &)
     return;
 }
 
-void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+
+void QnResourceWidget::updateSelectedState()
 {
+    const auto calculateSelectedState =
+        [this]()
+        {
+            const bool selected = (m_options.testFlag(DisplaySelection) && isSelected());
+            const bool focused = isSelected();
+            const bool active = isLocalActive();
+
+            if (selected && focused && active)
+                return SelectionState::focusedAndSelected;
+            else if (!active && selected)
+                return SelectionState::selected;
+            else if (focused)
+                return SelectionState::focused;
+            else if (active)
+                return SelectionState::inactiveFocused;
+
+            return SelectionState::notSelected;
+        };
+
+    const auto selectionState = calculateSelectedState();
+    if (selectionState == m_selectionState)
+        return;
+
+    m_selectionState = selectionState;
+    m_framePainter.setColor(calculateFrameColor());
+    updateFrameWidth();
+}
+
+void QnResourceWidget::updateFrameWidth()
+{
+    m_framePainter.setFrameWidth(calculateFrameWidth() * m_scaleWatcher.scale());
+    updateFrameGeometry();
+}
+
+void QnResourceWidget::updateFrameGeometry()
+{
+    static const qreal kPadding = 1.5;
+    const auto frameWidth = m_framePainter.frameWidth();
+    const auto offsetValue = frameWidth + kPadding * m_scaleWatcher.scale();
+    const auto offset = QPointF(offsetValue, offsetValue);
+    const auto targetRect = QRectF(-offset, size() + QSizeF(offsetValue, offsetValue) * 2);
+    m_framePainter.setBoundingRect(targetRect);
+}
+
+qreal QnResourceWidget::calculateFrameWidth() const
+{
+    static const auto kSelectedFrameWidth = 1;
+    static const auto kNormalFrameWidth = 2;
+    return (m_selectionState == SelectionState::selected
+        ? kSelectedFrameWidth
+        : kNormalFrameWidth);
+}
+
+QColor QnResourceWidget::calculateFrameColor() const
+{
+    switch (m_selectionState)
+    {
+        case SelectionState::focusedAndSelected:
+        case SelectionState::selected:
+            return qnNxStyle->mainColor(QnNxStyle::Colors::kBrand);
+        case SelectionState::focused:
+            return (m_frameDistinctionColor.isValid()
+                ? m_frameDistinctionColor.lighter()
+                : qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(4));
+        case SelectionState::inactiveFocused:
+            return (m_frameDistinctionColor.isValid()
+                ? m_frameDistinctionColor
+                : qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(3));
+        default:
+            return (m_frameDistinctionColor.isValid()
+                ? m_frameDistinctionColor
+                : Qt::transparent);
+    }
+}
+
+void QnResourceWidget::paintWindowFrame(QPainter *painter,
+    const QStyleOptionGraphicsItem *option,
+    QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     if (qFuzzyIsNull(m_frameOpacity))
         return;
 
-    QColor color;
-    if (isSelected())
-    {
-        color = m_frameColors.selected;
-    }
-    else if (isLocalActive())
-    {
-        if (m_frameDistinctionColor.isValid())
-        {
-            color = m_frameDistinctionColor.lighter();
-        }
-        else
-        {
-            color = m_frameColors.active;
-        }
-    }
-    else
-    {
-        if (m_frameDistinctionColor.isValid())
-        {
-            color = m_frameDistinctionColor;
-        }
-        else
-        {
-            color = m_frameColors.normal;
-        }
-    }
-
-    QSizeF size = this->size();
-    qreal w = size.width();
-    qreal h = size.height();
-    qreal fw = m_frameWidth;
-
-    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
-    painter->fillRect(QRectF(-fw, -fw, w + fw * 2, fw), color);
-    painter->fillRect(QRectF(-fw, h, w + fw * 2, fw), color);
-    painter->fillRect(QRectF(-fw, 0, fw, h), color);
-    painter->fillRect(QRectF(w, 0, fw, h), color);
+    m_framePainter.paint(*painter);
 }
 
 void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
@@ -999,7 +1024,8 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
     if (!(m_options & DisplaySelection))
         return;
 
-    painter->fillRect(rect, palette().color(QPalette::Highlight));
+    painter->fillRect(rect,
+        toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), 0.1));
 }
 
 float QnResourceWidget::defaultAspectRatio() const
@@ -1078,6 +1104,9 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
 
     if (changedFlags.testFlag(ActivityPresence))
         updateHud(true);
+
+    if (changedFlags.testFlag(DisplaySelection))
+        updateSelectedState();
 }
 
 void QnResourceWidget::at_itemDataChanged(int role)

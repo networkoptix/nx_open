@@ -6,6 +6,9 @@
 #include <network/module_information.h>
 #include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
+#include <rest/helpers/permissions_helper.h>
+#include <core/resource_management/resource_pool.h>
+#include <rest/server/rest_connection_processor.h>
 
 #include <nx/network/socket_common.h>
 
@@ -22,12 +25,23 @@ namespace {
     }
 }
 
-int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnModuleInformationRestHandler::executeGet(
+    const QString &path,
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
     bool allModules = params.value(lit("allModules")) == lit("true");
     bool useAddresses = params.value(lit("showAddresses"), lit("true")) != lit("false");
+    bool checkOwnerPermissions = params.value(lit("checkOwnerPermissions"), lit("false")) != lit("false");
+
+    if (checkOwnerPermissions)
+    {
+        if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+            return QnPermissionsHelper::notOwnerError(result);
+    }
 
     if (allModules)
     {

@@ -448,7 +448,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->request = d->request;
     other.d_ptr->response = d->response;
     other.d_ptr->protocol = d->protocol;
-    other.d_ptr->authUserId = d->authUserId;
+    other.d_ptr->accessRights = d->accessRights;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const
@@ -509,7 +509,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         return result;
     }
 
-    if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
+    if (const auto& userRes = qnResPool->getResourceById(d->accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");

@@ -8,14 +8,15 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
-#include <utils/common/product_features.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
 
-#include "common/common_module.h"
+#include <common/common_module.h>
 #include "module_information.h"
+
+#include <utils/common/app_info.h>
 #include "utils/common/cryptographic_hash.h"
 
 static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
@@ -99,7 +100,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
         try {
             //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
             //    continue;
-            auto sock = std::make_unique<nx::network::UDPSocket>();
+            auto sock = std::make_unique<nx::network::UDPSocket>(AF_INET);
             sock->bind(SocketAddress(address.toString(), 0));
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
@@ -230,10 +231,20 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (response->type != QnModuleInformation::nxMediaServerId() && response->type != QnModuleInformation::nxECId())
         return true;
 
-    if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
+    //TODO: #GDM #isCompatibleCustomization VMS-2163
+    if (!m_compatibilityMode &&
+        response->customization.compare(QnAppInfo::customizationName(), Qt::CaseInsensitive) != 0)
     {
         NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 on local address %4").
             arg(response->type).arg(remoteEndpoint.toString()).arg(response->customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
+        return false;
+    }
+
+    //TODO: #GDM #isCompatibleCustomization VMS-2163
+    if (response->cloudHost != QnAppInfo::defaultCloudHost())
+    {
+        NX_LOGX(lit("Ignoring %1 (%2) with different cloud host %3 on local address %4").
+            arg(response->type).arg(remoteEndpoint.toString()).arg(response->cloudHost).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
 
@@ -257,7 +268,7 @@ void QnMulticastModuleFinder::run() {
     if (!m_clientMode) {
         QnMutexLocker lk(&m_mutex);
 
-        m_serverSocket.reset(new UDPSocket());
+        m_serverSocket.reset(new UDPSocket(AF_INET));
         m_serverSocket->setReuseAddrFlag(true);
         m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
 

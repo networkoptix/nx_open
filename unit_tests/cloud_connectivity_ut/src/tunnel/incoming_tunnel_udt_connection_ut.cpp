@@ -65,7 +65,7 @@ protected:
 
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
     {
-        auto socket = std::make_unique<UdtStreamSocket>();
+        auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         NX_CRITICAL(socket->setRendezvous(randevous));
         NX_CRITICAL(socket->setSendTimeout(kSocketTimeout.count()));
         NX_CRITICAL(socket->setRecvTimeout(kSocketTimeout.count()));
@@ -247,7 +247,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
         promise.get_future().wait();
     }
 
-    // connection was brocken by wrong packet
+    // connection was broken by wrong packet
     runConnectingSockets();
     ASSERT_NE(connectResults.pop(), SystemError::noError);
     ASSERT_EQ(acceptResults.pop(), SystemError::invalidData);
@@ -267,7 +267,7 @@ TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
             {
                 for (;;)
                 {
-                    auto socket = std::make_unique<UdtStreamSocket>();
+                    auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
                     ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
                     if (!socket->connect(connectionAddress))
                         return;

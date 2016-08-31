@@ -85,17 +85,19 @@ class QnBusyIndicatorWidget : public QWidget, public QnBusyIndicatorPainter
 {
     Q_OBJECT
 
-    Q_PROPERTY(unsigned int dotCount        READ dotCount       WRITE setDotCount)
-    Q_PROPERTY(unsigned int dotSpacing      READ dotSpacing     WRITE setDotSpacing)
-    Q_PROPERTY(qreal        dotRadius       READ dotRadius      WRITE setDotRadius)
-    Q_PROPERTY(QSize        indicatorSize   READ indicatorSize)
-    Q_PROPERTY(qreal        minimumOpacity  READ minimumOpacity WRITE setMinimumOpacity)
-    Q_PROPERTY(int          dotLagMs        READ dotLagMs       WRITE setDotLagMs)
-    Q_PROPERTY(unsigned int downTimeMs      READ downTimeMs     WRITE setDownTimeMs)
-    Q_PROPERTY(unsigned int fadeInTimeMs    READ fadeInTimeMs   WRITE setFadeInTimeMs)
-    Q_PROPERTY(unsigned int upTimeMs        READ upTimeMs       WRITE setUpTimeMs)
-    Q_PROPERTY(unsigned int fadeOutTimeMs   READ fadeOutTimeMs  WRITE setFadeOutTimeMs)
-    Q_PROPERTY(unsigned int totalTimeMs     READ totalTimeMs)
+    Q_PROPERTY(unsigned int        dotCount       READ dotCount       WRITE setDotCount)
+    Q_PROPERTY(unsigned int        dotSpacing     READ dotSpacing     WRITE setDotSpacing)
+    Q_PROPERTY(qreal               dotRadius      READ dotRadius      WRITE setDotRadius)
+    Q_PROPERTY(QSize               indicatorSize  READ indicatorSize)
+    Q_PROPERTY(qreal               minimumOpacity READ minimumOpacity WRITE setMinimumOpacity)
+    Q_PROPERTY(int                 dotLagMs       READ dotLagMs       WRITE setDotLagMs)
+    Q_PROPERTY(unsigned int        downTimeMs     READ downTimeMs     WRITE setDownTimeMs)
+    Q_PROPERTY(unsigned int        fadeInTimeMs   READ fadeInTimeMs   WRITE setFadeInTimeMs)
+    Q_PROPERTY(unsigned int        upTimeMs       READ upTimeMs       WRITE setUpTimeMs)
+    Q_PROPERTY(unsigned int        fadeOutTimeMs  READ fadeOutTimeMs  WRITE setFadeOutTimeMs)
+    Q_PROPERTY(unsigned int        totalTimeMs    READ totalTimeMs)
+    Q_PROPERTY(QPalette::ColorRole indicatorRole  READ indicatorRole  WRITE setIndicatorRole)
+    Q_PROPERTY(QPalette::ColorRole borderRole     READ borderRole     WRITE setBorderRole)
 
 public:
     explicit QnBusyIndicatorWidget(QWidget* parent = nullptr);
@@ -103,12 +105,22 @@ public:
     virtual QSize minimumSizeHint() const override;
     virtual QSize sizeHint() const override;
 
+    QPalette::ColorRole indicatorRole() const;
+    void setIndicatorRole(QPalette::ColorRole role);
+
+    QPalette::ColorRole borderRole() const;
+    void setBorderRole(QPalette::ColorRole role);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void indicatorSizeChanged() override;
     virtual void updateIndicator() override;
 
     QRect indicatorRect() const;
+
+private:
+    QPalette::ColorRole m_indicatorRole;
+    QPalette::ColorRole m_borderRole;
 };
 
 /*
@@ -129,13 +141,22 @@ class QnBusyIndicatorGraphicsWidget : public Animated<GraphicsWidget>, public Qn
     Q_PROPERTY(unsigned int upTimeMs        READ upTimeMs       WRITE setUpTimeMs)
     Q_PROPERTY(unsigned int fadeOutTimeMs   READ fadeOutTimeMs  WRITE setFadeOutTimeMs)
     Q_PROPERTY(unsigned int totalTimeMs     READ totalTimeMs)
+    Q_PROPERTY(QColor       indicatorColor  READ indicatorColor WRITE setIndicatorColor)
+    Q_PROPERTY(QColor       borderColor     READ borderColor    WRITE setBorderColor)
 
     using base_type = Animated<GraphicsWidget>;
 
 public:
-    explicit QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0);
+    explicit QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent = nullptr,
+        Qt::WindowFlags windowFlags = 0);
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+    QColor indicatorColor() const;
+    void setIndicatorColor(QColor color);
+
+    QColor borderColor() const;
+    void setBorderColor(QColor color);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
@@ -143,4 +164,8 @@ protected:
     virtual void updateIndicator() override;
 
     QRectF indicatorRect() const;
+
+private:
+    QColor m_indicatorColor;
+    QColor m_borderColor;
 };

@@ -381,8 +381,11 @@ struct NX_NETWORK_API KeepAliveOptions
      *  the connection dead and notifying the application layer */
     int probeCount;
 
-    KeepAliveOptions( int time = 0, int interval = 0, int probes = 0 )
-        : timeSec( time ), intervalSec( interval ), probeCount( probes ) {}
+    KeepAliveOptions(int timeSec = 0, int intervalSec = 0, int probeCount = 0);
+    bool operator==(const KeepAliveOptions& rhs) const;
+
+    QString toString() const;
+    static boost::optional<KeepAliveOptions> fromString(const QString& string);
 };
 
 //!Interface for connection-orientied sockets

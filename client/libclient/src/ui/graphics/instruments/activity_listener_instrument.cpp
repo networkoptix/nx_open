@@ -25,6 +25,16 @@ ActivityListenerInstrument::~ActivityListenerInstrument()
     ensureUninstalled();
 }
 
+int ActivityListenerInstrument::activityTimeoutMSec() const
+{
+    return m_activityTimeoutMSec;
+}
+
+bool ActivityListenerInstrument::isActive() const
+{
+    return m_active;
+}
+
 void ActivityListenerInstrument::enabledNotify()
 {
     setAutoStopping(true);

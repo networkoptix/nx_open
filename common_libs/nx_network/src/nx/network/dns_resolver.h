@@ -1,5 +1,4 @@
-#ifndef DNS_RESOLVER_H
-#define DNS_RESOLVER_H
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -13,6 +12,7 @@
 #include "socket_common.h"
 
 namespace nx {
+namespace network {
 
 /*!
     \note Thread-safe
@@ -38,17 +38,18 @@ public:
     void resolveAddressAsync(
         const HostAddress& addressToResolve,
         std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
-        RequestID reqID );
+        int ipVersion, RequestID reqID );
     /*!
         \note This method is re-enterable
     */
-    bool resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress );
-    //!Returns \a true if address \a addr is resolved
-    bool isAddressResolved( const HostAddress& addr ) const;
+    bool resolveAddressSync(
+        const QString& hostName, HostAddress* const resolvedAddress, int ipVersion );
+
     /*!
         \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
     */
     void cancel( RequestID reqID, bool waitForRunningHandlerCompletion );
+
     //!Returns \a true if at least one resolve operation is scheduled with \a reqID
     bool isRequestIDKnown( RequestID reqID ) const;
 
@@ -64,12 +65,14 @@ private:
         std::function<void(SystemError::ErrorCode, const HostAddress&)> completionHandler;
         RequestID reqID;
         size_t sequence;
+        int ipVersion;
 
         ResolveTask(
             HostAddress _hostAddress,
             std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
             RequestID _reqID,
-            size_t _sequence );
+            size_t _sequence,
+            int _ipVersion);
     };
 
     bool m_terminated;
@@ -78,8 +81,8 @@ private:
     std::list<ResolveTask> m_taskQueue;
     RequestID m_runningTaskReqID;
     size_t m_currentSequence;
+    int ipVersion;
 };
 
+} // namespace network
 } // namespace nx
-
-#endif  //HOST_ADDRESS_RESOLVER_H

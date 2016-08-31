@@ -72,7 +72,7 @@ Page
     SearchToolBar
     {
         id: searchToolBar
-        parent: header
+        parent: toolBar
     }
 
     CamerasGrid
@@ -99,6 +99,17 @@ Page
             leftPadding: 6
             width: 4
         }
+    }
+
+    DummyMessage
+    {
+        anchors.fill: parent
+        title: qsTr("No cameras available on this layout")
+        buttonText: qsTr("Show all cameras")
+        onButtonClicked: uiController.layoutId = ""
+        visible: camerasGrid.count == 0
+                 && uiController.layoutId != ""
+                 && connectionManager.online
     }
 
     Loader
@@ -138,6 +149,13 @@ Page
                     leftPadding: 10
                     width: 4
                 }
+            }
+
+            DummyMessage
+            {
+                anchors.fill: parent
+                title: qsTr("Nothing found")
+                visible: camerasList.count == 0
             }
         }
     }
@@ -188,12 +206,6 @@ Page
                 font.pixelSize: 32
                 color: ColorTheme.base13
             }
-        }
-
-        onVisibleChanged:
-        {
-            if (!visible)
-                mainWindow.unlockScreenOrientation()
         }
     }
 

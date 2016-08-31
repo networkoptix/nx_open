@@ -41,15 +41,6 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>udt</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/udt/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>nx_network</artifactId>
             <version>${project.version}</version>
             <type>pom</type>

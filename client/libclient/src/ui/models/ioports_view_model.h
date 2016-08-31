@@ -6,8 +6,6 @@
 
 #include <api/model/api_ioport_data.h>
 
-#include <common/common_globals.h>
-
 class QnIOPortsViewModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -34,7 +32,7 @@ public:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    
+
     void clear();
     void setModelData(const QnIOPortDataList& data);
     QnIOPortDataList modelData() const;
@@ -43,7 +41,7 @@ private:
     QVariant editData(const QModelIndex &index) const;
     bool isDisabledData(const QModelIndex &index) const;
 
-    QString portTypeToString(Qn::IOPortType portType) const; 
+    QString portTypeToString(Qn::IOPortType portType) const;
     QString stateToString(Qn::IODefaultState state) const;
 private:
     QnIOPortDataList m_data;

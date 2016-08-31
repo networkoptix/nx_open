@@ -12,12 +12,13 @@ namespace Ui {
     class BackupScheduleDialog;
 }
 
-class QnBackupScheduleDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+class QnBackupScheduleDialog: public QnWorkbenchStateDependentButtonBoxDialog
+{
     Q_OBJECT
-
     Q_PROPERTY(QnBackupScheduleColors colors READ colors WRITE setColors)
 
     typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+
 public:
     QnBackupScheduleDialog(QWidget *parent = NULL);
     virtual ~QnBackupScheduleDialog();
@@ -27,6 +28,10 @@ public:
 
     const QnBackupScheduleColors &colors() const;
     void setColors(const QnBackupScheduleColors &colors);
+
+protected:
+    virtual void setReadOnlyInternal() override;
+
 private:
     void setNearestValue(QComboBox* combobox, int time);
     void initDayOfWeekCheckboxes();

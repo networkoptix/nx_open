@@ -21,6 +21,8 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
+#include <utils/common/app_info.h>
+
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     : base_type(parent)
     , ui(new Ui::QnSystemAdministrationDialog)
@@ -40,7 +42,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
     addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));
-    addPage(CloudManagement,        new QnCloudManagementWidget(this),      tr("Cloud"));
+    addPage(CloudManagement,        new QnCloudManagementWidget(this),      QnAppInfo::cloudName());
 
     loadDataToUi();
 
