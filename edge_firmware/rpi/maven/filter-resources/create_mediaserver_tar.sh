@@ -159,7 +159,7 @@ fi
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/etc/
-cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
+cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
 
 #start script and platform specific scripts
 cp -R ./etc $BUILD_DIR
@@ -205,7 +205,7 @@ if [[ "${box}" == "bpi" ]]; then
   cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
-  cp ./opt/networkoptix/mediaserver/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+  cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
   chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts
 fi
 
