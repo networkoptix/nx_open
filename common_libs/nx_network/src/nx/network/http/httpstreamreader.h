@@ -6,12 +6,11 @@
 #ifndef HTTPSTREAMREADER_H
 #define HTTPSTREAMREADER_H
 
-#include <mutex>
-
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
 #endif
 
+#include <nx/utils/thread/mutex.h>
 #include <utils/media/abstract_byte_stream_filter.h>
 
 #include "httptypes.h"
@@ -66,6 +65,7 @@ namespace nx_http
         /** moves message out of parser */
         Message takeMessage();
         ReadState state() const;
+        quint64 messageBodyBytesRead() const;
         size_t messageBodyBufferSize() const;
         //!Returns internal message body buffer and clears internal buffer
         BufferType fetchMessageBody();
@@ -125,7 +125,7 @@ namespace nx_http
         bool m_breakAfterReadingHeaders;
 
         LineSplitter m_lineSplitter;
-        mutable std::mutex m_mutex;
+        mutable QnMutex m_mutex;
 
         bool parseLine( const ConstBufferRefType& data );
         //!Reads message body parameters from message headers and initializes required data

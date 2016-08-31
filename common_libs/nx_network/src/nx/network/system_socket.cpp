@@ -738,7 +738,25 @@ template<typename InterfaceToImplement>
 int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int bufferLen, int flags )
 {
 #ifdef _WIN32
-    int bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
+    int bytesRead;
+    if (flags & MSG_DONTWAIT)
+    {
+        bool value;
+        if (!getNonBlockingMode(&value))
+            return -1;
+
+        if (!setNonBlockingMode(true))
+            return -1;
+
+        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags ^ MSG_DONTWAIT);
+
+        if (!setNonBlockingMode(&value))
+            return -1;
+    }
+    else
+    {
+        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
+    }
 #else
     unsigned int recvTimeout = 0;
     if( !this->getRecvTimeout( &recvTimeout ) )

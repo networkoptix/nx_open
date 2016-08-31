@@ -907,9 +907,7 @@ void initAppServerConnection(QSettings &settings)
     appServerUrl.setPassword(password);
     appServerUrl.setQuery(params);
 
-    QUrl urlNoPassword(appServerUrl);
-    urlNoPassword.setPassword("");
-    NX_LOG(lit("Connect to server %1").arg(urlNoPassword.toString()), cl_logINFO);
+    NX_LOG(lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)), cl_logINFO);
     QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }

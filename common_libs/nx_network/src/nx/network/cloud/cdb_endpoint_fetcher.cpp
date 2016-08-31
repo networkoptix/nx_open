@@ -43,8 +43,8 @@ CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
 
 void CloudModuleEndPointFetcher::stopWhileInAioThread()
 {
-    //we do not need mutex here since noone uses object anymore
-    //    and internal events are delivered in same aio thread
+    //We do not need mutex here since no one uses object anymore
+    //    and internal events are delivered in same aio thread.
     m_httpClient.reset();
     m_endpointSelector.reset();
 }
@@ -224,6 +224,7 @@ void CloudModuleEndPointFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Ha
 {
     auto sharedGuard = m_guard.sharedGuard();
     m_fetcher->get(
+        auth,
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
             nx_http::StatusCode::Value statusCode, SocketAddress result) mutable
         {

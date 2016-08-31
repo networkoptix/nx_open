@@ -223,7 +223,7 @@ struct CloudServerSocketTcpTester
                     startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
                         m_addressManager, getAioThread(), true, 0));
 
-                    // brocken acceptor
+                    // broken acceptor
                     startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
                         m_addressManager, getAioThread(), false));
                 }

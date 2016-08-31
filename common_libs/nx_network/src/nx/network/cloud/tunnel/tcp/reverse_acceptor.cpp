@@ -34,8 +34,11 @@ ReverseAcceptor::ReverseAcceptor(String selfHostName, ConnectHandler connectHand
 {
 }
 
-bool ReverseAcceptor::start(const SocketAddress& address)
+bool ReverseAcceptor::start(const SocketAddress& address, aio::AbstractAioThread* aioThread)
 {
+    if (aioThread)
+        m_httpServer->bindToAioThread(aioThread);
+
     auto registration = m_httpMessageDispatcher.registerRequestProcessor<NxRcHandler>(
         nx_http::kAnyPath,
         [this]() -> std::unique_ptr<NxRcHandler>
@@ -44,12 +47,18 @@ bool ReverseAcceptor::start(const SocketAddress& address)
         },
         nx_http::StringType("OPTIONS"));
 
-    return registration && m_httpServer->bind(address) && m_httpServer->listen();
+    NX_CRITICAL(registration);
+    return m_httpServer->bind(address) && m_httpServer->listen();
 }
 
 SocketAddress ReverseAcceptor::address() const
 {
     return m_httpServer->address();
+}
+
+String ReverseAcceptor::selfHostName() const
+{
+    return m_selfHostName;
 }
 
 void ReverseAcceptor::setPoolSize(boost::optional<size_t> value)
@@ -64,7 +73,7 @@ void ReverseAcceptor::setKeepAliveOptions(boost::optional<KeepAliveOptions> valu
     m_keepAliveOptions = value;
 }
 
-void ReverseAcceptor::setNxRcHeaders(nx_http::HttpHeaders* headers) const
+void ReverseAcceptor::fillNxRcHeaders(nx_http::HttpHeaders* headers) const
 {
     headers->emplace(kNxRcHostName, m_selfHostName);
     QnMutexLocker lk(&m_dataMutex);
@@ -128,7 +137,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
                 acceptor->newClient(hostName, connection);
         });
 
-    m_acceptor->setNxRcHeaders(&response->headers);
+    m_acceptor->fillNxRcHeaders(&response->headers);
     handler(nx_http::StatusCode::upgrade, std::make_unique<UpgradeMsgBody>());
 }
 
