@@ -19,6 +19,10 @@
 
 namespace {
     const qint64 requestIntervalMs = 30 * 1000;
+
+    QString dt(qint64 time) {
+        return QDateTime::fromMSecsSinceEpoch(time).toString(lit("MMM/dd/yyyy hh:mm:ss"));
+    }
 }
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &resource, QObject *parent):
@@ -33,7 +37,9 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     QTimer* loadTimer = new QTimer(this);
     loadTimer->setInterval(requestIntervalMs / 10);  // time period will be loaded no often than once in 30 seconds, but timer should check it much more often
     loadTimer->setSingleShot(false);
-    connect(loadTimer, &QTimer::timeout, this, [this] {
+    connect(loadTimer, &QTimer::timeout, this, [this]
+    {
+        trace(lit("Checking load by timer (enabled: %1)").arg(m_enabled));
         if (m_enabled)
             load();
     });
@@ -82,7 +88,11 @@ void QnCachingCameraDataLoader::initLoaders() {
             connect(loader, &QnAbstractCameraDataLoader::ready, this,
                 [this, dataType](const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle)
                 {
-                    Q_UNUSED(handle);
+                    trace(lit("Handling reply %1 for period %2 (%3)")
+                        .arg(handle)
+                        .arg(updatedPeriod.startTimeMs)
+                        .arg(dt(updatedPeriod.startTimeMs)),
+                        dataType);
                     Q_ASSERT_X(updatedPeriod.isInfinite(), Q_FUNC_INFO, "We are always loading till very end.");
                     at_loader_ready(data, updatedPeriod.startTimeMs, dataType);
                 });
@@ -103,6 +113,7 @@ void QnCachingCameraDataLoader::initLoaders() {
 void QnCachingCameraDataLoader::setEnabled(bool value) {
     if (m_enabled == value)
         return;
+    trace(lit("Set loader enabled %1").arg(value));
     m_enabled = value;
     if (value)
         load(true);
@@ -188,21 +199,20 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
     m_cameraChunks[timePeriodType] = data
         ? data->dataSource()
         : QnTimePeriodList();
-    if (dataType == Qn::RecordingContent)
-    {
-        NX_LOG(lit("Chunks: received chunks update. Size: %1").arg(m_cameraChunks[timePeriodType].size()) , cl_logDEBUG1);
-    }
+    trace(lit("Received chunks update. Total size: %1 for period %2 (%3)")
+        .arg(m_cameraChunks[timePeriodType].size())
+        .arg(startTimeMs)
+        .arg(dt(startTimeMs)),
+        dataType);
     emit periodsChanged(timePeriodType, startTimeMs);
-
 }
 
 void QnCachingCameraDataLoader::discardCachedData()
 {
-    NX_LOG("Chunks: clear local cache" , cl_logDEBUG1);
     for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
 
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
-
+        trace(lit("discardCachedData()"), timePeriodType);
         if (m_loaders[i])
             m_loaders[i]->discardCachedData();
 
@@ -221,18 +231,20 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodTy
     //TODO: #GDM #2.4 make sure we are not sending requests while loader is disabled
     if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs))
     {
-        if (periodType == Qn::RecordingContent)
-        {
-            if (forced)
-            {
-                NX_LOG("Chunks: forcibly updating chunks" , cl_logDEBUG1);
-            }
-            else
-            {
-                NX_LOG("Chunks: updating chunks by timer" , cl_logDEBUG1);
-            }
-        }
+        if (forced)
+            trace(lit("updateTimePeriods(forced)"), periodType);
+        else
+            trace(lit("updateTimePeriods(by timer)"), periodType);
         loadInternal(periodType);
         m_previousRequestTime[periodType].restart();
     }
+}
+
+void QnCachingCameraDataLoader::trace(const QString& message, Qn::TimePeriodContent periodType)
+{
+    if (periodType != Qn::RecordingContent)
+        return;
+
+    QString name = m_resource ? m_resource->toResourcePtr()->getName() : lit("_invalid_camera_");
+    qDebug() << lit("Chunks: (cached) (%1)").arg(name) << message;
 }
