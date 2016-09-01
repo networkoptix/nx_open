@@ -33,7 +33,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
+#include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 
@@ -497,7 +497,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
         return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     };
 
-    QMenu* menu = 0;
+    QScopedPointer<QMenu> menu;
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
@@ -508,7 +508,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            menu = manager->newMenu(Qn::TreeScope, this, parameters);
+            menu.reset(manager->newMenu(Qn::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -516,7 +516,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     if (menu)
         menu->addSeparator();
     else
-        menu = new QMenu(this);
+        menu.reset(new QMenu());
 
     m_filterAction->setEnabled(idx.isValid());
     m_clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
@@ -531,8 +531,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
-    menu->exec(QCursor::pos());
-    menu->deleteLater();
+    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
 void QnEventLogDialog::at_exportAction_triggered()
