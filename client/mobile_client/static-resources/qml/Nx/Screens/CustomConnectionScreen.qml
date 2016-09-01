@@ -105,7 +105,7 @@ Page
 
     function showWarning(status, info)
     {
-        if (status === QnConnectionManager.Unauthorized)
+        if (status == QnConnectionManager.Unauthorized)
         {
             credentialsEditor.displayUserCredentialsError = true
         }
@@ -115,7 +115,7 @@ Page
             credentialsEditor.displayAddressError = true
         }
 
-        if (status === QnConnectionManager.InvalidVersion)
+        if (status == QnConnectionManager.IncompatibleVersion)
             Workflow.openOldClientDownloadSuggestion()
     }
 
