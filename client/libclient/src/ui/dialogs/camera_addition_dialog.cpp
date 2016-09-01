@@ -11,6 +11,7 @@
 
 #include <client/client_settings.h>
 
+#include <ui/common/aligner.h>
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -93,7 +94,11 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     ui->progressWidget->setVisible(false);
 
-    resize(width(), 1); // set widget height to minimal possible
+    auto aligner = new QnAligner(this);
+    aligner->addWidgets({
+        ui->singleCameraLabel,
+        ui->startIPLabel,
+        ui->endIPLabel });
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){
