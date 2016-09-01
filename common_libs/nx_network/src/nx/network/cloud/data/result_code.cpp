@@ -62,9 +62,9 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
 
 QString toString(ResultCode code)
 {
-    QString string;
-    serialize(code, &string);
-    return string;
+    QString s;
+    serialize(code, &s);
+    return s;
 }
 
 } // namespace api

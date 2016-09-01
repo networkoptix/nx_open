@@ -114,8 +114,9 @@ void IncomingReverseTunnelConnection::saveConnection(
             {
                 if (!(*it)->setKeepAlive(m_keepAliveOptions))
                 {
-                    NX_LOGX(lm("Could not set keepAliveOptions=%1 to existed socket(%2)")
-                        .arg(m_keepAliveOptions).arg(*it), cl_logWARNING);
+                    NX_LOGX(lm("Could not set keepAliveOptions=%1 to existed socket(%2): %3")
+                        .arg(m_keepAliveOptions).arg(*it)
+                        .arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
 
                     it = m_sockets.erase(it);
                 }
@@ -130,8 +131,9 @@ void IncomingReverseTunnelConnection::saveConnection(
     auto socket = connector->takeSocket();
     if (m_keepAliveOptions && !socket->setKeepAlive(m_keepAliveOptions))
     {
-        NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2)")
-            .arg(m_keepAliveOptions).arg(socket), cl_logWARNING);
+        NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2): %3")
+            .arg(m_keepAliveOptions).arg(socket)
+            .arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
 
         return spawnConnectorIfNeeded();
     }
