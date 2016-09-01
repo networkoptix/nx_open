@@ -72,7 +72,7 @@ namespace detail
     {
         Q_OBJECT
 
-        friend class QnDbManagerAccess;
+        friend class ::ec2::QnDbManagerAccess;
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -180,7 +180,7 @@ namespace detail
         };
 
 
-        friend class QnTransactionLog;
+        friend class ::ec2::QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QnReadWriteLock& getMutex() { return m_mutex; }
 
