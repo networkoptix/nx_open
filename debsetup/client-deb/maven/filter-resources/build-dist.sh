@@ -110,13 +110,11 @@ do
     cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
 done
 
-#'libstdc++.so.6 is needed on some machines
 if [ '${arch}' != 'arm' ]
 then 
     cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE
     cp -r /lib/${arch.dir}/libpng12.so* $LIBSTAGE
     cp -r /usr/lib/${arch.dir}/libopenal.so.1* $LIBSTAGE
-    cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
     cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 fi
 

@@ -43,6 +43,13 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
 {
     SystemUri uri(url);
 
+    if (uri.referral().source == SystemUri::ReferralSource::MobileClient)
+    {
+        // Ignore our own URL requests.
+        QDesktopServices::openUrl(url);
+        return;
+    }
+
     if (!uri.isValid())
         return;
 

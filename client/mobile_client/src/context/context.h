@@ -11,42 +11,28 @@ class QnContextSettings;
 class QnCloudStatusWatcher;
 class QnMobileClientUiController;
 class QnUserWatcher;
+class QnCloudUrlHelper;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
     typedef QObject base_type;
 
-    Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
-    Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
-    Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
-    Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher NOTIFY cloudStatusWatcherChanged)
-    Q_PROPERTY(QnMobileClientUiController* uiController READ uiController NOTIFY nothingChanged)
-    Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher NOTIFY nothingChanged)
-    Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
-    Q_PROPERTY(bool testMode READ testMode NOTIFY nothingChanged)
-    Q_PROPERTY(QString initialTest READ initialTest NOTIFY nothingChanged)
+    Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
+    Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
+    Q_PROPERTY(QnContextSettings* settings MEMBER m_settings CONSTANT)
+    Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher CONSTANT)
+    Q_PROPERTY(QnMobileClientUiController* uiController READ uiController CONSTANT)
+    Q_PROPERTY(QnUserWatcher* userWatcher READ userWatcher CONSTANT)
+    Q_PROPERTY(QnCloudUrlHelper* cloudUrlHelper MEMBER m_cloudUrlHelper CONSTANT)
+    Q_PROPERTY(bool liteMode READ liteMode CONSTANT)
+    Q_PROPERTY(bool testMode READ testMode CONSTANT)
+    Q_PROPERTY(QString initialTest READ initialTest CONSTANT)
 
 public:
     QnContext(QObject *parent = NULL);
     virtual ~QnContext();
 
-    QnConnectionManager *connectionManager() const {
-        return m_connectionManager;
-    }
-
-    QnMobileAppInfo *applicationInfo() const {
-        return m_appInfo;
-    }
-
-    QnContextSettings *settings() const {
-        return m_settings;
-    }
-
-    QnMobileClientUiController* uiController() const
-    {
-        return m_uiController;
-    }
-
+    QnMobileClientUiController* uiController() const { return m_uiController; }
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnUserWatcher* userWatcher() const;
 
@@ -83,21 +69,12 @@ public:
     Q_INVOKABLE QString lp(const QString& path) const;
     void setLocalPrefix(const QString& prefix);
 
-signals:
-    /* Dummy signals to prevent non-NOTIFYable warnings */
-    void nothingChanged();
-    void connectionManagerChanged();
-    void colorThemeChanged();
-    void applicationInfoChanged();
-    void settingsChanged();
-    void cloudStatusWatcherChanged();
-    void liteModeChanged();
-
 private:
     QnConnectionManager *m_connectionManager;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;
     QnMobileClientUiController* m_uiController;
+    QnCloudUrlHelper* m_cloudUrlHelper;
 
     QString m_localPrefix;
 };

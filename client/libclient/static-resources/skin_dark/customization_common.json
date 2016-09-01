@@ -197,21 +197,21 @@
         "palette": {
             "default": {
                 "base":             "transparent",
-                "midlight":         "dark12.setAlpha(102)",
+                "midlight":         "dark10.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10",
                 "highlightedText":  "light4"
             },
             "disabled": {
                 "base":             "transparent",
-                "midlight":         "dark12.setAlpha(102)",
+                "midlight":         "dark10.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10.setAlpha(75)",
                 "highlightedText":  "light4.setAlpha(75)"
             },
             "inactive": {
                 "base":             "transparent",
-                "midlight":         "dark12.setAlpha(102)",
+                "midlight":         "dark10.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10",
                 "highlightedText":  "light4"
@@ -420,12 +420,7 @@
     },
 
     "QnResourceWidget": {
-        "palette": { "default": { "highlight": "selection" } },
-        "frameColors": {
-            "normal": "dark8",
-            "active": "#c0c0c0c0",
-            "selected": "selection"
-        }
+        "palette": { "default": { "highlight": "selection" } }
     },
 
     "QnServerResourceWidget": {

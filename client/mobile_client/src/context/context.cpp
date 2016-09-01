@@ -18,6 +18,9 @@
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/user_watcher.h>
+#include <helpers/cloud_url_helper.h>
+
+using namespace nx::vms::utils;
 
 namespace {
 
@@ -30,7 +33,11 @@ QnContext::QnContext(QObject* parent) :
     m_connectionManager(new QnConnectionManager(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this)),
-    m_uiController(new QnMobileClientUiController(this))
+    m_uiController(new QnMobileClientUiController(this)),
+    m_cloudUrlHelper(new QnCloudUrlHelper(
+        SystemUri::ReferralSource::MobileClient,
+        SystemUri::ReferralContext::WelcomePage,
+        this))
 {
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged,
             this, [this]()

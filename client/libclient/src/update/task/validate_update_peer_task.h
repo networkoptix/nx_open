@@ -22,5 +22,5 @@ protected:
     virtual void doCancel() override;
 
 private:
-    rest::Handle m_requestId = -1;
+    void validateCloudHost();
 };

@@ -680,7 +680,7 @@ void QnNxStyle::drawPrimitive(
         * QTreeView draws in PE_PanelItemViewItem:
         *  - selection markers for items (but not branch area)
         *
-        * All views draw in PE_PanelItemViewRow:
+        * All other views draw in PE_PanelItemViewItem:
         *  - hover markers
         *  - selection markers
         */
@@ -699,7 +699,7 @@ void QnNxStyle::drawPrimitive(
                     if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
                         (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
                     {
-                        /* Itemviews with kSuppressHoverPropery should suppress hover. */
+                        /* Itemviews with kSuppressHoverProperty should suppress hover. */
                         /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
                         hasHover = false;
                     }
@@ -2895,7 +2895,7 @@ int QnNxStyle::pixelMetric(
             return dp(8);
 
         case PM_SplitterWidth:
-            return dp(Metrics::kDefaultTopLevelMargin*2 + 1);
+            return dp(5);
 
         case PM_TabBarTabHSpace:
         case PM_TabBarTabVSpace:
@@ -2983,10 +2983,34 @@ QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option,
     switch (iconId)
     {
         case SP_LineEditClearButton:
-            return qnSkin->icon("theme/input_clear.png");
+            return qnSkin->icon("standard_icons/sp_line_edit_clear_button.png");
+        case SP_ArrowBack:
+            return qnSkin->icon("standard_icons/sp_arrow_back.png");
+        case SP_ArrowForward:
+            return qnSkin->icon("standard_icons/sp_arrow_forward.png");
+        case SP_FileDialogToParent:
+            return qnSkin->icon("standard_icons/sp_file_dialog_to_parent.png");
+        case SP_FileDialogListView:
+            return qnSkin->icon("standard_icons/sp_file_dialog_list_view.png");
+        case SP_FileDialogDetailedView:
+            return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view.png");
+        case SP_FileDialogNewFolder:
+            return qnSkin->icon("standard_icons/sp_file_dialog_new_folder.png");
+        case SP_MessageBoxInformation:
+            return qnSkin->icon("standard_icons/sp_message_box_information.png");
+        case SP_MessageBoxQuestion:
+            return qnSkin->icon("standard_icons/sp_message_box_question.png");
+        case SP_MessageBoxWarning:
+            return qnSkin->icon("standard_icons/sp_message_box_warning.png");
+        case SP_MessageBoxCritical:
+            return qnSkin->icon("standard_icons/sp_message_box_critical.png");
 
         default:
-            return base_type::standardIcon(iconId, option, widget);
+            auto baseIcon = base_type::standardIcon(iconId, option, widget);
+            /* Let leave it here for now to make sure we will not miss important icons. */
+            if (!baseIcon.isNull())
+                qDebug() << "Requested NOT_NULL standard icon!!!!" << iconId;
+            return baseIcon;
     }
 }
 

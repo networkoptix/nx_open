@@ -86,6 +86,11 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     ui->setupUi(this);
     Q_D(QnLinkToCloudDialog);
 
+    using nx::vms::utils::SystemUri;
+    QnCloudUrlHelper urlHelper(
+        SystemUri::ReferralSource::DesktopClient,
+        SystemUri::ReferralContext::SettingsDialog);
+
     /* We replace standard button instead of simply adding our one to keep OS theme values: */
     QScopedPointer<QAbstractButton> okButton(ui->buttonBox->button(QDialogButtonBox::Ok));
     d->indicatorButton->setText(okButton->text()); // Title from OS theme
@@ -109,8 +114,8 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
-    ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
-    ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::restorePasswordUrl()));
+    ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
+    ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
 
     auto aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());

@@ -204,13 +204,8 @@
     },
 
     "QnResourceWidget": {
-        "palette": { "default": { "highlight": "selection" } },
-        "frameColors": {
-            "normal": "#808080c0",
-            "active": "#c0c0c0c0",
-            "selected": "selection"
-        }
-    },
+        "palette": { "default": { "highlight": "selection" } }
+     },
 
     "QnMediaResourceWidget": {
         "palette": { "default": { "window": "custom_grey.setAlpha(64)" } }

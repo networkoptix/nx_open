@@ -66,10 +66,15 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
     connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
 
-    ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
-    ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::restorePasswordUrl()));
+    using nx::vms::utils::SystemUri;
+    QnCloudUrlHelper urlHelper(
+        SystemUri::ReferralSource::DesktopClient,
+        SystemUri::ReferralContext::SettingsDialog);
 
-    ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), QnCloudUrlHelper::aboutUrl()));
+    ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
+    ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
+
+    ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
 
