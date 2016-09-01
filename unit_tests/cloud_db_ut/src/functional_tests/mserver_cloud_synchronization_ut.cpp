@@ -9,6 +9,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <transaction/transaction_transport.h>
+#include <utils/common/app_info.h>
 
 #include "ec2/appserver2_process.h"
 #include "test_setup.h"
@@ -249,6 +250,136 @@ public:
         return url;
     }
 
+protected:
+    void addTransactionConnection()
+    {
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        // TODO: #ak Checking connection is there.
+    }
+
+    void testSynchronizingUserFromCloudToMediaServer()
+    {
+        nx::utils::SyncQueue<::ec2::ApiUserData> newUsersQueue;
+        const auto connection = QObject::connect(
+            appserver2()->moduleInstance()->ecConnection()->getUserNotificationManager().get(),
+            &ec2::AbstractUserNotificationManager::addedOrUpdated,
+            [&newUsersQueue](const ::ec2::ApiUserData& user)
+            {
+                newUsersQueue.push(user);
+            });
+
+        // Sharing system with some account.
+        api::AccountData account2;
+        std::string account2Password;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->addActivatedAccount(&account2, &account2Password));
+
+        api::SystemSharing sharingData;
+        sharingData.systemID = registeredSystemData().id;
+        sharingData.accountEmail = account2.email;
+        sharingData.accessRole = api::SystemAccessRole::cloudAdmin;
+        sharingData.groupID = "test_group";
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->shareSystem(account().email, accountPassword(), sharingData));
+
+        // Waiting for new cloud user to arrive to local system.
+        for (;;)
+        {
+            const auto newUser = newUsersQueue.pop(std::chrono::seconds(10));
+            ASSERT_TRUE(newUser);
+            if (newUser->email.toStdString() == account2.email)
+                break;
+        }
+
+        // Validating data.
+        ec2::ApiUserDataList users;
+        ASSERT_EQ(
+            ec2::ErrorCode::ok,
+            appserver2()->moduleInstance()->ecConnection()
+                ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
+
+        ASSERT_EQ(2, users.size());
+        ASSERT_NE(
+            users.end(),
+            std::find_if(
+                users.begin(), users.end(),
+                [email = account2.email](const ec2::ApiUserData& elem)
+                {
+                    return elem.email.toStdString() == email;
+                }));
+
+        QObject::disconnect(connection);
+    }
+
+    void testSynchronizingUserFromMediaServerToCloud()
+    {
+        // Adding cloud user.
+
+        api::AccountData account3;
+        std::string account3Password;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->addActivatedAccount(&account3, &account3Password));
+
+        // Adding cloud user locally.
+        ::ec2::ApiUserData newCloudUser;
+        newCloudUser.id = guidFromArbitraryData(account3.email);
+        newCloudUser.isCloud = true;
+        newCloudUser.isEnabled = true;
+        newCloudUser.email = QString::fromStdString(account3.email);
+        newCloudUser.name = newCloudUser.email;
+        newCloudUser.groupId = QnUuid::createUuid();
+        newCloudUser.fullName = QString::fromStdString(account3.fullName);
+        newCloudUser.realm = QnAppInfo::realm();
+        newCloudUser.hash = "password_is_in_cloud";
+        newCloudUser.digest = "password_is_in_cloud";
+        newCloudUser.permissions = Qn::GlobalLiveViewerPermissionSet;
+        appserver2()->moduleInstance()->ecConnection()
+            ->getUserManager(Qn::kSystemAccess)->saveSync(newCloudUser);
+
+        // TODO: waiting for it to appear in cloud
+        const auto t0 = std::chrono::steady_clock::now();
+        static const auto maxTimeToWaitForUserApperInCloud = std::chrono::seconds(10);
+        for (;;)
+        {
+            ASSERT_LT(
+                std::chrono::steady_clock::now(),
+                t0 + maxTimeToWaitForUserApperInCloud);
+
+            std::vector<api::SystemSharingEx> systemUsers;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                cdb()->getSystemSharings(
+                    account().email,
+                    accountPassword(),
+                    registeredSystemData().id,
+                    &systemUsers));
+
+            bool found = false;
+            for (const auto& user: systemUsers)
+            {
+                if (user.accountEmail == account3.email)
+                {
+                    // TODO: Validating data
+                    ASSERT_EQ(newCloudUser.isEnabled, user.isEnabled);
+                    ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found)
+                break;
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+
 private:
     utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> m_appserver2;
     CdbLauncher m_cdb;
@@ -263,62 +394,11 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
     ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
 
-    nx::utils::SyncQueue<::ec2::ApiUserData> newUsersQueue;
-    QObject::connect(
-        appserver2()->moduleInstance()->ecConnection()->getUserNotificationManager().get(),
-        &ec2::AbstractUserNotificationManager::addedOrUpdated,
-        [&newUsersQueue](const ::ec2::ApiUserData& user)
-        {
-            newUsersQueue.push(user);
-        });
+    addTransactionConnection();
 
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+    testSynchronizingUserFromCloudToMediaServer();
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    // TODO: #ak Checking connection is there.
-
-    // Sharing system with some account.
-    api::AccountData account2;
-    std::string account2Password;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        cdb()->addActivatedAccount(&account2, &account2Password));
-
-    api::SystemSharing sharingData;
-    sharingData.systemID = registeredSystemData().id;
-    sharingData.accountEmail = account2.email;
-    sharingData.accessRole = api::SystemAccessRole::cloudAdmin;
-    sharingData.groupID = "test_group";
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        cdb()->shareSystem(account().email, accountPassword(), sharingData));
-
-    // Waiting for new cloud user to arrive to local system.
-    for (;;)
-    {
-        const auto newUser = newUsersQueue.pop(std::chrono::seconds(10));
-        ASSERT_TRUE(newUser);
-        if (newUser->email.toStdString() == account2.email)
-            break;
-    }
-
-    // Validating data.
-    ec2::ApiUserDataList users;
-    ASSERT_EQ(
-        ec2::ErrorCode::ok,
-        appserver2()->moduleInstance()->ecConnection()
-            ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
-
-    ASSERT_EQ(2, users.size());
-    ASSERT_NE(
-        users.end(),
-        std::find_if(
-            users.begin(), users.end(),
-            [email = account2.email](const ec2::ApiUserData& elem)
-            {
-                return elem.email.toStdString() == email;
-            }));
+    testSynchronizingUserFromMediaServerToCloud();
 }
 
 } // namespace cdb
