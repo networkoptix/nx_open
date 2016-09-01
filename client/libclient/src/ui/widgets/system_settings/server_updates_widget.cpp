@@ -95,10 +95,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
     ui->tableView->setModel(sortedUpdatesModel);
     ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::VersionColumn, new QnUpdateStatusItemDelegate(ui->tableView));
 
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
-    setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent); //FIXME!!!
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->updateButton->setEnabled(false);
@@ -235,19 +233,17 @@ QAction* QnServerUpdatesWidget::initDropdownActions()
             checkForUpdates(false);
         });
 
-    QPixmap dropdownPixmap = qnSkin->pixmap("titlebar/dropdown.png");
-    ui->selectUpdateTypeButton->setIcon(dropdownPixmap);
-
-    QIcon rollupIcon(QPixmap::fromImage(dropdownPixmap.toImage().mirrored()));
+    ui->selectUpdateTypeButton->setIcon(qnSkin->icon("buttons/expand.png"));
+    QIcon collapseIcon(qnSkin->icon("buttons/collapse.png"));
 
     connect(ui->selectUpdateTypeButton, &QPushButton::clicked, this,
-        [this, dropdownPixmap, rollupIcon, selectUpdateTypeMenu]()
+        [this, collapseIcon, selectUpdateTypeMenu]()
         {
             QnScopedTypedPropertyRollback<QIcon, QPushButton> iconRollback(
                 ui->selectUpdateTypeButton,
                 &QPushButton::setIcon,
                 &QPushButton::icon,
-                rollupIcon);
+                collapseIcon);
 
             selectUpdateTypeMenu->exec(ui->selectUpdateTypeButton->mapToGlobal(
                 ui->selectUpdateTypeButton->rect().bottomLeft() + QPoint(0, 1)));
