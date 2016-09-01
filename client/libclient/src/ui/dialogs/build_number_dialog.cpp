@@ -59,6 +59,8 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
     aligner->addWidgets({
         ui->buildNumberInputField,
         ui->passwordInputField });
+
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnBuildNumberDialog::~QnBuildNumberDialog()
