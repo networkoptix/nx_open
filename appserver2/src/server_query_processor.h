@@ -415,7 +415,7 @@ private:
                         tran.params.id,
                         connection,
                         transactionsToSend,
-                        tran.isLocal),
+                        true),
                     lit("Remove resource status failed"));
 
                 break;

@@ -2942,7 +2942,7 @@ ErrorCode QnDbManager::removeResourceStatus(const QnUuid& id)
     if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
-    removeQuery.bindValue(":resourceId", id.toRfc4122());
+    removeQuery.bindValue(":resourceId", QnSql::serialized_field(id));
     if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
