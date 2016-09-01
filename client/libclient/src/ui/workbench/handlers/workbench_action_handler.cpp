@@ -604,7 +604,7 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered()
 {
     if (!m_mainMenu)
-        m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
+        m_mainMenu = menu()->newMenu(Qn::MainScope, nullptr);
 
     action(QnActions::MainMenuAction)->setMenu(m_mainMenu.data());
 }

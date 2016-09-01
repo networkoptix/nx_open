@@ -36,6 +36,10 @@ public:
     QIcon offlineIcon;      /*< User is logged in, but cloud is unreachable. */
 };
 
+
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+
 QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -51,7 +55,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
         &QnCloudStatusWatcher::updateSystems);
 
     connect(this, &QnCloudStatusPanel::clicked, this,
-        [this]
+        [this, parent]
         {
             if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
             {

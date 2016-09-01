@@ -670,6 +670,7 @@ void QnMainWindow::updateDwmState() {
     }
 }
 
+#include <ui/workaround/hidpi_workarounds.h>
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -681,11 +682,8 @@ bool QnMainWindow::event(QEvent *event) {
         result |= m_dwm->widgetEvent(event);
 
     if (event->type() == QEvent::Show)
-    {
-        const auto window = m_view->viewport()->windowHandle();
-        const auto flags = (window->flags() & Qt::WindowType_Mask);
-        window->setFlags(flags | Qt::ForeignWindow);
-    }
+        QnHiDpiWorkarounds::setViewportWindow (m_view->viewport()->windowHandle());
+
     return result;
 }
 
