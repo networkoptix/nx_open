@@ -109,7 +109,9 @@ public:
         if (lastValidationResult.state != QValidator::Acceptable)
             setWarningStyle(&palette);
 
-        input->setPalette(palette);
+        if (!input->hasFocus())
+            input->setPalette(palette);
+
         hint->setPalette(palette);
     }
 
