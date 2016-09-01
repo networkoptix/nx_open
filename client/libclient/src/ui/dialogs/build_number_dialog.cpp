@@ -13,7 +13,7 @@ bool checkPassword(int buildNumber, const QString& password)
 #ifdef _DEBUG
     Q_UNUSED(buildNumber);
     Q_UNUSED(password);
-    return false;// true;
+    return true;
 #else
     return passwordForBuild((unsigned)buildNumber) == password;
 #endif
