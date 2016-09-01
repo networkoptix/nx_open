@@ -47,13 +47,13 @@ private slots:
     void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
 
 private:
-    QAction* initDropdownActions();
+    void initDropdownActions();
     void initDownloadActions();
 
     void autoCheckForUpdates();
     void checkForUpdates(bool fromInternet);
 
-    QString serverNamesString(const QnMediaServerResourceList &servers);
+    QString serverNamesString(const QnMediaServerResourceList& servers);
 
     bool beginChecking();
     void endChecking(const QnCheckForUpdateResult& result);

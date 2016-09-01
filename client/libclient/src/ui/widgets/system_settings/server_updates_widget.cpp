@@ -170,11 +170,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
     ui->downloadButton->setForegroundRole(QPalette::WindowText);
     initDownloadActions();
 
-    auto defaultAction = initDropdownActions();
-    defaultAction->trigger();
+    initDropdownActions();
 }
 
-QAction* QnServerUpdatesWidget::initDropdownActions()
+void QnServerUpdatesWidget::initDropdownActions()
 {
     auto selectUpdateTypeMenu = new QMenu(this);
     auto defaultAction = selectUpdateTypeMenu->addAction(tr("Latest Available Update"),
@@ -249,7 +248,7 @@ QAction* QnServerUpdatesWidget::initDropdownActions()
                 ui->selectUpdateTypeButton->rect().bottomLeft() + QPoint(0, 1)));
         });
 
-    return defaultAction;
+    defaultAction->trigger();
 }
 
 void QnServerUpdatesWidget::initDownloadActions()
