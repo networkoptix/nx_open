@@ -1864,6 +1864,7 @@ void QnNxStyle::drawControl(
 
                     if (progressBar->orientation == Qt::Horizontal)
                     {
+                        pos += rect.left();
                         if (progressBar->invertedAppearance)
                             rect.setLeft(pos);
                         else
@@ -1871,6 +1872,7 @@ void QnNxStyle::drawControl(
                     }
                     else
                     {
+                        pos += rect.top();
                         if (progressBar->invertedAppearance)
                             rect.setTop(pos);
                         else
