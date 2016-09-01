@@ -81,6 +81,24 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     return reqId;
 }
 
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::rebuildTransactionLog(
+    impl::SimpleHandlerPtr handler)
+{
+    const int reqId = generateRequestID();
+    QnTransaction<ApiRebuildTransactionLogData> transaction(ApiCommand::rebuildTransactionLog);
+    transaction.isLocal = true;
+
+    using namespace std::placeholders;
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+        [handler, reqId](ErrorCode errorCode)
+    {
+        handler->done(reqId, errorCode);
+    }
+    );
+
+    return reqId;
+}
 
 template class QnMiscManager<ServerQueryProcessorAccess>;
 template class QnMiscManager<FixedUrlClientQueryProcessor>;

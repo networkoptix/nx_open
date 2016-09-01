@@ -1347,6 +1347,30 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     }
 }
 
+void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudConnectionManager)
+{
+    PasswordData data;
+    data.password = QnServer::kDefaultAdminPassword;
+    while (1)
+    {
+        if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), nullptr))
+        {
+            qWarning() << "Error while clearing cloud information. Traying again...";
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            continue;
+        }
+
+        if (!cloudConnectionManager->cleanupCloudDataInLocalDB())
+        {
+            qWarning() << "Error while clearing cloud information. Traying again...";
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            continue;
+        }
+
+        break;
+    }
+}
+
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
     if (isStopping())
@@ -2265,6 +2289,8 @@ void MediaServerProcess::run()
     qnCommon->bindModuleinformation(m_mediaServer);
 
     // show our cloud host value in registry in case of installer will check it
+    MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey,
+        qnGlobalSettings->cloudSystemID().isEmpty() ? "0" : "1");
     MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
 
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
@@ -2323,13 +2349,30 @@ void MediaServerProcess::run()
 	addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
+    bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
+        qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
     if (!QnPermissionsHelper::isSafeMode() &&
-        (isNewServerInstance || systemName.isDefault()))
+        (isNewServerInstance || systemName.isDefault() || isCloudInstanceChanged))
     {
-        /* In case of error it will be instantly cleaned by the watcher. */
-        qnGlobalSettings->resetCloudParams();
+        resetCloudParams(&cloudConnectionManager);
         qnGlobalSettings->setNewSystem(true);
     }
+    if (isCloudInstanceChanged)
+    {
+        ec2::ErrorCode errCode;
+        do
+        {
+            errCode = QnAppServerConnectionFactory::getConnection2()->
+                getMiscManager(Qn::kSystemAccess)->rebuildTransactionLogSync();
+            if (errCode != ec2::ErrorCode::ok)
+            {
+                qWarning() << "Error while rebuild transaction log. Traying again...";
+                msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            }
+        } while (errCode != ec2::ErrorCode::ok && !m_needStop);
+    }
+    qnGlobalSettings->setCloudHost(QnAppInfo::defaultCloudHost());
+    qnGlobalSettings->synchronizeNow();
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 

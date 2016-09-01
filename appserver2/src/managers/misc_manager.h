@@ -24,6 +24,7 @@ namespace ec2
 
         virtual ~QnMiscManager();
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
+        virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) override;
 
     protected:
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) override;
