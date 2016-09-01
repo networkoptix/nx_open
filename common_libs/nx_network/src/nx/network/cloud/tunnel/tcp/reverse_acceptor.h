@@ -35,7 +35,7 @@ public:
      */
     bool start(const SocketAddress& address, aio::AbstractAioThread* aioThread = nullptr);
 
-    /** Stops accepting new connections (shell be called from AIO thread) */
+    /** Stops accepting new connections (shall be called from AIO thread) */
     void pleaseStop();
 
     SocketAddress address() const;
