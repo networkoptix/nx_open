@@ -88,6 +88,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
 
+#include <ui/workaround/hidpi_workarounds.h>
+
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
@@ -587,10 +589,8 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
                               Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
 }
 
-#include <ui/workaround/hidpi_workarounds.h>
-
 void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), selectedItems.materialized()));
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, nullptr, selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
