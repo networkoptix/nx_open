@@ -1851,7 +1851,7 @@ void QnResourceTreeModel::at_layout_itemRemoved(const QnLayoutResourcePtr &layou
 {
     /* Making copy as m_nodesByResource will be modified inside. */
     auto layoutNodes = m_nodesByResource[layout];
-    for (auto parentNode : m_nodesByResource[layout])
+    for (auto parentNode : layoutNodes)
     {
         if (parentNode->type() != Qn::ResourceNode && parentNode->type() != Qn::SharedLayoutNode)
             continue;
