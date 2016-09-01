@@ -67,7 +67,7 @@
 
 namespace {
 
-const int kVideowallCloseTimeoutMSec = 10000;
+static const int kVideowallCloseTimeoutMSec = 10000;
 
 }
 
