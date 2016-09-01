@@ -19,6 +19,7 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/workbench/workbench_context.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     base_type(parent),
@@ -157,7 +158,10 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
         QnActionParameters parameters(resources);
         parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-        menu.reset(context()->menu()->newMenu(Qn::TreeScope, this, parameters, QnActionManager::DontReuseActions)); /* We'll be changing hotkeys, so we cannot reuse global actions. */
+        // We'll be changing hotkeys, so we cannot reuse global actions.
+        menu.reset(context()->menu()->newMenu(Qn::TreeScope, nullptr,
+            parameters, QnActionManager::DontReuseActions));
+
         foreach(QAction *action, menu->actions())
             action->setShortcut(QKeySequence());
     }
@@ -175,7 +179,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
-    menu->exec(QCursor::pos());
+    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {

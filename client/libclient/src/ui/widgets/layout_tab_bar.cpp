@@ -27,6 +27,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
@@ -206,7 +207,7 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     if(index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
 
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, mainWindow(), target));
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, nullptr, target));
     if(menu->isEmpty())
         return;
 
@@ -214,7 +215,8 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
      * Note that we cannot use event->globalPos() here as it doesn't work when
      * the widget is embedded into graphics scene.
      */
-    menu->exec(QCursor::pos());
+
+    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
 void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
