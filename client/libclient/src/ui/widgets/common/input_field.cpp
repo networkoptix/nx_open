@@ -258,6 +258,18 @@ void QnInputField::setEchoMode(QLineEdit::EchoMode value)
     d->input->setEchoMode(value);
 }
 
+QString QnInputField::inputMask() const
+{
+    Q_D(const QnInputField);
+    return d->input->inputMask();
+}
+
+void QnInputField::setInputMask(const QString& inputMask)
+{
+    Q_D(QnInputField);
+    return d->input->setInputMask(inputMask);
+}
+
 const QnPasswordStrengthIndicator* QnInputField::passwordIndicator() const
 {
     Q_D(const QnInputField);

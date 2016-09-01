@@ -7,13 +7,14 @@ namespace Ui {
 class QnBuildNumberDialog;
 }
 
-class QnBuildNumberDialog : public QnButtonBoxDialog {
+class QnBuildNumberDialog : public QnButtonBoxDialog
+{
     Q_OBJECT
+    using base_type = QnButtonBoxDialog;
 
-    typedef QnButtonBoxDialog base_type;
 public:
-    explicit QnBuildNumberDialog(QWidget *parent = 0);
-    ~QnBuildNumberDialog();
+    explicit QnBuildNumberDialog(QWidget* parent = nullptr);
+    virtual ~QnBuildNumberDialog();
 
     int buildNumber() const;
     QString password() const;
