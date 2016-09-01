@@ -116,6 +116,8 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
         &QnCloudStatusPanelPrivate::updateUi);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged, this,
+        &QnCloudStatusPanelPrivate::updateUi);
 
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu = loggedInMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
@@ -135,21 +137,25 @@ void QnCloudStatusPanelPrivate::updateUi()
 
     QPalette palette(originalPalette);
 
+    QString effectiveUserName = qnCloudStatusWatcher->effectiveUserName();
+    if (effectiveUserName.isEmpty())
+        effectiveUserName = QnCloudStatusPanel::tr("Logging in...");
+
     switch (qnCloudStatusWatcher->status())
     {
         case QnCloudStatusWatcher::LoggedOut:
-            q->setText(QnCloudStatusPanel::tr("Login to cloud..."));
+            q->setText(QnCloudStatusPanel::tr("Login to %1...").arg(QnAppInfo::cloudName()));
             q->setIcon(QIcon());
             font.setWeight(QFont::Normal);
             palette.setColor(QPalette::ButtonText, palette.color(QPalette::Light));
             break;
         case QnCloudStatusWatcher::Online:
-            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
             font.setWeight(QFont::Bold);
             break;
         case QnCloudStatusWatcher::Offline:
-            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setText(effectiveUserName);
             q->setIcon(offlineIcon);
             font.setWeight(QFont::Bold);
             break;

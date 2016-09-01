@@ -13,7 +13,7 @@
 
 using namespace nx::cdb;
 
-//#define DEBUG_CLOUD_STATUS_WATCHER
+#define DEBUG_CLOUD_STATUS_WATCHER
 #ifdef DEBUG_CLOUD_STATUS_WATCHER
 #define TRACE(...) qDebug() << "QnCloudStatusWatcher: " << __VA_ARGS__;
 #else
@@ -21,37 +21,38 @@ using namespace nx::cdb;
 #endif
 
 
-namespace
+namespace {
+
+const auto kIdTag = lit("id");
+const auto kNameTag = lit("name");
+const auto kOwnerAccounEmail = lit("email");
+const auto kOwnerFullName = lit("owner_full_name");
+
+const int kUpdateIntervalMs = 5 * 1000;
+
+QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 {
-    const auto kIdTag = lit("id");
-    const auto kNameTag = lit("name");
-    const auto kOwnerAccounEmail = lit("email");
-    const auto kOwnerFullName = lit("owner_full_name");
+    QnCloudSystemList result;
 
-    const int kUpdateInterval = 5 * 1000;
-
-    QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
+    for (const api::SystemDataEx &systemData : systemsList.systems)
     {
-        QnCloudSystemList result;
+        if (systemData.status != api::ssActivated)
+            continue;
 
-        for (const api::SystemDataEx &systemData : systemsList.systems)
-        {
-            if (systemData.status != api::ssActivated)
-                continue;
-
-            QnCloudSystem system;
-            system.id = QString::fromStdString(systemData.id);
-            system.name = QString::fromStdString(systemData.name);
-            system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
-            system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
-            system.authKey = systemData.authKey;
-            result.append(system);
-        }
-
-        std::sort(result.begin(), result.end());
-
-        return result;
+        QnCloudSystem system;
+        system.id = QString::fromStdString(systemData.id);
+        system.name = QString::fromStdString(systemData.name);
+        system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
+        system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
+        system.authKey = systemData.authKey;
+        result.append(system);
     }
+
+    std::sort(result.begin(), result.end());
+
+    return result;
+}
+
 }
 
 class QnCloudStatusWatcherPrivate : public QObject
@@ -64,16 +65,14 @@ public:
 
     std::string cloudHost;
     int cloudPort;
-    QString cloudLogin;
-    QString cloudPassword;
+    QnCredentials credentials;
+    QString effectiveUserName;
     bool stayConnected;
     QnCloudStatusWatcher::ErrorCode errorCode;
 
     QTimer *updateTimer;
 
-    std::unique_ptr<
-        api::ConnectionFactory,
-        decltype(&destroyConnectionFactory)> connectionFactory;
+    std::unique_ptr<api::ConnectionFactory, decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> temporaryConnection;
 
@@ -94,6 +93,7 @@ private:
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList &newRecentSystems);
     void updateCurrentSystem();
+    void updateCurrentAccount();
     void createTemporaryCredentials();
     void prolongTemporaryCredentials();
 
@@ -134,42 +134,64 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
             qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
         });
 
+    setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+    setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
+    //TODO: #GDM store temporary credentials
+    setCloudCredentials(QnCredentials(
+        qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
+
+    connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
+        [this](int id)
+        {
+            if (id != QnClientCoreSettings::CloudPassword)
+                return;
+
+            setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+        });
 }
 
 QnCloudStatusWatcher::~QnCloudStatusWatcher()
 {
 }
 
-QString QnCloudStatusWatcher::cloudLogin() const
+QnCredentials QnCloudStatusWatcher::credentials() const
 {
     Q_D(const QnCloudStatusWatcher);
-    return d->cloudLogin;
+    return d->credentials;
 }
 
-void QnCloudStatusWatcher::setCloudLogin(const QString &login)
+void QnCloudStatusWatcher::setCredentials(const QnCredentials& value)
 {
     Q_D(QnCloudStatusWatcher);
-
-    if (d->cloudLogin == login)
+    if (d->credentials == value)
         return;
 
-    d->cloudLogin = login;
+    bool isUserChanged = d->credentials.user != value.user;
+    bool isPasswordChanged = d->credentials.password != value.password;
+
+    d->credentials = value;
     d->updateConnection();
-    emit loginChanged();
+
+    if (isUserChanged)
+        emit loginChanged();
+    if (isPasswordChanged)
+        emit passwordChanged();
 }
 
-QString QnCloudStatusWatcher::cloudPassword() const
+QString QnCloudStatusWatcher::effectiveUserName() const
 {
     Q_D(const QnCloudStatusWatcher);
-    return d->cloudPassword;
+    return d->effectiveUserName;
 }
 
-void QnCloudStatusWatcher::setCloudPassword(const QString &password)
+void QnCloudStatusWatcher::setEffectiveUserName(const QString& value)
 {
     Q_D(QnCloudStatusWatcher);
-    d->cloudPassword = password;
-    d->updateConnection();
-    emit passwordChanged();
+    if (d->effectiveUserName == value)
+        return;
+
+    d->effectiveUserName = value;
+    emit effectiveUserNameChanged();
 }
 
 bool QnCloudStatusWatcher::stayConnected() const
@@ -188,31 +210,31 @@ void QnCloudStatusWatcher::setStayConnected(bool value)
     emit stayConnectedChanged();
 }
 
-void QnCloudStatusWatcher::setCloudCredentials(const QString &login, const QString &password, bool initial)
+void QnCloudStatusWatcher::resetCloudCredentials()
+{
+    setCloudCredentials(QnCredentials());
+}
+
+void QnCloudStatusWatcher::setCloudCredentials(const QnCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
-    if (d->cloudLogin == login && d->cloudPassword == password)
+    if (d->credentials == credentials)
         return;
 
-    d->cloudLogin = login;
-    d->cloudPassword = password;
+    d->credentials = credentials;
 
     d->updateConnection(initial);
     emit loginChanged();
     emit passwordChanged();
 }
 
-QString QnCloudStatusWatcher::temporaryLogin() const
+QnCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
 {
     Q_D(const QnCloudStatusWatcher);
-    return QString::fromStdString(d->temporaryCredentials.login);
-}
-
-QString QnCloudStatusWatcher::temporaryPassword() const
-{
-    Q_D(const QnCloudStatusWatcher);
-    return QString::fromStdString(d->temporaryCredentials.password);
+    return QnCredentials(
+        QString::fromStdString(d->temporaryCredentials.login),
+        QString::fromStdString(d->temporaryCredentials.password));
 }
 
 QString QnCloudStatusWatcher::cloudEndpoint() const
@@ -319,8 +341,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     QObject(parent),
     q_ptr(parent),
     cloudPort(-1),
-    cloudLogin(),
-    cloudPassword(),
+    credentials(),
+    effectiveUserName(),
     stayConnected(false),
     errorCode(QnCloudStatusWatcher::NoError),
     updateTimer(new QTimer(this)),
@@ -334,7 +356,7 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
 {
     Q_Q(QnCloudStatusWatcher);
 
-    updateTimer->setInterval(kUpdateInterval);
+    updateTimer->setInterval(kUpdateIntervalMs);
     updateTimer->start();
     connect(updateTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
@@ -345,6 +367,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 {
+    Q_Q(QnCloudStatusWatcher);
+
     const auto status = (initial
         ? QnCloudStatusWatcher::Offline
         : QnCloudStatusWatcher::LoggedOut);
@@ -353,21 +377,29 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     cloudConnection.reset();
     temporaryConnection.reset();
 
-    if (cloudLogin.isEmpty() || cloudPassword.isEmpty())
+    if (!credentials.isValid())
     {
-        const auto error = (initial || (cloudLogin.isEmpty() && cloudPassword.isEmpty()))
+        const auto error = (initial || credentials.isEmpty())
             ? QnCloudStatusWatcher::NoError
             : QnCloudStatusWatcher::InvalidCredentials;
         setStatus(QnCloudStatusWatcher::LoggedOut, error);
         setCloudSystems(QnCloudSystemList());
+        q->setEffectiveUserName(QString());
         return;
     }
 
     cloudConnection = connectionFactory->createConnection();
-    cloudConnection->setCredentials(cloudLogin.toStdString(), cloudPassword.toStdString());
-    createTemporaryCredentials();
+    cloudConnection->setCredentials(credentials.user.toStdString(),
+        credentials.password.toStdString());
 
-    Q_Q(QnCloudStatusWatcher);
+    /* Very simple e-mail check. */
+    if (credentials.user.contains(L'@'))
+        q->setEffectiveUserName(credentials.user);
+    else
+        q->setEffectiveUserName(QString());
+
+    updateCurrentAccount();
+    createTemporaryCredentials();
     q->updateSystems();
 }
 
@@ -419,7 +451,6 @@ void QnCloudStatusWatcherPrivate::setRecentCloudSystems(const QnCloudSystemList 
     emit q->recentCloudSystemsChanged();
 }
 
-
 void QnCloudStatusWatcherPrivate::updateCurrentSystem()
 {
     Q_Q(QnCloudStatusWatcher);
@@ -438,6 +469,29 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
         currentSystem = *it;
         emit q->currentSystemChanged(currentSystem);
     }
+}
+
+void QnCloudStatusWatcherPrivate::updateCurrentAccount()
+{
+    NX_ASSERT(cloudConnection);
+    if (!cloudConnection)
+        return;
+
+    TRACE("Updating current account");
+    auto callback = [this](api::ResultCode result, api::AccountData accountData)
+        {
+            QString value = QString::fromStdString(accountData.email);
+            TRACE("Received effective username" << value);
+            Q_Q(QnCloudStatusWatcher);
+            q->setEffectiveUserName(value);
+        };
+    auto targetThread = QThread::currentThread();
+
+    cloudConnection->accountManager()->getAccount(
+        [callback, targetThread](api::ResultCode result, api::AccountData accountData)
+    {
+        executeDelayed([callback, result, accountData] { callback(result, accountData); }, 0, targetThread);
+    });
 }
 
 void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
