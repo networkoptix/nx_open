@@ -36,7 +36,7 @@ public:
     bool start(const SocketAddress& address, aio::AbstractAioThread* aioThread = nullptr);
 
     /** Stops accepting new connections (shell be called from AIO thread) */
-    void stopAccepting();
+    void pleaseStop();
 
     SocketAddress address() const;
     String selfHostName() const;

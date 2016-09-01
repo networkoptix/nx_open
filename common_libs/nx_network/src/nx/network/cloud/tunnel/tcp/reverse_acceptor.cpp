@@ -51,7 +51,7 @@ bool ReverseAcceptor::start(const SocketAddress& address, aio::AbstractAioThread
     return m_httpServer->bind(address) && m_httpServer->listen();
 }
 
-void ReverseAcceptor::stopAccepting()
+void ReverseAcceptor::pleaseStop()
 {
     m_connectHandler = nullptr;
     m_httpServer->pleaseStop();

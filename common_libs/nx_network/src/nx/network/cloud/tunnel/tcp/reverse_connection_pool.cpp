@@ -65,7 +65,7 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
     m_mediatorConnection->pleaseStop(
         [this, handler = std::move(completionHandler)]()
         {
-            m_acceptor.stopAccepting();
+            m_acceptor.pleaseStop();
             for (auto& holder: m_connectionHolders)
                 holder.second->stopInAioThread();
 
