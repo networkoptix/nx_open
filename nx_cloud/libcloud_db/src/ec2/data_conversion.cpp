@@ -11,8 +11,7 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
-namespace {
-static api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)
+api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)
 {
     switch (permissions)
     {
@@ -29,36 +28,36 @@ static api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permi
     }
 }
 
-static void accessRoleToPermissions(
+void accessRoleToPermissions(
     api::SystemAccessRole accessRole,
-    ::ec2::ApiUserData* const userData)
+    Qn::GlobalPermissions* const permissions,
+    bool* const isAdmin)
 {
-    userData->isAdmin = false;
+    *isAdmin = false;
     switch (accessRole)
     {
         case api::SystemAccessRole::owner:
-            userData->permissions = Qn::GlobalAdminPermissionSet;
-            userData->isAdmin = true;   //aka "owner"
+            *permissions = Qn::GlobalAdminPermissionSet;
+            *isAdmin = true;   //aka "owner"
             break;
         case api::SystemAccessRole::liveViewer:
-            userData->permissions = Qn::GlobalLiveViewerPermissionSet;
+            *permissions = Qn::GlobalLiveViewerPermissionSet;
             break;
         case api::SystemAccessRole::viewer:
-            userData->permissions = Qn::GlobalViewerPermissionSet;
+            *permissions = Qn::GlobalViewerPermissionSet;
             break;
         case api::SystemAccessRole::advancedViewer:
-            userData->permissions = Qn::GlobalAdvancedViewerPermissionSet;
+            *permissions = Qn::GlobalAdvancedViewerPermissionSet;
             break;
         case api::SystemAccessRole::cloudAdmin:
-            userData->permissions = Qn::GlobalAdminPermissionSet;
+            *permissions = Qn::GlobalAdminPermissionSet;
             break;
         case api::SystemAccessRole::custom:
         default:
-            userData->permissions = Qn::NoGlobalPermissions;
+            *permissions = Qn::NoGlobalPermissions;
             break;
     }
 }
-} // namespace
 
 void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
 {
@@ -73,7 +72,7 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
     to->realm = QnAppInfo::realm();
     to->hash = "password_is_in_cloud";
     to->digest = "password_is_in_cloud";
-    accessRoleToPermissions(from.accessRole, to);
+    accessRoleToPermissions(from.accessRole, &to->permissions, &to->isAdmin);
 }
 
 void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to)

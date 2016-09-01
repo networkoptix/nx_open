@@ -154,8 +154,9 @@ void SystemManager::bindSystemToAccount(
         return;
     }
 
-    auto registrationDataWithAccount = std::make_unique<data::SystemRegistrationDataWithAccount>(
-        std::move(registrationData));
+    auto registrationDataWithAccount = 
+        std::make_unique<data::SystemRegistrationDataWithAccount>(
+            std::move(registrationData));
     registrationDataWithAccount->accountEmail = accountEmail.toStdString();
     auto registrationDataWithAccountPtr = registrationDataWithAccount.get();
     auto newSystemData = std::make_unique<data::SystemData>();
@@ -323,7 +324,14 @@ void SystemManager::shareSystem(
 {
     using namespace std::placeholders;
 
-    sharing.vmsUserId = guidFromArbitraryData(sharing.accountEmail).toSimpleString().toStdString();
+    Qn::GlobalPermissions permissions = Qn::NoPermissions;
+    bool isAdmin = false;
+    ec2::accessRoleToPermissions(sharing.accessRole, &permissions, &isAdmin);
+    sharing.customPermissions = QnLexical::serialized(permissions).toStdString();
+    sharing.isEnabled = true;
+    sharing.vmsUserId = guidFromArbitraryData(
+        sharing.accountEmail).toSimpleString().toStdString();
+
     auto sharingOHeap = std::make_unique<data::SystemSharing>(std::move(sharing));
     data::SystemSharing* sharingOHeapPtr = sharingOHeap.get();
 
@@ -668,6 +676,11 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     systemSharing.accountEmail = newSystem.accountEmail;
     systemSharing.systemID = systemData->id;
     systemSharing.accessRole = api::SystemAccessRole::owner;
+    systemSharing.vmsUserId = guidFromArbitraryData(
+        systemSharing.accountEmail).toSimpleString().toStdString();
+    systemSharing.isEnabled = true;
+    systemSharing.customPermissions = QnLexical::serialized(
+        static_cast<Qn::GlobalPermissions>(Qn::GlobalAdminPermissionSet)).toStdString();
     auto result = updateSharingInDbAndGenerateTransaction(connection, systemSharing);
     if (result != nx::db::DBResult::ok)
     {
