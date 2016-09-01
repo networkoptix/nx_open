@@ -66,11 +66,9 @@
 #include "compatibility.h"
 
 namespace {
-    const int videowallReconnectTimeoutMSec = 5000;
-    const int videowallCloseTimeoutMSec = 10000;
 
-    const int maxReconnectTimeout = 10*1000;                // 10 seconds
-    const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
+static const int kVideowallCloseTimeoutMSec = 10000;
+
 }
 
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
@@ -210,7 +208,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         if (qnRuntime->isVideoWallMode()) {
             //TODO: #GDM #High videowall should try indefinitely
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
-                QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
+                QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), kVideowallCloseTimeoutMSec);
                 connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(QnActions::ExitAction), &QAction::trigger);
             }
         }
@@ -442,7 +440,8 @@ void QnWorkbenchConnectHandler::clearConnection() {
     qnCommon->setReadOnly(false);
 }
 
-bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
+bool QnWorkbenchConnectHandler::tryToRestoreConnection()
+{
     QUrl currentUrl = QnAppServerConnectionFactory::url();
     if (currentUrl.isEmpty())
         return false;
@@ -483,10 +482,16 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
             break;
         }
 
-        //TODO: #dklychkov #GDM When client tries to reconnect to a single server very often we can get "unauthorized" reply,
-        //      because we try to connect before the server initialized its auth classes.
-
-        if (errCode == ec2::ErrorCode::incompatiblePeer || errCode == ec2::ErrorCode::unauthorized)
+        //TODO: #ak fix server behavior
+        /* When client tries to reconnect to a single server very fast we can
+         * get "unauthorized" reply, because we try to connect before the
+         * server have initialized its auth classes. Need to return
+         * temporaryUnauthorized error code in this case.
+         * Ignoring this issue in videowall mode as it is hard to restart.
+         */
+        if (errCode == ec2::ErrorCode::incompatiblePeer)
+            reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
+        else if (errCode == ec2::ErrorCode::unauthorized && !qnRuntime->isVideoWallMode())
             reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
 
         /* Find next valid server for reconnect. */
