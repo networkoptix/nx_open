@@ -2448,7 +2448,7 @@ QRect QnNxStyle::subElementRect(
         {
             if (auto progressBar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
             {
-                const bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
+                const bool hasText = progressBar->textVisible;
                 const int kProgressBarWidth = dp(4);
                 QSize size = progressBar->rect.size();
 
@@ -2483,8 +2483,7 @@ QRect QnNxStyle::subElementRect(
         {
             if (auto progressBar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
             {
-                const bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
-                if (!hasText)
+                if (!progressBar->textVisible)
                     break;
 
                 if (progressBar->orientation == Qt::Horizontal)
@@ -2804,8 +2803,7 @@ QSize QnNxStyle::sizeFromContents(
         {
             if (auto progressBar = qstyleoption_cast<const QStyleOptionProgressBar*>(option))
             {
-                bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
-                if (!hasText)
+                if (!progressBar->textVisible)
                 {
                     QStyleOptionProgressBar subOption(*progressBar);
                     subOption.rect.setSize(size);
