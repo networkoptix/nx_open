@@ -9,7 +9,9 @@ namespace cloud {
 namespace tcp {
 
 /**
- * Initiates NXRC/1.0 connection over HTTP upgrade
+ * Initiates NXRC/1.0 connection over HTTP upgrade.
+ * It is only safe to remove this object when async operations are in progress or from bound AIO
+ * thread (see Constructor).
  */
 class NX_NETWORK_API ReverseConnector
 {

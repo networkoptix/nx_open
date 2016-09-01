@@ -21,8 +21,7 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
 #include <api/http_client_pool.h>
-
-
+#include <nx/network/socket_global.h>
 
 namespace nx_http {
 
@@ -49,6 +48,7 @@ public:
     }
 
 protected:
+    nx::network::SocketGlobals::InitGuard m_guard;
     std::unique_ptr<TestHttpServer> m_testHttpServer;
     std::unique_ptr<TestHttpServer> m_testHttpServer2;
 };
@@ -62,7 +62,7 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     ASSERT_TRUE(testHttpServer2()->registerStaticProcessor(
         "/test2",
         "SimpleTest2",
-        "application/text"));
+        "application/text2"));
 
     ASSERT_TRUE(testHttpServer()->bindAndListen());
     ASSERT_TRUE(testHttpServer2()->bindAndListen());
@@ -88,7 +88,12 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     {
         ASSERT_FALSE(client->failed());
         ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
-        ASSERT_TRUE(client->fetchMessageBodyBuffer().startsWith("SimpleTest"));
+        QByteArray msgBody = client->fetchMessageBodyBuffer();
+        ASSERT_TRUE(msgBody.startsWith("SimpleTest"));
+        if (msgBody == "SimpleTest2")
+            ASSERT_TRUE(client->contentType() == QByteArray("application/text2"));
+        else
+            ASSERT_TRUE(client->contentType() ==  QByteArray("application/text"));
 
         QnMutexLocker lock(&mutex);
         ++requestsFinished;
@@ -96,14 +101,15 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     }, Qt::DirectConnection);
 
     static const int kWaitTimeoutMs = 1000 * 10;
-    for (int i = 0; i < 100; ++i)
+    static const int kRequests = 100;
+    for (int i = 0; i < kRequests; ++i)
     {
         httpPool->doGet(url);
         httpPool->doGet(url2);
     }
 
     QnMutexLocker lock(&mutex);
-    while (requestsFinished < 200)
+    while (requestsFinished < kRequests * 2)
         ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
 }
 

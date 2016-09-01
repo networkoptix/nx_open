@@ -161,7 +161,11 @@ namespace nx_http
 
     SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
     {
-        return m_lastSysErrorCode;
+        if (m_lastSysErrorCode != SystemError::noError)
+            return m_lastSysErrorCode;
+        // Ensuring system error code is always non-zero in case of failure 
+        //  to simplify AsyncHttpClient user's life.
+        return failed() ? SystemError::connectionReset : SystemError::noError;
     }
 
     //!Start request to \a url
@@ -434,7 +438,7 @@ namespace nx_http
             return;
         }
 
-        NX_LOGX(lit("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2);
+        NX_LOGX(lit("Http request has been successfully sent to %1").arg(m_url.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
         const auto requestSequenceBak = m_requestSequence;
         emit requestHasBeenSent(sharedThis, m_authorizationTried);
@@ -510,7 +514,7 @@ namespace nx_http
                 if (m_connectionClosed)
                 {
                     NX_LOGX(lit("Failed to read (1) response from %1. %2").
-                        arg(m_url.toString()).arg(SystemError::connectionReset), cl_logDEBUG1);
+                        arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::connectionReset), cl_logDEBUG1);
                     m_state = sFailed;
                     emit done(sharedThis);
                     return;
@@ -533,7 +537,7 @@ namespace nx_http
 
             //response read
             NX_LOGX(lit("Http response from %1 has been successfully read. Status line: %2(%3)").
-                arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
+                arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                 arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2);
 
             const Response* response = m_httpStreamReader.message().response;
@@ -610,7 +614,11 @@ namespace nx_http
                 m_responseBuffer.resize(0);
                 if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
                 {
-                    NX_LOGX(lit("Failed to read (1) response from %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+                    NX_LOGX(lit("Failed to read (1) response from %1. %2")
+                        .arg(m_url.toString(QUrl::RemovePassword))
+                        .arg(SystemError::getLastOSErrorText()),
+                        cl_logDEBUG1);
+
                     m_state = sFailed;
                     emit done(sharedThis);
                     return;
@@ -772,11 +780,22 @@ namespace nx_http
             //m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
             //TODO #ak check if whole message body is received (if message body size is known)
             m_httpStreamReader.flush();
-            m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) ||
-                (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
-                (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
-                ? sDone
-                : sFailed;
+            if (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody &&
+                m_httpStreamReader.contentLength() &&
+                m_httpStreamReader.contentLength().get() > m_httpStreamReader.messageBodyBytesRead())
+            {
+                m_state = sFailed;
+                m_lastSysErrorCode = SystemError::connectionReset;
+            }
+            else
+            {
+                m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) ||
+                    (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
+                    (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
+                    ? sDone
+                    : sFailed;
+            }
+
             m_connectionClosed = true;
             return 0;
         }

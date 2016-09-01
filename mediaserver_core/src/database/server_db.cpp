@@ -284,6 +284,7 @@ QnServerDb::QnServerDb():
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
+    m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
     const QString fileName = closeDirPath(MSSettings::roSettings()->value( "eventsDBFilePath", getDataDirectory()).toString())
@@ -293,6 +294,8 @@ QnServerDb::QnServerDb():
     {
         if (!createDatabase()) // create tables is DB is empty
             qWarning() << "can't create tables for sqlLite database!";
+        else
+            m_runtimeActionsTotalRecords = getRuntimeActionsRecordCount();
     }
     else {
         qWarning() << "can't initialize sqlLite database! Actions log is not created!";
@@ -464,10 +467,27 @@ QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnU
     return result;
 }
 
+int QnServerDb::getRuntimeActionsRecordCount()
+{
+    int currentRecordCount = -1;
+    QSqlQuery countQuery(m_sdb);
+    countQuery.prepare("SELECT Count(*) FROM runtime_actions");
+    bool rez = execSQLQuery(&countQuery, Q_FUNC_INFO);
+
+    if (!rez)
+        return currentRecordCount;
+
+    countQuery.next();
+    currentRecordCount = countQuery.value(0).toInt();
+
+    return currentRecordCount;
+};
+
 bool QnServerDb::cleanupEvents()
 {
     bool rez = true;
 
+    // cleanup by time
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
     if (currentTime - m_lastCleanuptime > CLEANUP_INTERVAL)
     {
@@ -477,7 +497,27 @@ bool QnServerDb::cleanupEvents()
         int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
         delQuery.bindValue(":timestamp", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
+
+        if (rez)
+            m_runtimeActionsTotalRecords -= delQuery.numRowsAffected();
     }
+
+    // cleanup by  record count
+    const int kMaxRecords = 100000;
+    const int kMaxOverflowRecords = 150000;
+
+    if (kMaxOverflowRecords < m_runtimeActionsTotalRecords)
+    {
+        QSqlQuery cleanupQuery(m_sdb);
+        cleanupQuery.prepare("DELETE FROM runtime_actions WHERE rowid in \
+                              (SELECT rowid FROM runtime_actions ORDER BY rowid LIMIT :recordsToDelete)");
+        cleanupQuery.bindValue(":recordsToDelete", m_runtimeActionsTotalRecords - kMaxRecords);
+        rez = execSQLQuery(&cleanupQuery, Q_FUNC_INFO);
+
+        if (rez)
+            m_runtimeActionsTotalRecords -= cleanupQuery.numRowsAffected();
+    }
+
     return rez;
 }
 
@@ -603,7 +643,11 @@ bool QnServerDb::removeLogForRes(QnUuid resId)
     delQuery.bindValue(":id1", resId.toRfc4122());
     delQuery.bindValue(":id2", resId.toRfc4122());
 
-    return execSQLQuery(&delQuery, Q_FUNC_INFO);
+    bool rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
+    if (rez)
+        m_runtimeActionsTotalRecords -= delQuery.numRowsAffected();
+
+    return rez;
 }
 
 bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
@@ -637,7 +681,11 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 
     bool rez = execSQLQuery(&insQuery, Q_FUNC_INFO);
     if (rez)
+    {
+        m_runtimeActionsTotalRecords += insQuery.numRowsAffected();
         cleanupEvents();
+    }
+
     return rez;
 }
 

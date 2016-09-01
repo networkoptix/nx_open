@@ -11,6 +11,7 @@ namespace tcp {
 
 /**
  * HTTP Server to accept NXRC/1.0 connections
+ * Is is safe to remove this object from any thread
  */
 class ReverseAcceptor
 {
@@ -19,17 +20,23 @@ public:
         String remoteHostName,
         std::unique_ptr<AbstractStreamSocket> socket)> ConnectHandler;
 
-    ReverseAcceptor(String selfName, ConnectHandler clientHandler);
+    ReverseAcceptor(String selfHostName, ConnectHandler clientHandler);
 
-    bool start(const SocketAddress& address);
+    /**
+     * Starts accepting connections.
+     * @param aioThread is used to call handler, also removal from this thread will be nonblocking
+     */
+    bool start(const SocketAddress& address, aio::AbstractAioThread* aioThread = nullptr);
+
     SocketAddress address() const;
+    String selfHostName() const;
 
     // TODO: make is configurable for each client? can it be usefull?
     void setPoolSize(boost::optional<size_t> value);
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
 
-public:
-    void setNxRcHeaders(nx_http::HttpHeaders* headers) const;
+private:
+    void fillNxRcHeaders(nx_http::HttpHeaders* headers) const;
     void newClient(String name, nx_http::HttpServerConnection* connection) const;
 
     class NxRcHandler: public nx_http::AbstractHttpRequestHandler
