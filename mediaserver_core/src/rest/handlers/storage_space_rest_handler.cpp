@@ -48,9 +48,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
         if (totalSpace == QnStorageResource::kUnknownSize)
             return true;
 
-        return totalSpace >= QnFileStorageResource::calcSpaceLimit(
-            storage->getUrl()
-        );
+        return totalSpace >= storage->getSpaceLimit();
     };
 
     auto enumerate = [enoughSpace, fastRequest, &reply] (const QnStorageResourceList &storages)
@@ -159,7 +157,6 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
         if (storage)
         {
             storage->setUrl(data.url); /* createStorage does not fill url. */
-            storage->setSpaceLimit(QnFileStorageResource::calcSpaceLimit(partition.type));
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
             data.isWritable = storage->initOrUpdate() && storage->isWritable();
