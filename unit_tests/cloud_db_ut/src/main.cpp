@@ -9,11 +9,6 @@
 #define USE_GMOCK
 #include <nx/utils/test_support/run_test.h>
 
-int test(const std::unique_ptr<int>& y)
-{
-    return *y;
-}
-
 int main(int argc, char **argv)
 {
     Q_INIT_RESOURCE(cloud_db_ut);
