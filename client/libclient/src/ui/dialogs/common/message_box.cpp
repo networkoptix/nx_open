@@ -438,6 +438,9 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
         case Question:
             pixmap = standardPixmap(QStyle::SP_MessageBoxQuestion);
             break;
+        case Success:
+            pixmap = qnSkin->pixmap("standard_icons/message_box_success.png");
+            break;
         default:
             break;
     }
@@ -590,6 +593,39 @@ QDialogButtonBox::StandardButton QnMessageBox::information(
                           text,
                           buttons,
                           defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::success(
+    QWidget *parent,
+    int helpTopicId,
+    const QString &title,
+    const QString& text,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execMessageBox(parent,
+        Success,
+        helpTopicId,
+        title,
+        text,
+        buttons,
+        defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::success(
+    QWidget *parent,
+    const QString &title,
+    const QString &text,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execMessageBox(parent,
+        Success,
+        Qn::Empty_Help,
+        title,
+        text,
+        buttons,
+        defaultButton);
 }
 
 QDialogButtonBox::StandardButton QnMessageBox::question(
