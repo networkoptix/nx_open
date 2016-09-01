@@ -336,6 +336,12 @@ private:
         const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
+    ErrorCode removeResourceStatusHelper(
+        const QnUuid& id,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend,
+        bool isLocal = false);
+
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
@@ -369,6 +375,14 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeObjParamsHelper(tran, connection, transactionsToSend),
                     lit("Remove camera params failed"));
+
+                RUN_AND_CHECK_ERROR(
+                    removeResourceStatusHelper(
+                        tran.params.id,
+                        connection,
+                        transactionsToSend),
+                    lit("Remove resource access status failed"));
+
                 break;
             }
 
@@ -395,6 +409,26 @@ private:
                             .toIdList(),
                         transactionsToSend),
                     lit("Remove server child resources failed"));
+
+                RUN_AND_CHECK_ERROR(
+                    removeResourceStatusHelper(
+                        tran.params.id,
+                        connection,
+                        transactionsToSend,
+                        tran.isLocal),
+                    lit("Remove resource status failed"));
+
+                break;
+            }
+
+            case ApiObject_Storage:
+            {
+                RUN_AND_CHECK_ERROR(
+                    removeResourceStatusHelper(
+                        tran.params.id,
+                        connection,
+                        transactionsToSend),
+                    lit("Remove resource status failed"));
 
                 break;
             }

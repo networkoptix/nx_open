@@ -2910,6 +2910,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
         return removeCameraAttributes(tran.params.id);
     case ApiCommand::removeAccessRights:
         return removeResourceAccessRights(tran.params.id);
+    case ApiCommand::removeResourceStatus:
+        return removeResourceStatus(tran.params.id);
     default:
         return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
@@ -2926,6 +2928,21 @@ ErrorCode QnDbManager::removeResourceAccessRights(const QnUuid& id)
         return ErrorCode::dbError;
 
     removeQuery.bindValue(":resourceId", internalResourceId);
+    if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::removeResourceStatus(const QnUuid& id)
+{
+    QSqlQuery removeQuery(m_sdb);
+    QString removeQueryStr("DELETE FROM vms_resource_status WHERE guid = :resourceId");
+
+    if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    removeQuery.bindValue(":resourceId", id.toRfc4122());
     if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
         return ErrorCode::dbError;
 

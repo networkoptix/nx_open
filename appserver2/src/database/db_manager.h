@@ -486,6 +486,7 @@ namespace detail
         ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
         ErrorCode removeCameraAttributes(const QnUuid& id);
         ErrorCode removeResourceAccessRights(const QnUuid& id);
+        ErrorCode removeResourceStatus(const QnUuid& id);
         ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
