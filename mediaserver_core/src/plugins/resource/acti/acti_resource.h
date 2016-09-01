@@ -27,6 +27,7 @@ class QnActiResource
 {
     Q_OBJECT
 
+    typedef QMap<QString, QString> ActiSystemInfo;
 public:
     static const QString MANUFACTURE;
     static const QString CAMERA_PARAMETER_GROUP_ENCODER;
@@ -92,8 +93,9 @@ public:
         bool keepAllData,
         QByteArray* const msgBody,
         QString* const localAddress = nullptr );
+
     static QByteArray unquoteStr(const QByteArray& value);
-    static QMap<QByteArray, QByteArray> parseSystemInfo(const QByteArray& report);
+    static ActiSystemInfo parseSystemInfo(const QByteArray& report);
 
     //!Called by http server on receiving message from camera
     void cameraMessageReceived( const QString& path, const QnRequestParamList& message );
@@ -119,7 +121,7 @@ private:
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     void initializePtz();
-    void initializeIO( const QMap<QByteArray, QByteArray>& systemInfo );
+    void initializeIO( const ActiSystemInfo& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
     void fetchAndSetAdvancedParameters();
     QString getAdvancedParametersTemplate() const;
