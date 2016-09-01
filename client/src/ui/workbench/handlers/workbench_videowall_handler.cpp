@@ -220,7 +220,7 @@ namespace {
 
     const QnUuid uuidPoolBase("621992b6-5b8a-4197-af04-1657baab71f0");
 
-
+    //TODO: #GDM #VW clean nonexistent videowalls sometimes
     class QnVideowallAutoStarter: public QnWorkbenchAutoStarter {
     public:
         QnVideowallAutoStarter(const QnUuid &videowallUuid, QObject *parent = NULL):
@@ -1043,8 +1043,8 @@ void QnWorkbenchVideoWallHandler::controlResolutionMode(Qn::ResolutionMode resol
     sendMessage(message);
 }
 
-void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
-
+void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
+{
     // not logged in yet
     if (!m_videoWallMode.ready)
         return;
@@ -1056,24 +1056,24 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
     m_videoWallMode.opening = false;
 
     QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
-    if (!videoWall || videoWall->items()->getItems().isEmpty()) {
+    if (!videoWall || videoWall->items()->getItems().isEmpty())
+    {
         if (!videoWall)
             qWarning() << "Warning: videowall not exists, cannot start videowall on this pc";
         else
             qWarning() << "Warning: videowall is empty, cannot start videowall on this pc";
+        QnVideowallAutoStarter(m_videoWallMode.guid, this).setAutoStartEnabled(false);
         closeInstanceDelayed();
         return;
     }
 
     QnUuid pcUuid = qnSettings->pcUuid();
-    if (pcUuid.isNull()) {
+    if (pcUuid.isNull())
+    {
         qWarning() << "Warning: pc UUID is null, cannot start videowall on this pc";
         closeInstanceDelayed();
         return;
     }
-
-    connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
-    connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
 
     bool master = m_videoWallMode.instanceGuid.isNull();
     if (master) {
@@ -1823,7 +1823,17 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
     });
 
-    if (!m_videoWallMode.active)
+    if (m_videoWallMode.active)
+    {
+        if (videoWall->getId() == m_videoWallMode.guid)
+        {
+            connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
+            connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
+            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
+            openVideoWallItem(videoWall);
+        }
+    }
+    else
     {
         connect(videoWall, &QnVideoWallResource::pcAdded,       this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
         connect(videoWall, &QnVideoWallResource::pcChanged,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
@@ -1837,23 +1847,24 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     }
 }
 
-void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
+void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr &resource)
+{
     /* Return id to the pool. */
     m_uuidPool->markAsFree(resource->getId());
 
-    if (m_videoWallMode.active) {
+    QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+    if (!videoWall)
+        return;
+
+    disconnect(videoWall, nullptr, this, nullptr);
+    if (m_videoWallMode.active)
+    {
         if (resource->getId() != m_videoWallMode.guid)
             return;
-
-        QnVideowallAutoStarter(resource->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
         closeInstanceDelayed();
-    } else {
-        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall)
-            return;
-        disconnect(videoWall, NULL, this, NULL);
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
-
+    }
+    else
+    {
         QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videoWall);
         if (layout && layout->resource())
             qnResPool->removeResource(layout->resource());
