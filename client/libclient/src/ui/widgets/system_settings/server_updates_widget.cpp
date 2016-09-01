@@ -393,6 +393,7 @@ bool QnServerUpdatesWidget::beginChecking()
     ui->updateButton->setEnabled(false);
     ui->selectUpdateTypeButton->setEnabled(false);
     ui->targetVersionLabel->setPalette(palette());
+    ui->versionStackedWidget->setCurrentWidget(ui->checkingPage);
     ui->errorLabel->setText(QString());
 
     return true;
@@ -489,6 +490,8 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
     ui->releaseNotesLabel->setVisible(!m_releaseNotesUrl.isEmpty());
 
     ui->targetVersionLabel->setText(versionText);
+
+    ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
 }
 
 void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
@@ -502,7 +505,7 @@ void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
     if (fromInternet)
         m_lastAutoUpdateCheck = QDateTime::currentMSecsSinceEpoch();
 
-    ui->refreshWidget->setCurrentWidget(ui->progressPage);
+    ui->refreshButton->hide();
     ui->targetVersionLabel->setPalette(palette());
 
     if (fromInternet)
@@ -517,7 +520,7 @@ void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
                     m_updatesModel->setLatestVersion(m_latestVersion);
                 }
 
-                ui->refreshWidget->setCurrentWidget(ui->refreshPage);
+                ui->refreshButton->show();
                 ui->downloadButton->show();
                 endChecking(result);
             });
@@ -527,7 +530,6 @@ void QnServerUpdatesWidget::checkForUpdates(bool fromInternet)
         m_updateTool->checkForUpdates(m_localFileName,
             [this](const QnCheckForUpdateResult& result)
             {
-                ui->refreshWidget->setCurrentWidget(ui->emptyPage);
                 endChecking(result);
             });
     }
