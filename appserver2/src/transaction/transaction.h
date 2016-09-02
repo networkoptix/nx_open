@@ -155,7 +155,7 @@ APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(),
+                       AllowForAllAccessOut(),                     \
                        SetStatusTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_status by resource id */ \
                        true, /* persistent*/ \
@@ -166,7 +166,7 @@ APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(),
+                       AllowForAllAccessOut(),                     \
                        SetStatusTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
@@ -1136,7 +1136,7 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(),
+                       ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
                        true, \
@@ -1147,7 +1147,7 @@ APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(),
+                       AllowForAllAccessOut(),      \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(4001, getClientInfos, ApiClientInfoDataList, \
                        false, \
