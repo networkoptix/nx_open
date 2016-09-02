@@ -70,7 +70,7 @@ const char* kFilterPropertyName = "_qn_filter";
 const int kNoDataFontPixelSize = 32;
 const int kNoDataFontWeight = QFont::Light;
 
-const auto kHtmlLabelFormat = lit("<center><div style='font-weight: 500'>%1</div> %2</center>");
+const auto kHtmlLabelFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
 
 const QSize kMaxThumbnailSize(224, 184);
 
@@ -89,6 +89,8 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     m_proxyWidget->setVisible(false);
     m_proxyWidget->setWidget(m_embeddedWidget);
     m_proxyWidget->installSceneEventFilter(this);
+
+    m_embeddedWidget->setAttribute(Qt::WA_TranslucentBackground);
 
     /* To keep aspect ratio specify only maximum height for server request: */
     m_previewWidget->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
