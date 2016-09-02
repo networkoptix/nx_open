@@ -13,7 +13,7 @@ public:
 
     static QAction* showMenu(QMenu* menu, const QPoint& globalPoint);
 
-    static void toolButtonMenuWorkaround(QToolButton* button, QMenu* menu);
+    static void showMenuOnWidget(QWidget* widget, const QPoint& offset, QMenu* menu);
 
     static void setViewportWindow(QWindow* window);
 };

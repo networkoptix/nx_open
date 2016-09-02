@@ -1,6 +1,7 @@
 
 #include "hidpi_workarounds.h"
 
+#include <nx/utils/raii_guard.h>
 #include <utils/common/connective.h>
 
 namespace {
@@ -15,7 +16,6 @@ QPoint convertScaledToGlobal(const QPoint& scaled)
     for (auto screen : QGuiApplication::screens())
         xSorted.insert(screen->geometry().left(), screen);
 
-    bool found = false;
     QPoint logicalOffset;
     for (auto it = xSorted.begin(); it != xSorted.end(); ++it)
     {
@@ -35,15 +35,23 @@ QPoint convertScaledToGlobal(const QPoint& scaled)
     return result;
 }
 
+// TODO: #ynikitenkov develop totally correct functiom -
+// now it correct only for one horizontal line positioned screen
 QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
 {
     const auto geometry = screen->geometry();
+    if (geometry.contains(point))
+        return point;
+
     const auto topLeft = geometry.topLeft();
     const auto left = topLeft.x();
+    auto scaledPointOnScreen = (point - topLeft);
 
-    const auto scaledPointOnScreen = (point - topLeft);
-    if (scaledPointOnScreen.x() > 0 && scaledPointOnScreen.y() > 0)
-        return point;
+    const bool backwardSearch = ((scaledPointOnScreen.x() < 0)
+        || (scaledPointOnScreen.y() < 0));
+
+    if (!backwardSearch)
+        scaledPointOnScreen -= QPoint(geometry.width(), 0);
 
     const auto pixelPointOnScreen = scaledPointOnScreen * screen->devicePixelRatio();
     SortedScreens tmp;
@@ -51,22 +59,33 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
         tmp.insert(src->geometry().left(), src);
 
 
-    // Searching for prev screen
-    const auto xSorted = tmp.values().toVector();
-    for (auto it = xSorted.rbegin(); it != xSorted.rend(); ++it)
-    {
-        const auto src = *it;
-        if (src->geometry().left() >= left)
-            continue;
+    // Searching for appropriate screen
 
-        // We've found prev screen
-        const auto factor = src->devicePixelRatio();
-        const auto targetGeometry = src->geometry();
-        const auto targetTopLeft = targetGeometry.topLeft();
-        return targetTopLeft + QPoint(targetGeometry.width(), 0)
-            + pixelPointOnScreen / factor;
-    }
-    return QPoint();
+
+    const auto xSorted = tmp.values().toVector();
+    const auto it = std::find_if(xSorted.begin(), xSorted.end(),
+        [screen](const QScreen* value)
+        {
+            return (value == screen);
+        });
+
+    if (it == xSorted.end())
+        return point;
+
+    const auto itRealScreen = (backwardSearch
+        ? (it == xSorted.begin() ? xSorted.end() : it - 1)
+        : (it == (xSorted.end() - 1) ? xSorted.end() : it + 1));
+
+    if (it == xSorted.end())
+        return QPoint();
+
+    // We've found prev screen
+    QScreen *appropriate = *itRealScreen;
+    const auto targetGeometry = appropriate->geometry();
+    const auto offset = (backwardSearch ? QPoint(targetGeometry.width(), 0) : QPoint());
+    const auto factor = appropriate->devicePixelRatio();
+    const auto targetTopLeft = targetGeometry.topLeft();
+    return targetTopLeft + offset + pixelPointOnScreen / factor;
 }
 
 QScreen* getScreen(const QPoint& scaled)
@@ -103,14 +122,21 @@ public:
 
         const auto window = getWindow();
         if (window)
-        {
             window->setScreen(m_screen);
-            qDebug() << "--target pos : " << m_screen;
-        }
     }
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override
     {
+        if (event->type() == QEvent::MouseButtonRelease)
+        {
+            // Workarounds menu popup after second click in some cases.
+            const auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+            auto mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, mouseEvent->localPos(),
+                Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+            qApp->postEvent(watched, mouseMoveEvent);
+            return QObject::eventFilter(watched, event);
+        }
+
         if (!m_screen || (event->type() != QEvent::Show))
             return QObject::eventFilter(watched, event);
 
@@ -119,15 +145,11 @@ public:
             return QObject::eventFilter(watched, event);
 
         window->setScreen(m_screen);
-        qDebug() << "--show: " << m_screen;
         connect(window, &QWindow::screenChanged, this,
             [window, this](QScreen* newScreen)
             {
                 if (window && (m_screen != newScreen))
-                {
                     window->setScreen(m_screen);
-                    qDebug() << "--changed: " << m_screen << newScreen;
-                }
             });
 
         return QObject::eventFilter(watched, event);
@@ -153,6 +175,8 @@ typedef QSharedPointer<MenuMouseEventsCorrector> MouseEventsCorrectorPtr;
 typedef QHash<QMenu*, MouseEventsCorrectorPtr> MouseEventsCorrectorsHash;
 
 static MouseEventsCorrectorsHash knownCorrectors;
+
+static bool customMenuIsVisible = false;
 
 void installMenuMouseEventCorrector(QMenu* menu)
 {
@@ -194,31 +218,110 @@ QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
 
     const auto corrector = knownCorrectors.value(menu);
     const auto pos = QCursor::pos();
-    qDebug() << pos << globalPoint;
     corrector->setTargetPosition(globalPoint);
+
+    customMenuIsVisible = true;
+    const auto customMenuLock = QnRaiiGuard::createDestructable(
+        []() { customMenuIsVisible = false; });
+
     return menu->exec(globalPoint);
 }
 
-void QnHiDpiWorkarounds::toolButtonMenuWorkaround(QToolButton* button, QMenu* menu)
+QWindow* getParentWindow(QWidget* widget)
 {
-    if (!viewportWindow)
-        return;
+    // Checks if widget is in graphics view
 
-    // Checks if we has placed title bar to proxy widget
-    const bool isGraphicsEnvironment = (button->parent() && !button->parent()->parent());
-    const auto menuLocalPos = button->rect().bottomLeft();
+    if (!widget)
+        return nullptr;
 
-    setMouseWorkaroundActive(false, viewportWindow);
-    const auto globalPos = button->mapToGlobal(menuLocalPos);
-    setMouseWorkaroundActive(true, viewportWindow);
+    auto item = widget;
+    while (item->parentWidget() && !dynamic_cast<QGLWidget*>(item->parentWidget()))
+        item = item->parentWidget();
 
-    const auto fixedGlobalPoint = screenRelatedToGlobal(globalPos, viewportWindow->screen());
+    if (item->parentWidget())    //< direct child of GL widget
+        return item->parentWidget()->windowHandle();
 
-    showMenu(menu, fixedGlobalPoint);
+    // We have at least
+    const auto proxy = item->graphicsProxyWidget();
+    const QGraphicsView* view = (proxy && proxy->scene() && !proxy->scene()->views().isEmpty()
+        ? proxy->scene()->views().first() : nullptr);
+    if (view)
+        return view->viewport()->windowHandle();
+
+    while (widget)
+    {
+        if (widget->windowHandle())
+            return widget->windowHandle();
+
+        widget = widget->parentWidget();
+    }
+    return nullptr;
 }
+
+QPoint getPoint(QWidget* widget, const QPoint& offset, QWindow* parentWindow = nullptr)
+{
+    if (!parentWindow)
+        parentWindow = getParentWindow(widget);
+
+    if (!parentWindow)
+        return QPoint();
+
+    QPoint globalPos;
+    {
+        QnRaiiGuardPtr workaroundTurnOff;
+        if (parentWindow == viewportWindow)
+        {
+            workaroundTurnOff =
+                QnRaiiGuard::create([]() { setMouseWorkaroundActive(false, viewportWindow); },
+                []() { setMouseWorkaroundActive(true, viewportWindow); });
+        }
+        globalPos = widget->mapToGlobal(offset);
+    }
+
+    return screenRelatedToGlobal(globalPos, parentWindow->screen());
+}
+
+void QnHiDpiWorkarounds::showMenuOnWidget(QWidget* widget, const QPoint& offset, QMenu* menu)
+{
+    showMenu(menu, getPoint(widget, offset, viewportWindow));
+}
+
+class CE : public QContextMenuEvent
+{
+public:
+    CE(QContextMenuEvent::Reason reason, const QPoint& pos, const QPoint& globalPos)
+        :QContextMenuEvent(QContextMenuEvent::Mouse,   //< Always set mouse to prevent coordinates transforming
+            pos, globalPos)
+    {}
+};
+class Test : public QObject
+{
+private:
+    bool eventFilter(QObject*watched, QEvent* event)
+    {
+        if (event->type() != QEvent::ContextMenu)
+            return QObject::eventFilter(watched, event);
+
+        const auto contextMenuEvent = dynamic_cast<QContextMenuEvent*>(event);
+        const auto widget = qobject_cast<QWidget*>(watched);
+        const auto parentWindow = getParentWindow(widget);
+        if (!dynamic_cast<CE*>(event) && parentWindow && !customMenuIsVisible)   // Ignore events from directly shown menu
+        {
+            const auto targetPos = getPoint(widget, contextMenuEvent->pos(), parentWindow);
+            qDebug() << widget << targetPos;
+            auto fixedEvent = CE(contextMenuEvent->reason(), contextMenuEvent->pos(), targetPos);
+            if (!qApp->sendEvent(watched, &fixedEvent) || !fixedEvent.isAccepted())
+                return QObject::eventFilter(watched, event);
+
+            return true;
+        }
+        return QObject::eventFilter(watched, event);
+    }
+};
 
 void QnHiDpiWorkarounds::setViewportWindow(QWindow* window)
 {
+    qApp->installEventFilter(new Test());
     if (viewportWindow)
         setMouseWorkaroundActive(false, viewportWindow);
 
