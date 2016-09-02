@@ -152,7 +152,7 @@ public:
     MockConnection* queryProcessor() { return this; }
     MockConnection& getAccess(...) { return *this; }
     MockConnection* auditManager() { return this; }
-    void addAuditRecord(...) {}
+    void setAuditData(...) {}
 
 private:
     const QueryCallback m_queryCallback;
@@ -160,6 +160,8 @@ private:
 };
 
 typedef UpdateHttpHandler<ApiMockData, MockConnection> TestUpdateHttpHandler;
+
+static const ApiCommand::Value kMockApiCommand = (ApiCommand::Value) 1; //< Any existing command.
 
 //-------------------------------------------------------------------------------------------------
 // Test mechanism.
@@ -190,7 +192,7 @@ public:
         QByteArray resultBody;
         QByteArray contentType;
         int httpStatusCode = m_updateHttpHandler->executePost(
-            /*path*/ "",
+            /*path*/ ApiCommand::toString(kMockApiCommand),
             QnRequestParamList(),
             m_requestJson.json,
             "application/json",
@@ -270,7 +272,7 @@ private:
     {
         ASSERT_FALSE(m_wasHandleUpdateCalled) << "handleUpdate() called twice";
         m_wasHandleUpdateCalled = true;
-        ASSERT(tran.command == ApiCommand::NotDefined);
+        ASSERT(tran.command == kMockApiCommand);
 
         LOG(lit("Transaction: %1").arg(tran.params.toJsonString().c_str()));
 
