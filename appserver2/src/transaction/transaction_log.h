@@ -74,27 +74,6 @@ namespace ec2
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
-         /**
-         *  Semantics of the transactionHash() function is following:
-         *  if transaction A follows transaction B and overrides it,
-         *  their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
-         *  Obviously, transactionHash() is not needed for the non-persistent transaction.
-         */
-
-        template<typename Param>
-        QnUuid transactionHash(const Param &param)
-        {
-            for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
-            {
-                auto tdBase = (*it).get();
-                auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
-                if (td)
-                    return td->getHashFunc(param);
-            }
-            NX_ASSERT(0, "Transaciton descriptor for the given param not found");
-            return QnUuid();
-        }
-
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
         void fillPersistentInfo(QnAbstractTransaction& tran);
 

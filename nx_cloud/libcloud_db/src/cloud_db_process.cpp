@@ -580,6 +580,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddCustomAndDisabledAccessRoles);
     dbStructureUpdater.addUpdateScript(db::kAddMoreFieldsToSystemSharing);
     dbStructureUpdater.addUpdateScript(db::kAddVmsUserIdToSystemSharing);
+    dbStructureUpdater.addUpdateScript(db::kAddSystemTransactionLog);
     return dbStructureUpdater.updateStructSync();
 }
 

@@ -29,6 +29,7 @@ struct QnTranStateKey {
 #define QnTranStateKey_Fields (peerID)(dbID)
 
 struct QnTranState {
+    /** map<(peer, db), persistent sequence> */
     QMap<QnTranStateKey, qint32> values;
 };
 #define QnTranState_Fields (values)

@@ -97,6 +97,12 @@ QString QnUuid::toSimpleString() const
     return s.mid( 1, s.length() - 2 );
 }
 
+QByteArray QnUuid::toSimpleByteArray() const
+{
+    auto s = toByteArray();
+    return s.mid(1, s.length() - 2);
+}
+
 std::string QnUuid::toStdString() const
 {
     const auto& byteArray = toByteArray();

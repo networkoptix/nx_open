@@ -455,6 +455,28 @@ static const char kAddVmsUserIdToSystemSharing[] =
 ALTER TABLE system_to_account ADD COLUMN vms_user_id VARCHAR(64) NULL;      \
 ";
 
+//#CLOUD-485. Adding system transaction log
+static const char kAddSystemTransactionLog[] =
+"                                                                           \
+CREATE TABLE transaction_log (                                              \
+    system_id   VARCHAR(64) NOT NULL,                                       \
+    peer_guid   VARCHAR(64) NOT NULL,                                       \
+    db_guid     VARCHAR(64) NOT NULL,                                       \
+    sequence    INTEGER NOT NULL,                                           \
+    timestamp   INTEGER NOT NULL,                                           \
+    tran_guid   VARCHAR(64) NOT NULL,                                       \
+    tran_data   BLOB NOT NULL,                                              \
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE          \
+);                                                                          \
+                                                                            \
+CREATE UNIQUE INDEX idx_transaction_key                                     \
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);            \
+CREATE UNIQUE INDEX idx_transaction_hash                                    \
+    ON transaction_log(system_id, tran_guid);                               \
+CREATE INDEX idx_transaction_time                                           \
+    ON transaction_log(system_id, timestamp);                               \
+";
+
 }   //db
 }   //cdb
 }   //nx

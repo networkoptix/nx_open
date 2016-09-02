@@ -1,10 +1,18 @@
 #include "transaction_log.h"
 
+#include <QtSql/QSqlQuery>
+
 #include "outgoing_transaction_dispatcher.h"
 
 namespace nx {
 namespace cdb {
 namespace ec2 {
+
+QString toString(const ::ec2::QnAbstractTransaction& tran)
+{
+    return lit("seq %1, ts %2")
+        .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
+}
 
 ////////////////////////////////////////////////////////////
 //// class TransactionLog
@@ -19,6 +27,7 @@ TransactionLog::TransactionLog(
     m_dbManager(dbManager),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher)
 {
+    fillCache();
 }
 
 void TransactionLog::startDbTransaction(
@@ -39,29 +48,255 @@ void TransactionLog::startDbTransaction(
             QSqlDatabase* dbConnection,
             nx::db::DBResult dbResult)
         {
-            if (dbResult != nx::db::DBResult::ok)
-            {
-                // TODO: #ak Rolling back transaction log change.
-            }
             onDbUpdateCompleted(dbConnection, dbResult);
-
-            DbTransactionContext currentDbTranContext;
-            {
-                QnMutexLocker lk(&m_mutex);
-                auto it = m_dbTransactionContexts.find(dbConnection);
-                if (it != m_dbTransactionContexts.end())
-                {
-                    currentDbTranContext = std::move(it->second);
-                    m_dbTransactionContexts.erase(it);
-                }
-            }
-
-            // Issuing "new transaction" event.
-            for (auto& tran: currentDbTranContext.transactions)
-                m_outgoingTransactionDispatcher->dispatchTransaction(
-                    currentDbTranContext.systemId,
-                    std::move(tran));
+            onDbTransactionCompleted(dbConnection, dbResult);
         });
+}
+
+void TransactionLog::fillCache()
+{
+    // TODO: Filling in m_systemIdToTransactionLog.
+}
+
+bool TransactionLog::isShouldBeIgnored(
+    QSqlDatabase* /*connection*/,
+    const nx::String& systemId,
+    const ::ec2::QnAbstractTransaction& tran,
+    const QByteArray& hash)
+{
+    using namespace ::ec2;
+    VmsTransactionLogData* vmsTransactionLog = nullptr;
+    {
+        QnMutexLocker lk(&m_mutex);
+        vmsTransactionLog = &m_systemIdToTransactionLog[systemId];
+    }
+
+    QnTranStateKey key(tran.peerID, tran.persistentInfo.dbID);
+    NX_ASSERT(tran.persistentInfo.sequence != 0);
+    const auto currentSequence = vmsTransactionLog->transactionState.values.value(key);
+    if (currentSequence >= tran.persistentInfo.sequence)
+    {
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
+                "because of persistent sequence: %5 <= %6")
+                .arg(systemId).arg(ApiCommand::toString(tran.command)).str(tran)
+                .arg(hash).str(tran.persistentInfo.sequence).arg(currentSequence),
+            cl_logDEBUG1);
+        return true;    //< Transaction should be ignored.
+    }
+
+    const auto itr = vmsTransactionLog->transactionHashToUpdateAuthor.find(hash);
+    if (itr == vmsTransactionLog->transactionHashToUpdateAuthor.cend())
+        return false;   //< Transaction should be processed.
+
+    const auto lastTime = itr->second.timestamp;
+    bool rez = lastTime > tran.persistentInfo.timestamp;
+    if (lastTime == tran.persistentInfo.timestamp)
+        rez = key < itr->second.updatedBy;
+    if (rez)
+    {
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
+                "because of timestamp: %5 <= %6")
+            .arg(systemId).arg(ApiCommand::toString(tran.command)).str(tran)
+            .arg(hash).str(tran.persistentInfo.timestamp).arg(lastTime),
+            cl_logDEBUG1);
+        return true;    //< Transaction should be ignored.
+    }
+
+    return false;   //< Transaction should be processed.
+}
+
+//bool TransactionLog::checkTransactionSequence(
+//    QSqlDatabase* /*connection*/,
+//    const nx::String& systemId,
+//    const ::ec2::QnAbstractTransaction& transaction,
+//    const TransactionTransportHeader& cdbTransportHeader)
+//{
+//    using namespace ::ec2;
+//    VmsTransactionLogData* vmsTransactionLog = nullptr;
+//    {
+//        QnMutexLocker lk(&m_mutex);
+//        vmsTransactionLog = &m_systemIdToTransactionLog[systemId];
+//    }
+//    
+//    const QnTransactionTransportHeader& transportHeader = cdbTransportHeader.vmsTransportHeader;
+//
+//    if (transportHeader.sender.isNull())
+//        return true; // old version, nothing to check
+//
+//    // 1. check transport sequence
+//    QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
+//    int transportSeq = vmsTransactionLog->lastTransportSeq[ttSenderKey];
+//    if (transportSeq >= transportHeader.sequence)
+//    {
+//        NX_LOG(QnLog::EC2_TRAN_LOG,
+//            lm("systemId %1. Ignoring transaction %2 (%3) received "
+//                "from %4 because of transport sequence: %5 <= %6")
+//                .arg(systemId).arg(ApiCommand::toString(transaction.command)).str(transaction)
+//                .str(cdbTransportHeader).arg(transportHeader.sequence).arg(transportSeq),
+//            cl_logDEBUG1);
+//        return false; // already processed
+//    }
+//    vmsTransactionLog->lastTransportSeq[ttSenderKey] = transportHeader.sequence;
+//
+//    // 2. check persistent sequence
+//    if (transaction.persistentInfo.isNull())
+//    {
+//        NX_LOG(QnLog::EC2_TRAN_LOG,
+//            lm("systemId %1. Transaction %2 (%3) received "
+//                "from %4 has no persistent info")
+//                .arg(systemId).arg(ApiCommand::toString(transaction.command))
+//                .str(transaction).str(cdbTransportHeader),
+//            cl_logDEBUG1);
+//        return true; // nothing to check
+//    }
+//
+//    return true;
+//
+//#if 0
+//    QnTranStateKey persistentKey(transaction.peerID, transaction.persistentInfo.dbID);
+//    const int persistentSeq = vmsTransactionLog->transactionState.values[persistentKey];
+//
+//    //if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING)
+//    //    if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
+//    //    {
+//    //        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
+//    //            arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING);
+//    //    }
+//
+//    if (transaction.persistentInfo.sequence > persistentSeq + 1)
+//    {
+//        if (transport->isSyncDone())
+//        {
+//            // gap in persistent data detect, do resync
+//            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
+//                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+//
+//            if (!transport->remotePeer().isClient() && !ApiPeerData::isClient(m_localPeerType))
+//                queueSyncRequest(transport);
+//            else
+//                transport->setState(QnTransactionTransport::Error); // reopen
+//            return false;
+//        }
+//        else
+//        {
+//            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
+//                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+//        }
+//    }
+//    return true;
+//#endif
+//}
+
+nx::db::DBResult TransactionLog::saveToDb(
+    QSqlDatabase* connection,
+    const nx::String& systemId,
+    const ::ec2::QnAbstractTransaction& transaction,
+    const QByteArray& transactionHash,
+    const QByteArray& ubjsonData)
+{
+    NX_LOG(
+        QnLog::EC2_TRAN_LOG,
+        lm("systemId %1. Saving transaction %2 (%3, hash %4) to log")
+            .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
+            .str(transaction).arg(transactionHash),
+        cl_logDEBUG1);
+
+    QSqlQuery saveTranQuery(*connection);
+    saveTranQuery.prepare(
+        "REPLACE INTO transaction_log(system_id, peer_guid, db_guid, sequence, "
+                                     "timestamp, tran_guid, tran_data) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)");
+    saveTranQuery.addBindValue(systemId);
+    saveTranQuery.addBindValue(transaction.peerID.toSimpleString());
+    saveTranQuery.addBindValue(transaction.persistentInfo.dbID.toSimpleString());
+    saveTranQuery.addBindValue(transaction.persistentInfo.sequence);
+    saveTranQuery.addBindValue(transaction.persistentInfo.timestamp);
+    saveTranQuery.addBindValue(transactionHash);
+    saveTranQuery.addBindValue(ubjsonData);
+    if (!saveTranQuery.exec())
+    {
+        NX_LOGX(lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
+            .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
+            .str(transaction).arg(transactionHash).arg(connection->lastError().text()),
+            cl_logWARNING);
+        return nx::db::DBResult::ioError;
+    }
+
+    // Modifying transaction log cache.
+    QnMutexLocker lk(&m_mutex);
+    DbTransactionContext& dbTranContext = m_dbTransactionContexts[connection];
+    const ::ec2::QnTranStateKey tranKey(transaction.peerID, transaction.persistentInfo.dbID);
+    dbTranContext.transactionLogUpdate.transactionHashToUpdateAuthor[transactionHash] =
+        UpdateHistoryData{
+            tranKey,
+            transaction.persistentInfo.timestamp};
+    dbTranContext.transactionLogUpdate.transactionState.values[tranKey] = transaction.persistentInfo.sequence;
+
+    return nx::db::DBResult::ok;
+}
+
+int TransactionLog::generateNewTransactionSequence(
+    QSqlDatabase* connection,
+    const nx::String& systemId)
+{
+    // TODO:
+    QnMutexLocker lk(&m_mutex);
+    int& currentSequence = m_systemIdToTransactionLog[systemId].persistentSequence;
+    ++currentSequence;
+    return currentSequence;
+}
+
+qint64 TransactionLog::generateNewTransactionTimestamp(
+    QSqlDatabase* connection,
+    const nx::String& systemId)
+{
+    // TODO:
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+}
+
+void TransactionLog::onDbTransactionCompleted(
+    QSqlDatabase* dbConnection,
+    nx::db::DBResult dbResult)
+{
+    DbTransactionContext currentDbTranContext;
+    VmsTransactionLogData* vmsTransactionLogData = nullptr;
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto it = m_dbTransactionContexts.find(dbConnection);
+        if (it != m_dbTransactionContexts.end())
+        {
+            currentDbTranContext = std::move(it->second);
+            m_dbTransactionContexts.erase(it);
+            vmsTransactionLogData =
+                &m_systemIdToTransactionLog[currentDbTranContext.systemId];
+        }
+    }
+
+    if (dbResult != nx::db::DBResult::ok)
+    {
+        // Rolling back transaction log change.
+        return;
+    }
+
+    // Applying transaction log changes.
+    for (const auto& elem: currentDbTranContext.transactionLogUpdate.transactionHashToUpdateAuthor)
+        vmsTransactionLogData->transactionHashToUpdateAuthor[elem.first] = elem.second;
+
+    for (auto it = currentDbTranContext.transactionLogUpdate.transactionState.values.cbegin();
+         it != currentDbTranContext.transactionLogUpdate.transactionState.values.cend();
+         ++it)
+    {
+        vmsTransactionLogData->transactionState.values[it.key()] = it.value();
+    }
+
+    // Issuing "new transaction" event.
+    for (auto& tran : currentDbTranContext.transactions)
+        m_outgoingTransactionDispatcher->dispatchTransaction(
+            currentDbTranContext.systemId,
+            std::move(tran));
 }
 
 ////////////////////////////////////////////////////////////

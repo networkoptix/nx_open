@@ -1410,7 +1410,6 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
 #define ApiTransactionData_Fields (tranGuid)(tran)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
-
     int generateRequestID();
 } /* namespace ec2*/
 

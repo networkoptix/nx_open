@@ -264,6 +264,27 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
     return nullptr;
 }
 
+/**
+* Semantics of the transactionHash() function is following:
+* if transaction A follows transaction B and overrides it,
+* their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
+* Obviously, transactionHash() is not needed for the non-persistent transaction.
+*/
+
+template<typename Param>
+static QnUuid transactionHash(const Param &param)
+{
+    for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+    {
+        auto tdBase = (*it).get();
+        auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+        if (td)
+            return td->getHashFunc(param);
+    }
+    NX_ASSERT(0, "Transaction descriptor for the given param not found");
+    return QnUuid();
+}
+
 } //namespace ec2
 
 #endif

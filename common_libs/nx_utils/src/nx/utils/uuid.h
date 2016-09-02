@@ -42,7 +42,9 @@ public:
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
+    /** Returns guid without {}. */
     QString toSimpleString() const;
+    QByteArray toSimpleByteArray() const;
     std::string toStdString() const;
     QUuid toQUuid() const;
 
