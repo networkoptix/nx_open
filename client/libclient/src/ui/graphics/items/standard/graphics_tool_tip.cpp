@@ -13,47 +13,45 @@
 #include <QtWidgets/QApplication>
 
 #include <ui/animation/opacity_animator.h>
+#include <ui/common/palette.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/graphics/items/generic/proxy_label.h>
+#include <ui/style/helper.h>
 
 #include <nx/utils/math/fuzzy.h>
 
-namespace {
-    const qreal toolTipMargin = 5.0;
-}
 
 // -------------------------------------------------------------------------- //
 // GraphicsToolTipLabel
 // -------------------------------------------------------------------------- //
-// TODO: #ynikitenkov. replace QnProxyLabel with GraphicsLabel. VMS-2805
-class GraphicsToolTipLabel: public QnProxyLabel {
-    typedef QnProxyLabel base_type;
+
+class GraphicsToolTipLabel: public QnProxyLabel
+{
+    using base_type = QnProxyLabel;
 
 public:
-    GraphicsToolTipLabel(const QString &text, QGraphicsItem *newItem);
+    GraphicsToolTipLabel(const QString& text, QGraphicsItem* newItem);
     virtual ~GraphicsToolTipLabel();
 
-    static GraphicsToolTipLabel *instance;
+    static GraphicsToolTipLabel* instance;
 
-    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
-    void reuseTip(const QString &newText, QGraphicsItem *newItem);
+    void reuseTip(const QString& newText, QGraphicsItem* newItem);
     void hideTip();
     void hideTipImmediately();
     void restartExpireTimer();
-    void placeTip(const QPointF &pos, const QRectF &viewport);
-    bool tipChanged(const QString &newText, QGraphicsItem *parent);
+    void placeTip(const QPointF& pos, const QRectF& viewport);
+    bool tipChanged(const QString& newText, QGraphicsItem* parent);
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 protected:
-    virtual void timerEvent(QTimerEvent *e) override;
-    virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
+    virtual void timerEvent(QTimerEvent* e) override;
+    virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
 
 private:
-    QGraphicsItem *item() const {
-        return m_item.data();
-    }
+    QGraphicsItem* item() const;
 
 private:
     QBasicTimer m_hideTimer, m_expireTimer;
@@ -61,29 +59,40 @@ private:
     QPointF m_oldParentPos;
 };
 
-GraphicsToolTipLabel *GraphicsToolTipLabel::instance = 0;
+GraphicsToolTipLabel* GraphicsToolTipLabel::instance = nullptr;
 
-GraphicsToolTipLabel::GraphicsToolTipLabel(const QString &text, QGraphicsItem *newItem):
+GraphicsToolTipLabel::GraphicsToolTipLabel(const QString& text, QGraphicsItem* newItem):
     base_type(text),
-    m_item(0)
+    m_item(nullptr)
 {
     delete instance;
     instance = this;
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-    setPalette(QToolTip::palette());
 
+    setPaletteColor(this, QPalette::Window, Qt::transparent);
+
+    auto embedded = widget();
+    embedded->setForegroundRole(QPalette::ToolTipText);
+    embedded->setBackgroundRole(QPalette::ToolTipBase);
+/*
     QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect();
     shadow->setXOffset(toolTipMargin);
     shadow->setYOffset(toolTipMargin);
     shadow->setBlurRadius(toolTipMargin * .5);
     setGraphicsEffect(shadow);
-
+*/
     qApp->installEventFilter(this);
     reuseTip(text, newItem);
 }
 
-GraphicsToolTipLabel::~GraphicsToolTipLabel() {
-    instance = 0;
+GraphicsToolTipLabel::~GraphicsToolTipLabel()
+{
+    instance = nullptr;
+}
+
+QGraphicsItem* GraphicsToolTipLabel::item() const
+{
+    return m_item.data();
 }
 
 void GraphicsToolTipLabel::restartExpireTimer()
@@ -93,12 +102,13 @@ void GraphicsToolTipLabel::restartExpireTimer()
     m_hideTimer.stop();
 }
 
-void GraphicsToolTipLabel::reuseTip(const QString &newText, QGraphicsItem *newItem)
+void GraphicsToolTipLabel::reuseTip(const QString& newText, QGraphicsItem* newItem)
 {
     if (item())
         item()->removeSceneEventFilter(this);
 
-    if (scene() != newItem->scene()) {
+    if (scene() != newItem->scene())
+    {
         if (scene())
             scene()->removeItem(this);
         newItem->scene()->addItem(this);
@@ -107,9 +117,13 @@ void GraphicsToolTipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
     m_item = newItem;
     m_oldParentPos = newItem->pos();
 
+    int height = widget()->fontMetrics().height();
+    int h = style::Metrics::kStandardPadding;
+    int v = qMax((style::Metrics::kToolTipHeight - height + 1) / 2, 0);
+    widget()->setContentsMargins(h, v, h, v);
+
     setZValue(std::numeric_limits<qreal>::max());
     setText(newText);
-    setMargin(toolTipMargin);
     resize(sizeHint(Qt::PreferredSize));
     newItem->installSceneEventFilter(this);
     newItem->setAcceptHoverEvents(true); /* This won't be undone. */
@@ -127,28 +141,33 @@ void GraphicsToolTipLabel::hideTipImmediately()
     opacityAnimator(this, 6.0)->animateTo(0.0);
 }
 
-bool GraphicsToolTipLabel::eventFilter(QObject *, QEvent *event)
+bool GraphicsToolTipLabel::eventFilter(QObject* object, QEvent* event)
 {
-    switch (event->type()) {
-    case QEvent::WindowActivate:
-    case QEvent::WindowDeactivate:
-    case QEvent::MouseButtonPress:
-    case QEvent::MouseButtonRelease:
-    case QEvent::MouseButtonDblClick:
-    case QEvent::FocusIn:
-    case QEvent::FocusOut:
-    case QEvent::Wheel:
-        hideTipImmediately();
-        break;
-    default:
-        break;
+    Q_UNUSED(object);
+
+    switch (event->type())
+    {
+        case QEvent::WindowActivate:
+        case QEvent::WindowDeactivate:
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+        case QEvent::MouseButtonDblClick:
+        case QEvent::FocusIn:
+        case QEvent::FocusOut:
+        case QEvent::Wheel:
+            hideTipImmediately();
+            break;
+
+        default:
+            break;
     }
+
     return false;
 }
 
-void GraphicsToolTipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
+void GraphicsToolTipLabel::placeTip(const QPointF& pos, const QRectF& viewport)
 {
-    if(!item())
+    if (!item())
         return;
 
     QPointF p = pos;
@@ -182,33 +201,34 @@ void GraphicsToolTipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
     this->setPos(p);
 }
 
-bool GraphicsToolTipLabel::tipChanged(const QString &newText, QGraphicsItem *parent) {
-    return newText != this->text() 
-        || parent != this->item() 
-        || (parent && !qFuzzyEquals(parent->pos(), m_oldParentPos))
-        ;
+bool GraphicsToolTipLabel::tipChanged(const QString& newText, QGraphicsItem* parent)
+{
+    return newText != this->text()
+        || parent != this->item()
+        || (parent && !qFuzzyEquals(parent->pos(), m_oldParentPos));
 }
 
-void GraphicsToolTipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    QStyleOptionFrame opt;
-    opt.rect = rect().toRect();
-
-    style()->drawPrimitive(QStyle::PE_PanelTipLabel, &opt, painter);
+void GraphicsToolTipLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    style()->drawPrimitive(QStyle::PE_PanelTipLabel, option, painter);
     base_type::paint(painter, option, widget);
 }
 
-void GraphicsToolTipLabel::timerEvent(QTimerEvent *event)
+void GraphicsToolTipLabel::timerEvent(QTimerEvent* event)
 {
-    if (event->timerId() == m_hideTimer.timerId() || event->timerId() == m_expireTimer.timerId()) {
+    if (event->timerId() == m_hideTimer.timerId() || event->timerId() == m_expireTimer.timerId())
+    {
         m_hideTimer.stop();
         m_expireTimer.stop();
         hideTipImmediately();
     }
 }
 
-bool GraphicsToolTipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
+bool GraphicsToolTipLabel::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
+{
     if (event->type() == QEvent::GraphicsSceneHoverLeave && watched == item())
         hideTip();
+
     return base_type::sceneEventFilter(watched, event);
 }
 
@@ -216,9 +236,10 @@ bool GraphicsToolTipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *even
 // -------------------------------------------------------------------------- //
 // GraphicsToolTip
 // -------------------------------------------------------------------------- //
-void GraphicsToolTip::showText(const QString &text, QGraphicsView *view, QGraphicsItem *item, const QPoint &pos) {
+void GraphicsToolTip::showText(const QString& text, QGraphicsView* view, QGraphicsItem* item, const QPoint& pos)
+{
     QPointF scenePos = view->mapToScene(pos);
-    QWidget *viewport = view->childAt(pos);
+    QWidget* viewport = view->childAt(pos);
 
     //window can be in the resize animation process, so no child will be found at current coordinates --gdm
     if (!viewport)
@@ -226,31 +247,39 @@ void GraphicsToolTip::showText(const QString &text, QGraphicsView *view, QGraphi
 
     QRectF sceneRect(
         view->mapToScene(viewport->geometry().topLeft()),
-        view->mapToScene(viewport->geometry().bottomRight())
-    );
+        view->mapToScene(viewport->geometry().bottomRight()));
 
     showText(text, item, scenePos, sceneRect);
 }
 
-void GraphicsToolTip::showText(const QString &text, QGraphicsItem *item, QPointF scenePos, QRectF sceneRect) {
-    if (GraphicsToolTipLabel::instance && GraphicsToolTipLabel::instance->isVisible() && !qFuzzyEquals(GraphicsToolTipLabel::instance->opacity(), 0.0)) { 
+void GraphicsToolTip::showText(const QString& text, QGraphicsItem* item, QPointF scenePos, QRectF sceneRect)
+{
+    if (GraphicsToolTipLabel::instance && GraphicsToolTipLabel::instance->isVisible()
+        && !qFuzzyEquals(GraphicsToolTipLabel::instance->opacity(), 0.0))
+    {
         /* A tip does already exist. */
-        if (text.isEmpty()) { 
+        if (text.isEmpty())
+        {
             /* Empty text => hide current tip. */
             GraphicsToolTipLabel::instance->hideTip();
             return;
-        } else {
+        }
+        else
+        {
             /* If the tip has changed, reuse the one that is being shown (removes flickering). */
-            if (GraphicsToolTipLabel::instance->tipChanged(text, item)) {
+            if (GraphicsToolTipLabel::instance->tipChanged(text, item))
+            {
                 GraphicsToolTipLabel::instance->reuseTip(text, item);
                 GraphicsToolTipLabel::instance->placeTip(scenePos, sceneRect);
             }
+
             opacityAnimator(GraphicsToolTipLabel::instance, 3.0)->animateTo(1.0);
             return;
         }
     }
 
-    if (!text.isEmpty()) { /* No tip can be reused, create new tip. */
+    if (!text.isEmpty()) /* No tip can be reused, create new tip. */
+    {
         new GraphicsToolTipLabel(text, item); /* Sets GraphicsToolTipLabel::instance to itself. */
         GraphicsToolTipLabel::instance->setOpacity(0.0);
         GraphicsToolTipLabel::instance->placeTip(scenePos, sceneRect);

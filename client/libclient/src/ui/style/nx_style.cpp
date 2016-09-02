@@ -736,12 +736,17 @@ void QnNxStyle::drawPrimitive(
 
         case PE_PanelTipLabel:
         {
-            static const int kToolTipRoundingRadius = 2.0;
             QnScopedPainterPenRollback penRollback(painter, QPen(option->palette.toolTipText(), 0));
             QnScopedPainterBrushRollback brushRollback(painter, option->palette.toolTipBase());
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
-            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5),
-                kToolTipRoundingRadius, kToolTipRoundingRadius);
+
+            static const int kToolTipRoundingRadius = 2.0;
+
+            /* Workaround to get the same visual radius in common paining and graphics scene: */
+            auto graphicsItem = qstyleoption_cast<const QStyleOptionGraphicsItem*>(option);
+            int radius = kToolTipRoundingRadius + (graphicsItem ? 1 : 0);
+
+            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5), radius, radius);
             return;
         }
 
