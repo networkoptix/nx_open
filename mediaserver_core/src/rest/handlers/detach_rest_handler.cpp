@@ -71,7 +71,7 @@ int QnDetachFromCloudRestHandler::execute(DetachFromCloudData data, const Qn::Us
         return nx_http::StatusCode::ok;
     }
 
-    // first of all, enable admin user and changing its password 
+    // first of all, enable admin user and changing its password
     //      so that there is always a way to connect to the system
     if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
@@ -102,7 +102,7 @@ int QnDetachFromCloudRestHandler::execute(DetachFromCloudData data, const Qn::Us
         return nx_http::StatusCode::ok;
     }
 
-    if (!m_cloudConnectionManager->cleanupCloudDataInLocalDB())
+    if (!m_cloudConnectionManager->cleanUpCloudDataInLocalDb())
     {
         NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         result.setError(
