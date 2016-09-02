@@ -163,32 +163,45 @@ QnTimePeriodList QnCachingCameraDataLoader::periods(Qn::TimePeriodContent timePe
     return m_cameraChunks[timePeriodType];
 }
 
-void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
+bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
+{
     QnAbstractCameraDataLoaderPtr loader = m_loaders[periodType];
     Q_ASSERT_X(loader, Q_FUNC_INFO, "Loader must always exists");
-    if(!loader) {
+    if(!loader)
+    {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
-        return;
+        return false;
     }
 
-    switch (periodType) {
-    case Qn::RecordingContent:
-        loader->load();
-        break;
-    case Qn::MotionContent:
-        if(!isMotionRegionsEmpty()) {
-            QString filter = QString::fromUtf8(QJson::serialized(m_motionRegions));
-            loader->load(filter);
-        } else if(!m_cameraChunks[Qn::MotionContent].isEmpty()) {
-            m_cameraChunks[Qn::MotionContent].clear();
-            emit periodsChanged(Qn::MotionContent);
-        }
-        break;
-    default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
-        break;
+    int handle = 0;
+    switch (periodType)
+    {
+        case Qn::RecordingContent:
+            handle = loader->load();
+            break;
+        case Qn::MotionContent:
+            if(!isMotionRegionsEmpty())
+            {
+                QString filter = QString::fromUtf8(QJson::serialized(m_motionRegions));
+                handle = loader->load(filter);
+            }
+            else if(!m_cameraChunks[Qn::MotionContent].isEmpty())
+            {
+                m_cameraChunks[Qn::MotionContent].clear();
+                emit periodsChanged(Qn::MotionContent);
+                return true;
+            }
+            break;
+        default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+            break;
     }
+
+    if (handle <= 0)
+        trace(lit("Loading failed"), periodType);
+
+    return handle > 0;
 }
 
 // -------------------------------------------------------------------------- //
@@ -235,8 +248,9 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodTy
             trace(lit("updateTimePeriods(forced)"), periodType);
         else
             trace(lit("updateTimePeriods(by timer)"), periodType);
-        loadInternal(periodType);
-        m_previousRequestTime[periodType].restart();
+
+        if (loadInternal(periodType))
+            m_previousRequestTime[periodType].restart();
     }
 }
 
