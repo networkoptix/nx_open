@@ -1,57 +1,39 @@
-/**********************************************************
-* Sep 3, 2015
-* NetworkOptix
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_API_RESULT_CODE_H
-#define NX_CDB_API_RESULT_CODE_H
+#pragma once
 
 #include <string>
 
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace cdb {
 namespace api {
 
-static const int CDB_API_ERROR_CODE_BASE = 100;
+static const int kErrorCodeBase = 100;
 
 enum class ResultCode
 {
     ok = 0,
-    /** Provided credentials are invalid */
-    notAuthorized = CDB_API_ERROR_CODE_BASE,
-
-    /** Requested operation is not allowed with credentials provided */
-    forbidden,
+    notAuthorized = kErrorCodeBase, //< Provided credentials are invalid.
+    forbidden, //< Requested operation is not allowed with credentials provided.
     accountNotActivated,
     accountBlocked,
-
     notFound,
     alreadyExists,
     dbError,
-    /** Network operation failed */
-    networkError,
+    networkError, //< Network operation failed.
     notImplemented,
     unknownRealm,
     badUsername,
     badRequest,
     invalidNonce,
     serviceUnavailable,
-
-    /** Credentials used for authentication are no longer valid */
-    credentialsRemovedPermanently,
-
-    /** received data in unexpected/unsupported format */
-    invalidFormat,
-
+    credentialsRemovedPermanently, //< Credentials used for authentication are no longer valid.
+    invalidFormat, //< Received data in unexpected/unsupported format.
     unknownError
 };
 
 std::string toString(ResultCode resultCode);
 
-}   //api
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_API_RESULT_CODE_H
+} // namespace api
+} // namespace cdb
+} // namespace nx
