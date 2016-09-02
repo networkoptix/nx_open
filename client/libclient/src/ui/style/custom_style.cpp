@@ -1,6 +1,7 @@
 #include "custom_style.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QElapsedTimer>
 #include <QtWidgets/QPushButton>
 
 #include <ui/style/generic_palette.h>
@@ -105,14 +106,14 @@ void fadeWidget(
             animationTimer->setSingleShot(false);
             animationTimer->start(animationStepMs);
 
-            qint64 startMs = QDateTime::currentMSecsSinceEpoch();
+            QElapsedTimer stopwatch;
+            stopwatch.start();
 
             QObject::connect(animationTimer, &QTimer::timeout, opacityEffect,
-                [animationTimer, opacityEffect, initialOpacity, targetOpacity, opacityPerMs, startMs, finishHandler]()
+                [animationTimer, opacityEffect, initialOpacity, targetOpacity, opacityPerMs, stopwatch, finishHandler]()
                 {
                     /* Compute new opacity: */
-                    qint64 timeMs = QDateTime::currentMSecsSinceEpoch() - startMs;
-                    auto opacity = initialOpacity + opacityPerMs * timeMs;
+                    auto opacity = initialOpacity + opacityPerMs * stopwatch.elapsed();
                     opacityEffect->setOpacity(qBound(0.0, opacity, 1.0));
 
                     /* Check if animation end is reached: */
