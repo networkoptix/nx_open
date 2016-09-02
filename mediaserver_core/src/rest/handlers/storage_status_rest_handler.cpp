@@ -36,17 +36,19 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
 
         storage->setUrl(storageUrl);
         storage->setSpaceLimit(spaceLimit);
-        if (!storage || !storage->initOrUpdate())
-            return CODE_INVALID_PARAMETER;
 
         if (!storage)
         {
             reply.status = Qn::StorageInit_CreateFailed;
-            return CODE_OK;
+            result.setReply(reply);
+            return nx_http::StatusCode::invalidParameter;
         }
 
-        switch(storage->initOrUpdate())
+        reply.status = storage->initOrUpdate();
+        if (reply.status != Qn::StorageInit_Ok)
         {
+            result.setReply(reply);
+            return nx_http::StatusCode::invalidParameter;
         }
     }
 
@@ -68,5 +70,5 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     }
 
     result.setReply(reply);
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }

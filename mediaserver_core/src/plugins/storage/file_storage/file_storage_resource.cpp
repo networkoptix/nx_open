@@ -169,10 +169,9 @@ qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
         return getTotalSpace();
     else if (url.contains("://"))
     {
-        valid = mountTmpDrive(url) == 0;
         {
             QnMutexLocker lock(&m_mutexCheckStorage);
-            m_valid = valid;
+            m_valid = mountTmpDrive(url) == Qn::StorageInit_Ok;
         }
         return getTotalSpace();
     }
