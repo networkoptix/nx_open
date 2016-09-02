@@ -44,7 +44,7 @@ QnActiResource::QnActiResource()
     setVendor(lit("ACTI"));
 
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
-        m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
+        m_availBitrate.push_back(DEFAULT_AVAIL_BITRATE_KBPS[i]);
 }
 
 QnActiResource::~QnActiResource()
@@ -252,7 +252,7 @@ QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) co
         if (bitrate.endsWith("M"))
             coeff = 1000;
         bitrate.chop(1);
-        result << bitrate.toFloat()*coeff;
+        result.push_back(bitrate.toFloat()*coeff);
     }
     return result;
 }
@@ -456,7 +456,10 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     auto bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())
+    {
         m_availBitrate = parseVideoBitrateCap(bitrateCap.toLatin1());
+        m_rawBitrate = bitrateCap.split(',');
+    }
 
     initializeIO(report);
 
@@ -668,6 +671,44 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
 int QnActiResource::getMaxFps() const
 {
     return m_availFps[0].last();
+}
+
+QString QnActiResource::formatBitrateString(int bitrateKbps) const
+{
+    if (bitrateKbps < 1000)
+    {
+        return lit("%1K").arg(bitrateKbps);
+    }
+    else
+    {
+        bool usePoint = true;
+
+        if (!m_rawBitrate.empty())
+        {
+            int bitrateIndex = -1;
+            for(size_t i=0; i < m_availBitrate.size(); ++i)
+            {
+                if (bitrateKbps == m_availBitrate[i])
+                {
+                    bitrateIndex = i;
+                    break;
+                }
+            }
+
+            if (bitrateIndex != -1 && m_rawBitrate.size() > bitrateIndex)
+            {
+                usePoint = m_rawBitrate[bitrateIndex].indexOf('.') != -1;
+            }
+        }
+
+        QString tpl = usePoint ? lit("%1.%2M") : lit("%1M");
+        QString result = tpl.arg(bitrateKbps/1000);
+
+        if(usePoint)
+            result = result.arg((bitrateKbps%1000)/100);
+
+        return result;
+    }
 }
 
 QSize QnActiResource::getResolution(Qn::ConnectionRole role) const

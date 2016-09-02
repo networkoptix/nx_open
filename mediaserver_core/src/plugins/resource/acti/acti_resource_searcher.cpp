@@ -99,7 +99,7 @@ UpnpDeviceInfo QnActiResourceSearcher::parseDeviceXml(
     input.setData(rawData);
     if(!xmlReader.parse(&input))
     {
-        outStatus = false;
+        *outStatus = false;
         return UpnpDeviceInfo();
     }
 
