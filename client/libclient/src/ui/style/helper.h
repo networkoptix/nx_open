@@ -39,6 +39,7 @@ namespace style
         static const QMargins kGroupBoxContentMargins;  /**< Group box content margins, frame width included */
         static const qreal kGroupBoxCornerRadius;       /**< Group box corner rounding radius */
         static const int kDefaultIconSize;              /**< Default size of UI icon */
+        static const int kToolTipHeight;                /**< Height of a single line tooltip */
     };
 
     class Hints

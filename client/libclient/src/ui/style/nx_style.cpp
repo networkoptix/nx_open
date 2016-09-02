@@ -46,6 +46,7 @@ namespace
 {
     const char* kDelegateClassBackupId = "delegateClass";
     const char* kViewportMarginsBackupId = "viewportMargins";
+    const char* kContentsMarginsBackupId = "contentsMargins";
 
     const char* kHoveredChildProperty = "_qn_hoveredChild";
 
@@ -733,6 +734,17 @@ void QnNxStyle::drawPrimitive(
             break;
         }
 
+        case PE_PanelTipLabel:
+        {
+            static const int kToolTipRoundingRadius = 2.0;
+            QnScopedPainterPenRollback penRollback(painter, QPen(option->palette.toolTipText(), 0));
+            QnScopedPainterBrushRollback brushRollback(painter, option->palette.toolTipBase());
+            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5),
+                kToolTipRoundingRadius, kToolTipRoundingRadius);
+            return;
+        }
+
         case PE_FrameGroupBox:
         {
             if (auto frame = qstyleoption_cast<const QStyleOptionFrame*>(option))
@@ -939,7 +951,7 @@ void QnNxStyle::drawPrimitive(
         }
 
         default:
-            return;
+            break;
     }
 
     base_type::drawPrimitive(element, option, painter, widget);
@@ -2939,6 +2951,9 @@ int QnNxStyle::pixelMetric(
         case PM_ToolBarIconSize:
             return dp(32);
 
+        case PM_ToolTipLabelFrameWidth:
+            return dp(1);
+
         case PM_SmallIconSize:
         case PM_ListViewIconSize:
         case PM_TabBarIconSize:
@@ -3117,6 +3132,27 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
+    /* Polish tooltips: */
+    if ((widget->windowFlags() & Qt::ToolTip) == Qt::ToolTip
+        && widget->contentsMargins().isNull()
+        && qobject_cast<QLabel*>(widget))
+    {
+        QnTypedPropertyBackup<QMargins, QWidget>::backup(widget, &QWidget::contentsMargins,
+            QN_SETTER(QWidget::setContentsMargins), kContentsMarginsBackupId);
+
+        int qtTooltipMargin = 1 + proxy()->pixelMetric(PM_ToolTipLabelFrameWidth, 0, widget);
+
+        int h = qMax(Metrics::kStandardPadding - qtTooltipMargin, 0);
+        int v = qMax((Metrics::kToolTipHeight - widget->fontMetrics().height() + 1) / 2
+            - qtTooltipMargin, 0);
+
+        widget->setContentsMargins(h, v, h, v);
+
+        /* To have rounded corners without using a window mask: */
+        widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
+        widget->setAttribute(Qt::WA_TranslucentBackground);
+    }
+
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
     {
         comboBox->setAttribute(Qt::WA_Hover);
@@ -3266,6 +3302,9 @@ void QnNxStyle::unpolish(QWidget* widget)
 
     if (qobject_cast<QPlainTextEdit*>(widget) || qobject_cast<QTextEdit*>(widget))
         QnAbstractPropertyBackup::restore(widget, kViewportMarginsBackupId);
+
+    if ((widget->windowFlags() & Qt::ToolTip) == Qt::ToolTip)
+        QnAbstractPropertyBackup::restore(widget, kContentsMarginsBackupId);
 
     QWidget* popupWithCustomizedShadow = nullptr;
 

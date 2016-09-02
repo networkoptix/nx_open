@@ -48,6 +48,8 @@ namespace style
     const qreal Metrics::kGroupBoxCornerRadius = dp(2.0);
     const int Metrics::kDefaultIconSize = 20;
 
+    const int Metrics::kToolTipHeight = 24;
+
     const qreal Hints::kDisabledItemOpacity = 0.3;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";

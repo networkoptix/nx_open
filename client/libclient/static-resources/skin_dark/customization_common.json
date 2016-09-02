@@ -118,8 +118,8 @@
                 "link":             "blue12",
                 "linkVisited":      "blue11",
                 "alternateBase":    "dark7",
-                "toolTipBase":      "#f0f0f0",
-                "toolTipText":      "#222222"
+                "toolTipBase":      "light4",
+                "toolTipText":      "dark4"
             },
             "disabled": {
                 "windowText":       "light16.setAlpha(75)",
@@ -139,8 +139,8 @@
                 "link":             "blue12.setAlpha(75)",
                 "linkVisited":      "blue11.setAlpha(75)",
                 "alternateBase":    "dark7.setAlpha(75)",
-                "toolTipBase":      "#f0f0f0",
-                "toolTipText":      "#222222"
+                "toolTipBase":      "light4",
+                "toolTipText":      "dark4"
             }
         }
     },
