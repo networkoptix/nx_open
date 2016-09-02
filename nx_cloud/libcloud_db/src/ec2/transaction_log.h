@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
@@ -160,6 +159,22 @@ public:
         return db::DBResult::ok;
     }
 
+    ::ec2::QnTranState getTransactionState(const nx::String& systemId) const;
+    /**
+     * Asynchronously reads requested transactions from Db.
+     * @param completionHandler is called within unspecified DB connection thread.
+     * In case of high load request can be cancelled internaly. 
+     * In this case \a api::ResultCode::retryLater will be reported
+     */
+    void readTransactions(
+        const nx::String& systemId,
+        const ::ec2::QnTranState& from,
+        const ::ec2::QnTranState& to,
+        int maxTransactionsToReturn,
+        nx::utils::MoveOnlyFunc<void(
+            api::ResultCode /*resultCode*/,
+            std::vector<nx::Buffer> /*serializedTransactions*/)> completionHandler);
+
 private:
     struct UpdateHistoryData
     {
@@ -188,9 +203,8 @@ private:
         /** map<peer, transport sequence> */
         std::map<::ec2::QnTranStateKey, int> lastTransportSeq;
         ::ec2::QnTranState transactionState;
-        int persistentSequence;
 
-        VmsTransactionLogData(): persistentSequence(0) {}
+        //VmsTransactionLogData(): persistentSequence(0) {}
     };
 
     struct DbTransactionContext
@@ -210,7 +224,7 @@ private:
     const QnUuid m_peerId;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     std::map<QSqlDatabase*, DbTransactionContext> m_dbTransactionContexts;
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
 
@@ -219,6 +233,13 @@ private:
     nx::db::DBResult fetchTransactionState(
         QSqlDatabase* connection,
         int* const /*dummyResult*/);
+    nx::db::DBResult TransactionLog::fetchTransactions(
+        QSqlDatabase* connection,
+        const nx::String& systemId,
+        const ::ec2::QnTranState& from,
+        const ::ec2::QnTranState& to,
+        int maxTransactionsToReturn,
+        std::vector<nx::Buffer>* const outputData);
     bool isShouldBeIgnored(
         QSqlDatabase* connection,
         const nx::String& systemId,
@@ -247,52 +268,6 @@ private:
     void onDbTransactionCompleted(
         QSqlDatabase* dbConnection,
         nx::db::DBResult dbResult);
-};
-
-/** 
- * Asynchronously reads transactions of specified system from log.
- * Returns data in specified format.
- */
-class TransactionLogReader
-:
-    public network::aio::BasicPollable
-{
-public:
-    TransactionLogReader(
-        TransactionLog* const transactionLog,
-        nx::String systemId,
-        Qn::SerializationFormat dataFormat);
-    ~TransactionLogReader();
-
-    virtual void stopWhileInAioThread() override;
-
-    void getTransactions(
-        const ::ec2::QnTranState& from,
-        const ::ec2::QnTranState& to,
-        int maxTransactionsToReturn,
-        nx::utils::MoveOnlyFunc<void(
-            api::ResultCode resultCode,
-            std::vector<nx::Buffer> serializedTransactions)> completionHandler);
-
-    // TODO: #ak following method MUST be asynchronous
-    ::ec2::QnTranState getCurrentState() const;
-
-    /**
-     * Called before returning ubjson-transaction to the caller.
-     * Handler is allowed to modify transaction. E.g., add transport header
-     */
-    void setOnUbjsonTransactionReady(
-        nx::utils::MoveOnlyFunc<void(nx::Buffer)> handler);
-    /**
-     * Called before returning JSON-transaction to the caller.
-     * Handler is allowed to modify transaction. E.g., add transport header
-     */
-    void setOnJsonTransactionReady(
-        nx::utils::MoveOnlyFunc<void(QJsonObject*)> handler);
-
-private:
-    nx::utils::MoveOnlyFunc<void(nx::Buffer)> m_onUbjsonTransactionReady;
-    nx::utils::MoveOnlyFunc<void(QJsonObject*)> m_onJsonTransactionReady;
 };
 
 } // namespace ec2

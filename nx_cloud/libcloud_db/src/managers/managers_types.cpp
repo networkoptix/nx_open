@@ -38,6 +38,9 @@ api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
         case nx::db::DBResult::notFound:
             return api::ResultCode::notFound;
 
+        case nx::db::DBResult::cancelled:
+            return api::ResultCode::retryLater;
+
         case nx::db::DBResult::ioError:
         case nx::db::DBResult::statementError:
             return api::ResultCode::dbError;

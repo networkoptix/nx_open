@@ -145,7 +145,7 @@ void TransactionTransport::processSpecialTransaction(
 
     //starting transactions delivery
     using namespace std::placeholders;
-    m_transactionLogReader->getTransactions(
+    m_transactionLogReader->readTransactions(
         m_remotePeerTranState,
         m_tranStateToSynchronizeTo,
         kMaxTransactionsPerIteration,

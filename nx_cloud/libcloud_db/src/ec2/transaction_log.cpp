@@ -3,6 +3,7 @@
 #include <QtSql/QSqlQuery>
 
 #include "outgoing_transaction_dispatcher.h"
+#include "managers/managers_types.h"
 
 namespace nx {
 namespace cdb {
@@ -13,10 +14,6 @@ QString toString(const ::ec2::QnAbstractTransaction& tran)
     return lit("seq %1, ts %2")
         .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
 }
-
-////////////////////////////////////////////////////////////
-//// class TransactionLog
-////////////////////////////////////////////////////////////
 
 TransactionLog::TransactionLog(
     const QnUuid& peerId,
@@ -51,6 +48,39 @@ void TransactionLog::startDbTransaction(
         {
             onDbUpdateCompleted(dbConnection, dbResult);
             onDbTransactionCompleted(dbConnection, dbResult);
+        });
+}
+
+::ec2::QnTranState TransactionLog::getTransactionState(const nx::String& systemId) const
+{
+    QnMutexLocker lk(&m_mutex);
+    const auto it = m_systemIdToTransactionLog.find(systemId);
+    if (it == m_systemIdToTransactionLog.cend())
+        return ::ec2::QnTranState();
+    return it->second.transactionState;
+}
+
+void TransactionLog::readTransactions(
+    const nx::String& systemId,
+    const ::ec2::QnTranState& from,
+    const ::ec2::QnTranState& to,
+    int maxTransactionsToReturn,
+    nx::utils::MoveOnlyFunc<void(
+        api::ResultCode /*resultCode*/,
+        std::vector<nx::Buffer> /*serializedTransactions*/)> completionHandler)
+{
+    using namespace std::placeholders;
+
+    m_dbManager->executeSelect<std::vector<nx::Buffer>>(
+        std::bind(
+            &TransactionLog::fetchTransactions, this,
+            _1, systemId, from, to, maxTransactionsToReturn, _2),
+        [completionHandler = std::move(completionHandler)](
+            QSqlDatabase* /*connection*/,
+            nx::db::DBResult dbResult,
+            std::vector<nx::Buffer> outputData)
+        {
+            completionHandler(fromDbResultCode(dbResult), std::move(outputData));
         });
 }
 
@@ -120,6 +150,18 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
             UpdateHistoryData{tranStateKey, timestamp};
     }
 
+    return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult TransactionLog::fetchTransactions(
+    QSqlDatabase* connection,
+    const nx::String& systemId,
+    const ::ec2::QnTranState& from,
+    const ::ec2::QnTranState& to,
+    int maxTransactionsToReturn,
+    std::vector<nx::Buffer>* const outputData)
+{
+    // TODO: 
     return nx::db::DBResult::ok;
 }
 
@@ -366,62 +408,6 @@ void TransactionLog::onDbTransactionCompleted(
         m_outgoingTransactionDispatcher->dispatchTransaction(
             currentDbTranContext.systemId,
             std::move(tran));
-}
-
-////////////////////////////////////////////////////////////
-//// class TransactionLogReader
-////////////////////////////////////////////////////////////
-
-TransactionLogReader::TransactionLogReader(
-    TransactionLog* const transactionLog,
-    nx::String systemId,
-    Qn::SerializationFormat dataFormat)
-{
-    // TODO:
-}
-
-TransactionLogReader::~TransactionLogReader()
-{
-    stopWhileInAioThread();
-}
-
-void TransactionLogReader::stopWhileInAioThread()
-{
-    // TODO:
-}
-
-void TransactionLogReader::getTransactions(
-    const ::ec2::QnTranState& /*from*/,
-    const ::ec2::QnTranState& /*to*/,
-    int /*maxTransactionsToReturn*/,
-    nx::utils::MoveOnlyFunc<void(
-        api::ResultCode /*resultCode*/,
-        std::vector<nx::Buffer> /*serializedTransactions*/)> completionHandler)
-{
-    // TODO:
-    post(
-        [completionHandler = std::move(completionHandler)]()
-        {
-            completionHandler(api::ResultCode::ok, std::vector<nx::Buffer>());
-        });
-}
-
-::ec2::QnTranState TransactionLogReader::getCurrentState() const
-{
-    // TODO:
-    return ::ec2::QnTranState();
-}
-
-void TransactionLogReader::setOnUbjsonTransactionReady(
-    nx::utils::MoveOnlyFunc<void(nx::Buffer)> handler)
-{
-    m_onUbjsonTransactionReady = std::move(handler);
-}
-
-void TransactionLogReader::setOnJsonTransactionReady(
-    nx::utils::MoveOnlyFunc<void(QJsonObject*)> handler)
-{
-    m_onJsonTransactionReady = std::move(handler);
 }
 
 } // namespace ec2
