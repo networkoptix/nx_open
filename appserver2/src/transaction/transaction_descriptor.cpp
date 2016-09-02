@@ -10,6 +10,7 @@
 
 #include <nx_ec/data/api_tran_state_data.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"

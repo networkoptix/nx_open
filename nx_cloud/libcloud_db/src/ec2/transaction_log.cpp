@@ -111,7 +111,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
             QnUuid::fromStringSafe(dbGuid));
 
         VmsTransactionLogData& vmsTranLog = m_systemIdToTransactionLog[systemId];
-        if (vmsTranLog.systemId.empty())
+       if (vmsTranLog.systemId.isEmpty())
             vmsTranLog.systemId = systemId;
         qint32& persistentSequence = vmsTranLog.transactionState.values[tranStateKey];
         if (persistentSequence < sequence)
