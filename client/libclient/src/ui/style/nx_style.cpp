@@ -2519,9 +2519,12 @@ QRect QnNxStyle::subElementRect(
                 QRect rect = base_type::subElementRect(subElement, option, widget);
 
                 if (tabShape(tabWidget->tabBar()) == TabShape::Compact)
-                    rect.adjust(-hspace + kCompactTabFocusMargin, 0, -hspace + kCompactTabFocusMargin, 0);
+                    rect.moveLeft(rect.left() - hspace + kCompactTabFocusMargin);
                 else
-                    rect.adjust(hspace, 0, hspace, 0);
+                    rect.moveLeft(rect.left() + hspace);
+
+                int indent = tabWidget->property(Properties::kTabBarIndent).toInt();
+                rect.moveLeft(rect.left() + indent);
 
                 if (rect.right() > option->rect.right())
                     rect.setRight(option->rect.right());

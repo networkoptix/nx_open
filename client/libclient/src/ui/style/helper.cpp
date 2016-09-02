@@ -63,6 +63,7 @@ namespace style
     const char* Properties::kSideIndentation = "_qn_sideIndentation";
     const char* Properties::kCheckBoxAsButton = "_qn_checkBoxAsButton";
     const char* Properties::kButtonMarginProperty = "_qn_buttonMargin";
+    const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
 
     qreal dpr(qreal value)
     {
