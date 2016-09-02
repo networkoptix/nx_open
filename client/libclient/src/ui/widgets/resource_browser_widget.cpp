@@ -42,6 +42,7 @@
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/text_edit_label.h>
@@ -242,7 +243,14 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setWorkbench(workbench());
     ui->searchTreeWidget->setWorkbench(workbench());
 
+    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
+    ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
     ui->tabWidget->tabBar()->setMaximumHeight(32);
+
+    //TODO: #vkutin Change to something more adequate:
+    QColor color = palette().color(QPalette::Shadow);
+    color.setAlphaF(0.4);
+    setPaletteColor(ui->tabWidget, QPalette::Window, color);
 
     connect(workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
