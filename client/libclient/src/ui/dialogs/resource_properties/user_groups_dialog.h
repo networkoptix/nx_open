@@ -2,7 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnUserGroupSettingsWidget;
 class QnPermissionsWidget;
@@ -15,11 +15,11 @@ namespace Ui
     class UserGroupsDialog;
 }
 
-class QnUserGroupsDialog: public QnWorkbenchStateDependentTabbedDialog
+class QnUserGroupsDialog: public QnSessionAwareTabbedDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentTabbedDialog base_type;
+    typedef QnSessionAwareTabbedDialog base_type;
 
 public:
     enum DialogPage

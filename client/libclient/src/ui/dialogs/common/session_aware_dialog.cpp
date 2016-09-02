@@ -1,35 +1,35 @@
-#include "workbench_state_dependent_dialog.h"
+#include "session_aware_dialog.h"
 
 /************************************************************************/
-/* QnWorkbenchStateDependentButtonBoxDialog                             */
+/* QnSessionAwareButtonBoxDialog                             */
 /************************************************************************/
-QnWorkbenchStateDependentButtonBoxDialog::QnWorkbenchStateDependentButtonBoxDialog(QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/)
+QnSessionAwareButtonBoxDialog::QnSessionAwareButtonBoxDialog(QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/)
     : base_type(parent, windowFlags)
-    , QnWorkbenchStateDelegate(parent)
+    , QnSessionAwareDelegate(parent)
 {
 }
 
-bool QnWorkbenchStateDependentButtonBoxDialog::tryClose(bool force) {
+bool QnSessionAwareButtonBoxDialog::tryClose(bool force) {
     base_type::reject();
     if (force)
         base_type::hide();
     return true;
 }
 
-void QnWorkbenchStateDependentButtonBoxDialog::forcedUpdate() {
+void QnSessionAwareButtonBoxDialog::forcedUpdate() {
     retranslateUi();
     tryClose(true);
 }
 
 /************************************************************************/
-/* QnWorkbenchStateDependentTabbedDialog                                */
+/* QnSessionAwareTabbedDialog                                */
 /************************************************************************/
-QnWorkbenchStateDependentTabbedDialog::QnWorkbenchStateDependentTabbedDialog( QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/ )
+QnSessionAwareTabbedDialog::QnSessionAwareTabbedDialog( QWidget *parent /* = NULL*/, Qt::WindowFlags windowFlags /* = 0*/ )
     : base_type(parent, windowFlags)
-    , QnWorkbenchStateDelegate(parent)
+    , QnSessionAwareDelegate(parent)
 {}
 
-bool QnWorkbenchStateDependentTabbedDialog::tryClose( bool force ) {
+bool QnSessionAwareTabbedDialog::tryClose( bool force ) {
     if (force)
         return forcefullyClose();
 
@@ -57,12 +57,12 @@ bool QnWorkbenchStateDependentTabbedDialog::tryClose( bool force ) {
 }
 
 
-void QnWorkbenchStateDependentTabbedDialog::forcedUpdate() {
+void QnSessionAwareTabbedDialog::forcedUpdate() {
     loadDataToUi();
 }
 
 
-QDialogButtonBox::StandardButton QnWorkbenchStateDependentTabbedDialog::showConfirmationDialog() {
+QDialogButtonBox::StandardButton QnSessionAwareTabbedDialog::showConfirmationDialog() {
     auto confirmMessageText = [this]{
         QStringList details;
         for(const Page &page: modifiedPages())

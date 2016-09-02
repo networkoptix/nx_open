@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ui/dialogs/common/button_box_dialog.h>
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui
 {
@@ -10,11 +10,11 @@ namespace Ui
 
 class QnLinkToCloudDialogPrivate;
 
-class QnLinkToCloudDialog : public QnWorkbenchStateDependentButtonBoxDialog
+class QnLinkToCloudDialog : public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     explicit QnLinkToCloudDialog(QWidget* parent = nullptr);

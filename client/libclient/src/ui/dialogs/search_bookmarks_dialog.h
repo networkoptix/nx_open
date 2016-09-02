@@ -1,12 +1,12 @@
 #pragma once
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnSearchBookmarksDialogPrivate;
 
-class QnSearchBookmarksDialog: public QnWorkbenchStateDependentButtonBoxDialog
+class QnSearchBookmarksDialog: public QnSessionAwareButtonBoxDialog
 {
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
     QnSearchBookmarksDialog(const QString &filterText
         , qint64 utcStartTimeMs

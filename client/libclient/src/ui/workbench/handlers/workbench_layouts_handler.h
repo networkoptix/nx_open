@@ -7,7 +7,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchStateDelegate;
+class QnSessionAwareDelegate;
 
 class QnWorkbenchLayoutsHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -91,7 +91,7 @@ private:
 
     void at_layout_saved(bool success, const QnLayoutResourcePtr &layout);
 private:
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
+    QScopedPointer<QnSessionAwareDelegate> m_workbenchStateDelegate;
 
     /** Flag that we are in layouts closing process. */
     bool m_closingLayouts;

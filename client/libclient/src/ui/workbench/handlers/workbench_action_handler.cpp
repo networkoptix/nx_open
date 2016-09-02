@@ -1513,7 +1513,7 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
 
     QScopedPointer<QnMediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnWorkbenchStateDependentDialog<QnMediaFileSettingsDialog>(mainWindow()));
+        dialog.reset(new QnSessionAwareDialog<QnMediaFileSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
 
@@ -2161,8 +2161,8 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
 
     QString message = messageParts.join(lit("<br/>"));
 
-    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
-        new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
+    QScopedPointer<QnSessionAwareMessageBox> messageBox(
+        new QnSessionAwareMessageBox(mainWindow()));
     messageBox->setIcon(QnMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);

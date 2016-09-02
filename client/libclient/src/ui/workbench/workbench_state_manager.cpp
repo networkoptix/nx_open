@@ -34,7 +34,7 @@ bool QnWorkbenchStateManager::tryClose(bool force)
         qnStatisticsManager->saveCurrentStatistics();
     }
 
-    for (QnWorkbenchStateDelegate *d: m_delegates)
+    for (QnSessionAwareDelegate *d: m_delegates)
         if (!d->tryClose(force))
             return false;
 
@@ -49,29 +49,29 @@ bool QnWorkbenchStateManager::tryClose(bool force)
     return true;
 }
 
-void QnWorkbenchStateManager::registerDelegate(QnWorkbenchStateDelegate* d)
+void QnWorkbenchStateManager::registerDelegate(QnSessionAwareDelegate* d)
 {
     m_delegates << d;
 }
 
-void QnWorkbenchStateManager::unregisterDelegate(QnWorkbenchStateDelegate* d)
+void QnWorkbenchStateManager::unregisterDelegate(QnSessionAwareDelegate* d)
 {
     m_delegates.removeOne(d);
 }
 
 void QnWorkbenchStateManager::forcedUpdate()
 {
-    for (QnWorkbenchStateDelegate *d : m_delegates)
+    for (QnSessionAwareDelegate *d : m_delegates)
         d->forcedUpdate();
 }
 
-QnWorkbenchStateDelegate::QnWorkbenchStateDelegate(QObject *parent /* = NULL*/) :
+QnSessionAwareDelegate::QnSessionAwareDelegate(QObject *parent /* = NULL*/) :
     QnWorkbenchContextAware(parent)
 {
     context()->instance<QnWorkbenchStateManager>()->registerDelegate(this);
 }
 
-QnWorkbenchStateDelegate::~QnWorkbenchStateDelegate()
+QnSessionAwareDelegate::~QnSessionAwareDelegate()
 {
     context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(this);
 }

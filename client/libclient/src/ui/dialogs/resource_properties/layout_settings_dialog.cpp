@@ -510,7 +510,7 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
 
     QScopedPointer<QnCustomFileDialog> dialog(
-        new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (
+        new QnSessionAwareDialog<QnCustomFileDialog> (
             this, tr("Select file..."),
             qnSettings->backgroundsFolder(),
             tr("Pictures %1").arg(nameFilter)
