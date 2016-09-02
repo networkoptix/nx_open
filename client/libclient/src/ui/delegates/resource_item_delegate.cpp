@@ -443,17 +443,28 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         return;
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (!resource)
-        return;
-
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
     if (nodeType == Qn::VideoWallItemNode)
     {
+        if (!resource)
+            return;
         extInfo = kCustomExtInfoTemplate.arg(resource->getName());
+    }
+    else if (nodeType == Qn::RecorderNode)
+    {
+        auto firstChild = index.model()->index(0, 0, index);
+        NX_ASSERT(firstChild.isValid());
+        if (!firstChild.isValid())
+            return;
+        QnResourcePtr resource = firstChild.data(Qn::ResourceRole).value<QnResourcePtr>();
+        extInfo = QnResourceDisplayInfo(resource).extraInfo();
     }
     else
     {
+        if (!resource)
+            return;
+
         QnResourceDisplayInfo info(resource);
         extInfo = info.extraInfo();
 
