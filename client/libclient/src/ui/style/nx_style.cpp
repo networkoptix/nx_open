@@ -740,13 +740,10 @@ void QnNxStyle::drawPrimitive(
             QnScopedPainterBrushRollback brushRollback(painter, option->palette.toolTipBase());
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
-            static const int kToolTipRoundingRadius = 2.0;
+            static const qreal kToolTipRoundingRadius = 2.5;
+            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5),
+                kToolTipRoundingRadius, kToolTipRoundingRadius);
 
-            /* Workaround to get the same visual radius in common paining and graphics scene: */
-            auto graphicsItem = qstyleoption_cast<const QStyleOptionGraphicsItem*>(option);
-            int radius = kToolTipRoundingRadius + (graphicsItem ? 1 : 0);
-
-            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5), radius, radius);
             return;
         }
 
