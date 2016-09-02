@@ -34,9 +34,9 @@
 #include <ui/style/custom_style.h>
 
 
-QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
+QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     QTabBar(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     m_submit(false),
     m_update(false),
     m_midClickedTab(-1)
@@ -49,40 +49,48 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     setElideMode(Qt::ElideRight);
     setTabShape(this, style::TabShape::Rectangular);
 
-    connect(this, SIGNAL(currentChanged(int)),      this, SLOT(at_currentChanged(int)));
-    connect(this, SIGNAL(tabCloseRequested(int)),   this, SLOT(at_tabCloseRequested(int)));
-    connect(this, SIGNAL(tabMoved(int, int)),       this, SLOT(at_tabMoved(int, int)));
+    connect(this, &QTabBar::currentChanged,     this, &QnLayoutTabBar::at_currentChanged);
+    connect(this, &QTabBar::tabCloseRequested,  this, &QnLayoutTabBar::at_tabCloseRequested);
+    connect(this, &QTabBar::tabMoved,           this, &QnLayoutTabBar::at_tabMoved);
 
     /* Connect to context. */
     at_workbench_layoutsChanged();
     at_workbench_currentLayoutChanged();
 
-    connect(workbench(),        SIGNAL(layoutsChanged()),                           this, SLOT(at_workbench_layoutsChanged()));
-    connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
-    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
+    connect(workbench(), &QnWorkbench::layoutsChanged, this,
+        &QnLayoutTabBar::at_workbench_layoutsChanged);
+    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+        &QnLayoutTabBar::at_workbench_currentLayoutChanged);
+    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
+        &QnLayoutTabBar::at_snapshotManager_flagsChanged);
 
     m_submit = m_update = true;
 }
 
-QnLayoutTabBar::~QnLayoutTabBar() {
-    disconnect(workbench(), NULL, this, NULL);
-    disconnect(snapshotManager(), NULL, this, NULL);
+QnLayoutTabBar::~QnLayoutTabBar()
+{
+    disconnect(workbench(), nullptr, this, nullptr);
+    disconnect(snapshotManager(), nullptr, this, nullptr);
 
     m_submit = m_update = false;
-    while(count() > 0)
+    while (count() > 0)
         removeTab(count() - 1);
 }
 
-void QnLayoutTabBar::checkInvariants() const {
+void QnLayoutTabBar::checkInvariants() const
+{
     NX_ASSERT(m_layouts.size() == count());
 
-    if(workbench() && m_submit && m_update) {
+    if (workbench() && m_submit && m_update)
+    {
         NX_ASSERT(workbench()->layouts() == m_layouts);
-        NX_ASSERT(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex() || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
+        NX_ASSERT(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex()
+            || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
     }
 }
 
-Qn::ActionScope QnLayoutTabBar::currentScope() const {
+Qn::ActionScope QnLayoutTabBar::currentScope() const
+{
     return Qn::TitleBarScope;
 }
 
@@ -94,34 +102,38 @@ QnActionParameters QnLayoutTabBar::currentParameters(Qn::ActionScope scope) cons
     QnWorkbenchLayoutList result;
 
     int currentIndex = this->currentIndex();
-    if(currentIndex >= 0 && currentIndex < m_layouts.size())
+    if (currentIndex >= 0 && currentIndex < m_layouts.size())
         result.push_back(m_layouts[currentIndex]);
 
     return QnActionParameters(result);
 }
 
-void QnLayoutTabBar::submitCurrentLayout() {
-    if(!m_submit)
+void QnLayoutTabBar::submitCurrentLayout()
+{
+    if (!m_submit)
         return;
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_update, false)
+        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
         workbench()->setCurrentLayout(currentIndex() == -1 ? NULL : m_layouts[currentIndex()]);
     }
 
     checkInvariants();
 }
 
-QString QnLayoutTabBar::layoutText(QnWorkbenchLayout *layout) const {
-    if(layout == NULL)
+QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
+{
+    if (!layout)
         return QString();
 
     QnLayoutResourcePtr resource = layout->resource();
-    return layout->name() + (snapshotManager()->isModified(resource) ? QLatin1String("*") : QString());
+    return layout->name()
+        + (snapshotManager()->isModified(resource) ? L'*' : QChar());
 }
 
-QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
-    if(!layout)
+QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
+{
+    if (!layout)
         return QIcon();
 
     QIcon layoutIcon = layout->data(Qt::DecorationRole).value<QIcon>();
@@ -134,12 +146,14 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
 
     // videowall control mode
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
-    if (!videoWallInstanceGuid.isNull()) {
+    if (!videoWallInstanceGuid.isNull())
+    {
         QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
         if (idx.isNull())
             return QIcon();
 
-        if (idx.item().runtimeStatus.online) {
+        if (idx.item().runtimeStatus.online)
+        {
             if (idx.item().runtimeStatus.controlledBy.isNull())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
             if (idx.item().runtimeStatus.controlledBy == qnCommon->moduleGUID())
@@ -156,7 +170,8 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
     return QIcon();
 }
 
-void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
+void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout)
+{
     int idx = m_layouts.indexOf(layout);
     QString oldText = tabText(idx);
     QString newText = layoutText(layout);
@@ -167,7 +182,8 @@ void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
     emit tabTextChanged();
 }
 
-void QnLayoutTabBar::updateTabIcon(QnWorkbenchLayout *layout) {
+void QnLayoutTabBar::updateTabIcon(QnWorkbenchLayout *layout)
+{
     setTabIcon(m_layouts.indexOf(layout), layoutIcon(layout));
 }
 
@@ -175,26 +191,30 @@ void QnLayoutTabBar::updateTabIcon(QnWorkbenchLayout *layout) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-QSize QnLayoutTabBar::minimumSizeHint() const {
+QSize QnLayoutTabBar::minimumSizeHint() const
+{
     int d = 2 * style()->pixelMetric(QStyle::PM_TabBarScrollButtonWidth, NULL, this);
-    switch(shape()) {
-    case RoundedNorth:
-    case RoundedSouth:
-    case TriangularNorth:
-    case TriangularSouth:
-        return QSize(d, sizeHint().height());
-    case RoundedWest:
-    case RoundedEast:
-    case TriangularWest:
-    case TriangularEast:
-        return QSize(sizeHint().width(), d);
-    default:
-        return QSize(); /* Just to make the compiler happy. */
+    switch (shape())
+    {
+        case RoundedNorth:
+        case RoundedSouth:
+        case TriangularNorth:
+        case TriangularSouth:
+            return QSize(d, sizeHint().height());
+        case RoundedWest:
+        case RoundedEast:
+        case TriangularWest:
+        case TriangularEast:
+            return QSize(sizeHint().width(), d);
+        default:
+            return QSize(); /* Just to make the compiler happy. */
     }
 }
 
-void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
-    if(!context() || !context()->menu()) {
+void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event)
+{
+    if (!context() || !context()->menu())
+    {
         qnWarning("Requesting context menu for a layout tab bar while no menu manager instance is available.");
         return;
     }
@@ -204,11 +224,11 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
 
     QnWorkbenchLayoutList target;
     int index = tabAt(event->pos());
-    if(index >= 0 && index < m_layouts.size())
+    if (index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
 
     QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, nullptr, target));
-    if(menu->isEmpty())
+    if (menu->isEmpty())
         return;
 
     /**
@@ -219,17 +239,23 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
-void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
-    if (event->button() == Qt::MiddleButton) {
+void QnLayoutTabBar::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::MiddleButton)
+    {
         m_midClickedTab = tabAt(event->pos());
-    } else { /* QTabBar ignores event if MiddleButton was clicked. */
+    }
+    else
+    { /* QTabBar ignores event if MiddleButton was clicked. */
         QTabBar::mousePressEvent(event);
     }
     event->accept();
 }
 
-void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
-    if (event->button() == Qt::MiddleButton) {
+void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::MiddleButton)
+    {
         if (m_midClickedTab >= 0 && m_midClickedTab == tabAt(event->pos()))
             emit tabCloseRequested(m_midClickedTab);
         m_midClickedTab = -1;
@@ -244,28 +270,33 @@ void QnLayoutTabBar::showEvent(QShowEvent* event)
     updateGeometry();
 }
 
-void QnLayoutTabBar::at_workbench_layoutsChanged() {
-    if(!m_update)
+void QnLayoutTabBar::at_workbench_layoutsChanged()
+{
+    if (!m_update)
         return;
 
     const QList<QnWorkbenchLayout *> &layouts = workbench()->layouts();
-    if(m_layouts == layouts)
+    if (m_layouts == layouts)
         return;
 
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
-        for(int i = 0; i < layouts.size(); i++) {
+        for (int i = 0; i < layouts.size(); i++)
+        {
             int index = m_layouts.indexOf(layouts[i]);
-            if(index == -1) {
+            if (index == -1)
+            {
                 m_layouts.insert(i, layouts[i]);
                 insertTab(i, layoutIcon(layouts[i]), layoutText(layouts[i]));
-            } else {
+            }
+            else
+            {
                 moveTab(index, i);
             }
         }
 
-        while(count() > layouts.size())
+        while (count() > layouts.size())
             removeTab(count() - 1);
 
         /* Force parent widget layout recalculation: */
@@ -279,14 +310,15 @@ void QnLayoutTabBar::at_workbench_layoutsChanged() {
     checkInvariants();
 }
 
-void QnLayoutTabBar::at_workbench_currentLayoutChanged() {
-    if(!m_update)
+void QnLayoutTabBar::at_workbench_currentLayoutChanged()
+{
+    if (!m_update)
         return;
 
     /* It is important to check indices equality because it will also work
      * for invalid current index (-1). */
     int newCurrentIndex = workbench()->layoutIndex(workbench()->currentLayout());
-    if(currentIndex() == newCurrentIndex)
+    if (currentIndex() == newCurrentIndex)
         return;
 
     {
@@ -297,37 +329,43 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged() {
     checkInvariants();
 }
 
-void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
+void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource)
+{
     updateTabText(QnWorkbenchLayout::instance(resource));
 }
 
-void QnLayoutTabBar::tabInserted(int index) {
+void QnLayoutTabBar::tabInserted(int index)
+{
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
         QString name;
-        if(m_layouts.size() != count()) { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
+        if (m_layouts.size() != count())
+        { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
             QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
             m_layouts.insert(index, layout);
             name = tabText(index);
         }
 
         QnWorkbenchLayout *layout = m_layouts[index];
-        connect(layout, &QnWorkbenchLayout::nameChanged,    this, [this, layout] {
+        connect(layout, &QnWorkbenchLayout::nameChanged, this, [this, layout]
+        {
             updateTabText(layout);
         });
-        connect(layout, &QnWorkbenchLayout::lockedChanged,  this, [this, layout] {
+        connect(layout, &QnWorkbenchLayout::lockedChanged, this, [this, layout]
+        {
             updateTabIcon(layout);
         });
-        connect(layout, &QnWorkbenchLayout::titleChanged,   this, [this, layout] {
+        connect(layout, &QnWorkbenchLayout::titleChanged, this, [this, layout]
+        {
             updateTabText(layout);
             updateTabIcon(layout);
         });
 
-        if(!name.isNull())
+        if (!name.isNull())
             layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */
 
-        if(m_submit)
+        if (m_submit)
             workbench()->insertLayout(layout, index);
         submitCurrentLayout();
     }
@@ -336,7 +374,8 @@ void QnLayoutTabBar::tabInserted(int index) {
     setMovable(count() > 1);
 }
 
-void QnLayoutTabBar::tabRemoved(int index) {
+void QnLayoutTabBar::tabRemoved(int index)
+{
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
@@ -346,7 +385,7 @@ void QnLayoutTabBar::tabRemoved(int index) {
         m_layouts.removeAt(index);
         submitCurrentLayout();
 
-        if(m_submit)
+        if (m_submit)
             workbench()->removeLayout(layout);
     }
 
@@ -354,28 +393,31 @@ void QnLayoutTabBar::tabRemoved(int index) {
     setMovable(count() > 1);
 }
 
-void QnLayoutTabBar::at_tabMoved(int from, int to) {
+void QnLayoutTabBar::at_tabMoved(int from, int to)
+{
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
         QnWorkbenchLayout *layout = m_layouts[from];
         m_layouts.move(from, to);
 
-        if(m_submit)
+        if (m_submit)
             workbench()->moveLayout(layout, to);
     }
 
     checkInvariants();
 }
 
-void QnLayoutTabBar::at_tabCloseRequested(int index) {
+void QnLayoutTabBar::at_tabCloseRequested(int index)
+{
     emit closeRequested(m_layouts[index]);
 }
 
-void QnLayoutTabBar::at_currentChanged(int index) {
+void QnLayoutTabBar::at_currentChanged(int index)
+{
     Q_UNUSED(index);
 
-    if(m_layouts.size() != count())
+    if (m_layouts.size() != count())
         return; /* Was called from add/remove function before our handler was able to sync, current layout will be updated later. */
 
     submitCurrentLayout();
