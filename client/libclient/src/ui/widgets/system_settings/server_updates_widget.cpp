@@ -109,8 +109,13 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
 
     connect(ui->updateButton, &QPushButton::clicked, this, [this]()
     {
-        if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+            return;
+
+        if (m_localFileName.isEmpty())
             m_updateTool->startUpdate(m_targetVersion);
+        else
+            m_updateTool->startUpdate(m_localFileName);
     });
 
     connect(ui->refreshButton, &QPushButton::clicked, this, [this]()
