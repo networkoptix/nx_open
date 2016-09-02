@@ -122,7 +122,6 @@
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
-#include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
@@ -622,10 +621,6 @@ void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered()
 
     action(QnActions::OpenCurrentUserLayoutMenu)->setMenu(
         m_currentUserLayoutsMenu.data());
-}
-
-void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
-    action(QnActions::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
