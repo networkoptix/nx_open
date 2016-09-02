@@ -151,7 +151,7 @@ public:
                 std::move(serializedTransaction));
 
         // Saving transactions, generated under current DB transaction,
-        //  so that we can send "new transaction" notifications after commit
+        //  so that we can send "new transaction" notifications after commit.
         QnMutexLocker lk(&m_mutex);
         DbTransactionContext& dbTranContext = m_dbTransactionContexts[connection];
         dbTranContext.systemId = systemId;
@@ -184,7 +184,7 @@ private:
     {
         nx::String systemId;
         /** map<transaction hash, peer which updated transaction> */
-        std::map<QByteArray, UpdateHistoryData> transactionHashToUpdateAuthor;
+        std::map<nx::Buffer, UpdateHistoryData> transactionHashToUpdateAuthor;
         /** map<peer, transport sequence> */
         std::map<::ec2::QnTranStateKey, int> lastTransportSeq;
         ::ec2::QnTranState transactionState;
@@ -215,7 +215,10 @@ private:
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
 
     /** Fills transaction state cache. Throws in case of error. */
-    void fillCache();
+    nx::db::DBResult fillCache();
+    nx::db::DBResult fetchTransactionState(
+        QSqlDatabase* connection,
+        int* const /*dummyResult*/);
     bool isShouldBeIgnored(
         QSqlDatabase* connection,
         const nx::String& systemId,
