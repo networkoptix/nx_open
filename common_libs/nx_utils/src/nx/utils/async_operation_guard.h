@@ -22,6 +22,7 @@ class NX_UTILS_API AsyncOperationGuard
 {
 public:
     AsyncOperationGuard();
+    /** Blocks while \a SharedGuard::Lock instance is alive. */
     ~AsyncOperationGuard();
 
     /** The guard shall be passed in every async operation handler to be able to
