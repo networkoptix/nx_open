@@ -19,6 +19,7 @@
 
 int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
+    QnStorageStatusReply reply;
     QString storageUrl;
     if(!requireParameter(params, lit("path"), result, &storageUrl))
         return CODE_INVALID_PARAMETER;
@@ -37,12 +38,21 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
         storage->setSpaceLimit(spaceLimit);
         if (!storage || !storage->initOrUpdate())
             return CODE_INVALID_PARAMETER;
+
+        if (!storage)
+        {
+            reply.status = Qn::StorageInit_CreateFailed;
+            return CODE_OK;
+        }
+
+        switch(storage->initOrUpdate())
+        {
+        }
     }
 
     NX_ASSERT(storage, Q_FUNC_INFO, "Storage must exist here");
     bool exists = !storage.isNull();
 
-    QnStorageStatusReply reply;
     reply.pluginExists = exists;
     reply.storage.url  = storageUrl;
 

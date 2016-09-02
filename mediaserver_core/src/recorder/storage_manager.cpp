@@ -109,8 +109,7 @@ bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath)
     }
     else if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
     {
-        QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        dbFolderPath = fileStorage ? fileStorage->getLocalPath() : storage->getPath();
+        dbFolderPath = storage->getPath();
         return true;
     }
     return false;

@@ -93,10 +93,10 @@ QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
 {
     QList<QString> storagePaths;
     for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>())
-        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
     for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>())
-        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
     return storagePaths;
 }

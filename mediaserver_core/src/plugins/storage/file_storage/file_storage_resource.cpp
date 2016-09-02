@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <array>
 
 #include <QtCore/QDir>
 
@@ -168,7 +169,7 @@ qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
         return getTotalSpace();
     else if (url.contains("://"))
     {
-        valid = mountTmpDrive() == 0;
+        valid = mountTmpDrive(url) == 0;
         {
             QnMutexLocker lock(&m_mutexCheckStorage);
             m_valid = valid;
@@ -179,33 +180,31 @@ qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
     return getDiskTotalSpace(getPath());
 }
 
-bool QnFileStorageResource::initOrUpdateInternal() const
+Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal() const
 {
-    QString url;
-    bool valid;
-    {
-        QnMutexLocker lock(&m_mutexCheckStorage);
-        url = getUrl();
-        if (url.isEmpty())
-            return false;
-        valid = m_valid;
-    }
+    if (m_valid)
+        return Qn::StorageInit_Ok;
 
-    if (valid)
-        return true;
-    else if (url.contains("://"))
-        valid = mountTmpDrive() == 0; // true if no error code
+    Qn::StorageInitResult result = Qn::StorageInit_CreateFailed;
+    QString url = getUrl();
+
+    if (url.isEmpty())
+        return Qn::StorageInit_WrongPath;
+
+    if (url.contains("://"))
+        result = mountTmpDrive(url);
     else
     {
         QDir storageDir(url);
-        valid = storageDir.exists() ? true : storageDir.mkpath(url);
+        if (storageDir.exists() || storageDir.mkpath(url))
+            result = Qn::StorageInit_Ok;
+        else
+            result = Qn::StorageInit_WrongPath;
     }
 
-    QnMutexLocker lock(&m_mutexCheckStorage);
-    if (getUrl() != url)
-        return false;
-    m_valid = valid;
-    return m_valid;
+    m_valid = result == Qn::StorageInit_Ok; 
+
+    return result;
 }
 
 bool QnFileStorageResource::checkWriteCap() const
@@ -419,7 +418,7 @@ int QnFileStorageResource::mountTmpDrive() const
 }
 #else
 
-bool QnFileStorageResource::updatePermissionsHelper(
+Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
     LPWSTR userName,
     LPWSTR password,
     NETRESOURCE* netRes) const
@@ -435,90 +434,113 @@ bool QnFileStorageResource::updatePermissionsHelper(
         NULL // additional connection info buffer
     );
 
-    if (errCode == ERROR_SESSION_CREDENTIAL_CONFLICT)
-    {   // That means that user has already used this network resource
-        // with different credentials set.
-        // If so we can attempt to just use this resource as local one.
-        NX_LOG(lit("%1 Mounting remote drive %2 SESSION_CREDENTIAL_CONFLICT error. It may work though.")
-                .arg(Q_FUNC_INFO)
-                .arg(getUrl()), cl_logDEBUG1);
-        return true;
-    }
+#define PROCESS_ERROR(x, result) \
+    case (x): \
+        NX_LOG(lit("%1 Mounting remote drive %2. Result: %3") \
+               .arg(Q_FUNC_INFO) \
+               .arg(getUrl()) \
+               .arg(#x), cl_logDEBUG1); \
+        return result 
 
-    if (errCode != NO_ERROR)
+    switch (errCode)
     {
-        NX_LOG(lit("%1 Mounting remote drive %2 error %3.")
-                .arg(Q_FUNC_INFO)
-                .arg(getUrl())
-                .arg(errCode), cl_logWARNING);
-        return false;
-    }
+        PROCESS_ERROR(NO_ERROR, Qn::StorageInit_Ok);
+        PROCESS_ERROR(ERROR_SESSION_CREDENTIAL_CONFLICT, Qn::StorageInit_Ok);
+        PROCESS_ERROR(ERROR_ALREADY_ASSIGNED, Qn::StorageInit_Ok);
+        PROCESS_ERROR(ERROR_ACCESS_DENIED, Qn::StorageInit_WrongAuth);
+        PROCESS_ERROR(ERROR_WRONG_PASSWORD, Qn::StorageInit_WrongAuth);
 
-    return true;
+        default:
+            NX_LOG(lit("%1 Mounting remote drive %2 error %3.")
+                    .arg(Q_FUNC_INFO)
+                    .arg(getUrl())
+                    .arg(errCode), cl_logWARNING);
+            return Qn::StorageInit_WrongPath;
+    };
+
+#undef PROCESS_ERROR
+
+    return Qn::StorageInit_WrongPath;
 }
 
-bool QnFileStorageResource::updatePermissions() const
+namespace {
+
+NETRESOURCE prepareNetRes(const QUrl& url)
 {
+    NETRESOURCE netRes;
+    memset(&netRes, 0, sizeof(netRes));
+    netRes.dwType = RESOURCETYPE_DISK;
+
+    QString path = lit("\\\\") + url.host() +
+                   lit("\\") + url.path().mid((1));
+
+    netRes.lpRemoteName = (LPWSTR) path.constData();
+    return netRes;
+}
+
+void prepareUserNamesToTest(const QUrl& url, std::array<QString, 4>* userNames, LPWSTR* password)
+{
+    DWORD bufSize = 1024;
+    TCHAR sysUserNameBuf[1024];
+    bool getSysNameResult = GetUserName(sysUserNameBuf, &bufSize); 
+    QString sysUserName = getSysNameResult 
+        ? QString::fromWCharArray(sysUserNameBuf, bufSize)
+        : QString();
+    QString initialUserName = url.userName().isEmpty() ? "guest" : url.userName();
+
+    *password = (LPWSTR) url.password().constData();
+    *userNames = {
+        initialUserName,
+        lit("WORKGROUP\\") + initialUserName,
+        sysUserName,
+        sysUserName.isNull() ? sysUserName : lit("WORKGROUP\\") + sysUserName,
+    };
+}
+}
+
+Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& url) const
+{
+    if (!url.startsWith("smb://"))
+        return Qn::StorageInit_Ok;
+
     NX_LOG(lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()), cl_logDEBUG2);
-    if (getUrl().startsWith("smb://"))
+
+    QUrl storageUrl(url);
+    NETRESOURCE netRes = prepareNetRes(storageUrl);
+
+    std::array<QString, 4> userNamesToTest;
+    LPWSTR password = nullptr;
+    prepareUserNamesToTest(storageUrl, &userNamesToTest, &password);
+
+    bool wrongAuth = false;
+    for (const auto& userName : userNamesToTest)
     {
-        NETRESOURCE netRes;
-        memset(&netRes, 0, sizeof(netRes));
-        netRes.dwType = RESOURCETYPE_DISK;
-
-        QUrl storageUrl(getUrl());
-        QString path = lit("\\\\") + storageUrl.host() +
-                       lit("\\") + storageUrl.path().mid((1));
-
-        netRes.lpRemoteName = (LPWSTR) path.constData();
-        LPWSTR password = (LPWSTR) storageUrl.password().constData();
-        QString userName = QUrl(getUrl()).userName().isEmpty() 
-            ? "guest" 
-            : QUrl(getUrl()).userName();
-
-        if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
+        auto result = updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes);
+        switch (result)
         {
-            userName = lit("WORKGROUP\\") + userName;
-            if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
-            {
-                DWORD bufSize = 1024;
-                TCHAR sysUserName[1024];
-                if (GetUserName(sysUserName, &bufSize))
-                {
-                    userName = QString::fromWCharArray(sysUserName, bufSize);
-                    if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
-                    {
-                        userName = lit("WORKGROUP\\") + userName;
-                        if (!updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes))
-                            return false;
-                    }
-                }
-                else
-                    return false;
-            }
-        }
+            case Qn::StorageInit_Ok: 
+                return result;
+            case Qn::StorageInit_WrongAuth:
+                wrongAuth = true;
+                break;
+        };
     }
 
-    return true;
+    return wrongAuth ? Qn::StorageInit_WrongAuth : Qn::StorageInit_WrongPath;
 }
 
-int QnFileStorageResource::mountTmpDrive() const
+Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url) const
 {
-    QUrl storageUrl(getUrl());
+    QUrl storageUrl(url);
     if (!storageUrl.isValid())
-        return -1;
+        return Qn::StorageInit_WrongPath;
 
-    QString path =
+    setLocalPathSafe(
         lit("\\\\") +
         storageUrl.host() +
-        storageUrl.path().replace(lit("/"), lit("\\"));
+        storageUrl.path().replace(lit("/"), lit("\\")));
 
-    if (!updatePermissions())
-        return -1;
-
-    setLocalPathSafe(path);
-
-    return 0;
+    return updatePermissions(url);
 }
 #endif
 
@@ -672,21 +694,23 @@ bool QnFileStorageResource::testWriteCapInternal() const
     return file.open(QIODevice::WriteOnly);
 }
 
-bool QnFileStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnFileStorageResource::initOrUpdate() const
 {
-    QString localPathCopy;
+    Qn::StorageInitResult result;
     {
-        QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath;
-    }
+        QnMutexLocker lock(&m_mutexCheckStorage);
+        bool oldValid = m_valid;
+        result = initOrUpdateInternal();
+        if (result != Qn::StorageInit_Ok)
+            return result;
 
-    if (!initOrUpdateInternal())
-        return false;
+        bool dontNeedToCheckForMount = oldValid == false && m_valid == true;
 
-    if (!isStorageDirMounted())
-    {
-        m_valid = false;
-        return false;
+        if (!dontNeedToCheckForMount && !isStorageDirMounted())
+        {
+            m_valid = false;
+            return Qn::StorageInit_WrongPath;
+        }
     }
 
     QnMutexLocker lock(&m_writeTestMutex);
@@ -696,12 +720,13 @@ bool QnFileStorageResource::initOrUpdate() const
     if (!m_writeCapCached)
     {
         m_valid = false;
-        return false;
+        return Qn::StorageInit_WrongPath;
     }
-    m_cachedTotalSpace = getDiskTotalSpace(localPathCopy.isEmpty() ?
+    QString localPath = getLocalPathSafe();
+    m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ?
                                            getPath() :
-                                           localPathCopy); // update cached value periodically
-    return *m_writeCapCached;
+                                           localPath); // update cached value periodically
+    return Qn::StorageInit_Ok;
 }
 
 QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
