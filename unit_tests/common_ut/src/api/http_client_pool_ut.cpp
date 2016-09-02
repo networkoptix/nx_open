@@ -152,9 +152,14 @@ TEST_F(HttpClientPoolTest, terminateTest)
 
     static const int kWaitTimeoutMs = 1000 * 10;
     static const int kRequests = 100;
-    for (int i = 0; i < kRequests; ++i)
+
     {
-        requests << httpPool->doGet(url);
+        QnMutexLocker lock(&mutex);
+        for (int i = 0; i < kRequests; ++i)
+        {
+            requests << httpPool->doGet(url);
+        }
+        ASSERT_TRUE(httpPool->size() > 0);
     }
 
     // terminate some requests
