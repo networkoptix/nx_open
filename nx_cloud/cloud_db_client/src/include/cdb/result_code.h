@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include <nx/fusion/model_functions_fwd.h>
-
 namespace nx {
 namespace cdb {
 namespace api {
