@@ -94,7 +94,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->mainMenuButton, &QnToolButton::justPressed, this,
         [this]()
         {
-            QScopedPointer<QMenu> menu(menu()->newMenu(Qn::MainScope, nullptr));
+            QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::MainScope, nullptr));
             if (!menu)
                 return;
 
@@ -140,7 +140,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->currentLayoutsButton, &QnToolButton::justPressed, this,
         [this]()
         {
-            QScopedPointer<QMenu> menu(menu()->newMenu(
+            QScopedPointer<QMenu> menu(this->menu()->newMenu(
                 QnActions::OpenCurrentUserLayoutMenu,
                 Qn::TitleBarScope));
             if (!menu)
