@@ -79,11 +79,10 @@ int QnMiscManager<QueryProcessorType>::rebuildTransactionLog(
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    QnTransaction<ApiRebuildTransactionLogData> transaction(ApiCommand::rebuildTransactionLog);
-    transaction.isLocal = true;
+    ApiRebuildTransactionLogData data;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::rebuildTransactionLog, data,
         [handler, reqId](ErrorCode errorCode)
     {
         handler->done(reqId, errorCode);

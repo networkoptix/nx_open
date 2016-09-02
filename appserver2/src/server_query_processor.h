@@ -347,7 +347,7 @@ private:
         const QnUuid& id,
         const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend,
-        bool isLocal = false);
+        TransactionType::Value transactionType = TransactionType::Regular);
 
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
@@ -422,7 +422,7 @@ private:
                         tran.params.id,
                         connection,
                         transactionsToSend,
-                        true),
+                        TransactionType::Local),
                     lit("Remove resource status failed"));
 
                 break;

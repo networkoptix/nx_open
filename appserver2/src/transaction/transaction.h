@@ -167,7 +167,7 @@ APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
-                       SetStatusTransactionType()) /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* local transaction type is set manually in  server query processor via removeResourceStatusHelper call*/ \
 APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -1148,7 +1148,7 @@ APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
-                       RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(4001, getClientInfos, ApiClientInfoDataList, \
                        false, \
                        false, \
