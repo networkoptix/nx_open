@@ -88,9 +88,11 @@ bool QnSkin::hasFile(const char* name) const
     return hasFile(QLatin1String(name));
 }
 
-QIcon QnSkin::icon(const QString& name, const QString& checkedName, int numModes, const QPair<QIcon::Mode, QString>* modes)
+QIcon QnSkin::icon(const QString& name,
+    const QString& checkedName,
+    const QnIcon::SuffixesList* suffixes)
 {
-    return m_iconLoader->load(name, checkedName, numModes, modes);
+    return m_iconLoader->load(name, checkedName, suffixes);
 }
 
 QIcon QnSkin::icon(const char* name, const char* checkedName)

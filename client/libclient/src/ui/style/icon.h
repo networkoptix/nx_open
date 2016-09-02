@@ -1,9 +1,9 @@
-#ifndef QN_ICON_H
-#define QN_ICON_H
+#pragma once
 
-class QnIcon: public QIcon {
+class QnIcon: public QIcon
+{
 public:
     static const QIcon::Mode Pressed;
-};
 
-#endif // QN_ICON_H
+    using SuffixesList = QVector<QPair<QIcon::Mode, QString>>;
+};
