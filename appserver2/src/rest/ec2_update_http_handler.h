@@ -304,7 +304,7 @@ private:
 
         auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
         processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail
-        processor.processUpdateAsync(command, *requestData, queryDoneHandler);
+        processor.processUpdateAsync(command, requestData, queryDoneHandler);
 
         {
             QnMutexLocker lk(&m_mutex);
@@ -313,7 +313,7 @@ private:
         }
 
         if (m_customAction)
-            m_customAction(*requestData);
+            m_customAction(requestData);
 
         return errorCode;
     }
