@@ -27,7 +27,7 @@ namespace {
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &resource, QObject *parent):
     base_type(parent),
-    m_enabled(true),
+    m_enabled(false),
     m_resource(resource)
 {
     Q_ASSERT_X(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
