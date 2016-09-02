@@ -187,6 +187,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
     int* const /*dummyResult*/)
 {
     QSqlQuery readPasswordsQuery(*connection);
+    readPasswordsQuery.setForwardOnly(true);
     readPasswordsQuery.prepare(
         "SELECT ap.id,                                                          \
             a.email as accountEmail,                                            \

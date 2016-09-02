@@ -1283,6 +1283,7 @@ nx::db::DBResult SystemManager::fillCache()
 nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* const /*dummy*/)
 {
     QSqlQuery readSystemsQuery(*connection);
+    readSystemsQuery.setForwardOnly(true);
     readSystemsQuery.prepare(
         "SELECT s.id, s.name, s.customization, s.auth_key as authKey, "
         "       a.email as ownerAccountEmail, s.status_code as status, "
@@ -1316,6 +1317,7 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     int* const /*dummy*/)
 {
     QSqlQuery readSystemToAccountQuery(*connection);
+    readSystemToAccountQuery.setForwardOnly(true);
     readSystemToAccountQuery.prepare(
         "SELECT a.email as accountEmail, "
                "sa.system_id as systemID, "

@@ -399,6 +399,7 @@ db::DBResult AccountManager::fetchAccounts(
     int* const /*dummyResult*/ )
 {
     QSqlQuery readAccountsQuery(*connection);
+    readAccountsQuery.setForwardOnly(true);
     readAccountsQuery.prepare(
         "SELECT id, email, password_ha1 as passwordHa1, "
                "full_name as fullName, customization, status_code as statusCode "
@@ -461,6 +462,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 {
     //removing already-existing activation codes
     QSqlQuery fetchActivationCodesQuery(*connection);
+    fetchActivationCodesQuery.setForwardOnly(true);
     fetchActivationCodesQuery.prepare(
         "SELECT verification_code "
         "FROM email_verification "
@@ -574,6 +576,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     std::string* const resultAccountEmail )
 {
     QSqlQuery getAccountByVerificationCode( *connection );
+    getAccountByVerificationCode.setForwardOnly(true);
     getAccountByVerificationCode.prepare(
         "SELECT a.email "
         "FROM email_verification ev, account a "
