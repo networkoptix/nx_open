@@ -73,14 +73,6 @@ private:
     /** If user has custom access rights, he must be given direct access to cameras on changed local layout. */
     void grantMissingAccessRights(const QnUserResourcePtr& user, const LayoutChange& change);
 
-    /**
-     * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
-     * @param buttons               Message box buttons.
-     * @param defaultButton         Default button.
-     * @return                      Selected button.
-     */
-    QDialogButtonBox::StandardButton askOverrideLayout(QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton);
-
     bool canRemoveLayouts(const QnLayoutResourceList &layouts);
 
     void removeLayouts(const QnLayoutResourceList &layouts);
