@@ -184,8 +184,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
 
-    connect(action(QnActions::MainMenuAction), SIGNAL(triggered()), this, SLOT(at_mainMenuAction_triggered()));
-    connect(action(QnActions::OpenCurrentUserLayoutMenu), SIGNAL(triggered()), this, SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
     connect(action(QnActions::ShowcaseAction), SIGNAL(triggered()), this, SLOT(at_showcaseAction_triggered()));
     connect(action(QnActions::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
@@ -286,20 +284,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     at_scheduleWatcher_scheduleEnabledChanged();
 }
 
-QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
-    disconnect(context(), NULL, this, NULL);
-    disconnect(workbench(), NULL, this, NULL);
-
-    foreach(QAction *action, menu()->actions())
-        disconnect(action, NULL, this, NULL);
-
-    /* Clean up. */
-    if (m_mainMenu)
-        delete m_mainMenu.data();
-
-    if (m_currentUserLayoutsMenu)
-        delete m_currentUserLayoutsMenu.data();
-
+QnWorkbenchActionHandler::~QnWorkbenchActionHandler()
+{
     deleteDialogs();
 }
 
@@ -598,29 +584,6 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(QnActions::RadassAutoAction)->setChecked(true);
     if (qnRedAssController)
         qnRedAssController->setMode(Qn::AutoResolution);
-}
-
-void QnWorkbenchActionHandler::at_mainMenuAction_triggered()
-{
-    if (!m_mainMenu)
-        m_mainMenu = menu()->newMenu(Qn::MainScope, nullptr);
-
-    action(QnActions::MainMenuAction)->setMenu(m_mainMenu.data());
-}
-
-void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered()
-{
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-        return;
-
-    if (!m_currentUserLayoutsMenu)
-    {
-        m_currentUserLayoutsMenu = menu()->newMenu(
-            QnActions::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
-    }
-
-    action(QnActions::OpenCurrentUserLayoutMenu)->setMenu(
-        m_currentUserLayoutsMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
