@@ -277,16 +277,16 @@ const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
-	QList<QnResourceTypePtr> resourceTypeList;
-	const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
-	if (errorCode != ec2::ErrorCode::ok)
-	{
-		NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
-		return false;
-	}
+    QList<QnResourceTypePtr> resourceTypeList;
+    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
+        return false;
+    }
 
-	qnResTypePool->replaceResourceTypeList(resourceTypeList);
-	return true;
+    qnResTypePool->replaceResourceTypeList(resourceTypeList);
+    return true;
 }
 
 void addFakeVideowallUser()
@@ -2290,7 +2290,7 @@ void MediaServerProcess::run()
 
     // show our cloud host value in registry in case of installer will check it
     MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey,
-        qnGlobalSettings->cloudSystemID().isEmpty() ? "0" : "1");
+        qnGlobalSettings->cloudSystemID().isEmpty() ? "no" : "yes");
     MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
 
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
@@ -2346,7 +2346,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
-	addFakeVideowallUser();
+    addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
     bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&

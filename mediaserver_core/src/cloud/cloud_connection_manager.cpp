@@ -179,7 +179,7 @@ bool CloudConnectionManager::cleanupCloudDataInLocalDB()
     }
 
     qnCommon->updateModuleInformation();
-    MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "0");
+    MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
 
     return true;
 }
@@ -314,14 +314,14 @@ void CloudConnectionManager::cloudSettingsChanged()
             .setSystemCredentials(std::move(credentials));
 
         monitorForCloudEvents();
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "1");
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
         stopMonitoringCloudEvents();
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "0");
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
     }
 
     emit cloudBindingStatusChanged(boundToCloud);
