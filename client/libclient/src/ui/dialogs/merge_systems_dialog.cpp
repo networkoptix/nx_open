@@ -22,6 +22,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/merge_systems_tool.h>
 #include <utils/common/util.h>
+#include <utils/common/app_info.h>
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     base_type(parent),
@@ -315,16 +316,16 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
             message = tr("System is in safe mode.");
             break;
         case QnMergeSystemsTool::ConfigurationError:
-            message = tr("Cloud not configure remote system.");
+            message = tr("Could not configure remote system.");
             break;
         case QnMergeSystemsTool::DependentSystemBoundToCloudError:
-            message = tr("System being merged cannot be bound to the cloud.");
+            message = tr("System being merged cannot be bound to the %1.").arg(QnAppInfo::cloudName());
             break;
         case QnMergeSystemsTool::BothSystemBoundToCloudError:
-            message = tr("Both systems are bound to the cloud. Merge is not allowed.");
+            message = tr("Both systems are bound to the %1. Merge is not allowed.").arg(QnAppInfo::cloudName());
             break;
         case QnMergeSystemsTool::differentCloudHostError:
-            message = tr("These systems are built with different cloud portal URL. Merge is not allowed.");
+            message = tr("These systems are built with different %1 URL. Merge is not allowed.").arg(QnAppInfo::cloudName());
             break;
         case QnMergeSystemsTool::UnconfiguredSystemError:
             message = tr("System name is not configured yet.");

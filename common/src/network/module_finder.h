@@ -33,6 +33,7 @@ public:
     ec2::ApiDiscoveredServerDataList discoveredServers() const;
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
+    QnModuleInformation moduleInformation(const QnMediaServerResourcePtr& server) const;
     QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
 
     /** Get the best address to access the server with the given id.

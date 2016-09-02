@@ -7,7 +7,7 @@
 
 #include <common/common_module.h>
 
-#include <core/resource/camera_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -51,7 +51,7 @@ QnCameraThumbnailManager::~QnCameraThumbnailManager()
 {
 }
 
-void QnCameraThumbnailManager::selectResource(const QnVirtualCameraResourcePtr& camera)
+void QnCameraThumbnailManager::selectResource(const QnSecurityCamResourcePtr& camera)
 {
     ThumbnailData& data = m_thumbnailByCamera[camera];
     if (data.status == None || data.status == Refreshing)
@@ -132,7 +132,7 @@ void QnCameraThumbnailManager::setThumbnailSize(const QSize &size)
     updateStatusPixmaps();
 }
 
-rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera)
+rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnSecurityCamResourcePtr& camera)
 {
     if (!camera || !camera->hasVideo(nullptr))
         return kInvalidHandle;
@@ -188,7 +188,7 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
 
 void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr& resource)
 {
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
 
@@ -208,11 +208,11 @@ void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr& res
 
 void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr& resource)
 {
-    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    if (QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
         m_thumbnailByCamera.remove(camera);
 }
 
-bool QnCameraThumbnailManager::isUpdateRequired(const QnVirtualCameraResourcePtr& camera, const ThumbnailStatus status) const
+bool QnCameraThumbnailManager::isUpdateRequired(const QnSecurityCamResourcePtr& camera, const ThumbnailStatus status) const
 {
     switch (camera->getStatus())
     {

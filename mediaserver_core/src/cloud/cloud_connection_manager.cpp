@@ -17,7 +17,7 @@
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
 #include <core/resource/media_server_resource.h>
-
+#include <server/server_globals.h>
 
 namespace {
 constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
@@ -179,6 +179,7 @@ bool CloudConnectionManager::cleanupCloudDataInLocalDB()
     }
 
     qnCommon->updateModuleInformation();
+    MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "0");
 
     return true;
 }
@@ -313,12 +314,14 @@ void CloudConnectionManager::cloudSettingsChanged()
             .setSystemCredentials(std::move(credentials));
 
         monitorForCloudEvents();
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "1");
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
         stopMonitoringCloudEvents();
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "0");
     }
 
     emit cloudBindingStatusChanged(boundToCloud);

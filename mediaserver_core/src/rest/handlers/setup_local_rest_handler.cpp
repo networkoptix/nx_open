@@ -16,7 +16,6 @@
 
 namespace
 {
-    static const QString kDefaultAdminPassword(QLatin1String("admin"));
     static const QString kSystemNameParamName(QLatin1String("systemName"));
 }
 

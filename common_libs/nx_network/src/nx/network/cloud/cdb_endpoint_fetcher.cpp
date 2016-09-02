@@ -224,6 +224,7 @@ void CloudModuleEndPointFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Ha
 {
     auto sharedGuard = m_guard.sharedGuard();
     m_fetcher->get(
+        auth,
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
             nx_http::StatusCode::Value statusCode, SocketAddress result) mutable
         {

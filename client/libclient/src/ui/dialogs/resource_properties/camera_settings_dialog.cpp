@@ -236,6 +236,16 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
     retranslateUi();
 }
 
+Qn::CameraSettingsTab QnCameraSettingsDialog::currentTab() const
+{
+    return m_settingsWidget->currentTab();
+}
+
+void QnCameraSettingsDialog::setCurrentTab(Qn::CameraSettingsTab tab)
+{
+    m_settingsWidget->setCurrentTab(tab);
+}
+
 void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/)
 {
     bool hasDbChanges = m_settingsWidget->hasDbChanges();

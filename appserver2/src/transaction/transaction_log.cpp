@@ -32,6 +32,33 @@ QnTransactionLog::~QnTransactionLog()
     globalInstance = nullptr;
 }
 
+bool QnTransactionLog::clear()
+{
+    QSqlQuery query(m_dbManager->getDB());
+    query.prepare("DELETE from transaction_log");
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+    query.prepare("DELETE from transaction_sequence");
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+
+    m_state.values.clear();
+    m_updateHistory.clear();
+    m_commitData.clear();
+
+    m_lastTimestamp = qnSyncTime->currentMSecsSinceEpoch();
+    m_baseTime = m_lastTimestamp;
+    m_relativeTimer.restart();
+
+    return true;
+}
+
 bool QnTransactionLog::init()
 {
     QSqlQuery delQuery(m_dbManager->getDB());

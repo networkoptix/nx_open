@@ -53,6 +53,8 @@ void QnWinDesktopResource::createSharedDataProvider()
             return; // already exists
     }
 
+    QnVoiceSpectrumAnalyzer::instance()->reset();
+
     QnVideoRecorderSettings recorderSettings;
 
     QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();

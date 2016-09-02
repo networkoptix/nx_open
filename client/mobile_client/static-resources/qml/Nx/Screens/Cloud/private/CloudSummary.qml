@@ -39,6 +39,7 @@ Item
         {
             text: qsTr("Go to %1").arg(applicationInfo.cloudName())
             width: parent.width
+            onClicked: Qt.openUrlExternally(cloudUrlHelper.mainUrl())
         }
     }
 }

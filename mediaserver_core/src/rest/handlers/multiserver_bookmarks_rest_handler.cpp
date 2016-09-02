@@ -12,7 +12,9 @@
 
 namespace {
 
-/* Check if operation will modify the database. */
+/**
+ * Check if operation modifies the database.
+ */
 bool isModifyingOperation(QnBookmarkOperation op)
 {
     switch (op)
@@ -27,7 +29,7 @@ bool isModifyingOperation(QnBookmarkOperation op)
     return false;
 }
 
-}
+} // namespace
 
 QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(const QString& path):
     QnFusionRestHandler()
@@ -45,7 +47,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     QString action = extractAction(path);
     QnBookmarkOperation op = QnMultiserverBookmarksRestHandlerPrivate::getOperation(action);
 
-    /* Check user permissions. */
+    // Check user permissions.
     {
         QnMultiserverRequestData request(params);
         Qn::GlobalPermission requiredPermission = Qn::GlobalViewBookmarksPermission;
@@ -134,6 +136,4 @@ int QnMultiserverBookmarksRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
     }
-
-
 }

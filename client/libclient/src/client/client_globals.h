@@ -190,6 +190,7 @@ namespace Qn
         SerializedDataRole,
         ConnectionInfoRole,
         FocusElementRole,
+        FocusTabRole,                               /**< Role for selecting tab in the tabbed dialogs. Value of type int. */
         TimePeriodRole,
         TimePeriodsRole,
         MergedTimePeriodsRole,

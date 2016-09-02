@@ -60,7 +60,7 @@ public:
     /* Bookmarks API */
 
     // It does not sort by tags or camera names. Caller should sort it manually
-    bool getBookmarks(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+    bool getBookmarks(const QnSecurityCamResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 
     bool containsBookmark(const QnUuid &bookmarkId) const;
     QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());
@@ -87,6 +87,7 @@ protected:
 private:
     bool createDatabase();
     bool cleanupEvents();
+    int getRuntimeActionsRecordCount();
     bool migrateBusinessParamsUnderTransaction();
     bool createBookmarkTagTriggersUnderTransaction();
     bool cleanupAuditLog();
@@ -100,6 +101,7 @@ private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;
     qint64 m_eventKeepPeriod;
+    int m_runtimeActionsTotalRecords;
     QnDbTransaction m_tran;
     std::function<void(size_t)> m_updateBookmarkCount;
 };

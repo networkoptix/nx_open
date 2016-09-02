@@ -131,7 +131,7 @@ namespace
 
     VisualizerData animateVector(const VisualizerData& prev, const VisualizerData& next, qint64 timeStepMs)
     {
-        //Q_ASSERT(next.size() == QnVoiceSpectrumAnalyzer::bandsCount());
+        //NX_ASSERT(next.size() == QnVoiceSpectrumAnalyzer::bandsCount());
 
         if (prev.size() != next.size())
             return next;
@@ -166,7 +166,7 @@ namespace
             idx = maxIdx - idx;
 
         bool isValidIndex = idx >= 0 && idx < result.size();
-        Q_ASSERT_X(isValidIndex, Q_FUNC_INFO, "Invalid timeStep value");
+        NX_ASSERT(isValidIndex, Q_FUNC_INFO, "Invalid timeStep value");
         if (isValidIndex)
             result[idx] = 0.2;
         return result;
@@ -224,11 +224,15 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
             return;
 
         case Pressed:
-            if (m_stateTimer.hasExpired(kDataTimeoutMs) && m_visualizerData.isEmpty())
+            if (m_stateTimer.hasExpired(kDataTimeoutMs))
             {
-                setHint(tr("Input device is not selected."));
-                setState(Error);
-                stopStreaming();
+                auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
+                if (data.isEmpty())
+                {
+                    setHint(tr("Input device is not selected"));
+                    setState(Error);
+                    stopStreaming();
+                }
             }
             return;
 
@@ -241,7 +245,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
             break;
 
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid case");
+            NX_ASSERT(false, Q_FUNC_INFO, "Invalid case");
             return;
         }
 
@@ -322,26 +326,26 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
     m_requestHandle = server->restConnection()->twoWayAudioCommand(m_camera->getId(), true, [this]
         (bool success, rest::Handle handle, const QnJsonRestResult& result)
-    {
-        if (handle != m_requestHandle)
-            return;
-
-        if (m_state != Pressed)
-            return;
-
-        if (!success || result.error != QnRestResult::NoError)
         {
-            setHint(tr("Streaming is not ready yet, please try again later."));
-            setState(Error);
-            stopStreaming();
-        }
+            if (handle != m_requestHandle)
+                return;
 
-    }, QThread::currentThread());
+            if (m_state != Pressed)
+                return;
+
+            if (!success || result.error != QnRestResult::NoError)
+            {
+                setHint(tr("Streaming is not ready yet"));
+                setState(Error);
+                stopStreaming();
+            }
+
+        }, QThread::currentThread());
 
     m_started = m_requestHandle > 0;
     if (!m_started)
     {
-        setHint(tr("Network error."));
+        setHint(tr("Network error"));
         setState(Error);
     }
 }
@@ -351,12 +355,14 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     if (!m_started)
         return;
 
-    Q_ASSERT_X(m_state == Pressed || m_state == Error, Q_FUNC_INFO, "Invalid state");
+    NX_ASSERT(m_state == Pressed || m_state == Error, Q_FUNC_INFO, "Invalid state");
     if (m_state != Error)
         setState(Released);
 
     m_started = false;
     m_requestHandle = 0;
+    QnVoiceSpectrumAnalyzer::instance()->reset();
+    m_visualizerData = VisualizerData();
 
     if (!m_camera)
         return;
@@ -394,7 +400,7 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
 
     QRectF rect(sourceRect);
     rect.setLeft(minLeftValue + maxHintWidth - targetHintWidth);
-    Q_ASSERT(rect.width() >= minSize);
+    NX_ASSERT(rect.width() >= minSize);
 
     qreal roundness = minSize / 2;
     QPainterPath path;
@@ -408,9 +414,9 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
 
     if (m_state == Pressed && qFuzzyEquals(m_hintVisibility, kVisible))
     {
-        Q_ASSERT(m_stateTimer.isValid());
+        NX_ASSERT(m_stateTimer.isValid());
         QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize, 0.0));
-        Q_ASSERT(visualizerRect.isValid());
+        NX_ASSERT(visualizerRect.isValid());
         if (!visualizerRect.isValid())
             return;
 

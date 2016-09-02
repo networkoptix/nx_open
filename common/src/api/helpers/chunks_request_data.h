@@ -15,7 +15,7 @@ struct QnChunksRequestData
     bool isValid() const;
 
     Qn::TimePeriodContent periodsType;
-    QnVirtualCameraResourceList resList;
+    QnSecurityCamResourceList resList;
     qint64 startTimeMs;
     qint64 endTimeMs;
     qint64 detailLevel;

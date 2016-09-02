@@ -1,13 +1,16 @@
 #pragma once
 
 #ifdef _WIN32
-#   include <winsock2.h>
-#   include <in6addr.h>
-#   include <ws2ipdef.h>
+    #include <winsock2.h>
+    #include <in6addr.h>
+    #include <ws2ipdef.h>
+
+    // Windows does not support this flag, so we emulate it
+    #define MSG_DONTWAIT 0x01000000
 #else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   include <arpa/inet.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
 #endif
 
 #include <stdint.h>

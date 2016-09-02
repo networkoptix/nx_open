@@ -399,7 +399,7 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
     if (isStoragePoolInRebuild(data))
         return false;
 
-    return data.isExternal || !data.isWritable;
+    return data.isExternal;
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const

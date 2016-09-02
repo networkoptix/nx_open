@@ -593,6 +593,12 @@ class ECConnectionNotificationManager;
             );
         }
 
+        ErrorCode rebuildTransactionLogSync()
+        {
+            int(AbstractMiscManager::*fn)(impl::SimpleHandlerPtr) = &AbstractMiscManager::rebuildTransactionLog;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, std::placeholders::_1));
+        }
+
         template<class TargetType, class HandlerType> int markLicenseOverflow(bool value, qint64 time, TargetType *target, HandlerType handler) {
             return markLicenseOverflow(value, time, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -607,6 +613,7 @@ class ECConnectionNotificationManager;
     protected:
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
+        virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

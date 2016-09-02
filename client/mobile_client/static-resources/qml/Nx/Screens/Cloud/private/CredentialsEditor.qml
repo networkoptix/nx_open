@@ -40,10 +40,11 @@ Item
             TextField
             {
                 id: emailField
-                placeholderText: qsTr("E-mail")
+                placeholderText: qsTr("Email")
                 width: parent.width
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
+                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhPreferLatin
             }
             TextField
             {
@@ -55,6 +56,7 @@ Item
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
                 onAccepted: login()
+                inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
             }
         }
 
@@ -77,18 +79,21 @@ Item
             LinkButton
             {
                 id: learnMoreLink
-                text: qsTr("Learn mote about %1").arg(applicationInfo.cloudName())
+                text: qsTr("Learn more about %1").arg(applicationInfo.cloudName())
                 width: parent.width
+                onClicked: Qt.openUrlExternally(cloudUrlHelper.aboutUrl())
             }
             LinkButton
             {
                 text: qsTr("Create account")
                 width: parent.width
+                onClicked: Qt.openUrlExternally(cloudUrlHelper.createAccountUrl())
             }
             LinkButton
             {
                 text: qsTr("Forgot your password?")
                 width: parent.width
+                onClicked: Qt.openUrlExternally(cloudUrlHelper.restorePasswordUrl())
             }
         }
     }
@@ -107,7 +112,7 @@ Item
             if (cloudStatusWatcher.error == QnCloudStatusWatcher.InvalidCredentials)
             {
                 d.invalidCredentials = true
-                showWarning(qsTr("Invalid e-mail or password"))
+                showWarning(qsTr("Invalid email or password"))
             }
             else
             {
@@ -133,7 +138,7 @@ Item
         if (!emailField.text || !passwordField.text)
         {
             d.invalidCredentials = true
-            showWarning(qsTr("Invalid e-mail or password"))
+            showWarning(qsTr("Invalid email or password"))
             return
         }
 
