@@ -5,6 +5,7 @@ class QMenu;
 class QAction;
 class QToolButton;
 class QPoint;
+class QComboBox;
 
 class QnHiDpiWorkarounds
 {
@@ -15,5 +16,7 @@ public:
 
     static void showMenuOnWidget(QWidget* widget, const QPoint& offset, QMenu* menu);
 
-    static void setViewportWindow(QWindow* window);
+    static QPoint safeMapToGlobal(QWidget*widget, const QPoint& offset);
+
+    static void init();
 };

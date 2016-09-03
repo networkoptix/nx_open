@@ -757,8 +757,7 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent* event)
         if (pos.isNull())
             return;
 
-        qDebug() << "--- initial: " << pos;
-        showContextMenuAt(QnHiDpiWorkarounds::scaledToGlobal(pos));
+        showContextMenuAt(pos);
     }
 }
 

@@ -191,42 +191,6 @@ void installMenuMouseEventCorrector(QMenu* menu)
     menu->installEventFilter(corrector.data());
 }
 
-static QWindow* viewportWindow = nullptr;
-void setMouseWorkaroundActive(bool active, QWindow* window)
-{
-    if (!window)
-        return;
-
-    const auto flags = (window->flags() & ~Qt::WindowType_Mask);
-    window->setFlags(flags | (active ? Qt::ForeignWindow : Qt::Widget));
-}
-
-}   // unnamed namespace
-
-QPoint QnHiDpiWorkarounds::scaledToGlobal(const QPoint& scaled)
-{
-    return convertScaledToGlobal(scaled);
-}
-
-QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
-{
-    if (!viewportWindow)
-        return nullptr;
-
-    if (!knownCorrectors.contains(menu))
-        installMenuMouseEventCorrector(menu);
-
-    const auto corrector = knownCorrectors.value(menu);
-    const auto pos = QCursor::pos();
-    corrector->setTargetPosition(globalPoint);
-
-    customMenuIsVisible = true;
-    const auto customMenuLock = QnRaiiGuard::createDestructable(
-        []() { customMenuIsVisible = false; });
-
-    return menu->exec(globalPoint);
-}
-
 QWindow* getParentWindow(QWidget* widget)
 {
     // Checks if widget is in graphics view
@@ -266,24 +230,8 @@ QPoint getPoint(QWidget* widget, const QPoint& offset, QWindow* parentWindow = n
     if (!parentWindow)
         return QPoint();
 
-    QPoint globalPos;
-    {
-        QnRaiiGuardPtr workaroundTurnOff;
-        if (parentWindow == viewportWindow)
-        {
-            workaroundTurnOff =
-                QnRaiiGuard::create([]() { setMouseWorkaroundActive(false, viewportWindow); },
-                []() { setMouseWorkaroundActive(true, viewportWindow); });
-        }
-        globalPos = widget->mapToGlobal(offset);
-    }
-
+    const QPoint globalPos = widget->mapToGlobal(offset);
     return screenRelatedToGlobal(globalPos, parentWindow->screen());
-}
-
-void QnHiDpiWorkarounds::showMenuOnWidget(QWidget* widget, const QPoint& offset, QMenu* menu)
-{
-    showMenu(menu, getPoint(widget, offset, viewportWindow));
 }
 
 class CE : public QContextMenuEvent
@@ -294,6 +242,7 @@ public:
             pos, globalPos)
     {}
 };
+
 class Test : public QObject
 {
 private:
@@ -308,7 +257,6 @@ private:
         if (!dynamic_cast<CE*>(event) && parentWindow && !customMenuIsVisible)   // Ignore events from directly shown menu
         {
             const auto targetPos = getPoint(widget, contextMenuEvent->pos(), parentWindow);
-            qDebug() << widget << targetPos;
             auto fixedEvent = CE(contextMenuEvent->reason(), contextMenuEvent->pos(), targetPos);
             if (!qApp->sendEvent(watched, &fixedEvent) || !fixedEvent.isAccepted())
                 return QObject::eventFilter(watched, event);
@@ -319,13 +267,39 @@ private:
     }
 };
 
-void QnHiDpiWorkarounds::setViewportWindow(QWindow* window)
+}   // unnamed namespace
+
+QPoint QnHiDpiWorkarounds::scaledToGlobal(const QPoint& scaled)
+{
+    return convertScaledToGlobal(scaled);
+}
+
+QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
+{
+    if (!knownCorrectors.contains(menu))
+        installMenuMouseEventCorrector(menu);
+
+    const auto corrector = knownCorrectors.value(menu);
+    corrector->setTargetPosition(globalPoint);
+
+    const auto guard = QnRaiiGuard::create(
+        []() { customMenuIsVisible = true; },
+        []() { customMenuIsVisible = false; });
+    return menu->exec(globalPoint);
+}
+
+void QnHiDpiWorkarounds::showMenuOnWidget(QWidget* widget, const QPoint& offset, QMenu* menu)
+{
+    showMenu(menu, getPoint(widget, offset));
+}
+
+QPoint QnHiDpiWorkarounds::safeMapToGlobal(QWidget* widget, const QPoint& offset)
+{
+    return getPoint(widget, offset);
+}
+
+void QnHiDpiWorkarounds::init()
 {
     qApp->installEventFilter(new Test());
-    if (viewportWindow)
-        setMouseWorkaroundActive(false, viewportWindow);
-
-    viewportWindow = window;
-    if (viewportWindow)
-        setMouseWorkaroundActive(true, viewportWindow);
 }
+
