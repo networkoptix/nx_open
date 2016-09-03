@@ -99,12 +99,13 @@ struct QnHTTPRawResponse
     QnHTTPRawResponse();
     QnHTTPRawResponse(
         SystemError::ErrorCode _sysErrorCode,
-        nx_http::Response _response,
-        QByteArray _msgBody);
+        const nx_http::StatusLine& statusLine,
+        const QByteArray& _contentType,
+        const QByteArray& _msgBody);
 
     SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;
-    nx_http::Response response;
+    QByteArray contentType;
     QByteArray msgBody;
     QString errorString;
 
