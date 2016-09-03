@@ -44,6 +44,7 @@ namespace Qn
     static const QByteArray EC2_INTERNAL_RTP_FORMAT = "X-FFMPEG-RTP";
     //!Name of Http header holding ec2 proto version
     static const QByteArray EC2_PROTO_VERSION_HEADER_NAME = "X-Nx-EC-PROTO-VERSION";
+    static const QByteArray EC2_CLOUD_HOST_HEADER_NAME = "X-Nx-EC-CLOUD-HOST";
     static const QByteArray EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME = "X-Nx-base64-encoding-required";
     static const QByteArray EC2_MEDIA_ROLE = "X-Media-Role";
 
