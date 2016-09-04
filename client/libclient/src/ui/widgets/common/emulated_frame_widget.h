@@ -23,7 +23,7 @@ protected:
     /**
      * This function is to be overridden in derived class to provide information
      * on window frame sections.
-     * 
+     *
      * \param pos                       Position in widget coordinates.
      * \returns                         Window frame section at the given position.
      */
@@ -38,6 +38,7 @@ protected:
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
+    virtual void resizeEvent(QResizeEvent *event) override;
 private:
     void updateCursor();
     void updateCursor(const QPoint &mousePos);

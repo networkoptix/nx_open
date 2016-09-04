@@ -422,7 +422,7 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     if(popupMenu->isEmpty())
         return;
 
-    QnHiDpiWorkarounds::showMenu(popupMenu.data(), QCursor::pos());
+    popupMenu->exec(QCursor::pos());
 }
 
 void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {

@@ -7,35 +7,8 @@
 namespace {
 
 typedef QMultiMap<int, QScreen*> SortedScreens;
-QPoint convertScaledToGlobal(const QPoint& scaled)
-{
 
-    QPoint result(scaled);
-
-    SortedScreens xSorted;
-    for (auto screen : QGuiApplication::screens())
-        xSorted.insert(screen->geometry().left(), screen);
-
-    QPoint logicalOffset;
-    for (auto it = xSorted.begin(); it != xSorted.end(); ++it)
-    {
-        const auto geometry = it.value()->geometry();
-        const auto offset = QPoint(geometry.width(), 0);
-        const auto newValue = logicalOffset + offset;
-        if (result.x() > newValue.x())
-        {
-            logicalOffset += offset;
-            continue;
-        }
-
-        const auto screenOrigin = geometry.topLeft();
-        return screenOrigin + (result - logicalOffset);
-    }
-
-    return result;
-}
-
-// TODO: #ynikitenkov develop totally correct functiom -
+// TODO: #ynikitenkov develop totally correct function -
 // now it correct only for one horizontal line positioned screen
 QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
 {
@@ -101,12 +74,12 @@ QScreen* getScreen(const QPoint& scaled)
     return (it == screens.end() ? nullptr : *it);
 }
 
-class MenuMouseEventsCorrector: public Connective<QObject>
+class MenuScreenCorrector: public Connective<QObject>
 {
     typedef Connective<QObject> base_type;
 
 public:
-    MenuMouseEventsCorrector(QMenu* parent):
+    MenuScreenCorrector(QMenu* parent):
         base_type(parent),
         m_screen(nullptr)
     {
@@ -171,19 +144,17 @@ private:
     QScreen* m_screen;
 };
 
-typedef QSharedPointer<MenuMouseEventsCorrector> MouseEventsCorrectorPtr;
+typedef QSharedPointer<MenuScreenCorrector> MouseEventsCorrectorPtr;
 typedef QHash<QMenu*, MouseEventsCorrectorPtr> MouseEventsCorrectorsHash;
 
 static MouseEventsCorrectorsHash knownCorrectors;
-
-static bool customMenuIsVisible = false;
 
 void installMenuMouseEventCorrector(QMenu* menu)
 {
     if (knownCorrectors.contains(menu))
         return;
 
-    const auto corrector = MouseEventsCorrectorPtr(new MenuMouseEventsCorrector(menu));
+    const auto corrector = MouseEventsCorrectorPtr(new MenuScreenCorrector(menu));
     knownCorrectors.insert(menu, corrector);
     menu->connect(menu, &QObject::destroyed, menu,
         [menu]() { knownCorrectors.remove(menu); });
@@ -243,7 +214,7 @@ public:
     {}
 };
 
-class Test : public QObject
+class ContextMenuEventCorrector : public QObject
 {
 private:
     bool eventFilter(QObject*watched, QEvent* event)
@@ -251,10 +222,10 @@ private:
         if (event->type() != QEvent::ContextMenu)
             return QObject::eventFilter(watched, event);
 
-        const auto contextMenuEvent = dynamic_cast<QContextMenuEvent*>(event);
-        const auto widget = qobject_cast<QWidget*>(watched);
+        const auto contextMenuEvent = static_cast<QContextMenuEvent*>(event);
+        const auto widget = dynamic_cast<QWidget*>(watched);
         const auto parentWindow = getParentWindow(widget);
-        if (!dynamic_cast<CE*>(event) && parentWindow && !customMenuIsVisible)   // Ignore events from directly shown menu
+        if (!dynamic_cast<CE*>(event) && parentWindow)
         {
             const auto targetPos = getPoint(widget, contextMenuEvent->pos(), parentWindow);
             auto fixedEvent = CE(contextMenuEvent->reason(), contextMenuEvent->pos(), targetPos);
@@ -268,23 +239,15 @@ private:
 };
 
 }   // unnamed namespace
-
-QPoint QnHiDpiWorkarounds::scaledToGlobal(const QPoint& scaled)
-{
-    return convertScaledToGlobal(scaled);
-}
-
+/*
 QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
 {
-    if (!knownCorrectors.contains(menu))
-        installMenuMouseEventCorrector(menu);
+    //if (!knownCorrectors.contains(menu))
+    //    installMenuMouseEventCorrector(menu);
 
-    const auto corrector = knownCorrectors.value(menu);
-    corrector->setTargetPosition(globalPoint);
+   // const auto corrector = knownCorrectors.value(menu);
+   // corrector->setTargetPosition(globalPoint);
 
-    const auto guard = QnRaiiGuard::create(
-        []() { customMenuIsVisible = true; },
-        []() { customMenuIsVisible = false; });
     return menu->exec(globalPoint);
 }
 
@@ -292,7 +255,7 @@ void QnHiDpiWorkarounds::showMenuOnWidget(QWidget* widget, const QPoint& offset,
 {
     showMenu(menu, getPoint(widget, offset));
 }
-
+*/
 QPoint QnHiDpiWorkarounds::safeMapToGlobal(QWidget* widget, const QPoint& offset)
 {
     return getPoint(widget, offset);
@@ -300,6 +263,6 @@ QPoint QnHiDpiWorkarounds::safeMapToGlobal(QWidget* widget, const QPoint& offset
 
 void QnHiDpiWorkarounds::init()
 {
-    qApp->installEventFilter(new Test());
+    qApp->installEventFilter(new ContextMenuEventCorrector());
 }
 

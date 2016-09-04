@@ -531,7 +531,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
-    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
+    menu->exec(QCursor::pos());
 }
 
 void QnEventLogDialog::at_exportAction_triggered()

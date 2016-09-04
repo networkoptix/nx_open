@@ -594,7 +594,7 @@ void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const W
     if(menu->isEmpty())
         return;
 
-    QnHiDpiWorkarounds::showMenu(menu.data(), pos);
+    menu->exec(QCursor::pos());
 }
 
 void QnWorkbenchController::updateDraggedItems()

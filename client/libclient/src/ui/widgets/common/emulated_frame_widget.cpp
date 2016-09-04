@@ -71,16 +71,16 @@ void QnEmulatedFrameWidget::startDragProcess(DragInfo *) {
     m_timer.stop();
 }
 
+void QnEmulatedFrameWidget::resizeEvent(QResizeEvent *event)
+{
+    int i = 0;
+}
+
 void QnEmulatedFrameWidget::dragMove(DragInfo *info)
 {
     if(m_section == Qt::TitleBarArea)
     {
-        const auto mouseScreenPos =
-            QnHiDpiWorkarounds::scaledToGlobal(info->mouseScreenPos());
-        const auto mousePressScreenPos =
-            QnHiDpiWorkarounds::scaledToGlobal(info->mousePressScreenPos());
-
-        const auto diff = (mouseScreenPos - mousePressScreenPos);
+        const auto diff = (info->mouseScreenPos() - info->mousePressScreenPos());
         move(m_startPosition + diff);
     }
     else

@@ -48,7 +48,7 @@ QToolButton* newActionButton(
             if (!menu)
                 return;
 
-            QnHiDpiWorkarounds::showMenuOnWidget(button, button->rect().bottomLeft(), menu);
+            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(button, button->rect().bottomLeft()));
             action->setMenu(nullptr);
         });
     }

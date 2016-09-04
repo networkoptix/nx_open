@@ -1898,7 +1898,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     manager->redirectAction(menu.data(), QnActions::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : NULL);
 
     /* Run menu. */
-    QAction *action = QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
+    QAction *action = menu->exec(QCursor::pos());
 
     /* Process slider-local actions. */
     if (action == m_startSelectionAction)

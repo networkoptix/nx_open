@@ -473,7 +473,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
-    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
+    menu->exec(QCursor::pos());
 }
 
 void QnStorageAnalyticsWidget::at_exportAction_triggered()

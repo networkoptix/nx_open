@@ -386,7 +386,8 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
         return;
 
     /* Run menu. */
-    QAction* action = QnHiDpiWorkarounds::showMenu(menu.data(), pos);
+    QAction* action = menu->exec(pos);
+
 
     /* Process tree-local actions. */
     if (m_renameActions.values().contains(action))

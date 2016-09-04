@@ -236,7 +236,7 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event)
      * the widget is embedded into graphics scene.
      */
 
-    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
+    menu->exec(QCursor::pos());
 }
 
 void QnLayoutTabBar::mousePressEvent(QMouseEvent *event)

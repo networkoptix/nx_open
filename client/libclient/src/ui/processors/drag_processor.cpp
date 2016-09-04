@@ -392,6 +392,8 @@ void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &
         return;
     }
 
+    if (abs((screenPos - m_info.m_lastMouseScreenPos).x()) > 500)
+        int i = 0;
     m_info.m_mouseScreenPos = screenPos;
     m_info.m_mouseScenePos = scenePos;
     m_info.m_mouseItemPos = itemPos;

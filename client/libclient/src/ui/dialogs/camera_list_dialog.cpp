@@ -179,7 +179,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
-    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
+    menu->exec(QCursor::pos());
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {

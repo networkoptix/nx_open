@@ -80,7 +80,8 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
 
             if (!menu)
                 return;
-            QnHiDpiWorkarounds::showMenuOnWidget(this, rect().bottomLeft(), menu);
+
+            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
         });
 
     d->updateUi();
