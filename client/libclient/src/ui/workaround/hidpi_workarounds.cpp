@@ -242,22 +242,29 @@ private:
 
 QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
 {
+#if defined(Q_OS_WIN)
     if (!knownCorrectors.contains(menu))
         installMenuMouseEventCorrector(menu);
 
     const auto corrector = knownCorrectors.value(menu);
     corrector->setTargetPosition(globalPoint);
-
+#endif
     return menu->exec(globalPoint);
 }
 
 QPoint QnHiDpiWorkarounds::safeMapToGlobal(QWidget* widget, const QPoint& offset)
 {
+#if defined(Q_OS_WIN)
     return getPoint(widget, offset);
+#else
+    return widget->mapToGlobal(offset);
+#endif
 }
 
 void QnHiDpiWorkarounds::init()
 {
+#if defined(Q_OS_WIN)
     qApp->installEventFilter(new ContextMenuEventCorrector());
+#endif
 }
 
