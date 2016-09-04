@@ -100,7 +100,7 @@
           <number>8</number>
          </property>
          <item>
-          <widget class="QnComboBox" name="typeComboBox"/>
+          <widget class="QComboBox" name="typeComboBox"/>
          </item>
          <item>
           <widget class="QLineEdit" name="filterLineEdit">
