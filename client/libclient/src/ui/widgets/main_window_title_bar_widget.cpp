@@ -23,54 +23,6 @@ const int kVLineWidth = 1;
 const QSize kControlButtonSize(40 - kVLineWidth, kTitleBarHeight);
 const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
 
-QToolButton* newActionButton(
-    QAction* action,
-    int helpTopicId = Qn::Empty_Help,
-    bool popup = false,
-    const QSize& fixedSize = QSize())
-{
-    QnToolButton* button = new QnToolButton();
-
-    button->setDefaultAction(action);
-    button->setFocusPolicy(Qt::NoFocus);
-    button->adjustIconSize();
-    button->setFixedSize(fixedSize.isEmpty() ? button->iconSize() : fixedSize);
-
-    if (popup)
-    {
-        button->setPopupMode(QToolButton::InstantPopup);
-        QObject::connect(button, &QnToolButton::justPressed, [button, action]()
-        {
-            action->trigger();
-
-            // Below is workaround-related stuff for HiDpi screens
-            const auto menu = action->menu();
-            if (!menu)
-                return;
-
-            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(button, button->rect().bottomLeft()));
-            action->setMenu(nullptr);
-        });
-    }
-    else
-    {
-        button->setDefaultAction(action);
-    }
-
-    if (helpTopicId != Qn::Empty_Help)
-        setHelpTopic(button, helpTopicId);
-
-    return button;
-}
-
-QToolButton* newActionButton(
-    QAction* action,
-    bool popup,
-    const QSize& fixedSize = QSize())
-{
-    return newActionButton(action, Qn::Empty_Help, popup, fixedSize);
-}
-
 QFrame* newVLine()
 {
     QFrame* line = new QFrame();
@@ -147,8 +99,9 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
                 return;
 
             Q_D(const QnMainWindowTitleBarWidget);
-            QnHiDpiWorkarounds::toolButtonMenuWorkaround(d->mainMenuButton, menu.data());
-        });
+            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
+                d->mainMenuButton->rect().bottomLeft()));
+    });
 
 
     d->tabBar = new QnLayoutTabBar(this);
@@ -195,7 +148,8 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
                 return;
 
             Q_D(const QnMainWindowTitleBarWidget);
-            QnHiDpiWorkarounds::toolButtonMenuWorkaround(d->currentLayoutsButton, menu.data());
+            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(d->currentLayoutsButton,
+                d->currentLayoutsButton->rect().bottomLeft()));
         });
 
     layout->addWidget(d->newTabButton);
