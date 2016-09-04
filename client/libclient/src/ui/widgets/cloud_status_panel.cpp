@@ -7,6 +7,8 @@
 #include <ui/style/skin.h>
 #include <utils/common/app_info.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -35,10 +37,6 @@ public:
     QIcon loggedInIcon;     /*< User is logged in. */
     QIcon offlineIcon;      /*< User is logged in, but cloud is unreachable. */
 };
-
-
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 
 QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     base_type(parent),
@@ -81,7 +79,8 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
             if (!menu)
                 return;
 
-            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
+            QnHiDpiWorkarounds::showMenu(menu,
+                QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
         });
 
     d->updateUi();

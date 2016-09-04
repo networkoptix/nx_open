@@ -71,11 +71,6 @@ void QnEmulatedFrameWidget::startDragProcess(DragInfo *) {
     m_timer.stop();
 }
 
-void QnEmulatedFrameWidget::resizeEvent(QResizeEvent *event)
-{
-    int i = 0;
-}
-
 void QnEmulatedFrameWidget::dragMove(DragInfo *info)
 {
     if(m_section == Qt::TitleBarArea)

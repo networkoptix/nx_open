@@ -99,8 +99,9 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
                 return;
 
             Q_D(const QnMainWindowTitleBarWidget);
-            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
-                d->mainMenuButton->rect().bottomLeft()));
+            QnHiDpiWorkarounds::showMenu(menu.data(),
+                QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
+                    d->mainMenuButton->rect().bottomLeft()));
     });
 
 
@@ -148,8 +149,9 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
                 return;
 
             Q_D(const QnMainWindowTitleBarWidget);
-            menu->exec(QnHiDpiWorkarounds::safeMapToGlobal(d->currentLayoutsButton,
-                d->currentLayoutsButton->rect().bottomLeft()));
+            QnHiDpiWorkarounds::showMenu(menu.data(),
+                QnHiDpiWorkarounds::safeMapToGlobal(d->currentLayoutsButton,
+                    d->currentLayoutsButton->rect().bottomLeft()));
         });
 
     layout->addWidget(d->newTabButton);

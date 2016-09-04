@@ -14,7 +14,13 @@ public:
     QnComboBox(QWidget *parent = NULL): base_type(parent) {}
 
 public slots:
-    virtual void showPopup() override { base_type::showPopup(); }
+    virtual void showPopup() override
+    {
+        base_type::showPopup();
+
+        // Dirty hack to place popup correctly between screens
+        QWidget *popup = findChild<QFrame *>();
+    }
     virtual void hidePopup() override { base_type::hidePopup(); }
 };
 

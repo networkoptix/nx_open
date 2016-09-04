@@ -38,7 +38,6 @@ protected:
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
-    virtual void resizeEvent(QResizeEvent *event) override;
 private:
     void updateCursor();
     void updateCursor(const QPoint &mousePos);

@@ -75,6 +75,7 @@
 #include <ui/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 #include <ui/widgets/main_window_title_bar_widget.h>
 
@@ -127,8 +128,6 @@ extern "C" {
     }
 }
 #endif
-
-#include <ui/workaround/hidpi_workarounds.h>
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
