@@ -29,6 +29,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
@@ -308,8 +309,7 @@ QPoint QnResourceTreeWidget::selectionPos() const
 
     QModelIndex selected = selectedRows.back();
     QPoint pos = ui->resourcesTreeView->visualRect(selected).bottomRight();
-    pos = ui->resourcesTreeView->mapToGlobal(pos);
-    return pos;
+    return QnHiDpiWorkarounds::safeMapToGlobal(ui->resourcesTreeView, pos);
 }
 
 void QnResourceTreeWidget::setCheckboxesVisible(bool visible)

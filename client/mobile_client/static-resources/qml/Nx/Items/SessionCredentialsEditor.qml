@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Qt.labs.controls 1.0
+import Nx 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
@@ -20,6 +21,7 @@ Pane
 
     property bool displayAddressError: false
     property bool displayUserCredentialsError: false
+    property alias addressErrorText: addressErrorPanel.text
 
     signal accepted()
     signal changed()
@@ -52,6 +54,18 @@ Pane
                 onClicked: hostSelectionDialog.open()
                 visible: hostsModel.count > 1
             }
+
+            onActiveFocusChanged:
+            {
+                if (activeFocus)
+                    displayAddressError = false
+            }
+        }
+        FieldWarning
+        {
+            id: addressErrorPanel
+            width: parent.width
+            opened: displayAddressError
         }
 
         Item
@@ -72,6 +86,11 @@ Pane
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
             activeFocusOnTab: true
             onAccepted: KeyNavigation.tab.forceActiveFocus()
+            onActiveFocusChanged:
+            {
+                if (activeFocus)
+                    displayUserCredentialsError = false
+            }
         }
 
         TextField
@@ -93,6 +112,17 @@ Pane
                 if (Qt.platform.os == "android")
                     passwordCharacter = "\u2022"
             }
+            onActiveFocusChanged:
+            {
+                if (activeFocus)
+                    displayUserCredentialsError = false
+            }
+        }
+        FieldWarning
+        {
+            text: LoginUtils.connectionErrorText(QnConnectionManager.Unauthorized)
+            width: parent.width
+            opened: displayUserCredentialsError
         }
     }
 

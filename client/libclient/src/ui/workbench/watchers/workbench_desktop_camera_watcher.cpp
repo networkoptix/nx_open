@@ -14,7 +14,7 @@
 
 QnWorkbenchDesktopCameraWatcher::QnWorkbenchDesktopCameraWatcher(QObject *parent):
     QObject(parent),
-    QnWorkbenchStateDelegate(parent),
+    QnSessionAwareDelegate(parent),
     m_desktopConnected(false)
 {
     /* Server we are currently connected to MUST exist in the initial resources pool. */

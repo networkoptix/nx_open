@@ -26,6 +26,7 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/models/recording_stats_model.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
@@ -440,7 +441,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
 
     auto table = currentTable();
 
-    QMenu* menu = nullptr;
+    QScopedPointer<QMenu> menu;
     QModelIndex idx = table->currentIndex();
     if (idx.isValid())
     {
@@ -452,7 +453,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            menu = manager->newMenu(Qn::TreeScope, this, parameters);
+            menu.reset(manager->newMenu(Qn::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -461,7 +462,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
     if (menu)
         menu->addSeparator();
     else
-        menu = new QMenu(this);
+        menu.reset(new QMenu());
 
     m_clipboardAction->setEnabled(table->selectionModel()->hasSelection());
     m_exportAction->setEnabled(table->selectionModel()->hasSelection());
@@ -472,8 +473,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
-    menu->exec(QCursor::pos());
-    menu->deleteLater();
+    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
 void QnStorageAnalyticsWidget::at_exportAction_triggered()

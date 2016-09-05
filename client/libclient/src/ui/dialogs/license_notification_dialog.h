@@ -4,7 +4,7 @@
 #include <QtWidgets/QDialog>
 #include <licensing/license.h> // TODO: #Elric fwd
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnLicenseListModel;
 
@@ -12,10 +12,10 @@ namespace Ui {
     class LicenseNotificationDialog;
 }
 
-class QnLicenseNotificationDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+class QnLicenseNotificationDialog: public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     QnLicenseNotificationDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);

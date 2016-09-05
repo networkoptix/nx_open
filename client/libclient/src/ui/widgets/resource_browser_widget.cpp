@@ -12,7 +12,6 @@
 #include <QtWidgets/QTreeView>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QGraphicsLinearLayout>
-
 #include <camera/camera_thumbnail_manager.h>
 
 #include <client/client_runtime_settings.h>
@@ -43,6 +42,7 @@
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/widgets/common/text_edit_label.h>
@@ -54,6 +54,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
@@ -70,7 +71,7 @@ const char* kFilterPropertyName = "_qn_filter";
 const int kNoDataFontPixelSize = 32;
 const int kNoDataFontWeight = QFont::Light;
 
-const auto kHtmlLabelFormat = lit("<center><div style='font-weight: 500'>%1</div> %2</center>");
+const auto kHtmlLabelFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
 
 const QSize kMaxThumbnailSize(224, 184);
 
@@ -89,6 +90,8 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     m_proxyWidget->setVisible(false);
     m_proxyWidget->setWidget(m_embeddedWidget);
     m_proxyWidget->installSceneEventFilter(this);
+
+    m_embeddedWidget->setAttribute(Qt::WA_TranslucentBackground);
 
     /* To keep aspect ratio specify only maximum height for server request: */
     m_previewWidget->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
@@ -240,7 +243,14 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setWorkbench(workbench());
     ui->searchTreeWidget->setWorkbench(workbench());
 
+    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
+    ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
     ui->tabWidget->tabBar()->setMaximumHeight(32);
+
+    //TODO: #vkutin Change to something more adequate:
+    QColor color = palette().color(QPalette::Shadow);
+    color.setAlphaF(0.4);
+    setPaletteColor(ui->tabWidget, QPalette::Window, color);
 
     connect(workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
@@ -356,7 +366,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
 
     QnActionManager* manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, nullptr, ignoreSelection
         ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
         : currentParameters(Qn::TreeScope)));
 
@@ -376,7 +386,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
         return;
 
     /* Run menu. */
-    QAction* action = menu->exec(pos);
+    QAction* action = QnHiDpiWorkarounds::showMenu(menu.data(), pos);
 
     /* Process tree-local actions. */
     if (m_renameActions.values().contains(action))
@@ -746,7 +756,8 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent* event)
         QPoint pos = currentTreeWidget()->selectionPos();
         if (pos.isNull())
             return;
-        showContextMenuAt(display()->view()->mapToGlobal(pos));
+
+        showContextMenuAt(pos);
     }
 }
 

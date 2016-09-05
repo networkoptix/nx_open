@@ -8,8 +8,7 @@
 
 QnClientRecentConnectionsManager::QnClientRecentConnectionsManager():
     base_type(),
-    m_unbound(),
-    m_bound(),
+    m_models(),
     m_dataCache(),
     m_updating(false)
 {
@@ -31,6 +30,7 @@ QnClientRecentConnectionsManager::~QnClientRecentConnectionsManager()
 
 void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* model)
 {
+    NX_ASSERT(model);
     NX_ASSERT(!m_updating);
 
     connect(model, &QnRecentUserConnectionsModel::systemNameChanged, this,
@@ -40,67 +40,36 @@ void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* mo
         });
 
     const auto systemName = model->systemName();
-    m_unbound.insert(model);
+    m_models << model;
     if (!systemName.isEmpty())
         updateModelBinding(model);
 }
 
 void QnClientRecentConnectionsManager::removeModel(QnRecentUserConnectionsModel* model)
 {
+    NX_ASSERT(model);
     NX_ASSERT(!m_updating);
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (m_unbound.remove(model))
-        return;
+    NX_ASSERT(m_models.contains(model));
 
     const auto systemName = model->systemName();
-    const auto it = m_bound.find(systemName);
-    const bool isFound = (it != m_bound.end());
-
     qDebug() << "Removing model for " << systemName;
-//    NX_ASSERT(isFound, Q_FUNC_INFO, "Model has not been found"); //TODO: #ynikitenkov Investigate
-    if (!isFound)
-        return;
-
-    m_bound.erase(it);
+    m_models.removeOne(model);
 }
 
 void QnClientRecentConnectionsManager::updateModelBinding(QnRecentUserConnectionsModel* model)
 {
+    NX_ASSERT(model);
     NX_ASSERT(!m_updating);
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    const bool isCorrectSystemName = !model->systemName().isEmpty();
-    NX_ASSERT(isCorrectSystemName, Q_FUNC_INFO
-        , "System name for model can't be empty");
+    const auto systemName = model->systemName();
+    const bool isCorrectSystemName = !systemName.isEmpty();
+    NX_ASSERT(isCorrectSystemName, Q_FUNC_INFO, "System name for model can't be empty");
     if (!isCorrectSystemName)
         return;
 
-    const auto itUnbound = m_unbound.find(model);
-    const bool isUnbound = (itUnbound != m_unbound.end());
-    const auto systemName = model->systemName();
-    if (isUnbound)
-    {
-        m_unbound.erase(itUnbound);
-    }
-    else
-    {
-        const auto it = std::find(m_bound.cbegin(), m_bound.cend(), model);
-
-        const bool isBoundAlready = (it != m_bound.cend());
-//        NX_ASSERT(!isBoundAlready, Q_FUNC_INFO, "Model is bound"); //TODO: #ynikitenkov Investigate
-        if (isBoundAlready)
-            return;
-
-        const bool modelWithSameSystem = m_bound.contains(systemName);
-//        NX_ASSERT(!modelWithSameSystem, Q_FUNC_INFO
-//            , "Model with the same system name exists"); //TODO: #ynikitenkov Investigate
-
-        if (modelWithSameSystem)
-            return;
-    }
-
-    m_bound.insert(systemName, model);
     model->updateData(m_dataCache.value(systemName));
 }
 
@@ -115,9 +84,12 @@ void QnClientRecentConnectionsManager::updateModelsData()
     {
         m_dataCache[connectionDesc.systemName].append(connectionDesc);
     }
-    for (const auto boundModel : m_bound)
+    for (const auto model : m_models)
     {
-        const auto systemName = boundModel->systemName();
-        boundModel->updateData(m_dataCache.value(systemName));
+        NX_ASSERT(model);
+        if (!model || model->systemName().isEmpty())
+            continue;
+        const auto systemName = model->systemName();
+        model->updateData(m_dataCache.value(systemName));
     }
 }

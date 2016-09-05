@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QDialog>
 
+#include <utils/common/credentials.h>
+
 class QnSetupWizardDialogPrivate;
 class QnSetupWizardDialog : public QDialog
 {
@@ -18,14 +20,9 @@ public:
     QUrl url() const;
     void setUrl(const QUrl& url);
 
-    QString localLogin() const;
-    QString localPassword() const;
-
-    QString cloudLogin() const;
-    void setCloudLogin(const QString& login);
-
-    QString cloudPassword() const;
-    void setCloudPassword(const QString& password);
+    QnCredentials localCredentials() const;
+    QnCredentials cloudCredentials() const;
+    void setCloudCredentials(const QnCredentials& value);
 private:
     Q_DECLARE_PRIVATE(QnSetupWizardDialog);
     QScopedPointer<QnSetupWizardDialogPrivate> d_ptr;

@@ -1,17 +1,17 @@
 #ifndef UPDATE_DIALOG_H
 #define UPDATE_DIALOG_H
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
-class QnWorkbenchStateDelegate;
+class QnSessionAwareDelegate;
 
 namespace Ui {
     class QnSystemAdministrationDialog;
 }
 
-class QnSystemAdministrationDialog : public QnWorkbenchStateDependentTabbedDialog {
+class QnSystemAdministrationDialog : public QnSessionAwareTabbedDialog {
     Q_OBJECT
-    typedef QnWorkbenchStateDependentTabbedDialog base_type;
+    typedef QnSessionAwareTabbedDialog base_type;
 public:
     enum DialogPage {
         GeneralPage,

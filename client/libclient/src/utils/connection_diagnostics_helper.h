@@ -6,10 +6,11 @@
 
 #include <network/connection_validator.h>
 
-class QnConnectionDiagnosticsHelper: public QnConnectionValidator
+class QnConnectionDiagnosticsHelper: public QObject
 {
     Q_OBJECT
-    using base_type = QnConnectionValidator;
+    using base_type = QObject;
+
 public:
     QnConnectionDiagnosticsHelper(QObject* parent = nullptr);
 
@@ -47,5 +48,4 @@ private:
     };
 
     static QString strings(ErrorStrings id);
-
 };

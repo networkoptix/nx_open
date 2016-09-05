@@ -8,7 +8,7 @@
 
 #include "api/model/storage_status_reply.h"
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/storage_model_info.h>
 
 struct QnStorageStatusReply;
@@ -17,10 +17,10 @@ namespace Ui {
     class StorageUrlDialog;
 }
 
-class QnStorageUrlDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+class QnStorageUrlDialog: public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);

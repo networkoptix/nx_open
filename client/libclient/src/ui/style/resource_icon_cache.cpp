@@ -16,21 +16,22 @@
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
-namespace
+namespace {
+
+const QString customKeyProperty = lit("customIconCacheKey");
+
+QIcon loadIcon(const QString& name)
 {
-    const QString customKeyProperty = lit("customIconCacheKey");
+    static const QnIcon::SuffixesList kResourceIconSuffixes({
+        {QnIcon::Active,   lit("accented")},
+        {QnIcon::Disabled, lit("disabled")},
+        {QnIcon::Selected, lit("selected")},
+    });
 
-    QIcon loadIcon(const QString& name)
-    {
-        static const QVector<QPair<QIcon::Mode, QString> > kResourceIconModes({
-            qMakePair(QnIcon::Active,   lit("accented")),
-            qMakePair(QnIcon::Disabled, lit("disabled")),
-            qMakePair(QnIcon::Selected, lit("selected")),
-        });
-
-        return qnSkin->icon(name, QString(), kResourceIconModes.size(), &kResourceIconModes.front());
-    }
+    return qnSkin->icon(name, QString(), &kResourceIconSuffixes);
 }
+
+} //namespace
 
 QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
 {
@@ -53,7 +54,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(VideoWall,               loadIcon(lit("tree/videowall.png")));
     m_cache.insert(VideoWallItem,           loadIcon(lit("tree/screen.png")));
     m_cache.insert(VideoWallMatrix,         loadIcon(lit("tree/matrix.png")));
-    m_cache.insert(OtherSystem,             loadIcon(lit("tree/system.png")));
+    m_cache.insert(OtherSystem,             loadIcon(lit("tree/other_systems.png")));
     m_cache.insert(OtherSystems,            loadIcon(lit("tree/other_systems.png")));
     m_cache.insert(WebPage,                 loadIcon(lit("tree/webpage.png")));
     m_cache.insert(WebPages,                loadIcon(lit("tree/webpages.png")));

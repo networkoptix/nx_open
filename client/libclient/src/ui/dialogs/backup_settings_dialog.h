@@ -5,16 +5,16 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/server_backup_schedule.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
     class BackupSettingsDialog;
 } // namespace Ui
 
-class QnBackupSettingsDialog : public QnWorkbenchStateDependentButtonBoxDialog
+class QnBackupSettingsDialog : public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
-    using base_type = QnWorkbenchStateDependentButtonBoxDialog;
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
     explicit QnBackupSettingsDialog(QWidget* parent = nullptr);

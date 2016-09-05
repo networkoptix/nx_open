@@ -318,7 +318,7 @@ void DragProcessor::mousePressEventInternal(T *object, Event *event, bool instan
 
             /* Send drag right away if needed. */
             if(m_state == Running)
-                drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos, m_info.m_mousePressItemPos, false); 
+                drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos, m_info.m_mousePressItemPos, false);
         }
     } else {
         if(m_state == Running)
@@ -341,10 +341,10 @@ void DragProcessor::timerEvent(QTimerEvent *event) {
 
     /* Send drag right away. */
     if(m_state == Running) {
-        /* Using press pos here is not 100% correct, but we don't want to 
+        /* Using press pos here is not 100% correct, but we don't want to
          * complicate the event handling logic even further to store the
          * current mouse pos. */
-        drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos, m_info.m_mousePressItemPos, false); 
+        drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos, m_info.m_mousePressItemPos, false);
     }
 }
 
@@ -503,9 +503,13 @@ void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *event) {
             return;
         }
 
-        if(viewport == m_viewport) {
-            QPoint screenPos = QCursor::pos();
-            drag(event, screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)), QPointF(), false);
+        if(viewport == m_viewport)
+        {
+            const QPoint screenPos = QCursor::pos();
+            const auto graphicsView = view(viewport);
+            const auto viewPos = view(viewport)->mapFromGlobal(screenPos);
+            const auto scenePos = graphicsView->mapToScene(viewPos);
+            drag(event, screenPos, scenePos, QPointF(), false);
         }
     }
 }

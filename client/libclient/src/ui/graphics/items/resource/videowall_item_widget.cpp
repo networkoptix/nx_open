@@ -35,6 +35,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
@@ -417,11 +418,11 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     if (event->button() != Qt::RightButton)
         return;
 
-    QScopedPointer<QMenu> popupMenu(menu()->newMenu(Qn::SceneScope, mainWindow(), QnActionParameters(m_indices)));
+    QScopedPointer<QMenu> popupMenu(menu()->newMenu(Qn::SceneScope, nullptr, QnActionParameters(m_indices)));
     if(popupMenu->isEmpty())
         return;
 
-    popupMenu->exec(event->screenPos());
+    QnHiDpiWorkarounds::showMenu(popupMenu.data(), QCursor::pos());
 }
 
 void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {

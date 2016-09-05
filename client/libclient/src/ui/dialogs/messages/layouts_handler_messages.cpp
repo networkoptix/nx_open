@@ -2,10 +2,38 @@
 
 #include <client/client_settings.h>
 
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 
-bool QnLayoutsHandlerMessages::changeUserLocalLayout(QWidget* parent, const QnResourceList& stillAccessible)
+void QnLayoutsHandlerMessages::layoutAlreadyExists(QWidget* parent)
+{
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Layout already exists."));
+    messageBox.setText(tr("Layout already exists."));
+    messageBox.setInformativeText(tr("A layout with the same name already exists. "
+        "You do not have the rights to overwrite it."));
+    messageBox.exec();
+}
+
+QDialogButtonBox::StandardButton QnLayoutsHandlerMessages::askOverrideLayout(
+    QWidget* parent,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Layout already exists."));
+    messageBox.setText(tr("A layout with the same name already exists. "
+        "Would you like to overwrite it?"));
+    messageBox.setStandardButtons(buttons);
+    messageBox.setDefaultButton(defaultButton);
+    return static_cast<QDialogButtonBox::StandardButton>(messageBox.exec());
+}
+
+bool QnLayoutsHandlerMessages::changeUserLocalLayout(QWidget* parent,
+    const QnResourceList& stillAccessible)
 {
     if (stillAccessible.isEmpty())
         return true;
@@ -14,13 +42,12 @@ bool QnLayoutsHandlerMessages::changeUserLocalLayout(QWidget* parent, const QnRe
     if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::ChangeUserLocalLayout))
         return true;
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Save Layout..."),
-        tr("User will keep access to %n removed cameras", "", stillAccessible.size()),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        parent);
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Save Layout..."));
+    messageBox.setText(tr("User will keep access to %n removed cameras", "",
+        stillAccessible.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.setInformativeText(tr("To remove access go to User Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
@@ -46,13 +73,12 @@ bool QnLayoutsHandlerMessages::addToRoleLocalLayout(QWidget* parent, const QnRes
     if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::AddToRoleLocalLayout))
         return true;
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Save Layout..."),
-        tr("All users with this role will get access to these %n cameras", "", toShare.size()),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        parent);
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Save Layout..."));
+    messageBox.setText(tr("All users with this role will get access to these %n cameras", "",
+        toShare.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.setInformativeText(tr("To remove access go to User Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
@@ -69,7 +95,8 @@ bool QnLayoutsHandlerMessages::addToRoleLocalLayout(QWidget* parent, const QnRes
     return result == QDialogButtonBox::Ok;
 }
 
-bool QnLayoutsHandlerMessages::removeFromRoleLocalLayout(QWidget* parent, const QnResourceList& stillAccessible)
+bool QnLayoutsHandlerMessages::removeFromRoleLocalLayout(QWidget* parent,
+    const QnResourceList& stillAccessible)
 {
     if (stillAccessible.isEmpty())
         return true;
@@ -78,13 +105,12 @@ bool QnLayoutsHandlerMessages::removeFromRoleLocalLayout(QWidget* parent, const 
     if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::RemoveFromRoleLocalLayout))
         return true;
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Save Layout..."),
-        tr("All users with this role will keep access to %n removed cameras", "", stillAccessible.size()),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        parent);
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Save Layout..."));
+    messageBox.setText(tr("All users with this role will keep access to %n removed cameras", "",
+        stillAccessible.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.setInformativeText(tr("To remove access go to User Roles Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
@@ -107,15 +133,14 @@ bool QnLayoutsHandlerMessages::sharedLayoutEdit(QWidget* parent)
     if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::SharedLayoutEdit))
         return true;
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Save Layout..."),
-        tr("Changes will affect many users"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        parent);
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Save Layout..."));
+    messageBox.setText(tr("Changes will affect many users"));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(tr("This layout is shared. By changing this layout you change it for all users who have it."));
+    messageBox.setInformativeText(tr("This layout is shared. "
+        "By changing this layout you change it for all users who have it."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
 
     auto result = messageBox.exec();
@@ -137,15 +162,14 @@ bool QnLayoutsHandlerMessages::stopSharingLayouts(QWidget* parent,
 
     QString informativeText = subject.user()
         ? tr("User will lose access to the following %n cameras:", "", mediaResources.size())
-        : tr("All users with this role will lose access to the following %n cameras:", "", mediaResources.size());
+        : tr("All users with this role will lose access to the following %n cameras:", "",
+            mediaResources.size());
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Stop Sharing Layout..."),
-        tr("If sharing layout is stopped some cameras will become inaccessible"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        parent);
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Stop Sharing Layout..."));
+    messageBox.setText(tr("If sharing layout is stopped some cameras will become inaccessible"));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.addCustomWidget(new QnResourceListView(mediaResources));
     messageBox.setInformativeText(informativeText);
@@ -156,21 +180,21 @@ bool QnLayoutsHandlerMessages::stopSharingLayouts(QWidget* parent,
 
 bool QnLayoutsHandlerMessages::deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts)
 {
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Delete Layouts..."),
-        tr("Changes will affect many users"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        parent);
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Delete Layouts..."));
+    messageBox.setText(tr("Changes will affect many users"));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.setInformativeText(tr("These %n layouts are shared. "
-        "By deleting these layouts you delete them from all users who have it.", "", layouts.size()));
+        "By deleting these layouts you delete them from all users who have it.", "",
+        layouts.size()));
     messageBox.addCustomWidget(new QnResourceListView(layouts));
     return messageBox.exec() == QDialogButtonBox::Ok;
 }
 
-bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent, const QnResourceList& stillAccessible)
+bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,
+    const QnResourceList& stillAccessible)
 {
     if (stillAccessible.isEmpty())
         return true;
@@ -179,13 +203,12 @@ bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent, const QnResou
     if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteLocalLayouts))
         return true;
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Delete Layouts..."),
-        tr("User will keep access to %n removed cameras", "", stillAccessible.size()),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        parent);
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Delete Layouts..."));
+    messageBox.setText(tr("User will keep access to %n removed cameras", "",
+        stillAccessible.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
     messageBox.setInformativeText(tr("To remove access go to User Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));

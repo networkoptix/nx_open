@@ -1,6 +1,8 @@
 #pragma once
-#include <QtCore>
-#include <QtNetwork>
+
+#include <QtCore/QString>
+#include <QtNetwork/QAuthenticator>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 struct QnCredentials{
@@ -17,6 +19,15 @@ struct QnCredentials{
 
     QString user;
     QString password;
+
+    bool isNull() const;
+    bool isEmpty() const;
+
+    /**
+     * Check both user and password are filled.
+     * @param allowEmptyPassword    Disable password check
+     */
+    bool isValid(bool allowEmptyPassword = false) const;
 };
 
 inline uint qHash(const QnCredentials& creds)
@@ -30,8 +41,4 @@ inline uint qHash(const QAuthenticator& auth)
 }
 
 #define QnCredentials_Fields (user)(password)
-QN_FUSION_DECLARE_FUNCTIONS(QnCredentials, (eq)(json)(ubjson)(xml)(csv_record))
-Q_DECLARE_METATYPE(QnCredentials)
-
-
-
+QN_FUSION_DECLARE_FUNCTIONS(QnCredentials, (metatype)(eq)(json)(ubjson)(xml)(csv_record))

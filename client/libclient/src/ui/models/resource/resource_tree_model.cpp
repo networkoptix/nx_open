@@ -39,6 +39,8 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/common/scoped_value_rollback.h>
+
 //#define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
 #define TRACE(...) qDebug() << "QnResourceTreeModel: " << __VA_ARGS__;
@@ -128,8 +130,11 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
                 if (!m_nodesByResource.contains(resource))
                     continue;
 
-                for (auto node: m_nodesByResource[resource])
-                    node->updateRecursive();
+                {
+                    QN_SCOPED_VALUE_ROLLBACK(&m_iteratingOverNodesByResource, true);
+                    for (auto node: m_nodesByResource[resource])
+                        node->updateRecursive();
+                }
 
                 if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
                 {
@@ -207,6 +212,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResou
     auto pos = m_resourceNodeByResource.find(resource);
     if (pos == m_resourceNodeByResource.end())
     {
+        NX_ASSERT(!m_iteratingOverNodesByResource);
         Qn::NodeType nodeType = Qn::ResourceNode;
         if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             if (QnMediaServerResource::isHiddenServer(resource->getParentResource()))
@@ -275,6 +281,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnU
     auto pos = layouts.find(sharedLayout);
     if (pos == layouts.end())
     {
+        NX_ASSERT(!m_iteratingOverNodesByResource);
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, sharedLayout, Qn::SharedLayoutNode));
         pos = layouts.insert(sharedLayout, node);
         m_nodesByResource[sharedLayout].push_back(*pos);
@@ -295,6 +302,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureAccessibleResourceNode(con
     auto pos = resources.find(resource);
     if (pos == resources.end())
     {
+        NX_ASSERT(!m_iteratingOverNodesByResource);
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, resource, Qn::AccessibleResourceNode));
         pos = resources.insert(resource, node);
         m_nodesByResource[resource].push_back(*pos);
@@ -655,6 +663,7 @@ void QnResourceTreeModel::updateNodeResource(const QnResourceTreeModelNodePtr& n
     if (node->resource() == resource)
         return;
 
+    NX_ASSERT(!m_iteratingOverNodesByResource);
     if (node->resource())
         m_nodesByResource[node->resource()].removeAll(node);
     node->setResource(resource);
@@ -1613,6 +1622,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     for (auto node: nodesToDelete)
         removeNode(node);
 
+    NX_ASSERT(!m_iteratingOverNodesByResource);
     m_nodesByResource.remove(resource);
     m_resourceNodeByResource.remove(resource);
 
@@ -1759,8 +1769,11 @@ void QnResourceTreeModel::at_accessController_permissionsChanged(const QnResourc
         return;
     }
 
-    for (auto node : m_nodesByResource[resource])
-        node->updateRecursive();
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_iteratingOverNodesByResource, true);
+        for (auto node : m_nodesByResource[resource])
+            node->updateRecursive();
+    }
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
@@ -1813,6 +1826,7 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 
 void QnResourceTreeModel::at_resource_resourceChanged(const QnResourcePtr &resource)
 {
+    QN_SCOPED_VALUE_ROLLBACK(&m_iteratingOverNodesByResource, true);
     if (m_nodesByResource.contains(resource))
         for (auto node: m_nodesByResource[resource])
             node->update();
@@ -1820,7 +1834,9 @@ void QnResourceTreeModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
 void QnResourceTreeModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item)
 {
-    for (auto parentNode : m_nodesByResource[layout])
+    /* Making copy as m_nodesByResource will be modified inside. */
+    auto layoutNodes = m_nodesByResource[layout];
+    for (auto parentNode : layoutNodes)
     {
         if (parentNode->type() != Qn::ResourceNode && parentNode->type() != Qn::SharedLayoutNode)
             continue;
@@ -1829,12 +1845,13 @@ void QnResourceTreeModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
         QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
         updateNodeResource(node, resource); /* In case item is just created. */
     }
-
 }
 
 void QnResourceTreeModel::at_layout_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item)
 {
-    for (auto parentNode : m_nodesByResource[layout])
+    /* Making copy as m_nodesByResource will be modified inside. */
+    auto layoutNodes = m_nodesByResource[layout];
+    for (auto parentNode : layoutNodes)
     {
         if (parentNode->type() != Qn::ResourceNode && parentNode->type() != Qn::SharedLayoutNode)
             continue;

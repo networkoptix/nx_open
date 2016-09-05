@@ -148,6 +148,8 @@ void QnNoptixStyle::polish(QApplication *application) {
     application->setEffectEnabled(Qt::UI_AnimateCombo, false);
 
     m_customizer->customize(application);
+
+    QToolTip::setPalette(application->palette());
 }
 
 void QnNoptixStyle::unpolish(QApplication *application) {

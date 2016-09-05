@@ -9,7 +9,6 @@ fi
 export DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
 
 update () {
-  cp /opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf /tmp/mediaserver.conf
   cp $DISTRIB.tar.gz /tmp
   tar xfv $DISTRIB.tar.gz -C /
   if [[ "${box}" == "bpi" ]]; then 
@@ -17,7 +16,6 @@ update () {
     /etc/init.d/nx1boot upgrade
   fi
   # TODO: add errorlevel handling
-  cat /tmp/mediaserver.conf >> /opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf  
   rm /tmp/$DISTRIB.tar.gz
 }
 

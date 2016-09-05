@@ -32,6 +32,7 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
+class QnTwoWayAudioWidget;
 
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -173,6 +174,8 @@ protected:
 
     virtual void updateHud(bool animate);
 
+    void updateTwoWayAudioWidget();
+
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
@@ -284,6 +287,8 @@ private:
 
     QVector<QColor> m_motionSensitivityColors;
     const QColor m_backgroundColor;
+
+    QnTwoWayAudioWidget* m_twoWayAudioWidget;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)
