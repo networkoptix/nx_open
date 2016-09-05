@@ -38,7 +38,6 @@ struct ApiMockInnerData
     int i;
 };
 #define ApiMockInnerData_Fields (i)
-Q_DECLARE_METATYPE(ApiMockInnerData)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiMockInnerData), (ubjson)(json), _Fields)
 typedef std::vector<ApiMockInnerData> ApiMockInnerDataList;
 
@@ -67,7 +66,6 @@ struct ApiMockData: ApiIdData
     ApiMockInnerDataList array;
 };
 #define ApiMockData_Fields (id)(i)(array)(inner)
-Q_DECLARE_METATYPE(ApiMockData)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiMockData), (ubjson)(json), _Fields)
 typedef std::vector<ApiMockData> ApiMockDataList;
 
@@ -154,7 +152,7 @@ public:
     MockConnection* queryProcessor() { return this; }
     MockConnection& getAccess(...) { return *this; }
     MockConnection* auditManager() { return this; }
-    void addAuditRecord(...) {}
+    void setAuditData(...) {}
 
 private:
     const QueryCallback m_queryCallback;
@@ -162,6 +160,8 @@ private:
 };
 
 typedef UpdateHttpHandler<ApiMockData, MockConnection> TestUpdateHttpHandler;
+
+static const ApiCommand::Value kMockApiCommand = (ApiCommand::Value) 1; //< Any existing command.
 
 //-------------------------------------------------------------------------------------------------
 // Test mechanism.
@@ -192,7 +192,7 @@ public:
         QByteArray resultBody;
         QByteArray contentType;
         int httpStatusCode = m_updateHttpHandler->executePost(
-            /*path*/ "",
+            /*path*/ ApiCommand::toString(kMockApiCommand),
             QnRequestParamList(),
             m_requestJson.json,
             "application/json",
@@ -252,7 +252,7 @@ private:
 
         ASSERT_FALSE(m_wasHandleQueryCalled) << "handleQuery() called twice";
         m_wasHandleQueryCalled = true;
-        ASSERT_TRUE(m_requestJson.id) << "handleQuery() called but Id omitted from json";
+        ASSERT_TRUE((bool) m_requestJson.id) << "handleQuery() called but Id omitted from json";
 
         if (m_requestJson.id.get() != input)
         {
@@ -272,7 +272,7 @@ private:
     {
         ASSERT_FALSE(m_wasHandleUpdateCalled) << "handleUpdate() called twice";
         m_wasHandleUpdateCalled = true;
-        ASSERT(tran.command == ApiCommand::NotDefined);
+        ASSERT(tran.command == kMockApiCommand);
 
         LOG(lit("Transaction: %1").arg(tran.params.toJsonString().c_str()));
 
@@ -371,3 +371,7 @@ TEST_F(RestApiTest, StructMerging)
 
 } // namespace test
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::test::ApiMockInnerData)
+Q_DECLARE_METATYPE(ec2::test::ApiMockData)
+

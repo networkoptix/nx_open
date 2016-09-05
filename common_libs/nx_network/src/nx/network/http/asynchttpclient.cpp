@@ -513,6 +513,9 @@ namespace nx_http
                 m_responseBuffer.resize(0);
                 if (m_connectionClosed)
                 {
+                    if (reconnectIfAppropriate())
+                        return;
+
                     NX_LOGX(lit("Failed to read (1) response from %1. %2").
                         arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::connectionReset), cl_logDEBUG1);
                     m_state = sFailed;
@@ -925,7 +928,7 @@ namespace nx_http
 
     bool AsyncHttpClient::reconnectIfAppropriate()
     {
-        if ((m_state == sSendingRequest || m_state == sReceivingResponse) &&
+        if ((m_connectionClosed || m_state == sSendingRequest || m_state == sReceivingResponse) &&
             m_bytesRead == 0 &&
             m_totalRequests > 1)
         {

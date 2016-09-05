@@ -4454,6 +4454,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& tran)
+{
+    return transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+}
+
 QnUuid QnDbManager::getID() const
 {
     return m_dbInstanceId;

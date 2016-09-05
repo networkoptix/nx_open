@@ -17,7 +17,7 @@
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
 #include <core/resource/media_server_resource.h>
-
+#include <server/server_globals.h>
 
 namespace {
 constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
@@ -127,7 +127,7 @@ void CloudConnectionManager::processCloudErrorCode(
             .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
 
         //system has been disconnected from cloud: cleaning up cloud credentials...
-        if (!cleanupCloudDataInLocalDB())
+        if (!cleanUpCloudDataInLocalDb())
         {
             NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         }
@@ -149,7 +149,7 @@ void CloudConnectionManager::unsubscribeFromSystemAccessListUpdatedEvent(
     m_systemAccessListUpdatedEventSubscription.removeSubscription(subscriptionId);
 }
 
-bool CloudConnectionManager::cleanupCloudDataInLocalDB()
+bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
 {
     qnGlobalSettings->resetCloudParams();
     if (!qnGlobalSettings->synchronizeNowSync())
@@ -179,6 +179,7 @@ bool CloudConnectionManager::cleanupCloudDataInLocalDB()
     }
 
     qnCommon->updateModuleInformation();
+    MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
 
     return true;
 }
@@ -313,12 +314,14 @@ void CloudConnectionManager::cloudSettingsChanged()
             .setSystemCredentials(std::move(credentials));
 
         monitorForCloudEvents();
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
         stopMonitoringCloudEvents();
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
     }
 
     emit cloudBindingStatusChanged(boundToCloud);

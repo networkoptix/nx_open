@@ -446,6 +446,7 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateSequenceData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
@@ -596,6 +597,7 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
+
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

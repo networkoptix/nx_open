@@ -76,9 +76,9 @@ public:
      * Convenience function which creates serialized JSON result.
      */
     static void writeError(QByteArray* outBody, Error error, const QString& errorMessage) {
-        QnJsonRestResult jsonResult;
-        jsonResult.setError(error, errorMessage);
-        *outBody = QJson::serialized(jsonResult);
+        QnJsonRestResult jsonRestResult;
+        jsonRestResult.setError(error, errorMessage);
+        *outBody = QJson::serialized(jsonRestResult);
     }
 };
 

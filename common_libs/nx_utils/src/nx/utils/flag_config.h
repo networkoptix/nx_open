@@ -17,14 +17,17 @@ namespace utils {
  * To use, define a derived class and its instance as follows:
  * <pre><code>
  *
- *     struct MyModuleFlagConfig: public nx::utils::FlagConfig
+ *     struct MyModuleConf: nx::utils::FlagConfig
  *     {
- *         using nx::utils::FlagConfig::FlagConfig;
+ *         using nx::utils::FlagConfig::FlagConfig; //< No initial reload.
+ *         // or:
+ *         MyModuleConf(const char* s): nx::utils::FlagConfig(s) { reload(); } //< Initial reload.
+ *
  *         NX_FLAG(0, myFlag "Here 0 stands for 'false' as the default value.");
  *         NX_INT_PARAM(7, myInt, "Here 7 is the default value.");
  *         NX_STRING_PARAM("Default value", myStr, "Description.");
  *     };
- *     MyModuleFlagConfig conf("mymodule");
+ *     MyModuleConf conf("mymodule");
  *
  * </code></pre>
  * In the code, call conf.reload() when needed to reload from file(s), and use conf.<param-name> to
