@@ -44,7 +44,11 @@ QnActiResource::QnActiResource()
     setVendor(lit("ACTI"));
 
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
-        m_availBitrate.push_back(DEFAULT_AVAIL_BITRATE_KBPS[i]);
+    {
+        m_availableBitrates.insert(
+            DEFAULT_AVAIL_BITRATE_KBPS[i],
+            bitrateToDefaultString(DEFAULT_AVAIL_BITRATE_KBPS[i]));
+    }
 }
 
 QnActiResource::~QnActiResource()
@@ -242,19 +246,33 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
         qnSyncTime->currentUSecsSinceEpoch() );
 }
 
-QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
+QMap<int, QString> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
 {
-    QList<int> result;
-    for(QByteArray bitrate: bitrateCap.split(','))
+    QMap<int, QString> result;
+    int coeff = 1;
+    for(auto bitrate: bitrateCap.split(','))
     {
         bitrate = bitrate.trimmed().toUpper();
-        int coeff = 1;
         if (bitrate.endsWith("M"))
             coeff = 1000;
-        bitrate.chop(1);
-        result.push_back(bitrate.toFloat()*coeff);
+        else
+            coeff = 1;
+
+        result.insert(
+            bitrate.left(bitrate.size() - 1).toDouble() * coeff,
+            bitrate);
     }
+    
     return result;
+}
+
+QString QnActiResource::bitrateToDefaultString(int bitrateKbps) const
+{
+    const int kKbitInMbit = 1000;
+    if (bitrateKbps < kKbitInMbit)
+        return lit("%1K").arg(bitrateKbps);
+    
+    return lit("%1.%2M").arg(bitrateKbps / 1000).arg((bitrateKbps % 1000) / 100);
 }
 
 bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const
@@ -456,10 +474,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     auto bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())
-    {
-        m_availBitrate = parseVideoBitrateCap(bitrateCap.toLatin1());
-        m_rawBitrate = bitrateCap.split(',');
-    }
+        m_availableBitrates = parseVideoBitrateCap(bitrateCap.toLatin1());
 
     initializeIO(report);
 
@@ -675,40 +690,10 @@ int QnActiResource::getMaxFps() const
 
 QString QnActiResource::formatBitrateString(int bitrateKbps) const
 {
-    if (bitrateKbps < 1000)
-    {
-        return lit("%1K").arg(bitrateKbps);
-    }
-    else
-    {
-        bool usePoint = true;
+    if (m_availableBitrates.contains(bitrateKbps))
+        return m_availableBitrates[bitrateKbps];
 
-        if (!m_rawBitrate.empty())
-        {
-            int bitrateIndex = -1;
-            for(size_t i=0; i < m_availBitrate.size(); ++i)
-            {
-                if (bitrateKbps == m_availBitrate[i])
-                {
-                    bitrateIndex = i;
-                    break;
-                }
-            }
-
-            if (bitrateIndex != -1 && m_rawBitrate.size() > bitrateIndex)
-            {
-                usePoint = m_rawBitrate[bitrateIndex].indexOf('.') != -1;
-            }
-        }
-
-        QString tpl = usePoint ? lit("%1.%2M") : lit("%1M");
-        QString result = tpl.arg(bitrateKbps/1000);
-
-        if(usePoint)
-            result = result.arg((bitrateKbps%1000)/100);
-
-        return result;
-    }
+    return bitrateToDefaultString(bitrateKbps);
 }
 
 QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
@@ -724,7 +709,7 @@ int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
     for (int i = 0; i < availFps.size(); ++i)
     {
         int distance = qAbs(availFps[i] - srcFps);
-        if (distance <= minDistance) { // preffer higher fps if same distance
+        if (distance <= minDistance) { // prefer higher fps if same distance
             minDistance = distance;
             result = availFps[i];
         }
@@ -737,12 +722,14 @@ int QnActiResource::roundBitrate(int srcBitrateKbps) const
 {
     int minDistance = INT_MAX;
     int result = srcBitrateKbps;
-    for (int i = 0; i < m_availBitrate.size(); ++i)
+
+    for (const auto& bitrate: m_availableBitrates.keys())
     {
-        int distance = qAbs(m_availBitrate[i] - srcBitrateKbps);
-        if (distance <= minDistance) { // preffer higher bitrate if same distance
+        int distance = qAbs(bitrate - srcBitrateKbps);
+        if (distance <= minDistance)
+        {
             minDistance = distance;
-            result = m_availBitrate[i];
+            result = bitrate;
         }
     }
 
