@@ -790,7 +790,7 @@ void QnNxStyle::drawPrimitive(
             rect.setLeft(option->rect.left());
             rect.setRight(option->rect.right());
 
-            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(3);
+            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Mid));
 
             QnScopedPainterPenRollback penRollback(painter);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
