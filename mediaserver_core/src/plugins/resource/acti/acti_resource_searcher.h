@@ -5,7 +5,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
-#include <utils/network/mac_address.h>
+#include <nx/network/mac_address.h>
 
 class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcherAsync
 {
