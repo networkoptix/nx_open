@@ -28,14 +28,6 @@ int QnActiStreamReader::getActiChannelNum() const
     return m_role == Qn::CR_LiveVideo ? 1 : 2;
 }
 
-QString QnActiStreamReader::formatBitrateStr(int bitrateKbps) const
-{
-    if (bitrateKbps < 1000)
-        return QString(QLatin1String("%1K")).arg(bitrateKbps);
-    else
-        return QString(QLatin1String("%1.%2M")).arg(bitrateKbps/1000).arg((bitrateKbps%1000)/100);
-}
-
 QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
 {
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
@@ -47,18 +39,30 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
 
     QString SET_RESOLUTION(QLatin1String("CHANNEL=%1&VIDEO_RESOLUTION=%2"));
     QString SET_FPS(QLatin1String("CHANNEL=%1&VIDEO_FPS_NUM=%2"));
-    QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2"));
+    QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2&VIDEO_MAX_BITRATE=%2"));
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
 
     m_multiCodec.setRole(m_role);
     int fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
+
     QSize resolution = m_actiRes->getResolution(m_role);
     QString resolutionStr = formatResolutionStr(resolution);
+
     int bitrate = m_actiRes->suggestBitrateKbps(params.quality, resolution, fps);
     bitrate = m_actiRes->roundBitrate(bitrate);
-    QString bitrateStr = formatBitrateStr(bitrate);
-    QString encoderStr(QLatin1String("H264"));
+    QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
+
+    auto encoders = m_actiRes->getAvailableEncoders();
+    QString encoderStr;
+
+    if (encoders.contains(lit("H264")))
+        encoderStr = lit("H264");
+    else if (encoderStr.contains(lit("MJPEG")))
+        encoderStr = lit("MJPEG");
+    else
+        return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
+    
     if (isCameraControlRequired)
     {
         CLHttpStatus status;
