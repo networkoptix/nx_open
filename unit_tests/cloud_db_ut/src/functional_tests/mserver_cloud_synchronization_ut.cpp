@@ -253,7 +253,7 @@ public:
 protected:
     void verifyTransactionConnection()
     {
-        constexpr static const auto kMaxTimeToWaitForConnection = std::chrono::seconds(5);
+        constexpr static const auto kMaxTimeToWaitForConnection = std::chrono::seconds(15);
 
         for (const auto t0 = std::chrono::steady_clock::now();
              std::chrono::steady_clock::now() < (t0 + kMaxTimeToWaitForConnection);
@@ -284,31 +284,15 @@ protected:
         const auto deadline = std::chrono::steady_clock::now() + testTime;
         while (std::chrono::steady_clock::now() < deadline)
         {
-            ec2::ApiUserDataList users;
-            ASSERT_EQ(
-                ec2::ErrorCode::ok,
-                appserver2()->moduleInstance()->ecConnection()
-                    ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
-
-            auto cloudOwnerIter = std::find_if(
-                users.begin(), users.end(),
-                [email = account().email](const ec2::ApiUserData& elem)
-                {
-                    return elem.email.toStdString() == email;
-                });
-            if (cloudOwnerIter != users.end())
-            {
-                ASSERT_TRUE(cloudOwnerIter->isAdmin);
-                ASSERT_EQ(account().email, cloudOwnerIter->name.toStdString());
-                ASSERT_EQ(account().fullName, cloudOwnerIter->fullName.toStdString());
-                ASSERT_TRUE(cloudOwnerIter->isCloud);
-                ASSERT_TRUE(cloudOwnerIter->isEnabled);
-                ASSERT_EQ("VMS", cloudOwnerIter->realm);
-                ASSERT_EQ(guidFromArbitraryData(account().email), cloudOwnerIter->id);
-                ASSERT_FALSE(cloudOwnerIter->isLdap);
-                ASSERT_EQ(Qn::GlobalAdminPermissionSet, cloudOwnerIter->permissions);
+            api::SystemSharingEx sharingData;
+            sharingData.accountEmail = account().email;
+            sharingData.accountFullName = account().fullName;
+            sharingData.isEnabled = true;
+            sharingData.accessRole = api::SystemAccessRole::owner;
+            bool found = false;
+            verifyCloudUserPresenceInLocalDb(sharingData, &found, false);
+            if (found)
                 return;
-            }
         }
 
         // Cloud owner has not arrived to local system.
@@ -333,11 +317,12 @@ protected:
             api::ResultCode::ok,
             cdb()->addActivatedAccount(&account2, &account2Password));
 
-        api::SystemSharing sharingData;
+        api::SystemSharingEx sharingData;
         sharingData.systemID = registeredSystemData().id;
         sharingData.accountEmail = account2.email;
         sharingData.accessRole = api::SystemAccessRole::cloudAdmin;
         sharingData.groupID = "test_group";
+        sharingData.accountFullName = account2.fullName;
         ASSERT_EQ(
             api::ResultCode::ok,
             cdb()->shareSystem(account().email, accountPassword(), sharingData));
@@ -351,22 +336,9 @@ protected:
                 break;
         }
 
-        // Validating data.
-        ec2::ApiUserDataList users;
-        ASSERT_EQ(
-            ec2::ErrorCode::ok,
-            appserver2()->moduleInstance()->ecConnection()
-                ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
-
-        //ASSERT_EQ(3, users.size()); //local admin, cloud admin, new user
-        ASSERT_NE(
-            users.end(),
-            std::find_if(
-                users.begin(), users.end(),
-                [email = account2.email](const ec2::ApiUserData& elem)
-                {
-                    return elem.email.toStdString() == email;
-                }));
+        bool found = false;
+        verifyCloudUserPresenceInLocalDb(sharingData, &found);
+        ASSERT_TRUE(found);
 
         QObject::disconnect(connection);
     }
@@ -381,30 +353,46 @@ protected:
             api::ResultCode::ok,
             cdb()->addActivatedAccount(&account3, &account3Password));
 
-        // Adding cloud user locally.
         ::ec2::ApiUserData newCloudUser;
-        newCloudUser.id = guidFromArbitraryData(account3.email);
-        newCloudUser.isCloud = true;
-        newCloudUser.isEnabled = true;
-        newCloudUser.email = QString::fromStdString(account3.email);
-        newCloudUser.name = newCloudUser.email;
-        newCloudUser.groupId = QnUuid::createUuid();
-        newCloudUser.fullName = QString::fromStdString(account3.fullName);
-        newCloudUser.realm = QnAppInfo::realm();
-        newCloudUser.hash = "password_is_in_cloud";
-        newCloudUser.digest = "password_is_in_cloud";
-        newCloudUser.permissions = Qn::GlobalLiveViewerPermissionSet;
-        appserver2()->moduleInstance()->ecConnection()
-            ->getUserManager(Qn::kSystemAccess)->saveSync(newCloudUser);
+        addCloudUserLocally(account3.email, &newCloudUser);
 
+        waitForUserToAppearInCloud(newCloudUser);
+    }
+
+    void addCloudUserLocally(
+        const std::string& accountEmail,
+        ::ec2::ApiUserData* const accountVmsData)
+    {
+        // Adding cloud user locally.
+        accountVmsData->id = guidFromArbitraryData(accountEmail);
+        accountVmsData->isCloud = true;
+        accountVmsData->isEnabled = true;
+        accountVmsData->email = QString::fromStdString(accountEmail);
+        accountVmsData->name = QString::fromStdString(accountEmail);
+        accountVmsData->groupId = QnUuid::createUuid();
+        accountVmsData->realm = QnAppInfo::realm();
+        accountVmsData->hash = "password_is_in_cloud";
+        accountVmsData->digest = "password_is_in_cloud";
+        // TODO: randomize access rights
+        accountVmsData->permissions = Qn::GlobalLiveViewerPermissionSet;
+        ASSERT_EQ(
+            ec2::ErrorCode::ok,
+            appserver2()->moduleInstance()->ecConnection()
+                ->getUserManager(Qn::kSystemAccess)->saveSync(*accountVmsData));
+    }
+
+    constexpr static const auto maxTimeToWaitForChangesToBePropagatedToCloud = std::chrono::seconds(10);
+
+    void waitForUserToAppearInCloud(
+        const ::ec2::ApiUserData& accountVmsData)
+    {
         // Waiting for it to appear in cloud.
         const auto t0 = std::chrono::steady_clock::now();
-        constexpr static const auto maxTimeToWaitForUserToAppearInCloud = std::chrono::seconds(10);
         for (;;)
         {
             ASSERT_LT(
                 std::chrono::steady_clock::now(),
-                t0 + maxTimeToWaitForUserToAppearInCloud);
+                t0 + maxTimeToWaitForChangesToBePropagatedToCloud);
 
             std::vector<api::SystemSharingEx> systemUsers;
             ASSERT_EQ(
@@ -416,14 +404,19 @@ protected:
                     &systemUsers));
 
             bool found = false;
-            for (const auto& user: systemUsers)
+            for (const auto& user : systemUsers)
             {
-                if (user.accountEmail == account3.email)
+                if (user.accountEmail == accountVmsData.email.toStdString())
                 {
                     // TODO: Validating data
-                    ASSERT_EQ(newCloudUser.isEnabled, user.isEnabled);
-                    ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
-                    ASSERT_EQ(account3.fullName, user.accountFullName);
+                    ASSERT_EQ(accountVmsData.isEnabled, user.isEnabled);
+                    ASSERT_EQ(accountVmsData.id.toSimpleString().toStdString(), user.vmsUserId);
+                    ASSERT_EQ(accountVmsData.groupId.toSimpleString().toStdString(), user.groupID);
+                    //ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
+                    //ASSERT_EQ(accountVmsData.fullName.toStdString(), user.accountFullName);
+                    ASSERT_EQ(
+                        QnLexical::serialized(accountVmsData.permissions).toStdString(),
+                        user.customPermissions);
                     found = true;
                     break;
                 }
@@ -434,6 +427,136 @@ protected:
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+    }
+
+    void waitForUserToDisappearFromCloud(const std::string& email)
+    {
+        // Waiting for it to appear in cloud.
+        const auto t0 = std::chrono::steady_clock::now();
+        for (;;)
+        {
+            ASSERT_LT(
+                std::chrono::steady_clock::now(),
+                t0 + maxTimeToWaitForChangesToBePropagatedToCloud);
+
+            std::vector<api::SystemSharingEx> systemUsers;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                cdb()->getSystemSharings(
+                    account().email,
+                    accountPassword(),
+                    registeredSystemData().id,
+                    &systemUsers));
+
+            if (cdb()->findSharing(systemUsers, email, registeredSystemData().id).accessRole
+                == api::SystemAccessRole::none)
+            {
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+
+    void waitForUserToDisappearLocally(const QnUuid& userId)
+    {
+        const auto t0 = std::chrono::steady_clock::now();
+        for (;;)
+        {
+            ASSERT_LT(
+                std::chrono::steady_clock::now(),
+                t0 + maxTimeToWaitForChangesToBePropagatedToCloud);
+
+            ec2::ApiUserDataList users;
+            ASSERT_EQ(
+                ec2::ErrorCode::ok,
+                appserver2()->moduleInstance()->ecConnection()
+                    ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
+
+            const auto userIter = std::find_if(
+                users.cbegin(), users.cend(),
+                [userId](const ec2::ApiUserData& elem)
+                {
+                    return elem.id == userId;
+                });
+
+            if (userIter == users.cend())
+                break;
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+
+    /**
+     * @param found[out] Set to \a true if user has been found and verified. \a false otherwise
+     */
+    void verifyCloudUserPresenceInLocalDb(
+        const api::SystemSharingEx& sharingData,
+        bool* const found = nullptr,
+        bool assertOnUserAbsense = true)
+    {
+        // Validating data.
+        ec2::ApiUserDataList users;
+        ASSERT_EQ(
+            ec2::ErrorCode::ok,
+            appserver2()->moduleInstance()->ecConnection()
+                ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
+
+        const auto userIter = std::find_if(
+            users.cbegin(), users.cend(),
+            [email = sharingData.accountEmail](const ec2::ApiUserData& elem)
+            {
+                return elem.email.toStdString() == email;
+            });
+        if (assertOnUserAbsense)
+        {
+            ASSERT_NE(users.cend(), userIter);
+        }
+
+        if (userIter == users.cend())
+        {
+            if (found)
+                *found = false;
+        }
+
+        ASSERT_EQ(sharingData.accountEmail, userIter->name.toStdString());
+        ASSERT_EQ(sharingData.accountFullName, userIter->fullName.toStdString());
+        ASSERT_TRUE(userIter->isCloud);
+        ASSERT_EQ(sharingData.isEnabled, userIter->isEnabled);
+        ASSERT_EQ("VMS", userIter->realm);
+        ASSERT_EQ(guidFromArbitraryData(sharingData.accountEmail), userIter->id);
+        ASSERT_FALSE(userIter->isLdap);
+        if (sharingData.accessRole == api::SystemAccessRole::owner)
+        {
+            ASSERT_TRUE(userIter->isAdmin);
+            ASSERT_EQ(Qn::GlobalAdminPermissionSet, userIter->permissions);
+        }
+
+        // TODO: #ak verify permissions
+        if (found)
+            *found = true;
+    }
+
+    void fetchOwnerSharing(api::SystemSharingEx* const ownerSharing)
+    {
+        std::vector<api::SystemSharingEx> systemUsers;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->getSystemSharings(
+                account().email,
+                accountPassword(),
+                registeredSystemData().id,
+                &systemUsers));
+        for (auto& sharingData: systemUsers)
+        {
+            if (sharingData.accessRole == api::SystemAccessRole::owner)
+            {
+                *ownerSharing = std::move(sharingData);
+                return;
+            }
+        }
+
+        ASSERT_TRUE(false);
     }
 
 private:
@@ -450,10 +573,10 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
     ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
 
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
-
     for (int i = 0; i < 2; ++i)
     {
+        // Cdb can change port after restart.
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
         verifyTransactionConnection();
         testSynchronizingCloudOwner();
         testSynchronizingUserFromCloudToMediaServer();
@@ -462,6 +585,60 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
         if (i == 0)
             cdb()->restart();
     }
+}
+
+TEST_F(Ec2MserverCloudSynchronization2, addingUserLocallyWhileOffline)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    // Sharing system with some account.
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->addActivatedAccount(&account2, &account2Password));
+
+    cdb()->stop();
+    
+    // Adding user locally
+    ::ec2::ApiUserData account2VmsData;
+    addCloudUserLocally(account2.email, &account2VmsData);
+
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+    verifyTransactionConnection();
+    waitForUserToAppearInCloud(account2VmsData);
+    // TODO: Check that cloud reported user's full name
+
+    // Checking that owner is in local DB
+    api::SystemSharingEx ownerSharing;
+    fetchOwnerSharing(&ownerSharing);
+    verifyCloudUserPresenceInLocalDb(ownerSharing);
+
+#if 0
+    // Removing user locally
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        appserver2()->moduleInstance()->ecConnection()
+            ->getUserManager(Qn::kSystemAccess)->removeSync(account2VmsData.id));
+
+    // Waiting for user to disappear in cloud
+    waitForUserToDisappearFromCloud(account2VmsData.email.toStdString());
+#endif
+
+    // Removing user in cloud
+    api::SystemSharing sharingData;
+    sharingData.accountEmail = account2VmsData.email.toStdString();
+    sharingData.accessRole = api::SystemAccessRole::none;   //< Removing user
+    sharingData.systemID = registeredSystemData().id;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->shareSystem(account().email, accountPassword(), sharingData));
+
+    // Waiting for user to disappear from vms
+    waitForUserToDisappearLocally(account2VmsData.id);
 }
 
 } // namespace cdb

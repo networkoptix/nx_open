@@ -79,13 +79,13 @@ void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to)
 {
     to->accountEmail = from.email.toStdString();
     to->customPermissions = QnLexical::serialized(from.permissions).toStdString();
-    to->groupID = from.groupId.toStdString();
+    to->groupID = from.groupId.toSimpleString().toStdString();
     to->isEnabled = from.isEnabled;
     to->accessRole =
         from.isAdmin
         ? api::SystemAccessRole::owner
         : permissionsToAccessRole(from.permissions);
-    to->vmsUserId = from.id.toStdString();
+    to->vmsUserId = from.id.toSimpleString().toStdString();
 }
 
 void convert(const api::SystemSharing& from, ::ec2::ApiIdData* const to)
