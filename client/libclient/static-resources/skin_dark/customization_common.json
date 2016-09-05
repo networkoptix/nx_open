@@ -672,6 +672,10 @@
             "#d24729",
             "#c22626"
         ]
+    },
+
+    "QnFisheyeCalibrationWidget": {
+        "palette": { "default": { "window": "dark4" } }
     }
 }
 

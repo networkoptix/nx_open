@@ -39,6 +39,8 @@ QnFisheyeCalibrationImageWidget::QnFisheyeCalibrationImageWidget(QWidget *parent
     m_animation.stage = Idle;
     m_animation.circle = new QnFisheyeAnimatedCircle(this);
     connect(m_animation.circle, SIGNAL(changed()),this, SLOT(repaint()));
+
+    setAutoFillBackground(false);
 }
 
 QnFisheyeCalibrationImageWidget::~QnFisheyeCalibrationImageWidget() {
@@ -262,8 +264,9 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent* event)
     if (!isEnabled())
         painter->setOpacity(style::Hints::kDisabledItemOpacity);
 
-    int halfLineWidth = m_lineWidth / 2;
-    QRect targetRect = rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
+    painter->fillRect(rect(), palette().color(QPalette::Window));
+
+    QRect targetRect = rect().adjusted(1, 1, -1, -1);
 
     if (targetRect != m_cachedRect || m_cachedImage.isNull())
     {
