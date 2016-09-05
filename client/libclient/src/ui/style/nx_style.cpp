@@ -790,24 +790,22 @@ void QnNxStyle::drawPrimitive(
             rect.setLeft(option->rect.left());
             rect.setRight(option->rect.right());
 
-            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Mid));
-
             QnScopedPainterPenRollback penRollback(painter);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
             if (shape == TabShape::Default)
             {
-                painter->fillRect(rect, mainColor);
+                painter->fillRect(rect, option->palette.color(QPalette::Mid));
 
-                painter->setPen(mainColor.darker(3));
+                painter->setPen(option->palette.color(QPalette::Window));
                 painter->drawLine(rect.topLeft(), rect.topRight());
 
-                painter->setPen(option->palette.base().color());
+                painter->setPen(option->palette.color(QPalette::Base));
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
             else
             {
-                painter->setPen(mainColor);
+                painter->setPen(option->palette.color(QPalette::Mid));
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
 #if 0
@@ -1573,7 +1571,7 @@ void QnNxStyle::drawControl(
                     {
                         if (!tab->state.testFlag(State_Selected) && isTabHovered(tab, widget))
                         {
-                            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(4);
+                            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Mid)).lighter(1);
                             painter->fillRect(tab->rect.adjusted(0, 1, 0, -1), mainColor);
 
                             QnScopedPainterPenRollback penRollback(painter, mainColor.darker(3).color());
@@ -1585,7 +1583,7 @@ void QnNxStyle::drawControl(
                     case TabShape::Rectangular:
                     {
                         QnPaletteColor mainColor = findColor(
-                                option->palette.window().color()).lighter(4);
+                            option->palette.color(QPalette::Mid)).lighter(1);
 
                         QColor color = mainColor;
 
@@ -1677,7 +1675,7 @@ void QnNxStyle::drawControl(
                         {
                             color = mainColor.lighter(2);
                             painter->fillRect(rect, findColor(
-                                option->palette.window().color()).lighter(6));
+                                option->palette.color(QPalette::Mid)).lighter(3));
                         }
                         else
                         {
