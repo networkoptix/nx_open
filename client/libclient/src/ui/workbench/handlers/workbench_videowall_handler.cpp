@@ -241,7 +241,7 @@ const qreal defaultReviewAR = 1920.0 / 1080.0;
 
 const QnUuid uuidPoolBase("621992b6-5b8a-4197-af04-1657baab71f0");
 
-
+//TODO: #GDM #VW clean nonexistent videowalls sometimes
 class QnVideowallAutoStarter: public QnWorkbenchAutoStarter
 {
 public:
@@ -448,6 +448,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(workbench(), &QnWorkbench::currentLayoutChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
         connect(navigator(), &QnWorkbenchNavigator::positionChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
+        connect(navigator(), &QnWorkbenchNavigator::playingChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
         connect(navigator(), &QnWorkbenchNavigator::speedChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
 
         connect(context()->instance<QnWorkbenchStreamSynchronizer>(), &QnWorkbenchStreamSynchronizer::runningChanged,
@@ -953,10 +954,16 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             navigator()->setPosition(message[positionKey].toLongLong());
             break;
         }
+	    case QnVideoWallControlMessage::NavigatorPlayingChanged:
+	    {
+	        navigator()->setPlaying(QnLexical::deserialized<bool>(message[valueKey]));
+	        break;
+	    }
         case QnVideoWallControlMessage::NavigatorSpeedChanged:
         {
             navigator()->setSpeed(message[speedKey].toDouble());
-            navigator()->setPosition(message[positionKey].toLongLong());
+	        if (message.contains(positionKey))
+	            navigator()->setPosition(message[positionKey].toLongLong());
             break;
         }
         case QnVideoWallControlMessage::SynchronizationChanged:
@@ -1163,7 +1170,6 @@ void QnWorkbenchVideoWallHandler::controlResolutionMode(Qn::ResolutionMode resol
 
 void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
 {
-
     // not logged in yet
     if (!m_videoWallMode.ready)
         return;
@@ -1181,6 +1187,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
             qWarning() << "Warning: videowall not exists, cannot start videowall on this pc";
         else
             qWarning() << "Warning: videowall is empty, cannot start videowall on this pc";
+        QnVideowallAutoStarter(m_videoWallMode.guid, this).setAutoStartEnabled(false);
         closeInstanceDelayed();
         return;
     }
@@ -1192,9 +1199,6 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
         closeInstanceDelayed();
         return;
     }
-
-    connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
-    connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
 
     bool master = m_videoWallMode.instanceGuid.isNull();
     if (master)
@@ -2084,7 +2088,17 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
     });
 
-    if (!m_videoWallMode.active)
+    if (m_videoWallMode.active)
+    {
+        if (videoWall->getId() == m_videoWallMode.guid)
+        {
+            connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
+            connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
+            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
+            openVideoWallItem(videoWall);
+        }
+    }
+    else
     {
         connect(videoWall, &QnVideoWallResource::pcAdded,       this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
         connect(videoWall, &QnVideoWallResource::pcChanged,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
@@ -2103,22 +2117,19 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
     /* Return id to the pool. */
     m_uuidPool->markAsFree(resource->getId());
 
+    QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+    if (!videoWall)
+        return;
+
+    disconnect(videoWall, nullptr, this, nullptr);
     if (m_videoWallMode.active)
     {
         if (resource->getId() != m_videoWallMode.guid)
             return;
-
-        QnVideowallAutoStarter(resource->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
         closeInstanceDelayed();
     }
     else
     {
-        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall)
-            return;
-        disconnect(videoWall, NULL, this, NULL);
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
-
         QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videoWall);
         if (layout && layout->resource())
             qnResPool->removeResource(layout->resource());
@@ -2576,6 +2587,19 @@ void QnWorkbenchVideoWallHandler::at_navigator_positionChanged()
     sendMessage(message);
 }
 
+void QnWorkbenchVideoWallHandler::at_navigator_playingChanged()
+{
+    if (!m_controlMode.active)
+        return;
+
+    if (display()->isChangingLayout())
+        return;
+
+    QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPlayingChanged);
+    message[valueKey] = QnLexical::serialized(navigator()->isPlaying());
+    sendMessage(message);
+}
+
 void QnWorkbenchVideoWallHandler::at_navigator_speedChanged()
 {
     if (!m_controlMode.active)
@@ -2584,12 +2608,11 @@ void QnWorkbenchVideoWallHandler::at_navigator_speedChanged()
     if (display()->isChangingLayout())
         return;
 
-    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
-        return;
-
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorSpeedChanged);
     message[speedKey] = QString::number(navigator()->speed());
-    message[positionKey] = QString::number(navigator()->positionUsec());
+    auto position = navigator()->positionUsec();
+    if (position != AV_NOPTS_VALUE)
+        message[positionKey] = QString::number(position);
     sendMessage(message);
 }
 

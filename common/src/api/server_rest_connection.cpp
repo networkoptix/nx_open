@@ -291,7 +291,7 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     const nx_http::StringType& contentType,
     const nx_http::StringType& messageBody)
 {
-    QnMediaServerResourcePtr server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
+    const auto server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return nx_http::ClientPool::Request();
 
@@ -303,12 +303,21 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     request.contentType = contentType;
     request.messageBody = messageBody;
 
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+    if (user.isEmpty() || password.isEmpty())
+    {
+        // if auth is not known, use server auth key
+        user = server->getId().toString();
+        password = server->getAuthKey();
+    }
     auto videoWallGuid = QnAppServerConnectionFactory::videowallGuid();
     if (!videoWallGuid.isNull())
         request.headers.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videoWallGuid.toByteArray());
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
-    request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, QnAppServerConnectionFactory::url().userName().toUtf8());
+    request.headers.emplace(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, user.toLower().toUtf8());
     request.headers.emplace("User-Agent", nx_http::userAgentString());
 
     QnRoute route = QnRouter::instance()->routeTo(server->getId());
@@ -331,19 +340,10 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
         request.url.setPort(route.addr.port);
     }
 
-    QString user = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
-    if (user.isEmpty() || password.isEmpty())
-    {
-        if (QnUserResourcePtr admin = qnResPool->getAdministrator())
-        {
-            // if auth is not known, use server auth key
-            user = server->getId().toString();
-            password = server->getAuthKey();
-        }
-    }
+
     request.url.setUserName(user);
     request.url.setPassword(password);
+
     return request;
 }
 

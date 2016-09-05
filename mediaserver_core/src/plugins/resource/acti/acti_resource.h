@@ -26,6 +26,7 @@ class QnActiResource
 {
     Q_OBJECT
 
+    typedef QMap<QString, QString> ActiSystemInfo;
 public:
     static const QString MANUFACTURE;
     static const QString CAMERA_PARAMETER_GROUP_ENCODER;
@@ -64,6 +65,7 @@ public:
     QSize getResolution(Qn::ConnectionRole role) const;
     int roundFps(int srcFps, Qn::ConnectionRole role) const;
     int roundBitrate(int srcBitrateKbps) const;
+    QString formatBitrateString(int bitrateKbps) const;
 
     bool isAudioSupported() const;
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
@@ -91,8 +93,9 @@ public:
         bool keepAllData,
         QByteArray* const msgBody,
         QString* const localAddress = nullptr );
+
     static QByteArray unquoteStr(const QByteArray& value);
-    static QMap<QByteArray, QByteArray> parseSystemInfo(const QByteArray& report);
+    static ActiSystemInfo parseSystemInfo(const QByteArray& report);
 
     //!Called by http server on receiving message from camera
     void cameraMessageReceived( const QString& path, const QnRequestParamList& message );
@@ -118,7 +121,7 @@ private:
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     void initializePtz();
-    void initializeIO( const QMap<QByteArray, QByteArray>& systemInfo );
+    void initializeIO( const ActiSystemInfo& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
     void fetchAndSetAdvancedParameters();
     QString getAdvancedParametersTemplate() const;
@@ -194,6 +197,8 @@ private:
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
     QList<int> m_availBitrate;
+    QList<QString> m_rawBitrate;
+
     int m_rtspPort;
     bool m_hasAudio;
     QByteArray m_platform;
