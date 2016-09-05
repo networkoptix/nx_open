@@ -51,9 +51,9 @@ private:
     QMap<QString, nx_http::AsyncHttpClientPtr > m_httpInProgress;
     QnMutex m_mutex;
 
-    nx_upnp::UpnpDeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
+    nx_upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
     QByteArray getDeviceXmlAsync(const QUrl& url);
-    nx_upnp::UpnpDeviceInfo getDeviceInfoSync(const QUrl& url, bool* outStatus) const;
+    nx_upnp::DeviceInfo getDeviceInfoSync(const QUrl& url, bool* outStatus) const;
 
     bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
 

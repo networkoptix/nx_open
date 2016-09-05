@@ -75,21 +75,21 @@ QnResourceList QnActiResourceSearcher::findResources(void)
                     .arg(remoteAddress)
                     .arg(kActiDeviceXmlPort)
                     .arg(kActiDeviceXmlPath));
-            
+
             processDeviceXml(response, remoteAddress, remoteAddress, result);
             processedUuid << uuidStr;
         }
     }
-    
+
     return result;
 }
 
-UpnpDeviceInfo QnActiResourceSearcher::parseDeviceXml(
+nx_upnp::DeviceInfo QnActiResourceSearcher::parseDeviceXml(
     const QByteArray& rawData,
     bool* outStatus) const
 {
     *outStatus = true;
-    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    nx_upnp::DeviceDescriptionHandler xmlHandler;
     QXmlSimpleReader xmlReader;
     xmlReader.setContentHandler( &xmlHandler );
     xmlReader.setErrorHandler( &xmlHandler );
@@ -99,7 +99,7 @@ UpnpDeviceInfo QnActiResourceSearcher::parseDeviceXml(
     if(!xmlReader.parse(&input))
     {
         *outStatus = false;
-        return UpnpDeviceInfo();
+        return nx_upnp::DeviceInfo();
     }
 
     return xmlHandler.deviceInfo();
@@ -113,7 +113,7 @@ QByteArray QnActiResourceSearcher::getDeviceXmlAsync(const QUrl& url)
     auto info = m_cachedXml.value(host);
     if (!m_cachedXml.contains(host) || info.timer.elapsed() > kCacheExpirationInterval)
     {
-        if (!m_httpInProgress.contains(url.host())) 
+        if (!m_httpInProgress.contains(url.host()))
         {
             auto urlStr = url.toString();
             auto request = nx_http::AsyncHttpClient::create();
@@ -131,9 +131,9 @@ QByteArray QnActiResourceSearcher::getDeviceXmlAsync(const QUrl& url)
     return m_cachedXml.value(host).xml;
 }
 
-UpnpDeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const QUrl& url, bool* outStatus) const
+nx_upnp::DeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const QUrl& url, bool* outStatus) const
 {
-    UpnpDeviceInfo deviceInfo;
+    nx_upnp::DeviceInfo deviceInfo;
     QByteArray response;
     CLSimpleHTTPClient client(
         url.host(),
@@ -147,7 +147,7 @@ UpnpDeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const QUrl& url, bool* 
         *outStatus = false;
         return deviceInfo;
     }
-    
+
     client.readAll(response);
     deviceInfo = parseDeviceXml(response, outStatus);
 
@@ -162,7 +162,7 @@ void QnActiResourceSearcher::processDeviceXml(
 {
     bool status = false;
     auto deviceInfo = parseDeviceXml(foundDeviceDescription, &status);
-    
+
     if (!status)
         return;
 
@@ -248,10 +248,10 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
             true);
 
         if (status != CL_HTTP_SUCCESS)
-        { 
+        {
             /* Trying to get appropriate port from the UPnP device description XML,
              * which is always located on the same port.
-             */ 
+             */
             bool upnpDevInfoStatus = false;
             auto upnpDevInfo = getDeviceInfoSync(deviceXmlUrl, &upnpDevInfoStatus);
 
@@ -392,11 +392,11 @@ void QnActiResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    QnActiResourcePtr resource(new QnActiResource());    
+    QnActiResourcePtr resource(new QnActiResource());
     resource->setTypeId(m_resTypeId);
 
     if(isNx)
-    {    
+    {
         resource->setVendor(NX_VENDOR);
         resource->setName(resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME));
         resource->setModel(resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME));
@@ -449,7 +449,7 @@ QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(const QString&
 
     if (!existingRes)
         existingRes = qnResPool->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
-    
+
     return existingRes;
 }
 
