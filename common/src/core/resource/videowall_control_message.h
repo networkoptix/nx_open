@@ -30,6 +30,7 @@ public:
         ZoomLinkRemoved,
 
         NavigatorPositionChanged,
+        NavigatorPlayingChanged,
         NavigatorSpeedChanged,
 
         SynchronizationChanged,
@@ -52,6 +53,8 @@ public:
 
     QString& operator[](const QString &key) { return params[key]; }
     const QString operator[](const QString &key) const {return params[key]; }
+    bool contains(const QString& key) const { return params.contains(key); }
+
 };
 
 

@@ -405,6 +405,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(workbench(),   &QnWorkbench::currentLayoutChanged,                      this,   &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
         connect(navigator(),   &QnWorkbenchNavigator::positionChanged,                  this,   &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
+        connect(navigator(),   &QnWorkbenchNavigator::playingChanged,                   this,   &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
         connect(navigator(),   &QnWorkbenchNavigator::speedChanged,                     this,   &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
 
         connect(context()->instance<QnWorkbenchStreamSynchronizer>(),   &QnWorkbenchStreamSynchronizer::runningChanged,
@@ -851,10 +852,16 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         navigator()->setPosition(message[positionKey].toLongLong());
         break;
     }
+    case QnVideoWallControlMessage::NavigatorPlayingChanged:
+    {
+        navigator()->setPlaying(QnLexical::deserialized<bool>(message[valueKey]));
+        break;
+    }
     case QnVideoWallControlMessage::NavigatorSpeedChanged:
     {
         navigator()->setSpeed(message[speedKey].toDouble());
-        navigator()->setPosition(message[positionKey].toLongLong());
+        if (message.contains(positionKey))
+            navigator()->setPosition(message[positionKey].toLongLong());
         break;
     }
     case QnVideoWallControlMessage::SynchronizationChanged:
@@ -2273,8 +2280,24 @@ void QnWorkbenchVideoWallHandler::at_navigator_positionChanged() {
     if (display()->isChangingLayout())
         return;
 
+    if (navigator()->positionUsec() == qint64(AV_NOPTS_VALUE))
+        return;
+
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
     message[positionKey] = QString::number(navigator()->positionUsec());
+    sendMessage(message);
+}
+
+void QnWorkbenchVideoWallHandler::at_navigator_playingChanged()
+{
+    if (!m_controlMode.active)
+        return;
+
+    if (display()->isChangingLayout())
+        return;
+
+    QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPlayingChanged);
+    message[valueKey] = QnLexical::serialized(navigator()->isPlaying());
     sendMessage(message);
 }
 
@@ -2288,7 +2311,9 @@ void QnWorkbenchVideoWallHandler::at_navigator_speedChanged()
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorSpeedChanged);
     message[speedKey] = QString::number(navigator()->speed());
-    message[positionKey] = QString::number(navigator()->positionUsec());
+    auto position = navigator()->positionUsec();
+    if (position != AV_NOPTS_VALUE)
+        message[positionKey] = QString::number(position);
     sendMessage(message);
 }
 
