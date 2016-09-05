@@ -1220,7 +1220,7 @@ bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPara
 
     if (!result)
     {
-        NX_LOG(lit("Error while parsing xml (acti) %1").arg(templateFilename));
+        NX_LOG(lit("Error while parsing xml (acti) %1").arg(templateFilename), cl_logWARNING);
     }
 
     return result;
