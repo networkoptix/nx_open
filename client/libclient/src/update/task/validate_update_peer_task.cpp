@@ -4,7 +4,6 @@
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <api/model/update_information_reply.h>
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <network/module_finder.h>
 #include <utils/common/app_info.h>
