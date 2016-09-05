@@ -364,11 +364,11 @@ void QnFileStorageResource::removeOldDirs()
 
 #ifndef _WIN32
 
-int QnFileStorageResource::mountTmpDrive() const
+Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlString) const
 {
-    QUrl url(getUrl());
+    QUrl url(urlString);
     if (!url.isValid())
-        return -1;
+        return Qn::StorageInit_WrongPath;
 
     QString uncString = url.host() + url.path();
     uncString.replace(lit("/"), lit("\\"));
@@ -410,10 +410,10 @@ int QnFileStorageResource::mountTmpDrive() const
             << "Mount SMB resource " << srcString
             << " to local path " << localPathCopy << " failed"
             << " retCode: " << retCode << ", errno!: " << errno;
-        return -1;
+        return Qn::StorageInit_WrongPath;
     }
 
-    return 0;
+    return Qn::StorageInit_Ok;
 }
 #else
 
@@ -831,131 +831,48 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
     return true;
 }
 
-
-bool QnFileStorageResource::isStorageDirMounted() const
+namespace {
+bool findPathInTabFile(const QString& path, const QString& tabFilePath, QString* outMountPoint, bool exact)
 {
-    QString localPathCopy = getLocalPathSafe();
-
-    if (!localPathCopy.isEmpty()) // smb
-    {
-        QUrl url(getUrl());
-
-        QString uncString = url.host() + url.path();
-        uncString.replace(lit("/"), lit("\\"));
-
-        QString cifsOptionsString =
-            lit("rsize=8192,wsize=8192,sec=ntlm,username=%1,password=%2,unc=\\\\%3")
-                .arg(url.userName())
-                .arg(aux::passwordFromUrl(url))
-                .arg(uncString);
-
-        QString srcString = lit("//") + url.host() + url.path();
-
-        auto badResultHandler = [this, &localPathCopy]()
-        {   // Treat every unexpected test result the same way.
-            // Cleanup attempt will be performed.
-            // Will try to unmount, remove local mount point directory
-            // and set flag meaning that local path recreation
-            // + remount is needed
-            umount(localPathCopy.toLatin1().constData()); // directory may not exists, but this is Ok
-            rmdir(localPathCopy.toLatin1().constData()); // same as above
-            return false;
-        };
-
-        // Check if local (mounted) storage path exists
-        DIR* dir = opendir(localPathCopy.toLatin1().constData());
-        if (dir)
-            closedir(dir);
-        else if (ENOENT == errno)
-        {   // Directory does not exist.
-            NX_LOG(
-                lit("[QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, directory does not exists")
-                    .arg(localPathCopy),
-                cl_logDEBUG1
-            );
-            return badResultHandler();
-        }
-        else
-        {   // opendir() failed for some other reason.
-            NX_LOG(
-                lit("[QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, errno = %2")
-                    .arg(localPathCopy)
-                    .arg(errno),
-                cl_logDEBUG1
-            );
-            return badResultHandler();
-        }
-
-#if __linux__
-        int retCode = mount(
-            srcString.toLatin1().constData(),
-            localPathCopy.toLatin1().constData(),
-            "cifs",
-            MS_NOSUID | MS_NODEV | MS_NOEXEC,
-            cifsOptionsString.toLatin1().constData()
-        );
-#elif __APPLE__
-#error "TODO BSD-style mount call"
-#endif
-
-        int err = errno;
-
-        if ((retCode == -1 && err != EBUSY) || retCode == 0)
-        {   // Bad. Mount succeeded OR it failed but for another reason than
-            // local path is already mounted.
-            NX_LOG(
-                lit("[QnFileStorageResource::isStorageDirMounted] mount result = %1 , errno = %2")
-                    .arg(retCode)
-                    .arg(err),
-                cl_logDEBUG1
-            );
-            return badResultHandler();
-        }
-
-        return true;
-    }
-
-    // This part is for manually mounted folders
-
-    const QString notResolvedStoragePath = closeDirPath(getPath());
-    const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
-    //on unix, checking that storage directory is mounted, if it is to be mounted
-
     QStringList mountPoints;
-    if( !readTabFile( lit("/etc/fstab"), &mountPoints ) )
+
+    if(!readTabFile(tabFilePath, &mountPoints))
     {
-        NX_LOG( lit("Could not read /etc/fstab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
+        NX_LOG(
+            lit("Could not read %1 file while checking storage %2 availability")
+                .arg(tabFilePath)
+                .arg(path),
+            cl_logWARNING);
         return false;
     }
 
-    //checking if storage dir is to be mounted
-    QString storageMountPoint;
+    const QString notResolvedStoragePath = closeDirPath(path);
+    const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
+
     for(const QString& mountPoint: mountPoints )
     {
         const QString& mountPointCanonical = QDir(closeDirPath(mountPoint)).canonicalPath();
-        if( storagePath.startsWith(mountPointCanonical) )
-            storageMountPoint = mountPointCanonical;
-    }
-
-    //checking, if it has been mounted
-    if( !storageMountPoint.isEmpty() )
-    {
-        QStringList mountedDirectories;
-        //reading /etc/mtab
-        if( !readTabFile( QLatin1String("/etc/mtab"), &mountedDirectories ) )
+        if((!exact && storagePath.startsWith(mountPointCanonical)) || (exact && storagePath == mountPointCanonical))
         {
-            NX_LOG( lit("Could not read /etc/mtab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
-            return false;
-        }
-        if( !mountedDirectories.contains(storageMountPoint) )
-        {
-            NX_LOG( lit("Storage %1 mount directory has not been mounted yet (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logWARNING );
-            return false;  //storage directory has not been mounted yet
+            *outMountPoint = mountPointCanonical;
+            return true;
         }
     }
 
-    NX_LOG( lit("Storage %1 is mounted (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logDEBUG2 );
-    return true;
+    return false;
+}
+} // namespace <anonymous>
+
+bool QnFileStorageResource::isStorageDirMounted() const
+{
+    QString mountPoint;
+
+    if (!m_localPath.isEmpty())
+        return findPathInTabFile(m_localPath, lit("/etc/mtab"), &mountPoint, true);
+    else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
+        return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
+
+    return false;
 }
 #endif    // _WIN32
 

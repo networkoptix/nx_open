@@ -147,9 +147,20 @@ void QnStorageUrlDialog::accept()
     unsetCursor();
 
     m_storage = QnStorageModelInfo(result.reply().value<QnStorageStatusReply>().storage);
-    if(result.status() != 0 || !m_storage.isWritable || !m_storage.isExternal) {
-        QnMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
-        return;
+    if(result.status() != 0 /*|| !m_storage.isWritable || !m_storage.isExternal*/) {
+        switch (result.reply().value<QnStorageStatusReply>().status)
+        {
+        case Qn::StorageInit_WrongAuth:
+            QnMessageBox::warning(this, tr("Invalid Storage"), tr("Invalid external storage credentials."));
+            return;
+        case Qn::StorageInit_WrongPath:
+        case Qn::StorageInit_CreateFailed:
+            QnMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
+            return;
+        case Qn::StorageInit_Ok:
+            break;
+        }
+
     }
 
     if (storageAlreadyUsed(m_storage.url)) {
