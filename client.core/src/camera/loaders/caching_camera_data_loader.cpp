@@ -260,5 +260,5 @@ void QnCachingCameraDataLoader::trace(const QString& message, Qn::TimePeriodCont
         return;
 
     QString name = m_resource ? m_resource->toResourcePtr()->getName() : lit("_invalid_camera_");
-    qDebug() << lit("Chunks: (cached) (%1)").arg(name) << message;
+    NX_LOG(lit("Chunks: (cached) (%1) %2").arg(name).arg(message), cl_logDEBUG1);
 }
