@@ -16,6 +16,14 @@ class QnResourceItemDelegate : public Customized<QStyledItemDelegate>
     Q_PROPERTY(QnResourceItemColors colors READ colors WRITE setColors)
 
 public:
+    enum Option
+    {
+        NoOptions      = 0x0,
+        RecordingIcons = 0x1,
+        ProblemIcons   = 0x2
+    };
+    Q_DECLARE_FLAGS(Options, Option)
+
     explicit QnResourceItemDelegate(QObject* parent = nullptr);
 
     QnWorkbench* workbench() const;
@@ -35,6 +43,9 @@ public:
 
     Qn::ResourceInfoLevel customInfoLevel() const;
     void setCustomInfoLevel(Qn::ResourceInfoLevel value);
+
+    Options options() const;
+    void setOptions(Options value);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
@@ -67,4 +78,7 @@ private:
     int m_fixedHeight;
     int m_rowSpacing;
     Qn::ResourceInfoLevel m_customInfoLevel;
+    Options m_options;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceItemDelegate::Options)
