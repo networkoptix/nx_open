@@ -155,7 +155,7 @@ def patch_project(project):
     fix_mocables(root)
     add_prebuild_events(root)
     add_qt_path(root)
-    enable_fastlink(root)
+    #enable_fastlink(root)
     tree.write(project, encoding="utf-8", xml_declaration=True)
 
 def main():

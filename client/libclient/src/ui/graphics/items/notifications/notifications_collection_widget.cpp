@@ -44,6 +44,7 @@
 #include <health/system_health_helper.h>
 
 #include <utils/common/delete_later.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>
 #include <utils/app_server_notification_cache.h>
@@ -256,6 +257,11 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF& rec
     listRect.setTop(m_list->geometry().topLeft().y());
 
     m_list->setToolTipsEnclosingRect(mapRectToItem(m_list, listRect));
+}
+
+QnBlinkingImageButtonWidget* QnNotificationsCollectionWidget::blinker() const
+{
+    return m_blinker.data();
 }
 
 void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget* blinker)
@@ -820,4 +826,16 @@ void QnNotificationsCollectionWidget::cleanUpItem(QnNotificationWidget* item)
 
     for (QString soundPath : m_itemsByLoadingSound.keys(item))
         m_itemsByLoadingSound.remove(soundPath, item);
+}
+
+void QnNotificationsCollectionWidget::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    base_type::paint(painter, option, widget);
+
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette().color(QPalette::Dark), 0.0));
+    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
+
+    qreal y = m_headerWidget->rect().height() + 0.5;
+    painter->drawLine(QPointF(1.0, y), QPointF(rect().width() - 1.0, y));
 }

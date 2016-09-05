@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
     class LayoutSettingsDialog;
@@ -15,11 +15,11 @@ namespace Ui {
 class QnAppServerImageCache;
 class QnLayoutSettingsDialogPrivate;
 
-class QnLayoutSettingsDialog : public QnWorkbenchStateDependentButtonBoxDialog
+class QnLayoutSettingsDialog : public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
     explicit QnLayoutSettingsDialog(QWidget *parent = 0);
     ~QnLayoutSettingsDialog();

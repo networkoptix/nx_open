@@ -19,7 +19,7 @@
  * is emitted. If its name changes, or if it is deleted from the pool,
  * <tt>userChanged</tt> signal will be emitted again, passing a null resource.
  */
-class QnWorkbenchUserWatcher: public Connective<QObject>, public QnWorkbenchStateDelegate
+class QnWorkbenchUserWatcher: public Connective<QObject>, public QnSessionAwareDelegate
 {
     Q_OBJECT
 

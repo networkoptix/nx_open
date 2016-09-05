@@ -146,11 +146,13 @@ protected:
     void showContextMenuAt(const QPoint& pos, bool ignoreSelection = false);
 
     void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
+
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
     void hideToolTip();
     void showToolTip();
+    void updateIcons();
 
     void forceUpdateFilter() { updateFilter(true); }
 

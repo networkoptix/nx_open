@@ -153,6 +153,8 @@ QnSystemsModel::QnSystemsModel(QObject *parent)
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
             d, &QnSystemsModelPrivate::updateOwnerDescription);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged,
+        d, &QnSystemsModelPrivate::updateOwnerDescription);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
             d, &QnSystemsModelPrivate::updateOwnerDescription);
 
@@ -212,7 +214,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 
             const bool isLoggedIn =
                 (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut);
-            if (isLoggedIn && (qnCloudStatusWatcher->cloudLogin() == system->ownerAccountEmail()))
+            if (isLoggedIn && (qnCloudStatusWatcher->effectiveUserName() == system->ownerAccountEmail()))
             {
                 return tr("Your system");
             }

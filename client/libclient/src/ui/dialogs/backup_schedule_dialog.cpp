@@ -36,11 +36,11 @@ namespace {
         return mBits * bitsPerMegabit / bitsPerByte;
     }
 
-    int dayToIndex(Qt::DayOfWeek day) {
-        return static_cast<int>(day) - 1;
+    size_t dayToIndex(Qt::DayOfWeek day) {
+        return static_cast<size_t>(day) - 1;
     }
 
-    Qt::DayOfWeek indexToDay(int index) {
+    Qt::DayOfWeek indexToDay(size_t index) {
         return static_cast<Qt::DayOfWeek>(index + 1);
     }
 }

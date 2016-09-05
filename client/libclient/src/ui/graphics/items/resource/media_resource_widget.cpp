@@ -170,7 +170,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_ioCouldBeShown(false),
     m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
     m_posUtcMs(DATETIME_INVALID),
-    m_backgroundColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2))
+    m_backgroundColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2)),
+    m_twoWayAudioWidget(nullptr)
 {
     NX_ASSERT(m_resource, "Media resource widget was created with a non-media resource.");
 
@@ -273,17 +274,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         updateIoModuleVisibility(false);
     }
 
-    if (m_camera && m_camera->hasTwoWayAudio() && accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
-    {
-        auto twoWayAudioItem = new QnTwoWayAudioWidget();
-        twoWayAudioItem->setCamera(m_camera);
-        twoWayAudioItem->setFixedHeight(kTwoWayAudioButtonSize);
-        this->context()->statisticsModule()->registerButton(lit("two_way_audio"), twoWayAudioItem);
-
-        /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
-        overlayWidgets()->positionOverlay->insertItem(0, twoWayAudioItem);
-        overlayWidgets()->positionOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
-    }
+    updateTwoWayAudioWidget();
 
     /* Set up buttons. */
     createButtons();
@@ -583,6 +574,28 @@ void QnMediaResourceWidget::updateHud(bool animate)
     setOverlayWidgetVisible(m_compositeTextOverlay, compositeOverlayCouldBeVisible, animate);
 
     QnResourceWidget::updateHud(animate);
+}
+
+void QnMediaResourceWidget::updateTwoWayAudioWidget()
+{
+    /* Check if widget is already created. */
+    if (m_twoWayAudioWidget)
+        return;
+
+    bool hasTwoWayAudio = m_camera && m_camera->hasTwoWayAudio()
+        && accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission);
+
+    if (!hasTwoWayAudio)
+        return;
+
+    m_twoWayAudioWidget = new QnTwoWayAudioWidget();
+    m_twoWayAudioWidget->setCamera(m_camera);
+    m_twoWayAudioWidget->setFixedHeight(kTwoWayAudioButtonSize);
+    context()->statisticsModule()->registerButton(lit("two_way_audio"), m_twoWayAudioWidget);
+
+    /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
+    overlayWidgets()->positionOverlay->insertItem(0, m_twoWayAudioWidget);
+    overlayWidgets()->positionOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
 }
 
 void QnMediaResourceWidget::resumeHomePtzController()
@@ -1563,6 +1576,8 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
     Q_UNUSED(resource);
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
+    else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
+        updateTwoWayAudioWidget();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()

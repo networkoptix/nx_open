@@ -11,7 +11,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
     class CameraAdditionDialog;
@@ -19,9 +19,9 @@ namespace Ui {
 
 class QnCheckBoxedHeaderView;
 
-class QnCameraAdditionDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+class QnCameraAdditionDialog: public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
     enum State {
         NoServer,           /**< No server is selected. */

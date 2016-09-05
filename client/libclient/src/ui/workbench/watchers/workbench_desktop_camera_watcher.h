@@ -9,7 +9,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 /** Module maintaining connection between desktop resource and a server we are currently connected to. */
-class QnWorkbenchDesktopCameraWatcher: public QObject, public QnWorkbenchStateDelegate {
+class QnWorkbenchDesktopCameraWatcher: public QObject, public QnSessionAwareDelegate {
     Q_OBJECT
     typedef QObject base_type;
 public:

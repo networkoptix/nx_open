@@ -5,7 +5,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
     class QnNotificationSoundManagerDialog;
@@ -13,8 +13,8 @@ namespace Ui {
 
 class QnAppServerNotificationCache;
 
-class QnNotificationSoundManagerDialog : public QnWorkbenchStateDependentButtonBoxDialog {
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+class QnNotificationSoundManagerDialog : public QnSessionAwareButtonBoxDialog {
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
     Q_OBJECT
 public:

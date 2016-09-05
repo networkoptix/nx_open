@@ -150,11 +150,6 @@ public:
         LOG_LEVEL,
         EC2_TRAN_LOG_LEVEL,
 
-        CDB_ENDPOINT,
-
-        CLOUD_LOGIN,
-        CLOUD_PASSWORD,
-
         /** Initial and maximal live buffer lengths, in milliseconds. */
         INITIAL_LIVE_BUFFER_MSECS,
         MAXIMUM_LIVE_BUFFER_MSECS,
@@ -245,10 +240,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
-        // TODO: #dklychkov #3.0 Migrate cloud settings to client core settings.
-        QN_DECLARE_RW_PROPERTY(QString,                     cdbEndpoint,            setCdbEndpoint,             CDB_ENDPOINT,               QString())
-        QN_DECLARE_RW_PROPERTY(QString,                     cloudLogin,             setCloudLogin,              CLOUD_LOGIN,                QString())
-        QN_DECLARE_RW_PROPERTY(QString,                     cloudPassword,          setCloudPassword,           CLOUD_PASSWORD,             QString())
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
         QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)

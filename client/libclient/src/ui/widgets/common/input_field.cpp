@@ -109,7 +109,9 @@ public:
         if (lastValidationResult.state != QValidator::Acceptable)
             setWarningStyle(&palette);
 
-        input->setPalette(palette);
+        if (!input->hasFocus())
+            input->setPalette(palette);
+
         hint->setPalette(palette);
     }
 
@@ -256,6 +258,18 @@ void QnInputField::setEchoMode(QLineEdit::EchoMode value)
 {
     Q_D(QnInputField);
     d->input->setEchoMode(value);
+}
+
+QString QnInputField::inputMask() const
+{
+    Q_D(const QnInputField);
+    return d->input->inputMask();
+}
+
+void QnInputField::setInputMask(const QString& inputMask)
+{
+    Q_D(QnInputField);
+    return d->input->setInputMask(inputMask);
 }
 
 const QnPasswordStrengthIndicator* QnInputField::passwordIndicator() const

@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_STATE_DEPENDENT_DIALOG_H
-#define QN_WORKBENCH_STATE_DEPENDENT_DIALOG_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
@@ -17,12 +16,14 @@
 #define ID(x) x
 
 template<class Base>
-class QnWorkbenchStateDependentDialog: public Base, public QnWorkbenchStateDelegate  {
+class QnSessionAwareDialog: public Base, public QnSessionAwareDelegate
+{
     typedef Base base_type;
 public:
-    QN_FORWARD_CONSTRUCTOR(QnWorkbenchStateDependentDialog, Base, ID(COMMA QnWorkbenchStateDelegate(this->parent()) {}))
+    QN_FORWARD_CONSTRUCTOR(QnSessionAwareDialog, Base, ID(COMMA QnSessionAwareDelegate(this->parent()) {}))
 
-    virtual bool tryClose(bool force) override {
+    virtual bool tryClose(bool force) override
+    {
         base_type::reject();
         if (force)
             base_type::hide();
@@ -30,7 +31,8 @@ public:
     }
 
     /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
-    virtual void forcedUpdate() override {
+    virtual void forcedUpdate() override
+    {
         retranslateUi();
         tryClose(true);
     }
@@ -42,16 +44,19 @@ protected:
 #undef ID
 #undef COMMA
 
+using QnSessionAwareMessageBox = QnSessionAwareDialog<QnMessageBox>;
+
 /**
  * Button box dialog that will be closed if we are disconnected from server.
  * Warning: class is QnWorkbenchContextAware
  */
-class QnWorkbenchStateDependentButtonBoxDialog: public QnButtonBoxDialog, public QnWorkbenchStateDelegate {
+class QnSessionAwareButtonBoxDialog: public QnButtonBoxDialog, public QnSessionAwareDelegate
+{
     Q_OBJECT;
     typedef QnButtonBoxDialog base_type;
 
 public:
-    QnWorkbenchStateDependentButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnSessionAwareButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     virtual bool tryClose(bool force) override;
 
@@ -66,12 +71,13 @@ protected:
  * Tabbed dialog that will be closed if we are disconnected from server.
  * Warning: class is QnWorkbenchContextAware
  */
-class QnWorkbenchStateDependentTabbedDialog: public QnGenericTabbedDialog, public QnWorkbenchStateDelegate {
+class QnSessionAwareTabbedDialog: public QnGenericTabbedDialog, public QnSessionAwareDelegate
+{
     Q_OBJECT;
     typedef QnGenericTabbedDialog base_type;
 
 public:
-    QnWorkbenchStateDependentTabbedDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnSessionAwareTabbedDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     virtual bool tryClose(bool force) override;
 
@@ -88,6 +94,3 @@ protected:
      */
     virtual QDialogButtonBox::StandardButton showConfirmationDialog();
 };
-
-
-#endif // QN_WORKBENCH_STATE_DEPENDENT_DIALOG_H

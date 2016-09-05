@@ -33,7 +33,7 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/export_timelapse_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
@@ -338,7 +338,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
         if (wasLoggedIn && !context()->user())
             return;
 
-        QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog>(
+        QScopedPointer<QnCustomFileDialog> dialog(new QnSessionAwareDialog<QnCustomFileDialog>(
             mainWindow(),
             tr("Export Video As..."),
             suggestion,
@@ -560,7 +560,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     }
     else
     {
-        QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
+        QnProgressDialog *exportProgressDialog = new QnSessionAwareDialog<QnProgressDialog>(mainWindow());
         exportProgressDialog->setWindowTitle(tr("Exporting Video"));
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setModal(false);
@@ -805,7 +805,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         if (wasLoggedIn && !context()->user())
             return false;
 
-        QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog>(
+        QScopedPointer<QnCustomFileDialog> dialog(new QnSessionAwareDialog<QnCustomFileDialog>(
             mainWindow(),
             dialogName,
             suggestion,

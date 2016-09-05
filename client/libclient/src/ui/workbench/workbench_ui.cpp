@@ -1165,7 +1165,7 @@ void QnWorkbenchUi::at_treeItem_paintGeometryChanged()
 
     m_treeShowButton->setPos(QPointF(
         qMax(m_controlsWidgetRect.left(), paintGeometry.right()),
-        (paintGeometry.top() + paintGeometry.bottom() - m_treeShowButton->size().height()) / 2.0));
+        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_treeShowButton->size().height()) / 2.0));
 
     m_treePinButton->setPos(QPointF(
         paintGeometry.right() - m_treePinButton->size().width() - 1.0,
@@ -1713,7 +1713,7 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged()
     m_notificationsBackgroundItem->setGeometry(paintGeometry);
     m_notificationsShowButton->setPos(QPointF(
         qMin(m_controlsWidgetRect.right(), paintGeometry.left()),
-        (paintGeometry.top() + paintGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
+        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_notificationsShowButton->size().height()) / 2
     ));
     m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
     if (isNotificationsOpened())

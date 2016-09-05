@@ -48,6 +48,8 @@ namespace style
     const qreal Metrics::kGroupBoxCornerRadius = dp(2.0);
     const int Metrics::kDefaultIconSize = 20;
 
+    const int Metrics::kToolTipHeight = 24;
+
     const qreal Hints::kDisabledItemOpacity = 0.3;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
@@ -61,6 +63,7 @@ namespace style
     const char* Properties::kSideIndentation = "_qn_sideIndentation";
     const char* Properties::kCheckBoxAsButton = "_qn_checkBoxAsButton";
     const char* Properties::kButtonMarginProperty = "_qn_buttonMargin";
+    const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
 
     qreal dpr(qreal value)
     {

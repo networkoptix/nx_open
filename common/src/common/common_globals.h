@@ -24,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
-    Permission GlobalPermission UserRole
+    Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
     MotionTypes TimePeriodTypes
@@ -803,6 +803,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LiveViewer,
     };
 
+    enum class ConnectionResult
+    {
+        Success,                    /*< Connection available. */
+        NetworkError,               /*< Connection could not be established. */
+        Unauthorized,               /*< Invalid login/password. */
+        TemporaryUnauthorized,      /*< LDAP server is not accessible. */
+        IncompatibleInternal,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleVersion,        /*< Server version is too low. */
+        CompatibilityMode           /*< Client should be restarted in compatibility mode.*/
+    };
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -825,7 +835,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole),
+    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole)(Qn::ConnectionResult),
     (metatype)
 )
 

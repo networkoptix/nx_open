@@ -5,6 +5,7 @@
 #include <api/app_server_connection.h>
 
 #include <client/desktop_client_message_processor.h>
+#include <client_core/client_core_settings.h>
 
 #include <core/resource/user_resource.h>
 
@@ -54,7 +55,7 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
     if (!m_loginToCloudDialog)
     {
         m_loginToCloudDialog = new QnLoginToCloudDialog(mainWindow());
-        m_loginToCloudDialog->setLogin(qnSettings->cloudLogin());
+        m_loginToCloudDialog->setLogin(qnClientCoreSettings->cloudLogin());
         m_loginToCloudDialog->show();
 
         connect(m_loginToCloudDialog, &QnLoginToCloudDialog::finished, this,
@@ -70,8 +71,11 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
-    qnSettings->setCloudPassword(QString());
-    qnCloudStatusWatcher->setCloudPassword(QString());
+    qnClientCoreSettings->setCloudPassword(QString());
+
+    /* Updating login if were logged under temporary credentials. */
+    qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+        qnCloudStatusWatcher->effectiveUserName(), QString()));
 
     /* Check if we need to logout if logged in under this user. */
     const auto state = qnDesktopClientMessageProcessor->connectionState();
@@ -82,7 +86,7 @@ void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
     if (currentLogin.isEmpty())
         return;
 
-    if (qnCloudStatusWatcher->cloudLogin() == currentLogin)
+    if (qnCloudStatusWatcher->effectiveUserName() == currentLogin)
         menu()->trigger(QnActions::DisconnectAction,
             QnActionParameters().withArgument(Qn::ForceRole, true));
 }

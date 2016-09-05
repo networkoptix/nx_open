@@ -49,9 +49,8 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 
     if (auth)
     {
-        uri.setAuthenticator(
-            qnCloudStatusWatcher->temporaryLogin(),
-            qnCloudStatusWatcher->temporaryPassword());
+        auto credentials = qnCloudStatusWatcher->createTemporaryCredentials();
+        uri.setAuthenticator(credentials.user, credentials.password);
     }
 
     uri.setReferral(m_source, m_context);

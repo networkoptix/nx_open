@@ -3,17 +3,17 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
 class QnVideowallSettingsDialog;
 }
 
-class QnVideowallSettingsDialog : public QnWorkbenchStateDependentButtonBoxDialog
+class QnVideowallSettingsDialog : public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
     explicit QnVideowallSettingsDialog(QWidget *parent = 0);
     ~QnVideowallSettingsDialog();

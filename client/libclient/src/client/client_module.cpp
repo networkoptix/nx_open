@@ -288,21 +288,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
     /* Just to feel safe */
-    QScopedPointer<QnCloudStatusWatcher> cloudStatusWatcher(new QnCloudStatusWatcher());
-    cloudStatusWatcher->setStayConnected(!qnSettings->cloudPassword().isEmpty());
-    cloudStatusWatcher->setCloudEndpoint(clientSettings->cdbEndpoint());
-    cloudStatusWatcher->setCloudCredentials(clientSettings->cloudLogin(), clientSettings->cloudPassword(), true);
-    common->store<QnCloudStatusWatcher>(cloudStatusWatcher.take());
-
-    connect(qnSettings, &QnClientSettings::valueChanged, this,
-        [this, common](int id)
-    {
-        if (id != QnClientSettings::CLOUD_PASSWORD)
-            return;
-
-        if (auto cloudWatcher = common->instance<QnCloudStatusWatcher>())
-            cloudWatcher->setStayConnected(!qnSettings->cloudPassword().isEmpty());
-    });
+    common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());

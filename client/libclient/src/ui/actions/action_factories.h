@@ -36,12 +36,8 @@ public:
 class QnOpenCurrentUserLayoutActionFactory: public QnActionFactory {
     Q_OBJECT
 public:
-    QnOpenCurrentUserLayoutActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
-
+    QnOpenCurrentUserLayoutActionFactory(QObject *parent = NULL);
     virtual QList<QAction *> newActions(const QnActionParameters &parameters, QObject *parent) override;
-
-private slots:
-    void at_action_triggered();
 };
 
 

@@ -18,7 +18,7 @@
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace {
     const QLatin1String dbExtension(".db");
@@ -70,7 +70,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
         return;
     }
 
-    //TODO: #GDM QnWorkbenchStateDependentDialog, QScopedPointer vs QObject-parent problem
+    //TODO: #GDM QnSessionAwareDialog, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog());
     dialog->setMinimum(0);
     dialog->setMaximum(0);
@@ -131,7 +131,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     data.data = file.readAll();
     file.close();
 
-    //TODO: #GDM QnWorkbenchStateDependentDialog, QScopedPointer vs QObject-parent problem
+    //TODO: #GDM QnSessionAwareDialog, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog);
     dialog->setMinimum(0);
     dialog->setMaximum(0);

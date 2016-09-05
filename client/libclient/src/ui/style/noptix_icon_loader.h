@@ -1,8 +1,9 @@
-#ifndef QN_NOPTIX_ICON_LOADER_H
-#define QN_NOPTIX_ICON_LOADER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtGui/QIcon>
+
+#include <ui/style/icon.h>
 
 class QnSkin;
 
@@ -16,12 +17,19 @@ public:
     virtual ~QnNoptixIconLoader();
 
     QIcon polish(const QIcon& icon);
-    QIcon load(const QString& name, const QString& checkedName = QString(), int numModes = -1, const QPair<QIcon::Mode, QString>* modes = nullptr);
+    QIcon load(
+        const QString& name,
+        const QString& checkedName = QString(),
+        const QnIcon::SuffixesList* suffixes = nullptr);
+
+private:
+    void loadIconInternal(
+        const QString& key,
+        const QString& name,
+        const QString& checkedName = QString(),
+        const QnIcon::SuffixesList* suffixes = nullptr);
 
 private:
     QHash<QString, QIcon> m_iconByKey;
     QSet<qint64> m_cacheKeys;
 };
-
-
-#endif // QN_NOPTIX_ICON_LOADER_H
