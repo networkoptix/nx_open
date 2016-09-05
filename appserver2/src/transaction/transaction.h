@@ -1038,7 +1038,7 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
+APPLY(2008, cleanupDanglingDbObjects, ApiCleanupDanglingDbObjectsData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \

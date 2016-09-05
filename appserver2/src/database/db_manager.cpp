@@ -159,6 +159,7 @@ QnDbManager::QnDbManager()
     m_initialized(false),
     m_tran(m_sdb, m_mutex),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
+    m_needClearLog(false),
     m_needResyncLog(false),
     m_needResyncLicenses(false),
     m_needResyncFiles(false),
@@ -431,6 +432,9 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
 
     if (!syncLicensesBetweenDB())
+        return false;
+
+    if (m_needClearLog && !transactionLog->clear())
         return false;
 
     if( m_needResyncLog ) {
@@ -1130,6 +1134,30 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
     return true;
 }
 
+bool QnDbManager::cleanupDanglingDbObjects()
+{
+    QFile cleanupScript(":/updates/68_cleanup_dangling_attrs.sql");
+
+    if (!cleanupScript.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QTextStream inStream(&cleanupScript);
+    auto queryStrings = inStream.readAll().split(',');
+
+    if (queryStrings.isEmpty())
+        return false;
+
+    QSqlQuery query(m_sdb);
+
+    for (const auto& queryString : queryStrings)
+    {
+        if (!query.exec(queryString.trimmed()))
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::fixBusinessRules()
 {
     QSqlQuery query(m_sdb);
@@ -1321,6 +1349,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/52_fix_onvif_mt.sql"))
     {
         return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
+    }
+    else if (updateName == lit(":/updates/68_cleanup_dangling_attrs.sql"))
+    {
+        if (!m_dbJustCreated)
+        {
+            m_needClearLog = true;
+            m_needResyncLog = true;
+        }
     }
 
     return true;
@@ -4454,9 +4490,19 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCleanupDanglingDbObjectsData>& tran)
 {
-    return transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+    ErrorCode result = ErrorCode::ok;
+    if (tran.params.cleanupDbObjects)
+        result = cleanupDanglingDbObjects() ? ErrorCode::ok : ErrorCode::failure;
+
+    if (result != ErrorCode::ok)
+        return result;
+
+    if (tran.params.cleanupTransactionLog)
+        result = transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+
+    return result;
 }
 
 QnUuid QnDbManager::getID() const

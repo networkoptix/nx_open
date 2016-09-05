@@ -324,6 +324,7 @@ public:
     QString rebuildArchive;
     QString devModeKey;
     QString allowedDiscoveryPeers;
+    bool cleanupDb;
 
     CmdLineArguments()
     :
@@ -1355,14 +1356,14 @@ void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudCon
     {
         if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), nullptr))
         {
-            qWarning() << "Error while clearing cloud information. Traying again...";
+            qWarning() << "Error while clearing cloud information. Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             continue;
         }
 
         if (!cloudConnectionManager->cleanUpCloudDataInLocalDb())
         {
-            qWarning() << "Error while clearing cloud information. Traying again...";
+            qWarning() << "Error while clearing cloud information. Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             continue;
         }
@@ -1988,6 +1989,14 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
 
+    if (cmdLineArguments.cleanupDb)
+    {
+        const bool kCleanupDbObjects = true;
+        const bool kCleanupTransactionLog = true;
+        auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
+        miscManager->cleanupDanglingDbObjectsSync(kCleanupDbObjects, kCleanupTransactionLog);
+    }
+
     if (needToStop())
         return; //TODO #ak correctly deinitialize what has been initialised
 
@@ -2362,13 +2371,19 @@ void MediaServerProcess::run()
         ec2::ErrorCode errCode;
         do
         {
-            errCode = QnAppServerConnectionFactory::getConnection2()->
-                getMiscManager(Qn::kSystemAccess)->rebuildTransactionLogSync();
+            const bool kCleanupDbObjects = false;
+            const bool kCleanupTransactionLog = true;
+
+            errCode = QnAppServerConnectionFactory::getConnection2()
+                ->getMiscManager(Qn::kSystemAccess)
+                ->cleanupDanglingDbObjectsSync(kCleanupDbObjects, kCleanupTransactionLog);
+
             if (errCode != ec2::ErrorCode::ok)
             {
-                qWarning() << "Error while rebuild transaction log. Traying again...";
+                qWarning() << "Error while rebuild transaction log. Trying again...";
                 msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             }
+
         } while (errCode != ec2::ErrorCode::ok && !m_needStop);
     }
     qnGlobalSettings->setCloudHost(QnAppInfo::defaultCloudHost());
@@ -2915,6 +2930,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("Enforces mediator address"), QString());
     commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
         lit("Force ip version"), QString());
+    commandLineParser.addParameter(&cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
+        lit("Cleans dangling cameras and servers user attributes, kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), false);
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
