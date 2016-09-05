@@ -400,10 +400,11 @@ bool QnUserManagementWidget::enableUser(const QnUserResourcePtr& user, bool enab
     if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
         return false;
 
-    qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user)
-    {
-        user->setEnabled(enabled);
-    });
+    qnResourcesChangesManager->saveUser(user,
+        [enabled](const QnUserResourcePtr &user)
+        {
+            user->setEnabled(enabled);
+        });
 
     return true;
 }

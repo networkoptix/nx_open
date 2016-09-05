@@ -228,11 +228,12 @@ void QnUserGroupsDialog::applyChanges()
         auto replacement = m_model->replacement(group.id);
         for (auto user : m_model->users(group.id, false))
         {
-            qnResourcesChangesManager->saveUser(user, [replacement](const QnUserResourcePtr &user)
-            {
-                user->setUserGroup(replacement.group);
-                user->setRawPermissions(replacement.permissions);
-            });
+            qnResourcesChangesManager->saveUser(user,
+                [replacement](const QnUserResourcePtr &user)
+                {
+                    user->setUserGroup(replacement.group);
+                    user->setRawPermissions(replacement.permissions);
+                });
         }
 
         qnResourcesChangesManager->removeUserGroup(group.id);

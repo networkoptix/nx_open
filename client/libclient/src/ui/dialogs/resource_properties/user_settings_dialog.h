@@ -44,7 +44,6 @@ protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
     virtual void retranslateUi() override;
 
-    virtual bool hasChanges() const override;
     virtual void applyChanges() override;
 
     virtual void showEvent(QShowEvent* event) override;
