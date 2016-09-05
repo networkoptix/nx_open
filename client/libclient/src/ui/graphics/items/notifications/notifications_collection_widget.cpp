@@ -833,7 +833,7 @@ void QnNotificationsCollectionWidget::paint(QPainter* painter,
 {
     base_type::paint(painter, option, widget);
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(palette().color(QPalette::Dark), 0.0));
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette().color(QPalette::Mid), 0.0));
     QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
     qreal y = m_headerWidget->rect().height() + 0.5;

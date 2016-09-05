@@ -402,6 +402,16 @@
         "palette": { "default": { "window": "dark4" } }
     },
 
+    "QnGraphicsView": {
+        "palette": {
+            "default": {
+                "_": "Scene background color.",
+
+                "base": "dark4"
+            }
+        }
+    },
+
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, notifications panel).",
 
@@ -410,12 +420,18 @@
         "frameWidth": 1.0
     },
 
-    "QnGraphicsView": {
+    "QnResourceBrowserWidget": {
         "palette": {
             "default": {
-                "_": "Scene background color.",
+                "mid": "dark8"
+            }
+        }
+    },
 
-                "base": "dark4"
+    "QnNotificationsCollectionWidget": {
+        "palette": {
+            "default": {
+                "mid": "dark8"
             }
         }
     },
