@@ -34,6 +34,7 @@
 #include <ui/actions/action.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
+#include <ui/delegates/resource_item_delegate.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/help/help_topic_accessor.h>
@@ -256,8 +257,12 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
 
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+        &QnResourceBrowserWidget::updateIcons);
+
     /* Run handlers. */
     updateFilter();
+    updateIcons();
 
     at_workbench_currentLayoutChanged();
 }
@@ -703,6 +708,16 @@ void QnResourceBrowserWidget::showToolTip()
     if (!m_tooltipWidget)
         return;
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
+}
+
+void QnResourceBrowserWidget::updateIcons()
+{
+    QnResourceItemDelegate::Options opts = QnResourceItemDelegate::RecordingIcons;
+    if (accessController()->hasGlobalPermission(Qn::GlobalEditCamerasPermission))
+        opts |= QnResourceItemDelegate::ProblemIcons;
+
+    ui->resourceTreeWidget->itemDelegate()->setOptions(opts);
+    ui->searchTreeWidget->itemDelegate()->setOptions(opts);
 }
 
 void QnResourceBrowserWidget::updateToolTipPosition()

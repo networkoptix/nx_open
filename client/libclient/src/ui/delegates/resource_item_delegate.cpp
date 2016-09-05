@@ -37,7 +37,8 @@ QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     m_colors(),
     m_fixedHeight(style::Metrics::kViewRowHeight),
     m_rowSpacing(0),
-    m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid)
+    m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid),
+    m_options(NoOptions)
 {
 }
 
@@ -79,6 +80,16 @@ Qn::ResourceInfoLevel QnResourceItemDelegate::customInfoLevel() const
 void QnResourceItemDelegate::setCustomInfoLevel(Qn::ResourceInfoLevel value)
 {
     m_customInfoLevel = value;
+}
+
+QnResourceItemDelegate::Options QnResourceItemDelegate::options() const
+{
+    return m_options;
+}
+
+void QnResourceItemDelegate::setOptions(Options value)
+{
+    m_options = value;
 }
 
 int QnResourceItemDelegate::fixedHeight() const
@@ -207,31 +218,29 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         }
     }
 
-    /* Draw "recording" or "scheduled" icon: */
     QRect extraIconRect = iconRect.adjusted(-4, 0, -4, 0);
-    extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
+    auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
-    bool recording = false;
-    bool scheduled = false;
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource)
+    /* Draw "recording" or "scheduled" icon: */
+    if (m_options.testFlag(RecordingIcons))
     {
-        if (resource->getStatus() == Qn::Recording && resource.dynamicCast<QnVirtualCameraResource>())
-            recording = true;
+        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
 
-        if (!recording)
-            if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-                scheduled = !camera->isScheduleDisabled();
+        const bool recording = camera && camera->getStatus() == Qn::Recording;
+        const bool scheduled = camera && !camera->isScheduleDisabled();
+
+        if (recording || scheduled)
+            (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, extraIconRect);
     }
 
-    if (recording || scheduled)
-        (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, extraIconRect);
-
     /* Draw "problems" icon: */
-    extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
-    if (QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
-        if (camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
+    if (m_options.testFlag(ProblemIcons))
+    {
+        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
+        if (camera && camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
             m_buggyIcon.paint(painter, extraIconRect);
+    }
 }
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
