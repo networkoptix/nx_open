@@ -354,6 +354,20 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         .toUpper()
         .toLatin1();
 
+    auto encodersStr = report.value("ENCODER_CAP");
+
+    if (!encodersStr.isEmpty())
+    {
+        auto encoders = encodersStr.split(',');
+        for (const auto& encoder: encoders)
+            m_availableEncoders.insert(encoder.trimmed());
+    }
+    else
+    {
+        //Try to use h264 if no codecs defined;
+        m_availableEncoders.insert(lit("H264"));
+    }
+
     bool dualStreaming = report.value("channels").toInt() > 1 ||
         !report.value("video2_resolution_cap").isEmpty() ||
         report.value("streaming_mode_cap").toLower() == lit("dual");
@@ -694,6 +708,11 @@ QString QnActiResource::formatBitrateString(int bitrateKbps) const
         return m_availableBitrates[bitrateKbps];
 
     return bitrateToDefaultString(bitrateKbps);
+}
+
+QSet<QString> QnActiResource::getAvailableEncoders() const
+{
+    return m_availableEncoders;
 }
 
 QSize QnActiResource::getResolution(Qn::ConnectionRole role) const

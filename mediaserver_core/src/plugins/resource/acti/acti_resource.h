@@ -68,6 +68,8 @@ public:
     int roundBitrate(int srcBitrateKbps) const;
     QString formatBitrateString(int bitrateKbps) const;
 
+    QSet<QString> getAvailableEncoders() const;
+
     bool isAudioSupported() const;
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
@@ -200,6 +202,7 @@ private:
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
     QMap<int, QString> m_availableBitrates;
+    QSet<QString> m_availableEncoders;
 
     int m_rtspPort;
     bool m_hasAudio;
