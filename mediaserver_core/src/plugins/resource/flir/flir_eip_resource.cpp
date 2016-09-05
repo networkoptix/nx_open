@@ -3,6 +3,7 @@
 #include <utils/common/synctime.h>
 #include "core/resource_management/resource_data_pool.h"
 #include "utils/serialization/json.h"
+#include <utils/common/log.h>
 
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
@@ -440,10 +441,12 @@ bool QnFlirEIPResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedP
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
-#ifdef _DEBUG
+
     if (!result)
-        qWarning() << "Error while parsing xml" << templateFilename;
-#endif
+    {
+        NX_LOG(lit("Error while parsing xml (flir) %1").arg(templateFilename), cl_logWARNING);
+    }
+
     return result;
 }
 
