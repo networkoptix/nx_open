@@ -36,5 +36,7 @@ const char* kPingPath = "/cdb/ping";
 const char* kEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStage1";
 const char* kPushEc2TransactionPath = "/ec2/forward_events/";
 
+const char* kMaintenanceGetVmsConnections = "/cdb/maintenance/get_vms_connections";
+
 }   //cdb
 }   //nx

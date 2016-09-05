@@ -67,6 +67,7 @@ class AuthenticationProvider;
 namespace ec2 {
 class ConnectionManager;
 }   // namespace ec2
+class MaintenanceManager;
 
 class CloudDBProcess
 :
@@ -177,7 +178,8 @@ private:
         SystemManager* const systemManager,
         AuthenticationProvider* const authProvider,
         EventManager* const eventManager,
-        ec2::ConnectionManager* const ec2ConnectionManager);
+        ec2::ConnectionManager* const ec2ConnectionManager,
+        MaintenanceManager* const maintenanceManager);
     bool initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
     bool configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
     bool updateDB( nx::db::AsyncSqlQueryExecutor* const dbManager );

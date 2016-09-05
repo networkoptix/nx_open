@@ -118,7 +118,9 @@ namespace ec2
         /*!
             \note \a TimeSynchronizationManager::start MUST be called before using class instance
         */
-        TimeSynchronizationManager( Qn::PeerType peerType );
+        TimeSynchronizationManager(
+            Qn::PeerType peerType,
+            nx::utils::TimerManager* const timerManager);
         virtual ~TimeSynchronizationManager();
 
         //!Implemenattion of QnStoppable::pleaseStop
@@ -247,6 +249,7 @@ namespace ec2
         */
         std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
+        nx::utils::TimerManager* const m_timerManager;
         std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
         bool m_timeSynchronized;

@@ -270,6 +270,22 @@ void ConnectionManager::dispatchTransaction(
     }
 }
 
+api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
+{
+    QnMutexLocker lk(&m_mutex);
+    api::VmsConnectionDataList result;
+    for (const auto& connectionContext: m_connections)
+    {
+        api::VmsConnectionData connectionData;
+        connectionData.systemId = connectionContext.systemIdAndPeerId.first;
+        connectionData.mediaserverEndpoint =
+            connectionContext.connection->remoteSocketAddr().toString().toStdString();
+        result.connections.push_back(std::move(connectionData));
+    }
+
+    return result;
+}
+
 void ConnectionManager::addNewConnection(ConnectionContext context)
 {
     QnMutexLocker lk(&m_mutex);

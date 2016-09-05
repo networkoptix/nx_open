@@ -738,6 +738,21 @@ api::ResultCode CdbLauncher::fetchSystemData(
     return api::ResultCode::notFound;
 }
 
+api::ResultCode CdbLauncher::getVmsConnections(
+    api::VmsConnectionDataList* const vmsConnections)
+{
+    auto connection = connectionFactory()->createConnection();
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *vmsConnections) =
+        makeSyncCall<nx::cdb::api::ResultCode, api::VmsConnectionDataList>(
+            std::bind(
+                &nx::cdb::api::MaintenanceManager::getConnectionsFromVms,
+                connection->maintenanceManager(),
+                std::placeholders::_1));
+    return resCode;
+}
+
 void CdbLauncher::setTemporaryDirectoryPath(const QString& path)
 {
     sTemporaryDirectoryPath = path;

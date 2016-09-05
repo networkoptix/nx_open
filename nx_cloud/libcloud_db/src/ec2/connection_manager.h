@@ -9,6 +9,7 @@
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
 
+#include <cdb/maintenance_manager.h>
 #include <cdb/result_code.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
@@ -86,6 +87,8 @@ public:
         const nx::String& systemId,
         std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
 
+    api::VmsConnectionDataList getVmsConnections() const;
+
 private:
     struct ConnectionContext
     {
@@ -121,7 +124,7 @@ private:
     const ::ec2::ApiPeerData m_localPeerData;
     ConnectionDict m_connections;
     std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnCounter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
 

@@ -207,6 +207,11 @@ namespace stree
             const AbstractResourceReader& rc1,
             const AbstractResourceReader& rc2,
             const AbstractResourceReader& rc3);
+        MultiSourceResourceReader(
+            const AbstractResourceReader& rc1,
+            const AbstractResourceReader& rc2,
+            const AbstractResourceReader& rc3,
+            const AbstractResourceReader& rc4);
 
         //!Implementation of AbstractResourceReader::get
         /*!
@@ -216,7 +221,7 @@ namespace stree
 
     private:
         const size_t m_elementCount;
-        std::array<const AbstractResourceReader*, 3> m_readers;
+        std::array<const AbstractResourceReader*, 4> m_readers;
     };
 
     //TODO #ak using variadic template add method makeMultiSourceResourceReader that accepts any number of aguments
@@ -242,8 +247,9 @@ namespace stree
         MultiIteratableResourceReader& operator=(const MultiIteratableResourceReader&);
     };
 
-    //!Proxies every \a stree::AbstractResourceWriter::put call to the provided container and saves value of desired resource
-    template<class T>
+    /**
+     * Writes to \a target and \a additionalOutput.
+     */
     class ResourceWriterProxy
     :
         public stree::AbstractResourceWriter
@@ -251,34 +257,22 @@ namespace stree
     public:
         ResourceWriterProxy(
             stree::AbstractResourceWriter* target,
-            int resToCatchID)
+            stree::AbstractResourceWriter* additionalOutput)
         :
             m_target(target),
-            m_resToCatchID(resToCatchID)
+            m_additionalOutput(additionalOutput)
         {
         }
 
         virtual void put(int resID, const QVariant& value) override
         {
-            if (resID == m_resToCatchID)
-                m_catchedVal = value.value<T>();
             m_target->put(resID, value);
-        }
-
-        boost::optional<T> get() const
-        {
-            return m_catchedVal;
-        }
-
-        boost::optional<T> take()
-        {
-            return std::move(m_catchedVal);
+            m_additionalOutput->put(resID, value);
         }
 
     private:
         AbstractResourceWriter* m_target;
-        int m_resToCatchID;
-        boost::optional<T> m_catchedVal;
+        AbstractResourceWriter* m_additionalOutput;
     };
 }
 

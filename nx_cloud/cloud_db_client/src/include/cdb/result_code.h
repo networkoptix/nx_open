@@ -18,7 +18,7 @@ enum class ResultCode
      */
     partialContent,
     /** Provided credentials are invalid. */
-    notAuthorized = CDB_API_ERROR_CODE_BASE,
+    notAuthorized = kErrorCodeBase,
 
     /** Requested operation is not allowed with credentials provided. */
     forbidden,

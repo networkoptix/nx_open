@@ -163,7 +163,6 @@ int Appserver2Process::exec()
 
     registerQtResources();
 
-    // TODO: propagate this timerManager to TimeSynchronizationManager
     nx::utils::TimerManager timerManager;
     timerManager.start();
 
@@ -203,7 +202,7 @@ int Appserver2Process::exec()
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server));
+        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));

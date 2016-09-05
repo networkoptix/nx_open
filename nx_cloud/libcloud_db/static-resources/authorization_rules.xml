@@ -24,6 +24,9 @@
 
             <condition resName="request.path">
                 <set value="/cdb/account/reset_password" resName="authenticated" resValue="true"/>
+                <condition value="/cdb/maintenance/get_vms_connections" resName="secureSource">
+                    <set value="true" resName="authenticated" resValue="true"/>
+                </condition>
             </condition>
         </sequence>
 
@@ -203,6 +206,12 @@
                     <condition value="/cdb/account/create_temporary_credentials" resName="auth.accountEmail" matchType="presence">
                         <set value="false" resName="authorized" resValue="false"/>
                     </condition>
+                    <sequence value="/cdb/maintenance/get_vms_connections">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="secureSource">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
                 </condition>
             </condition>
         </sequence>     <!-- authorization -->

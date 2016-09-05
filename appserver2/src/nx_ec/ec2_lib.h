@@ -10,12 +10,22 @@
 #include <common/common_globals.h>
 
 
+namespace nx {
+namespace utils {
+
+class TimerManager;
+
+} // namespace utils
+} // namespace nx
+
 extern "C"
 {
     /*!
         \return This object MUST be freed by caller using operator delete()
     */
-    ec2::AbstractECConnectionFactory* getConnectionFactory( Qn::PeerType peerType );
+    ec2::AbstractECConnectionFactory* getConnectionFactory(
+        Qn::PeerType peerType,
+        nx::utils::TimerManager* const timerManager);
 }
 
 #endif  //EC2_LIB_H

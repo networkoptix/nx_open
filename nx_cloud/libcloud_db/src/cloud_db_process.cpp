@@ -45,6 +45,7 @@
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
 #include "managers/event_manager.h"
+#include "managers/maintenance_manager.h"
 #include "managers/system_manager.h"
 #include "managers/temporary_account_password_manager.h"
 #include "stree/stree_manager.h"
@@ -246,6 +247,9 @@ int CloudDBProcess::exec()
             systemManager);
         m_authProvider = &authProvider;
 
+        MaintenanceManager maintenanceManager(
+            ec2ConnectionManager);
+
         //registering HTTP handlers
         registerApiHandlers(
             &httpMessageDispatcher,
@@ -254,7 +258,8 @@ int CloudDBProcess::exec()
             &systemManager,
             &authProvider,
             &eventManager,
-            &ec2ConnectionManager);
+            &ec2ConnectionManager,
+            &maintenanceManager);
         //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
         eventManager.registerHttpHandlers(
             authorizationManager,
@@ -369,7 +374,8 @@ void CloudDBProcess::registerApiHandlers(
     SystemManager* const systemManager,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
-    ec2::ConnectionManager* const ec2ConnectionManager)
+    ec2::ConnectionManager* const ec2ConnectionManager,
+    MaintenanceManager* const maintenanceManager)
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
         PingHandler::kHandlerPath,
@@ -477,6 +483,11 @@ void CloudDBProcess::registerApiHandlers(
         nx_http::kAnyPath.toStdString().c_str(),   //dispatcher does not support max prefix by now
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
+
+    registerHttpHandler(
+        kMaintenanceGetVmsConnections,
+        &MaintenanceManager::getVmsConnections, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
 }
 
 bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )

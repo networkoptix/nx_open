@@ -18,6 +18,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(EntityType,
     (EntityType::system, "system")
     (EntityType::subscription, "subscription")
     (EntityType::product, "product")
+    (EntityType::maintenance, "maintenance")
     )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(DataActionType,

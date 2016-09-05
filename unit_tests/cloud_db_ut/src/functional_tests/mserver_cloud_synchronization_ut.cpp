@@ -251,13 +251,30 @@ public:
     }
 
 protected:
-    void addTransactionConnection()
+    void verifyTransactionConnection()
     {
-        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+        constexpr static const auto kMaxTimeToWaitForConnection = std::chrono::seconds(5);
 
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        for (const auto t0 = std::chrono::steady_clock::now();
+             std::chrono::steady_clock::now() < (t0 + kMaxTimeToWaitForConnection);
+             )
+        {
+            // Checking connection is there.
+            api::VmsConnectionDataList vmsConnections;
+            ASSERT_EQ(api::ResultCode::ok, cdb()->getVmsConnections(&vmsConnections));
+            const auto connectionIt = std::find_if(
+                vmsConnections.connections.cbegin(),
+                vmsConnections.connections.cend(),
+                [systemId = registeredSystemData().id](const api::VmsConnectionData& data)
+                {
+                    return data.systemId == systemId;
+                });
+            if (connectionIt != vmsConnections.connections.cend())
+                return; //< Connection has been found
 
-        // TODO: #ak Checking connection is there.
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        ASSERT_TRUE(false);
     }
 
     void testSynchronizingCloudOwner()
@@ -433,14 +450,13 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
     ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
 
-    addTransactionConnection();
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
     for (int i = 0; i < 2; ++i)
     {
+        verifyTransactionConnection();
         testSynchronizingCloudOwner();
-
         testSynchronizingUserFromCloudToMediaServer();
-
         testSynchronizingUserFromMediaServerToCloud();
 
         if (i == 0)

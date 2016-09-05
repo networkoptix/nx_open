@@ -35,10 +35,13 @@ namespace ec2 {
 
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
-Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(Qn::PeerType peerType):
+Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
+    Qn::PeerType peerType,
+    nx::utils::TimerManager* const timerManager)
+    :
     // dbmanager is initialized by direct connection.
     m_dbManager(peerType == Qn::PT_Server ? new detail::QnDbManager() : nullptr),
-    m_timeSynchronizationManager(new TimeSynchronizationManager(peerType)),
+    m_timeSynchronizationManager(new TimeSynchronizationManager(peerType, timerManager)),
     m_transactionMessageBus(new QnTransactionMessageBus(peerType)),
     m_terminated(false),
     m_runningRequests(0),

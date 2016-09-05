@@ -163,6 +163,9 @@ public:
         const std::string& systemId,
         api::SystemDataEx* const systemData);
 
+    api::ResultCode getVmsConnections(
+        api::VmsConnectionDataList* const vmsConnections);
+
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath();
     static void setDbConnectionOptions(

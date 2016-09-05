@@ -124,7 +124,8 @@ void AuthenticationManager::authenticate(
     const auto authSearchInputData = stree::MultiSourceResourceReader(
         socketResources,
         httpRequestResources,
-        inputRes);
+        inputRes,
+        authTraversalResult);
     m_stree.search(
         StreeOperation::authentication,
         authSearchInputData,
