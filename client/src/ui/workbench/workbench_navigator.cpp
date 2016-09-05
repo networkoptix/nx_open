@@ -82,7 +82,7 @@ namespace {
 
     const int cameraHistoryRetryTimeoutMs = 5 * 1000;
 
-    const int discardCacheIntervalMs = 10 * 60 * 1000;
+    const int discardCacheIntervalMs = 60 * 60 * 1000;
 
     /** Size of timeline window near live when there is no recorded periods on cameras. */
     const int timelineWindowNearLive = 10 * 1000;

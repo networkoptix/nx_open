@@ -285,7 +285,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     {
         NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 since peer id mismatch (old %2, new %3)")
             .arg(address.toString()).arg(oldId.toString()).arg(moduleInformation.id.toString()),
-            cl_logDEBUG1);
+            cl_logDEBUG2);
         removeAddress(address, true, ignoredUrlsForServer(oldId));
     }
 
@@ -350,7 +350,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         foreach (const SocketAddress &address, item.addresses)
         {
             NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 due to server conflict")
-                .arg(address.toString()), cl_logDEBUG1);
+                .arg(address.toString()), cl_logDEBUG2);
             removeAddress(address, true);
         }
     }
@@ -370,7 +370,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
                 if (address.port == item.moduleInformation.port)
                 {
                     NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 due to module information change")
-                        .arg(address.toString()), cl_logDEBUG1);
+                        .arg(address.toString()), cl_logDEBUG2);
                     removeAddress(address, true);
                 }
             }
@@ -419,7 +419,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         }
 
         NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
-               .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
+               .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG2);
 
         emit moduleAddressFound(moduleInformation, address);
     }
@@ -442,7 +442,7 @@ void QnModuleFinder::at_timer_timeout()
         QnUuid id = m_idByAddress.value(address);
         QSet<QUrl> ignoredUrls = ignoredUrlsForServer(id);
         NX_LOG(lit("QnModuleFinder::at_timer_timeout. Removing address %1 by timeout")
-            .arg(address.toString()), cl_logDEBUG1);
+            .arg(address.toString()), cl_logDEBUG2);
         removeAddress(address, false, ignoredUrls);
     }
 }
@@ -460,7 +460,7 @@ void QnModuleFinder::at_server_auxUrlsChanged(const QnResourcePtr &resource)
     {
         const SocketAddress addr(url.host(), url.port(port));
         NX_LOG(lit("QnModuleFinder::at_server_auxUrlsChanged. Removing address %1")
-            .arg(addr.toString()), cl_logDEBUG1);
+            .arg(addr.toString()), cl_logDEBUG2);
         removeAddress(addr, false, ignoredUrls);
     }
 }
@@ -504,13 +504,13 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
     }
 
     NX_LOG(lit("QnModuleFinder: Module URL lost: %1 %2:%3")
-           .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);
+           .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG2);
     emit moduleAddressLost(moduleInformation, address);
 
     if (!it->addresses.isEmpty())
         return;
 
-    NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+    NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG2);
 
     QnModuleInformation moduleInformationCopy = moduleInformation;
     SocketAddress primaryAddress = it->primaryAddress;
@@ -589,7 +589,7 @@ void QnModuleFinder::removeModule(const QnUuid &id)
     for (const SocketAddress &address: addresses)
     {
         NX_LOG(lit("QnModuleFinder::removeModule(%1). Removing address %2")
-            .arg(id.toString()).arg(address.toString()), cl_logDEBUG1);
+            .arg(id.toString()).arg(address.toString()), cl_logDEBUG2);
         removeAddress(address, false);
     }
 }

@@ -62,6 +62,7 @@
 #include <network/module_finder.h>
 #include <network/router.h>
 #include <utils/reconnect_helper.h>
+#include <utils/common/log.h>
 
 #include "compatibility.h"
 
@@ -517,7 +518,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
 }
 
 
-void QnWorkbenchConnectHandler::at_beforeExitAction_triggered() {
+void QnWorkbenchConnectHandler::at_beforeExitAction_triggered()
+{
+    NX_LOG(lit("Exiting client"), cl_logDEBUG1);
     disconnectFromServer(true);
 
     if (loginDialog())
