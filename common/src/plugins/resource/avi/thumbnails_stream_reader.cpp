@@ -124,7 +124,7 @@ void QnThumbnailsStreamReader::run()
 
         if (videoData)
             m_stat[videoData->channelNumber].onData(
-                videoData->dataSize(), videoData->flags & AV_PKT_FLAG_KEY);
+                (unsigned int) videoData->dataSize(), videoData->flags & AV_PKT_FLAG_KEY);
 
         putData(data);
     }

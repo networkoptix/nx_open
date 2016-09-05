@@ -65,7 +65,7 @@ public:
 	{
 		qint64 occupiedSpace;
 		double usageCoeff;
-		StorageSpaceInfo() 
+		StorageSpaceInfo()
 			: occupiedSpace(0),
 			  usageCoeff(0.0)
 		{}
@@ -112,7 +112,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
-    static QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
+    static QnTimePeriodList getRecordedPeriods(const QnSecurityCamResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
                                                const QList<QnServer::ChunksCatalog> &catalogs, int limit);
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
 
@@ -182,7 +182,7 @@ private:
     void resetCameraInfoSavedFlagsForStorage(const QnStorageResourcePtr &storage);
     void createArchiveCameras(const ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
-                                    const QnVirtualCameraResourceList &cameras,
+                                    const QnSecurityCamResourceList &cameras,
                                     qint64 startTime, qint64 endTime, qint64 detailLevel,  bool keepSmallChunks,
                                     const QList<QnServer::ChunksCatalog> &catalogs, int limit);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs);

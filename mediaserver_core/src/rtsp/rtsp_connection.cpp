@@ -280,12 +280,20 @@ void QnRtspConnectionProcessor::parseRequest()
         QString resId = url.path();
         if (resId.startsWith('/'))
             resId = resId.mid(1);
-        QnResourcePtr resource = qnResPool->getResourceByUrl(resId);
-        if (resource == 0) {
-            resource = qnResPool->getNetResourceByPhysicalId(resId);
-            if (resource == 0)
-                resource = qnResPool->getResourceByMacAddress(resId);
-        }
+
+        QnResourcePtr resource;
+        const QnUuid uuid = QnUuid::fromStringSafe(resId);
+        if (!uuid.isNull())
+            resource = qnResPool->getResourceById(uuid);
+        if (!resource)
+            resource = qnResPool->getResourceByUniqueId(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByMacAddress(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByUrl(resId);
+        if (!resource)
+            return;
+
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
 
         d->peerHasAccess = qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission);

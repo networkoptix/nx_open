@@ -1,11 +1,9 @@
 #include "server_db.h"
 
-#include <QtCore/QElapsedTimer>
 #include <QtCore/QtEndian>
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
-#include <business/business_action_factory.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
@@ -504,7 +502,7 @@ bool QnServerDb::cleanupEvents()
 
     // cleanup by  record count
     const int kMaxRecords = 100000;
-    const int kMaxOverflowRecords = 150000;
+    const int kMaxOverflowRecords = 120000;
 
     if (kMaxOverflowRecords < m_runtimeActionsTotalRecords)
     {
@@ -870,7 +868,7 @@ bool QnServerDb::afterInstallUpdate(const QString& updateName) {
     return true;
 }
 
-bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
+bool QnServerDb::getBookmarks(const QnSecurityCamResourceList &cameras
     , const QnCameraBookmarkSearchFilter &filter
     , QnCameraBookmarkList &result)
 {

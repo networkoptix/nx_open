@@ -59,6 +59,7 @@ namespace ec2
 
         qint64 getTimeStamp();
         bool init();
+        bool clear();
 
         int getLatestSequence(const QnTranStateKey& key) const;
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());

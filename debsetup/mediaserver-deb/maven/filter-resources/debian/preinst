@@ -28,8 +28,9 @@ check_cloud_host()
     [ -f "$CONFIG_FILE" ] || return 0
 
     INSTALLED_CLOUD_HOST=$(awk -F= '/^cloudHost/ {print $2}' "$CONFIG_FILE")
+    IS_CONNECTED_TO_CLOUD=$(awk -F= '/^isConnectedToCloud/ {print $2}' "$CONFIG_FILE")
 
-    if [ -n "$INSTALLED_CLOUD_HOST" -a "$INSTALLED_CLOUD_HOST" != "$CLOUD_HOST" ]
+    if [ "$IS_CONNECTED_TO_CLOUD" = "yes" -a -n "$INSTALLED_CLOUD_HOST" -a "$INSTALLED_CLOUD_HOST" != "$CLOUD_HOST" ]
     then
         echo "This beta package is for another cloud instance. Exiting.." >&2
         exit 1

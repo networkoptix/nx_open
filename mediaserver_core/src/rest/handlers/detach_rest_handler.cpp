@@ -14,13 +14,16 @@
 #include <rest/helpers/permissions_helper.h>
 #include <utils/common/sync_call.h>
 
-#include "media_server/serverutil.h"
-#include "cloud/cloud_connection_manager.h"
-
+#include <media_server/serverutil.h>
+#include <cloud/cloud_connection_manager.h>
+#include <utils/common/app_info.h>
+#include <api/model/detach_from_cloud_reply.h>
 
 namespace {
-    static const QString kDefaultAdminPassword = "admin";
-}
+
+static const QString kDefaultAdminPassword = "admin";
+
+} // namespace
 
 QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
     CloudConnectionManager* const cloudConnectionManager)
@@ -28,34 +31,30 @@ QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
     QnJsonRestHandler(),
     m_cloudConnectionManager(cloudConnectionManager)
 {
-
 }
 
 int QnDetachFromCloudRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
     return execute(std::move(DetachFromCloudData(params)), owner->accessRights(), result);
 }
 
 int QnDetachFromCloudRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-
     DetachFromCloudData passwordData = QJson::deserialized<DetachFromCloudData>(body);
     return execute(std::move(passwordData), owner->accessRights(), result);
 }
 
-int QnDetachFromCloudRestHandler::execute(DetachFromCloudData data, const Qn::UserAccessData& accessRights, QnJsonRestResult &result)
+int QnDetachFromCloudRestHandler::execute(
+    DetachFromCloudData data, const Qn::UserAccessData& accessRights, QnJsonRestResult& result)
 {
     using namespace nx::cdb;
 
@@ -68,46 +67,60 @@ int QnDetachFromCloudRestHandler::execute(DetachFromCloudData data, const Qn::Us
     if (!validatePasswordData(data, &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
+        result.setReply(DetachFromCloudReply(
+            DetachFromCloudReply::ResultCode::invalidPasswordData));
         return nx_http::StatusCode::ok;
     }
 
-    // first of all, enable admin user and changing its password 
+    // first of all, enable admin user and changing its password
     //      so that there is always a way to connect to the system
     if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
+        result.setReply(DetachFromCloudReply(
+            DetachFromCloudReply::ResultCode::cannotUpdateUserCredentials));
         return nx_http::StatusCode::ok;
     }
 
-    // second, updating data in cloud
-    nx::cdb::api::ResultCode cdbResultCode = api::ResultCode::ok;
+    // Second, updating data in cloud.
+    api::ResultCode cdbResultCode = api::ResultCode::ok;
     auto systemId = qnGlobalSettings->cloudSystemID();
     auto authKey = qnGlobalSettings->cloudAuthKey();
     auto cloudConnection = m_cloudConnectionManager->getCloudConnection(systemId, authKey);
-    std::tie(cdbResultCode) = makeSyncCall<nx::cdb::api::ResultCode>(
+    std::tie(cdbResultCode) = makeSyncCall<api::ResultCode>(
         std::bind(
-            &nx::cdb::api::SystemManager::unbindSystem,
+            &api::SystemManager::unbindSystem,
             cloudConnection->systemManager(),
             systemId.toStdString(),
             std::placeholders::_1));
     if (cdbResultCode != api::ResultCode::ok)
     {
-        //TODO #ak rollback "admin" user modification?
+        // TODO: #ak: Rollback "admin" user modification?
 
-        NX_LOGX(lm("Received error response from cloud: %1").arg(api::toString(cdbResultCode)), cl_logWARNING);
+        NX_LOGX(lm("Received error response from %1: %2").arg(QnAppInfo::cloudName())
+            .arg(api::toString(cdbResultCode)), cl_logWARNING);
+
+        // We've decided ignore cloud error in detach operation. So, it allows to do detach in offline mode
+#if 0
         result.setError(
             QnJsonRestResult::CantProcessRequest,
-            tr("Could not connect to cloud: %1").
-            arg(QString::fromStdString(nx::cdb::api::toString(cdbResultCode))));
+            lit("Could not connect to %1: %2").arg(QnAppInfo::cloudName())
+                .arg(QString::fromStdString(api::toString(cdbResultCode))));
+        result.setReply(DetachFromCloudReply(
+            DetachFromCloudReply::ResultCode::errorFromCloudServer,
+            static_cast<int>(cdbResultCode)));
         return nx_http::StatusCode::ok;
+#endif
     }
 
-    if (!m_cloudConnectionManager->cleanupCloudDataInLocalDB())
+    if (!m_cloudConnectionManager->cleanUpCloudDataInLocalDb())
     {
         NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Failed to save cloud credentials to local DB"));
+        result.setReply(DetachFromCloudReply(
+            DetachFromCloudReply::ResultCode::cannotCleanUpCloudDataInLocalDb));
         return nx_http::StatusCode::internalServerError;
     }
 

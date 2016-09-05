@@ -155,8 +155,7 @@ protected:
         T reply;
         if(status == 0) {
             Qn::SerializationFormat format =
-                Qn::serializationFormatFromHttpContentType(
-                    nx_http::getHeaderValue(response.response.headers, "Content-Type"));
+                Qn::serializationFormatFromHttpContentType(response.contentType);
             NX_ASSERT(format != Qn::UnsupportedFormat, Q_FUNC_INFO, "Invalid content-type header");
 
             switch (format) {
