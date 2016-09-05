@@ -66,9 +66,9 @@ QString QnSavedSessionsModel::updateSession(
     };
 
     auto similarSessionPredicate = [&address, &port, &user](const QnLoginSession &session) -> bool {
-        return session.address == address &&
+        return session.address.compare(address, Qt::CaseInsensitive) == 0 &&
                session.port == port &&
-               session.user == user;
+               session.user.compare(user, Qt::CaseInsensitive) == 0;
     };
 
     auto it = sessionId.isNull()
