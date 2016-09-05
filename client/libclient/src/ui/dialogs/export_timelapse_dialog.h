@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
 class ExportTimelapseDialog;
@@ -8,11 +8,11 @@ class ExportTimelapseDialog;
 
 class QnFilteredUnitsModel;
 
-class QnExportTimelapseDialog : public QnWorkbenchStateDependentButtonBoxDialog
+class QnExportTimelapseDialog : public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
     explicit QnExportTimelapseDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     virtual ~QnExportTimelapseDialog();

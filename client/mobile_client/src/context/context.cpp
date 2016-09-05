@@ -193,9 +193,10 @@ QString QnContext::getLastUsedUrl() const
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
+    //TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
-    cloudStatusWatcher()->setCloudCredentials(login, password);
+    cloudStatusWatcher()->setCloudCredentials(QnCredentials(login, password));
     qnClientCoreSettings->save();
 }
 

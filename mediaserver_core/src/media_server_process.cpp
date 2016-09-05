@@ -1367,7 +1367,7 @@ void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudCon
             continue;
         }
 
-        if (!cloudConnectionManager->cleanupCloudDataInLocalDB())
+        if (!cloudConnectionManager->cleanUpCloudDataInLocalDb())
         {
             qWarning() << "Error while clearing cloud information. Traying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);

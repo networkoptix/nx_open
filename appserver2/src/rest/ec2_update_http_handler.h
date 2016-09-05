@@ -308,7 +308,7 @@ private:
 
         {
             QnMutexLocker lk(&m_mutex);
-            while(!finished)
+            while (!finished)
                 m_cond.wait(lk.mutex());
         }
 

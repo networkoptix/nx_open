@@ -14,13 +14,15 @@
 
 namespace {
 
-QnSoftwareVersion minSupportedVersion()
+QnSoftwareVersion minSupportedVersion(const ec2::ApiRuntimeData& localInfo)
 {
-#if defined(Q_OS_MACX)
-    return QnSoftwareVersion("3.0");
-#else
+    if (localInfo.peer.isMobileClient())
+        return QnSoftwareVersion("2.5");
+
+    if (QnAppInfo::applicationPlatform() == lit("macosx"))
+        return QnSoftwareVersion("3.0");
+
     return QnSoftwareVersion("1.4");
-#endif
 }
 
 bool compatibleCustomization(const QString& customization, const ec2::ApiRuntimeData& localInfo)
@@ -41,16 +43,11 @@ bool compatibleCustomization(const QString& customization, const ec2::ApiRuntime
     return c1 == c2;
 }
 
-}
-
-QnConnectionValidator::QnConnectionValidator(QObject* parent):
-    base_type(parent)
-{
-}
+} // namespace
 
 QnSoftwareVersion QnConnectionValidator::minSupportedVersion()
 {
-    return ::minSupportedVersion();
+    return ::minSupportedVersion(qnRuntimeInfoManager->localInfo().data);
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
@@ -66,13 +63,13 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 {
     using namespace Qn;
     if (networkError == ec2::ErrorCode::unauthorized)
-        return ConnectionResult::unauthorized;
+        return ConnectionResult::Unauthorized;
 
     if (networkError == ec2::ErrorCode::temporary_unauthorized)
-        return ConnectionResult::temporaryUnauthorized;
+        return ConnectionResult::TemporaryUnauthorized;
 
     if (networkError != ec2::ErrorCode::ok)
-        return ConnectionResult::networkError;
+        return ConnectionResult::NetworkError;
 
     return validateConnectionInternal(connectionInfo.brand, connectionInfo.nxClusterProtoVersion,
         connectionInfo.version, connectionInfo.cloudHost);
@@ -87,21 +84,21 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     using namespace Qn;
 
     if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
-        return ConnectionResult::incompatibleInternal;
+        return ConnectionResult::IncompatibleInternal;
 
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
     if (!compatibleCustomization(customization, localInfo))
-        return ConnectionResult::incompatibleInternal;
+        return ConnectionResult::IncompatibleInternal;
 
     if (!customization.isEmpty()
         && !localInfo.brand.isEmpty()
         && customization != localInfo.brand)
 
     if (version < minSupportedVersion())
-        return ConnectionResult::incompatibleVersion;
+        return ConnectionResult::IncompatibleVersion;
 
     if (protoVersion != QnAppInfo::ec2ProtoVersion())
-        return ConnectionResult::compatibilityMode;
+        return ConnectionResult::CompatibilityMode;
 
-    return ConnectionResult::success;
+    return ConnectionResult::Success;
 }

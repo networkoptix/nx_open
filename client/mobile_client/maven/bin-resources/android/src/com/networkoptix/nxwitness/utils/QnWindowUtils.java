@@ -65,9 +65,19 @@ public class QnWindowUtils {
         }
 
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-        private void prepareSystemUi() {
+        private void prepareSystemUi()
+        {
+            if (statusBarHeight < 0)
+            {
+                Resources resources = QtNative.activity().getResources();
+                int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+                if (resourceId > 0)
+                    statusBarHeight = resources.getDimensionPixelSize(resourceId);
+            }
+
             Window window = mActivity.getWindow();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            {
                 window.setFlags(
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -131,13 +141,8 @@ public class QnWindowUtils {
         return result;
     }
 
-    public static int getStatusBarHeight() {
-        if (statusBarHeight < 0) {
-            Rect rectangle = new Rect();
-            Window window = QtNative.activity().getWindow();
-            window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-            statusBarHeight = rectangle.top;
-        }
+    public static int getStatusBarHeight()
+    {
         return statusBarHeight;
     }
 

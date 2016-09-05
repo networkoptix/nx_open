@@ -224,7 +224,7 @@ void QnLoginDialog::accept()
         auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status)
         {
-            case Qn::ConnectionResult::success:
+            case Qn::ConnectionResult::Success:
             {
                 const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                 QnActionParameters params;
@@ -234,7 +234,7 @@ void QnLoginDialog::accept()
                 menu()->trigger(QnActions::ConnectAction, params);
                 break;
             }
-            case Qn::ConnectionResult::compatibilityMode:
+            case Qn::ConnectionResult::CompatibilityMode:
                 menu()->trigger(QnActions::DelayedForcedExitAction);
                 break; // to avoid cycle
             default:    //error
@@ -365,10 +365,10 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
             /* Do not show servers with incompatible customization or cloud host */
             if (!qnRuntime->isDevMode()
-                && compatibilityCode == Qn::ConnectionResult::incompatibleInternal)
+                && compatibilityCode == Qn::ConnectionResult::IncompatibleInternal)
                     continue;
 
-            bool isCompatible = (compatibilityCode == Qn::ConnectionResult::success);
+            bool isCompatible = (compatibilityCode == Qn::ConnectionResult::Success);
 
             QString title;
             if (!data.info.systemName.isEmpty())

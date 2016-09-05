@@ -11,13 +11,14 @@ QnHTTPRawResponse::QnHTTPRawResponse()
 
 QnHTTPRawResponse::QnHTTPRawResponse(
     SystemError::ErrorCode _sysErrorCode,
-    nx_http::Response _response,
-    QByteArray _msgBody)
+    const nx_http::StatusLine&  statusLine,
+    const QByteArray& _contentType,
+    const QByteArray& _msgBody)
 :
     sysErrorCode(_sysErrorCode),
     status(QNetworkReply::NoError),
-    response(std::move(_response)),
-    msgBody(std::move(_msgBody))
+    contentType(_contentType),
+    msgBody(_msgBody)
 {
     if (sysErrorCode != SystemError::noError)
     {
@@ -27,8 +28,8 @@ QnHTTPRawResponse::QnHTTPRawResponse(
     else
     {
         status = httpStatusCodeToNetworkError(
-            static_cast<nx_http::StatusCode::Value>(response.statusLine.statusCode));
-        errorString = QString::fromUtf8(response.statusLine.reasonPhrase);
+            static_cast<nx_http::StatusCode::Value>(statusLine.statusCode));
+        errorString = QString::fromUtf8(statusLine.reasonPhrase);
     }
 }
 

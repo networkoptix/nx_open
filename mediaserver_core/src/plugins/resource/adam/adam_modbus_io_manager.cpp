@@ -268,7 +268,7 @@ void QnAdamModbusIOManager::fetchAllPortStates()
 
     quint16 transactionId = 0;
     if (status)
-        m_client.readCoilsAsync(startCoil, lastCoil - startCoil, &transactionId);
+        m_client.readCoilsAsync(startCoil, lastCoil - startCoil + 1, &transactionId);
 }
 
 void QnAdamModbusIOManager::processAllPortStatesResponse(const nx::modbus::ModbusMessage& response)
@@ -383,7 +383,7 @@ bool QnAdamModbusIOManager::getBitValue(const QByteArray& bytes, quint64 bitInde
 
     auto byte = bytes[byteIndex];
 
-    return !!(byte & (1 << bitIndex % kBitsInByte));
+    return !!(byte & ((quint8)1 << (bitIndex % kBitsInByte)));
 }
 
 void QnAdamModbusIOManager::scheduleMonitoringIteration()

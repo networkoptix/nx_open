@@ -1,7 +1,7 @@
 #include "login_to_cloud_dialog.h"
 #include "ui_login_to_cloud_dialog.h"
 
-#include <client/client_settings.h>
+#include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
 
@@ -166,14 +166,16 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     showCredentialsError(false);
 
-    qnCloudStatusWatcher->setCloudCredentials(QString(), QString());
+    qnCloudStatusWatcher->resetCloudCredentials();
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
-    qnCloudStatusWatcher->setCloudCredentials(q->ui->loginInputField->text().trimmed(),
-        q->ui->passwordInputField->text().trimmed());
+
+    qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+        q->ui->loginInputField->text().trimmed(),
+        q->ui->passwordInputField->text().trimmed()));
 }
 
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status)
@@ -188,9 +190,10 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
     Q_Q(QnLoginToCloudDialog);
 
-    qnSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
+    //TODO: #GDM Store temporary credentials?
+    qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
     const bool stayLoggedIn = q->ui->stayLoggedInChackBox->isChecked();
-    qnSettings->setCloudPassword(stayLoggedIn
+    qnClientCoreSettings->setCloudPassword(stayLoggedIn
         ? q->ui->passwordInputField->text().trimmed()
         : QString());
 

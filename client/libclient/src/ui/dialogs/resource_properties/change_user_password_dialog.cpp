@@ -48,6 +48,8 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
         ui->confirmPasswordInputField,
         ui->currentPasswordInputField
     });
+
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnChangeUserPasswordDialog::~QnChangeUserPasswordDialog()

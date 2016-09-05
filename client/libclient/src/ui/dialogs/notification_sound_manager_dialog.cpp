@@ -7,7 +7,7 @@
 #include <client/client_settings.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topics.h>
@@ -64,7 +64,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     QString supportedFormats = tr("Sound Files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (this, tr("Select File..."), qnSettings->mediaFolder(), supportedFormats));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnSessionAwareDialog<QnCustomFileDialog> (this, tr("Select File..."), qnSettings->mediaFolder(), supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;

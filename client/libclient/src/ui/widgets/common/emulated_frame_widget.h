@@ -23,7 +23,7 @@ protected:
     /**
      * This function is to be overridden in derived class to provide information
      * on window frame sections.
-     * 
+     *
      * \param pos                       Position in widget coordinates.
      * \returns                         Window frame section at the given position.
      */

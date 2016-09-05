@@ -57,7 +57,7 @@ namespace nx_hls
         nx::Buffer m_writeBuffer;
         StreamingChunkPtr m_currentChunk;
         //!For reading data from \a m_currentChunk
-        std::unique_ptr<AbstractInputByteStream> m_chunkInputStream;
+        std::unique_ptr<StreamingChunkInputStream> m_chunkInputStream;
         QnMutex m_mutex;
         QnWaitCondition m_cond;
         bool m_switchToChunkedTransfer;
@@ -122,9 +122,6 @@ namespace nx_hls
             const QnVideoCameraPtr& videoCamera,
             MediaQuality streamQuality );
         void ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality );
-
-    private slots:
-        void chunkDataAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );
     };
 }
 

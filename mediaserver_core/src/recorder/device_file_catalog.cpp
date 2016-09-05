@@ -404,7 +404,7 @@ void DeviceFileCatalog::setLastSyncTime(int64_t time)
         m_storagePool,
         guidFromArbitraryData(m_cameraUniqueId),
         m_catalog,
-        time 
+        time
     );
 
     QnMutexLocker lk(&m_mutex);
@@ -489,6 +489,8 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(
 void DeviceFileCatalog::rebuildPause(void* value)
 {
     QnMutexLocker lock( &m_rebuildMutex );
+    if (m_pauseList.isEmpty())
+        qWarning() << "Temporary disable rebuild archive (if active) due to high disk usage slow down recorders";
     m_pauseList << value;
 }
 
@@ -496,6 +498,8 @@ void DeviceFileCatalog::rebuildResume(void* value)
 {
     QnMutexLocker lock( &m_rebuildMutex );
     m_pauseList.remove(value);
+    if (m_pauseList.isEmpty())
+        qWarning() << "Rebuild archive is allowed again (if active) due to disk performance is OK";
 }
 
 bool DeviceFileCatalog::needRebuildPause()

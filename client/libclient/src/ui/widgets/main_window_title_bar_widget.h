@@ -6,6 +6,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnLayoutTabBar;
+class QnToolButton;
 class QnMainWindowTitleBarWidgetPrivate;
 
 class QnMainWindowTitleBarWidget: public QWidget, public QnWorkbenchContextAware
@@ -35,6 +36,16 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent* event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent* event) override;
     virtual void dropEvent(QDropEvent* event) override;
+
+private:
+    QnToolButton* newActionButton(
+        QnActions::IDType actionId,
+        int helpTopicId = Qn::Empty_Help,
+        const QSize& fixedSize = QSize());
+
+    QnToolButton* newActionButton(
+        QnActions::IDType actionId,
+        const QSize& fixedSize = QSize());
 
 private:
     Q_DECLARE_PRIVATE(QnMainWindowTitleBarWidget)
