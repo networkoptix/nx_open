@@ -26,7 +26,7 @@ public:
     QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader);
     virtual ~QnRtspClientArchiveDelegate();
 
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    void setCamera(const QnSecurityCamResourcePtr &camera);
     void setFixedServer(const QnMediaServerResourcePtr &server);
 
     virtual bool open(const QnResourcePtr &resource) override;
@@ -75,12 +75,12 @@ private:
 
     // determine camera's video server on specified time
     QnMediaServerResourcePtr getServerOnTime(qint64 time);
-    QnMediaServerResourcePtr getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time);
+    QnMediaServerResourcePtr getNextMediaServerFromTime(const QnSecurityCamResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
-    QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
-    void checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
-    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
-    void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const;
+    QString getUrl(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
+    void checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
+    void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera);
+    void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
     QnMutex m_mutex;
@@ -91,7 +91,7 @@ private:
     QMap<quint32, quint16> m_prevTimestamp;
     qint64 m_position;
     bool m_opened;
-    QnVirtualCameraResourcePtr m_camera;
+    QnSecurityCamResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
     QnMediaServerResourcePtr m_fixedServer;
     //bool m_waitBOF;

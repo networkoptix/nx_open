@@ -209,16 +209,13 @@ AbstractStreamSocket* MultipleServerSocket::accept()
 
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    nx::utils::BarrierHandler barrier(
+    m_timerSocket.pleaseStop(
         [this, handler = std::move(handler)]()
         {
-            m_acceptHandler = nullptr;
+            NX_LOGX(lm("Stopped"), cl_logDEBUG1);
+            m_serverSockets.clear();
             handler();
         });
-
-    m_timerSocket.pleaseStop(barrier.fork());
-    for (auto& socket : m_serverSockets)
-        socket->pleaseStop(barrier.fork());
 }
 
 Pollable* MultipleServerSocket::pollable()
@@ -248,22 +245,26 @@ void MultipleServerSocket::acceptAsync(
         m_acceptHandler = std::move(handler);
 
         if (m_recvTmeout)
+        {
             m_timerSocket.start(
                 std::chrono::milliseconds(m_recvTmeout),
                 std::bind(
                     &MultipleServerSocket::accepted, this,
                     nullptr, SystemError::timedOut, nullptr));
+        }
 
-        for (auto& socket : m_serverSockets)
-            if (!socket.isAccepting)
+        for (auto& source : m_serverSockets)
+        {
+            if (!source.isAccepting)
             {
-                socket.isAccepting = true;
-                NX_LOGX(lm("accept on %1").arg(&socket), cl_logDEBUG2);
+                source.isAccepting = true;
+                NX_LOGX(lm("Accept on source(%1)").arg(&source), cl_logDEBUG1);
 
                 using namespace std::placeholders;
-                socket->acceptAsync(std::bind(
-                    &MultipleServerSocket::accepted, this, &socket, _1, _2));
+                source->acceptAsync(std::bind(
+                    &MultipleServerSocket::accepted, this, &source, _1, _2));
             }
+        }
     });
 }
 
@@ -291,6 +292,7 @@ void MultipleServerSocket::cancelIOSync()
             m_acceptHandler = nullptr;
             ioCancelledPromise.set_value();
         });
+
     ioCancelledPromise.get_future().wait();
 }
 
@@ -333,13 +335,17 @@ bool MultipleServerSocket::addSocket(
 
             socket->bindToAioThread(m_timerSocket.getAioThread());
             m_serverSockets.push_back(ServerSocketHandle(std::move(socket)));
-
             if (m_acceptHandler)
-                m_timerSocket.start(
-                    std::chrono::milliseconds::zero(),
-                    std::bind(
-                        &MultipleServerSocket::accepted, this,
-                        nullptr, SystemError::timedOut, nullptr));  //TODO #ak use interrupted error code
+            {
+                ServerSocketHandle& source = m_serverSockets.back();
+                source.isAccepting = true;
+                NX_LOGX(lm("Accept on source(%1) when added").arg(&source), cl_logDEBUG1);
+
+                using namespace std::placeholders;
+                source->acceptAsync(std::bind(
+                    &MultipleServerSocket::accepted, this, &source, _1, _2));
+            }
+
             socketAddedPromise.set_value();
         });
     socketAddedPromise.get_future().wait();
@@ -376,9 +382,9 @@ void MultipleServerSocket::accepted(
 
     std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
 
-    NX_LOGX(lm("accepted %1 (%2) from %3")
+    NX_LOGX(lm("Accepted socket(%1) (%2) from source(%3)")
             .arg(rawSocket).arg(SystemError::toString(code)).arg(source),
-            cl_logDEBUG2);
+            cl_logDEBUG1);
 
     if (source)
     {
@@ -396,7 +402,7 @@ void MultipleServerSocket::accepted(
     //            is handled, so we can not take any decisions afterhand.
     //            Consider using condition variables!
 
-    NX_LOGX(lm("cancel all other accepts"), cl_logDEBUG2);
+    NX_LOGX(lm("Cancel all other accepts"), cl_logDEBUG1);
     for (auto& socketContext : m_serverSockets)
         socketContext.stopAccepting();
 

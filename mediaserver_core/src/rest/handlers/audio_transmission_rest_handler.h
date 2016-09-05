@@ -4,17 +4,15 @@
 
 class QnProxyDesktopDataProvider;
 
-class QnAudioTransmissionRestHandler : public QnJsonRestHandler
+class QnAudioTransmissionRestHandler: public QnJsonRestHandler
 {
-
 public:
     virtual int executeGet(
         const QString& path,
         const QnRequestParams& params,
         QnJsonRestResult& result,
-        const QnRestConnectionProcessor*) override;
+        const QnRestConnectionProcessor* owner) override;
 
     static bool validateParams(const QnRequestParams& params, QString& error);
-private:
 };
 

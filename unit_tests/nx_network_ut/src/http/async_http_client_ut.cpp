@@ -337,11 +337,11 @@ TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
 {
     static const char* testPath = "/ConnectionBreakAfterReceivingSecondRequest";
 
-    std::atomic<int> requestCounter = 0;
+    std::atomic<int> requestCounter(0);
     ASSERT_TRUE(
         testHttpServer()->registerRequestProcessor<TestHandler>(
             testPath,
-            [&requestCounter]() -> auto
+            [&requestCounter]() mutable
             {
                 return std::make_unique<TestHandler>(requestCounter++);
             }));

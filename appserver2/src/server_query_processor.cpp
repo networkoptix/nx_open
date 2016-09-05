@@ -69,4 +69,20 @@ ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
 
     return ErrorCode::ok;
 }
+
+ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
+    const QnUuid& id,
+    const AbstractECConnectionPtr& connection,
+    std::list<std::function<void()>>* const transactionsToSend,
+    bool isLocal)
+{
+    QnTransaction<ApiIdData> removeResourceStatusTran(ApiCommand::removeResourceStatus, ApiIdData(id));
+    removeResourceStatusTran.isLocal = isLocal;
+    ErrorCode errorCode = processUpdateSync(removeResourceStatusTran, transactionsToSend, 0);
+    if (errorCode != ErrorCode::ok)
+        return errorCode;
+
+    return ErrorCode::ok;
+}
+
 } //namespace ec2

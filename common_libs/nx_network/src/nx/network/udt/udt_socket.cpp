@@ -601,7 +601,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         if (!setNonBlockingMode(true))
             return -1;
 
-        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags ^ MSG_DONTWAIT);
+        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags & ~MSG_DONTWAIT);
 
         if (!setNonBlockingMode(&value))
             return -1;

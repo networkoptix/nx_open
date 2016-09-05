@@ -16,7 +16,6 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 

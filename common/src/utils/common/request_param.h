@@ -76,6 +76,13 @@ public:
     void insert(const Key &key, const Value &value) {
         base_type::push_back(qMakePair(key, value));
     }
+
+    QHash<Key, Value> toHash() const {
+        QHash<Key, Value> result;
+        for(const QPair<Key, Value> &pair: *this)
+            result.insert(pair.first, pair.second);
+        return result;
+    }
 };
 
 typedef QPair<QString, QString> QnRequestHeader;
@@ -92,12 +99,13 @@ struct QnHTTPRawResponse
     QnHTTPRawResponse();
     QnHTTPRawResponse(
         SystemError::ErrorCode _sysErrorCode,
-        nx_http::Response _response,
-        QByteArray _msgBody);
+        const nx_http::StatusLine& statusLine,
+        const QByteArray& _contentType,
+        const QByteArray& _msgBody);
 
     SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;
-    nx_http::Response response;
+    QByteArray contentType;
     QByteArray msgBody;
     QString errorString;
 

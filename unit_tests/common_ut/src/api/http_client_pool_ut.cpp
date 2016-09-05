@@ -22,6 +22,12 @@
 #include <nx/network/http/test_http_server.h>
 #include <api/http_client_pool.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/random.h>
+#include <utils/common/sleep.h>
+
+namespace {
+    static const int kWaitTimeoutMs = 1000 * 10;
+}
 
 namespace nx_http {
 
@@ -100,7 +106,6 @@ TEST_F(HttpClientPoolTest, GeneralTest)
         waitCond.wakeAll();
     }, Qt::DirectConnection);
 
-    static const int kWaitTimeoutMs = 1000 * 10;
     static const int kRequests = 100;
     for (int i = 0; i < kRequests; ++i)
     {
@@ -111,6 +116,65 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     QnMutexLocker lock(&mutex);
     while (requestsFinished < kRequests * 2)
         ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+}
+
+TEST_F(HttpClientPoolTest, terminateTest)
+{
+    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+        "/test",
+        "SimpleTest",
+        "application/text"));
+
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+    const QUrl url(lit("http://127.0.0.1:%1/test")
+        .arg(testHttpServer()->serverAddress().port));
+
+    std::unique_ptr<nx_http::ClientPool> httpPool(new nx_http::ClientPool());
+
+    QByteArray expectedResponse;
+
+    QnMutex mutex;
+    QnWaitCondition waitCond;
+    int requestsFinished = 0;
+    QSet<int> requests;
+
+    QObject::connect(
+        httpPool.get(), &nx_http::ClientPool::done,
+        httpPool.get(),
+        [&](int /*handle*/, nx_http::AsyncHttpClientPtr client)
+    {
+        QnMutexLocker lock(&mutex);
+        client->fetchMessageBodyBuffer();
+        ++requestsFinished;
+        waitCond.wakeAll();
+    }, Qt::DirectConnection);
+
+    static const int kWaitTimeoutMs = 1000 * 10;
+    static const int kRequests = 100;
+
+    {
+        QnMutexLocker lock(&mutex);
+        for (int i = 0; i < kRequests; ++i)
+        {
+            requests << httpPool->doGet(url);
+        }
+        ASSERT_TRUE(httpPool->size() > 0);
+    }
+
+    // terminate some requests
+    for (int handle: requests)
+    {
+        if (nx::utils::random::number() % 2 == 1)
+            httpPool->terminate(handle);
+    }
+
+    QElapsedTimer waitTimer;
+    waitTimer.restart();
+    while (!waitTimer.hasExpired(kWaitTimeoutMs) && httpPool->size() > 0)
+        QnSleep::msleep(10);
+
+    ASSERT_TRUE(httpPool->size() == 0);
 }
 
 

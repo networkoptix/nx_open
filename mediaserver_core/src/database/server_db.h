@@ -60,7 +60,7 @@ public:
     /* Bookmarks API */
 
     // It does not sort by tags or camera names. Caller should sort it manually
-    bool getBookmarks(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+    bool getBookmarks(const QnSecurityCamResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 
     bool containsBookmark(const QnUuid &bookmarkId) const;
     QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());

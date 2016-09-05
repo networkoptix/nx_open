@@ -90,12 +90,28 @@ void ClientPool::terminate(int handle)
         HttpConnection* connection = itr->second.get();
         if (connection->handle == handle)
         {
-            connection->client->terminate();
+            AsyncHttpClientPtr client = connection->client;
+            connection->client = createHttpConnection();
             connection->handle = 0;
             sendNextRequestUnsafe();
+            lock.unlock();
+            client->terminate();
             break;
         }
     }
+}
+
+int ClientPool::size() const
+{
+    QnMutexLocker lock(&m_mutex);
+    int result = m_awaitingRequests.size();
+    for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end(); ++itr)
+    {
+        const HttpConnection* connection = itr->second.get();
+        if (connection->handle)
+            ++result;
+    }
+    return result;
 }
 
 void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient)
@@ -175,24 +191,31 @@ ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
     {
 
         result = new HttpConnection();
-        result->client = nx_http::AsyncHttpClient::create();
-
-        //setting appropriate timeouts
-        using namespace std::chrono;
-        result->client->setSendTimeoutMs(
-            duration_cast<milliseconds>(kRequestSendTimeout).count());
-        result->client->setResponseReadTimeoutMs(
-            duration_cast<milliseconds>(kResponseReadTimeout).count());
-        result->client->setMessageBodyReadTimeoutMs(
-            duration_cast<milliseconds>(kMessageBodyReadTimeout).count());
-
-        connect(
-            result->client.get(), &nx_http::AsyncHttpClient::done,
-            this, &ClientPool::at_HttpClientDone,
-            Qt::DirectConnection);
+        result->client = createHttpConnection();
 
         m_connectionPool.emplace(requestAddress, std::move(HttpConnectionPtr(result)));
     }
+
+    return result;
+}
+
+AsyncHttpClientPtr ClientPool::createHttpConnection()
+{
+    AsyncHttpClientPtr result = nx_http::AsyncHttpClient::create();
+
+    //setting appropriate timeouts
+    using namespace std::chrono;
+    result->setSendTimeoutMs(
+        duration_cast<milliseconds>(kRequestSendTimeout).count());
+    result->setResponseReadTimeoutMs(
+        duration_cast<milliseconds>(kResponseReadTimeout).count());
+    result->setMessageBodyReadTimeoutMs(
+        duration_cast<milliseconds>(kMessageBodyReadTimeout).count());
+
+    connect(
+        result.get(), &nx_http::AsyncHttpClient::done,
+        this, &ClientPool::at_HttpClientDone,
+        Qt::DirectConnection);
 
     return result;
 }

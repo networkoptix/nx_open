@@ -50,7 +50,7 @@ public:
     void unsubscribeFromSystemAccessListUpdatedEvent(
         nx::utils::SubscriptionId subscriptionId);
 
-    bool cleanupCloudDataInLocalDB();
+    bool cleanUpCloudDataInLocalDb();
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 signals:
