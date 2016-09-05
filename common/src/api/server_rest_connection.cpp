@@ -215,9 +215,13 @@ void ServerConnection::cancelRequest(const Handle& requestId)
         httpClient->terminate();
 }
 
-ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType, const nx_http::StringType& messageBody)
+ServerConnection::Request ServerConnection::prepareRequest(
+    HttpMethod method,
+    const QUrl& url,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody)
 {
-    QnMediaServerResourcePtr server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
+    const auto server = qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return Request();
 
@@ -229,12 +233,27 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
     request.contentType = contentType;
     request.messageBody = messageBody;
 
+    auto user = QnAppServerConnectionFactory::url().userName().toLower();
+    auto password = QnAppServerConnectionFactory::url().password();
+
+    if (user.isEmpty() || password.isEmpty())
+    {
+        if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+        {
+            // if auth is not known, use admin hash
+            user = admin->getName().toLower();
+            password = QString::fromUtf8(admin->getDigest());
+            request.authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
+        }
+    }
+
     auto videoWallGuid = QnAppServerConnectionFactory::videowallGuid();
     if (!videoWallGuid.isNull())
         request.headers.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videoWallGuid.toByteArray());
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
-    request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, QnAppServerConnectionFactory::url().userName().toUtf8());
+    request.headers.emplace(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, user.toUtf8());
     request.headers.emplace("User-Agent", nx_http::userAgentString());
 
     QnRoute route = QnRouter::instance()->routeTo(server->getId());
@@ -257,19 +276,9 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
         request.url.setPort(route.addr.port);
     }
 
-    QString user = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
-    if (user.isEmpty() || password.isEmpty()) {
-        if (QnUserResourcePtr admin = qnResPool->getAdministrator())
-        {
-            // if auth is not known, use admin hash
-            user = admin->getName();
-            password = QString::fromUtf8(admin->getDigest());
-            request.authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
-        }
-    }
     request.url.setUserName(user);
     request.url.setPassword(password);
+
     return request;
 }
 
