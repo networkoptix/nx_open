@@ -40,6 +40,10 @@ class TransactionLog
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
+    typedef nx::utils::MoveOnlyFunc<void(
+        api::ResultCode /*resultCode*/,
+        std::vector<std::shared_ptr<const Serializable>> /*serializedTransactions*/,
+        ::ec2::QnTranState /*readedUpTo*/)> TransactionsReadHandler;
 
     /**
      * Fills internal cache.
@@ -145,7 +149,7 @@ public:
             return result;
 
         auto transactionSerializer = std::make_shared<
-            typename SerializedUbjsonTransaction<TransactionDataType>>(
+            typename TransactionWithUbjsonPresentation<TransactionDataType>>(
                 std::move(transaction),
                 std::move(serializedTransaction));
 
@@ -165,15 +169,16 @@ public:
      * @param completionHandler is called within unspecified DB connection thread.
      * In case of high load request can be cancelled internaly. 
      * In this case \a api::ResultCode::retryLater will be reported
+     * \note If there more transactions then \a maxTransactionsToReturn then 
+     *      \a api::ResultCode::partialContent result code will be reported 
+     *      to the \a completionHandler.
      */
     void readTransactions(
         const nx::String& systemId,
         const ::ec2::QnTranState& from,
         const ::ec2::QnTranState& to,
         int maxTransactionsToReturn,
-        nx::utils::MoveOnlyFunc<void(
-            api::ResultCode /*resultCode*/,
-            std::vector<nx::Buffer> /*serializedTransactions*/)> completionHandler);
+        TransactionsReadHandler completionHandler);
 
 private:
     struct UpdateHistoryData
@@ -212,13 +217,21 @@ private:
     public:
         nx::String systemId;
         /** List of transactions, added within this DB transaction. */
-        std::vector<std::shared_ptr<const TransactionSerializer>> transactions;
+        std::vector<std::shared_ptr<const TransactionWithSerializedPresentation>> transactions;
         /** Changes done to vms transaction log under Db transaction. */
         VmsTransactionLogData transactionLogUpdate;
 
         //DbTransactionContext() = default;
         //DbTransactionContext(DbTransactionContext&&) = default;
         //DbTransactionContext& operator=(DbTransactionContext&&) = default;
+    };
+
+    struct TransactionReadResult
+    {
+        api::ResultCode resultCode;
+        std::vector<std::shared_ptr<const Serializable>> transactions;
+        /** (Read start state) + (readed transactions). */
+        ::ec2::QnTranState state;
     };
 
     const QnUuid m_peerId;
@@ -233,13 +246,16 @@ private:
     nx::db::DBResult fetchTransactionState(
         QSqlDatabase* connection,
         int* const /*dummyResult*/);
-    nx::db::DBResult TransactionLog::fetchTransactions(
+    /**
+     * Selects transactions from DB by condition.
+     */
+    nx::db::DBResult fetchTransactions(
         QSqlDatabase* connection,
         const nx::String& systemId,
         const ::ec2::QnTranState& from,
         const ::ec2::QnTranState& to,
         int maxTransactionsToReturn,
-        std::vector<nx::Buffer>* const outputData);
+        TransactionReadResult* const outputData);
     bool isShouldBeIgnored(
         QSqlDatabase* connection,
         const nx::String& systemId,

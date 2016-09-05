@@ -11,6 +11,7 @@
 #include <nx_ec/ec2_lib.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/timer_manager.h>
 
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
@@ -161,6 +162,10 @@ int Appserver2Process::exec()
         });
 
     registerQtResources();
+
+    // TODO: propagate this timerManager to TimeSynchronizationManager
+    nx::utils::TimerManager timerManager;
+    timerManager.start();
 
     QnCommonModule commonModule;
     commonModule.setModuleGUID(QnUuid::createUuid());

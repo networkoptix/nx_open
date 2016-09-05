@@ -65,22 +65,25 @@ void TransactionLog::readTransactions(
     const ::ec2::QnTranState& from,
     const ::ec2::QnTranState& to,
     int maxTransactionsToReturn,
-    nx::utils::MoveOnlyFunc<void(
-        api::ResultCode /*resultCode*/,
-        std::vector<nx::Buffer> /*serializedTransactions*/)> completionHandler)
+    TransactionsReadHandler completionHandler)
 {
     using namespace std::placeholders;
 
-    m_dbManager->executeSelect<std::vector<nx::Buffer>>(
+    m_dbManager->executeSelect<TransactionReadResult>(
         std::bind(
             &TransactionLog::fetchTransactions, this,
             _1, systemId, from, to, maxTransactionsToReturn, _2),
         [completionHandler = std::move(completionHandler)](
             QSqlDatabase* /*connection*/,
             nx::db::DBResult dbResult,
-            std::vector<nx::Buffer> outputData)
+            TransactionReadResult outputData)
         {
-            completionHandler(fromDbResultCode(dbResult), std::move(outputData));
+            completionHandler(
+                dbResult == nx::db::DBResult::ok
+                    ? outputData.resultCode
+                    : fromDbResultCode(dbResult),
+                std::move(outputData.transactions),
+                std::move(outputData.state));
         });
 }
 
@@ -141,7 +144,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
             QnUuid::fromStringSafe(dbGuid));
 
         VmsTransactionLogData& vmsTranLog = m_systemIdToTransactionLog[systemId];
-       if (vmsTranLog.systemId.isEmpty())
+        if (vmsTranLog.systemId.isEmpty())
             vmsTranLog.systemId = systemId;
         qint32& persistentSequence = vmsTranLog.transactionState.values[tranStateKey];
         if (persistentSequence < sequence)
@@ -159,9 +162,60 @@ nx::db::DBResult TransactionLog::fetchTransactions(
     const ::ec2::QnTranState& from,
     const ::ec2::QnTranState& to,
     int maxTransactionsToReturn,
-    std::vector<nx::Buffer>* const outputData)
+    TransactionReadResult* const outputData)
 {
-    // TODO: 
+    // TODO: Taking into account maxTransactionsToReturn
+
+    //QMap<QnTranStateKey, qint32> values
+    ::ec2::QnTranState currentState;
+    {
+        // Merging "from" with local state
+        QnMutexLocker lk(&m_mutex);
+        VmsTransactionLogData& transactionLogBySystem = m_systemIdToTransactionLog[systemId];
+        // Using copy of current state since we must not hold mutex over sql request.
+        currentState = transactionLogBySystem.transactionState;
+    }
+
+    outputData->resultCode = api::ResultCode::dbError;
+
+    for (auto it = currentState.values.begin();
+         it != currentState.values.end();
+         ++it)
+    {
+        QSqlQuery fetchTransactionsOfAPeerQuery(*connection);
+        fetchTransactionsOfAPeerQuery.prepare(R"sql(
+            SELECT tran_data, timestamp, sequence
+            FROM transaction_log
+            WHERE system_id=? AND peer_guid=? AND db_guid=? AND sequence>? AND sequence<?
+            ORDER BY sequence
+            )sql");
+        fetchTransactionsOfAPeerQuery.addBindValue(QLatin1String(systemId));
+        fetchTransactionsOfAPeerQuery.addBindValue(it.key().peerID.toSimpleString());
+        fetchTransactionsOfAPeerQuery.addBindValue(it.key().dbID.toSimpleString());
+        fetchTransactionsOfAPeerQuery.addBindValue(from.values.value(it.key()));
+        fetchTransactionsOfAPeerQuery.addBindValue(to.values.value(it.key()));
+        if (!fetchTransactionsOfAPeerQuery.exec())
+        {
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
+                lm("systemId %1. Error executing fetch_transactions request "
+                   "for peer (%2; %3). %4")
+                    .arg(it.key().peerID.toSimpleString()).arg(it.key().dbID.toSimpleString())
+                    .arg(connection->lastError().text()),
+                cl_logERROR);
+            return nx::db::DBResult::ioError;
+        }
+
+        while (fetchTransactionsOfAPeerQuery.next())
+        {
+            outputData->transactions.push_back(
+                std::make_shared<UbjsonTransactionPresentation>(
+                    fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray()));
+        }
+    }
+
+    outputData->state = to;
+    outputData->resultCode = api::ResultCode::ok;
+
     return nx::db::DBResult::ok;
 }
 
@@ -315,20 +369,21 @@ nx::db::DBResult TransactionLog::saveToDb(
         R"sql(
         REPLACE INTO transaction_log(system_id, peer_guid, db_guid, sequence,
                                      timestamp, tran_hash, tran_data)
-        VALUES (?, ?, ?, ?, ?, ?, ?)")
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         )sql");
-    saveTranQuery.addBindValue(systemId);
+    saveTranQuery.addBindValue(QLatin1String(systemId));
     saveTranQuery.addBindValue(transaction.peerID.toSimpleString());
     saveTranQuery.addBindValue(transaction.persistentInfo.dbID.toSimpleString());
     saveTranQuery.addBindValue(transaction.persistentInfo.sequence);
     saveTranQuery.addBindValue(transaction.persistentInfo.timestamp);
-    saveTranQuery.addBindValue(transactionHash);
+    saveTranQuery.addBindValue(QLatin1String(transactionHash));
     saveTranQuery.addBindValue(ubjsonData);
     if (!saveTranQuery.exec())
     {
-        NX_LOGX(lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
-            .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-            .str(transaction).arg(transactionHash).arg(connection->lastError().text()),
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
+                .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
+                .str(transaction).arg(transactionHash).arg(connection->lastError().text()),
             cl_logWARNING);
         return nx::db::DBResult::ioError;
     }
@@ -363,7 +418,7 @@ qint64 TransactionLog::generateNewTransactionTimestamp(
     QSqlDatabase* connection,
     const nx::String& systemId)
 {
-    // TODO: copy function from ::ec2::QnTransactionLog
+    // TODO: #ak copy function from ::ec2::QnTransactionLog
     using namespace std::chrono;
     return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }

@@ -36,9 +36,7 @@ void TransactionLogReader::readTransactions(
     const ::ec2::QnTranState& from,
     const ::ec2::QnTranState& to,
     int maxTransactionsToReturn,
-    nx::utils::MoveOnlyFunc<void(
-        api::ResultCode /*resultCode*/,
-        std::vector<nx::Buffer> /*serializedTransactions*/)> completionHandler)
+    TransactionsReadHandler completionHandler)
 {
     m_transactionLog->readTransactions(
         m_systemId,
@@ -49,7 +47,8 @@ void TransactionLogReader::readTransactions(
             sharedGuard = m_asyncOperationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
-                std::vector<nx::Buffer> serializedTransactions) mutable
+                std::vector<std::shared_ptr<const Serializable>> serializedTransactions,
+                ::ec2::QnTranState readedUpTo) mutable
         {
             const auto locker = sharedGuard->lock();
             if (!locker)
@@ -59,13 +58,33 @@ void TransactionLogReader::readTransactions(
             if (m_terminated)
                 return;
             post(
-                [resultCode,
+                [this, resultCode,
                     serializedTransactions = std::move(serializedTransactions),
-                    completionHandler = std::move(completionHandler)]() mutable
+                    completionHandler = std::move(completionHandler),
+                    readedUpTo = std::move(readedUpTo)]() mutable
                 {
-                    completionHandler(resultCode, std::move(serializedTransactions));
+                    onTransactionsRead(
+                        resultCode,
+                        std::move(serializedTransactions),
+                        std::move(readedUpTo),
+                        std::move(completionHandler));
                 });
         });
+}
+
+void TransactionLogReader::onTransactionsRead(
+    api::ResultCode resultCode,
+    std::vector<std::shared_ptr<const Serializable>> serializedTransactions,
+    ::ec2::QnTranState readedUpTo,
+    TransactionsReadHandler completionHandler)
+{
+    NX_ASSERT(m_dataFormat == Qn::UbjsonFormat);
+    // TODO: #ak Converting transaction to JSON format if needed
+
+    completionHandler(
+        resultCode,
+        std::move(serializedTransactions),
+        std::move(readedUpTo));
 }
 
 ::ec2::QnTranState TransactionLogReader::getCurrentState() const
@@ -73,17 +92,17 @@ void TransactionLogReader::readTransactions(
     return m_transactionLog->getTransactionState(m_systemId);
 }
 
-void TransactionLogReader::setOnUbjsonTransactionReady(
-    nx::utils::MoveOnlyFunc<void(nx::Buffer)> handler)
-{
-    m_onUbjsonTransactionReady = std::move(handler);
-}
-
-void TransactionLogReader::setOnJsonTransactionReady(
-    nx::utils::MoveOnlyFunc<void(QJsonObject*)> handler)
-{
-    m_onJsonTransactionReady = std::move(handler);
-}
+//void TransactionLogReader::setOnUbjsonTransactionReady(
+//    nx::utils::MoveOnlyFunc<void(nx::Buffer*)> handler)
+//{
+//    m_onUbjsonTransactionReady = std::move(handler);
+//}
+//
+//void TransactionLogReader::setOnJsonTransactionReady(
+//    nx::utils::MoveOnlyFunc<void(QJsonObject*)> handler)
+//{
+//    m_onJsonTransactionReady = std::move(handler);
+//}
 
 } // namespace ec2
 } // namespace cdb

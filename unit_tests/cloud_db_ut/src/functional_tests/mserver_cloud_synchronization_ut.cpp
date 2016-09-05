@@ -260,6 +260,44 @@ protected:
         // TODO: #ak Checking connection is there.
     }
 
+    void testSynchronizingCloudOwner()
+    {
+        constexpr static const auto testTime = std::chrono::seconds(5);
+
+        const auto deadline = std::chrono::steady_clock::now() + testTime;
+        while (std::chrono::steady_clock::now() < deadline)
+        {
+            ec2::ApiUserDataList users;
+            ASSERT_EQ(
+                ec2::ErrorCode::ok,
+                appserver2()->moduleInstance()->ecConnection()
+                    ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
+
+            auto cloudOwnerIter = std::find_if(
+                users.begin(), users.end(),
+                [email = account().email](const ec2::ApiUserData& elem)
+                {
+                    return elem.email.toStdString() == email;
+                });
+            if (cloudOwnerIter != users.end())
+            {
+                ASSERT_TRUE(cloudOwnerIter->isAdmin);
+                ASSERT_EQ(account().email, cloudOwnerIter->name.toStdString());
+                ASSERT_EQ(account().fullName, cloudOwnerIter->fullName.toStdString());
+                ASSERT_TRUE(cloudOwnerIter->isCloud);
+                ASSERT_TRUE(cloudOwnerIter->isEnabled);
+                ASSERT_EQ("VMS", cloudOwnerIter->realm);
+                ASSERT_EQ(guidFromArbitraryData(account().email), cloudOwnerIter->id);
+                ASSERT_FALSE(cloudOwnerIter->isLdap);
+                ASSERT_EQ(Qn::GlobalAdminPermissionSet, cloudOwnerIter->permissions);
+                return;
+            }
+        }
+
+        // Cloud owner has not arrived to local system.
+        ASSERT_TRUE(false);
+    }
+
     void testSynchronizingUserFromCloudToMediaServer()
     {
         nx::utils::SyncQueue<::ec2::ApiUserData> newUsersQueue;
@@ -303,7 +341,7 @@ protected:
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
 
-        ASSERT_EQ(2, users.size());
+        //ASSERT_EQ(3, users.size()); //local admin, cloud admin, new user
         ASSERT_NE(
             users.end(),
             std::find_if(
@@ -342,14 +380,14 @@ protected:
         appserver2()->moduleInstance()->ecConnection()
             ->getUserManager(Qn::kSystemAccess)->saveSync(newCloudUser);
 
-        // TODO: waiting for it to appear in cloud
+        // Waiting for it to appear in cloud.
         const auto t0 = std::chrono::steady_clock::now();
-        static const auto maxTimeToWaitForUserApperInCloud = std::chrono::seconds(10);
+        constexpr static const auto maxTimeToWaitForUserToAppearInCloud = std::chrono::seconds(10);
         for (;;)
         {
             ASSERT_LT(
                 std::chrono::steady_clock::now(),
-                t0 + maxTimeToWaitForUserApperInCloud);
+                t0 + maxTimeToWaitForUserToAppearInCloud);
 
             std::vector<api::SystemSharingEx> systemUsers;
             ASSERT_EQ(
@@ -368,6 +406,7 @@ protected:
                     // TODO: Validating data
                     ASSERT_EQ(newCloudUser.isEnabled, user.isEnabled);
                     ASSERT_EQ(api::SystemAccessRole::liveViewer, user.accessRole);
+                    ASSERT_EQ(account3.fullName, user.accountFullName);
                     found = true;
                     break;
                 }
@@ -396,9 +435,17 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
 
     addTransactionConnection();
 
-    testSynchronizingUserFromCloudToMediaServer();
+    for (int i = 0; i < 2; ++i)
+    {
+        testSynchronizingCloudOwner();
 
-    testSynchronizingUserFromMediaServerToCloud();
+        testSynchronizingUserFromCloudToMediaServer();
+
+        testSynchronizingUserFromMediaServerToCloud();
+
+        if (i == 0)
+            cdb()->restart();
+    }
 }
 
 } // namespace cdb

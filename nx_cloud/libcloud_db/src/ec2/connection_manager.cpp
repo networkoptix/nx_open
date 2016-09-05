@@ -215,7 +215,7 @@ void ConnectionManager::pushTransaction(
 
 void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
-    std::shared_ptr<const TransactionSerializer> transactionSerializer)
+    std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer)
 {
     // Generating transport header.
     TransactionTransportHeader transportHeader;

@@ -13,13 +13,19 @@ namespace ec2 {
  * Holds transaction inside and is able to serialize it to a requested format.
  * Can add transport header optionally.
  */
-class TransactionSerializer
+class Serializable
 {
 public:
-    virtual ~TransactionSerializer() {}
+    virtual ~Serializable() = default;
 
-    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const = 0;
     /**
+     * Serialize transaction into \a targetFormat.
+     * @note Method is re-enterable
+     */
+    virtual nx::Buffer serialize(
+        Qn::SerializationFormat targetFormat) const = 0;
+    /**
+     * Serialize transaction into \a targetFormat while adding transport header.
      * @note Method is re-enterable
      */
     virtual nx::Buffer serialize(
@@ -27,18 +33,79 @@ public:
         const TransactionTransportHeader& transportHeader) const = 0;
 };
 
-template<typename TransactionDataType>
-class SerializedUbjsonTransaction
-:
-    public TransactionSerializer
+template<typename Base>
+class BaseUbjsonTransactionPresentation:
+    public Base
 {
 public:
-    SerializedUbjsonTransaction(
+    BaseUbjsonTransactionPresentation(nx::Buffer ubjsonData)
+        :
+        m_ubjsonData(std::move(ubjsonData))
+    {
+    }
+
+    virtual nx::Buffer serialize(
+        Qn::SerializationFormat targetFormat) const override
+    {
+        switch (targetFormat)
+        {
+            case Qn::UbjsonFormat:
+                return m_ubjsonData;
+            default:
+                NX_CRITICAL(false);
+                return nx::Buffer();
+        }
+    }
+
+    virtual nx::Buffer serialize(
+        Qn::SerializationFormat targetFormat,
+        const TransactionTransportHeader& transportHeader) const override
+    {
+        switch (targetFormat)
+        {
+            case Qn::UbjsonFormat:
+            {
+                // adding transport header
+                auto serializedTransportHeader =
+                    QnUbjson::serialized(transportHeader.vmsTransportHeader);
+                return serializedTransportHeader + m_ubjsonData;
+            }
+
+            default:
+                NX_CRITICAL(false);
+                return nx::Buffer();
+        }
+    }
+
+private:
+    const nx::Buffer m_ubjsonData;
+};
+
+typedef BaseUbjsonTransactionPresentation<Serializable> UbjsonTransactionPresentation;
+
+/**
+ * Extends \a Serializable functionality by providing access to transaction data.
+ */
+class TransactionWithSerializedPresentation:
+    public Serializable
+{
+public:
+    virtual const ::ec2::QnAbstractTransaction& transactionHeader() const = 0;
+};
+
+template<typename TransactionDataType>
+class TransactionWithUbjsonPresentation:
+    public BaseUbjsonTransactionPresentation<TransactionWithSerializedPresentation>
+{
+    typedef BaseUbjsonTransactionPresentation<TransactionWithSerializedPresentation> BaseType;
+
+public:
+    TransactionWithUbjsonPresentation(
         ::ec2::QnTransaction<TransactionDataType> transaction,
         nx::Buffer serializedTransaction)
     :
-        m_transaction(std::move(transaction)),
-        m_serializedTransaction(serializedTransaction)
+        BaseType(serializedTransaction),
+        m_transaction(std::move(transaction))
     {
     }
 
@@ -47,31 +114,9 @@ public:
         return m_transaction;
     }
 
-    virtual nx::Buffer serialize(
-        Qn::SerializationFormat targetFormat,
-        const TransactionTransportHeader& transportHeader) const
-    {
-        // TODO:
-
-        switch (targetFormat)
-        {
-            case Qn::UbjsonFormat:
-            {
-                // adding transport header
-                auto serializedTransportHeader = 
-                    QnUbjson::serialized(transportHeader.vmsTransportHeader);
-                return serializedTransportHeader + m_serializedTransaction;
-            }
-            default:
-                // TODO:
-                NX_CRITICAL(false);
-                return nx::Buffer();
-        }
-    }
 
 private:
     const ::ec2::QnTransaction<TransactionDataType> m_transaction;
-    const nx::Buffer m_serializedTransaction;
 };
 
 } // namespace ec2

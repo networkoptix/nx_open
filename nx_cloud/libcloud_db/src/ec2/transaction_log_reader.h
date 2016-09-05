@@ -8,21 +8,22 @@
 
 #include <cdb/result_code.h>
 
+#include "transaction_log.h"
+
 namespace nx {
 namespace cdb {
 namespace ec2 {
-
-class TransactionLog;
 
 /**
  * Asynchronously reads transactions of specified system from log.
  * Returns data in specified format.
  */
-class TransactionLogReader
-    :
+class TransactionLogReader:
     public network::aio::BasicPollable
 {
 public:
+    typedef TransactionLog::TransactionsReadHandler TransactionsReadHandler;
+
     TransactionLogReader(
         TransactionLog* const transactionLog,
         nx::String systemId,
@@ -35,35 +36,39 @@ public:
         const ::ec2::QnTranState& from,
         const ::ec2::QnTranState& to,
         int maxTransactionsToReturn,
-        nx::utils::MoveOnlyFunc<void(
-            api::ResultCode resultCode,
-            std::vector<nx::Buffer> serializedTransactions)> completionHandler);
+        TransactionsReadHandler completionHandler);
 
     // TODO: #ak following method MUST be asynchronous
     ::ec2::QnTranState getCurrentState() const;
 
-    /**
-     * Called before returning ubjson-transaction to the caller.
-     * Handler is allowed to modify transaction. E.g., add transport header
-     */
-    void setOnUbjsonTransactionReady(
-        nx::utils::MoveOnlyFunc<void(nx::Buffer)> handler);
-    /**
-     * Called before returning JSON-transaction to the caller.
-     * Handler is allowed to modify transaction. E.g., add transport header
-     */
-    void setOnJsonTransactionReady(
-        nx::utils::MoveOnlyFunc<void(QJsonObject*)> handler);
+    ///**
+    // * Called before returning ubjson-transaction to the caller.
+    // * Handler is allowed to modify transaction. E.g., add transport header
+    // */
+    //void setOnUbjsonTransactionReady(
+    //    nx::utils::MoveOnlyFunc<void(nx::Buffer*)> handler);
+    ///**
+    // * Called before returning JSON-transaction to the caller.
+    // * Handler is allowed to modify transaction. E.g., add transport header
+    // */
+    //void setOnJsonTransactionReady(
+    //    nx::utils::MoveOnlyFunc<void(QJsonObject*)> handler);
 
 private:
     TransactionLog* const m_transactionLog;
     const nx::String m_systemId;
     const Qn::SerializationFormat m_dataFormat;
-    nx::utils::MoveOnlyFunc<void(nx::Buffer)> m_onUbjsonTransactionReady;
-    nx::utils::MoveOnlyFunc<void(QJsonObject*)> m_onJsonTransactionReady;
+    //nx::utils::MoveOnlyFunc<void(nx::Buffer*)> m_onUbjsonTransactionReady;
+    //nx::utils::MoveOnlyFunc<void(QJsonObject*)> m_onJsonTransactionReady;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     bool m_terminated;
     QnMutex m_mutex;
+
+    void onTransactionsRead(
+        api::ResultCode resultCode,
+        std::vector<std::shared_ptr<const Serializable>> serializedTransactions,
+        ::ec2::QnTranState readedUpTo,
+        TransactionsReadHandler completionHandler);
 };
 
 } // namespace ec2

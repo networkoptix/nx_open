@@ -74,7 +74,7 @@ public:
 
     void sendTransaction(
         TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const TransactionSerializer>& transactionSerializer);
+        const std::shared_ptr<const TransactionWithSerializedPresentation>& transactionSerializer);
 
     template<class T>
     void sendTransaction(
@@ -87,15 +87,16 @@ public:
                 .str(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG1);
 
-        std::shared_ptr<const TransactionSerializer> transactionSerializer;
+        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer;
         switch (remotePeer().dataFormat)
         {
             case Qn::UbjsonFormat:
             {
                 auto serializedTransaction = QnUbjson::serialized(transaction);
-                transactionSerializer = std::make_unique<typename SerializedUbjsonTransaction<T>>(
-                    std::move(transaction),
-                    std::move(serializedTransaction));
+                transactionSerializer = 
+                    std::make_unique<typename TransactionWithUbjsonPresentation<T>>(
+                        std::move(transaction),
+                        std::move(serializedTransaction));
                 break;
             }
 
@@ -148,9 +149,12 @@ private:
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);
     void onTransactionsReadFromLog(
         api::ResultCode resultCode,
-        std::vector<nx::Buffer> serializedTransactions);
-    void addTransportHeaderToUbjsonTransaction(nx::Buffer);
-    void addTransportHeaderToJsonTransaction(QJsonObject*);
+        std::vector<std::shared_ptr<const Serializable>> serializedTransaction,
+        ::ec2::QnTranState readedUpTo);
+    void enableOutputChannel();
+    //void addTransportHeaderToUbjsonTransaction(
+    //    nx::Buffer* const ubjsonTransaction);
+    //void addTransportHeaderToJsonTransaction(QJsonObject*);
 };
 
 } // namespace ec2

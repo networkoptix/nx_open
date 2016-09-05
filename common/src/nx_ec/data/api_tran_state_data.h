@@ -21,9 +21,7 @@ struct QnTranStateKey {
         return dbID < other.dbID;
     }
     bool operator>(const QnTranStateKey& other) const {
-        if (peerID != other.peerID)
-            return peerID > other.peerID;
-        return dbID > other.dbID;
+        return other < (*this);
     }
 };
 #define QnTranStateKey_Fields (peerID)(dbID)
@@ -32,6 +30,10 @@ struct QnTranState {
     /** map<(peer, db), persistent sequence> */
     QMap<QnTranStateKey, qint32> values;
 };
+/** @returns \a true if \a left represents more transactions then \a right. */
+bool operator<(const QnTranState& left, const QnTranState& right);
+bool operator>(const QnTranState& left, const QnTranState& right);
+
 #define QnTranState_Fields (values)
 
 struct QnTranStateResponse

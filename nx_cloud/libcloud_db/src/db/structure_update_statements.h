@@ -472,7 +472,7 @@ CREATE TABLE transaction_log (
 CREATE UNIQUE INDEX idx_transaction_key
     ON transaction_log(system_id, peer_guid, db_guid, sequence);
 CREATE UNIQUE INDEX idx_transaction_hash
-    ON transaction_log(system_id, tran_guid);
+    ON transaction_log(system_id, tran_hash);
 CREATE INDEX idx_transaction_time
     ON transaction_log(system_id, timestamp);
 )sql";

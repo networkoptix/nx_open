@@ -84,7 +84,7 @@ public:
      */
     void dispatchTransaction(
         const nx::String& systemId,
-        std::shared_ptr<const TransactionSerializer> transactionSerializer);
+        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
 
 private:
     struct ConnectionContext

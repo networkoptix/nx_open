@@ -21,14 +21,14 @@ class OutgoingTransactionDispatcher
 public:
     typedef nx::utils::Subscription<
         const nx::String&,
-        std::shared_ptr<const TransactionSerializer>> OnNewTransactionSubscription;
+        std::shared_ptr<const TransactionWithSerializedPresentation>> OnNewTransactionSubscription;
     typedef OnNewTransactionSubscription::Handler OnNewTransactionHandler;
 
     OutgoingTransactionDispatcher();
 
     void dispatchTransaction(
         const nx::String& systemId,
-        std::shared_ptr<const TransactionSerializer> transactionSerializer);
+        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
 
     OnNewTransactionSubscription* onNewTransactionSubscription();
 

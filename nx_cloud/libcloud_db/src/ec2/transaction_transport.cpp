@@ -51,10 +51,10 @@ TransactionTransport::TransactionTransport(
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
     m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = remotePeer.id;
 
-    m_transactionLogReader->setOnUbjsonTransactionReady(
-        std::bind(&TransactionTransport::addTransportHeaderToUbjsonTransaction, this, _1));
-    m_transactionLogReader->setOnJsonTransactionReady(
-        std::bind(&TransactionTransport::addTransportHeaderToJsonTransaction, this, _1));
+    //m_transactionLogReader->setOnUbjsonTransactionReady(
+    //    std::bind(&TransactionTransport::addTransportHeaderToUbjsonTransaction, this, _1));
+    //m_transactionLogReader->setOnJsonTransactionReady(
+    //    std::bind(&TransactionTransport::addTransportHeaderToJsonTransaction, this, _1));
 
     nx::network::aio::BasicPollable::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
@@ -149,7 +149,7 @@ void TransactionTransport::processSpecialTransaction(
         m_remotePeerTranState,
         m_tranStateToSynchronizeTo,
         kMaxTransactionsPerIteration,
-        std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2));
+        std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 }
 
 void TransactionTransport::processSpecialTransaction(
@@ -172,7 +172,7 @@ void TransactionTransport::processSpecialTransaction(
 
 void TransactionTransport::sendTransaction(
     TransactionTransportHeader transportHeader,
-    const std::shared_ptr<const TransactionSerializer>& transactionSerializer)
+    const std::shared_ptr<const TransactionWithSerializedPresentation>& transactionSerializer)
 {
     transportHeader.vmsTransportHeader.fillSequence();
     auto serializedTransaction = transactionSerializer->serialize(
@@ -256,31 +256,97 @@ void TransactionTransport::onStateChanged(
 
 void TransactionTransport::onTransactionsReadFromLog(
     api::ResultCode resultCode,
-    std::vector<nx::Buffer> serializedTransactions)
+    std::vector<std::shared_ptr<const Serializable>> serializedTransactions,
+    ::ec2::QnTranState readedUpTo)
 {
+    using namespace std::placeholders;
     // TODO: handle api::ResultCode::tryLater result code
 
-    if (resultCode != api::ResultCode::ok)
+    if ((resultCode != api::ResultCode::ok) && (resultCode != api::ResultCode::partialContent))
     {
-        NX_LOGX(lm("m_transactionLogReader->getTransactions returned %1. "
-            "Closing connection from peer %2")
-            .arg(api::toString(resultCode)).str(m_commonTransportHeaderOfRemoteTransaction),
+        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            lm("systemId %1. Error reading transaction log (%2). "
+               "Closing connection to the peer %3")
+                .arg(m_systemId).arg(api::toString(resultCode))
+                .str(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG1);
         setState(Closed);   //closing connection
+        return;
     }
 
-    // TODO: posting transactions to send
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("systemId %1. Read %2 transactions from transaction log (result %3). "
+           "Posting them to the send queue to %4")
+            .arg(m_systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode))
+            .str(m_commonTransportHeaderOfRemoteTransaction),
+        cl_logDEBUG1);
+
+    // Posting transactions to send
+    for (auto& tran: serializedTransactions)
+    {
+        TransactionTransportHeader transportHeader;
+        transportHeader.systemId = m_systemId;
+        transportHeader.vmsTransportHeader.distance = 1;
+        transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
+
+        addData(tran->serialize(remotePeer().dataFormat, transportHeader));
+    }
+
+    m_remotePeerTranState = readedUpTo;
+
+    if (resultCode == api::ResultCode::partialContent
+        || m_tranStateToSynchronizeTo > m_remotePeerTranState)
+    {
+        if (resultCode != api::ResultCode::partialContent)
+        {
+            // TODO: Printing remote and local states.
+        }
+
+        //< Local state could be updated while we were synchronizing remote peer
+        // Continuing reading transactions.
+        m_transactionLogReader->readTransactions(
+            m_remotePeerTranState,
+            m_tranStateToSynchronizeTo,
+            kMaxTransactionsPerIteration,
+            std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
+        return;
+    }
+
+    // Sending transactions to remote peer is allowed now
+    enableOutputChannel();
 }
 
-void TransactionTransport::addTransportHeaderToUbjsonTransaction(
-    nx::Buffer /*objsonTransaction*/)
+void TransactionTransport::enableOutputChannel()
 {
+    setWriteSync(true);
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("systemId %1. Enabled output channel to the peer %2")
+        .arg(m_systemId).str(m_commonTransportHeaderOfRemoteTransaction),
+        cl_logDEBUG1);
+
+    if (m_haveToSendSyncDone)
+    {
+        m_haveToSendSyncDone = false;
+
+        ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData>
+            tranSyncDone(::ec2::ApiCommand::tranSyncDone);
+        tranSyncDone.params.result = 0;
+
+        TransactionTransportHeader transportHeader;
+        transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
+        sendTransaction(std::move(tranSyncDone), std::move(transportHeader));
+    }
 }
 
-void TransactionTransport::addTransportHeaderToJsonTransaction(
-    QJsonObject* /*jsonTransaction*/)
-{
-}
+//void TransactionTransport::addTransportHeaderToUbjsonTransaction(
+//    nx::Buffer* const ubjsonTransaction)
+//{
+//}
+//
+//void TransactionTransport::addTransportHeaderToJsonTransaction(
+//    QJsonObject* /*jsonTransaction*/)
+//{
+//}
 
 } // namespace ec2
 } // namespace cdb

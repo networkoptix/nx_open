@@ -19,6 +19,12 @@ static const int CDB_API_ERROR_CODE_BASE = 100;
 enum class ResultCode
 {
     ok = 0,
+    /**
+     * Operation succeeded but not full data has been returned 
+     * (e.g., due to memory usage restrictions).
+     * Caller should continue fetching data supplying data offset.
+     */
+    partialContent,
     /** Provided credentials are invalid */
     notAuthorized = CDB_API_ERROR_CODE_BASE,
 
