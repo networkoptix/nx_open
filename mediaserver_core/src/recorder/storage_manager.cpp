@@ -109,8 +109,7 @@ bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath)
     }
     else if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
     {
-        QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        dbFolderPath = fileStorage ? fileStorage->getLocalPath() : storage->getPath();
+        dbFolderPath = storage->getPath();
         return true;
     }
     return false;
@@ -499,7 +498,7 @@ public:
                 break;
 
             QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->initOrUpdate() ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status = fileStorage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
 

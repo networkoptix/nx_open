@@ -24,7 +24,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-    ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+    ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
@@ -683,6 +683,15 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
+    enum StorageInitResult
+    {
+        StorageInit_Ok,
+        StorageInit_CreateFailed,
+        StorageInit_WrongPath,
+        StorageInit_WrongAuth,
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageInitResult)
+
     /**
      * Flags describing the actions permitted for the user to do with the
      * selected resource. Calculated in runtime.
@@ -845,7 +854,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
+        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)

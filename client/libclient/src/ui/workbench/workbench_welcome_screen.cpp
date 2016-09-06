@@ -314,8 +314,8 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
     if (!isLoggedInToCloud())
         return;
 
-    connectToSystemInternal(systemId, serverUrl, qnCloudStatusWatcher->credentials(),
-        false, false);
+    connectToSystemInternal(systemId, QUrl::fromUserInput(serverUrl),
+        qnCloudStatusWatcher->credentials(), false, false);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()

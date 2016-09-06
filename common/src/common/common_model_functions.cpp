@@ -58,6 +58,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupType,
     (Qn::Backup_Schedule,          "BackupSchedule")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::StorageInitResult,
+    (Qn::StorageInit_Ok,            "Ok")
+    (Qn::StorageInit_CreateFailed,  "CreateFailed")
+    (Qn::StorageInit_WrongPath,     "InitFailed_WrongPath")
+    (Qn::StorageInit_WrongAuth,     "InitFailed_WrongAuth")
+)
+
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::CameraBackupQuality,
     (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
     (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")

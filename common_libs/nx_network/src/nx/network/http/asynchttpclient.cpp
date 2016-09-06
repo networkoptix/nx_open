@@ -175,6 +175,7 @@ namespace nx_http
     */
     void AsyncHttpClient::doGet(const QUrl& url)
     {
+        NX_ASSERT(!url.host().isEmpty());
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
