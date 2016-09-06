@@ -336,10 +336,10 @@ void QnUserSettingsDialog::applyChanges()
     //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
     //TODO: #GDM #access SafeMode what to rollback if we were creating new user
     qnResourcesChangesManager->saveUser(m_user,
-        [this, mode](const QnUserResourcePtr& user)
+        [this, mode](const QnUserResourcePtr& /*user*/)
         {
             //here accessible resources will also be filled
-            base_type::applyChanges();
+            applyChangesInternal();
         });
 
     auto accessibleResources = qnResourceAccessManager->accessibleResources(m_user->getId());
@@ -360,6 +360,11 @@ void QnUserSettingsDialog::showEvent(QShowEvent* event)
 {
     loadDataToUi();
     base_type::showEvent(event);
+}
+
+void QnUserSettingsDialog::applyChangesInternal()
+{
+    base_type::applyChanges();
 }
 
 void QnUserSettingsDialog::updateControlsVisibility()
