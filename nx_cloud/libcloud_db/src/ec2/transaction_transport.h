@@ -102,7 +102,8 @@ public:
 
             default:
             {
-                NX_LOGX(lm("Cannot send transaction in unsupported format %1 to %2")
+                NX_LOGX(QnLog::EC2_TRAN_LOG,
+                    lm("Cannot send transaction in unsupported format %1 to %2")
                     .arg(QnLexical::serialized(remotePeer().dataFormat))
                     .str(m_commonTransportHeaderOfRemoteTransaction),
                     cl_logDEBUG1);

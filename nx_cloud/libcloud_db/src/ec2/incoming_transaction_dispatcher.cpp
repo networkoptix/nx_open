@@ -32,7 +32,8 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         QnUbjsonReader<QByteArray> stream(&serializedTransaction);
         if (!QnUbjson::deserialize(&stream, &transaction))
         {
-            NX_LOGX(lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
+            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+                lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
                 .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
                 .arg(serializedTransaction.size()), cl_logDEBUG1);
             m_aioTimer.post(
@@ -53,7 +54,8 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         //TODO #ak take tranObject from cache
         if (!QJson::deserialize(serializedTransaction, &tranObject))
         {
-            NX_LOGX(lm("Failed to parse json transaction received from (%1, %2). size %3")
+            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+                lm("Failed to parse json transaction received from (%1, %2). size %3")
                 .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
                 .arg(serializedTransaction.size()), cl_logDEBUG1);
             m_aioTimer.post(
@@ -62,7 +64,8 @@ void IncomingTransactionDispatcher::dispatchTransaction(
         }
         if (!QJson::deserialize(tranObject["tran"], &transaction))
         {
-            NX_LOGX(lm("Failed to deserialize json transaction received from (%1, %2). size %3")
+            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+                lm("Failed to deserialize json transaction received from (%1, %2). size %3")
                 .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
                 .arg(serializedTransaction.size()), cl_logDEBUG1);
             m_aioTimer.post(

@@ -125,7 +125,8 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
 
     if (!selectTransactionStateQuery.exec())
     {
-        NX_LOGX(lm("Error loading transaction log. %1")
+        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            lm("Error loading transaction log. %1")
             .arg(connection->lastError().text()), cl_logERROR);
         return nx::db::DBResult::ioError;
     }

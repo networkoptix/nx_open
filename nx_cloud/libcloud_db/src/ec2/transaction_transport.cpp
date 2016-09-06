@@ -73,6 +73,11 @@ TransactionTransport::TransactionTransport(
 
 TransactionTransport::~TransactionTransport()
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("systemId %1. Closing connection %2")
+        .arg(m_systemId).str(m_commonTransportHeaderOfRemoteTransaction),
+        cl_logDEBUG1);
+
     stopWhileInAioThread();
 }
 
@@ -104,7 +109,8 @@ void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handle
 
 void TransactionTransport::startOutgoingChannel()
 {
-    NX_LOGX(lm("Starting outgoing transaction channel to %1")
+    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        lm("Starting outgoing transaction channel to %1")
         .str(m_commonTransportHeaderOfRemoteTransaction),
         cl_logDEBUG1);
 

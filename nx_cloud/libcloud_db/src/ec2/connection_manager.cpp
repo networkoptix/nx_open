@@ -79,7 +79,8 @@ void ConnectionManager::createTransactionConnection(
     std::string systemId;
     if (!authInfo.get(attr::authSystemID, &systemId))
     {
-        NX_LOGX(lm("Ignoring createTransactionConnection request without systemId from %1")
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Ignoring createTransactionConnection request without systemId from %1")
             .str(connection->socket()->getForeignAddress()), cl_logDEBUG1);
         return completionHandler(
             nx_http::StatusCode::ok,
@@ -90,7 +91,8 @@ void ConnectionManager::createTransactionConnection(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
     {
-        NX_LOGX(lm("Ignoring createTransactionConnection request without %1 header from %2")
+        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            lm("Ignoring createTransactionConnection request without %1 header from %2")
             .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME)
             .str(connection->socket()->getForeignAddress()),
             cl_logDEBUG1);
@@ -105,7 +107,8 @@ void ConnectionManager::createTransactionConnection(
     nx::String contentEncoding;
     if (!fetchDataFromConnectRequest(request, &remotePeer, &contentEncoding))
     {
-        NX_LOGX(lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
+        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
             .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
             cl_logDEBUG1);
         return completionHandler(
@@ -114,8 +117,10 @@ void ConnectionManager::createTransactionConnection(
             nx_http::ConnectionEvents());
     }
 
-    NX_LOGX(lm("Received createTransactionConnection request from (%1.%2; %3)")
-        .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
+    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
+        .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress())
+        .arg(connectionId),
         cl_logDEBUG1);
 
     // newTransport MUST be ready to accept connections before sending response.
@@ -171,7 +176,7 @@ void ConnectionManager::createTransactionConnection(
 }
 
 void ConnectionManager::pushTransaction(
-    nx_http::HttpServerConnection* const /*connection*/,
+    nx_http::HttpServerConnection* const connection,
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
@@ -185,10 +190,17 @@ void ConnectionManager::pushTransaction(
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            lm("Received %1 request from %2 without required header %3")
+            .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
+            .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME),
+            cl_logDEBUG1);
         return completionHandler(
             nx_http::StatusCode::badRequest,
             nullptr,
             nx_http::ConnectionEvents());
+    }
     const auto connectionId = connectionIdIter->second;
 
     QnMutexLocker lk(&m_mutex);
@@ -196,10 +208,23 @@ void ConnectionManager::pushTransaction(
     const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
     auto connectionIter = connectionByIdIndex.find(connectionId);
     if (connectionIter == connectionByIdIndex.end())
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            lm("Received %1 request from %2 for unknown connection %3")
+            .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
+            .arg(connectionId),
+            cl_logDEBUG1);
         return completionHandler(
             nx_http::StatusCode::notFound,
             nullptr,
             nx_http::ConnectionEvents());
+    }
+
+    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        lm("Received %1 request from %2 for connection %3")
+        .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
+        .arg(connectionId),
+        cl_logDEBUG2);
 
     connectionIter->connection->post(
         [connectionPtr = connectionIter->connection.get(),
@@ -217,6 +242,11 @@ void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
     std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer)
 {
+    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        lm("systemId %1. Dispatching transaction %2")
+        .arg(systemId).str(transactionSerializer->transactionHeader()),
+        cl_logDEBUG2);
+
     // Generating transport header.
     TransactionTransportHeader transportHeader;
     transportHeader.systemId = systemId;
@@ -302,7 +332,8 @@ void ConnectionManager::addNewConnection(ConnectionContext context)
             this, context.connection->connectionGuid().toByteArray(),
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    NX_LOGX(lm("Adding new transaction connection %1 from %2")
+    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        lm("Adding new transaction connection %1 from %2")
         .arg(context.connectionId)
         .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
         cl_logDEBUG1);
@@ -350,7 +381,8 @@ void ConnectionManager::removeExistingConnection(
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
     // Always called within transport's aio thread.
-    NX_LOGX(lm("Removing transaction connection %1").arg(connectionId), cl_logDEBUG1);
+    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        lm("Removing transaction connection %1").arg(connectionId), cl_logDEBUG1);
 
     QnMutexLocker lk(&m_mutex);
     auto& index = m_connections.get<kConnectionByIdIndex>();
@@ -427,7 +459,8 @@ bool ConnectionManager::fetchDataFromConnectRequest(
     if (query.hasQueryItem("format"))
         if (!QnLexical::deserialize(query.queryItemValue("format"), &dataFormat))
         {
-            NX_LOGX(lm("Invalid value of \"format\" field: %1")
+            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+                lm("Invalid value of \"format\" field: %1")
                 .arg(query.queryItemValue("format")), cl_logDEBUG1);
             return false;
         }
