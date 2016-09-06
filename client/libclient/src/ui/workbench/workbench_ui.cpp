@@ -1275,11 +1275,11 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     toggleTreeAction->setChecked(settings.state == Qn::PaneState::Opened);
     m_treeShowButton = newShowHideButton(m_controlsWidget, toggleTreeAction);
     m_treeShowButton->setFocusProxy(m_treeItem);
+    m_treeShowButton->stackBefore(m_treeItem);
 
     m_treeResizerWidget = new ResizerWidget(Qt::Horizontal, m_controlsWidget);
     m_treeResizerWidget->setProperty(Qn::NoHandScrollOver, true);
     m_treeResizerWidget->stackBefore(m_treeShowButton);
-    m_treeItem->stackBefore(m_treeResizerWidget);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -2521,13 +2521,11 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
     auto tooltip = m_timeline.item->timeSlider()->toolTipItem();
-    m_timeline.showButton->stackBefore(tooltip);
-    m_timeline.showWidget->stackBefore(m_timeline.showButton);
-    m_timeline.resizerWidget->stackBefore(m_timeline.showButton);
-    m_timeline.resizerWidget->stackBefore(m_timeline.zoomButtonsWidget);
-    m_timeline.resizerWidget->stackBefore(m_timeline.showWidget);
-    m_timeline.item->stackBefore(m_timeline.showWidget);
     tooltip->stackBefore(m_timeline.item->timeSlider()->bookmarksViewer());
+    m_timeline.item->stackBefore(tooltip);
+    m_timeline.showButton->stackBefore(m_timeline.item);
+    m_timeline.showWidget->stackBefore(m_timeline.showButton);
+    m_timeline.resizerWidget->stackBefore(m_timeline.showWidget);
 
     m_timeline.opacityProcessor = new HoverFocusProcessor(m_controlsWidget);
 
