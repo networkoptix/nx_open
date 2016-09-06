@@ -833,7 +833,7 @@ TEST(MediaDbTest, StorageDB)
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource);
     storage->setUrl(workDirPath);
-    result = storage->initOrUpdate();
+    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
 
     QnStorageDb sdb(storage, 1);
@@ -1039,7 +1039,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource);
     storage->setUrl(workDirPath);
-    result = storage->initOrUpdate();
+    result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
 
     auto connectionName = sqlDb->connectionName();
