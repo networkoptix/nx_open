@@ -159,9 +159,9 @@ void SystemManager::bindSystemToAccount(
             std::move(registrationData));
     registrationDataWithAccount->accountEmail = accountEmail.toStdString();
     auto registrationDataWithAccountPtr = registrationDataWithAccount.get();
-    auto newSystemData = std::make_unique<data::SystemData>();
+    auto newSystemData = std::make_unique<InsertNewSystemToDbResult>();
     auto newSystemDataPtr = newSystemData.get();
-    newSystemData->id = QnUuid::createUuid().toSimpleString().toStdString();   //guid without {}
+    newSystemData->systemData.id = QnUuid::createUuid().toSimpleString().toStdString();   //guid without {}
 
     auto dbUpdateFunc = 
         [this, registrationDataWithAccountPtr, newSystemDataPtr](
@@ -193,7 +193,7 @@ void SystemManager::bindSystemToAccount(
 
     // Creating db transaction via TransactionLog.
     m_transactionLog->startDbTransaction(
-        newSystemDataPtr->id.c_str(),
+        newSystemDataPtr->systemData.id.c_str(),
         std::move(dbUpdateFunc),
         std::move(onDbUpdateCompletedFunc));
 }
@@ -634,7 +634,7 @@ std::pair<std::string, std::string> SystemManager::extractSystemIdAndVmsUserId(
 nx::db::DBResult SystemManager::insertSystemToDB(
     QSqlDatabase* const connection,
     const data::SystemRegistrationDataWithAccount& newSystem,
-    data::SystemData* const systemData)
+    InsertNewSystemToDbResult* const result)
 {
     const auto account = m_accountManager.findAccountByUserName(newSystem.accountEmail);
     if (!account)
@@ -650,23 +650,23 @@ nx::db::DBResult SystemManager::insertSystemToDB(
                            "status_code, expiration_utc_timestamp) "
         " VALUES(:id, :name, :customization, :authKey, :ownerAccountID, "
                 ":status, :expiration_utc_timestamp)");
-    NX_ASSERT(!systemData->id.empty());
-    systemData->name = newSystem.name;
-    systemData->customization = newSystem.customization;
-    systemData->authKey = QnUuid::createUuid().toSimpleString().toStdString();
-    systemData->ownerAccountEmail = account->email;
-    systemData->status = api::SystemStatus::ssNotActivated;
-    systemData->expirationTimeUtc = 
+    NX_ASSERT(!result->systemData.id.empty());
+    result->systemData.name = newSystem.name;
+    result->systemData.customization = newSystem.customization;
+    result->systemData.authKey = QnUuid::createUuid().toSimpleString().toStdString();
+    result->systemData.ownerAccountEmail = account->email;
+    result->systemData.status = api::SystemStatus::ssNotActivated;
+    result->systemData.expirationTimeUtc =
         ::time(NULL) +
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.systemManager().notActivatedSystemLivePeriod).count();
-    QnSql::bind(*systemData, &insertSystemQuery);
+    QnSql::bind(result->systemData, &insertSystemQuery);
     insertSystemQuery.bindValue(
         ":ownerAccountID",
         QnSql::serialized_field(account->id));
     insertSystemQuery.bindValue(
         ":expiration_utc_timestamp",
-        systemData->expirationTimeUtc);
+        result->systemData.expirationTimeUtc);
     if (!insertSystemQuery.exec())
     {
         NX_LOG(lm("Could not insert system %1 into DB. %2").
@@ -674,22 +674,22 @@ nx::db::DBResult SystemManager::insertSystemToDB(
         return db::DBResult::ioError;
     }
 
-    data::SystemSharing systemSharing;
-    systemSharing.accountEmail = newSystem.accountEmail;
-    systemSharing.systemID = systemData->id;
-    systemSharing.accessRole = api::SystemAccessRole::owner;
-    systemSharing.vmsUserId = guidFromArbitraryData(
-        systemSharing.accountEmail).toSimpleString().toStdString();
-    systemSharing.isEnabled = true;
-    systemSharing.customPermissions = QnLexical::serialized(
+    result->ownerSharing.accountEmail = newSystem.accountEmail;
+    result->ownerSharing.systemID = result->systemData.id;
+    result->ownerSharing.accessRole = api::SystemAccessRole::owner;
+    result->ownerSharing.vmsUserId = guidFromArbitraryData(
+        result->ownerSharing.accountEmail).toSimpleString().toStdString();
+    result->ownerSharing.isEnabled = true;
+    result->ownerSharing.customPermissions = QnLexical::serialized(
         static_cast<Qn::GlobalPermissions>(Qn::GlobalAdminPermissionSet)).toStdString();
-    auto result = updateSharingInDbAndGenerateTransaction(connection, systemSharing);
-    if (result != nx::db::DBResult::ok)
+    const auto resultCode = 
+        updateSharingInDbAndGenerateTransaction(connection, result->ownerSharing);
+    if (resultCode != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
             arg(newSystem.name).arg(newSystem.accountEmail).
             arg(connection->lastError().text()), cl_logDEBUG1);
-        return result;
+        return resultCode;
     }
 
     return nx::db::DBResult::ok;
@@ -700,27 +700,22 @@ void SystemManager::systemAdded(
     QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount systemRegistrationData,
-    data::SystemData systemData,
+    InsertNewSystemToDbResult resultData,
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
         QnMutexLocker lk(&m_mutex);
         //updating cache
-        m_systems.insert(systemData);
-
+        m_systems.insert(resultData.systemData);
         //updating "systems by account id" index
-        api::SystemSharing sharing;
-        sharing.accountEmail = systemRegistrationData.accountEmail;
-        sharing.systemID = systemData.id;
-        sharing.accessRole = api::SystemAccessRole::owner;
-        m_accountAccessRoleForSystem.emplace(std::move(sharing));
+        m_accountAccessRoleForSystem.emplace(std::move(resultData.ownerSharing));
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
         ? api::ResultCode::ok
         : api::ResultCode::dbError,
-        std::move(systemData));
+        std::move(resultData.systemData));
 }
 
 void SystemManager::systemSharingAdded(
@@ -1466,12 +1461,19 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
         .arg(systemId).str(data.id),
         cl_logDEBUG2);
 
+    systemSharingData->systemID = systemId;
+    systemSharingData->vmsUserId = data.id.toSimpleString().toStdString();
+
     QSqlQuery removeSharingQuery(*dbConnection);
     removeSharingQuery.prepare(
         "DELETE FROM system_to_account "
         "  WHERE system_id=:systemId AND vms_user_id=:vmsUserId");
-    removeSharingQuery.bindValue(":systemId", QnSql::serialized_field(systemId));
-    removeSharingQuery.bindValue(":vmsUserId", QnSql::serialized_field(data.id.toStdString()));
+    removeSharingQuery.bindValue(
+        ":systemId",
+        QnSql::serialized_field(systemId));
+    removeSharingQuery.bindValue(
+        ":vmsUserId",
+        QnSql::serialized_field(systemSharingData->vmsUserId));
     if (!removeSharingQuery.exec())
     {
         NX_LOGX(lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
@@ -1479,9 +1481,6 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
-
-    systemSharingData->systemID = systemId;
-    systemSharingData->vmsUserId = data.id.toStdString();
 
     return db::DBResult::ok;
 }

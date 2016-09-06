@@ -195,6 +195,12 @@ private:
         >
     > AccountSystemAccessRoleDict;
 
+    struct InsertNewSystemToDbResult
+    {
+        data::SystemData systemData;
+        data::SystemSharing ownerSharing;
+    };
+
     constexpr static const int kSharingUniqueIndex = 0;
     constexpr static const int kSharingByAccountEmail = 1;
     constexpr static const int kSharingBySystemId = 2;
@@ -218,13 +224,13 @@ private:
     nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const connection,
         const data::SystemRegistrationDataWithAccount& newSystem,
-        data::SystemData* const systemData);
+        InsertNewSystemToDbResult* const systemData);
     void systemAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
-        data::SystemData systemData,
+        InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
     //nx::db::DBResult insertSystemSharingToDB(
