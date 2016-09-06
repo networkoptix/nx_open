@@ -99,7 +99,7 @@ UpnpDeviceInfo QnActiResourceSearcher::parseDeviceXml(
     input.setData(rawData);
     if(!xmlReader.parse(&input))
     {
-        outStatus = false;
+        *outStatus = false;
         return UpnpDeviceInfo();
     }
 
@@ -145,7 +145,7 @@ UpnpDeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const QUrl& url, bool* 
     CLHttpStatus status = client.doGET(kActiDeviceXmlPath);
     if (status != CL_HTTP_SUCCESS)
     {
-        outStatus = false;
+        *outStatus = false;
         return deviceInfo;
     }
     
