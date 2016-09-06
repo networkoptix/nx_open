@@ -39,12 +39,8 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        [this]()
-        {
-            m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
-            m_camerasPage->indirectAccessChanged();
-        });
+    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserGroupsDialog::accessibleLayoutsChanged);
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
         [this](const QSet<QnUuid>& resourceIds)
@@ -165,6 +161,7 @@ bool QnUserGroupsDialog::selectGroup(const QnUuid& groupId)
 
     QModelIndex index = m_model->index(group - groups.begin());
     ui->groupsTreeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
+
     return true;
 }
 
@@ -188,6 +185,12 @@ bool QnUserGroupsDialog::hasChanges() const
     }
 
     return false;
+}
+
+void QnUserGroupsDialog::loadDataToUi()
+{
+    base_type::loadDataToUi();
+    accessibleLayoutsChanged();
 }
 
 void QnUserGroupsDialog::applyChanges()
@@ -243,3 +246,8 @@ void QnUserGroupsDialog::applyChanges()
     loadDataToUi();
 }
 
+void QnUserGroupsDialog::accessibleLayoutsChanged()
+{
+    m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
+    m_camerasPage->indirectAccessChanged();
+}
