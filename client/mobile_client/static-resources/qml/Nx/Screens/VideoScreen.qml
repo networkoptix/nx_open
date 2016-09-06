@@ -83,6 +83,8 @@ PageBase
         }
     }
 
+    sideNavigationEnabled: false
+
     header: ToolBar
     {
         id: toolBar
