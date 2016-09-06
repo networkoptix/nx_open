@@ -1403,7 +1403,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     nx_http::Response* response)
 {
     connectionInfo->version = qnCommon->engineVersion();
-    connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
+    connectionInfo->brand = qnRuntimeInfoManager->localInfo().data.brand;
     connectionInfo->systemName = qnCommon->localSystemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
     #if defined(__arm__)

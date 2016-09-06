@@ -32,7 +32,7 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::ConnectionResult::IncompatibleInternal:
             return Qn::Login_Help;
         case Qn::ConnectionResult::IncompatibleVersion:
-        case Qn::ConnectionResult::CompatibilityMode:
+        case Qn::ConnectionResult::IncompatibleProtocol:
             return Qn::VersionMismatch_Help;
     }
     NX_ASSERT(false, "Unhandled switch case");
@@ -111,7 +111,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
         return result;
     }
 
-    if (result == ConnectionResult::CompatibilityMode)
+    if (result == ConnectionResult::IncompatibleProtocol)
         return handleCompatibilityMode(connectionInfo, url, parentWidget);
 
     NX_ASSERT(false);    //should never get here
@@ -169,7 +169,7 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
                 .arg(QnConnectionValidator::minSupportedVersion().toString());
             break;
         }
-        case ConnectionResult::CompatibilityMode:
+        case ConnectionResult::IncompatibleProtocol:
         {
             result.details = tr("Server has a different version:") + L'\n'
                 + versionDetails
@@ -188,7 +188,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     QWidget* parentWidget)
 {
     using namespace Qn;
-    int helpTopicId = helpTopic(ConnectionResult::CompatibilityMode);
+    int helpTopicId = helpTopic(ConnectionResult::IncompatibleProtocol);
 
     const auto versionDetails =
         tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString())
@@ -272,7 +272,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         switch (applauncher::restartClient(connectionInfo.version, url.toEncoded()))
         {
             case applauncher::api::ResultType::ok:
-                return ConnectionResult::CompatibilityMode;
+                return ConnectionResult::IncompatibleProtocol;
 
             case applauncher::api::ResultType::connectError:
                 QnMessageBox::critical(

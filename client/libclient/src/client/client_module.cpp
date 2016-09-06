@@ -465,7 +465,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    QnModuleFinder* moduleFinder(new QnModuleFinder(true, qnRuntime->isDevMode())); //TODO: #GDM make it common way via scoped pointer somehow
+    QnModuleFinder* moduleFinder(new QnModuleFinder(true)); //TODO: #GDM make it common way via scoped pointer somehow
     moduleFinder->start();
     qnCommon->store<QnModuleFinder>(moduleFinder);
 

@@ -31,8 +31,6 @@ struct QnModuleInformation
 
     QnModuleInformation();
 
-    bool isCompatibleToCurrentSystem() const;
-    bool hasCompatibleVersion() const;
     void fixRuntimeId();
     QString cloudId() const;
 

@@ -8,6 +8,7 @@
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
+#include <network/connection_validator.h>
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
@@ -88,7 +89,10 @@ namespace
             const QnModuleInformation &moduleInformation,
             Qn::ResourceStatus currentStatus = Qn::Online)
     {
-        Qn::ResourceStatus status = moduleInformation.isCompatibleToCurrentSystem() ? Qn::Online : Qn::Incompatible;
+        Qn::ResourceStatus status =
+            QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation)
+            ? Qn::Online
+            : Qn::Incompatible;
         if (status == Qn::Online && currentStatus == Qn::Unauthorized)
             status = Qn::Unauthorized;
 
@@ -96,7 +100,7 @@ namespace
     }
 }
 
-QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
+QnModuleFinder::QnModuleFinder(bool clientMode) :
     m_itemsMutex(QnMutex::Recursive),
     m_elapsedTimer(),
     m_timer(new QTimer(this)),
@@ -105,9 +109,6 @@ QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_helper(new QnDirectModuleFinderHelper(this, clientMode))
 {
-    m_multicastModuleFinder->setCompatibilityMode(compatibilityMode);
-    m_directModuleFinder->setCompatibilityMode(compatibilityMode);
-
     connect(m_multicastModuleFinder.data(), &QnMulticastModuleFinder::responseReceived,     this, &QnModuleFinder::at_responseReceived);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::responseReceived,        this, &QnModuleFinder::at_responseReceived);
 
@@ -132,11 +133,6 @@ QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
 QnModuleFinder::~QnModuleFinder()
 {
     pleaseStop();
-}
-
-bool QnModuleFinder::isCompatibilityMode() const
-{
-    return m_multicastModuleFinder->isCompatibilityMode();
 }
 
 QnMulticastModuleFinder *QnModuleFinder::multicastModuleFinder() const
@@ -322,7 +318,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     if (!item.moduleInformation.id.isNull() &&
         (item.moduleInformation.runtimeId != moduleInformation.runtimeId) &&
         !item.addresses.contains(endpoint)) // Same ip:port with different runtime id means that
-                                            // server was restarted    
+                                            // server was restarted
     {
         bool oldModuleIsValid = item.moduleInformation.systemName == qnCommon->localSystemName();
         bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
@@ -507,7 +503,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
 
     bool alreadyLost = it->primaryAddress.isNull();
 
-    if (it->primaryAddress == address) 
+    if (it->primaryAddress == address)
     {
         updatePrimaryAddress(*it, pickPrimaryAddress(it->addresses, ignoredUrls));
         alreadyLost = it->primaryAddress.isNull();

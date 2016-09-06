@@ -14,10 +14,9 @@ BaseTile
     property string systemId;
     property bool isFactoryTile: false;
     property bool isCloudTile: false;
-    property bool isCompatibleCloudHost: false;
+    property bool isCompatibleInternal: false;
 
     property string wrongVersion;
-    property string wrongCustomization;
     property string compatibleVersion;
 
     isConnecting: ((control.systemId == context.connectingToSystem) && !isFactoryTile);
@@ -27,7 +26,7 @@ BaseTile
         if (isFactoryTile)
             return true;
 
-        if (wrongCustomization.length || wrongVersion.length || !isCompatibleCloudHost)
+        if (wrongVersion.length || !isCompatibleInternal)
             return false;
 
         if (isCloudTile)
@@ -56,20 +55,18 @@ BaseTile
     indicator
     {
         visible: ((impl.tileType !== impl.kFactorySystemTileType) &&
-            (wrongVersion.length || wrongCustomization.length ||
-             compatibleVersion.length || !impl.isOnline || !isCompatibleCloudHost));
+            (wrongVersion.length ||
+             compatibleVersion.length || !impl.isOnline || !isCompatibleInternal));
 
         text:
         {
-            if (wrongCustomization.length)
-                return wrongCustomization;
-            else if (wrongVersion.length)
-                return wrongVersion;
-            else if (!isCompatibleCloudHost)
+            if (!isCompatibleInternal)
                 return qsTr("INCOMPATIBLE");
-            else if (compatibleVersion.length)
+            if (wrongVersion.length)
+                return wrongVersion;
+            if (compatibleVersion.length)
                 return compatibleVersion;
-            else if (!impl.isOnline)
+            if (!impl.isOnline)
                 return qsTr("OFFLINE");
 
             return "";
@@ -77,8 +74,8 @@ BaseTile
 
         textColor:
         {
-           if (wrongCustomization.length || wrongVersion.length ||
-                compatibleVersion.length || !isCompatibleCloudHost)
+           if (wrongVersion.length ||
+                compatibleVersion.length || !isCompatibleInternal)
            {
                return Style.colors.shadow;
            }
@@ -88,7 +85,7 @@ BaseTile
 
         color:
         {
-            if (wrongCustomization.length || wrongVersion.length || !isCompatibleCloudHost)
+            if (wrongVersion.length || !isCompatibleInternal)
                 return Style.colors.red_main;
             else if (compatibleVersion.length)
                 return Style.colors.yellow_main;

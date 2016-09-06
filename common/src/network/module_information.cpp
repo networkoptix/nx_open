@@ -38,19 +38,6 @@ QnModuleInformation::QnModuleInformation():
 {
 }
 
-bool QnModuleInformation::isCompatibleToCurrentSystem() const
-{
-    //TODO: #GDM #isCompatibleCustomization VMS-2163
-    return hasCompatibleVersion()
-        && systemName == qnCommon->localSystemName()
-        && cloudHost == QnAppInfo::defaultCloudHost();
-}
-
-bool QnModuleInformation::hasCompatibleVersion() const {
-    return  protoVersion == nx_ec::EC2_PROTO_VERSION &&
-        isCompatible(version, qnCommon->engineVersion());
-}
-
 void QnModuleInformation::fixRuntimeId()
 {
     if (!runtimeId.isNull())

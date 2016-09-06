@@ -75,6 +75,12 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         connectionInfo.version, connectionInfo.cloudHost);
 }
 
+bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
+{
+    return info.systemName == qnCommon->localSystemName()
+        && validateConnection(info) == Qn::ConnectionResult::Success;
+}
+
 Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QString& customization,
     int protoVersion,
@@ -90,15 +96,11 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (!compatibleCustomization(customization, localInfo))
         return ConnectionResult::IncompatibleInternal;
 
-    if (!customization.isEmpty()
-        && !localInfo.brand.isEmpty()
-        && customization != localInfo.brand)
-
     if (version < minSupportedVersion())
         return ConnectionResult::IncompatibleVersion;
 
     if (protoVersion != QnAppInfo::ec2ProtoVersion())
-        return ConnectionResult::CompatibilityMode;
+        return ConnectionResult::IncompatibleProtocol;
 
     return ConnectionResult::Success;
 }

@@ -14,6 +14,8 @@
 #include <nx/network/system_socket.h>
 
 #include <common/common_module.h>
+#include <network/connection_validator.h>
+
 #include "module_information.h"
 
 #include <utils/common/app_info.h>
@@ -50,7 +52,6 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_prevPingClock(0),
     m_checkInterfacesTimeoutMs(checkInterfacesTimeoutMs),
     m_lastInterfacesCheckMs(0),
-    m_compatibilityMode(false),
     m_multicastGroupAddress(multicastGroupAddress.isNull() ? defaultModuleRevealMulticastGroup : multicastGroupAddress),
     m_multicastGroupPort(multicastGroupPort == 0 ? defaultModuleRevealMulticastGroupPort : multicastGroupPort),
     m_cachedResponse(MAX_CACHE_SIZE_BYTES)
@@ -68,14 +69,6 @@ bool QnMulticastModuleFinder::isValid() const
 {
     QnMutexLocker lk(&m_mutex);
     return !m_clientSockets.empty();
-}
-
-bool QnMulticastModuleFinder::isCompatibilityMode() const {
-    return m_compatibilityMode;
-}
-
-void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
-    m_compatibilityMode = compatibilityMode;
 }
 
 bool QnMulticastModuleFinder::isDisabled(false);
@@ -262,20 +255,16 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket)
         && response->type != QnModuleInformation::nxECId())
         return true;
 
-    //TODO: #GDM #isCompatibleCustomization VMS-2163
-    if (!m_compatibilityMode &&
-        response->customization.compare(QnAppInfo::customizationName(), Qt::CaseInsensitive) != 0)
+    auto connectionResult = QnConnectionValidator::validateConnection(*response);
+    if (connectionResult == Qn::ConnectionResult::IncompatibleInternal)
     {
-        NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 on local address %4").
-            arg(response->type).arg(remoteEndpoint.toString()).arg(response->customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
-        return false;
-    }
-
-    //TODO: #GDM #isCompatibleCustomization VMS-2163
-    if (response->cloudHost != QnAppInfo::defaultCloudHost())
-    {
-        NX_LOGX(lit("Ignoring %1 (%2) with different cloud host %3 on local address %4").
-            arg(response->type).arg(remoteEndpoint.toString()).arg(response->cloudHost).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
+        NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 or cloud host %4 on local address %5")
+            .arg(response->type)
+            .arg(remoteEndpoint.toString())
+            .arg(response->customization)
+            .arg(response->cloudHost)
+            .arg(udpSocket->getLocalAddress().toString()),
+            cl_logDEBUG2);
         return false;
     }
 
