@@ -13,7 +13,7 @@
 
 using namespace nx::cdb;
 
-#define DEBUG_CLOUD_STATUS_WATCHER
+//#define DEBUG_CLOUD_STATUS_WATCHER
 #ifdef DEBUG_CLOUD_STATUS_WATCHER
 #define TRACE(...) qDebug() << "QnCloudStatusWatcher: " << __VA_ARGS__;
 #else
