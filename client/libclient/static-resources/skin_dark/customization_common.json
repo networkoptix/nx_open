@@ -566,7 +566,7 @@
     "QnEdgeShadowWidget": {
         "palette": {
             "default": {
-                "window": "#ff0000"
+                "window": "dark1.setAlpha(38)"
             }
         }
     },
