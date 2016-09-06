@@ -45,12 +45,24 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     m_multiCodec.setRole(m_role);
     int fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
+
     QSize resolution = m_actiRes->getResolution(m_role);
     QString resolutionStr = formatResolutionStr(resolution);
+
     int bitrate = m_actiRes->suggestBitrateKbps(params.quality, resolution, fps);
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
-    QString encoderStr(QLatin1String("H264"));
+
+    auto encoders = m_actiRes->getAvailableEncoders();
+    QString encoderStr;
+
+    if (encoders.contains(lit("H264")))
+        encoderStr = lit("H264");
+    else if (encoderStr.contains(lit("MJPEG")))
+        encoderStr = lit("MJPEG");
+    else
+        return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
+    
     if (isCameraControlRequired)
     {
         CLHttpStatus status;

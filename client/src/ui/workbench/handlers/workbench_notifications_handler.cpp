@@ -207,6 +207,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged() {
 
     checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
     checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {

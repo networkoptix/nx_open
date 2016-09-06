@@ -205,12 +205,18 @@ bool QnOnvifPtzController::readBuiltinPresets() {
         return false;
 
     m_presetNameByToken.clear();
-    for(onvifXsd__PTZPreset *preset: response.Preset) {
-        if (preset) {
-            QString id = QString::fromStdString(*preset->token);
-            QString name = fromLatinStdString(*preset->Name);
-            m_presetNameByToken.insert(id, name);
-        }
+    for(onvifXsd__PTZPreset* preset: response.Preset)
+    {
+        if (!preset || !preset->token)
+            return false;
+        
+        QString id = QString::fromStdString(*preset->token);
+        QString name = lit("Preset %1").arg(id);
+
+        if (preset->Name)
+            name = fromLatinStdString(*preset->Name);
+            
+        m_presetNameByToken.insert(id, name);
     }
     
     m_ptzPresetsReaded = true;
