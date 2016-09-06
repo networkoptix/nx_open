@@ -143,7 +143,8 @@ int CloudDBProcess::exec()
             return 0;
         }
 
-        initializeLogging( settings );
+        initializeLogging(settings.logging(), "log_file", QnLog::MAIN_LOG_ID);
+        initializeLogging(settings.vmsSynchronizationLogging(), "sync_log", QnLog::EC2_TRAN_LOG);
 
         const auto& httpAddrToListenList = settings.endpointsToListen();
         m_settings = &settings;
@@ -347,24 +348,32 @@ bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
 }
 #endif
 
-void CloudDBProcess::initializeLogging(const conf::Settings& settings)
+void CloudDBProcess::initializeLogging(
+    const conf::Logging& logSettings,
+    const QString& logFileNameBase,
+    int logInstanceId)
 {
-    //logging
-    if (settings.logging().logLevel != QString::fromLatin1("none"))
-    {
-        const QString& logDir = settings.logging().logDir;
+    if (logSettings.logLevel == QString::fromLatin1("none"))
+        return;
 
-        QDir().mkpath(logDir);
-        const QString& logFileName = logDir + lit("/log_file");
-        if (cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
-            QnLog::initLog(settings.logging().logLevel);
-        else
-            std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
-        NX_LOG(lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("%1 started").arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
-        NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+    const QString& logDir = logSettings.logDir;
+
+    QDir().mkpath(logDir);
+    const QString& logFileName = logDir + lit("/") + logFileNameBase;
+
+    if (!QnLog::instance(logInstanceId)->create(
+            logFileName,
+            1024 * 1024 * 10,
+            5,
+            QnLog::logLevelFromString(logSettings.logLevel)))
+    {
+        std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
     }
+
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
 }
 
 void CloudDBProcess::registerApiHandlers(

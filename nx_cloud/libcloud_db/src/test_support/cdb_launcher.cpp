@@ -44,6 +44,7 @@ CdbLauncher::CdbLauncher(QString tmpDir)
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
     addArg("-log/logLevel"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    addArg("-syncroLog/logLevel"); addArg("DEBUG2");
 
     addArg("-db/driverName");
     if (!sConnectionOptions.driverName.isEmpty())
