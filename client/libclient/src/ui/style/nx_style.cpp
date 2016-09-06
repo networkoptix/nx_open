@@ -1046,12 +1046,8 @@ void QnNxStyle::drawComplexControl(
                     QRectF grooveDrawRect = grooveRect.adjusted(0.5, 0.5, -0.5, -0.5); /* to include border, antialiased */
                     qreal radius = ((horizontal ? grooveDrawRect.height() : grooveDrawRect.width())) * 0.5;
 
-                    QnPaletteColor main = mainDark;
-                    if (!enabled)
-                        main.setAlphaF(Hints::kDisabledItemOpacity);
-
-                    painter->setPen(main.darker(1));
-                    painter->setBrush(QBrush(main.lighter(hovered ? 6 : 5)));
+                    painter->setPen(mainDark.darker(1));
+                    painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
                     painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
                     SliderFeatures features = static_cast<SliderFeatures>(option->styleObject
@@ -1170,6 +1166,8 @@ void QnNxStyle::drawComplexControl(
 
                     if (option->state.testFlag(State_Sunken))
                         fillColor = mainDark.lighter(3);
+
+                    fillColor.setAlphaF(1.0);
 
                     painter->setPen(QPen(borderColor, dp(2)));
                     painter->setBrush(QBrush(fillColor));

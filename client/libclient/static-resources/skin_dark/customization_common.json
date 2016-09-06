@@ -156,6 +156,14 @@
         }
     },
 
+    "QSlider": {
+        "palette": {
+            "disabled": {
+                "window":           "dark7.setAlpha(75)"
+            }
+        }
+    },
+
     "QnCurtainItem": {
         "color": "dark1"
     },
