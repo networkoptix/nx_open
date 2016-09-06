@@ -47,7 +47,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
 {
     ui->setupUi(this);
 
-    ui->emailInputField->setTitle(tr("Email:"));
+    ui->emailInputField->setTitle(tr("E-Mail"));
     ui->emailInputField->setValidator([](const QString& text)
     {
         if (text.trimmed().isEmpty() || !QnEmailAddress::isValid(text))
@@ -59,12 +59,12 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
 
         return Qn::kValidResult;
     });
-    ui->passwordInputField->setTitle(tr("Password:"));
+    ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Password cannot be empty.")));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
-    ui->signatureInputField->setTitle(tr("System Signature:"));
+    ui->signatureInputField->setTitle(tr("System Signature"));
     ui->signatureInputField->setPlaceholderText(tr("Enter a short system description here."));
-    ui->supportInputField->setTitle(tr("Support Signature:"));
+    ui->supportInputField->setTitle(tr("Support Signature"));
     ui->supportInputField->setPlaceholderText(QnAppInfo::supportLink());
 
     QnAligner* aligner = new QnAligner(this);
