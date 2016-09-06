@@ -423,9 +423,9 @@ public:
             QnAbstractStorageResource::cap::ListFile;
     }
 
-    virtual bool initOrUpdate() const override {
+    virtual Qn::StorageInitResult initOrUpdate() const override {
         NX_ASSERT(0);
-        return true;
+        return Qn::StorageInit_Ok;
     }
 
     virtual void setUrl(const QString& url) override {
