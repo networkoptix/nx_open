@@ -16,7 +16,7 @@ Item
         CloudBanner
         {
             id: cloudBanner
-            text: cloudStatusWatcher.cloudLogin
+            text: cloudStatusWatcher.effectiveUserName
         }
 
         Item
