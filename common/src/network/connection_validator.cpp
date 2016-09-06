@@ -25,22 +25,19 @@ QnSoftwareVersion minSupportedVersion(const ec2::ApiRuntimeData& localInfo)
     return QnSoftwareVersion("1.4");
 }
 
-bool compatibleCustomization(const QString& customization, const ec2::ApiRuntimeData& localInfo)
+/* For mobile clients country-local customizations must be compatible with base, e.g.
+ * 'default' should connect to 'default_cn' and 'default_zh_CN'. The same applied to brands
+ * comparing, e.g. 'hdwitness' is compatible with 'hdwitness_cn' on mobile clients. */
+bool compatibleCustomization(const QString& c1, const QString& c2, bool isMobile)
 {
-    QString c1 = customization;
-    QString c2 = localInfo.brand;
     if (c1.isEmpty() || c2.isEmpty())
         return true;
 
-    if (!localInfo.peer.isMobileClient())
+    if (!isMobile)
         return c1 == c2;
 
-    /* For mobile clients country-local customizations must be compatible with base, e.g.
-       'default' should connect to 'default_cn' and 'default_zh_CN' */
     const QChar kSeparator = L'_';
-    c1 = c1.left(c1.indexOf(kSeparator));
-    c2 = c2.left(c2.indexOf(kSeparator));
-    return c1 == c2;
+    return c1.left(c1.indexOf(kSeparator)) == c2.left(c2.indexOf(kSeparator));
 }
 
 } // namespace
@@ -53,7 +50,11 @@ QnSoftwareVersion QnConnectionValidator::minSupportedVersion()
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
     const QnModuleInformation& info)
 {
-    return validateConnectionInternal(info.customization, info.protoVersion, info.version,
+    return validateConnectionInternal(
+        info.brand,
+        info.customization,
+        info.protoVersion,
+        info.version,
         info.cloudHost);
 }
 
@@ -71,8 +72,12 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
     if (networkError != ec2::ErrorCode::ok)
         return ConnectionResult::NetworkError;
 
-    return validateConnectionInternal(connectionInfo.brand, connectionInfo.nxClusterProtoVersion,
-        connectionInfo.version, connectionInfo.cloudHost);
+    return validateConnectionInternal(
+        connectionInfo.brand,
+        connectionInfo.customization,
+        connectionInfo.nxClusterProtoVersion,
+        connectionInfo.version,
+        connectionInfo.cloudHost);
 }
 
 bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
@@ -82,6 +87,7 @@ bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformatio
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
+    const QString& brand,
     const QString& customization,
     int protoVersion,
     const QnSoftwareVersion& version,
@@ -93,7 +99,12 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
         return ConnectionResult::IncompatibleInternal;
 
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
-    if (!compatibleCustomization(customization, localInfo))
+    bool isMobile = localInfo.peer.isMobileClient();
+
+    if (!compatibleCustomization(brand, localInfo.brand, isMobile))
+        return ConnectionResult::IncompatibleInternal;
+
+    if (!compatibleCustomization(customization, localInfo.customization, isMobile))
         return ConnectionResult::IncompatibleInternal;
 
     if (version < minSupportedVersion())

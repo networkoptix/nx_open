@@ -26,7 +26,8 @@ namespace ec2
             updateStarted(false)
         {}
 
-        /* This operator must not be replaced with fusion implementation as is skips brand checking */
+        /* This operator must not be replaced with fusion implementation as is skips brand
+         * and customization checking */
         bool operator==(const ApiRuntimeData& other) const {
             return version == other.version &&
                    peer == other.peer &&
@@ -49,6 +50,7 @@ namespace ec2
         QString platform;
         QString box;
         QString brand;
+        QString customization;
         QString publicIP;
         qint64 prematureLicenseExperationDate;
 
@@ -75,7 +77,7 @@ namespace ec2
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
                                                         (hardwareIds)(updateStarted)(nx1mac)(nx1serial)\
-                                                        (userId)
+                                                        (userId)(customization)
 
 
 } // namespace ec2

@@ -13,6 +13,7 @@ struct QnModuleInformation
 {
     QString type;
     QString customization;
+    QString brand;
     QnSoftwareVersion version;
     QnSystemInformation systemInformation;
     QString systemName;
@@ -50,7 +51,7 @@ struct QnModuleInformationWithAddresses : QnModuleInformation
 
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation) \
     (systemName)(name)(port)(id)(sslAllowed)(protoVersion)(runtimeId) \
-    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)(cloudHost)
+    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)(cloudHost)(brand)
 
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 

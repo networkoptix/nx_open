@@ -323,7 +323,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         bool oldModuleIsValid = item.moduleInformation.systemName == qnCommon->localSystemName();
         bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
 
-        if (oldModuleIsValid == newModuleIsValid) {
+        if (oldModuleIsValid == newModuleIsValid)
+        {
             oldModuleIsValid = item.moduleInformation.customization == QnAppInfo::customizationName();
             newModuleIsValid = moduleInformation.customization == QnAppInfo::customizationName();
         }

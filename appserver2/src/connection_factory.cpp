@@ -1402,8 +1402,11 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     QnConnectionInfo* const connectionInfo,
     nx_http::Response* response)
 {
+    auto localInfo = qnRuntimeInfoManager->localInfo().data;
+
     connectionInfo->version = qnCommon->engineVersion();
-    connectionInfo->brand = qnRuntimeInfoManager->localInfo().data.brand;
+    connectionInfo->brand = localInfo.brand;
+    connectionInfo->customization = localInfo.customization;
     connectionInfo->systemName = qnCommon->localSystemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
     #if defined(__arm__)

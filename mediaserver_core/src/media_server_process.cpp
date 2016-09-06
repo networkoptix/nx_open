@@ -1947,7 +1947,8 @@ void MediaServerProcess::run()
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
-    runtimeData.brand = compatibilityMode ? QString() : QnAppInfo::customizationName();
+    runtimeData.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
 #ifdef __arm__
@@ -2071,16 +2072,9 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    if (connectInfo.nxClusterProtoVersion != QnAppInfo::ec2ProtoVersion())
+    if (QnConnectionValidator::validateConnection(connectInfo) != ConnectionResult::Success)
     {
         NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
-        return;
-    }
-
-    if (connectInfo.cloudHost != QnAppInfo::defaultCloudHost())
-    {
-        NX_LOG(lit("Incompatible Server version detected (cloud host name &1)! Giving up.")
-            .arg(connectInfo.cloudHost), cl_logERROR);
         return;
     }
 
@@ -2283,8 +2277,8 @@ void MediaServerProcess::run()
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
     QnModuleInformation selfInformation = m_mediaServer->getModuleInformation();
-    if (!compatibilityMode)
-        selfInformation.customization = QnAppInfo::customizationName();
+    selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
+    selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
