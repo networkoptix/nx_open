@@ -14,8 +14,11 @@
 #include <nx/utils/timer_manager.h>
 
 #include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <llutil/hardware_id.h>
 #include <network/http_connection_listener.h>
 #include <rest/server/rest_connection_processor.h>
@@ -115,6 +118,41 @@ protected:
 ////////////////////////////////////////////////////////////
 //// class Appserver2Process
 ////////////////////////////////////////////////////////////
+
+class Appserver2MessageProcessor:
+    public QnCommonMessageProcessor
+{
+public:
+    Appserver2MessageProcessor(
+        QnResourcePool* const resourcePool,
+        QnResourceDiscoveryManager* resourceDiscoveryManager)
+        :
+        m_resourcePool(resourcePool),
+        m_resourceDiscoveryManager(resourceDiscoveryManager)
+    {
+    }
+
+protected:
+    virtual void onResourceStatusChanged(
+        const QnResourcePtr& resource,
+        Qn::ResourceStatus status) override
+    {
+    }
+
+    virtual QnResourceFactory* getResourceFactory() const override
+    {
+        return m_resourceDiscoveryManager;
+    }
+
+    virtual void updateResource(const QnResourcePtr& resource) override
+    {
+        m_resourcePool->addResource(resource);
+    }
+
+protected:
+    QnResourcePool* const m_resourcePool;
+    QnResourceDiscoveryManager* m_resourceDiscoveryManager;
+};
 
 Appserver2Process::Appserver2Process(int argc, char** argv)
 :
@@ -251,7 +289,13 @@ int Appserver2Process::exec()
 
     tcpListener.start();
 
-    ec2Connection->startReceivingNotifications();
+    QnResourceDiscoveryManager resourceDiscoveryManager;
+    // Starting receiving notifications.
+    auto messageProcessor = std::make_unique<Appserver2MessageProcessor>(
+        QnResourcePool::instance(),
+        &resourceDiscoveryManager);
+    messageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+    //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
