@@ -72,4 +72,4 @@ private:
 
 };
 
-
+Q_DECLARE_METATYPE(QnUserSettingsDialog::DialogPage)

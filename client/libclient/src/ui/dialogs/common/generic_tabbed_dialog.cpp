@@ -38,22 +38,43 @@ int QnGenericTabbedDialog::currentPage() const
     return invalidPage;
 }
 
-void QnGenericTabbedDialog::setCurrentPage(int key)
+void QnGenericTabbedDialog::setCurrentPage(int key, bool adjust)
 {
-    if (!m_tabWidget)
+    NX_ASSERT(m_tabWidget);
+    NX_ASSERT(!m_pages.isEmpty());
+    if (!m_tabWidget || m_pages.isEmpty())
         return;
 
-    for(const Page &page: m_pages)
+    auto page = std::find_if(m_pages.cbegin(), m_pages.cend(),
+        [key](const Page& page)
+        {
+            return page.key == key;
+        });
+
+    NX_ASSERT(page != m_pages.cend());
+    if (!adjust)
     {
-        if (page.key != key)
-            continue;
-        NX_ASSERT(page.visible && page.enabled);
-        if (!page.visible || !page.enabled)
+        if (page == m_pages.cend())
             return;
 
-        m_tabWidget->setCurrentWidget(page.widget);
-        break;
+        NX_ASSERT(page->isValid());
+        if (page->isValid())
+            m_tabWidget->setCurrentWidget(page->widget);
+        return;
     }
+
+    auto nearestPage = m_pages.cend();
+    for (auto p = m_pages.cbegin(); p != m_pages.cend(); ++p)
+    {
+        if (!p->isValid())
+            continue;
+        if (nearestPage == m_pages.cend()
+            || qAbs(nearestPage->key - key) > qAbs(p->key - key))
+                nearestPage = p;
+    }
+    NX_ASSERT(nearestPage != m_pages.cend());
+    if (nearestPage != m_pages.cend())
+        m_tabWidget->setCurrentWidget(nearestPage->widget);
 }
 
 void QnGenericTabbedDialog::reject()
