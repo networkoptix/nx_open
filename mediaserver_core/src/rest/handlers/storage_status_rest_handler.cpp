@@ -21,44 +21,31 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
 {
     QnStorageStatusReply reply;
     QString storageUrl;
+
     if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return CODE_INVALID_PARAMETER;
+        return nx_http::StatusCode::invalidParameter;
 
     QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
     if (!storage)
         storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
 
-    if (!storage) {
+    if (!storage)
+    {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
-        qint64 spaceLimit = QnFileStorageResource::isLocal(storageUrl) ?
-                            nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE :
-                            QnFileStorageResource::kNasStorageLimit;
-
-        storage->setUrl(storageUrl);
-        storage->setSpaceLimit(spaceLimit);
 
         if (!storage)
-        {
-            reply.status = Qn::StorageInit_CreateFailed;
-            result.setReply(reply);
             return nx_http::StatusCode::invalidParameter;
-        }
-
-        reply.status = storage->initOrUpdate();
-        if (reply.status != Qn::StorageInit_Ok)
+        else
         {
-            result.setReply(reply);
-            return nx_http::StatusCode::invalidParameter;
+            storage->setUrl(storageUrl);
+            reply.status = storage->initOrUpdate();
         }
     }
 
-    NX_ASSERT(storage, Q_FUNC_INFO, "Storage must exist here");
-    bool exists = !storage.isNull();
-
-    reply.pluginExists = exists;
     reply.storage.url  = storageUrl;
 
-    if (storage) {
+    if (storage)
+    {
         reply.storage = QnStorageSpaceData(storage, false);
 #ifdef WIN32
         if (!reply.storage.isExternal) {

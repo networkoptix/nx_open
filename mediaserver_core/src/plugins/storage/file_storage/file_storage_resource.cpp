@@ -406,11 +406,13 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlStr
 
     if (retCode == -1)
     {
+        int errnoCode = errno;
         qWarning()
             << "Mount SMB resource " << srcString
             << " to local path " << localPathCopy << " failed"
-            << " retCode: " << retCode << ", errno!: " << errno;
-        return Qn::StorageInit_WrongPath;
+            << " retCode: " << retCode << ", errno!: " << errnoCode;
+
+        return errnoCode == EACCES ? Qn::StorageInit_WrongAuth : Qn::StorageInit_WrongPath;
     }
 
     return Qn::StorageInit_Ok;
@@ -703,9 +705,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate() const
         if (result != Qn::StorageInit_Ok)
             return result;
 
-        bool dontNeedToCheckForMount = oldValid == false && m_valid == true;
-
-        if (!dontNeedToCheckForMount && !isStorageDirMounted())
+        if (!(oldValid == false && m_valid == true) && !isStorageDirMounted())
         {
             m_valid = false;
             return Qn::StorageInit_WrongPath;
@@ -722,9 +722,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate() const
         return Qn::StorageInit_WrongPath;
     }
     QString localPath = getLocalPathSafe();
-    m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ?
-                                           getPath() :
-                                           localPath); // update cached value periodically
+    m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
     return Qn::StorageInit_Ok;
 }
 
@@ -868,7 +866,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
     QString mountPoint;
 
     if (!m_localPath.isEmpty())
-        return findPathInTabFile(m_localPath, lit("/etc/mtab"), &mountPoint, true);
+        return findPathInTabFile(m_localPath, lit("/proc/mounts"), &mountPoint, true);
     else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
         return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
 
