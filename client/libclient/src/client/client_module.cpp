@@ -447,7 +447,9 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;
 
-    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(clientPeerType));
+    NX_ASSERT(nx::utils::TimerManager::instance());
+    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
+        getConnectionFactory(clientPeerType, nx::utils::TimerManager::instance()));
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.data());
     qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory.take());
 
