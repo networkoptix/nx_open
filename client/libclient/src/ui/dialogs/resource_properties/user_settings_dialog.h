@@ -49,6 +49,7 @@ protected:
     virtual void showEvent(QShowEvent* event) override;
 
 private:
+    void applyChangesInternal();
     void updateControlsVisibility();
     void permissionsChanged();
 
