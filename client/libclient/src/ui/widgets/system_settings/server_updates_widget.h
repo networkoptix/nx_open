@@ -2,8 +2,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <array>
-
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -19,18 +17,19 @@ class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 struct QnLowFreeSpaceWarning;
 
-class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
+class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+{
     Q_OBJECT
+    using base_type = QnAbstractPreferencesWidget;
 
-    typedef QnAbstractPreferencesWidget base_type;
 public:
-    QnServerUpdatesWidget(QWidget *parent = 0);
+    QnServerUpdatesWidget(QWidget* parent = nullptr);
 
     bool cancelUpdate();
     bool canCancelUpdate() const;
     bool isUpdating() const;
 
-    QnMediaServerUpdateTool *updateTool() const;
+    QnMediaServerUpdateTool* updateTool() const;
 
     virtual void applyChanges() override;
     virtual void discardChanges() override;
@@ -41,45 +40,38 @@ public:
     virtual bool canDiscardChanges() const override;
 
 private slots:
-    void at_updateFinished(const QnUpdateResult &result);
+    void at_updateFinished(const QnUpdateResult& result);
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
     void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
     void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
 
 private:
-    void initSourceMenu();
-    void initLinkButtons();
-    void initBuildSelectionButtons();
+    void initDropdownActions();
+    void initDownloadActions();
 
-    void autoCheckForUpdatesInternet();
-    void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
-    void checkForUpdatesLocal();
+    void autoCheckForUpdates();
+    void checkForUpdates(bool fromInternet);
 
-    QString serverNamesString(const QnMediaServerResourceList &servers);
+    QString serverNamesString(const QnMediaServerResourceList& servers);
+
+    bool beginChecking();
+    void endChecking(const QnCheckForUpdateResult& result);
 
 private:
-    enum UpdateSource {
-        InternetSource,
-        LocalSource,
-
-        UpdateSourceCount
-    };
-
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
 
-    QnServerUpdatesModel *m_updatesModel;
-    QnMediaServerUpdateTool *m_updateTool;
-    std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
+    QnServerUpdatesModel* m_updatesModel;
+    QnMediaServerUpdateTool* m_updateTool;
 
     QnSoftwareVersion m_targetVersion;
     QnSoftwareVersion m_latestVersion;
-    bool m_checkingInternet;
-    bool m_checkingLocal;
+    QString m_localFileName;
+    bool m_checking;
 
     QUrl m_releaseNotesUrl;
 
-    QTimer *m_longUpdateWarningTimer;
+    QTimer* m_longUpdateWarningTimer;
 
     qint64 m_lastAutoUpdateCheck;
 };

@@ -39,6 +39,16 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     connect(ui->viewDownButton,        &QPushButton::clicked, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->viewUpButton,          &QPushButton::clicked, this, &QnFisheyeSettingsWidget::dataChanged);
 
+    auto updateEnabledState = [this](bool enable)
+    {
+        ui->autoCalibrationButton->setEnabled(enable);
+        ui->calibrateWidget->setEnabled(enable);
+        ui->settingsWidget->setEnabled(enable);
+    };
+
+    connect(ui->fisheyeEnabledButton,  &QPushButton::toggled, this, updateEnabledState);
+    updateEnabledState(ui->fisheyeEnabledButton->isChecked());
+
     connect(ui->sizeSlider, &QSlider::valueChanged, this,
         [this](int value)
         {

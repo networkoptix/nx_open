@@ -723,6 +723,11 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
         if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
             iSelRet = 0;
 
+        int result;
+        socklen_t result_len = sizeof(result);
+        if ((getsockopt(this->m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
+            iSelRet = 0;
+
         break;
     }
 #endif

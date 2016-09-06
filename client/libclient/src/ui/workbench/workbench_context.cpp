@@ -227,12 +227,15 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     if (startupParams.customUri.isValid())
     {
         using namespace nx::vms::utils;
+
+        SystemUri::Auth auth = startupParams.customUri.authenticator();
+        QnCredentials credentials(auth.user, auth.password);
+
         switch (startupParams.customUri.clientCommand())
         {
             case SystemUri::ClientCommand::LoginToCloud:
             {
-                SystemUri::Auth auth = startupParams.customUri.authenticator();
-                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(credentials, true);
                 break;
             }
             case SystemUri::ClientCommand::ConnectToSystem:
@@ -246,7 +249,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
                 systemUrl.setPassword(auth.password);
 
                 if (systemIsCloud)
-                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(auth.user, auth.password, true);
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(credentials, true);
 
                 menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, systemUrl));
                 break;

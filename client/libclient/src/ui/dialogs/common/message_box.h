@@ -24,7 +24,8 @@ public:
         Information,
         Warning,
         Critical,
-        Question
+        Question,
+        Success
     };
 
     /* Positions of custom widgets in the message box. */
@@ -47,7 +48,7 @@ public:
             QWidget *parent = nullptr,
             Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
-    ~QnMessageBox();
+    virtual ~QnMessageBox();
 
     void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
     QPushButton *addButton(const QString &text, QDialogButtonBox::ButtonRole role);
@@ -157,6 +158,20 @@ public:
             const QString &text,
             QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
             QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+
+    static QDialogButtonBox::StandardButton success(
+        QWidget *parent,
+        const QString &title,
+        const QString &text,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+    static QDialogButtonBox::StandardButton success(
+        QWidget *parent,
+        int helpTopicId,
+        const QString &title,
+        const QString &text,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
 
 protected:
     virtual void closeEvent(QCloseEvent *event) override;

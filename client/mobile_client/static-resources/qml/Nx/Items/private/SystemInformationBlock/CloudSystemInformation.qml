@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import QtQuick.Layouts 1.1
 import Nx 1.0
+import com.networkoptix.qml 1.0
 
 Item
 {
@@ -9,6 +10,8 @@ Item
 
     property alias description: descriptionText.text
     property bool online: true
+    readonly property bool cloudAvailable:
+        cloudStatusWatcher.status == QnCloudStatusWatcher.Online
 
     Column
     {
@@ -30,14 +33,17 @@ Item
         Image
         {
             x: -2
-            source: enabled ? lp("/images/cloud.png")
-                            : lp("/images/cloud_disabled.png")
+            source: !cloudAvailable
+                ? lp("/images/cloud_unavailable.png")
+                : enabled
+                    ? lp("/images/cloud.png")
+                    : lp("/images/cloud_disabled.png")
         }
     }
 
     IssueLabel
     {
-        text: online ? "" : qsTr("OFFLINE")
+        text: visible ? qsTr("OFFLINE") : ""
         anchors
         {
             bottom: parent.bottom
@@ -45,6 +51,6 @@ Item
             rightMargin: -4
         }
         color: ColorTheme.base14
-        visible: !online
+        visible: !online && cloudAvailable
     }
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>726</width>
-    <height>233</height>
+    <height>268</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,23 +25,19 @@
   <property name="windowTitle">
    <string>Add device(s)...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0,0">
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_9">
+      <property name="spacing">
+       <number>16</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QLabel" name="serverCaptionLabel">
-          <property name="text">
-           <string>Selected Server:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QLabel" name="serverNameLabel">
           <property name="text">
-           <string/>
+           <string notr="true"/>
           </property>
          </widget>
         </item>
@@ -79,7 +75,7 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="searchParametersPage">
-         <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,1">
+         <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -95,6 +91,9 @@
           <item>
            <widget class="QWidget" name="scanParamsWidget" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+             <property name="spacing">
+              <number>16</number>
+             </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -109,16 +108,19 @@
              </property>
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_3">
-               <property name="spacing">
-                <number>0</number>
-               </property>
                <item>
                 <widget class="QStackedWidget" name="addressStackedWidget">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="currentIndex">
                   <number>0</number>
                  </property>
                  <widget class="QWidget" name="pageSingleCamera">
-                  <layout class="QVBoxLayout" name="verticalLayout_7">
+                  <layout class="QGridLayout" name="singleCameraLayout" rowstretch="1,0">
                    <property name="leftMargin">
                     <number>0</number>
                    </property>
@@ -131,34 +133,46 @@
                    <property name="bottomMargin">
                     <number>0</number>
                    </property>
-                   <item>
-                    <layout class="QFormLayout" name="singleCameraLayout">
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="singleCameraLabel">
-                       <property name="text">
-                        <string>Device Address:</string>
-                       </property>
-                       <property name="buddy">
-                        <cstring>singleCameraLineEdit</cstring>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QLineEdit" name="singleCameraLineEdit">
-                       <property name="text">
-                        <string notr="true"/>
-                       </property>
-                       <property name="placeholderText">
-                        <string>IP, hostname, RTSP link...</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="singleCameraLabel">
+                     <property name="text">
+                      <string>Device Address</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                     <property name="buddy">
+                      <cstring>singleCameraLineEdit</cstring>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="singleCameraLineEdit">
+                     <property name="text">
+                      <string notr="true"/>
+                     </property>
+                     <property name="placeholderText">
+                      <string>IP, hostname, RTSP link...</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0" colspan="2">
+                    <spacer name="verticalSpacer_2">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>1</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                   </layout>
                  </widget>
                  <widget class="QWidget" name="pageSubnet">
-                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                  <layout class="QGridLayout" name="subnetLayout">
                    <property name="leftMargin">
                     <number>0</number>
                    </property>
@@ -171,43 +185,51 @@
                    <property name="bottomMargin">
                     <number>0</number>
                    </property>
-                   <item>
-                    <layout class="QFormLayout" name="subnetLayout">
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="startIPLabel">
-                       <property name="text">
-                        <string>Start IP:</string>
-                       </property>
-                       <property name="buddy">
-                        <cstring>startIPLineEdit</cstring>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QnIpLineEdit" name="startIPLineEdit">
-                       <property name="inputMethodHints">
-                        <set>Qt::ImhDigitsOnly</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="endIPLabel">
-                       <property name="text">
-                        <string>End IP:</string>
-                       </property>
-                       <property name="buddy">
-                        <cstring>endIPLineEdit</cstring>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QnIpLineEdit" name="endIPLineEdit">
-                       <property name="inputMethodHints">
-                        <set>Qt::ImhDigitsOnly</set>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="startIPLabel">
+                     <property name="text">
+                      <string>Start IP</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                     <property name="buddy">
+                      <cstring>startIPLineEdit</cstring>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QnIpLineEdit" name="startIPLineEdit">
+                     <property name="inputMethodHints">
+                      <set>Qt::ImhDigitsOnly</set>
+                     </property>
+                     <property name="text">
+                      <string>0.0.0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="endIPLabel">
+                     <property name="text">
+                      <string>End IP</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                     <property name="buddy">
+                      <cstring>endIPLineEdit</cstring>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QnIpLineEdit" name="endIPLineEdit">
+                     <property name="inputMethodHints">
+                      <set>Qt::ImhDigitsOnly</set>
+                     </property>
+                     <property name="text">
+                      <string>0.0.0.255</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -220,91 +242,46 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <spacer name="verticalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
               </layout>
              </item>
              <item>
-              <layout class="QFormLayout" name="credsLayout">
-               <property name="fieldGrowthPolicy">
-                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+              <layout class="QGridLayout" name="credsLayout">
+               <property name="spacing">
+                <number>8</number>
                </property>
-               <item row="0" column="0">
-                <widget class="QLabel" name="loginLabel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Login:</string>
-                 </property>
-                 <property name="buddy">
-                  <cstring>loginLineEdit</cstring>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="loginLineEdit">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="placeholderText">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="passwordLabel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Password:</string>
-                 </property>
-                 <property name="buddy">
-                  <cstring>passwordLineEdit</cstring>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="passwordLineEdit">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="placeholderText">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
                <item row="2" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <item>
                   <widget class="QStackedWidget" name="portStackedWidget">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="currentIndex">
                     <number>1</number>
                    </property>
                    <widget class="QWidget" name="pagePort">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <layout class="QVBoxLayout" name="verticalLayout_4">
                      <property name="spacing">
                       <number>0</number>
@@ -349,6 +326,12 @@
                     </layout>
                    </widget>
                    <widget class="QWidget" name="pageAuto">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <layout class="QVBoxLayout" name="verticalLayout_5">
                      <property name="spacing">
                       <number>0</number>
@@ -366,12 +349,12 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QLabel" name="label">
-                       <property name="frameShape">
-                        <enum>QFrame::NoFrame</enum>
-                       </property>
+                      <widget class="QLineEdit" name="lineEdit">
                        <property name="text">
                         <string>Auto</string>
+                       </property>
+                       <property name="readOnly">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -391,15 +374,107 @@
                  </item>
                 </layout>
                </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="passwordLineEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="placeholderText">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="portLabel">
                  <property name="text">
-                  <string>Discovery Port:</string>
+                  <string>Discovery Port</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                  <property name="buddy">
                   <cstring>portSpinBox</cstring>
                  </property>
                 </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="passwordLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Password</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="buddy">
+                  <cstring>passwordLineEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="loginLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Login</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="buddy">
+                  <cstring>loginLineEdit</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="loginLineEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="placeholderText">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <spacer name="verticalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </item>
@@ -414,14 +489,14 @@
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer">
+           <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>1</height>
+              <height>20</height>
              </size>
             </property>
            </spacer>
@@ -585,6 +660,19 @@
     </widget>
    </item>
    <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -656,12 +744,6 @@
          </property>
          <item>
           <widget class="QPushButton" name="addButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
            <property name="text">
             <string>Add selected</string>
            </property>

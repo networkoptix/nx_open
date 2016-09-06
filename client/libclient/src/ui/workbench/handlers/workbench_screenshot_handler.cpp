@@ -29,7 +29,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -381,7 +381,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     bool wasLoggedIn = !context()->user().isNull();
 
     QScopedPointer<QnCustomFileDialog> dialog(
-        new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (
+        new QnSessionAwareDialog<QnCustomFileDialog> (
         mainWindow(),
         tr("Save Screenshot As..."),
         suggestion,
@@ -524,7 +524,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
     if (!m_screenshotProgressDialog) {
-        m_screenshotProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
+        m_screenshotProgressDialog = new QnSessionAwareDialog<QnProgressDialog>(mainWindow());
         m_screenshotProgressDialog->setWindowTitle(tr("Saving Screenshot..."));
         m_screenshotProgressDialog->setInfiniteProgress();
         // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality

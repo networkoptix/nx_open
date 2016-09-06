@@ -75,6 +75,7 @@
 #include <ui/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 #include <ui/widgets/main_window_title_bar_widget.h>
 
@@ -142,6 +143,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_drawCustomFrame(false),
     m_inFullscreenTransition(false)
 {
+    QnHiDpiWorkarounds::init();
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
     // But with this line Mac OS shows white background in place of QGraphicsView when application enters or
@@ -669,7 +671,6 @@ void QnMainWindow::updateDwmState() {
         );
     }
 }
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

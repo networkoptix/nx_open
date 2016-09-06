@@ -79,12 +79,13 @@ public:
     /** Rectangle where all tooltips should fit - in local coordinates. */
     void setToolTipsEnclosingRect(const QRectF &rect);
 
-    QnBlinkingImageButtonWidget *blinker() const {
-        return m_blinker.data();
-    }
-    void setBlinker(QnBlinkingImageButtonWidget *blinker);
+    QnBlinkingImageButtonWidget* blinker() const;
+    void setBlinker(QnBlinkingImageButtonWidget* blinker);
 
     QnNotificationLevel::Value notificationLevel() const;
+
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+        QWidget* widget = nullptr) override;
 
 signals:
     void visibleSizeChanged();

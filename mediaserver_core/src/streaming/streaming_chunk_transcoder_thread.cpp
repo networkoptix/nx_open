@@ -17,7 +17,7 @@
 
 
 static const size_t RESERVED_TRANSCODED_PACKET_SIZE = 4096;
-static const qint64 EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS = 1000;
+static const qint64 EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS = 500;
 //static const size_t USEC_IN_MSEC = 1000;
 
 using namespace std;
@@ -160,6 +160,17 @@ void StreamingChunkTranscoderThread::run()
         QnAbstractDataPacketPtr srcPacket;
         if( !transcodeIter->second->dataSourceCtx->mediaDataProvider->tryRead( &srcPacket ) )
         {
+            //no data at source
+            transcodeIter->second->prevReadTryTimestamp = currentMonotonicTimestamp;
+            transcodeIter->second->dataAvailable = false;
+            continue;
+        }
+
+        if( !transcodeIter->second->chunk->wantMoreData() )
+        {
+            // Output stream does not want more data. Will try later...
+            // TODO #ak should use some event here and get rid of fixed delay before trying
+            transcodeIter->second->dataSourceCtx->mediaDataProvider->put(std::move(srcPacket));
             transcodeIter->second->prevReadTryTimestamp = currentMonotonicTimestamp;
             transcodeIter->second->dataAvailable = false;
             continue;

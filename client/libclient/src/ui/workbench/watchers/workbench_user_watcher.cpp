@@ -17,7 +17,7 @@
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     base_type(parent),
-    QnWorkbenchStateDelegate(parent),
+    QnSessionAwareDelegate(parent),
     m_userName(),
     m_userPassword(),
     m_userDigest(),

@@ -29,7 +29,7 @@ namespace {
     const qreal ignoreRadius = arrowWidth;
 
     const QSizeF headSize = QSizeF(20, 35); /* (Side, Front) */
-    
+
     const qreal headOverlap = 5;
 
     const qreal snapTo90IntervalSize = 5.0;
@@ -95,7 +95,7 @@ namespace {
 
 class RotationItem: public QGraphicsObject, protected QnGeometry {
 public:
-    RotationItem(QGraphicsItem *parent = NULL): 
+    RotationItem(QGraphicsItem *parent = NULL):
         QGraphicsObject(parent),
         m_viewport(NULL)
     {
@@ -162,10 +162,10 @@ public:
     }
 
     /**
-     * This item will be drawn only on the given viewport. 
+     * This item will be drawn only on the given viewport.
      * This item won't access the given viewport in any way, so it is
      * safe to delete the viewport without notifying the item.
-     * 
+     *
      * \param viewport                  Viewport to draw this item on.
      */
     void setViewport(QWidget *viewport) {
@@ -286,8 +286,8 @@ void RotationInstrument::start(QGraphicsView *view, QGraphicsWidget *target) {
         return;
 
     QMouseEvent event(
-        QEvent::MouseButtonPress, 
-        view->viewport()->mapFromGlobal(QCursor::pos()),
+        QEvent::MouseButtonPress,
+        view->mapFromGlobal(QCursor::pos()),
         QCursor::pos(),
         Qt::LeftButton,
         qApp->mouseButtons() | Qt::LeftButton,
@@ -327,7 +327,7 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     startInternal(view, event, target, false);
-    
+
     event->accept();
     return false;
 }
@@ -369,7 +369,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
         return;
     }
 
-    /* Make sure that rotation didn't change since the last call. 
+    /* Make sure that rotation didn't change since the last call.
      * We may get some nasty effects if we don't do this. */
     target()->setRotation(m_lastRotation);
 
@@ -426,7 +426,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
     /* Update rotation item. */
     rotationItem()->setHead(sceneHead);
     rotationItem()->setOrigin(m_sceneOrigin);
-    
+
     m_lastRotation = target()->rotation();
 }
 

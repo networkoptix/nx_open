@@ -5,8 +5,10 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-
 #include <utils/common/app_info.h>
+#include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -51,10 +53,34 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
         &QnCloudStatusWatcher::updateSystems);
 
     connect(this, &QnCloudStatusPanel::clicked, this,
-        [this]
+        [this, parent]
         {
             if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
+            {
                 action(QnActions::LoginToCloud)->trigger();
+                return;
+            }
+
+            const auto menu =
+                [this]() -> QMenu *
+            {
+                Q_D(QnCloudStatusPanel);
+                switch (qnCloudStatusWatcher->status())
+                {
+                    case QnCloudStatusWatcher::Online:
+                        return d->loggedInMenu;
+                    case QnCloudStatusWatcher::Offline:
+                        return d->offlineMenu;
+                    default:
+                        return nullptr;
+                }
+            }();
+
+            if (!menu)
+                return;
+
+            QnHiDpiWorkarounds::showMenu(menu,
+                QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
         });
 
     d->updateUi();
@@ -67,8 +93,8 @@ QnCloudStatusPanel::~QnCloudStatusPanel()
 QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent):
     QObject(parent),
     q_ptr(parent),
-    loggedInMenu(new QMenu(parent)),
-    offlineMenu(new QMenu(parent)),
+    loggedInMenu(new QMenu(parent->mainWindow())),
+    offlineMenu(new QMenu(parent->mainWindow())),
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu(nullptr),
 #endif
@@ -77,7 +103,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     offlineIcon(qnSkin->icon("titlebar/cloud_offline.png"))
 {
     Q_Q(QnCloudStatusPanel);
-    loggedInMenu->setWindowFlags(loggedInMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    loggedInMenu->setWindowFlags(loggedInMenu->windowFlags());
     loggedInMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
     loggedInMenu->addSeparator();
     loggedInMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
@@ -87,12 +113,14 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1").arg(QnAppInfo::cloudName()));
     offlineAction->setEnabled(false);
 
-    offlineMenu->setWindowFlags(loggedInMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    offlineMenu->setWindowFlags(offlineMenu->windowFlags());
     offlineMenu->addAction(offlineAction);
     offlineMenu->addSeparator();
     offlineMenu->addAction(q->action(QnActions::LogoutFromCloud));
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
+        &QnCloudStatusPanelPrivate::updateUi);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged, this,
         &QnCloudStatusPanelPrivate::updateUi);
 
 #ifdef DIRECT_CLOUD_CONNECT
@@ -113,25 +141,26 @@ void QnCloudStatusPanelPrivate::updateUi()
 
     QPalette palette(originalPalette);
 
+    QString effectiveUserName = qnCloudStatusWatcher->effectiveUserName();
+    if (effectiveUserName.isEmpty())
+        effectiveUserName = QnCloudStatusPanel::tr("Logging in...");
+
     switch (qnCloudStatusWatcher->status())
     {
         case QnCloudStatusWatcher::LoggedOut:
-            q->setText(QnCloudStatusPanel::tr("Login to cloud..."));
+            q->setText(QnCloudStatusPanel::tr("Login to %1...").arg(QnAppInfo::cloudName()));
             q->setIcon(QIcon());
-            q->setMenu(nullptr);
             font.setWeight(QFont::Normal);
             palette.setColor(QPalette::ButtonText, palette.color(QPalette::Light));
             break;
         case QnCloudStatusWatcher::Online:
-            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
-            q->setMenu(loggedInMenu);
             font.setWeight(QFont::Bold);
             break;
         case QnCloudStatusWatcher::Offline:
-            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setText(effectiveUserName);
             q->setIcon(offlineIcon);
-            q->setMenu(offlineMenu);
             font.setWeight(QFont::Bold);
             break;
         default:

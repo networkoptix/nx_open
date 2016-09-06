@@ -8,6 +8,19 @@ class QnLayoutsHandlerMessages
 {
     Q_DECLARE_TR_FUNCTIONS(QnLayoutsHandlerMessages)
 public:
+    static void layoutAlreadyExists(QWidget* parent);
+
+    /**
+    * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
+    * @param buttons               Message box buttons.
+    * @param defaultButton         Default button.
+    * @return                      Selected button.
+    */
+    static QDialogButtonBox::StandardButton askOverrideLayout(
+        QWidget* parent,
+        QDialogButtonBox::StandardButtons buttons,
+        QDialogButtonBox::StandardButton defaultButton);
+
     static bool changeUserLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);
     static bool addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare);
     static bool removeFromRoleLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);

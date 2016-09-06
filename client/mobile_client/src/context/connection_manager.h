@@ -1,13 +1,11 @@
 #pragma once
 
-#include <QtCore/QObject>
-
+#include <context/context_aware.h>
 #include <utils/common/software_version.h>
 
-#include "context_aware.h"
-
 class QnConnectionManagerPrivate;
-class QnConnectionManager : public QObject, public QnContextAware {
+class QnConnectionManager: public QObject, public QnContextAware
+{
     Q_OBJECT
 
     Q_PROPERTY(QString systemName READ systemName NOTIFY systemNameChanged)
@@ -20,23 +18,17 @@ class QnConnectionManager : public QObject, public QnContextAware {
     Q_PROPERTY(QString currentPassword READ currentPassword NOTIFY currentPasswordChanged)
     Q_PROPERTY(bool initialResourcesReceived READ initialResourcesReceived NOTIFY initialResourcesReceivedChanged)
 
-public:
-    enum ConnectionStatus {
-        Success,
-        InvalidServer,
-        InvalidVersion,
-        Unauthorized,
-        NetworkError
-    };
-    Q_ENUMS(ConnectionStatus)
+    Q_ENUM(Qn::ConnectionResult)
 
-    enum State {
+public:
+    enum State
+    {
         Disconnected,
         Connecting,
         Connected,
         Suspended
     };
-    Q_ENUMS(State)
+    Q_ENUM(State)
 
     enum ConnectionType
     {
@@ -67,7 +59,7 @@ public:
     QnSoftwareVersion connectionVersion() const;
 
 signals:
-    void connectionFailed(ConnectionStatus status, const QVariant &infoParameter);
+    void connectionFailed(Qn::ConnectionResult status, const QVariant &infoParameter);
     void systemNameChanged(const QString &systemName);
     void initialResourcesReceivedChanged();
     void connectionStateChanged();

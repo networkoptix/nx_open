@@ -277,7 +277,7 @@ void QnLicenseManagerWidget::updateLicenses()
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning)
 {
-    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox>> messageBox(new QnWorkbenchStateDependentDialog<QnMessageBox>(this));
+    QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
     messageBox->setIcon(warning ? QnMessageBox::Warning : QnMessageBox::Information);
     messageBox->setWindowTitle(title);
     messageBox->setText(message);

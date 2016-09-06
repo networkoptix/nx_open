@@ -56,7 +56,6 @@ PageBase
 
                 CredentialsEditor
                 {
-                    warningPanel: warningPanel
                     onLoggedIn: Workflow.openSessionsScreen()
                 }
             }

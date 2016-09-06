@@ -122,9 +122,6 @@ protected:
     void at_workbench_cellSpacingChanged();
     void at_workbench_currentLayoutChanged();
 
-    void at_mainMenuAction_triggered();
-    void at_openCurrentUserLayoutMenuAction_triggered();
-
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
@@ -197,7 +194,6 @@ protected:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
-    void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
@@ -245,9 +241,6 @@ private:
     void at_nonceReceived(QnAsyncHttpClientReply* client);
 
 private:
-    QPointer<QMenu> m_mainMenu;
-    QPointer<QMenu> m_currentUserLayoutsMenu;
-
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;

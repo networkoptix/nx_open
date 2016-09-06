@@ -10,7 +10,7 @@
 #include <cdb/connection.h>
 
 #include <common/common_module.h>
-#include <client/client_settings.h>
+#include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
 #include <utils/common/delayed.h>
@@ -125,8 +125,14 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
 
-    ui->loginInputField->setText(qnSettings->cloudLogin());
-    ui->passwordInputField->setText(qnSettings->cloudPassword());
+    /* Checking if we have logged in under temporary credentials. */
+    auto credentials = qnCloudStatusWatcher->credentials();
+    auto effectiveName = qnCloudStatusWatcher->effectiveUserName();
+    ui->loginInputField->setText(effectiveName);
+    if (credentials.user == effectiveName)
+        ui->passwordInputField->setText(credentials.password);
+    else
+        ui->passwordInputField->setText(QString());
 
     connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLinkToCloudDialogPrivate::updateUi);
     connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLinkToCloudDialogPrivate::updateUi);
@@ -165,7 +171,7 @@ QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog* pare
     linkedSuccessfully(false),
     indicatorButton(new QnBusyIndicatorButton(parent))
 {
-    const auto cdbEndpoint = qnSettings->cdbEndpoint();
+    const auto cdbEndpoint = qnClientCoreSettings->cdbEndpoint();
     if (!cdbEndpoint.isEmpty())
     {
         const auto hostAndPort = cdbEndpoint.split(lit(":"));

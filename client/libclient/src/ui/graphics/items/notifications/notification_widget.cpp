@@ -161,7 +161,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     base_type(parent, flags),
     m_defaultActionIdx(-1),
     m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
-    m_textLabel(new QnClickableProxyLabel(this)),
+    m_textLabel(new QnProxyLabel(this)),
     m_closeButton(new QnImageButtonWidget(this)),
     m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
     m_imageProvider(nullptr),
@@ -323,7 +323,7 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
 void QnNotificationWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     if (m_hoverProcessor->isHovered())
-        painter->fillRect(rect(), palette().shadow());
+        painter->fillRect(rect().adjusted(1, 1, 0, 0), palette().shadow());
 
     QRectF rect = this->rect().adjusted(0.5, 0.5, -0.5, 0.5);
     base_type::paint(painter, option, widget);
@@ -338,7 +338,6 @@ void QnNotificationWidget::paint(QPainter* painter, const QStyleOptionGraphicsIt
 
     painter->setPen(palette().color(QPalette::Dark));
 
-    painter->drawLine(rect.topLeft(), rect.topRight());
     painter->drawLine(rect.bottomLeft(), rect.bottomRight());
 
     //TODO: #GDM #Business draw corresponding image

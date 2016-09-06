@@ -176,7 +176,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     QUrl url = reply->url();
 
     NX_LOG(lit("QnDirectModuleFinder. Received %1 reply from %2")
-        .arg(!reply->isFailed()).arg(url.toString()), cl_logDEBUG1);
+        .arg(!reply->isFailed()).arg(url.toString()), cl_logDEBUG2);
 
     const auto replyIter = m_activeRequests.find(url);
     NX_ASSERT(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
@@ -203,14 +203,14 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     if (moduleInformation.id.isNull())
     {
         NX_LOG(lit("QnDirectModuleFinder. Received empty module id from %1. Ignoring reply...")
-            .arg(url.toString()), cl_logDEBUG1);
+            .arg(url.toString()), cl_logDEBUG2);
         return;
     }
 
     if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
     {
         NX_LOG(lit("QnDirectModuleFinder. Received reply with improper module type (%1) id from %2. Ignoring reply...")
-            .arg(moduleInformation.type).arg(url.toString()), cl_logDEBUG1);
+            .arg(moduleInformation.type).arg(url.toString()), cl_logDEBUG2);
         return;
     }
 
@@ -218,7 +218,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
     {
         NX_LOG(lit("QnDirectModuleFinder. Received reply from imcompatible server: url %1, customization %2. Ignoring reply...")
-            .arg(url.toString()).arg(moduleInformation.customization), cl_logDEBUG1);
+            .arg(url.toString()).arg(moduleInformation.customization), cl_logDEBUG2);
         return;
     }
 
@@ -226,7 +226,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
     NX_LOG(lit("QnDirectModuleFinder. Received success reply from url %1")
-        .arg(url.toString()), cl_logDEBUG1);
+        .arg(url.toString()), cl_logDEBUG2);
 
     emit responseReceived(moduleInformation, SocketAddress(url.host(), url.port()));
 }

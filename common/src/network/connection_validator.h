@@ -1,27 +1,10 @@
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <nx_ec/ec_api_fwd.h>
 
 struct QnConnectionInfo;
 struct QnModuleInformation;
 class QnSoftwareVersion;
-
-namespace Qn {
-
-enum class ConnectionResult
-{
-    success,                    /*< Connection available. */
-    networkError,               /*< Connection could not be established. */
-    unauthorized,               /*< Invalid login/password. */
-    temporaryUnauthorized,      /*< LDAP server is not accessible. */
-    incompatibleInternal,       /*< Server has incompatible customization or cloud host. */
-    incompatibleVersion,        /*< Server version is too low. */
-    compatibilityMode           /*< Client should be restarted in compatibility mode.*/
-};
-
-}
 
 /**
 * Helper class to diagnose connection possibility.
@@ -36,13 +19,9 @@ enum class ConnectionResult
 *   * Otherwise, compatibility mode is enabled.
 *   * Internal 'ServerError' is for all other cases.
 */
-class QnConnectionValidator: public QObject
+class QnConnectionValidator
 {
-    Q_OBJECT
-    using base_type = QObject;
 public:
-    QnConnectionValidator(QObject* parent = nullptr);
-
     static QnSoftwareVersion minSupportedVersion();
 
     static Qn::ConnectionResult validateConnection(const QnModuleInformation& info);
@@ -55,5 +34,4 @@ protected:
         int protoVersion,
         const QnSoftwareVersion& version,
         const QString& cloudHost);
-
 };

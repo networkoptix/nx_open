@@ -1,6 +1,8 @@
 #include "credentials.h"
 #include <nx/fusion/model_functions.h>
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCredentials, (eq)(json)(ubjson)(xml)(csv_record), QnCredentials_Fields)
+
 QAuthenticator QnCredentials::toAuthenticator() const
 {
     QAuthenticator auth;
@@ -10,5 +12,20 @@ QAuthenticator QnCredentials::toAuthenticator() const
     return auth;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnCredentials), (eq)(json)(ubjson)(xml)(csv_record), _Fields)
+bool QnCredentials::isNull() const
+{
+    return user.isNull() && password.isNull();
+}
+
+bool QnCredentials::isEmpty() const
+{
+    return user.isEmpty() && password.isEmpty();
+}
+
+bool QnCredentials::isValid(bool allowEmptyPassword) const
+{
+    if (user.isEmpty())
+        return false;
+
+    return allowEmptyPassword || !password.isEmpty();
+}

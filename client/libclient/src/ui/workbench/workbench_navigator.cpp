@@ -58,6 +58,7 @@ extern "C"
 #include <ui/widgets/day_time_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
@@ -1886,11 +1887,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
 
-    QScopedPointer<QMenu> menu(manager->newMenu(
-        Qn::SliderScope,
-        mainWindow(),
-        parameters
-    ));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::SliderScope, nullptr, parameters));
     if (menu->isEmpty())
         return;
 
@@ -1901,7 +1898,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     manager->redirectAction(menu.data(), QnActions::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : NULL);
 
     /* Run menu. */
-    QAction *action = menu->exec(screenPos);
+    QAction *action = QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 
     /* Process slider-local actions. */
     if (action == m_startSelectionAction)

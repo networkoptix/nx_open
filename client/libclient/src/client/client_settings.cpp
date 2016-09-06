@@ -107,8 +107,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
             return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
         return baseValue;
     }
-    case CLOUD_PASSWORD:
-        return nx::utils::xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), kEncodeXorKey);
+
 
     case SHOW_ONCE_MESSAGES:
     {
@@ -158,9 +157,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         break;
     }
-    case CLOUD_PASSWORD:
-        base_type::writeValueToSettings(settings, id, nx::utils::xorEncrypt(value.toString(), kEncodeXorKey));
-        break;
 
     case SHOW_ONCE_MESSAGES:
         base_type::writeValueToSettings(settings, id, static_cast<int>(value.value<Qn::ShowOnceMessages>()));
