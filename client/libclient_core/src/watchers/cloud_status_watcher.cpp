@@ -402,7 +402,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     cloudConnection->setCredentials(credentials.user.toStdString(),
         credentials.password.toStdString());
 
-    /* Very simple e-mail check. */
+    /* Very simple email check. */
     if (credentials.user.contains(L'@'))
         q->setEffectiveUserName(credentials.user);
     else

@@ -63,7 +63,7 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
 {
     ui->setupUi(this);
 
-    ui->emailInputField->setTitle(tr("E-Mail"));
+    ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     ui->serverInputField->setTitle(tr("SMTP Server"));

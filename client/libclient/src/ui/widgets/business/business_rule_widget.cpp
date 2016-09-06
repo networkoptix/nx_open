@@ -163,7 +163,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
         switch (m_model->actionType())
         {
             case QnBusiness::SendMailAction:
-                //: "to" is from the sentence "Send e-mail _to_:"
+                //: "to" is from the sentence "Send email _to_:"
                 actionAtLabelText = tr("to");
                 break;
             case QnBusiness::ShowOnAlarmLayoutAction:
