@@ -107,6 +107,9 @@ public:
     TimerId addTimer(
         MoveOnlyFunc<void(TimerId)> taskHandler,
         std::chrono::milliseconds delay);
+    TimerGuard addTimerEx(
+        MoveOnlyFunc<void(TimerId)> taskHandler,
+        std::chrono::milliseconds delay);
     //!This timer will trigger every \a delay until deleted
     /*!
         \note first event will trigger after \a firstShotDelay period

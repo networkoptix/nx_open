@@ -152,6 +152,14 @@ TimerId TimerManager::addTimer(
     return timerId;
 }
 
+TimerManager::TimerGuard TimerManager::addTimerEx(
+    MoveOnlyFunc<void(TimerId)> taskHandler,
+    std::chrono::milliseconds delay)
+{
+    auto timerId = addTimer(std::move(taskHandler), delay);
+    return TimerGuard(this, timerId);
+}
+
 TimerId TimerManager::addNonStopTimer(
     MoveOnlyFunc<void(TimerId)> func,
     std::chrono::milliseconds repeatPeriod,
