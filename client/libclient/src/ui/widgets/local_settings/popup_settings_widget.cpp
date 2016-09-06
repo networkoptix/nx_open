@@ -130,6 +130,10 @@ void QnPopupSettingsWidget::applyChanges()
     if (context()->user())
     {
         m_adaptor->setWatchedEvents(watchedEvents());
+        m_adaptor->saveToResource();
+        propertyDictionary->saveParamsAsync(context()->user()->getId());
+    }
+
     qnSettings->setPopupSystemHealth(watchedSystemHealth());
 }
 
