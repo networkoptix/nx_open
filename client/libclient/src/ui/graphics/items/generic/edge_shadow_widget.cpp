@@ -34,31 +34,28 @@ QnEdgeShadowWidget::QnEdgeShadowWidget(QGraphicsWidget* shadowCaster,
 
 void QnEdgeShadowWidget::at_shadowCasterGeometryChanged()
 {
-    auto delta = [this]()
-    {
-        return m_inner ? 0.0 : m_thickness;
-    };
-
+    auto delta = m_inner ? 0.0 : m_thickness;
     auto shadowCasterRect = m_shadowCaster->rect();
+
     switch (m_edge)
     {
         case Qt::LeftEdge:
-            setGeometry({ shadowCasterRect.topLeft() - QPointF(delta(), 0.0),
+            setGeometry({ shadowCasterRect.topLeft() - QPointF(delta, 0.0),
                 QSizeF(m_thickness, shadowCasterRect.height()) });
             break;
 
         case Qt::RightEdge:
-            setGeometry({ shadowCasterRect.topRight() - QPointF(m_thickness - delta(), 0.0),
+            setGeometry({ shadowCasterRect.topRight() - QPointF(m_thickness - delta, 0.0),
                 QSizeF(m_thickness, shadowCasterRect.height()) });
             break;
 
         case Qt::TopEdge:
-            setGeometry({ shadowCasterRect.topLeft() - QPointF(0.0, delta()),
+            setGeometry({ shadowCasterRect.topLeft() - QPointF(0.0, delta),
                 QSizeF(shadowCasterRect.width(), m_thickness) });
             break;
 
         case Qt::BottomEdge:
-            setGeometry({ shadowCasterRect.bottomLeft() - QPointF(0.0, m_thickness - delta()),
+            setGeometry({ shadowCasterRect.bottomLeft() - QPointF(0.0, m_thickness - delta),
                 QSizeF(shadowCasterRect.width(), m_thickness) });
             break;
     }
