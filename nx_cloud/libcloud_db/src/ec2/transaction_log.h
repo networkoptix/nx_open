@@ -116,7 +116,7 @@ public:
         const int tranSequence = generateNewTransactionSequence(connection, systemId);
 
         // Generating transaction.
-        ::ec2::QnTransaction<TransactionDataType> transaction;
+        ::ec2::QnTransaction<TransactionDataType> transaction(m_peerId);
         // Filling transaction header.
         transaction.command = static_cast<::ec2::ApiCommand::Value>(TransactionCommandValue);
         transaction.peerID = m_peerId;

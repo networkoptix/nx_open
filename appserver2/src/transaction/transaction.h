@@ -1312,8 +1312,36 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
     class QnAbstractTransaction
     {
     public:
-        QnAbstractTransaction(): command(ApiCommand::NotDefined), transactionType(TransactionType::Regular) { peerID = qnCommon->moduleGUID(); }
-        QnAbstractTransaction(ApiCommand::Value value): command(value), transactionType(TransactionType::Regular) { peerID = qnCommon->moduleGUID(); }
+        /**
+         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
+         */
+        QnAbstractTransaction():
+            command(ApiCommand::NotDefined),
+            peerID(qnCommon->moduleGUID()),
+            transactionType(TransactionType::Regular)
+        {
+        }
+        /**
+         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
+         */
+        QnAbstractTransaction(ApiCommand::Value value):
+            command(value),
+            peerID(qnCommon->moduleGUID()),
+            transactionType(TransactionType::Regular)
+        {
+        }
+        QnAbstractTransaction(QnUuid _peerID):
+            command(ApiCommand::NotDefined),
+            peerID(std::move(_peerID)),
+            transactionType(TransactionType::Regular)
+        {
+        }
+        QnAbstractTransaction(ApiCommand::Value value, QnUuid _peerID):
+            command(value),
+            peerID(std::move(_peerID)),
+            transactionType(TransactionType::Regular)
+        {
+        }
 
         struct PersistentInfo
         {
@@ -1358,8 +1386,31 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
     {
     public:
         QnTransaction(): QnAbstractTransaction() {}
-        QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
-        QnTransaction(ApiCommand::Value command, const T& params = T()): QnAbstractTransaction(command), params(params) {}
+        QnTransaction(QnUuid _peerID):
+            QnAbstractTransaction(std::move(_peerID))
+        {
+        }
+        QnTransaction(const QnAbstractTransaction& abstractTran):
+            QnAbstractTransaction(abstractTran)
+        {
+        }
+        QnTransaction(
+            ApiCommand::Value command,
+            const T& params = T())
+            :
+            QnAbstractTransaction(command),
+            params(params)
+        {
+        }
+        QnTransaction(
+            ApiCommand::Value command,
+            QnUuid _peerID,
+            const T& params = T())
+            :
+            QnAbstractTransaction(command, std::move(_peerID)),
+            params(params)
+        {
+        }
 
         template<typename U>
         QnTransaction(const QnTransaction<U>&)

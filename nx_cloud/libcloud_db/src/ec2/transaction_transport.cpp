@@ -110,7 +110,7 @@ void TransactionTransport::startOutgoingChannel()
 
     //sending tranSyncRequest
     ::ec2::QnTransaction<::ec2::ApiSyncRequestData>
-        requestTran(::ec2::ApiCommand::tranSyncRequest);
+        requestTran(::ec2::ApiCommand::tranSyncRequest, localPeer().id);
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
 
     TransactionTransportHeader transportHeader;
@@ -134,7 +134,7 @@ void TransactionTransport::processSpecialTransaction(
 
     //sending sync response
     ::ec2::QnTransaction<::ec2::QnTranStateResponse>
-        tranSyncResponse(::ec2::ApiCommand::tranSyncResponse);
+        tranSyncResponse(::ec2::ApiCommand::tranSyncResponse, localPeer().id);
     tranSyncResponse.params.result = 0;
 
     TransactionTransportHeader transportHeader;
@@ -329,7 +329,7 @@ void TransactionTransport::enableOutputChannel()
         m_haveToSendSyncDone = false;
 
         ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData>
-            tranSyncDone(::ec2::ApiCommand::tranSyncDone);
+            tranSyncDone(::ec2::ApiCommand::tranSyncDone, localPeer().id);
         tranSyncDone.params.result = 0;
 
         TransactionTransportHeader transportHeader;
