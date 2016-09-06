@@ -105,10 +105,6 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler);
-    void setSystemUserList(
-        const AuthorizationInfo& authzInfo,
-        data::SystemSharingList sharings,
-        std::function<void(api::ResultCode)> completionHandler);
     //!Provides list of cloud accounts who have access to this system
     void getCloudUsersOfSystem(
         const AuthorizationInfo& authzInfo,
@@ -274,18 +270,6 @@ private:
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
-        std::function<void(api::ResultCode)> completionHandler);
-
-    nx::db::DBResult updateUserListInDB(
-        QSqlDatabase* const connection,
-        const std::string& systemId,
-        const data::SystemSharingList& sharingList);
-    void userListUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
-        nx::db::DBResult dbResult,
-        const std::string& systemId,
-        data::SystemSharingList sharingList,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult updateSystemNameInDB(

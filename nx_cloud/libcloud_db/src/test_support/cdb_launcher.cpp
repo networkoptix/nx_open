@@ -676,24 +676,6 @@ api::ResultCode CdbLauncher::ping(
     return resCode;
 }
 
-api::ResultCode CdbLauncher::setSystemUserList(
-    const std::string& systemID,
-    const std::string& authKey,
-    api::SystemSharingList sharings)
-{
-    auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(systemID, authKey);
-
-    api::ResultCode resCode = api::ResultCode::ok;
-    std::tie(resCode) = makeSyncCall<nx::cdb::api::ResultCode>(
-        std::bind(
-            &nx::cdb::api::SystemManager::setSystemUserList,
-            connection->systemManager(),
-            std::move(sharings),
-            std::placeholders::_1));
-    return resCode;
-}
-
 const api::SystemSharingEx& CdbLauncher::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
