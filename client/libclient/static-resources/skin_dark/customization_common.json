@@ -563,6 +563,14 @@
         }
     },
 
+    "QnEdgeShadowWidget": {
+        "palette": {
+            "default": {
+                "window": "#ff0000"
+            }
+        }
+    },
+
     "QnFisheyeCalibrationImageWidget": {
         "lineColor": "ptz"
     },
