@@ -213,6 +213,7 @@
         <resource name = "AXISQ6128" public = "AXISP1365"/>      
         <resource name = "AXISP5515" public = "AXISM1124"/>          
         <resource name = "AXISQ8632" public = "AXISM1124"/>    
-        <resource name = "AXISQ8631" public = "AXISM1124"/>            
+        <resource name = "AXISQ8631" public = "AXISM1124"/>        
+        <resource name = "AXISP12/M20" public = "AXISP1224"/>
     </oem>
 </resources>

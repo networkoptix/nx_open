@@ -15,6 +15,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/log/log.h>
 
 namespace {
     const qint64 requestIntervalMs = 30 * 1000;
@@ -71,14 +72,24 @@ void QnCachingCameraDataLoader::initLoaders() {
 
         m_loaders[i].reset(loader);
 
-        if (loader) {           
-            connect(loader, &QnAbstractCameraDataLoader::ready,         this,  [this, dataType](const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle){ 
-                Q_UNUSED(handle);
-                NX_ASSERT(updatedPeriod.isInfinite(), Q_FUNC_INFO, "We are always loading till very end.");
-                at_loader_ready(data, updatedPeriod.startTimeMs, dataType);
-            });
+        if (loader) {
+            connect(loader, &QnAbstractCameraDataLoader::ready, this,
+                [this, dataType](const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle)
+                {
+                    Q_UNUSED(handle);
+                	NX_ASSERT(updatedPeriod.isInfinite(), Q_FUNC_INFO, "We are always loading till very end.");
+                    at_loader_ready(data, updatedPeriod.startTimeMs, dataType);
+                });
 
-            connect(loader, &QnAbstractCameraDataLoader::failed,        this,  &QnCachingCameraDataLoader::loadingFailed);
+            connect(loader, &QnAbstractCameraDataLoader::failed, this,
+                [this, dataType]()
+                {
+                    if (dataType == Qn::RecordingContent)
+                    {
+                        NX_LOG("Chunks: failed to load" , cl_logDEBUG1);
+                    }
+                    emit loadingFailed();
+                });
         }
     }
 }
@@ -142,7 +153,7 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
         return;
-    } 
+    }
 
     switch (periodType) {
     case Qn::RecordingContent:
@@ -168,21 +179,27 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
 // -------------------------------------------------------------------------- //
 void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &data, qint64 startTimeMs, Qn::TimePeriodContent dataType) {
     auto timePeriodType = (dataType);
-    m_cameraChunks[timePeriodType] = data 
+    m_cameraChunks[timePeriodType] = data
         ? data->dataSource()
         : QnTimePeriodList();
+    if (dataType == Qn::RecordingContent)
+    {
+        NX_LOG(lit("Chunks: received chunks update. Size: %1").arg(m_cameraChunks[timePeriodType].size()) , cl_logDEBUG1);
+    }
     emit periodsChanged(timePeriodType, startTimeMs);
 
 }
 
-void QnCachingCameraDataLoader::discardCachedData() {
+void QnCachingCameraDataLoader::discardCachedData()
+{
+    NX_LOG("Chunks: clear local cache" , cl_logDEBUG1);
     for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
 
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
 
         if (m_loaders[i])
             m_loaders[i]->discardCachedData();
-        
+
         m_cameraChunks[timePeriodType].clear();
         if (m_enabled) {
             updateTimePeriods(timePeriodType, true);
@@ -196,7 +213,19 @@ void QnCachingCameraDataLoader::discardCachedData() {
 
 void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodType, bool forced) {
     //TODO: #GDM #2.4 make sure we are not sending requests while loader is disabled
-    if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs)) {
+    if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs))
+    {
+        if (periodType == Qn::RecordingContent)
+        {
+            if (forced)
+            {
+                NX_LOG("Chunks: forcibly updating chunks" , cl_logDEBUG1);
+            }
+            else
+            {
+                NX_LOG("Chunks: updating chunks by timer" , cl_logDEBUG1);
+            }
+        }
         loadInternal(periodType);
         m_previousRequestTime[periodType].restart();
     }

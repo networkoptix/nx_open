@@ -2,6 +2,7 @@
 #define __STORAGE_MANAGER_H__
 
 #include <random>
+#include <functional>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QString>
@@ -129,6 +130,17 @@ public:
     );
 
     QnStorageResourceList getStorages() const;
+
+    /*
+     * Return writable storages with checkBox 'usedForWriting'
+     */
+    QSet<QnStorageResourcePtr> getUsedWritableStorages() const;
+
+    /*
+     * Return all storages which can be used for writing
+     */
+    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
@@ -197,7 +209,9 @@ private:
 
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
-    QSet<QnStorageResourcePtr> getWritableStorages() const;
+	QSet<QnStorageResourcePtr> getWritableStorages(
+        std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
+		
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 

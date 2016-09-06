@@ -285,7 +285,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 
     qint64 relTime = qMax(time-m_startTime, 0ll);
     if (m_hasVideo)
-        avformat_seek_file(m_formatContext, -1, 0, relTime + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+        av_seek_frame(m_formatContext, -1, relTime + m_startMksec, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
     else {
         // mp3 seek is bugged in current ffmpeg version
         if (!reopen())
