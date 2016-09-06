@@ -26,7 +26,7 @@ public:
     QnTimeLapseRecorder(const QnResourcePtr& resource, qint64 timeStepUsec):
         QnStreamRecorder(resource),
         m_currentRelativeTimeUsec(0),
-        m_currentAbsoluteTimeUsec(AV_NOPTS_VALUE),
+        m_currentAbsoluteTimeUsec(std::numeric_limits<qint64>::min()),
         m_timeStepUsec(timeStepUsec)
     {
 
@@ -45,7 +45,7 @@ protected:
         // we can use non const object if only 1 consumer
         Q_ASSERT(nonConstMd->dataProvider->processorsCount() <= 1);
 
-        if (m_currentAbsoluteTimeUsec == AV_NOPTS_VALUE)
+        if (m_currentAbsoluteTimeUsec < md->timestamp)
             m_currentAbsoluteTimeUsec = md->timestamp;
         else
             m_currentAbsoluteTimeUsec += m_timeStepUsec;
