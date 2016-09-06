@@ -894,7 +894,7 @@
         },            
         {
             "keys": [
-                "VISTA|VK2-HD30IR-PM","VISTA|VK2-1080XIRPTZF",  "VISTA|NFX-22053H3", "HITRON|NFX-22053H3"
+                "VISTA|VK2-HD30IR-PM", "VISTA|VK2-1080XIRPTZF", "VISTA|NFX-22053H3", "HITRON|NFX-22053H3"
             ],
             "ptzMapper": {
                 "fromCamera": {
