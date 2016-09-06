@@ -52,7 +52,7 @@ void processHttpResponse(
     OutputData outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
     if (!success)
     {
-        handler(SystemError::noError, response, OutputData());
+        handler(SystemError::invalidData, response, OutputData());
         return;
     }
 
