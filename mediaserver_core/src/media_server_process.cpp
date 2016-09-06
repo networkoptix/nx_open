@@ -75,6 +75,7 @@
 #include <motion/motion_helper.h>
 
 #include <network/authenticate_helper.h>
+#include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
@@ -2072,7 +2073,7 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    if (QnConnectionValidator::validateConnection(connectInfo) != ConnectionResult::Success)
+    if (QnConnectionValidator::validateConnection(connectInfo, ec2::ErrorCode::ok) != Qn::ConnectionResult::Success)
     {
         NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
         return;
