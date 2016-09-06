@@ -174,7 +174,7 @@ int runApplication(QGuiApplication *application, const QnUuid& videowallInstance
     runtimeData.peer.peerType = qnSettings->isLiteClientModeEnabled()
         ? Qn::PT_LiteClient : Qn::PT_MobileClient;
     runtimeData.peer.dataFormat = Qn::JsonFormat;
-    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.brand = QnAppInfo::customizationName();
     if (!videowallInstanceGuid.isNull())
         runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
