@@ -52,3 +52,5 @@ private:
     QnStorageConfigWidget* m_storagesPage;
     QPushButton* m_webPageButton;
 };
+
+Q_DECLARE_METATYPE(QnServerSettingsDialog::DialogPage)
