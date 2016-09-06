@@ -6,6 +6,8 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <rest/ec2_update_http_handler.h>
+#include <core/resource_management/user_access_data.h>
+#include <api/model/audit/auth_session.h>
 #include <nx_ec/data/api_data.h>
 
 #include "mock_stream_socket.h"
@@ -150,9 +152,11 @@ public:
     }
 
     MockConnection* queryProcessor() { return this; }
-    MockConnection& getAccess(...) { return *this; }
+    MockConnection& getAccess(const Qn::UserAccessData& /*accessRights*/) { return *this; }
     MockConnection* auditManager() { return this; }
-    void setAuditData(...) {}
+    void setAuditData(const MockConnection* /*auditManager*/, const QnAuthSession& /*authSession*/)
+    {
+    }
 
 private:
     const QueryCallback m_queryCallback;

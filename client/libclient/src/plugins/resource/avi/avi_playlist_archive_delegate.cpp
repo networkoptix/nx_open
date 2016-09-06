@@ -162,7 +162,7 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec, bool /*findIFrame*/)
         avformat_flush(m_formatContext);
     } else
     {
-        avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+        av_seek_frame(m_formatContext, -1, relativeMksec, AVSEEK_FLAG_BACKWARD);
     }
 
     m_inSeek = false;
