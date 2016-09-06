@@ -75,6 +75,10 @@ TEST_F(SystemSharing, getCloudUsers)
             account1.email,
             account1Password,
             std::move(system1ToAccount2SharingData)));
+    // vmsUserId will be filled by cloud_db
+    system1ToAccount2SharingData.vmsUserId = 
+        guidFromArbitraryData(system1ToAccount2SharingData.accountEmail)
+            .toSimpleString().toStdString();
 
     //sharing system2 with account2 as cloudAdmin
     ASSERT_EQ(

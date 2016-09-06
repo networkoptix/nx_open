@@ -325,10 +325,12 @@ void SystemManager::shareSystem(
     using namespace std::placeholders;
 
     Qn::GlobalPermissions permissions = Qn::NoPermissions;
-    bool isAdmin = false;
-    ec2::accessRoleToPermissions(sharing.accessRole, &permissions, &isAdmin);
-    sharing.customPermissions = QnLexical::serialized(permissions).toStdString();
-    sharing.isEnabled = true;
+    if (sharing.customPermissions.empty())
+    {
+        bool isAdmin = false;
+        ec2::accessRoleToPermissions(sharing.accessRole, &permissions, &isAdmin);
+        sharing.customPermissions = QnLexical::serialized(permissions).toStdString();
+    }
     sharing.vmsUserId = guidFromArbitraryData(
         sharing.accountEmail).toSimpleString().toStdString();
 
@@ -567,7 +569,7 @@ void SystemManager::updateSystemName(
         };
 
     m_transactionLog->startDbTransaction(
-        systemNameDataOnHeap->id.c_str(),
+        systemNameDataOnHeapPtr->id.c_str(),
         std::move(dbUpdateFunc),
         std::move(onDbUpdateCompletedFunc));
 }

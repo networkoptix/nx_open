@@ -118,7 +118,7 @@ private:
     }
 };
 
-TEST_F(Ec2MserverCloudSynchronization, establishConnection)
+TEST_F(Ec2MserverCloudSynchronization, DISABLED_establishConnection)
 {
     constexpr static const auto kWaitTimeout = std::chrono::seconds(5);
 
