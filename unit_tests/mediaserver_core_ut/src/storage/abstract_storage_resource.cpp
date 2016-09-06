@@ -315,7 +315,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         {
             const qint64 seekPos = seekDistribution(gen);
             ASSERT_TRUE(ioDevice->seek(seekPos));
-            ASSERT_TRUE(ioDevice->write(newData, newDataSize) == newDataSize);
+            ASSERT_EQ(newDataSize, ioDevice->write(newData, newDataSize));
             std::copy(newData, newData + newDataSize, data.begin() + seekPos);
         }
 
@@ -567,7 +567,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     const int kWriteCount = 1000 * 10;
 	const int kWrittenBlock = 10 * 1024;
 	const size_t kRecordersCount = 10;
-    const double kMaxUsageDelta = 50;
+    //const double kMaxUsageDelta = 50;
 
 	struct StorageUseStats
 	{

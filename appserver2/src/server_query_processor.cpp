@@ -59,7 +59,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
+    const AbstractECConnectionPtr& /*connection*/,
     std::list<std::function<void()>>* const transactionsToSend)
 {
     QnTransaction<ApiIdData> removeObjAccessRightsTran(ApiCommand::removeAccessRights, ApiIdData(id));
@@ -72,7 +72,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
+    const AbstractECConnectionPtr& /*connection*/,
     std::list<std::function<void()>>* const transactionsToSend,
     TransactionType::Value transactionType)
 {
