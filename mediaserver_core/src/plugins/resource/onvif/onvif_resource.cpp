@@ -2752,10 +2752,13 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
-#ifdef _DEBUG
+
     if (!result)
-        qWarning() << "Error while parsing xml" << paramsTemplateFileName;
-#endif
+    {
+        NX_LOG(lit("Error while parsing xml (onvif) %1").arg(paramsTemplateFileName), cl_logWARNING);
+    }
+    
+
     return result;
 }
 

@@ -1268,10 +1268,12 @@ bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPara
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
-#ifdef _DEBUG
+
     if (!result)
-        qWarning() << "Error while parsing xml" << templateFilename;
-#endif
+    {
+        NX_LOG(lit("Error while parsing xml (acti) %1").arg(templateFilename), cl_logWARNING);
+    }
+
     return result;
 }
 
