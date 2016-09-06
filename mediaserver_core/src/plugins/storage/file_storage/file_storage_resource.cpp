@@ -435,21 +435,25 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
         NULL // additional connection info buffer
     );
 
-#define PROCESS_ERROR(x, result) \
-    case (x): \
-        NX_LOG(lit("%1 Mounting remote drive %2. Result: %3") \
-               .arg(Q_FUNC_INFO) \
-               .arg(getUrl()) \
-               .arg(#x), cl_logDEBUG1); \
-        return result 
+    auto logAndExit = [this] (const char* message, Qn::StorageInitResult result)
+    {
+        NX_LOG(lit("%1 Mounting remote drive %2. Result: %3") 
+               .arg(Q_FUNC_INFO) 
+               .arg(getUrl()) 
+               .arg(message), cl_logDEBUG1); 
+        return result;
+    };
+
+#define STR(x) #x
 
     switch (errCode)
     {
-        PROCESS_ERROR(NO_ERROR, Qn::StorageInit_Ok);
-        PROCESS_ERROR(ERROR_SESSION_CREDENTIAL_CONFLICT, Qn::StorageInit_Ok);
-        PROCESS_ERROR(ERROR_ALREADY_ASSIGNED, Qn::StorageInit_Ok);
-        PROCESS_ERROR(ERROR_ACCESS_DENIED, Qn::StorageInit_WrongAuth);
-        PROCESS_ERROR(ERROR_WRONG_PASSWORD, Qn::StorageInit_WrongAuth);
+        case NO_ERROR: return logAndExit(STR(NO_ERROR), Qn::StorageInit_Ok);
+        case ERROR_SESSION_CREDENTIAL_CONFLICT: return logAndExit(STR(ERROR_SESSION_CREDENTIAL_CONFLICT), Qn::StorageInit_Ok);
+        case ERROR_ALREADY_ASSIGNED: return logAndExit(STR(ERROR_ALREADY_ASSIGNED), Qn::StorageInit_Ok);
+        case ERROR_ACCESS_DENIED: return logAndExit(STR(ERROR_ACCESS_DENIED), Qn::StorageInit_WrongAuth);
+        case ERROR_WRONG_PASSWORD: return logAndExit(STR(ERROR_WRONG_PASSWORD), Qn::StorageInit_WrongAuth);
+        case ERROR_INVALID_PASSWORD: return logAndExit(STR(ERROR_INVALID_PASSWORD), Qn::StorageInit_WrongAuth);
 
         default:
             NX_LOG(lit("%1 Mounting remote drive %2 error %3.")
@@ -459,44 +463,9 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissionsHelper(
             return Qn::StorageInit_WrongPath;
     };
 
-#undef PROCESS_ERROR
+#undef STR 
 
     return Qn::StorageInit_WrongPath;
-}
-
-namespace {
-
-NETRESOURCE prepareNetRes(const QUrl& url)
-{
-    NETRESOURCE netRes;
-    memset(&netRes, 0, sizeof(netRes));
-    netRes.dwType = RESOURCETYPE_DISK;
-
-    QString path = lit("\\\\") + url.host() +
-                   lit("\\") + url.path().mid((1));
-
-    netRes.lpRemoteName = (LPWSTR) path.constData();
-    return netRes;
-}
-
-void prepareUserNamesToTest(const QUrl& url, std::array<QString, 4>* userNames, LPWSTR* password)
-{
-    DWORD bufSize = 1024;
-    TCHAR sysUserNameBuf[1024];
-    bool getSysNameResult = GetUserName(sysUserNameBuf, &bufSize); 
-    QString sysUserName = getSysNameResult 
-        ? QString::fromWCharArray(sysUserNameBuf, bufSize)
-        : QString();
-    QString initialUserName = url.userName().isEmpty() ? "guest" : url.userName();
-
-    *password = (LPWSTR) url.password().constData();
-    *userNames = {
-        initialUserName,
-        lit("WORKGROUP\\") + initialUserName,
-        sysUserName,
-        sysUserName.isNull() ? sysUserName : lit("WORKGROUP\\") + sysUserName,
-    };
-}
 }
 
 Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& url) const
@@ -507,13 +476,21 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
     NX_LOG(lit("%1 Mounting remote drive %2").arg(Q_FUNC_INFO).arg(getUrl()), cl_logDEBUG2);
 
     QUrl storageUrl(url);
-    NETRESOURCE netRes = prepareNetRes(storageUrl);
+    NETRESOURCE netRes;
+    memset(&netRes, 0, sizeof(netRes));
+    netRes.dwType = RESOURCETYPE_DISK;
+    QString path = lit("\\\\") + storageUrl.host() + lit("\\") + storageUrl.path().mid((1));
+    netRes.lpRemoteName = (LPWSTR) path.constData();
 
-    std::array<QString, 4> userNamesToTest;
-    LPWSTR password = nullptr;
-    prepareUserNamesToTest(storageUrl, &userNamesToTest, &password);
+    QString initialUserName = storageUrl.userName().isEmpty() ? "guest" : storageUrl.userName();
+    std::array<QString, 2> userNamesToTest = {
+        initialUserName,
+        lit("WORKGROUP\\") + initialUserName,
+    };
 
+    LPWSTR password = (LPWSTR) storageUrl.password().constData();
     bool wrongAuth = false;
+
     for (const auto& userName : userNamesToTest)
     {
         auto result = updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes);
