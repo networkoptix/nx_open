@@ -172,7 +172,7 @@ void ConnectionManager::createTransactionConnection(
 
 void ConnectionManager::pushTransaction(
     nx_http::HttpServerConnection* const /*connection*/,
-    stree::ResourceContainer authInfo,
+    stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
     nx_http::HttpRequestProcessedHandler completionHandler)
@@ -277,7 +277,7 @@ api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
     for (const auto& connectionContext: m_connections)
     {
         api::VmsConnectionData connectionData;
-        connectionData.systemId = connectionContext.systemIdAndPeerId.first;
+        connectionData.systemId = connectionContext.systemIdAndPeerId.first.toStdString();
         connectionData.mediaserverEndpoint =
             connectionContext.connection->remoteSocketAddr().toString().toStdString();
         result.connections.push_back(std::move(connectionData));

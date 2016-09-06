@@ -150,6 +150,8 @@ void TransactionTransport::processSpecialTransaction(
         m_tranStateToSynchronizeTo,
         kMaxTransactionsPerIteration,
         std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
+
+    handler(api::ResultCode::ok);
 }
 
 void TransactionTransport::processSpecialTransaction(

@@ -134,8 +134,8 @@ public:
 
 protected:
     virtual void onResourceStatusChanged(
-        const QnResourcePtr& resource,
-        Qn::ResourceStatus status) override
+        const QnResourcePtr& /*resource*/,
+        Qn::ResourceStatus /*status*/) override
     {
     }
 

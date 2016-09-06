@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef BOOST_BIND_NO_PLACEHOLDERS
 #define BOOST_BIND_NO_PLACEHOLDERS
+#endif // BOOST_BIND_NO_PLACEHOLDERS
 #include <cassert>
 #include <limits>
 

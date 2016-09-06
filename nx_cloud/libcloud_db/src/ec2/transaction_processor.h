@@ -132,6 +132,8 @@ class SpecialCommandProcessor
 :
     public BaseTransactionProcessor<TransactionCommandValue, TransactionDataType>
 {
+    typedef BaseTransactionProcessor<TransactionCommandValue, TransactionDataType> BaseType;
+
 public:
     typedef nx::utils::MoveOnlyFunc<void(
         const nx::String& /*systemId*/,
@@ -150,7 +152,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        Ec2Transaction transaction,
+        typename BaseType::Ec2Transaction transaction,
         TransactionProcessedHandler handler) override
     {
         const auto systemId = transportHeader.systemId;

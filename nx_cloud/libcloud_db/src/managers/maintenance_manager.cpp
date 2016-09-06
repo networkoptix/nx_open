@@ -19,7 +19,7 @@ MaintenanceManager::~MaintenanceManager()
 }
 
 void MaintenanceManager::getVmsConnections(
-    const AuthorizationInfo& authzInfo,
+    const AuthorizationInfo& /*authzInfo*/,
     std::function<void(
         api::ResultCode,
         api::VmsConnectionDataList)> completionHandler)

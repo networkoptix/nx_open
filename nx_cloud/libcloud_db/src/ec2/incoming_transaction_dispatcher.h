@@ -49,7 +49,7 @@ public:
     {
         m_transactionProcessors.emplace(
             (::ec2::ApiCommand::Value)TransactionCommandValue,
-            std::make_unique<typename TransactionProcessor<
+            std::make_unique<TransactionProcessor<
                 TransactionCommandValue, TransactionDataType, AuxiliaryArgType>>(
                     m_transactionLog,
                     std::move(processTranFunc),
@@ -67,8 +67,9 @@ public:
     {
         m_transactionProcessors.emplace(
             (::ec2::ApiCommand::Value)TransactionCommandValue,
-            std::make_unique<typename SpecialCommandProcessor<
-                TransactionCommandValue, TransactionDataType>>(std::move(processTranFunc)));
+            std::make_unique<SpecialCommandProcessor<
+                TransactionCommandValue, TransactionDataType>>(
+                    std::move(processTranFunc)));
     }
 
 private:

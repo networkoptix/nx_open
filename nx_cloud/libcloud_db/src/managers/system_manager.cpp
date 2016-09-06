@@ -324,7 +324,7 @@ void SystemManager::shareSystem(
 {
     using namespace std::placeholders;
 
-    Qn::GlobalPermissions permissions = Qn::NoPermissions;
+    Qn::GlobalPermissions permissions(Qn::NoPermissions);
     if (sharing.customPermissions.empty())
     {
         bool isAdmin = false;
@@ -699,7 +699,7 @@ void SystemManager::systemAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
-    data::SystemRegistrationDataWithAccount systemRegistrationData,
+    data::SystemRegistrationDataWithAccount /*systemRegistrationData*/,
     InsertNewSystemToDbResult resultData,
     std::function<void(api::ResultCode, data::SystemData)> completionHandler)
 {
@@ -1035,7 +1035,7 @@ nx::db::DBResult SystemManager::updateUserListInDB(
 }
 
 void SystemManager::userListUpdated(
-    QnCounter::ScopedIncrement asyncCallLocker,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     QSqlDatabase* /*dbConnection*/,
     nx::db::DBResult dbResult,
     const std::string& systemId,
@@ -1224,6 +1224,8 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
         case api::SystemAccessRole::liveViewer:
         case api::SystemAccessRole::viewer:
         case api::SystemAccessRole::advancedViewer:
+        case api::SystemAccessRole::disabled:
+        case api::SystemAccessRole::custom:
             break;
     }
 
@@ -1461,7 +1463,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
         .arg(systemId).str(data.id),
         cl_logDEBUG2);
 
-    systemSharingData->systemID = systemId;
+    systemSharingData->systemID = systemId.toStdString();
     systemSharingData->vmsUserId = data.id.toSimpleString().toStdString();
 
     QSqlQuery removeSharingQuery(*dbConnection);

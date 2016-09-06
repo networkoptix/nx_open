@@ -1,5 +1,7 @@
 #include "connect_to_cloud_watcher.h"
 
+#include <nx/utils/std/cpp14.h>
+
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <transaction/transaction_message_bus.h>

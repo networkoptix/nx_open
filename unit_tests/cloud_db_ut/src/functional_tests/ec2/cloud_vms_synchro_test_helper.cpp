@@ -195,7 +195,7 @@ void Ec2MserverCloudSynchronization2::testSynchronizingUserFromCloudToMediaServe
     for (;;)
     {
         const auto newUser = newUsersQueue.pop(std::chrono::seconds(10));
-        ASSERT_TRUE(newUser);
+        ASSERT_TRUE(static_cast<bool>(newUser));
         if (newUser->email.toStdString() == account2.email)
             break;
     }
@@ -443,7 +443,7 @@ void Ec2MserverCloudSynchronization2::verifyThatUsersMatchInCloudAndVms(
             &sharings));
 
     // Checking that number of cloud users in vms match that in cloud.
-    const auto numberOfCloudUsersInVms = std::count_if(
+    const std::size_t numberOfCloudUsersInVms = std::count_if(
         vmsUsers.cbegin(), vmsUsers.cend(),
         [](const ec2::ApiUserData& data) { return data.isCloud; });
     if (assertOnFailure)

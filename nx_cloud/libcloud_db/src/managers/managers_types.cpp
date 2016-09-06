@@ -45,6 +45,9 @@ api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
         case nx::db::DBResult::ioError:
         case nx::db::DBResult::statementError:
             return api::ResultCode::dbError;
+
+        case nx::db::DBResult::retryLater:
+            return api::ResultCode::retryLater;
     }
 
     return api::ResultCode::dbError;

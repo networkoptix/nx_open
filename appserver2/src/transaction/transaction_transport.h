@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "transaction_descriptor.h"
 #include "transaction_transport_base.h"
 
 

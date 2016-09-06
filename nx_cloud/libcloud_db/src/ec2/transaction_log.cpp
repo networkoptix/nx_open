@@ -161,7 +161,7 @@ nx::db::DBResult TransactionLog::fetchTransactions(
     const nx::String& systemId,
     const ::ec2::QnTranState& from,
     const ::ec2::QnTranState& to,
-    int maxTransactionsToReturn,
+    int /*maxTransactionsToReturn*/,
     TransactionReadResult* const outputData)
 {
     // TODO: Taking into account maxTransactionsToReturn
@@ -403,7 +403,7 @@ nx::db::DBResult TransactionLog::saveToDb(
 }
 
 int TransactionLog::generateNewTransactionSequence(
-    QSqlDatabase* connection,
+    QSqlDatabase* /*connection*/,
     const nx::String& systemId)
 {
     QnMutexLocker lk(&m_mutex);
@@ -415,8 +415,8 @@ int TransactionLog::generateNewTransactionSequence(
 }
 
 qint64 TransactionLog::generateNewTransactionTimestamp(
-    QSqlDatabase* connection,
-    const nx::String& systemId)
+    QSqlDatabase* /*connection*/,
+    const nx::String& /*systemId*/)
 {
     // TODO: #ak copy function from ::ec2::QnTransactionLog
     using namespace std::chrono;

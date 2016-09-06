@@ -57,7 +57,8 @@ public:
     void processUpdateAsync(
         ApiCommand::Value cmdCode, InputData input, HandlerType handler)
     {
-        processUpdateAsync(QnTransaction<InputData>(cmdCode, input), handler);
+        QnTransaction<InputData> tran(cmdCode, std::move(input));
+        processUpdateAsync(tran, std::move(handler));
     }
 
     /**

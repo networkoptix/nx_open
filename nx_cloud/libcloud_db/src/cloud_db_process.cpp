@@ -674,7 +674,7 @@ void CloudDBProcess::registerHttpHandler(
     typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
     ManagerType* manager)
 {
-    typedef typename CustomHttpHandler<ManagerType> RequestHandlerType;
+    typedef CustomHttpHandler<ManagerType> RequestHandlerType;
 
     m_httpMessageDispatcher->registerRequestProcessor<RequestHandlerType>(
         handlerPath,

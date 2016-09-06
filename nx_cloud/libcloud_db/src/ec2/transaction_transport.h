@@ -94,7 +94,7 @@ public:
             {
                 auto serializedTransaction = QnUbjson::serialized(transaction);
                 transactionSerializer = 
-                    std::make_unique<typename TransactionWithUbjsonPresentation<T>>(
+                    std::make_unique<TransactionWithUbjsonPresentation<T>>(
                         std::move(transaction),
                         std::move(serializedTransaction));
                 break;

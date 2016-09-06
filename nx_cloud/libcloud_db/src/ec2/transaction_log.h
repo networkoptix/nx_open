@@ -74,7 +74,7 @@ public:
         QSqlDatabase* connection,
         const nx::String& systemId,
         ::ec2::QnTransaction<TransactionDataType> transaction,
-        TransactionTransportHeader transportHeader)
+        TransactionTransportHeader /*transportHeader*/)
     {
         const auto transactionHash = calculateTransactionHash(transaction);
 
@@ -149,7 +149,7 @@ public:
             return result;
 
         auto transactionSerializer = std::make_shared<
-            typename TransactionWithUbjsonPresentation<TransactionDataType>>(
+            TransactionWithUbjsonPresentation<TransactionDataType>>(
                 std::move(transaction),
                 std::move(serializedTransaction));
 
@@ -160,7 +160,7 @@ public:
         dbTranContext.systemId = systemId;
         dbTranContext.transactions.push_back(std::move(transactionSerializer));
 
-        return db::DBResult::ok;
+        return nx::db::DBResult::ok;
     }
 
     ::ec2::QnTranState getTransactionState(const nx::String& systemId) const;
