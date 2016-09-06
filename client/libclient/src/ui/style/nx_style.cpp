@@ -1032,7 +1032,8 @@ void QnNxStyle::drawComplexControl(
                 QRectF handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
                 const bool horizontal = slider->orientation == Qt::Horizontal;
-                const bool hovered = slider->state.testFlag(State_MouseOver);
+                const bool enabled = slider->state.testFlag(State_Enabled);
+                const bool hovered = enabled && slider->state.testFlag(State_MouseOver);
 
                 QnPaletteColor mainDark = findColor(slider->palette.color(QPalette::Window));
                 QnPaletteColor mainLight = findColor(slider->palette.color(QPalette::WindowText));
@@ -1045,11 +1046,18 @@ void QnNxStyle::drawComplexControl(
                     QRectF grooveDrawRect = grooveRect.adjusted(0.5, 0.5, -0.5, -0.5); /* to include border, antialiased */
                     qreal radius = ((horizontal ? grooveDrawRect.height() : grooveDrawRect.width())) * 0.5;
 
-                    painter->setPen(mainDark.darker(1));
-                    painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
+                    QnPaletteColor main = mainDark;
+                    if (!enabled)
+                        main.setAlphaF(Hints::kDisabledItemOpacity);
+
+                    painter->setPen(main.darker(1));
+                    painter->setBrush(QBrush(main.lighter(hovered ? 6 : 5)));
                     painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
-                    SliderFeatures features = static_cast<SliderFeatures>(option->styleObject ? option->styleObject->property(Properties::kSliderFeatures).toInt() : 0);
+                    SliderFeatures features = static_cast<SliderFeatures>(option->styleObject
+                        ? option->styleObject->property(Properties::kSliderFeatures).toInt()
+                        : 0);
+
                     if (features.testFlag(SliderFeature::FillingUp))
                     {
                         QRectF fillDrawRect = grooveRect.adjusted(1, 1, -1, -1);
@@ -1155,7 +1163,7 @@ void QnNxStyle::drawComplexControl(
                     QColor borderColor = mainLight;
                     QColor fillColor = mainDark;
 
-                    if (option->activeSubControls.testFlag(SC_SliderHandle))
+                    if (enabled && option->activeSubControls.testFlag(SC_SliderHandle))
                         borderColor = mainLight.lighter(4);
                     else if (hovered)
                         borderColor = mainLight.lighter(2);
