@@ -450,6 +450,9 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
+    if (!data.groupId.isNull() && !m_userGroups.contains(data.groupId))
+        return false;
+
     return canCreateUser(user, data.permissions, data.isAdmin);
 }
 
@@ -940,6 +943,9 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiUserData& update) const
 {
+    if (!update.groupId.isNull() && !m_userGroups.contains(update.groupId))
+        return false;
+
     auto userResource = target.dynamicCast<QnUserResource>();
     NX_ASSERT(userResource);
 

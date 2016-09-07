@@ -43,6 +43,13 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
 {
     SystemUri uri(url);
 
+    if (uri.referral().source == SystemUri::ReferralSource::MobileClient)
+    {
+        // Ignore our own URL requests.
+        QDesktopServices::openUrl(url);
+        return;
+    }
+
     if (!uri.isValid())
         return;
 
@@ -77,8 +84,8 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
             if (m_uiController)
             {
                 m_uiController->disconnectFromSystem();
-                qnCloudStatusWatcher->setCloudCredentials(
-                    uri.authenticator().user, uri.authenticator().password);
+                qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+                    uri.authenticator().user, uri.authenticator().password));
             }
             break;
     }

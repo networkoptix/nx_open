@@ -122,7 +122,6 @@
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
-#include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
@@ -185,8 +184,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
 
-    connect(action(QnActions::MainMenuAction), SIGNAL(triggered()), this, SLOT(at_mainMenuAction_triggered()));
-    connect(action(QnActions::OpenCurrentUserLayoutMenu), SIGNAL(triggered()), this, SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
     connect(action(QnActions::ShowcaseAction), SIGNAL(triggered()), this, SLOT(at_showcaseAction_triggered()));
     connect(action(QnActions::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
@@ -287,20 +284,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     at_scheduleWatcher_scheduleEnabledChanged();
 }
 
-QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
-    disconnect(context(), NULL, this, NULL);
-    disconnect(workbench(), NULL, this, NULL);
-
-    foreach(QAction *action, menu()->actions())
-        disconnect(action, NULL, this, NULL);
-
-    /* Clean up. */
-    if (m_mainMenu)
-        delete m_mainMenu.data();
-
-    if (m_currentUserLayoutsMenu)
-        delete m_currentUserLayoutsMenu.data();
-
+QnWorkbenchActionHandler::~QnWorkbenchActionHandler()
+{
     deleteDialogs();
 }
 
@@ -599,25 +584,6 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(QnActions::RadassAutoAction)->setChecked(true);
     if (qnRedAssController)
         qnRedAssController->setMode(Qn::AutoResolution);
-}
-
-void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
-    m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
-
-    action(QnActions::MainMenuAction)->setMenu(m_mainMenu.data());
-}
-
-void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-        return;
-
-    m_currentUserLayoutsMenu = menu()->newMenu(QnActions::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
-
-    action(QnActions::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
-}
-
-void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
-    action(QnActions::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
@@ -1505,7 +1471,7 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
 
     QScopedPointer<QnMediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnWorkbenchStateDependentDialog<QnMediaFileSettingsDialog>(mainWindow()));
+        dialog.reset(new QnSessionAwareDialog<QnMediaFileSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
 
@@ -2153,8 +2119,8 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
 
     QString message = messageParts.join(lit("<br/>"));
 
-    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
-        new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
+    QScopedPointer<QnSessionAwareMessageBox> messageBox(
+        new QnSessionAwareMessageBox(mainWindow()));
     messageBox->setIcon(QnMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);

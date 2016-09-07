@@ -65,7 +65,16 @@ namespace QJsonDetail {
         bool operator()(T &target, const Access &access, const QnFusion::member_setter_tag &) {
             using namespace QnFusion;
 
-            return QJson::deserialize(m_ctx, m_object, access(name), &(target.*access(setter)), access(optional, true));
+            bool found = false;
+            if (!QJson::deserialize(
+                m_ctx, m_object, access(name), &(target.*access(setter)), access(optional, true),
+                &found))
+            {
+                return false;
+            }
+            if (!found)
+                m_ctx->setSomeFieldsNotFound(true);
+            return true;
         }
 
         template<class T, class Access, class Member>
@@ -78,6 +87,8 @@ namespace QJsonDetail {
                 return false;
             if(found)
                 invoke(access(setter), target, std::move(member));
+            else
+                m_ctx->setSomeFieldsNotFound(true);
             return true;
         }
 

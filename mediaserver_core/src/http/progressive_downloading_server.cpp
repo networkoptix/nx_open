@@ -304,10 +304,10 @@ private:
     QByteArray toHttpChunk( const char* data, size_t size )
     {
         QByteArray chunk;
-        chunk.reserve( size + 12 );
-        chunk.append(QByteArray::number((int)size,16));
+        chunk.reserve((int) size + 12);
+        chunk.append(QByteArray::number((int) size, 16));
         chunk.append("\r\n");
-        chunk.append(data, size);
+        chunk.append(data, (int) size);
         chunk.append("\r\n");
         return chunk;
     }
@@ -492,7 +492,7 @@ void QnProgressiveDownloadingConsumer::run()
         //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
         const QString& requestedResourcePath = QnFile::fileName(getDecodedUrl().path());
         const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
-        const QString& resUniqueID = requestedResourcePath.mid(0, nameFormatSepPos);
+        const QString& resId = requestedResourcePath.mid(0, nameFormatSepPos);
         d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLatin1();
         QByteArray mimeType = getMimeType(d->streamingFormat);
         if (mimeType.isEmpty())
@@ -535,10 +535,19 @@ void QnProgressiveDownloadingConsumer::run()
             codecParams[it->first] = it->second;
         }
 
-        QnResourcePtr resource = qnResPool->getResourceByUniqueId(resUniqueID);
-        if (resource == 0)
+        QnResourcePtr resource;
+        const QnUuid uuid = QnUuid::fromStringSafe(resId);
+        if (!uuid.isNull())
+            resource = qnResPool->getResourceById(uuid);
+        if (!resource)
+            resource = qnResPool->getResourceByUniqueId(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByMacAddress(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByUrl(resId);
+        if (!resource)
         {
-            d->response.messageBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLatin1()) + QByteArray(" not found ");
+            d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
             sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }

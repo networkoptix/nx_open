@@ -11,6 +11,7 @@
 
 #include <client/client_settings.h>
 
+#include <ui/common/aligner.h>
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -18,15 +19,22 @@
 #include <ui/workbench/workbench_context.h>
 
 namespace {
-    enum Column {
-        CheckBoxColumn,
-        ManufColumn,
-        NameColumn,
-        UrlColumn
-    };
 
-    const int portAuto = 0;
-}
+enum Column
+{
+    CheckBoxColumn,
+    ManufColumn,
+    NameColumn,
+    UrlColumn
+};
+
+const int kAutoPort = 0;
+
+const QString kServerNameFormat = QString::fromLatin1(
+    "<span style='font-weight: 400; font-size: 24px; color: %3'>%1 </span>"
+    "<span style='font-weight: 250; font-size: 18px; color: %4'>%2 </span>");
+
+} // namespace
 
 QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     base_type(parent),
@@ -86,7 +94,11 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     ui->progressWidget->setVisible(false);
 
-    resize(width(), 1); // set widget height to minimal possible
+    auto aligner = new QnAligner(this);
+    aligner->addWidgets({
+        ui->singleCameraLabel,
+        ui->startIPLabel,
+        ui->endIPLabel });
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){
@@ -169,7 +181,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         clearTable();
         break;
     case Searching:
-        ui->progressBar->setFormat(tr("Initializing scan..."));
+        ui->progressBar->setFormat(lit("%1\t").arg(tr("Initializing scan...")));
         ui->progressBar->setMaximum(1);
         ui->progressBar->setValue(0);
         ui->stageStackedWidget->setCurrentWidget(ui->discoveredCamerasPage);
@@ -284,28 +296,33 @@ void QnCameraAdditionDialog::removeAddedCameras() {
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 }
 
-void QnCameraAdditionDialog::updateSubnetMode() {
+void QnCameraAdditionDialog::updateSubnetMode()
+{
     ui->addressStackedWidget->setCurrentWidget(m_subnetMode
                                                ? ui->pageSubnet
                                                : ui->pageSingleCamera);
-
-    if (m_subnetMode) {
-        ui->startIPLineEdit->setText(ui->singleCameraLineEdit->text());
-        QHostAddress startAddr(ui->startIPLineEdit->text());
-        if (startAddr.toIPv4Address()) {
-            ui->startIPLineEdit->setText(startAddr.toString());
-
-            quint32 addr = startAddr.toIPv4Address();
-            addr = addr >> 8;
-            addr = (addr << 8) + 255;
-            QString endAddrStr = QHostAddress(addr).toString();
-            ui->endIPLineEdit->setText(endAddrStr);
-            ui->endIPLineEdit->setFocus();
-            ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
-        } else {
-            ui->startIPLineEdit->setFocus();
+    if (m_subnetMode)
+    {
+        ui->startIPLineEdit->setFocus();
+        if (!ui->singleCameraLineEdit->text().isEmpty())
+        {
+            ui->startIPLineEdit->setText(ui->singleCameraLineEdit->text());
+            QHostAddress startAddr(ui->startIPLineEdit->text());
+            if (startAddr.toIPv4Address())
+            {
+                ui->startIPLineEdit->setText(startAddr.toString());
+                quint32 addr = startAddr.toIPv4Address();
+                addr = addr >> 8;
+                addr = (addr << 8) + 255;
+                QString endAddrStr = QHostAddress(addr).toString();
+                ui->endIPLineEdit->setText(endAddrStr);
+                ui->endIPLineEdit->setFocus();
+                ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
+            }
         }
-    } else {
+    }
+    else
+    {
         ui->singleCameraLineEdit->setText(ui->startIPLineEdit->text());
         ui->singleCameraLineEdit->setFocus();
     }
@@ -463,7 +480,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
     int port = ui->portAutoCheckBox->isChecked()
-            ? portAuto
+            ? kAutoPort
             : ui->portSpinBox->value();
 
     QString startAddrStr;
@@ -513,7 +530,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
         return; //TODO: #GDM #CameraAddition do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
-    ui->progressBar->setFormat(tr("Finishing searching..."));
+    ui->progressBar->setFormat(lit("%1\t").arg(tr("Finishing searching...")));
     ui->progressBar->setMaximum(1);
     ui->progressBar->setValue(0);
     m_processUuid = QnUuid();
@@ -671,21 +688,21 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
     switch (result.status.state) {
     case QnManualResourceSearchStatus::Init:
         if (m_state == Searching)
-            ui->progressBar->setFormat(tr("Initializing scan..."));
+            ui->progressBar->setFormat(lit("%1\t").arg(tr("Initializing scan...")));
         break;
     case QnManualResourceSearchStatus::CheckingOnline:
         if (m_state == Searching)
-            ui->progressBar->setFormat(tr("Scanning online hosts..."));
+            ui->progressBar->setFormat(lit("%1\t").arg(tr("Scanning online hosts...")));
         break;
     case QnManualResourceSearchStatus::CheckingHost:
         if (m_state == Searching) {
             const QString found = tr("%n devices found", "", result.cameras.size());
             if (m_subnetMode)
                 //: Scanning hosts... (5 devices found)
-                ui->progressBar->setFormat(tr("Scanning hosts... (%1)").arg(found));
+                ui->progressBar->setFormat(lit("%1\t(%2)").arg(tr("Scanning hosts...")).arg(found));
             else
                 //: Scanning host... (0 devices found)
-                ui->progressBar->setFormat(tr("Scanning host... (%1)").arg(found));
+                ui->progressBar->setFormat(lit("%1\t(%2)").arg(tr("Scanning host...")).arg(found));
         }
         break;
     case QnManualResourceSearchStatus::Finished:
@@ -733,12 +750,17 @@ bool QnCameraAdditionDialog::tryClose(bool force) {
     return true;
 }
 
-void QnCameraAdditionDialog::updateTitle() {
+void QnCameraAdditionDialog::updateTitle()
+{
     if (m_server)
     {
-        QString name = QnResourceDisplayInfo(m_server).toString(qnSettings->extraInfoInTree());
-        setWindowTitle(tr("Add devices to %1").arg(name));
-        ui->serverNameLabel->setText(name);
+        QnResourceDisplayInfo info(m_server);
+        setWindowTitle(tr("Add devices to %1").arg(info.name()));
+        ui->serverNameLabel->setText(kServerNameFormat.
+            arg(info.name()).
+            arg(info.extraInfo()).
+            arg(palette().color(QPalette::Text).name()).
+            arg(palette().color(QPalette::WindowText).name()));
     }
     else
     {

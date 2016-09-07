@@ -46,6 +46,9 @@ public:
     QLineEdit::EchoMode echoMode() const;
     void setEchoMode(QLineEdit::EchoMode value);
 
+    QString inputMask() const;
+    void setInputMask(const QString& inputMask);
+
     const QnPasswordStrengthIndicator* passwordIndicator() const;
     bool passwordIndicatorEnabled() const;
     void setPasswordIndicatorEnabled(bool enabled, bool hideForEmptyInput = true, bool showImmediately = false);

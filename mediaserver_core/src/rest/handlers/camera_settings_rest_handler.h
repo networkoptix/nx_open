@@ -49,7 +49,9 @@ public:
 	QnCameraSettingsRestHandler();
 	virtual ~QnCameraSettingsRestHandler();
 
-    /** Implementation of QnJsonRestHandler::executeGet(). */
+    /**
+     * Implementation of QnJsonRestHandler::executeGet().
+     */
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor* /*owner*/) override;
@@ -60,7 +62,7 @@ private:
         GetParam,
         GetParamsBatch,
         SetParam,
-        SetParamsBatch
+        SetParamsBatch,
     };
 
     void connectToResource(const QnResourcePtr& resource, Operation operation);

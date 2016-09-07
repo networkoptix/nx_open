@@ -121,18 +121,16 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
     QnLayoutResourceList existing = alreadyExistingLayouts(newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
-        QnMessageBox::warning(
-            mainWindow(),
-            tr("Layout already exists."),
-            tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
-        );
+        QnLayoutsHandlerMessages::layoutAlreadyExists(mainWindow());
         return;
     }
 
     if (!existing.isEmpty())
     {
-        if (askOverrideLayout(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
-            return;
+        if (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
+            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
+                return;
         removeLayouts(existing);
     }
 
@@ -255,7 +253,9 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                     return;
                 }
 
-                switch (askOverrideLayout(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, QDialogButtonBox::Yes))
+                switch (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
+                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                    QDialogButtonBox::Yes))
                 {
                     case QDialogButtonBox::Cancel:
                         return;
@@ -272,11 +272,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
-                QnMessageBox::warning(
-                    mainWindow(),
-                    tr("Layout already exists."),
-                    tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
-                );
+                QnLayoutsHandlerMessages::layoutAlreadyExists(mainWindow());
                 dialog->setName(proposedName);
                 continue;
             }
@@ -284,7 +280,9 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             button = QDialogButtonBox::Yes;
             if (!existing.isEmpty())
             {
-                button = askOverrideLayout(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, QDialogButtonBox::Yes);
+                button = QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
+                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                    QDialogButtonBox::Yes);
                 if (button == QDialogButtonBox::Cancel)
                     return;
                 if (button == QDialogButtonBox::Yes)
@@ -299,18 +297,16 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
-            QnMessageBox::warning(
-                mainWindow(),
-                tr("Layout already exists."),
-                tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
-            );
+            QnLayoutsHandlerMessages::layoutAlreadyExists(mainWindow());
             return;
         }
 
         if (!existing.isEmpty())
         {
-            if (askOverrideLayout(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
-                return;
+            if (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
+                    return;
             removeLayouts(existing);
         }
     }
@@ -374,15 +370,14 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
         const auto question = tr("Are you sure you want to remove these %n items from layout?",
             "", items.size());
 
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::RemoveItems_Help,
-            tr("Remove Items"),
-            tr("Confirm items removing"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No,
-            mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Yes);
+        QnSessionAwareMessageBox messageBox(mainWindow());
+        setHelpTopic(&messageBox, Qn::RemoveItems_Help);
+        messageBox.setIcon(QnMessageBox::Icon::Warning);
+        messageBox.setWindowTitle(tr("Remove Items"));
+        messageBox.setText(tr("Confirm items removing"));
         messageBox.setInformativeText(question);
+        messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+        messageBox.setDefaultButton(QDialogButtonBox::Yes);
         messageBox.addCustomWidget(new QnResourceListView(QnActionParameterTypes::resources(items)));
         auto result = messageBox.exec();
         if (result != QDialogButtonBox::Yes)
@@ -672,18 +667,6 @@ void QnWorkbenchLayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr
     qnResourcesChangesManager->saveAccessibleResources(user, accessible);
 }
 
-QDialogButtonBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QDialogButtonBox::StandardButtons buttons,
-    QDialogButtonBox::StandardButton defaultButton)
-{
-    return QnMessageBox::warning(
-        mainWindow(),
-        tr("Layout already exists."),
-        tr("A layout with the same name already exists. Would you like to overwrite it?"),
-        buttons,
-        defaultButton
-    );
-}
-
 bool QnWorkbenchLayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &layouts)
 {
     for (const QnLayoutResourcePtr &layout : layouts)
@@ -880,11 +863,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
 
         if (!canRemoveLayouts(existing))
         {
-            QnMessageBox::warning(
-                mainWindow(),
-                tr("Layout already exists."),
-                tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
-            );
+            QnLayoutsHandlerMessages::layoutAlreadyExists(mainWindow());
             return;
         }
 
@@ -899,7 +878,9 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
                 break;
             }
 
-            button = askOverrideLayout(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, QDialogButtonBox::Yes);
+            button = QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
+                QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                QDialogButtonBox::Yes);
             if (button == QDialogButtonBox::Cancel)
                 return;
             if (button == QDialogButtonBox::Yes)
@@ -1111,13 +1092,11 @@ void QnWorkbenchLayoutsHandler::at_layout_saved(bool success, const QnLayoutReso
 
     const auto question = tr("Could not save the following layout to Server. Do you want to restore it?");
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Error"),
-        tr("Cannot save layout"),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        mainWindow());
+    QnSessionAwareMessageBox messageBox(mainWindow());
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Error"));
+    messageBox.setText(tr("Cannot save layout"));
+    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
     messageBox.setDefaultButton(QDialogButtonBox::Yes);
     messageBox.setInformativeText(question);
     messageBox.addCustomWidget(new QnResourceListView(QnResourceList() << layout));

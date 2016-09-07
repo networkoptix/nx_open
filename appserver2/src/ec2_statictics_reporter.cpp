@@ -75,7 +75,7 @@ namespace ec2
             if (cam.typeId != m_desktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
 
-        if ((res = dbManager(Qn::kSystemAccess).doQuery(nullptr, outData->clients)) != ErrorCode::ok)
+        if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->clients)) != ErrorCode::ok)
             return res;
 
         dbManager_queryOrReturn(ApiLicenseDataList, licenses);

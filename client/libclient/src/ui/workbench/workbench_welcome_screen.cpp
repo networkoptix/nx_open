@@ -102,7 +102,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_pageSize(m_widget->size())
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged,
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
@@ -157,7 +157,7 @@ void QnWorkbenchWelcomeScreen::setVisible(bool isVisible)
 
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
 {
-    return qnCloudStatusWatcher->cloudLogin();
+    return qnCloudStatusWatcher->effectiveUserName();
 }
 
 bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
@@ -258,14 +258,18 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     bool storePassword,
     bool autoLogin)
 {
-    connectToLocalSystemImpl(systemId, QUrl::fromUserInput(serverUrl), userName, password, storePassword, autoLogin);
+    connectToSystemInternal(
+        systemId,
+        QUrl::fromUserInput(serverUrl),
+        QnCredentials(userName, password),
+        storePassword,
+        autoLogin);
 }
 
-void QnWorkbenchWelcomeScreen::connectToLocalSystemImpl(
+void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QString& systemId,
     const QUrl& serverUrl,
-    const QString& userName,
-    const QString& password,
+    const QnCredentials& credentials,
     bool storePassword,
     bool autoLogin,
     const QnRaiiGuardPtr& completionTracker)
@@ -276,7 +280,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystemImpl(
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, serverUrl, userName, password, storePassword, autoLogin, systemId, completionTracker]()
+        [this, serverUrl, credentials, storePassword, autoLogin, systemId, completionTracker]()
         {
             setConnectingToSystem(systemId);
 
@@ -284,10 +288,10 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystemImpl(
                 [this]() { setConnectingToSystem(QString()); });
 
             QUrl url = serverUrl;
-            if (!password.isEmpty())
-                url.setPassword(password);
-            if (!userName.isEmpty())
-                url.setUserName(userName);
+            if (!credentials.password.isEmpty())
+                url.setPassword(credentials.password);
+            if (!credentials.user.isEmpty())
+                url.setUserName(credentials.user);
 
             QnActionParameters params;
             params.setArgument(Qn::UrlRole, url);
@@ -310,8 +314,8 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
     if (!isLoggedInToCloud())
         return;
 
-    connectToLocalSystem(systemId, serverUrl, qnCloudStatusWatcher->cloudLogin(),
-        qnCloudStatusWatcher->cloudPassword(), false, false);
+    connectToSystemInternal(systemId, QUrl::fromUserInput(serverUrl),
+        qnCloudStatusWatcher->credentials(), false, false);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
@@ -332,31 +336,28 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
             dialog->setUrl(QUrl::fromUserInput(serverUrl));
             if (isLoggedInToCloud())
-            {
-                dialog->setCloudLogin(qnCloudStatusWatcher->cloudLogin());
-                dialog->setCloudPassword(qnCloudStatusWatcher->cloudPassword());
-            }
+                dialog->setCloudCredentials(qnCloudStatusWatcher->credentials());
 
             if (dialog->exec() != QDialog::Accepted)
                 return;
 
-            if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
+            if (dialog->localCredentials().isValid())
             {
-                connectToLocalSystemImpl(QString(), serverUrl, dialog->localLogin(),
-                    dialog->localPassword(), false, false, controlsGuard);
+                connectToSystemInternal(QString(), serverUrl, dialog->localCredentials(),
+                    false, false, controlsGuard);
             }
-            else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
+            else if (dialog->cloudCredentials().isValid())
             {
-                qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
-                connectToLocalSystemImpl(QString(), serverUrl, dialog->cloudLogin(),
-                    dialog->cloudPassword(), false, false, controlsGuard);
+                qnCloudStatusWatcher->setCloudCredentials(dialog->cloudCredentials(), true);
+                connectToSystemInternal(QString(), serverUrl, dialog->cloudCredentials(),
+                    false, false, controlsGuard);
             }
 
         };
 
     // Use delayed handling for proper animation
-    enum { kNextEventDelay = 100 };
-    executeDelayedParented(showDialogHandler, kNextEventDelay, this);
+    static const int kNextEventDelayMs = 100;
+    executeDelayedParented(showDialogHandler, kNextEventDelayMs, this);
 }
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()

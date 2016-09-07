@@ -210,8 +210,10 @@ struct CloudServerSocketTcpTester
     {
         initTunnelPool(queueLen);
         moveToListeningState();
+
+        utils::promise<void> promise;
         m_mediatorRegistrationRetryTimer.dispatch(
-            [this]()
+            [this, &promise]()
             {
                 for (size_t i = 0; i < 2; ++i)
                 {
@@ -227,8 +229,11 @@ struct CloudServerSocketTcpTester
                     startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
                         m_addressManager, getAioThread(), false));
                 }
+
+                promise.set_value();
             });
 
+        promise.get_future().wait();
         return true;
     }
 

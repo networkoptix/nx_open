@@ -15,6 +15,8 @@ PageBase
 
     signal leftButtonClicked()
 
+    clip: true
+
     header: Item
     {
         width: parent.width

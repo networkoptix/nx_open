@@ -138,6 +138,9 @@ void QnTransactionTcpProcessor::run()
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
         nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
     d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_CLOUD_HOST_HEADER_NAME,
+        QnAppInfo::defaultCloudHost().toUtf8()));
+    d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_SYSTEM_NAME_HEADER_NAME,
         QnCommonModule::instance()->localSystemName().toUtf8()));
 
@@ -179,6 +182,10 @@ void QnTransactionTcpProcessor::run()
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_PROTO_VERSION_HEADER_NAME,
             nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
+        d->response.headers.insert(nx_http::HttpHeader(
+            Qn::EC2_CLOUD_HOST_HEADER_NAME,
+            QnAppInfo::defaultCloudHost().toUtf8()));
+
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_SYSTEM_NAME_HEADER_NAME,
             QnCommonModule::instance()->localSystemName().toUtf8()));
@@ -227,7 +234,7 @@ void QnTransactionTcpProcessor::run()
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());
-    
+
     bool fail = query.hasQueryItem("canceled");
     if (!fail)
     {

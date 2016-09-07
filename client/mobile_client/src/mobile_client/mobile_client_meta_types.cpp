@@ -1,6 +1,7 @@
 #include "mobile_client_meta_types.h"
 
 #include <QtQml/QtQml>
+#include <private/qqmlvaluetype_p.h>
 
 #include <context/connection_manager.h>
 #include <context/context_settings.h>
@@ -31,6 +32,7 @@
 #include <client_core/client_core_meta_types.h>
 #include <controllers/lite_client_controller.h>
 #include <helpers/lite_client_layout_helper.h>
+#include <helpers/cloud_url_helper.h>
 
 void QnMobileClientMetaTypes::initialize() {
     QnClientCoreMetaTypes::initialize();
@@ -50,6 +52,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
     qmlRegisterUncreatableType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings", lit("Cannot create an instance of QnContextSettings."));
+    qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
     qmlRegisterType<QnSystemsModel>("com.networkoptix.qml", 1, 0, "QnSystemsModel");
     qmlRegisterType<QnRecentUserConnectionsModel>("com.networkoptix.qml", 1, 0, "QnRecentUserConnectionsModel");
     qmlRegisterType<QnSystemHostsModel>("com.networkoptix.qml", 1, 0, "QnSystemHostsModel");

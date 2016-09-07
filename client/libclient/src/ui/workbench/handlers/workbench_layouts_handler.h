@@ -7,7 +7,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchStateDelegate;
+class QnSessionAwareDelegate;
 
 class QnWorkbenchLayoutsHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -73,14 +73,6 @@ private:
     /** If user has custom access rights, he must be given direct access to cameras on changed local layout. */
     void grantMissingAccessRights(const QnUserResourcePtr& user, const LayoutChange& change);
 
-    /**
-     * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
-     * @param buttons               Message box buttons.
-     * @param defaultButton         Default button.
-     * @return                      Selected button.
-     */
-    QDialogButtonBox::StandardButton askOverrideLayout(QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton);
-
     bool canRemoveLayouts(const QnLayoutResourceList &layouts);
 
     void removeLayouts(const QnLayoutResourceList &layouts);
@@ -91,7 +83,7 @@ private:
 
     void at_layout_saved(bool success, const QnLayoutResourcePtr &layout);
 private:
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
+    QScopedPointer<QnSessionAwareDelegate> m_workbenchStateDelegate;
 
     /** Flag that we are in layouts closing process. */
     bool m_closingLayouts;

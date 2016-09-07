@@ -1,5 +1,4 @@
-#ifndef QN_LAYOUT_TAB_BAR_H
-#define QN_LAYOUT_TAB_BAR_H
+#pragma once
 
 #include <QtWidgets/QTabBar>
 #include <core/resource/resource_fwd.h>
@@ -17,7 +16,7 @@ class QnLayoutTabBar: public QTabBar, public QnWorkbenchContextAware, public QnA
     typedef QTabBar base_type;
 
 public:
-    QnLayoutTabBar(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    QnLayoutTabBar(QWidget* parent = nullptr);
 
     virtual ~QnLayoutTabBar();
 
@@ -78,7 +77,3 @@ private:
     /** Tab we are trying to close with middle mouse button */
     int m_midClickedTab;
 };
-
-
-
-#endif // QN_LAYOUT_TAB_BAR_H

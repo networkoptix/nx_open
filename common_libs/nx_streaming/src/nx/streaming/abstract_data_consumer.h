@@ -36,6 +36,7 @@ protected:
     void run();
     virtual void setSpeed(float /*value*/) {}
     virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
+    virtual void beforeRun();
     virtual void endOfRun();
 
 protected:

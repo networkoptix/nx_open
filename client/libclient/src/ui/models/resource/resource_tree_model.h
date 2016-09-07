@@ -158,6 +158,8 @@ private:
 
     /** Mapping for all nodes by resource (for quick update). */
     QHash<QnResourcePtr, NodeList> m_nodesByResource;
+    /** Debug variable for VMS-3589. */
+    bool m_iteratingOverNodesByResource = false;    //TODO: #GDM #high remove before release
 
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;

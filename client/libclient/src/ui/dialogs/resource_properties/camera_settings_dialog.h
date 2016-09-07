@@ -8,16 +8,16 @@
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QAbstractButton;
 
 class QnCameraSettingsWidget;
 
-class QnCameraSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+class QnCameraSettingsDialog: public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
     QnCameraSettingsDialog(QWidget *parent = NULL);
     virtual ~QnCameraSettingsDialog();
@@ -25,6 +25,9 @@ public:
     virtual bool tryClose(bool force) override;
 
     void setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
+
+    Qn::CameraSettingsTab currentTab() const;
+    void setCurrentTab(Qn::CameraSettingsTab tab);
 
     virtual void accept() override;
     virtual void reject() override;

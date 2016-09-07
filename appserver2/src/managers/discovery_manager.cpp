@@ -132,8 +132,8 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
         handler->done(reqID, errorCode, outData);
     };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
-            std::nullptr_t, ApiDiscoveryDataList, decltype(queryDoneHandler)>(
-                ApiCommand::getDiscoveryData, nullptr, queryDoneHandler);
+            QnUuid, ApiDiscoveryDataList, decltype(queryDoneHandler)>(
+                ApiCommand::getDiscoveryData, QnUuid(), queryDoneHandler);
     return reqID;
 }
 

@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -25,10 +25,10 @@ namespace Ui {
     class SignDialog;
 }
 
-class SignDialog : public QnWorkbenchStateDependentButtonBoxDialog {
+class SignDialog : public QnSessionAwareButtonBoxDialog {
     Q_OBJECT;
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
     explicit SignDialog(QnResourcePtr resource, QWidget *parent = 0);
     virtual ~SignDialog();

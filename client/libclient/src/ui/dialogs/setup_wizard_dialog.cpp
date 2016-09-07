@@ -54,7 +54,7 @@ int QnSetupWizardDialog::exec()
     QUrl url = constructUrl(d->url);
 
     NX_LOG(lit("QnSetupWizardDialog: Opening setup URL: %1")
-           .arg(url.toString()), cl_logINFO);
+           .arg(url.toString()), cl_logDEBUG1);
 
     d->webView->load(url);
 
@@ -73,39 +73,21 @@ void QnSetupWizardDialog::setUrl(const QUrl& url)
     d->url = url;
 }
 
-QString QnSetupWizardDialog::localLogin() const
+QnCredentials QnSetupWizardDialog::localCredentials() const
 {
     Q_D(const QnSetupWizardDialog);
-    return d->loginInfo.localLogin;
-
+    return QnCredentials(d->loginInfo.localLogin, d->loginInfo.localPassword);
 }
 
-QString QnSetupWizardDialog::localPassword() const
+QnCredentials QnSetupWizardDialog::cloudCredentials() const
 {
     Q_D(const QnSetupWizardDialog);
-    return d->loginInfo.localPassword;
+    return QnCredentials(d->loginInfo.cloudEmail, d->loginInfo.cloudPassword);
 }
 
-QString QnSetupWizardDialog::cloudLogin() const
-{
-    Q_D(const QnSetupWizardDialog);
-    return d->loginInfo.cloudEmail;
-}
-
-void QnSetupWizardDialog::setCloudLogin(const QString& login)
+void QnSetupWizardDialog::setCloudCredentials(const QnCredentials& value)
 {
     Q_D(QnSetupWizardDialog);
-    d->loginInfo.cloudEmail = login;
-}
-
-QString QnSetupWizardDialog::cloudPassword() const
-{
-    Q_D(const QnSetupWizardDialog);
-    return d->loginInfo.cloudPassword;
-}
-
-void QnSetupWizardDialog::setCloudPassword(const QString& password)
-{
-    Q_D(QnSetupWizardDialog);
-    d->loginInfo.cloudPassword = password;
+    d->loginInfo.cloudEmail = value.user;
+    d->loginInfo.cloudPassword = value.password;
 }

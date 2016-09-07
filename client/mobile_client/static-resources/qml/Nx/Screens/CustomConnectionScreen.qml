@@ -8,7 +8,7 @@ Page
 {
     id: customConnectionScreen
 
-    title: systemName ? systemName : qsTr("Connect to Server")
+    title: systemName ? systemName : qsTr("Connect to System")
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     property alias systemId: systemHostsModel.systemId
@@ -105,21 +105,22 @@ Page
 
     function showWarning(status, info)
     {
-        warningText = LoginUtils.connectionErrorText(status, info)
-        warningVisible = true
-
-        if (status === QnConnectionManager.Unauthorized)
+        if (status == QnConnectionManager.Unauthorized)
+        {
             credentialsEditor.displayUserCredentialsError = true
+        }
         else
+        {
+            credentialsEditor.addressErrorText = LoginUtils.connectionErrorText(status, info)
             credentialsEditor.displayAddressError = true
+        }
 
-        if (status === QnConnectionManager.InvalidVersion)
+        if (status == QnConnectionManager.IncompatibleVersion)
             Workflow.openOldClientDownloadSuggestion()
     }
 
     function hideWarning()
     {
-        warningVisible = false
         credentialsEditor.displayUserCredentialsError = false
         credentialsEditor.displayAddressError = false
     }

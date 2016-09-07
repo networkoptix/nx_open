@@ -22,15 +22,15 @@ struct QnMultiserverRequestData
     virtual QUrlQuery toUrlQuery() const;
     virtual bool isValid() const;
 
-    /* Fix fields to make local request. */
+    /** Fix fields to make local request. */
     void makeLocal(Qn::SerializationFormat localFormat = Qn::UbjsonFormat);
 
-    bool isLocal;   // Shows if this request is sent by redirection
+    bool isLocal; //< Shows if this request is sent by redirection.
     Qn::SerializationFormat format;
     bool extraFormatting;
 
 protected:
-    /* Avoid creating invalid instances when making local requests. */
+    // Avoid creating invalid instances when making local requests.
     QnMultiserverRequestData();
-    QnMultiserverRequestData(const QnMultiserverRequestData &src);
+    QnMultiserverRequestData(const QnMultiserverRequestData& src);
 };

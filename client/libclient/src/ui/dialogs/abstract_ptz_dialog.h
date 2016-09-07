@@ -9,7 +9,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnAbstractPtzHotkeyDelegate {
@@ -19,9 +19,9 @@ public:
     virtual void updateHotkeys(const QnPtzHotkeyHash &value) = 0;
 };
 
-class QnAbstractPtzDialog : public QnWorkbenchStateDependentButtonBoxDialog {
+class QnAbstractPtzDialog : public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     QnAbstractPtzDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);

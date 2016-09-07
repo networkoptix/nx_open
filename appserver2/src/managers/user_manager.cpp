@@ -128,8 +128,8 @@ namespace ec2
         {
             handler->done(reqID, errorCode, result);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiUserGroupDataList, decltype(queryDoneHandler)>
-            (ApiCommand::getUserGroups, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiUserGroupDataList, decltype(queryDoneHandler)>
+            (ApiCommand::getUserGroups, QnUuid(), queryDoneHandler);
         return reqID;
     }
 

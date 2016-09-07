@@ -32,6 +32,7 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
+class QnTwoWayAudioWidget;
 
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -52,13 +53,9 @@ public:
     /**
      * \returns                         Display associated with this widget.
      */
-    QnResourceDisplayPtr display() const {
-        return m_display;
-    }
+    QnResourceDisplayPtr display() const;
 
-    QnResourceWidgetRenderer *renderer() const {
-        return m_renderer;
-    }
+    QnResourceWidgetRenderer* renderer() const;
 
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
@@ -102,8 +99,6 @@ public:
     void clearMotionSensitivity();
 
     const QList<QnMotionRegion> &motionSensitivity() const;
-
-    bool isMotionSensitivityEmpty() const;
 
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
@@ -179,8 +174,9 @@ protected:
 
     virtual void updateHud(bool animate);
 
+    void updateTwoWayAudioWidget();
+
 private slots:
-    void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
     void at_searchButton_toggled(bool checked);
@@ -200,9 +196,11 @@ private slots:
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
+
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
+    void createPtzController();
 
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
@@ -270,7 +268,7 @@ private:
     /** Whether motion selection cached paths are valid. */
     mutable bool m_motionSelectionCacheValid;
 
-    QStaticText m_sensStaticText[10];
+    QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
     QnPtzControllerPtr m_ptzController;
     QnFisheyeHomePtzController *m_homePtzController;
@@ -289,6 +287,8 @@ private:
 
     QVector<QColor> m_motionSensitivityColors;
     const QColor m_backgroundColor;
+
+    QnTwoWayAudioWidget* m_twoWayAudioWidget;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

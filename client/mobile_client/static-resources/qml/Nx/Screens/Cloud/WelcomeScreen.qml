@@ -56,7 +56,6 @@ PageBase
 
                 CredentialsEditor
                 {
-                    warningPanel: warningPanel
                     onLoggedIn: Workflow.openSessionsScreen()
                 }
             }
@@ -67,6 +66,9 @@ PageBase
                 text: qsTr("Skip")
                 width: parent.width
                 anchors.bottom: parent.bottom
+                leftPadding: 0
+                rightPadding: 0
+                padding: 0
 
                 onClicked: Workflow.openSessionsScreen()
             }

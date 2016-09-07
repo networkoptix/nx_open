@@ -88,6 +88,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
 
+#include <ui/workaround/hidpi_workarounds.h>
+
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
@@ -588,11 +590,11 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
 }
 
 void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), selectedItems.materialized()));
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, nullptr, selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
-    menu->exec(pos);
+    QnHiDpiWorkarounds::showMenu(menu.data(), pos);
 }
 
 void QnWorkbenchController::updateDraggedItems()
@@ -1228,7 +1230,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsI
         widget->scene()->clearSelection();
         widget->setSelected(true);
     }
-    showContextMenuAt(info.screenPos());
+    showContextMenuAt(QCursor::pos());
 }
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
@@ -1308,7 +1310,7 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const Cli
 
     view->scene()->clearSelection(); /* Just to feel safe. */
 
-    showContextMenuAt(info.screenPos());
+    showContextMenuAt(QCursor::pos());
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickInfo &) {

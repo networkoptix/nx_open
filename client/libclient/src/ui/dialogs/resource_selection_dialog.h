@@ -13,7 +13,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include "utils/common/id.h"
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
     class ResourceSelectionDialog;
@@ -22,9 +22,9 @@ namespace Ui {
 class QnResourceTreeModel;
 class QnCameraThumbnailManager;
 
-class QnResourceSelectionDialog : public QnWorkbenchStateDependentButtonBoxDialog {
+class QnResourceSelectionDialog : public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     enum SelectionTarget {

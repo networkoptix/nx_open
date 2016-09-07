@@ -50,5 +50,4 @@ void QnCameraDataManager::clearCache()
     for (auto loader: m_loaderByResource)
         if (loader)
             loader->discardCachedData();
-    m_loaderByResource.clear();
 }

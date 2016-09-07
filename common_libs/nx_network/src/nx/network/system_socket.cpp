@@ -723,6 +723,11 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
         if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
             iSelRet = 0;
 
+        int result;
+        socklen_t result_len = sizeof(result);
+        if ((getsockopt(this->m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
+            iSelRet = 0;
+
         break;
     }
 #endif
@@ -745,10 +750,10 @@ int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int 
         if (!getNonBlockingMode(&value))
             return -1;
 
-        if (setNonBlockingMode(true))
+        if (!setNonBlockingMode(true))
             return -1;
 
-        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags ^ MSG_DONTWAIT);
+        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags & ~MSG_DONTWAIT);
 
         if (!setNonBlockingMode(&value))
             return -1;
@@ -779,7 +784,7 @@ int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int 
 
 template<typename InterfaceToImplement>
 int CommunicatingSocket<InterfaceToImplement>::send( const void* buffer, unsigned int bufferLen )
-{   
+{
 #ifdef _WIN32
     int sended = ::send(m_fd, (raw_type*) buffer, bufferLen, 0);
 #else

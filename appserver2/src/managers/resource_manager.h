@@ -24,6 +24,10 @@ namespace ec2
             // nothing to do
         }
 
+        void triggerNotification(const QnTransaction<ApiRebuildTransactionLogData>& /*tran*/) {
+            // nothing to do
+        }
+
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran ) {
             if (tran.command == ApiCommand::setResourceParam)
                 emit resourceParamChanged(tran.params);

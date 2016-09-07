@@ -69,5 +69,5 @@ private:
     QPointer<QnMediaServerUpdateTool> m_updateTool;
     bool m_restartAllPeers;
 
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
+    QScopedPointer<QnSessionAwareDelegate> m_workbenchStateDelegate;
 };

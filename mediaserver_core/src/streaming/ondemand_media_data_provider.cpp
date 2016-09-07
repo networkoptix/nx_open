@@ -7,7 +7,7 @@
 #include <nx/utils/thread/mutex.h>
 
 
-static const size_t MAX_DATA_QUEUE_SIZE = 16;   //TODO: #ak is queue really needed here?
+static const size_t MAX_DATA_QUEUE_SIZE = 16;
 
 OnDemandMediaDataProvider::OnDemandMediaDataProvider( const QSharedPointer<QnAbstractStreamDataProvider>& dataProvider ) throw()
 :

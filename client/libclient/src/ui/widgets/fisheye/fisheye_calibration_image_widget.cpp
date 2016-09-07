@@ -13,6 +13,7 @@
 #include <ui/processors/drag_info.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
@@ -260,6 +261,9 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
         return;
 
     QScopedPointer<QPainter> painter(new QPainter(this));
+
+    if (!isEnabled())
+        painter->setOpacity(style::Hints::kDisabledItemOpacity);
 
     int halfLineWidth = m_lineWidth / 2;
     QRect targetRect = rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);

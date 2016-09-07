@@ -275,6 +275,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourceChannelMapping>();
     qRegisterMetaType<QList<QnResourceChannelMapping>>();
 
+    qRegisterMetaType<Qn::ConnectionResult>();
 
     /*
      * Following code requires full-scale refactor in the classes that uses signals with such parameters.

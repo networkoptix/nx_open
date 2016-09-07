@@ -282,8 +282,11 @@ void QnSessionManager::onHttpClientDone(int requestId, nx_http::AsyncHttpClientP
     }
 
     QnHTTPRawResponse httpRequestResult(
-        clientPtr->lastSysErrorCode(),
-        clientPtr->response() ? *clientPtr->response() : nx_http::Response(),
+        ((clientPtr->lastSysErrorCode() == SystemError::noError) && clientPtr->failed())
+            ? SystemError::connectionReset
+            : clientPtr->lastSysErrorCode(),
+        clientPtr->response() ? clientPtr->response()->statusLine : nx_http::StatusLine(),
+        clientPtr->contentType(),
         clientPtr->fetchMessageBodyBuffer());
 
     if (requestInfo.object)

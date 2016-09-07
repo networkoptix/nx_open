@@ -26,7 +26,7 @@ public:
     explicit QnCameraThumbnailManager(QObject* parent = nullptr);
     virtual ~QnCameraThumbnailManager();
 
-    void selectResource(const QnVirtualCameraResourcePtr& camera);
+    void selectResource(const QnSecurityCamResourcePtr& camera);
 
     QSize thumbnailSize() const;
     void setThumbnailSize(const QSize& size);
@@ -44,9 +44,9 @@ private slots:
 private:
     Q_SIGNAL void thumbnailReadyDelayed(const QnUuid& resourceId, const QPixmap& thumbnail);
 
-    rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera);
+    rest::Handle loadThumbnailForCamera(const QnSecurityCamResourcePtr& camera);
 
-    bool isUpdateRequired(const QnVirtualCameraResourcePtr& camera, const ThumbnailStatus status) const;
+    bool isUpdateRequired(const QnSecurityCamResourcePtr& camera, const ThumbnailStatus status) const;
     void forceRefreshThumbnails();
 
     QPixmap scaledPixmap(const QPixmap& pixmap) const;
@@ -61,7 +61,7 @@ private:
         rest::Handle loadingHandle;
     };
 
-    QHash<QnVirtualCameraResourcePtr, ThumbnailData> m_thumbnailByCamera;
+    QHash<QnSecurityCamResourcePtr, ThumbnailData> m_thumbnailByCamera;
     QSize m_thumnailSize;
     QHash<ThumbnailStatus, QPixmap> m_statusPixmaps;
     QTimer *m_refreshingTimer;

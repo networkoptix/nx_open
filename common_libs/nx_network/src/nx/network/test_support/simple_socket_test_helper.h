@@ -43,7 +43,7 @@ QByteArray readNBytes(SocketType* clientSocket, int count)
             buffer.size() - bufDataSize,
             0);
         if (bytesRead <= 0)
-            return QByteArray();
+            return buffer.mid(0, bufDataSize);
 
         bufDataSize += bytesRead;
         if (bufDataSize >= count)
@@ -216,6 +216,84 @@ void socketSimpleSync(
 
     serverThread.join();
     clientThread.join();
+}
+
+static void testWouldBlockLastError()
+{
+    const auto code = SystemError::getLastOSErrorCode();
+    ASSERT_TRUE(code == SystemError::wouldBlock || code == SystemError::again)
+        << SystemError::toString(code).toStdString();
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketSimpleSyncFlags(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    const SocketAddress& endpointToBindTo = kAnyPrivateAddress,
+    SocketAddress endpointToConnectTo = kAnyPrivateAddress,
+    const QByteArray& testMessage = kTestMessage,
+    int clientCount = kClientCount)
+{
+    auto server = serverMaker();
+    ASSERT_TRUE(server->bind(endpointToBindTo)) << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
+    if (endpointToConnectTo == kAnyPrivateAddress)
+        endpointToConnectTo = server->getLocalAddress();
+
+    Buffer buffer(kTestMessage.size() * 2, Qt::Uninitialized);
+    for (size_t i = 0; i != clientCount; ++i)
+    {
+        std::unique_ptr<AbstractStreamSocket> accepted;
+        nx::utils::thread acceptThread(
+            [&]()
+            {
+                accepted.reset(server->accept());
+                ASSERT_TRUE(accepted.get());
+                EXPECT_EQ(readNBytes(accepted.get(), testMessage.size()), kTestMessage);
+            });
+
+        auto client = clientMaker();
+        ASSERT_TRUE(client->connect(endpointToConnectTo, kTestTimeout.count()));
+        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size())
+            << SystemError::getLastOSErrorText().toStdString();
+        acceptThread.join();
+
+        // MSG_DONTWAIT does not block on server and client:
+        ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_DONTWAIT), -1);
+        testWouldBlockLastError();
+        ASSERT_EQ(client->recv(buffer.data(), buffer.size(), MSG_DONTWAIT), -1);
+        testWouldBlockLastError();
+
+// TODO: Should be enabled and fixed for UDT and SSL sockets
+#ifdef NX_TEST_MSG_WAITALL
+        // MSG_WAITALL blocks until buffer is full.
+        const auto recvWaitAll =
+            [&](AbstractStreamSocket* socket)
+            {
+                int ret = socket->recv(buffer.data(), buffer.size(), MSG_WAITALL);
+                if (ret == buffer.size())
+                    EXPECT_EQ(buffer, (kTestMessage + kTestMessage).left(buffer.size()));
+                else
+                    EXPECT_EQ(ret, buffer.size()) << SystemError::getLastOSErrorText().toStdString();
+            };
+
+        // Send 1st part of message and start ot recv:
+        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
+        nx::utils::thread serverRecvThread([&](){ recvWaitAll(accepted.get()); });
+
+        // Send 2nd part of message with delay:
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
+        serverRecvThread.join();
+
+        // MSG_WAITALL works an client as well:
+        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
+        nx::utils::thread clientRecvThread([&](){ recvWaitAll(accepted.get()); });
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
+        clientRecvThread.join();
+#endif
+    };
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker,
@@ -946,6 +1024,8 @@ typedef nx::network::test::StopType StopType;
 #define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
     Type(Name, SimpleSync) \
         { nx::network::test::socketSimpleSync(mkServer, mkClient); } \
+    Type(Name, SimpleSyncFlags) \
+        { nx::network::test::socketSimpleSyncFlags(mkServer, mkClient); } \
     Type(Name, SimpleAsync) \
         { nx::network::test::socketSimpleAsync(mkServer, mkClient); } \
     Type(Name, SimpleTrueAsync) \

@@ -384,7 +384,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
 }
 
 void CloudUserAuthenticator::onSystemAccessListUpdated(
-    nx::cdb::api::SystemAccessListModifiedEvent event)
+    nx::cdb::api::SystemAccessListModifiedEvent /*event*/)
 {
     NX_LOGX(lm("Received SystemAccessListModified event"), cl_logDEBUG1);
     //TODO #ak
@@ -432,7 +432,7 @@ QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
     userData.hash = "invalid_hash";
     if (userName == qnGlobalSettings->cloudAccountName())
         userData.isAdmin = true;
-    bool result = QnAppServerConnectionFactory::getConnection2()
+    /*bool*/ QnAppServerConnectionFactory::getConnection2()
         ->getUserManager(Qn::kSystemAccess)->save(
             userData, QnUuid::createUuid().toString(),  //using random password because cloud account password is used to authenticate request
             ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);

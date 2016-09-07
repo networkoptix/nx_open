@@ -133,7 +133,7 @@ private:
     QString m_soundPath;
 
     QGraphicsLinearLayout* m_layout;
-    QnClickableProxyLabel* m_textLabel;
+    QnProxyLabel* m_textLabel;
     QnImageButtonWidget* m_closeButton;
     QnNotificationLevel::Value m_notificationLevel;
     QnImageProvider* m_imageProvider;

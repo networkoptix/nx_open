@@ -48,25 +48,15 @@ public:
 
     void terminate(int handle);
     void setPoolSize(int value);
+
+    /** Returns amount of requests which are running or awaiting to be run */
+    int size() const;
 signals:
     void done(int requestId, AsyncHttpClientPtr httpClient);
 private slots:
     void at_HttpClientDone(AsyncHttpClientPtr httpClient);
 private:
-
-    /*
-    struct RequestInternal: public Request
-    {
-        RequestInternal(const Request& r = Request()):
-            Request(r),
-            handle(0)
-        {
-        }
-
-        //nx_http::AsyncHttpClientPtr httpClient;
-        int handle;
-    };
-    */
+    AsyncHttpClientPtr createHttpConnection();
 
     struct HttpConnection
     {
@@ -87,7 +77,7 @@ private:
     void sendNextRequestUnsafe();
     void cleanupDisconnectedUnsafe();
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     typedef std::unique_ptr<HttpConnection> HttpConnectionPtr;
     std::multimap<SocketAddress, HttpConnectionPtr> m_connectionPool;
     std::map<int, Request> m_awaitingRequests;
