@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="he" sourcelanguage="en">
+<TS version="2.0" language="he" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1215,7 +1215,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>יצוא סקירה מהירה...</translation>
     </message>
 </context>
 <context>
@@ -1712,9 +1712,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>מקור ו %n מצלמות נוספות</numerusform>
-            <numerusform></numerusform>
+            <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
         </translation>
     </message>
     <message>
@@ -2021,13 +2021,13 @@ to view more bookmarks</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר התקן</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>% אינו תומך באודיו דו כיווני</numerusform>
+            <numerusform>%1 אינם תומכים באודיו דו כיווני</numerusform>
         </translation>
     </message>
 </context>
@@ -2722,19 +2722,19 @@ to view more bookmarks</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">מקודד האודיו &apos;%1&apos; לא נמצא.</translation>
+        <translation>מקודד האודיו &apos;%1&apos; לא נמצא.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">לא ניתן להפעיל את מקודד האודיו.</translation>
+        <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>התקן האודיו הראשי לא נבחר.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>פורמט הדגימה של ההתקן %1 אינו נתמך.</translation>
     </message>
 </context>
 <context>
@@ -2932,9 +2932,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>ומשתמש נוסף אחד...</numerusform>
             <numerusform>ו %1 משתמשים נוספים...</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2972,53 +2972,53 @@ to view more bookmarks</source>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">שניה/שניות</translation>
+        <translation>שנ&apos;</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">דקה/דקות</translation>
+        <translation>דקות</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">שעות</translation>
+        <translation>שעות</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">ימים</translation>
+        <translation>ימים</translation>
     </message>
     <message numerus="yes">
         <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nms</numerusform>
+            <numerusform>%nms</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nש</numerusform>
+            <numerusform>%nש</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nד</numerusform>
+            <numerusform>%nד</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nשע</numerusform>
+            <numerusform>%nשע</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nימ</numerusform>
+            <numerusform>%nימ</numerusform>
         </translation>
     </message>
 </context>
@@ -4337,7 +4337,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות אודיו</translation>
     </message>
 </context>
 <context>
@@ -4733,7 +4733,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>קצת תקשורת</translation>
     </message>
 </context>
 <context>
@@ -4913,28 +4913,28 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>&lt;התקן&gt;</numerusform>
             <numerusform>&lt;%n התקנים&gt;</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>&lt;מצלמה&gt;</numerusform>
             <numerusform>&lt;%n מצלמות&gt;</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n מודולי קלט/פלט&gt;</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;התקן קלט/פלט&gt;</numerusform>
+            <numerusform>&lt;%n התקני קלט/פלט&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">ייצוא סימנייה...</translation>
+        <translation>ייצוא סימנייה...</translation>
     </message>
 </context>
 <context>
@@ -5513,7 +5513,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">לא ניתן לבצע את הבדיקה.</translation>
+        <translation>לא ניתן לבצע את הבדיקה.</translation>
     </message>
 </context>
 <context>
@@ -5693,16 +5693,16 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>מצלמה אחת</numerusform>
             <numerusform>%n מצלמות</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>התקן אחד</numerusform>
             <numerusform>%n התקנים</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6133,19 +6133,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>התקן קלט לא נבחר.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>הזרמת וידאו אינה מוכנה עדיין, נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאת רשת.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>לחץ לדיבור.</translation>
     </message>
 </context>
 <context>
@@ -6750,19 +6750,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 גילה שיש ברשותך מסך ברזולוציה גבוהה ויתכן שבעקבות כך %1 לא יוצג באופן תקין.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>אנו מודעים לבעיה זו והיא תתוקן בגירסה 3.0.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>בנתיים יש לשנות את רזולוציית המסך לקבלת תוצאות טובות יותר.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>אזהרת תמיכה במסכי HiDpi</translation>
     </message>
 </context>
 <context>
@@ -6801,9 +6801,9 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>האם למחוק את הסימניה?</numerusform>
             <numerusform>האם למחוק את %n הסימניות?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -7056,7 +7056,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>טווח הזמן שנבחר קצר מידי ולא ניתן לייצאו בסקירה מהירה.</translation>
     </message>
 </context>
 <context>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
+<TS version="2.0" language="vi_VN" sourcelanguage="en_US">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1205,7 +1205,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất khẩu nhanh chóng xem xét lại ...</translation>
     </message>
 </context>
 <context>
@@ -1692,7 +1692,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Nguồn và %n máy ảnh hơn</numerusform>
         </translation>
     </message>
@@ -1997,12 +1997,12 @@ to view more bookmarks</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn thiết bị</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 không hỗ trợ âm thanh hai chiều %n</numerusform>
         </translation>
     </message>
 </context>
@@ -2687,19 +2687,19 @@ to view more bookmarks</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
+        <translation>Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+        <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết bị âm thanh chính không được chọn.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>định dạng mẫu của %1 thiết bị đầu vào không được hỗ trợ.</translation>
     </message>
 </context>
 <context>
@@ -2894,8 +2894,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform>and %1 user(s) more...</numerusform>
+        <translation>
+            <numerusform>và %1 người sử dụng nhiều hơn %n...</numerusform>
         </translation>
     </message>
 </context>
@@ -2933,48 +2933,48 @@ to view more bookmarks</source>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">thứ hai</translation>
+        <translation>giây</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">chi nhánh</translation>
+        <translation>phút</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">thời gian</translation>
+        <translation>giờ</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">sơn mài Nhật</translation>
+        <translation>ngày</translation>
     </message>
     <message numerus="yes">
         <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nmicro giây</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%ngiây</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nphút</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%ngiờ</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nngày</numerusform>
         </translation>
     </message>
 </context>
@@ -4282,7 +4282,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt âm thanh</translation>
     </message>
 </context>
 <context>
@@ -4667,7 +4667,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>bitrate</translation>
     </message>
 </context>
 <context>
@@ -4847,25 +4847,25 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n thiết bị&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n camera(s)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n I/O module(s)&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">Xuất dấu trang ...</translation>
+        <translation>Xuất dấu trang ...</translation>
     </message>
 </context>
 <context>
@@ -5438,7 +5438,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">Không thể thực hiện một thử nghiệm.</translation>
+        <translation>Không thể thực hiện một thử nghiệm.</translation>
     </message>
 </context>
 <context>
@@ -5618,13 +5618,13 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Máy ảnh</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Thiết bị</numerusform>
         </translation>
     </message>
@@ -6056,19 +6056,19 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết bị đầu vào không được chọn.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>streaming là chưa sẵn sàng, xin vui lòng thử lại sau.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi mạng.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>Giữ để nói</translation>
     </message>
 </context>
 <context>
@@ -6650,19 +6650,19 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 đã phát hiện ra rằng bạn có một màn hình độ phân giải cao và kết quả là %1 có thể không được hiển thị tốt.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chúng tôi nhận thức được vấn đề này và một sửa chữa sẽ đến trong v3.0.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trong khi đó hãy điều chỉnh độ phân giải của màn hình của bạn nếu cần thiết cho một trải nghiệm tốt hơn.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>HiDpi màn hình Hỗ trợ cảnh báo</translation>
     </message>
 </context>
 <context>
@@ -6701,7 +6701,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Bạn có chắc chắn muốn xóa những %n dấu không?</numerusform>
         </translation>
     </message>
@@ -6954,7 +6954,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>thời gian lựa chọn là quá ngắn và không thể được xuất khẩu như xem xét nhanh chóng.</translation>
     </message>
 </context>
 <context>

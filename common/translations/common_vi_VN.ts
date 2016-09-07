@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="vi_VN" sourcelanguage="en">
+<TS version="2.0" language="vi_VN" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -416,7 +416,7 @@
     </message>
     <message>
         <source>Do HTTP request</source>
-        <translation type="unfinished"></translation>
+        <translation>gởi HTTP yêu cầu</translation>
     </message>
 </context>
 <context>
