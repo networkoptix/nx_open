@@ -42,7 +42,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/client.bin/pom.xml</systemPath>            
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nxtool</artifactId>
@@ -82,14 +82,14 @@
                     </execution>
                 </executions>
             </plugin>        
-           <!-- <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
                 <executions>
                     <execution>
-                        <id>copy-project-resources</id>
-                        <phase>generate-sources</phase>
+                        <id>copy-certificates</id>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -97,31 +97,19 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
                                 <resource>
-                                    <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
-                                    <filtering>false</filtering>
-                                </resource>
+                                    <directory>${environment.dir}/customization/${parent.customization}/wixsetup</directory>
+                                    <filtering>false</filtering>                           
+                                </resource> 
                                 <resource>
-                                    <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
-                                    <filtering>false</filtering>
-                                </resource>                                  
-                                <resource>
-                                    <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
-                                    <filtering>true</filtering>
-                                </resource>	                                
-                                <resource>
-                                    <directory>${parent.customization.dir}/wixsetup</directory>
-                                    <filtering>false</filtering>
-                                </resource>		                
-                                <resource>
-                                    <directory>${customization.dir}/wixsetup</directory>
-                                    <filtering>false</filtering>
-                                </resource>                             
+                                    <directory>${environment.dir}/customization/${customization}/wixsetup</directory>
+                                    <filtering>false</filtering>                           
+                                </resource>              
                             </resources>              
                             <encoding>UTF-8</encoding>
                         </configuration>            
                     </execution>
                 </executions>
-            </plugin>	-->
+            </plugin>
             <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
                 <artifactId>replacer</artifactId>
@@ -142,9 +130,11 @@
                             <replacements>
                                 <replacement>
                                     <token>
-                                        <![CDATA[<PlatformToolset>v110</PlatformToolset>]]></token>
+                                        <![CDATA[<PlatformToolset>v110</PlatformToolset>]]>
+                                    </token>
                                     <value>
-                                        <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
+                                        <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]>
+                                    </value>
                                 </replacement>           
                             </replacements>
                         </configuration>								
@@ -224,7 +214,7 @@
                             <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>    
                     </execution>
-                    
+
                     <execution>
                         <id>integration-test</id>
                         <phase>integration-test</phase>
