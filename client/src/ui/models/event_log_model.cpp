@@ -578,7 +578,7 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
                 const auto diffCount = (kMaxShownUsersCount - userNames.size());
 
                 userNames = userNames.mid(0, kMaxShownUsersCount);
-                userNames.append(tr("and %1 user(s) more...", nullptr, diffCount));
+                userNames.append(tr("and %n user(s) more...", "", diffCount));
             }
 
             return userNames.join(kDelimiter);

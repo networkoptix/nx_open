@@ -2047,8 +2047,8 @@ to view more bookmarks</source>
         <source>%1 doesn&apos;t support two-way audio</source>
         <translation>
             <numerusform>%1 не поддерживает двусторонний звук</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 не поддерживают двусторонний звук</numerusform>
+            <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         </translation>
     </message>
 </context>
@@ -2959,17 +2959,17 @@ to view more bookmarks</source>
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation>
-            <numerusform>%1 из (%n раза)</numerusform>
             <numerusform>%1 из (%n раз)</numerusform>
+            <numerusform>%1 из (%n раза)</numerusform>
             <numerusform>%1 из (%n раз)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>и %1 пользовалел(и)...</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>и ещё %n пользователь...</numerusform>
+            <numerusform>и ещё %n пользователя...</numerusform>
+            <numerusform>и ещё %n пользователей...</numerusform>
         </translation>
     </message>
 </context>
@@ -3025,40 +3025,40 @@ to view more bookmarks</source>
         <source>%nms</source>
         <translation>
             <numerusform>%nмс</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%nмс</numerusform>
+            <numerusform>%nмс</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%ns</source>
         <translation>
             <numerusform>%nс</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%nс</numerusform>
+            <numerusform>%nс</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nm</source>
         <translation>
             <numerusform>%nм</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%nм</numerusform>
+            <numerusform>%nм</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nh</source>
         <translation>
             <numerusform>%nч</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%nч</numerusform>
+            <numerusform>%nч</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%nd</source>
         <translation>
             <numerusform>%nд</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%nд</numerusform>
+            <numerusform>%nд</numerusform>
         </translation>
     </message>
 </context>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="he" sourcelanguage="en">
+<TS version="2.0" language="he" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -2026,7 +2026,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
         <translation>
-            <numerusform>% אינו תומך באודיו דו כיווני</numerusform>
+            <numerusform>%1 אינו תומך באודיו דו כיווני</numerusform>
             <numerusform>%1 אינם תומכים באודיו דו כיווני</numerusform>
         </translation>
     </message>
@@ -2931,10 +2931,10 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
             <numerusform>ומשתמש נוסף אחד...</numerusform>
-            <numerusform>ו %1 משתמשים נוספים...</numerusform>
+            <numerusform>ו %n משתמשים נוספים...</numerusform>
         </translation>
     </message>
 </context>

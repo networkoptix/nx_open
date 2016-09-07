@@ -1418,8 +1418,8 @@ to view more bookmarks</source>
         <source>%n action(s)</source>
         <translation>
             <numerusform>%n działania</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n działania</numerusform>
+            <numerusform>%n działania</numerusform>
         </translation>
     </message>
     <message>
@@ -2181,8 +2181,8 @@ to view more bookmarks</source>
         <source>%n devices found</source>
         <translation type="unfinished">
             <numerusform>%n urządzenie znaleziono</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n urządzenie znaleziono</numerusform>
+            <numerusform>%n urządzenie znaleziono</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2965,7 +2965,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -7675,8 +7675,8 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>%n items</source>
         <translation type="unfinished">
             <numerusform>%n elementów</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n elementów</numerusform>
+            <numerusform>%n elementów</numerusform>
         </translation>
     </message>
     <message>

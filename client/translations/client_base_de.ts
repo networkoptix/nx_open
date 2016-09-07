@@ -2931,10 +2931,10 @@ um mehr Lesezeichen zu sehen</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>und %1 Benutzer mehr...</numerusform>
-            <numerusform>und %1 Benutzer mehr...</numerusform>
+            <numerusform>und %n Benutzer mehr...</numerusform>
+            <numerusform>und %n Benutzer mehr...</numerusform>
         </translation>
     </message>
 </context>

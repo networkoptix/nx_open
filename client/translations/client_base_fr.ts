@@ -2030,7 +2030,7 @@ pour voir plus de signets</translation>
         <source>%1 doesn&apos;t support two-way audio</source>
         <translation>
             <numerusform>%1 ne supporte pas l&apos;audio bidirectionnelle</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 ne supporte pas l&apos;audio bidirectionnelle</numerusform>
         </translation>
     </message>
 </context>
@@ -2940,10 +2940,10 @@ pour voir plus de signets</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>et plus %1 utilisateur...</numerusform>
-            <numerusform>et plus %1 utilisateurs...</numerusform>
+            <numerusform>et plus %n utilisateur...</numerusform>
+            <numerusform>et plus %n utilisateurs...</numerusform>
         </translation>
     </message>
 </context>

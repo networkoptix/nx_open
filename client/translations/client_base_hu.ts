@@ -2894,9 +2894,9 @@ több könyvjelző megjelenítéséhez</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>és még %1 felhasználó...</numerusform>
+            <numerusform>és még %n felhasználó...</numerusform>
         </translation>
     </message>
 </context>

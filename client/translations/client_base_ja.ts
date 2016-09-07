@@ -2893,9 +2893,9 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform> %1 %n ユーザー以上...</numerusform>
+            <numerusform>%n ユーザー以上...</numerusform>
         </translation>
     </message>
 </context>

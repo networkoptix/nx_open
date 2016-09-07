@@ -2928,10 +2928,10 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>and %n user more...</numerusform>
+            <numerusform>and %n users more...</numerusform>
         </translation>
     </message>
 </context>
