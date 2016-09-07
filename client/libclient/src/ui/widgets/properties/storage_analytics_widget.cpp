@@ -603,14 +603,14 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
         return modelData; // no recording cameras at all. Do not forecast anything
 
     // 2.1 add free storage space
-    for (const auto& storageSpaceData: m_availStorages)
+    for (const auto& storageData: m_availStorages)
     {
-        QnResourcePtr storageRes = qnResPool->getResourceById(storageSpaceData.storageId);
+        QnResourcePtr storageRes = qnResPool->getResourceById(storageData.storageId);
         if (!storageRes)
             continue;
 
-        if (storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
-            forecastData.totalSpace += qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
+        if (storageData.isUsedForWriting && storageData.isWritable && !storageData.isBackup)
+            forecastData.totalSpace += qMax(0ll, storageData.freeSpace - storageData.reservedSpace);
     }
 
     // 2.2 add user extra data

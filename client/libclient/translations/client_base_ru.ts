@@ -2046,7 +2046,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
         <translation>
-            <numerusform>%1 не поддерживает двухсторонный звук</numerusform>
+            <numerusform>%1 не поддерживает двусторонний звук</numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
@@ -6847,7 +6847,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation>это известная проблема и она будет исправлена в версии 3.0.</translation>
+        <translation>Это известная проблема и она будет исправлена в версии 3.0.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
