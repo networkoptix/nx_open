@@ -69,6 +69,7 @@ public:
     bool replaceHostAddressWithPublicAddress;
     bool allowIpTarget;
     QString fetchPublicIpUrl;
+    QString publicIpAddress;
 
     struct {
         uint16_t port;

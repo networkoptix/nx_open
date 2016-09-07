@@ -93,7 +93,7 @@ private:
 
     void publicAddressFetched(
         const conf::Settings& settings,
-        const QHostAddress& publicAddress);
+        const QString& publicAddress);
 };
 
 }   //namespace cloud
