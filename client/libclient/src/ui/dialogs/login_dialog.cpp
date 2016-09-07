@@ -234,7 +234,7 @@ void QnLoginDialog::accept()
                 menu()->trigger(QnActions::ConnectAction, params);
                 break;
             }
-            case Qn::ConnectionResult::CompatibilityMode:
+            case Qn::ConnectionResult::IncompatibleProtocol:
                 menu()->trigger(QnActions::DelayedForcedExitAction);
                 break; // to avoid cycle
             default:    //error

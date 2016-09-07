@@ -10,15 +10,15 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class PopupSettingsWidget;
+class PopupSettingsWidget;
 }
 
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
-class QnPopupSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnPopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QnAbstractPreferencesWidget base_type;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
     explicit QnPopupSettingsWidget(QWidget *parent = 0);
@@ -34,8 +34,8 @@ private:
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
-    QMap<QnBusiness::EventType, QCheckBox* > m_businessRulesCheckBoxes;
-    QMap<QnSystemHealth::MessageType, QCheckBox* > m_systemHealthCheckBoxes;
-    QnBusinessEventsFilterResourcePropertyAdaptor *m_adaptor;
+    QMap<QnBusiness::EventType, QCheckBox*> m_businessRulesCheckBoxes;
+    QMap<QnSystemHealth::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
+    QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;
 };

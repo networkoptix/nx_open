@@ -790,24 +790,22 @@ void QnNxStyle::drawPrimitive(
             rect.setLeft(option->rect.left());
             rect.setRight(option->rect.right());
 
-            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(3);
-
             QnScopedPainterPenRollback penRollback(painter);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
             if (shape == TabShape::Default)
             {
-                painter->fillRect(rect, mainColor);
+                painter->fillRect(rect, option->palette.color(QPalette::Mid));
 
-                painter->setPen(mainColor.darker(3));
+                painter->setPen(option->palette.color(QPalette::Window));
                 painter->drawLine(rect.topLeft(), rect.topRight());
 
-                painter->setPen(option->palette.base().color());
+                painter->setPen(option->palette.color(QPalette::Base));
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
             else
             {
-                painter->setPen(mainColor);
+                painter->setPen(option->palette.color(QPalette::Mid));
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
 #if 0
@@ -1034,7 +1032,8 @@ void QnNxStyle::drawComplexControl(
                 QRectF handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
                 const bool horizontal = slider->orientation == Qt::Horizontal;
-                const bool hovered = slider->state.testFlag(State_MouseOver);
+                const bool enabled = slider->state.testFlag(State_Enabled);
+                const bool hovered = enabled && slider->state.testFlag(State_MouseOver);
 
                 QnPaletteColor mainDark = findColor(slider->palette.color(QPalette::Window));
                 QnPaletteColor mainLight = findColor(slider->palette.color(QPalette::WindowText));
@@ -1051,7 +1050,10 @@ void QnNxStyle::drawComplexControl(
                     painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
                     painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
-                    SliderFeatures features = static_cast<SliderFeatures>(option->styleObject ? option->styleObject->property(Properties::kSliderFeatures).toInt() : 0);
+                    SliderFeatures features = static_cast<SliderFeatures>(option->styleObject
+                        ? option->styleObject->property(Properties::kSliderFeatures).toInt()
+                        : 0);
+
                     if (features.testFlag(SliderFeature::FillingUp))
                     {
                         QRectF fillDrawRect = grooveRect.adjusted(1, 1, -1, -1);
@@ -1157,13 +1159,15 @@ void QnNxStyle::drawComplexControl(
                     QColor borderColor = mainLight;
                     QColor fillColor = mainDark;
 
-                    if (option->activeSubControls.testFlag(SC_SliderHandle))
+                    if (enabled && option->activeSubControls.testFlag(SC_SliderHandle))
                         borderColor = mainLight.lighter(4);
                     else if (hovered)
                         borderColor = mainLight.lighter(2);
 
                     if (option->state.testFlag(State_Sunken))
                         fillColor = mainDark.lighter(3);
+
+                    fillColor.setAlphaF(1.0);
 
                     painter->setPen(QPen(borderColor, dp(2)));
                     painter->setBrush(QBrush(fillColor));
@@ -1573,7 +1577,7 @@ void QnNxStyle::drawControl(
                     {
                         if (!tab->state.testFlag(State_Selected) && isTabHovered(tab, widget))
                         {
-                            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(4);
+                            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Mid)).lighter(1);
                             painter->fillRect(tab->rect.adjusted(0, 1, 0, -1), mainColor);
 
                             QnScopedPainterPenRollback penRollback(painter, mainColor.darker(3).color());
@@ -1585,7 +1589,7 @@ void QnNxStyle::drawControl(
                     case TabShape::Rectangular:
                     {
                         QnPaletteColor mainColor = findColor(
-                                option->palette.window().color()).lighter(4);
+                            option->palette.color(QPalette::Mid)).lighter(1);
 
                         QColor color = mainColor;
 
@@ -1677,7 +1681,7 @@ void QnNxStyle::drawControl(
                         {
                             color = mainColor.lighter(2);
                             painter->fillRect(rect, findColor(
-                                option->palette.window().color()).lighter(6));
+                                option->palette.color(QPalette::Mid)).lighter(3));
                         }
                         else
                         {

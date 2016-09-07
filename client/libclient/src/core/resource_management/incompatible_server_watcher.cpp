@@ -3,6 +3,9 @@
 #include <api/common_message_processor.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+
+#include <network/connection_validator.h>
+
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
@@ -160,7 +163,8 @@ void QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged(const QnR
     }
 
     Qn::ResourceStatus status = server->getStatus();
-    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem())
+    if (status != Qn::Offline
+        && QnConnectionValidator::isCompatibleToCurrentSystem(server->getModuleInformation()))
     {
         removeResource(getFakeId(id));
     }

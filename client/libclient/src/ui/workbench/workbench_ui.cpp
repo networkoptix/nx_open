@@ -49,6 +49,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
+#include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
@@ -166,6 +167,8 @@ const int kCloseTimelineTimeoutMs = 250;
 const int kVideoWallTimelineAutoHideTimeoutMs = 10000;
 
 const int kButtonInactivityTimeoutMs = 300;
+
+const qreal kShadowThickness = 2.0;
 
 } // anonymous namespace
 
@@ -311,6 +314,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Navigation slider. */
     createSliderWidget(settings[Qn::WorkbenchPane::Navigation]);
 
+    /* Windowed title shadow. */
+    auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
+        Qt::TopEdge, kShadowThickness, true);
+
 #ifdef QN_DEBUG_WIDGET
     /* Debug overlay */
     createDebugWidget();
@@ -325,11 +332,15 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(display(), &QnWorkbenchDisplay::widgetChanged, this, &QnWorkbenchUi::at_display_widgetChanged);
 
     connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
-    connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this, [this]()
-    {
-        if (m_inFreespace)
-            at_freespaceAction_triggered();
-    });
+    connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this,
+        [this, windowedTitleShadow]()
+        {
+            if (m_inFreespace)
+                at_freespaceAction_triggered();
+
+            windowedTitleShadow->setVisible(
+                !action(QnActions::EffectiveMaximizeAction)->isChecked());
+        });
 
     /* Init fields. */
     setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
@@ -1264,11 +1275,11 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     toggleTreeAction->setChecked(settings.state == Qn::PaneState::Opened);
     m_treeShowButton = newShowHideButton(m_controlsWidget, toggleTreeAction);
     m_treeShowButton->setFocusProxy(m_treeItem);
+    m_treeShowButton->stackBefore(m_treeItem);
 
     m_treeResizerWidget = new ResizerWidget(Qt::Horizontal, m_controlsWidget);
     m_treeResizerWidget->setProperty(Qn::NoHandScrollOver, true);
     m_treeResizerWidget->stackBefore(m_treeShowButton);
-    m_treeItem->stackBefore(m_treeResizerWidget);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -1339,6 +1350,9 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     connect(pinTreeAction, &QAction::toggled, this, &QnWorkbenchUi::at_pinTreeAction_toggled);
     connect(action(QnActions::PinNotificationsAction), &QAction::toggled, this,
         &QnWorkbenchUi::at_pinNotificationsAction_toggled);
+
+    /* Create a shadow: */
+    new QnEdgeShadowWidget(m_treeItem, Qt::RightEdge, kShadowThickness);
 }
 
 #pragma endregion Tree widget methods
@@ -1497,6 +1511,9 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
     connect(action(QnActions::ToggleTitleBarAction), &QAction::toggled, this, [this](bool checked) { if (!m_ignoreClickEvent) setTitleOpened(checked); });
 
     toggleTitleBarAction->setChecked(settings.state == Qn::PaneState::Opened);
+
+    /* Create a shadow: */
+    new QnEdgeShadowWidget(m_titleItem, Qt::BottomEdge, kShadowThickness);
 }
 
 #pragma endregion Title methods
@@ -1811,6 +1828,9 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 
     toggleNotificationsAction->setChecked(settings.state == Qn::PaneState::Opened);
     pinNotificationsAction->setChecked(settings.state != Qn::PaneState::Unpinned);
+
+    /* Create a shadow: */
+    new QnEdgeShadowWidget(m_notificationsItem, Qt::LeftEdge, kShadowThickness);
 }
 
 #pragma endregion Notifications widget methods
@@ -2501,13 +2521,11 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
     auto tooltip = m_timeline.item->timeSlider()->toolTipItem();
-    m_timeline.showButton->stackBefore(tooltip);
-    m_timeline.showWidget->stackBefore(m_timeline.showButton);
-    m_timeline.resizerWidget->stackBefore(m_timeline.showButton);
-    m_timeline.resizerWidget->stackBefore(m_timeline.zoomButtonsWidget);
-    m_timeline.resizerWidget->stackBefore(m_timeline.showWidget);
-    m_timeline.item->stackBefore(m_timeline.showWidget);
     tooltip->stackBefore(m_timeline.item->timeSlider()->bookmarksViewer());
+    m_timeline.item->stackBefore(tooltip);
+    m_timeline.showButton->stackBefore(m_timeline.item);
+    m_timeline.showWidget->stackBefore(m_timeline.showButton);
+    m_timeline.resizerWidget->stackBefore(m_timeline.showWidget);
 
     m_timeline.opacityProcessor = new HoverFocusProcessor(m_controlsWidget);
 
@@ -2701,6 +2719,9 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         });
 
     toggleSliderAction->setChecked(settings.state == Qn::PaneState::Opened);
+
+    /* Create a shadow: */
+    new QnEdgeShadowWidget(m_timeline.item, Qt::TopEdge, kShadowThickness);
 }
 
 #pragma endregion Slider methods

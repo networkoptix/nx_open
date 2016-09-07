@@ -27,6 +27,11 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
+
+//TODO: #gdm think about moving out pages enums
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
+
 #include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/notifications/notification_widget.h>
@@ -676,7 +681,10 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                 qnSkin->icon("events/email.png"),
                 tr("User Settings..."),
                 QnActions::UserSettingsAction,
-                QnActionParameters(context()->user()).withArgument(Qn::FocusElementRole, QString(QLatin1String("email"))));
+                QnActionParameters(context()->user())
+                    .withArgument(Qn::FocusElementRole, lit("email"))
+                    .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
+            );
             break;
 
         case QnSystemHealth::NoLicenses:
@@ -698,7 +706,10 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                 qnSkin->icon("events/email.png"),
                 tr("User Settings..."),
                 QnActions::UserSettingsAction,
-                QnActionParameters(resource).withArgument(Qn::FocusElementRole, QString(QLatin1String("email"))));
+                QnActionParameters(resource)
+                    .withArgument(Qn::FocusElementRole, lit("email"))
+                    .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
+                );
             break;
 
         case QnSystemHealth::ConnectionLost:
@@ -734,7 +745,9 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                 qnSkin->icon("events/storage.png"),
                 tr("Server settings..."),
                 QnActions::ServerSettingsAction,
-                QnActionParameters(resource));
+                QnActionParameters(resource)
+                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage)
+            );
             break;
 
         default:
@@ -833,7 +846,7 @@ void QnNotificationsCollectionWidget::paint(QPainter* painter,
 {
     base_type::paint(painter, option, widget);
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(palette().color(QPalette::Dark), 0.0));
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette().color(QPalette::Mid), 0.0));
     QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
     qreal y = m_headerWidget->rect().height() + 0.5;
