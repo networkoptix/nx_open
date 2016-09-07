@@ -24,7 +24,9 @@ class TransactionLog;
 class IncomingTransactionDispatcher
 {
 public:
-    IncomingTransactionDispatcher(TransactionLog* const transactionLog);
+    IncomingTransactionDispatcher(
+        const QnUuid& moduleGuid,
+        TransactionLog* const transactionLog);
 
     /** 
      * @note Method is non-blocking, result is delivered by invoking \a completionHandler
@@ -73,6 +75,7 @@ public:
     }
 
 private:
+    const QnUuid m_moduleGuid;
     TransactionLog* const m_transactionLog;
     std::map<
         ::ec2::ApiCommand::Value,

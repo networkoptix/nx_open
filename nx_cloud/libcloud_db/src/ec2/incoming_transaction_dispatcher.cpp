@@ -14,8 +14,10 @@ namespace ec2 {
 using namespace ::ec2;
 
 IncomingTransactionDispatcher::IncomingTransactionDispatcher(
+    const QnUuid& moduleGuid,
     TransactionLog* const transactionLog)
 :
+    m_moduleGuid(moduleGuid),
     m_transactionLog(transactionLog)
 {
 }
@@ -28,7 +30,7 @@ void IncomingTransactionDispatcher::dispatchTransaction(
 {
     if (tranFormat == Qn::UbjsonFormat)
     {
-        QnAbstractTransaction transaction;
+        QnAbstractTransaction transaction(m_moduleGuid);
         QnUbjsonReader<QByteArray> stream(&serializedTransaction);
         if (!QnUbjson::deserialize(&stream, &transaction))
         {
