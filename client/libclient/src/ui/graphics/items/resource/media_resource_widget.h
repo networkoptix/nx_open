@@ -1,5 +1,6 @@
-#ifndef QN_MEDIA_RESOURCE_WIDGET_H
-#define QN_MEDIA_RESOURCE_WIDGET_H
+#pragma once
+
+#include <array>
 
 #include "resource_widget.h"
 
@@ -150,7 +151,7 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) override;
-    void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
+    void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
@@ -159,10 +160,13 @@ protected:
     Q_SLOT void invalidateMotionSensitivity();
 
     void ensureBinaryMotionMask() const;
-    void invalidateBinaryMotionMask();
+    void invalidateBinaryMotionMask() const;
 
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
+
+    void ensureMotionLabelPositions() const;
+    void invalidateMotionLabelPositions() const;
 
     QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
@@ -268,6 +272,13 @@ private:
     /** Whether motion selection cached paths are valid. */
     mutable bool m_motionSelectionCacheValid;
 
+    /** Position for text labels for all motion sensitivity regions. */
+    /*   m_motionLabelPositions[channel][sensitivity][polygonIndex]  */
+    mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>> m_motionLabelPositions;
+
+    /** Whether motion label positions data is valid. */
+    mutable bool m_motionLabelPositionsValid;
+
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
     QnPtzControllerPtr m_ptzController;
@@ -292,5 +303,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)
-
-#endif // QN_MEDIA_RESOURCE_WIDGET_H
