@@ -34,7 +34,7 @@
 #include "http/http_transaction_receiver.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
-#include "compatibility_items.h"
+#include "compatibility.h"
 
 
 static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
