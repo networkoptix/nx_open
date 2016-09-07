@@ -2359,13 +2359,15 @@ void MediaServerProcess::run()
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
+    qnGlobalSettings->setNewSystem(false);
+
     bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
         qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
     if (!QnPermissionsHelper::isSafeMode() &&
         (isNewServerInstance || systemName.isDefault() || isCloudInstanceChanged))
     {
         resetCloudParams(&cloudConnectionManager);
-        qnGlobalSettings->setNewSystem(true);
+        qnGlobalSettings->setNewSystem(false);
     }
     if (isCloudInstanceChanged)
     {
