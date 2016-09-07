@@ -182,7 +182,9 @@ void TransactionTransport::sendTransaction(
     TransactionTransportHeader transportHeader,
     const std::shared_ptr<const TransactionWithSerializedPresentation>& transactionSerializer)
 {
-    transportHeader.vmsTransportHeader.fillSequence();
+    transportHeader.vmsTransportHeader.fillSequence(
+        localPeer().id,
+        localPeer().instanceId);
     auto serializedTransaction = transactionSerializer->serialize(
         remotePeer().dataFormat,
         std::move(transportHeader));
@@ -264,7 +266,7 @@ void TransactionTransport::onStateChanged(
 
 void TransactionTransport::onTransactionsReadFromLog(
     api::ResultCode resultCode,
-    std::vector<std::shared_ptr<const Serializable>> serializedTransactions,
+    std::vector<TransactionData> serializedTransactions,
     ::ec2::QnTranState readedUpTo)
 {
     using namespace std::placeholders;
@@ -290,14 +292,14 @@ void TransactionTransport::onTransactionsReadFromLog(
         cl_logDEBUG1);
 
     // Posting transactions to send
-    for (auto& tran: serializedTransactions)
+    for (auto& tranData: serializedTransactions)
     {
         TransactionTransportHeader transportHeader;
         transportHeader.systemId = m_systemId;
         transportHeader.vmsTransportHeader.distance = 1;
         transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
 
-        addData(tran->serialize(remotePeer().dataFormat, transportHeader));
+        addData(tranData.serializer->serialize(remotePeer().dataFormat, transportHeader));
     }
 
     m_remotePeerTranState = readedUpTo;

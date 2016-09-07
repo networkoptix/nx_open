@@ -37,6 +37,7 @@ const char* kEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStag
 const char* kPushEc2TransactionPath = "/ec2/forward_events/";
 
 const char* kMaintenanceGetVmsConnections = "/cdb/maintenance/get_vms_connections";
+const char* kMaintenanceGetTransactionLog = "/cdb/maintenance/get_transaction_log";
 
 }   //cdb
 }   //nx

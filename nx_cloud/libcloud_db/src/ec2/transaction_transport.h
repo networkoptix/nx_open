@@ -150,7 +150,7 @@ private:
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);
     void onTransactionsReadFromLog(
         api::ResultCode resultCode,
-        std::vector<std::shared_ptr<const Serializable>> serializedTransaction,
+        std::vector<TransactionData> serializedTransaction,
         ::ec2::QnTranState readedUpTo);
     void enableOutputChannel();
     //void addTransportHeaderToUbjsonTransaction(

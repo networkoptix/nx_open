@@ -212,6 +212,12 @@
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
+                    <sequence value="/cdb/maintenance/get_transaction_log">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="secureSource">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
                 </condition>
             </condition>
         </sequence>     <!-- authorization -->

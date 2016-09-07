@@ -39,6 +39,7 @@ extern const char* kPushEc2TransactionPath;
 
 /** Maintenance. */
 extern const char* kMaintenanceGetVmsConnections;
+extern const char* kMaintenanceGetTransactionLog;
 
 }   //cdb
 }   //nx

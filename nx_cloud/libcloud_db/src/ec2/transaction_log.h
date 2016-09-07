@@ -33,6 +33,15 @@ static const QnUuid kDbInstanceGuid("{DFD33CCE-92E5-48E4-AB7E-D4F164B2A94E}");
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
+/**
+ * Result of \a TransactionLog::readTransactions
+ */
+struct TransactionData
+{
+    nx::Buffer hash;
+    std::shared_ptr<const Serializable> serializer;
+};
+
 /** 
  * Comment will appear here later during class implementation.
  */
@@ -42,7 +51,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
     typedef nx::utils::MoveOnlyFunc<void(
         api::ResultCode /*resultCode*/,
-        std::vector<std::shared_ptr<const Serializable>> /*serializedTransactions*/,
+        std::vector<TransactionData> /*serializedTransactions*/,
         ::ec2::QnTranState /*readedUpTo*/)> TransactionsReadHandler;
 
     /**
@@ -229,7 +238,7 @@ private:
     struct TransactionReadResult
     {
         api::ResultCode resultCode;
-        std::vector<std::shared_ptr<const Serializable>> transactions;
+        std::vector<TransactionData> transactions;
         /** (Read start state) + (readed transactions). */
         ::ec2::QnTranState state;
     };

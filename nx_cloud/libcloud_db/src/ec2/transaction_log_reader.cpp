@@ -47,7 +47,7 @@ void TransactionLogReader::readTransactions(
             sharedGuard = m_asyncOperationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
-                std::vector<std::shared_ptr<const Serializable>> serializedTransactions,
+                std::vector<TransactionData> serializedTransactions,
                 ::ec2::QnTranState readedUpTo) mutable
         {
             const auto locker = sharedGuard->lock();
@@ -74,7 +74,7 @@ void TransactionLogReader::readTransactions(
 
 void TransactionLogReader::onTransactionsRead(
     api::ResultCode resultCode,
-    std::vector<std::shared_ptr<const Serializable>> serializedTransactions,
+    std::vector<TransactionData> serializedTransactions,
     ::ec2::QnTranState readedUpTo,
     TransactionsReadHandler completionHandler)
 {
@@ -91,18 +91,6 @@ void TransactionLogReader::onTransactionsRead(
 {
     return m_transactionLog->getTransactionState(m_systemId);
 }
-
-//void TransactionLogReader::setOnUbjsonTransactionReady(
-//    nx::utils::MoveOnlyFunc<void(nx::Buffer*)> handler)
-//{
-//    m_onUbjsonTransactionReady = std::move(handler);
-//}
-//
-//void TransactionLogReader::setOnJsonTransactionReady(
-//    nx::utils::MoveOnlyFunc<void(QJsonObject*)> handler)
-//{
-//    m_onJsonTransactionReady = std::move(handler);
-//}
 
 } // namespace ec2
 } // namespace cdb

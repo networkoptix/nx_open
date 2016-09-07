@@ -185,7 +185,7 @@ nx::db::DBResult TransactionLog::fetchTransactions(
     {
         QSqlQuery fetchTransactionsOfAPeerQuery(*connection);
         fetchTransactionsOfAPeerQuery.prepare(R"sql(
-            SELECT tran_data, timestamp, sequence
+            SELECT tran_data, tran_hash, timestamp, sequence
             FROM transaction_log
             WHERE system_id=? AND peer_guid=? AND db_guid=? AND sequence>? AND sequence<?
             ORDER BY sequence
@@ -209,8 +209,11 @@ nx::db::DBResult TransactionLog::fetchTransactions(
         while (fetchTransactionsOfAPeerQuery.next())
         {
             outputData->transactions.push_back(
-                std::make_shared<UbjsonTransactionPresentation>(
-                    fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray()));
+                TransactionData{
+                    fetchTransactionsOfAPeerQuery.value("tran_hash").toByteArray(),
+                    std::make_shared<UbjsonTransactionPresentation>(
+                        fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray())
+                });
         }
     }
 

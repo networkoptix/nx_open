@@ -5,7 +5,6 @@
 
 #include "result_code.h"
 
-
 namespace nx {
 namespace cdb {
 namespace api {

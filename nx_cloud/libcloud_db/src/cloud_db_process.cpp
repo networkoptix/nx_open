@@ -202,6 +202,7 @@ int CloudDBProcess::exec()
             &dbManager,
             &ec2OutgoingTransactionDispatcher);
         ec2::IncomingTransactionDispatcher incomingTransactionDispatcher(
+            kCdbGuid,
             &transactionLog);
         ec2::ConnectionManager ec2ConnectionManager(
             kCdbGuid,
@@ -249,7 +250,8 @@ int CloudDBProcess::exec()
         m_authProvider = &authProvider;
 
         MaintenanceManager maintenanceManager(
-            ec2ConnectionManager);
+            ec2ConnectionManager,
+            &transactionLog);
 
         //registering HTTP handlers
         registerApiHandlers(
@@ -393,7 +395,8 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<PingHandler>(authorizationManager);
         });
 
-    //accounts
+    //------------------------------------------
+    // AccountManager
     registerHttpHandler(
         kAccountRegisterPath,
         &AccountManager::addAccount, accountManager,
@@ -429,7 +432,8 @@ void CloudDBProcess::registerApiHandlers(
         &AccountManager::createTemporaryCredentials, accountManager,
         EntityType::account, DataActionType::update);
 
-    //systems
+    //------------------------------------------
+    // SystemManager
     registerHttpHandler(
         kSystemBindPath,
         &SystemManager::bindSystemToAccount, systemManager,
@@ -465,7 +469,8 @@ void CloudDBProcess::registerApiHandlers(
         &SystemManager::updateSystemName, systemManager,
         EntityType::system, DataActionType::update);
 
-    //authentication
+    //------------------------------------------
+    // AuthenticationProvider
     registerHttpHandler(
         kAuthGetNoncePath,
         &AuthenticationProvider::getCdbNonce, authProvider,
@@ -476,7 +481,8 @@ void CloudDBProcess::registerApiHandlers(
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
 
-    //transaction connection
+    //------------------------------------------
+    // ec2::ConnectionManager
     registerHttpHandler(
         kEstablishEc2TransactionConnectionPath,
         &ec2::ConnectionManager::createTransactionConnection,
@@ -488,9 +494,16 @@ void CloudDBProcess::registerApiHandlers(
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 
+    //------------------------------------------
+    // MaintenanceManager
     registerHttpHandler(
         kMaintenanceGetVmsConnections,
         &MaintenanceManager::getVmsConnections, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
+
+    registerHttpHandler(
+        kMaintenanceGetTransactionLog,
+        &MaintenanceManager::getTransactionLog, maintenanceManager,
         EntityType::maintenance, DataActionType::fetch);
 }
 
