@@ -19,6 +19,8 @@ QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem* parent):
     base_type(parent),
     m_tailLength(style::Metrics::kStandardPadding)
 {
+    setFlag(ItemIgnoresTransformations);
+
     setRoundingRadius(kDefaultRoundingRadius);
     setTailWidth(m_tailLength * 2.0);
 
