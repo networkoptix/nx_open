@@ -148,7 +148,10 @@ function openDialog(path, properties)
 {
     var component = Qt.createComponent(path)
     var dialog = component.createObject(mainWindow.contentItem, properties ? properties : {})
-    dialog.open()
+    if (dialog)
+        dialog.open()
+    else
+        console.log(component.errorString())
     return dialog
 }
 
