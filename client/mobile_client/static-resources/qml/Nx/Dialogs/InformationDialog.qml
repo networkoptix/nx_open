@@ -14,7 +14,7 @@ DialogBase
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: true
 
-    contentItem: Column
+    Column
     {
         width: parent.width
 

@@ -11,79 +11,50 @@ DialogBase
     property int activeQuality: QnPlayer.LowVideoQuality
     property size actualQuality
 
-    implicitHeight: Math.min(parent.height, contentItem.implicitHeight)
-
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: true
 
-    background: null
-
-    contentItem: Flickable
+    Column
     {
-        id: flickable
+        width: parent.width
 
-        anchors.fill: parent
-
-        implicitWidth: childrenRect.width
-        implicitHeight: childrenRect.height
-
-        contentWidth: width
-        contentHeight: column.height
-
-        topMargin: 16 + getStatusBarHeight()
-        bottomMargin: 16
-        contentY: 0
-
-        Rectangle
+        DialogTitle
         {
-            anchors.fill: column
-            color: ColorTheme.contrast3
+            text: qsTr("Video Quality")
+            bottomPadding: 6
+        }
+        DialogMessage
+        {
+            text: {
+                if (actualQuality.width > 0 && actualQuality.height > 0)
+                    return actualQuality.width + " x " + actualQuality.height
+                if (activeQuality != QnPlayer.LowVideoQuality && activeQuality != QnPlayer.HighVideoQuality)
+                    return activeQuality + 'p'
+                return qsTr("Unknown")
+            }
+            font.pixelSize: 14
+            bottomPadding: 12
         }
 
-        Column
+        DialogSeparator {}
+
+        QualityItem
         {
-            id: column
+            quality: QnPlayer.LowVideoQuality
+            text: qsTr("Highest speed")
+        }
+        QualityItem
+        {
+            quality: QnPlayer.HighVideoQuality
+            text: qsTr("Best quality")
+        }
 
-            width: flickable.width
+        DialogSeparator {}
 
-            DialogTitle
-            {
-                text: qsTr("Video Quality")
-                bottomPadding: 6
-            }
-            DialogMessage
-            {
-                text: {
-                    if (actualQuality.width > 0 && actualQuality.height > 0)
-                        return actualQuality.width + " x " + actualQuality.height
-                    if (activeQuality != QnPlayer.LowVideoQuality && activeQuality != QnPlayer.HighVideoQuality)
-                        return activeQuality + 'p'
-                    return qsTr("Unknown")
-                }
-                font.pixelSize: 14
-                bottomPadding: 12
-            }
-
-            DialogSeparator {}
-
-            QualityItem
-            {
-                quality: QnPlayer.LowVideoQuality
-                text: qsTr("Highest speed")
-            }
-            QualityItem
-            {
-                quality: QnPlayer.HighVideoQuality
-                text: qsTr("Best quality")
-            }
-
-            DialogSeparator {}
-
-            Repeater
-            {
-                model: [ 1080, 720, 480, 360 ]
-                QualityItem { quality: modelData }
-            }
+        Repeater
+        {
+            model: [ 1080, 720, 480, 360 ]
+            QualityItem { quality: modelData }
         }
     }
 }
