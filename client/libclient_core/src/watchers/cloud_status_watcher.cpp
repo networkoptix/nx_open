@@ -13,7 +13,7 @@
 
 using namespace nx::cdb;
 
-#define DEBUG_CLOUD_STATUS_WATCHER
+//#define DEBUG_CLOUD_STATUS_WATCHER
 #ifdef DEBUG_CLOUD_STATUS_WATCHER
 #define TRACE(...) qDebug() << "QnCloudStatusWatcher: " << __VA_ARGS__;
 #else
@@ -176,6 +176,16 @@ void QnCloudStatusWatcher::setCredentials(const QnCredentials& value)
         emit loginChanged();
     if (isPasswordChanged)
         emit passwordChanged();
+}
+
+QString QnCloudStatusWatcher::cloudLogin() const
+{
+    return credentials().user;
+}
+
+QString QnCloudStatusWatcher::cloudPassword() const
+{
+    return credentials().password;
 }
 
 QString QnCloudStatusWatcher::effectiveUserName() const
@@ -478,7 +488,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
         return;
 
     TRACE("Updating current account");
-    auto callback = [this](api::ResultCode result, api::AccountData accountData)
+    auto callback = [this](api::ResultCode /*result*/, api::AccountData accountData)
         {
             QString value = QString::fromStdString(accountData.email);
             TRACE("Received effective username" << value);
@@ -511,7 +521,7 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
     //TODO: #ak make this constant accessible through API
     params.type = std::string("short");
 #endif
-    auto callback = [this](api::ResultCode result, api::TemporaryCredentials credentials)
+    auto callback = [this](api::ResultCode /*result*/, api::TemporaryCredentials credentials)
         {
             temporaryCredentials = credentials;
             /* Ping twice as often to make sure temporary credentials will stay alive. */

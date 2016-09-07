@@ -765,8 +765,7 @@ class ECConnectionNotificationManager;
         Q_OBJECT
 
     public:
-        AbstractECConnectionFactory():
-            m_compatibilityMode(false)
+        AbstractECConnectionFactory()
         {}
         virtual ~AbstractECConnectionFactory() {}
 
@@ -794,25 +793,10 @@ class ECConnectionNotificationManager;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
 
-        /**
-        * \returns                         Whether this connection factory is working in compatibility mode.
-        *                                  In this mode all clients are supported regardless of customization.
-        */
-        bool isCompatibilityMode() const {
-            return m_compatibilityMode;
-        }
-
-        //! \param compatibilityMode         New compatibility mode state.
-        void setCompatibilityMode(bool compatibilityMode) {
-            m_compatibilityMode = compatibilityMode;
-        }
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
                                   impl::ConnectHandlerPtr handler ) = 0;
-
-    private:
-        bool m_compatibilityMode;
     };
 }
 

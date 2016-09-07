@@ -292,7 +292,7 @@ void QnConnectionManagerPrivate::doConnect()
 
             if (status == Qn::ConnectionResult::IncompatibleVersion)
                 infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
-            else if (status == Qn::ConnectionResult::CompatibilityMode)
+            else if (status == Qn::ConnectionResult::IncompatibleProtocol)
                 status = Qn::ConnectionResult::Success; // In mobile client it should be ignored
 
             Q_Q(QnConnectionManager);

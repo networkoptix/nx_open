@@ -485,7 +485,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         case Qn::ConnectionResult::Success:
             break;
-        case Qn::ConnectionResult::CompatibilityMode:
+        case Qn::ConnectionResult::IncompatibleProtocol:
             storeConnection();
             menu()->trigger(QnActions::DelayedForcedExitAction);
             return ec2::ErrorCode::ok; // to avoid cycle

@@ -78,6 +78,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
+    ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
 
     for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
     {

@@ -53,7 +53,10 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 
     ui->manageAccountLabel->setText(makeHref(tr("Manage account..."), urlHelper.accountManagementUrl()));
 
-    connect(ui->emailInputField, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->nameInputField, &QnInputField::textChanged, this,
+        &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->emailInputField, &QnInputField::textChanged, this,
+        &QnUserProfileWidget::hasChangesChanged);
 
     connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
     {

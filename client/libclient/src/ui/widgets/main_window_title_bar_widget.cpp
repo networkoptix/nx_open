@@ -234,7 +234,7 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
         return;
     }
 
-    action(QnActions::EffectiveMaximizeAction)->toggle();
+    action(QnActions::EffectiveMaximizeAction)->trigger();
     event->accept();
 #endif
 }

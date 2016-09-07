@@ -69,6 +69,10 @@ public:
     QnCredentials credentials() const;
     void setCredentials(const QnCredentials& value);
 
+    // These getters are for qml
+    Q_INVOKABLE QString cloudLogin() const;
+    Q_INVOKABLE QString cloudPassword() const;
+
     QString effectiveUserName() const;
     void setEffectiveUserName(const QString& value);
 

@@ -10,7 +10,7 @@ Pane
 
     clip: true
 
-    readonly property string login: cloudStatusWatcher.cloudLogin
+    readonly property string login: cloudStatusWatcher.effectiveUserName
 
     background: Rectangle
     {

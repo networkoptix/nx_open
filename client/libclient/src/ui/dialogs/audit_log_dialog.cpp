@@ -27,11 +27,14 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/properties/camera_settings_tab.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -675,7 +678,8 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId)
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId,
+    int selectedPage)
 {
     QnResourceList resList;
     for (const auto& id: record->resources)
@@ -692,6 +696,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
     }
 
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
+    params.setArgument(Qn::FocusTabRole, selectedPage);
     context()->menu()->trigger(ActionId, params);
 }
 
@@ -706,11 +711,17 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
     if (record->isPlaybackType())
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
-        triggerAction(record, QnActions::UserSettingsAction);
+        triggerAction(record,
+            QnActions::UserSettingsAction,
+            QnUserSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_ServerUpdate)
-        triggerAction(record, QnActions::ServerSettingsAction);
+        triggerAction(record,
+            QnActions::ServerSettingsAction,
+            QnServerSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-        triggerAction(record, QnActions::CameraSettingsAction);
+        triggerAction(record,
+            QnActions::CameraSettingsAction,
+            Qn::GeneralSettingsTab);
 
     if (isMaximized())
         showNormal();

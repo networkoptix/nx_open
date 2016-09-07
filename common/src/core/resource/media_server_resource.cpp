@@ -511,6 +511,7 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
     moduleInformation.type = QnModuleInformation::nxMediaServerId();
+    moduleInformation.brand = QnAppInfo::productName();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     moduleInformation.name = getName();

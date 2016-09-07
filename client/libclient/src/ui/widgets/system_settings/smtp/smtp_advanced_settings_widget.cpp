@@ -63,20 +63,20 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
 {
     ui->setupUi(this);
 
-    ui->emailInputField->setTitle(tr("Email:"));
+    ui->emailInputField->setTitle(tr("E-Mail"));
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
-    ui->serverInputField->setTitle(tr("SMTP Server:"));
+    ui->serverInputField->setTitle(tr("SMTP Server"));
     ui->serverInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Server cannot be empty.")));
 
-    ui->userInputField->setTitle(tr("User:"));
-    ui->passwordInputField->setTitle(tr("Password:"));
+    ui->userInputField->setTitle(tr("User"));
+    ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
 
-    ui->signatureInputField->setTitle(tr("System Signature:"));
+    ui->signatureInputField->setTitle(tr("System Signature"));
     ui->signatureInputField->setPlaceholderText(tr("Enter a short system description here."));
 
-    ui->supportInputField->setTitle(tr("Support Signature:"));
+    ui->supportInputField->setTitle(tr("Support Signature"));
     ui->supportInputField->setPlaceholderText(QnAppInfo::supportLink());
 
     const QString autoPort = tr("Auto");
