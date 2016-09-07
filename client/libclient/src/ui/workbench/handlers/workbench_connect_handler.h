@@ -1,5 +1,4 @@
-#ifndef WORKBENCH_CONNECT_HANDLER_H
-#define WORKBENCH_CONNECT_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -8,14 +7,15 @@
 #include <crash_reporter.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
 class QnGraphicsMessageBox;
 struct QnConnectionInfo;
 
-class QnWorkbenchConnectHandler : public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchConnectHandler: public Connective<QObject>, public QnWorkbenchContextAware
+{
     Q_OBJECT
-    typedef QObject base_type;
-
+    using base_type = Connective<QObject>;
 public:
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
@@ -37,17 +37,7 @@ public:
             const QnRaiiGuardPtr& completionWatcher);
     };
 
-    /// @brief Connects to server and stores successful connection data
-    /// according to specified settings. If no settings are specified no
-    /// connection data will be stored.
-    ec2::ErrorCode connectToServer(const QUrl &appServerUrl,
-        const ConnectionSettingsPtr &storeSettings,
-        bool silent);
-
-    bool disconnectFromServer(bool force);
-
-    ec2::AbstractECConnectionPtr connection2() const;
-
+private:
     bool connected() const;
 
     void showLoginDialog();
@@ -57,6 +47,17 @@ public:
 
     /** Clear all local data structures. */
     void clearConnection();
+
+    /// @brief Connects to server and stores successful connection data
+    /// according to specified settings. If no settings are specified no
+    /// connection data will be stored.
+    Qn::ConnectionResult connectToServer(const QUrl &appServerUrl,
+        const ConnectionSettingsPtr &storeSettings,
+        bool silent);
+
+    bool disconnectFromServer(bool force);
+
+    ec2::AbstractECConnectionPtr connection2() const;
 
 private:
     void at_messageProcessor_connectionOpened();
@@ -75,5 +76,3 @@ private:
     bool m_readyForConnection;
     ec2::CrashReporter m_crashReporter;
 };
-
-#endif // WORKBENCH_CONNECT_HANDLER_H
