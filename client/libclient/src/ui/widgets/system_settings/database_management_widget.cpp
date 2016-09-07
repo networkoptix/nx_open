@@ -147,8 +147,13 @@ void QnDatabaseManagementWidget::restoreDb()
         return;
     }
 
-    if (QnMessageBox::warning(this, tr("Warning"), tr("Are you sure you would like to restore the database? All existing data will be lost."),
-                             QDialogButtonBox::Ok, QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel) {
+    if (QnMessageBox::warning(
+        this,
+        tr("Warning"),
+        tr("Are you sure you would like to restore the database? All existing data will be lost."),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Ok) != QDialogButtonBox::Ok)
+    {
         file.close();
         return;
     }
