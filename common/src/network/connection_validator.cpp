@@ -110,7 +110,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (version < minSupportedVersion())
         return ConnectionResult::IncompatibleVersion;
 
-    if (protoVersion != QnAppInfo::ec2ProtoVersion())
+    // Mobile client can connect to servers with any protocol version.
+    if (!isMobile && protoVersion != QnAppInfo::ec2ProtoVersion())
         return ConnectionResult::IncompatibleProtocol;
 
     return ConnectionResult::Success;
