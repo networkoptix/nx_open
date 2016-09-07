@@ -369,11 +369,15 @@ QString prepareCommandString(const QUrl& url, const QString& localPath)
 {
     QString cifsOptionsString = lit("rsize=8192,wsize=8192");
     if (!url.userName().isEmpty())
-        cifsOptionsString += lit(",username=%2,password=%3").arg(url.userName())
-                                                            .arg(aux::passwordFromUrl(url));
+        cifsOptionsString +=
+            lit(",username=%2,password=%3")
+                .arg(url.userName())
+                .arg(aux::passwordFromUrl(url));
+    else
+        cifsOptionsString += lit(",password=");
 
     QString srcString = lit("//") + url.host() + url.path();
-    return lit("mount -vvv -t cifs -o %1 %2 %3 2>&1")
+    return lit("mount -t cifs -o %1 %2 %3 2>&1")
                 .arg(cifsOptionsString) 
                 .arg(srcString) 
                 .arg(localPath);
@@ -384,12 +388,19 @@ int callMount(const QString& commandString)
     FILE* pipe;
     char buf[BUFSIZ];
     int retCode = -1;
+//    int fd;
+//    int flags;
 
     if ((pipe = popen(commandString.toLatin1().constData(), "r")) == NULL)
     {
         NX_LOG(lit("%1 'mount' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
         return -1;
     }
+
+//    fd = fileno(pipe);
+//    flags = fcntl(fd, F_GETFL, 0);
+//    flags |= O_NONBLOCK;
+//    fcntl(fd, F_SETFL, flags);
 
     while (fgets(buf, BUFSIZ, pipe) != NULL) 
     {
