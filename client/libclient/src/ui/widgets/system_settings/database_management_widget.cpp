@@ -21,7 +21,7 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace {
-    const QLatin1String dbExtension(".db");
+const QLatin1String dbExtension(".db");
 }
 
 QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
@@ -34,24 +34,27 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
 
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
-    connect(ui->backupButton, SIGNAL(clicked()), this, SLOT(at_backupButton_clicked()));
-    connect(ui->restoreButton, SIGNAL(clicked()), this, SLOT(at_restoreButton_clicked()));
+    connect(ui->backupButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::backupDb);
+    connect(ui->restoreButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::restoreDb);
 }
 
-QnDatabaseManagementWidget::~QnDatabaseManagementWidget() {
+QnDatabaseManagementWidget::~QnDatabaseManagementWidget()
+{
     return;
 }
 
-void QnDatabaseManagementWidget::at_backupButton_clicked() {
+void QnDatabaseManagementWidget::backupDb()
+{
     // TODO: #dklychkov file name filter string duplicates the value of dbExtension variable
     QScopedPointer<QnCustomFileDialog> fileDialog(new QnCustomFileDialog(
-                                                      this,
-                                                      tr("Save Database Backup..."),
-                                                      qnSettings->lastDatabaseBackupDir(),
-                                                      tr("Database Backup Files (*.db)")));
+        this,
+        tr("Save Database Backup..."),
+        qnSettings->lastDatabaseBackupDir(),
+        tr("Database Backup Files (*.db)")));
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
-    if(!fileDialog->exec())
+    if (!fileDialog->exec())
         return;
+
     QString fileName = fileDialog->selectedFile();
     if (fileName.isEmpty())
         return;
@@ -65,8 +68,12 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
         fileName += dbExtension;
 
     QFile file(fileName);
-    if(!file.open(QIODevice::WriteOnly)) {
-        QnMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for writing.").arg(fileName));
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        QnMessageBox::critical(
+            this,
+            tr("Error"),
+            tr("Could not open file '%1' for writing.").arg(fileName));
         return;
     }
 
@@ -81,32 +88,47 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     ec2::ErrorCode errorCode;
     QByteArray databaseData;
     auto dumpDatabaseHandler =
-        [&dialog, &errorCode, &databaseData]( int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData& dbData ) {
+        [&dialog, &errorCode, &databaseData]
+        (int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData& dbData)
+        {
             errorCode = _errorCode;
             databaseData = dbData.data;
             dialog->reset();
-    };
-    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync( dialog.data(), dumpDatabaseHandler );
+        };
+    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync(dialog.data(), dumpDatabaseHandler);
     dialog->exec();
-    if(dialog->wasCanceled())
+    if (dialog->wasCanceled())
         return;    //TODO: #ak is running request finish OK?
 
-    if( errorCode != ec2::ErrorCode::ok )
+    if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_LOG( lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR );
-        QnMessageBox::information(this, tr("Information"), tr("Failed to dump server database to %1.").arg(fileName));
+        NX_LOG(lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
+        QnMessageBox::information(
+            this,
+            tr("Information"),
+            tr("Failed to dump server database to %1.").arg(fileName));
         return;
     }
 
-    file.write( databaseData );
+    file.write(databaseData);
     file.close();
 
-    QnMessageBox::information(this, tr("Information"), tr("Database was successfully backed up into file '%1'.").arg(fileName));
+    QnMessageBox::information(
+        this,
+        tr("Information"),
+        tr("Database was successfully backed up into file '%1'.").arg(fileName));
 }
 
-void QnDatabaseManagementWidget::at_restoreButton_clicked() {
-    QString fileName = QnFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
-    if(fileName.isEmpty())
+void QnDatabaseManagementWidget::restoreDb()
+{
+    QString fileName = QnFileDialog::getOpenFileName(
+        this,
+        tr("Open Database Backup..."),
+        qnSettings->lastDatabaseBackupDir(),
+        tr("Database Backup Files (*.db)"),
+        NULL,
+        QnCustomFileDialog::fileDialogOptions());
+    if (fileName.isEmpty())
         return;
 
     /* Check if we were disconnected (server shut down) while the dialog was open. */
@@ -116,8 +138,12 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
 
     QFile file(fileName);
-    if(!file.open(QIODevice::ReadOnly)) {
-        QnMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for reading.").arg(fileName));
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        QnMessageBox::critical(
+            this,
+            tr("Error"),
+            tr("Could not open file '%1' for reading.").arg(fileName));
         return;
     }
 
@@ -141,47 +167,63 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
 
     ec2::ErrorCode errorCode;
     auto restoreDatabaseHandler =
-        [&dialog, &errorCode]( int /*reqID*/, ec2::ErrorCode _errorCode ) {
+        [&dialog, &errorCode](int /*reqID*/, ec2::ErrorCode _errorCode)
+        {
             errorCode = _errorCode;
             dialog->reset();
-    };
+        };
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    if (!conn) {
+    if (!conn)
+    {
         QnMessageBox::information(this,
             tr("Information"),
             tr("You need to connect to a server prior to backup start."));
         return;
     }
 
-    conn->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
+    conn->restoreDatabaseAsync(data, dialog.data(), restoreDatabaseHandler);
     dialog->exec();
-    if(dialog->wasCanceled())
+    if (dialog->wasCanceled())
         return; // TODO: #Elric make non-cancelable.   TODO: #ak is running request finish OK?
 
-    if( errorCode == ec2::ErrorCode::ok ) {
+    if (errorCode == ec2::ErrorCode::ok)
+    {
         QnMessageBox::information(this,
-                                 tr("Information"),
-                                 tr("Database was successfully restored from file '%1'. Server will be restarted.").arg(fileName));
+            tr("Information"),
+            tr("Database was successfully restored from file '%1'. Server will be restarted.")
+                .arg(fileName));
         menu()->trigger(QnActions::ReconnectAction);
-    } else {
-        NX_LOG( lit("Failed to restore Server database from file '%1'. %2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
-        QnMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")
-                              .arg(fileName));
+    }
+    else
+    {
+        NX_LOG(lit("Failed to restore Server database from file '%1'. %2")
+            .arg(fileName)
+            .arg(ec2::toString(errorCode)),
+            cl_logERROR);
+        QnMessageBox::critical(
+            this,
+            tr("Error"),
+            tr("An error has occurred while restoring the database from file '%1'.")
+                .arg(fileName));
     }
 }
 
-void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly) {
+void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly)
+{
     ui->restoreButton->setEnabled(!readOnly);
 }
 
-void QnDatabaseManagementWidget::applyChanges() {
+void QnDatabaseManagementWidget::applyChanges()
+{
     /* Widget is read-only */
 }
 
-void QnDatabaseManagementWidget::loadDataToUi() {
+void QnDatabaseManagementWidget::loadDataToUi()
+{
     /* Widget is read-only */
 }
 
-bool QnDatabaseManagementWidget::hasChanges() const {
+bool QnDatabaseManagementWidget::hasChanges() const
+{
     return false;
 }
