@@ -238,7 +238,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
             NX_LOG(lit("Model name starts with AV"), cl_logINFO);
             auto unprefixed = model.mid(2);
 
-            qDebug() << "Unprefixed" << unprefixed;
+            NX_LOG(lit("Unprefixed %1").arg(unprefixed), cl_logINFO);
             rt = qnResTypePool->getLikeResourceTypeId(manufacture(), unprefixed);
         }
     }
@@ -249,11 +249,18 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
         return QList<QnResourcePtr>();
     }
 
+    NX_LOG(lit("AV RESOURCE SEARCHER, Resource type is not null %1").arg(url.toString()), cl_logINFO);
+
     QString mac = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?mac"), host, port, timeout, auth)));
     mac = getValueFromString(mac);
 
     if (mac.isEmpty())
+    {
+        NX_LOG(lit("MAC IS EMPTY %1").arg(url.toString()), cl_logINFO);
         return QList<QnResourcePtr>();
+    }
+
+    NX_LOG(lit("AV RESOURCE SEARCHER, Creating resource %1").arg(url.toString()), cl_logINFO);
 
     QnPlAreconVisionResourcePtr res(0);
 

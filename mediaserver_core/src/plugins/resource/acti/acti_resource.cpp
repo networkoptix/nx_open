@@ -356,8 +356,16 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     auto encodersStr = report.value("encoder_cap");
 
+    NX_LOG(lit("LISTING OF AVAILABLE ACTI ENCODERS: %1").arg(getUrl()), cl_logINFO);
+
+    for (const auto& key: report.keys())
+    {
+        NX_LOG(lit("%1 - %2").arg(key).arg(report[key]), cl_logINFO);
+    }
+
     if (!encodersStr.isEmpty())
     {
+        NX_LOG(lit("ENCODERS STRING IS NOT EMPTY"), cl_logINFO);
         auto encoders = encodersStr.split(',');
         for (const auto& encoder: encoders)
             m_availableEncoders.insert(encoder.trimmed());
@@ -365,6 +373,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     else
     {
         //Try to use h264 if no codecs defined;
+        NX_LOG(lit("ENCODERS STRING IS EMPTY"), cl_logINFO);
         m_availableEncoders.insert(lit("H264"));
     }
 

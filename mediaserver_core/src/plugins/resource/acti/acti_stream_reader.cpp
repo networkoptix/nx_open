@@ -56,6 +56,12 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     auto encoders = m_actiRes->getAvailableEncoders();
     QString encoderStr;
 
+    NX_LOG(lit("AVAILABLE ENCODERS LIST:"), cl_logINFO);
+    for (const auto& encoder: encoders)
+    {
+        NX_LOG(lit("ENCODER FOR %1: %2").arg(m_actiRes->getUrl()).arg(encoder), cl_logINFO);
+    }
+
     if (encoders.contains(lit("H264")))
         encoderStr = lit("H264");
     else if (encoderStr.contains(lit("MJPEG")))
