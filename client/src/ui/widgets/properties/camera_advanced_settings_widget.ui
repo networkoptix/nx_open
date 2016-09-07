@@ -21,9 +21,6 @@
      </property>
      <widget class="QWidget" name="noSettingsPage">
       <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="margin">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QLabel" name="noSettingsLabel">
          <property name="text">
@@ -38,7 +35,16 @@
      </widget>
      <widget class="QWidget" name="manualPage">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -48,7 +54,16 @@
      </widget>
      <widget class="QWidget" name="webPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -57,6 +72,20 @@
           <url>
            <string>about:blank</string>
           </url>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="unavailablePage">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="unavailableLabel">
+         <property name="text">
+          <string>Advanced settings are unavailable</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
