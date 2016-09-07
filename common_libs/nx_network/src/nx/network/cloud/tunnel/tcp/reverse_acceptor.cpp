@@ -34,6 +34,11 @@ ReverseAcceptor::ReverseAcceptor(String selfHostName, ConnectHandler connectHand
 {
 }
 
+ReverseAcceptor::~ReverseAcceptor()
+{
+    m_httpServer.reset();
+}
+
 bool ReverseAcceptor::start(const SocketAddress& address, aio::AbstractAioThread* aioThread)
 {
     if (aioThread)

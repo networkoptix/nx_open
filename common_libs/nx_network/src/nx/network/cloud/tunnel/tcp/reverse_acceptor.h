@@ -23,6 +23,7 @@ public:
         std::unique_ptr<AbstractStreamSocket> socket)> ConnectHandler;
 
     ReverseAcceptor(String selfHostName, ConnectHandler clientHandler);
+    ~ReverseAcceptor();
 
     ReverseAcceptor(const ReverseAcceptor&) = delete;
     ReverseAcceptor(ReverseAcceptor&&) = delete;
