@@ -46,14 +46,15 @@ RevealResponse::RevealResponse(const QnModuleInformation &other)
 {
 }
 
-//TODO: #ak why don't we sending and receiving realm here? Should we add new fields here?
 QByteArray RevealResponse::serialize()
 {
     QVariantMap map;
     map[lit("application")] = type;
+    map[lit("seed")] = id.toString();
     map[lit("version")] = version.toString();
     map[lit("customization")] = customization;
-    map[lit("seed")] = id.toString();
+    map[lit("brand")] = brand;
+    map[lit("realm")] = realm;
     map[lit("systemName")] = systemName;
     map[lit("name")] = name;
     map[lit("systemInformation")] = systemInformation.toString();
@@ -80,6 +81,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     version = QnSoftwareVersion(map.value(lit("version")).toString());
     systemInformation = map.value(lit("systemInformation")).toString();
     customization = map.value(lit("customization")).toString();
+    brand = map.value(lit("brand")).toString();
+    realm = map.value(lit("realm")).toString();
     systemName = map.value(lit("systemName")).toString();
     name = map.value(lit("name")).toString();
     id = QnUuid::fromStringSafe(map.value(lit("seed")).toString());
