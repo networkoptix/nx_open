@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="he" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -2986,40 +2986,30 @@ to view more bookmarks</source>
         <source>days</source>
         <translation>ימים</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation>
-            <numerusform>%nms</numerusform>
-            <numerusform>%nms</numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation>
-            <numerusform>%nש</numerusform>
-            <numerusform>%nש</numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>ש</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation>
-            <numerusform>%nד</numerusform>
-            <numerusform>%nד</numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>ד</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation>
-            <numerusform>%nשע</numerusform>
-            <numerusform>%nשע</numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>שע</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation>
-            <numerusform>%nימ</numerusform>
-            <numerusform>%nימ</numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>ימ</translation>
     </message>
 </context>
 <context>

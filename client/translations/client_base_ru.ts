@@ -3021,45 +3021,30 @@ to view more bookmarks</source>
         <source>days</source>
         <translation>д</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation>
-            <numerusform>%nмс</numerusform>
-            <numerusform>%nмс</numerusform>
-            <numerusform>%nмс</numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>мс</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation>
-            <numerusform>%nс</numerusform>
-            <numerusform>%nс</numerusform>
-            <numerusform>%nс</numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>с</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation>
-            <numerusform>%nм</numerusform>
-            <numerusform>%nм</numerusform>
-            <numerusform>%nм</numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>м</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation>
-            <numerusform>%nч</numerusform>
-            <numerusform>%nч</numerusform>
-            <numerusform>%nч</numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>ч</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation>
-            <numerusform>%nд</numerusform>
-            <numerusform>%nд</numerusform>
-            <numerusform>%nд</numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>д</translation>
     </message>
 </context>
 <context>
