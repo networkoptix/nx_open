@@ -38,13 +38,6 @@ exports.config = {
         browser.get('/');
         browser.waitForAngular();
 
-        this.helper.checkPresent(this.helper.setupWizardDialog).then( self.helper.completeSetup,
-            function() { // if there's no setup wizard
-                element(by.model('user.username')).sendKeys('admin');
-                element(by.model('user.password')).sendKeys('qweasd123');
-                element(by.buttonText('Log in')).click();
-
-                browser.sleep(500);
-            });
+        self.helper.login('admin', 'qweasd123');
     }
 };

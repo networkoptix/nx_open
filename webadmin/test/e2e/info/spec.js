@@ -9,14 +9,15 @@ describe('Information Page', function () {
     });
 
     it("should show software info",function(){
-        expect(p.versionNode.getText()).toMatch(/\d\.\d\.\d.\d+/);//2.3.0.1234
-        expect(p.archNode.getText()).toMatch(/\bx86|arm|x64\b|/);//x86,arm,x64
-        expect(p.archNode.getText()).toMatch(/[\w\d]+/);//x86,arm,x64
-        expect(p.platformNode.getText()).toMatch(/\blinux|mac|windows\b/); //linux,mac,windows
-        expect(p.platformNode.getText()).toMatch(/\w+/); //linux,mac,windows
+        expect(p.version.getText()).toMatch(/\d\.\d\.\d.\d+/);//2.3.0.1234
+        expect(p.architec.getText()).toMatch(/\bx86|arm|x64\b|/);//x86,arm,x64
+        expect(p.architec.getText()).toMatch(/[\w\d]+/);//x86,arm,x64
+        expect(p.platform.getText()).toMatch(/\blinux|mac|windows\b/); //linux,mac,windows
+        expect(p.platform.getText()).toMatch(/\w+/); //linux,mac,windows
     });
 
     it("should show storage info",function(){
+        p.helper.getTab('Storage').click();
         expect(p.storagesNodes.count()).toBeGreaterThan(0); // storages exist
 
         p.storagesNodes.each( function(storage) {
@@ -27,6 +28,8 @@ describe('Information Page', function () {
     });
 
     it("health monitoring: should display legend",function() {
+        p.helper.getTab('Health monitoring').click();
+
         p.helper.waitIfNotPresent( p.legendCheckboxFirst, 3000);
 
         p.helper.ignoreSyncFor( function() {
@@ -38,6 +41,8 @@ describe('Information Page', function () {
     });
 
     it("Health monitoring: canvas is displayed",function(){
+        p.helper.getTab('Health monitoring').click();
+
         p.helper.ignoreSyncFor( function() {
             expect(p.graphCanvas.isDisplayed()).toBe(true);
             expect(p.graphCanvas.getAttribute('width')).toBeGreaterThan(100);
@@ -46,24 +51,34 @@ describe('Information Page', function () {
     });
 
     it("Health monitoring: message when server is offline",function(){
+        p.helper.getTab('Health monitoring').click();
+
         p.helper.ignoreSyncFor( function() {
             expect(p.offlineAlert.getInnerHtml()).toContain('Server is offline now!');
         });
     });
 
     it("Piece of log is displayed in iframe",function(){
+        p.helper.getTab('Logs').click();
+
         browser.refresh();
+        p.helper.getTab('Logs').click();
         expect(p.logIframe.isDisplayed()).toBe(true);
         expect(p.logIframe.getAttribute("src")).toMatch("/api/showLog");
     });
 
     it("Log: Button More lines work - opens /static/index.html#/log",function(){
+        p.helper.getTab('Logs').click();
+
         p.moreLogLinesButton.click();
         expect(browser.getCurrentUrl()).toContain('/log');
         expect(p.logIframeMore.isDisplayed()).toBe(true);
+        p.get(); // return back to Info page
     });
 
     it("Log can be opened in new window",function(){
+        p.helper.getTab('Logs').click();
+
         expect(p.openLogButton.isDisplayed()).toBe(true);
         expect(p.openLogButton.getText()).toEqual("Open in new window");
         expect(p.openLogButton.getAttribute("target")).toEqual("_blank");
@@ -71,8 +86,8 @@ describe('Information Page', function () {
     });
 
     it("Refresh link to update iframe works",function(){
-        p.get();
-        browser.sleep(500);
+        p.helper.getTab('Logs').click();
+
         expect(p.refreshLogButton.isDisplayed()).toBe(true);
         expect(p.refreshLogButton.getText()).toEqual("Refresh");
         expect(p.refreshLogButton.getAttribute("target")).toEqual(p.logIframe.getAttribute("name"));
