@@ -203,19 +203,25 @@ void QnLdapUsersDialog::stopTesting(const QString &text /* = QString()*/) {
     ui->errorLabel->setVisible(true);
 }
 
-void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users) {
+void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
+{
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;
 
-    auto importedUsers = qnResPool->getResources().filtered<QnUserResource>([](const QnUserResourcePtr &user) {
-        return user->isLdap();
-    });
-
-    for (const QnLdapUser &ldapUser: users) {
-        auto it = std::find_if(importedUsers.cbegin(), importedUsers.cend(), [ldapUser](const QnUserResourcePtr &user) {
-            return QString::compare(ldapUser.login, user->getName(), Qt::CaseInsensitive) == 0;
+    auto importedUsers = qnResPool->getResources().filtered<QnUserResource>(
+        [](const QnUserResourcePtr &user)
+        {
+            return user->isLdap();
         });
+
+    for (const QnLdapUser &ldapUser : users)
+    {
+        auto it = std::find_if(importedUsers.cbegin(), importedUsers.cend(),
+            [ldapUser](const QnUserResourcePtr &user)
+            {
+                return QString::compare(ldapUser.login, user->getName(), Qt::CaseInsensitive) == 0;
+            });
 
         if (it == importedUsers.cend())
             continue;
@@ -224,9 +230,11 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users) {
         if (existingUser->getEmail() == ldapUser.email)
             continue;
 
-        qnResourcesChangesManager->saveUser(existingUser, [ldapUser](const QnUserResourcePtr &user){
-            user->setEmail(ldapUser.email);
-        });
+        qnResourcesChangesManager->saveUser(existingUser,
+            [ldapUser](const QnUserResourcePtr &user)
+            {
+                user->setEmail(ldapUser.email);
+            });
     }
 }
 
@@ -240,13 +248,14 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     /* Safety check */
     auto filteredUsers = filterExistingUsers(users);
 
-    for (const QnLdapUser &ldapUser: filteredUsers) {
+    for (const QnLdapUser &ldapUser: filteredUsers)
+    {
         QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
-        user->setId(QnUuid::createUuid());
-        user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
-        user->setEnabled(false);
         user->setName(ldapUser.login);
         user->setEmail(ldapUser.email);
+        user->fillId();
+        user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
+        user->setEnabled(false);
         user->generateHash();
 
         qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});

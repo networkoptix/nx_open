@@ -16,36 +16,42 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/media/audio_player.h>
 
-QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent) :
+QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent):
     base_type(parent),
-    ui(new Ui::QnNotificationSoundManagerDialog)
+    ui(new Ui::QnNotificationSoundManagerDialog),
+    m_model(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel())
 {
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
 
-    ui->listView->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
+    ui->listView->setModel(m_model);
 
-    connect(ui->playButton,     SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
-    connect(ui->addButton,      SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
-    connect(ui->renameButton,   SIGNAL(clicked()), this, SLOT(at_renameButton_clicked()));
-    connect(ui->deleteButton,   SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
+    connect(ui->playButton, &QPushButton::clicked, this,
+        &QnNotificationSoundManagerDialog::at_playButton_clicked);
+    connect(ui->addButton, &QPushButton::clicked, this,
+        &QnNotificationSoundManagerDialog::at_addButton_clicked);
+    connect(ui->renameButton, &QPushButton::clicked, this,
+        &QnNotificationSoundManagerDialog::at_renameButton_clicked);
+    connect(ui->deleteButton, &QPushButton::clicked, this,
+        &QnNotificationSoundManagerDialog::at_deleteButton_clicked);
 }
 
 QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
 {
 }
 
-void QnNotificationSoundManagerDialog::enablePlayButton() {
+void QnNotificationSoundManagerDialog::enablePlayButton()
+{
     ui->playButton->setEnabled(true);
 }
 
-void QnNotificationSoundManagerDialog::at_playButton_clicked() {
+void QnNotificationSoundManagerDialog::at_playButton_clicked()
+{
     if (!ui->listView->currentIndex().isValid())
         return;
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-    QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
+    QString filename = m_model->filenameByRow(ui->listView->currentIndex().row());
     if (filename.isEmpty())
         return;
 
@@ -58,21 +64,28 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
         ui->playButton->setEnabled(false);
 }
 
-void QnNotificationSoundManagerDialog::at_addButton_clicked() {
+void QnNotificationSoundManagerDialog::at_addButton_clicked()
+{
     //TODO: #GDM #Common progressbar required
 
     QString supportedFormats = tr("Sound Files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnSessionAwareDialog<QnCustomFileDialog> (this, tr("Select File..."), qnSettings->mediaFolder(), supportedFormats));
+    QScopedPointer<QnCustomFileDialog> dialog(
+        new QnSessionAwareDialog<QnCustomFileDialog>(
+            this,
+            tr("Select File..."),
+            qnSettings->mediaFolder(),
+            supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;
     QString title;
 
-    dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
+    dialog->addSpinBox(tr("Clip sound up to %1 seconds")
+        .arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
     dialog->addLineEdit(tr("Custom title:"), &title);
-    if(!dialog->exec())
+    if (!dialog->exec())
         return;
 
     /* Check if we were disconnected (server shut down) while the dialog was open. */
@@ -83,54 +96,58 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     if (fileName.isEmpty())
         return;
 
-    if (!context()->instance<QnAppServerNotificationCache>()->storeSound(fileName, cropSoundSecs*1000, title))
+    if (!context()->instance<QnAppServerNotificationCache>()->storeSound(
+        fileName,
+        cropSoundSecs * 1000,
+        title)
+        )
         QnMessageBox::warning(this,
-                             tr("Error"),
-                             tr("File cannot be added."));
+            tr("Error"),
+            tr("File cannot be added."));
 }
 
-void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
+void QnNotificationSoundManagerDialog::at_renameButton_clicked()
+{
     if (!ui->listView->currentIndex().isValid())
         return;
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-    QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
+    QString filename = m_model->filenameByRow(ui->listView->currentIndex().row());
     if (filename.isEmpty())
         return;
 
-    QString title = soundModel->titleByFilename(filename);
+    QString title = m_model->titleByFilename(filename);
 
     QString newTitle = QInputDialog::getText(this,
-                                             tr("Rename sound"),
-                                             tr("Enter New Title:"),
-                                             QLineEdit::Normal,
-                                             title);
+        tr("Rename sound"),
+        tr("Enter New Title:"),
+        QLineEdit::Normal,
+        title);
     if (newTitle.isEmpty())
         return;
 
     if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
         QnMessageBox::warning(this,
-                             tr("Error"),
-                             tr("New title could not be set."));
+            tr("Error"),
+            tr("New title could not be set."));
 
 }
 
-void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
+void QnNotificationSoundManagerDialog::at_deleteButton_clicked()
+{
     //TODO: #GDM #Common progressbar required
     if (!ui->listView->currentIndex().isValid())
         return;
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
-    QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
+    QString filename = m_model->filenameByRow(ui->listView->currentIndex().row());
     if (filename.isEmpty())
         return;
 
-    QString title = soundModel->titleByFilename(filename);
+    QString title = m_model->titleByFilename(filename);
     if (QnMessageBox::question(this,
-                              tr("Confirm File Deletion"),
-                              tr("Are you sure you want to delete '%1'?").arg(title),
-                              QDialogButtonBox::Ok,
-                              QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
+        tr("Confirm File Deletion"),
+        tr("Are you sure you want to delete '%1'?").arg(title),
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 
     context()->instance<QnAppServerNotificationCache>()->deleteFile(filename);

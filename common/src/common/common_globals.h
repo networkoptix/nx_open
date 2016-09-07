@@ -823,7 +823,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TemporaryUnauthorized,      /*< LDAP server is not accessible. */
         IncompatibleInternal,       /*< Server has incompatible customization or cloud host. */
         IncompatibleVersion,        /*< Server version is too low. */
-        CompatibilityMode           /*< Client should be restarted in compatibility mode.*/
+        IncompatibleProtocol        /*< Ec2 protocol versions differs.*/
     };
 
     /**

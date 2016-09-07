@@ -122,23 +122,23 @@
                 "toolTipText":      "dark4"
             },
             "disabled": {
-                "windowText":       "light16.setAlpha(75)",
-                "button":           "dark11.setAlpha(75)",
-                "light":            "light10.setAlpha(75)",
-                "midlight":         "dark13.setAlpha(75)",
-                "dark":             "dark9.setAlpha(75)",
-                "mid":              "dark10.setAlpha(75)",
-                "text":             "light4.setAlpha(75)",
-                "brightText":       "light1.setAlpha(75)",
-                "buttonText":       "light4.setAlpha(75)",
-                "base":             "dark7.setAlpha(75)",
+                "windowText":       "light16.setAlpha(77)",
+                "button":           "dark11.setAlpha(77)",
+                "light":            "light10.setAlpha(77)",
+                "midlight":         "dark13.setAlpha(77)",
+                "dark":             "dark9.setAlpha(77)",
+                "mid":              "dark10.setAlpha(77)",
+                "text":             "light4.setAlpha(77)",
+                "brightText":       "light1.setAlpha(77)",
+                "buttonText":       "light4.setAlpha(77)",
+                "base":             "dark7.setAlpha(77)",
                 "window":           "dark7",
-                "shadow":           "dark5.setAlpha(75)",
+                "shadow":           "dark5.setAlpha(77)",
                 "highlight":        "brand_core",
-                "highlightedText":  "brand_contrast.setAlpha(75)",
-                "link":             "blue12.setAlpha(75)",
-                "linkVisited":      "blue11.setAlpha(75)",
-                "alternateBase":    "dark7.setAlpha(75)",
+                "highlightedText":  "brand_contrast.setAlpha(77)",
+                "link":             "blue12.setAlpha(77)",
+                "linkVisited":      "blue11.setAlpha(77)",
+                "alternateBase":    "dark7.setAlpha(77)",
                 "toolTipBase":      "light4",
                 "toolTipText":      "dark4"
             }
@@ -152,6 +152,14 @@
             },
             "inactive": {
                 "link":             "blue12"
+            }
+        }
+    },
+
+    "QSlider": {
+        "palette": {
+            "disabled": {
+                "window":           "dark7.setAlpha(77)"
             }
         }
     },
@@ -171,8 +179,8 @@
                 "midlight":         "dark11"
             },
             "disabled": {
-                "windowText":       "light4.setAlpha(75)",
-                "buttonText":       "light12.setAlpha(75)"
+                "windowText":       "light4.setAlpha(77)",
+                "buttonText":       "light12.setAlpha(77)"
             }
         }
     },
@@ -206,8 +214,8 @@
                 "base":             "transparent",
                 "midlight":         "dark10.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
-                "text":             "light10.setAlpha(75)",
-                "highlightedText":  "light4.setAlpha(75)"
+                "text":             "light10.setAlpha(77)",
+                "highlightedText":  "light4.setAlpha(77)"
             },
             "inactive": {
                 "base":             "transparent",
@@ -250,7 +258,7 @@
                 "base":             "dark4"
             },
             "disabled": {
-                "base":             "dark4.setAlpha(75)"
+                "base":             "dark4.setAlpha(77)"
             }
         }
     },
@@ -402,20 +410,36 @@
         "palette": { "default": { "window": "dark4" } }
     },
 
-    "QnControlBackgroundWidget": {
-        "_": "Background for ui panels (resource tree, notifications panel).",
-
-        "colors": ["dark4.setAlpha(128)"],
-        "frameColor": "dark8",
-        "frameWidth": 1.0
-    },
-
     "QnGraphicsView": {
         "palette": {
             "default": {
                 "_": "Scene background color.",
 
                 "base": "dark4"
+            }
+        }
+    },
+
+    "QnControlBackgroundWidget": {
+        "_": "Background for ui panels (resource tree, notifications panel).",
+
+        "colors": ["dark4.setAlpha(217)"],
+        "frameColor": "dark8",
+        "frameWidth": 1.0
+    },
+
+    "QnResourceBrowserWidget": {
+        "palette": {
+            "default": {
+                "mid": "dark8"
+            }
+        }
+    },
+
+    "QnNotificationsCollectionWidget": {
+        "palette": {
+            "default": {
+                "mid": "dark8"
             }
         }
     },
@@ -450,7 +474,7 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "dark4.setAlpha(75)",
+            "window": "dark4.setAlpha(77)",
             "windowText": "#801010c0"
         }}
     },
@@ -536,6 +560,14 @@
             "frame": "#007ed4ff",
             "window": "#004b80cc",
             "text": "#ccccccff"
+        }
+    },
+
+    "QnEdgeShadowWidget": {
+        "palette": {
+            "default": {
+                "window": "dark1.setAlpha(38)"
+            }
         }
     },
 
@@ -656,6 +688,10 @@
             "#d24729",
             "#c22626"
         ]
+    },
+
+    "QnFisheyeCalibrationWidget": {
+        "palette": { "default": { "window": "dark4" } }
     }
 }
 

@@ -53,32 +53,38 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this, [this](const QSet<QnUuid>& resourceIds)
-    {
-        if (m_user && resourceIds.contains(m_user->getId()))
-            permissionsChanged();
-    });
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
+        [this](const QSet<QnUuid>& resourceIds)
+        {
+            if (m_user && resourceIds.contains(m_user->getId()))
+                permissionsChanged();
+        });
 
-    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
-    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
-    connect(m_camerasPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
-    connect(m_layoutsPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::permissionsChanged);
+    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        &QnUserSettingsDialog::permissionsChanged);
+    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        &QnUserSettingsDialog::permissionsChanged);
+    connect(m_camerasPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        &QnUserSettingsDialog::permissionsChanged);
+    connect(m_layoutsPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
+        &QnUserSettingsDialog::permissionsChanged);
 
-    connect(m_settingsPage,     &QnUserSettingsWidget::userTypeChanged,          this, [this](bool isCloud)
-    {
-        /* Kinda hack to change user type: we have to recreate user resource: */
-        QnUserResourcePtr newUser(new QnUserResource(isCloud ? QnUserType::Cloud : QnUserType::Local));
-        newUser->setFlags(m_user->flags());
-        newUser->setId(m_user->getId());
-        newUser->setRawPermissions(m_user->getRawPermissions());
-        m_user = newUser;
-        m_model->setUser(m_user);
+    connect(m_settingsPage,     &QnUserSettingsWidget::userTypeChanged,          this,
+        [this](bool isCloud)
+        {
+            /* Kinda hack to change user type: we have to recreate user resource: */
+            QnUserResourcePtr newUser(new QnUserResource(isCloud ? QnUserType::Cloud : QnUserType::Local));
+            newUser->setFlags(m_user->flags());
+            newUser->setId(m_user->getId());
+            newUser->setRawPermissions(m_user->getRawPermissions());
+            m_user = newUser;
+            m_model->setUser(m_user);
 
-#if false //TODO: #common Enable this if we want to change OK button caption when creating a cloud user
-        buttonBox()->button(QDialogButtonBox::Ok)->setText(
-            isCloud ? tr("Send Invite") : QCoreApplication::translate("QPlatformTheme", "OK")); // As in Qt
-#endif
-    });
+    #if false //TODO: #common Enable this if we want to change OK button caption when creating a cloud user
+            buttonBox()->button(QDialogButtonBox::Ok)->setText(
+                isCloud ? tr("Send Invite") : QCoreApplication::translate("QPlatformTheme", "OK")); // As in Qt
+    #endif
+        });
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
@@ -318,63 +324,33 @@ void QnUserSettingsDialog::retranslateUi()
     }
 }
 
-bool QnUserSettingsDialog::hasChanges() const
-{
-    return base_type::hasChanges();
-
-    //if (base_type::hasChanges())
-    //    return true;
-
-    ///* Permissions are checked separately */
-    //if (isPageVisible(SettingsPage))
-    //{
-    //    if (!m_settingsPage->selectedUserGroup().isNull())
-    //        return false;
-
-    //    Qn::GlobalPermissions basePermissions = m_settingsPage->selectedPermissions();
-    //    if (basePermissions != Qn::NoGlobalPermissions)
-    //        /* Predefined group selected */
-    //        return basePermissions != qnResourceAccessManager->globalPermissions(m_user))
-
-
-    //}
-
-    //TODO: #GDM What was intended here?
-
-}
-
 void QnUserSettingsDialog::applyChanges()
 {
     auto mode = m_model->mode();
     if (mode == QnUserSettingsModel::Invalid || mode == QnUserSettingsModel::OtherProfile)
         return;
 
+    if (m_user->getId().isNull())
+        m_user->fillId();
+
     //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
     //TODO: #GDM #access SafeMode what to rollback if we were creating new user
     qnResourcesChangesManager->saveUser(m_user,
-        [this, mode](const QnUserResourcePtr& user)
+        [this, mode](const QnUserResourcePtr& /*user*/)
         {
-            for (const auto& page : allPages())
-            {
-                if (page.enabled && page.visible)
-                    page.widget->applyChanges();
-            }
-            if (m_user->getId().isNull())
-                m_user->fillId();
+            //here accessible resources will also be filled
+            applyChangesInternal();
         });
+
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_user->getId());
+    qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);
+
     /* We may fill password field to change current user password. */
     m_user->setPassword(QString());
 
+    /* New User was created, clear dialog. */
     if (m_model->mode() == QnUserSettingsModel::NewUser)
-    {
-        if (m_model->user()->isCloud())
-        {
-            //TODO: FIXME! #GDM #vkutin Send an invite!
-        }
-
-        /* New User was created, clear dialog. */
         setUser(QnUserResourcePtr());
-    }
 
     updateButtonBox();
     loadDataToUi();
@@ -384,6 +360,11 @@ void QnUserSettingsDialog::showEvent(QShowEvent* event)
 {
     loadDataToUi();
     base_type::showEvent(event);
+}
+
+void QnUserSettingsDialog::applyChangesInternal()
+{
+    base_type::applyChanges();
 }
 
 void QnUserSettingsDialog::updateControlsVisibility()

@@ -83,6 +83,8 @@ PageBase
         }
     }
 
+    sideNavigationEnabled: false
+
     header: ToolBar
     {
         id: toolBar
@@ -163,14 +165,6 @@ PageBase
         customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
             || videoScreenController.mediaPlayer.aspectRatio)
         videoRotation: videoScreenController.resourceHelper.customRotation
-
-        onClicked:
-        {
-            if (navigationLoader.visible)
-                hideUi()
-            else
-                showUi()
-        }
     }
 
     Loader
@@ -204,6 +198,12 @@ PageBase
             width: videoScreen.width
             state: videoScreenController.dummyState
         }
+    }
+
+    MouseArea
+    {
+        anchors.fill: parent
+        onClicked: toggleUi()
     }
 
     Loader
@@ -269,5 +269,13 @@ PageBase
         navigationLoader.opacity = 1.0
         toolBar.opacity = 1.0
         navigationBarTint.opacity = 1.0
+    }
+
+    function toggleUi()
+    {
+        if (navigationLoader.visible)
+            hideUi()
+        else
+            showUi()
     }
 }

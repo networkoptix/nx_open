@@ -4,6 +4,7 @@
 #include "common/common_module.h"
 #include "network/module_finder.h"
 #include "network/module_information.h"
+#include <network/connection_validator.h>
 #include <nx/utils/log/log.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
@@ -26,14 +27,17 @@ QnServerConnector::QnServerConnector(QnModuleFinder *moduleFinder, QObject *pare
 {
 }
 
-void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
-    if (!moduleInformation.isCompatibleToCurrentSystem()) {
+void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address)
+{
+    if (!QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation))
+    {
         bool used;
         {
             QnMutexLocker lock( &m_mutex );
             used = m_usedAddresses.contains(address.toString());
         }
-        if (used) {
+        if (used)
+        {
             NX_LOG(lit("QnServerConnector: Module %1 has become incompatible. Url = %2, System name = %3, version = %4")
                    .arg(moduleInformation.id.toString())
                    .arg(address.toString())
@@ -58,11 +62,15 @@ void QnServerConnector::at_moduleFinder_moduleAddressLost(const QnModuleInformat
     removeConnection(moduleInformation, address);
 }
 
-void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (moduleInformation.isCompatibleToCurrentSystem()) {
+void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation)
+{
+    if (QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation))
+    {
         for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
             addConnection(moduleInformation, address);
-    } else {
+    }
+    else
+    {
         for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
         {
             NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since module has been changed")
@@ -124,7 +132,7 @@ void QnServerConnector::start() {
     connect(m_moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
 
     for (const QnModuleInformation &moduleInformation: m_moduleFinder->foundModules()) {
-        if (!moduleInformation.isCompatibleToCurrentSystem())
+        if (!QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation))
             continue;
 
         for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))

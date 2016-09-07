@@ -21,6 +21,8 @@
 #include "network/tcp_connection_priv.h"
 #include "network/module_finder.h"
 #include "network/direct_module_finder.h"
+#include <network/connection_validator.h>
+
 #include "utils/common/app_info.h"
 #include "nx/fusion/model_functions.h"
 #include <nx/utils/log/log.h>
@@ -233,14 +235,6 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (QnAppInfo::defaultCloudHost() != remoteModuleInformation.cloudHost)
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge because servers are built with different cloud host")
-            .arg(data.url), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("DIFFERENT_CLOUD_HOST"));
-        return nx_http::StatusCode::ok;
-    }
-
     bool canMerge = true;
     if (remoteModuleInformation.cloudSystemId != qnCommon->moduleInformation().cloudSystemId)
     {
@@ -258,16 +252,30 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    //TODO: #GDM #isCompatibleCustomization VMS-2163
-    bool customizationOK = remoteModuleInformation.customization == QnAppInfo::customizationName() ||
-                           remoteModuleInformation.customization.isEmpty() ||
-                           QnModuleFinder::instance()->isCompatibilityMode();
-    bool compatible = remoteModuleInformation.hasCompatibleVersion();
-
-    if ((!data.ignoreIncompatible && !compatible) || !customizationOK)
+    auto connectionResult = QnConnectionValidator::validateConnection(remoteModuleInformation);
+    if (connectionResult == Qn::ConnectionResult::IncompatibleInternal
+        || connectionResult == Qn::ConnectionResult::IncompatibleVersion)
     {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. Local customization %1, remote customization %2")
-            .arg(QnAppInfo::customizationName()).arg(remoteModuleInformation.customization),
+        NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. "
+            "Local customization %1, cloud host %2, "
+            "remote customization %3, cloud host %4, version %5")
+            .arg(QnAppInfo::customizationName())
+            .arg(QnAppInfo::defaultCloudHost())
+            .arg(remoteModuleInformation.customization)
+            .arg(remoteModuleInformation.cloudHost)
+            .arg(remoteModuleInformation.version.toString()),
+            cl_logDEBUG1);
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
+        return nx_http::StatusCode::ok;
+    }
+
+    if (connectionResult == Qn::ConnectionResult::IncompatibleProtocol
+        && !data.ignoreIncompatible)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems protocol. "
+                   "Local %1, remote %2")
+            .arg(QnAppInfo::ec2ProtoVersion())
+            .arg(remoteModuleInformation.protoVersion),
             cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return nx_http::StatusCode::ok;
@@ -333,7 +341,7 @@ int QnMergeSystemsRestHandler::execute(
     QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
     /* Connect to server if it is compatible */
-    if (compatible && QnServerConnector::instance())
+    if (connectionResult == Qn::ConnectionResult::Success && QnServerConnector::instance())
         QnServerConnector::instance()->addConnection(remoteModuleInformation, SocketAddress(url.host(), remoteModuleInformation.port));
 
     result.setReply(remoteModuleInformation);

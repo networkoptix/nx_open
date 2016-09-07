@@ -23,11 +23,9 @@ class QTimer;
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
 public:
-    QnModuleFinder(bool clientMode, bool compatibilityMode);
+    QnModuleFinder(bool clientMode);
 
     virtual ~QnModuleFinder();
-
-    bool isCompatibilityMode() const;
 
     QList<QnModuleInformation> foundModules() const;
     ec2::ApiDiscoveredServerDataList discoveredServers() const;

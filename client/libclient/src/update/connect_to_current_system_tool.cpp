@@ -157,7 +157,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!server)
             continue;
 
-        if (!server->getModuleInformation().hasCompatibleVersion())
+        if (server->getModuleInformation().protoVersion != QnAppInfo::ec2ProtoVersion())
         {
             m_updateTargets.insert(server->getId());
         }

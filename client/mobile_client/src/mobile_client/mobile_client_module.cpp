@@ -85,7 +85,7 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
 
-    QnModuleFinder *moduleFinder = new QnModuleFinder(true, false);
+    auto moduleFinder = new QnModuleFinder(true);
     common->store<QnModuleFinder>(moduleFinder);
     moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
     moduleFinder->start();

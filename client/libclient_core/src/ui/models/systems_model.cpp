@@ -7,6 +7,7 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
 #include <network/system_description.h>
+#include <network/connection_validator.h>
 #include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
@@ -30,12 +31,10 @@ namespace
         IsOnlineRoleId,
         IsCompatibleRoleId,
         IsCompatibleVersionRoleId,
-        IsCompatibleCloudHostRoleId,
-        IsCorrectCustomizationRoleId,
+        IsCompatibleInternalRoleId,
 
         WrongVersionRoleId,
         CompatibleVersionRoleId,
-        WrongCustomizationRoleId,
 
         // For local systems
         LastPasswordsModelRoleId,
@@ -58,12 +57,10 @@ namespace
         result.insert(IsOnlineRoleId, "isOnline");
         result.insert(IsCompatibleRoleId, "isCompatible");
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
-        result.insert(IsCompatibleCloudHostRoleId, "isCompatibleCloudHost");
-        result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
+        result.insert(IsCompatibleInternalRoleId, "isCompatibleInternal");
 
         result.insert(WrongVersionRoleId, "wrongVersion");
         result.insert(CompatibleVersionRoleId, "compatibleVersion");
-        result.insert(WrongCustomizationRoleId, "wrongCustomization");
 
         result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
 
@@ -124,9 +121,7 @@ public:
     QString getCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
-    bool isCompatibleCloudHost(const QnSystemDescriptionPtr& systemDescription) const;
-    QString getIncompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
-    bool isCorrectCustomization(const QnSystemDescriptionPtr& systemDescription) const;
+    bool isCompatibleInternal(const QnSystemDescriptionPtr& systemDescription) const;
     bool isFactorySystem(const QnSystemDescriptionPtr& systemDescription) const;
     QString getDisplayName(const QnSystemDescriptionPtr& systemDescription) const;
 
@@ -233,18 +228,14 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return !system->servers().isEmpty();
         case IsCompatibleRoleId:
             return d->isCompatibleSystem(system);
-        case IsCorrectCustomizationRoleId:
-            return d->isCorrectCustomization(system);
+        case IsCompatibleInternalRoleId:
+            return d->isCompatibleInternal(system);
         case IsCompatibleVersionRoleId:
             return d->isCompatibleVersion(system);
         case WrongVersionRoleId:
             return d->getIncompatibleVersion(system);
-        case IsCompatibleCloudHostRoleId:
-            return d->isCompatibleCloudHost(system);
         case CompatibleVersionRoleId:
             return d->getCompatibleVersion(system);
-        case WrongCustomizationRoleId:
-            return d->getIncompatibleCustomization(system);
 
         default:
             return QVariant();
@@ -498,7 +489,7 @@ QString QnSystemsModelPrivate::getCompatibleVersion(
 
     const auto predicate = [this](const QnModuleInformation& serverInfo)
     {
-        return !serverInfo.hasCompatibleVersion();
+        return serverInfo.protoVersion != QnAppInfo::ec2ProtoVersion();
     };
 
     const auto compatibleIt = std::find_if(servers.begin(), servers.end(), predicate);
@@ -515,7 +506,8 @@ QString QnSystemsModelPrivate::getIncompatibleVersion(
 
     const auto predicate = [this](const QnModuleInformation& serverInfo)
     {
-        return serverInfo.version < minimalVersion;
+        auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
+        return connectionResult == Qn::ConnectionResult::IncompatibleVersion;
     };
 
     const auto incompatibleIt =
@@ -531,61 +523,27 @@ bool QnSystemsModelPrivate::isCompatibleVersion(
 }
 
 bool QnSystemsModelPrivate::isCompatibleSystem(
-        const QnSystemDescriptionPtr& sysemDescription) const
-{
-    return isCompatibleVersion(sysemDescription)
-        && isCorrectCustomization(sysemDescription)
-        && isCompatibleCloudHost(sysemDescription)
-           // TODO: add more checks
-        ;
-}
-
-bool QnSystemsModelPrivate::isCompatibleCloudHost(const QnSystemDescriptionPtr& systemDescription) const
+    const QnSystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
-    if (servers.isEmpty())
-        return true;
-
-    const auto predicate =
-        [this](const QnModuleInformation& serverInfo)
+    return std::all_of(servers.cbegin(), servers.cend(),
+        [](const QnModuleInformation& serverInfo)
         {
-            return serverInfo.cloudHost != QnAppInfo::defaultCloudHost();
-        };
-
-    const auto incompatibleIt =
-        std::find_if(servers.begin(), servers.end(), predicate);
-    return incompatibleIt == servers.end();
+            auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
+            return connectionResult == Qn::ConnectionResult::Success;
+        });
 }
 
-QString QnSystemsModelPrivate::getIncompatibleCustomization(
-        const QnSystemDescriptionPtr& systemDescription) const
+bool QnSystemsModelPrivate::isCompatibleInternal(
+    const QnSystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
-    if (servers.isEmpty())
-        return QString();
-
-    const auto customization = QnAppInfo::customizationName();
-//     const auto customization = qnRuntime->isDevMode() // client-CORE!!!
-//         ? QString()
-//         : QnAppInfo::customizationName();
-    const auto predicate = [customization](const QnModuleInformation& serverInfo)
-    {
-        //TODO: #GDM #isCompatibleCustomization VMS-2163
-        return !customization.isEmpty()
-            && !serverInfo.customization.isEmpty()
-            && customization != serverInfo.customization;
-    };
-
-    const auto incompatibleIt =
-        std::find_if(servers.begin(), servers.end(), predicate);
-    return (incompatibleIt == servers.end() ? QString()
-        : incompatibleIt->customization);
-}
-
-bool QnSystemsModelPrivate::isCorrectCustomization(
-        const QnSystemDescriptionPtr& systemDescription) const
-{
-    return getIncompatibleCustomization(systemDescription).isEmpty();
+    return std::all_of(servers.cbegin(), servers.cend(),
+        [](const QnModuleInformation& serverInfo)
+        {
+            auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
+            return connectionResult != Qn::ConnectionResult::IncompatibleInternal;
+        });
 }
 
 bool QnSystemsModelPrivate::isFactorySystem(
