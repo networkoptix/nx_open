@@ -505,6 +505,11 @@
         <source>This camera has no advanced settings</source>
         <translation>למצלמה זו אין הגדרות מתקדמות</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>

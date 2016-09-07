@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>このカメラにはアドバンス設定がありません</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
