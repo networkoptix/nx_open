@@ -117,8 +117,11 @@ namespace {
     void trace(int handle, int obj, const QString& message = QString())
     {
         RequestObject object = static_cast<RequestObject>(obj);
-        //NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
-        qDebug() << "Server Request: " << handle << ": " << message << " " << QnLexical::serialized(object);
+        NX_LOG(lit("QnMediaServerConnection %1: %2 %3")
+            .arg(handle)
+            .arg(message)
+            .arg(QnLexical::serialized(object)),
+            cl_logDEBUG1);
     }
 
 } // anonymous namespace

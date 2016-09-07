@@ -18,6 +18,7 @@
 #include <http/custom_headers.h>
 #include <utils/network/http/httptypes.h>
 #include <utils/common/delayed.h>
+#include <utils/common/log.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
@@ -25,8 +26,7 @@ namespace {
 
     void trace(int handle, const QString& message)
     {
-        //NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
-        qDebug() << "Server Request: " << handle << ": " << message;
+        NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
     }
 }
 
