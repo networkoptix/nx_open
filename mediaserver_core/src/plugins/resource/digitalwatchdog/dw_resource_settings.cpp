@@ -39,8 +39,17 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::fetchParamsFromHttpResponse
         QString str = QString::fromLatin1(lines[i]);
         str.replace(DW_RES_SETTINGS_FILTER, QString());
         QStringList pairStrs = str.split(L':');
-        if (pairStrs.size() == 2) {
-            result << QnCameraAdvancedParamValue(pairStrs[0].trimmed(), pairStrs[1].trimmed());
+        if (pairStrs.size() == 2)
+        {
+            auto paramId = pairStrs[0].trimmed();
+            auto paramValue = pairStrs[1].trimmed();
+
+            auto param = m_params.getParameterById(paramId);
+
+            if (param.isValid())
+                paramValue = fromInnerValue(param, paramValue);
+
+            result << QnCameraAdvancedParamValue(paramId, paramValue);
         }
     }
     return result;
@@ -100,6 +109,31 @@ QString QnWin4NetCameraProxy::toInnerValue(const QnCameraAdvancedParameter &para
     }
 
     return innerValue;
+}
+
+QString QnWin4NetCameraProxy::fromInnerValue(const QnCameraAdvancedParameter& parameter, const QString& value) const
+{
+    bool ok = true;
+    std::size_t idx = value.toUInt(&ok);
+
+    if (!ok)
+        return QString();
+
+    if (parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+    {
+        auto range = parameter.getRange();
+
+        if (range.size() <= idx)
+            return QString();
+
+        return range[idx];
+    }
+    else if (parameter.dataType == QnCameraAdvancedParameter::DataType::Bool)
+    {
+        return value == lit("0") ? lit("false") : lit("true");
+    }
+
+    return value;
 }
 
 bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value) 
