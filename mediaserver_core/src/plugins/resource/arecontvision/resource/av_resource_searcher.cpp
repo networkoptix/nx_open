@@ -14,6 +14,7 @@
 #include "av_panoramic.h"
 #include "av_singesensor.h"
 #include "utils/network/socket.h"
+#include <utils/common/log.h>
 
 #define CL_BROAD_CAST_RETRY 1
 
@@ -229,9 +230,24 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
 
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
     if (rt.isNull())
+    {
+        NX_LOG(lit("Searching resource type for %1 %2").arg(manufacture()).arg(model), cl_logINFO);
+
+        if (model.left(2).toLower() == lit("av"))
+        {
+            NX_LOG(lit("Model name starts with AV"), cl_logINFO);
+            auto unprefixed = model.mid(2);
+
+            qDebug() << "Unprefixed" << unprefixed;
+            rt = qnResTypePool->getLikeResourceTypeId(manufacture(), unprefixed);
+        }
+    }
+
+    if (rt.isNull())
+    {
+        NX_LOG(lit("Resource type have not been found."), cl_logINFO);    
         return QList<QnResourcePtr>();
-
-
+    }
 
     QString mac = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?mac"), host, port, timeout, auth)));
     mac = getValueFromString(mac);

@@ -354,7 +354,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         .toUpper()
         .toLatin1();
 
-    auto encodersStr = report.value("ENCODER_CAP");
+    auto encodersStr = report.value("encoder_cap");
 
     if (!encodersStr.isEmpty())
     {
