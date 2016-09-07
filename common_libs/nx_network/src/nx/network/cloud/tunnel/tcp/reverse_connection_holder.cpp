@@ -8,15 +8,14 @@ namespace cloud {
 namespace tcp {
 
 ReverseConnectionHolder::ReverseConnectionHolder(aio::AbstractAioThread* aioThread):
+    aio::BasicPollable(aioThread),
     m_socketCount(0)
 {
-    m_timer.bindToAioThread(aioThread);
 }
 
-
-void ReverseConnectionHolder::stopInAioThread()
+void ReverseConnectionHolder::stopWhileInAioThread()
 {
-    m_timer.pleaseStopSync();
+    timer()->pleaseStopSync();
 }
 
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
@@ -30,7 +29,7 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
 
     const auto it = m_sockets.insert(m_sockets.end(), std::move(socket));
     ++m_socketCount;
-    (*it)->bindToAioThread(m_timer.getAioThread());
+    (*it)->bindToAioThread(getAioThread());
     monitorSocket(it);
 }
 
@@ -41,7 +40,7 @@ size_t ReverseConnectionHolder::socketCount() const
 
 void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Handler handler)
 {
-    m_timer.post(
+    post(
         [this, expirationTime = std::chrono::steady_clock::now() + timeout,
             handler = std::move(handler)]() mutable
         {
@@ -64,7 +63,7 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
 
                 if (m_handlers.empty() || expirationTime < m_handlers.begin()->first)
                 {
-                    m_timer.start(
+                    timer()->start(
                         timeLeft,
                         [this]()
                         {

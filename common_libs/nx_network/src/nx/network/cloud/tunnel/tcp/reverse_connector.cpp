@@ -33,11 +33,14 @@ void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeou
 
 void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler handler)
 {
-    // TODO: use timeout
-    QObject::connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
-        [this, handler=std::move(handler)](nx_http::AsyncHttpClientPtr)
+    m_handler = std::move(handler);
+    const auto onHttpDone =
+        [this](nx_http::AsyncHttpClientPtr)
         {
+            const auto handler = std::move(m_handler);
+            if (!handler)
+                return;
+
             if (m_httpClient->failed() || !m_httpClient->response())
                 return handler(SystemError::connectionRefused);
 
@@ -51,9 +54,10 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             }
 
             handler(processHeaders(m_httpClient->response()->headers));
-        });
+        };
 
-    // TODO: think about HTTPS
+    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, onHttpDone);
+    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, onHttpDone);
     m_httpClient->doOptions(endpoint.toUrl());
 }
 

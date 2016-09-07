@@ -14,7 +14,7 @@ class ReverseConnectionHolder;
 /**
  * Registers on mediator for NXRC connections, accept and stores them.
  *
- * Is is safe to remove this object from any thread (destructor blocks to wait connection
+ * Is is safe to remove this object from any non-AIO thread (destructor blocks to wait connection
  * handlers even if it's stopped).
  */
 class NX_NETWORK_API ReverseConnectionPool:
@@ -23,6 +23,7 @@ class NX_NETWORK_API ReverseConnectionPool:
 public:
     typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
     explicit ReverseConnectionPool(std::shared_ptr<MediatorConnection> mediatorConnection);
+    ~ReverseConnectionPool();
 
     ReverseConnectionPool(const ReverseConnectionPool&) = delete;
     ReverseConnectionPool(ReverseConnectionPool&&) = delete;

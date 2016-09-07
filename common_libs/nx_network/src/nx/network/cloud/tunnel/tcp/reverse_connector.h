@@ -39,7 +39,7 @@ private:
 
     const String m_targetHostName;
     nx_http::AsyncHttpClientPtr m_httpClient;
-    std::function<void(SystemError::ErrorCode)> m_handler;
+    ConnectHandler m_handler;
 };
 
 } // namespace tcp

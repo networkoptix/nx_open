@@ -17,7 +17,6 @@ public:
         std::shared_ptr<ReverseConnectionHolder> connectionHolder);
 
     void stopWhileInAioThread() override;
-    void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     void establishNewConnection(
         std::chrono::milliseconds timeout,
@@ -31,7 +30,6 @@ private:
     void updateCloseTimer();
 
     const std::shared_ptr<ReverseConnectionHolder> m_connectionHolder;
-    nx::network::aio::Timer m_timer;
     utils::AsyncOperationGuard m_asyncGuard;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_closedHandler;
 };

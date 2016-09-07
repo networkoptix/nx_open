@@ -17,10 +17,15 @@ ReverseConnectionPool::ReverseConnectionPool(
         QnUuid::createUuid().toByteArray(),
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
-          NX_LOGX(lm("New socket(%1) from '%2").args(socket, hostName), cl_logDEBUG1);
-          getHolder(hostName, true)->saveSocket(std::move(socket));
+            NX_LOGX(lm("New socket(%1) from '%2").args(socket, hostName), cl_logDEBUG1);
+            getHolder(hostName, true)->saveSocket(std::move(socket));
         })
 {
+}
+
+ReverseConnectionPool::~ReverseConnectionPool()
+{
+    pleaseStopSync();
 }
 
 bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool waitForRegistration)
@@ -66,8 +71,10 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
         [this, handler = std::move(completionHandler)]()
         {
             m_acceptor.pleaseStop();
+
+            // Holders are need to be stopped here, as other shared_ptrs are not primary.
             for (auto& holder: m_connectionHolders)
-                holder.second->stopInAioThread();
+                holder.second->stopWhileInAioThread();
 
             m_connectionHolders.clear();
             handler();

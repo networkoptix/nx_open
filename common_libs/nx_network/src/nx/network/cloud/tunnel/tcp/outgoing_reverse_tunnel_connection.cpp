@@ -15,20 +15,12 @@ OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
     AbstractOutgoingTunnelConnection(aioThread),
     m_connectionHolder(std::move(connectionHolder))
 {
-    if (aioThread)
-        m_timer.bindToAioThread(aioThread);
 }
-
 
 void OutgoingReverseTunnelConnection::stopWhileInAioThread()
 {
     m_asyncGuard.reset();
-    m_timer.pleaseStopSync();
-}
-
-void OutgoingReverseTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
-{
-    m_timer.bindToAioThread(aioThread);
+    timer()->pleaseStopSync();
 }
 
 void OutgoingReverseTunnelConnection::establishNewConnection(
@@ -52,7 +44,7 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
                 if (code == SystemError::noError)
                 {
                     socketAttributes.applyTo(socket.get());
-                    m_timer.start(
+                    timer()->start(
                         kCloseTunnelWhenInactive,
                         [this]()
                         {

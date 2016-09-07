@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/aio/timer.h>
+#include <nx/network/aio/basic_pollable.h>
 
 namespace nx {
 namespace network {
@@ -10,15 +10,13 @@ namespace tcp {
 
 /**
  * Keeps all user NXRC connections and moniors if they close.
- *
- * All methods are protected by the mutex including handler calls, so user shell not call any
- * methods from handler.
  */
 class ReverseConnectionHolder
+    : public aio::BasicPollable
 {
 public:
     explicit ReverseConnectionHolder(aio::AbstractAioThread* aioThread);
-    void stopInAioThread();
+    void stopWhileInAioThread() override;
 
     ReverseConnectionHolder(const ReverseConnectionHolder&) = delete;
     ReverseConnectionHolder(ReverseConnectionHolder&&) = delete;
@@ -37,7 +35,6 @@ public:
 private:
     void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
 
-    aio::Timer m_timer;
     std::atomic<size_t> m_socketCount;
     std::list<std::unique_ptr<AbstractStreamSocket>> m_sockets;
     std::multimap<std::chrono::steady_clock::time_point, Handler> m_handlers;
