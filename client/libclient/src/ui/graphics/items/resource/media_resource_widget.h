@@ -174,7 +174,7 @@ protected:
 
     virtual void updateHud(bool animate);
 
-    void updateTwoWayAudioWidget();
+    void ensureTwoWayAudioWidget();
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);

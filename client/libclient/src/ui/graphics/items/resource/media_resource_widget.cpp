@@ -274,7 +274,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         updateIoModuleVisibility(false);
     }
 
-    updateTwoWayAudioWidget();
+    ensureTwoWayAudioWidget();
 
     /* Set up buttons. */
     createButtons();
@@ -576,7 +576,7 @@ void QnMediaResourceWidget::updateHud(bool animate)
     QnResourceWidget::updateHud(animate);
 }
 
-void QnMediaResourceWidget::updateTwoWayAudioWidget()
+void QnMediaResourceWidget::ensureTwoWayAudioWidget()
 {
     /* Check if widget is already created. */
     if (m_twoWayAudioWidget)
@@ -1577,7 +1577,7 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
     else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
-        updateTwoWayAudioWidget();
+        ensureTwoWayAudioWidget();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
