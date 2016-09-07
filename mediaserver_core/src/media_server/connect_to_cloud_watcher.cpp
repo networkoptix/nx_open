@@ -57,9 +57,11 @@ void QnConnectToCloudWatcher::at_updateConnection()
                 return;
             }
 
-            m_cloudUrl = QUrl(lit("http://%1:%2").
+            m_cloudUrl = QUrl(lit("http://%1:%2/ec2/events").
                 arg(endpoint->address.toString()).
                 arg(endpoint->port));
+            m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemID());
+            m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
             qnTransactionBus->addConnectionToPeer(m_cloudUrl);
         });
 }
