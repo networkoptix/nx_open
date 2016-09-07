@@ -1985,14 +1985,28 @@ void MediaServerProcess::run()
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
             QnAppServerConnectionFactory::url(), ec2::ApiClientInfoData(), &ec2Connection );
-        if( errorCode == ec2::ErrorCode::ok )
+
+        connectInfo = ec2Connection->connectionInfo();
+        auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
+        if (connectionResult == Qn::ConnectionResult::Success)
         {
-            connectInfo = ec2Connection->connectionInfo();
-            NX_LOG( QString::fromLatin1("Connected to local EC2"), cl_logWARNING );
+            NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
             break;
         }
 
-        NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
+        switch (connectionResult)
+        {
+            case Qn::ConnectionResult::IncompatibleInternal:
+            case Qn::ConnectionResult::IncompatibleVersion:
+            case Qn::ConnectionResult::IncompatibleProtocol:
+                NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
+                return;
+            default:
+                break;
+        }
+
+        NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1")
+            .arg(ec2::toString(errorCode)), cl_logERROR );
         QnSleep::msleep(3000);
     }
 
@@ -2069,15 +2083,6 @@ void MediaServerProcess::run()
         QnFileStorageResource::instance,
         false
     );
-
-    if (needToStop())
-        return;
-
-    if (QnConnectionValidator::validateConnection(connectInfo, ec2::ErrorCode::ok) != Qn::ConnectionResult::Success)
-    {
-        NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
-        return;
-    }
 
     while (!needToStop() && !initResourceTypes(ec2Connection))
     {
