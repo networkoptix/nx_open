@@ -1064,6 +1064,9 @@ void MediaServerProcess::updateAddressesList()
     for (const auto& host : m_forwardedAddresses )
         serverAddresses << SocketAddress(host.first, host.second);
 
+    if (!m_publicAddress.isNull())
+        serverAddresses << SocketAddress(m_publicAddress.toString());
+
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
             .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
@@ -1404,6 +1407,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 
         if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
             propertyDictionary->saveParams(server->getId());
+
+        updateAddressesList();
     }
 }
 
@@ -2380,6 +2385,7 @@ void MediaServerProcess::run()
     qnGlobalSettings->synchronizeNow();
 
     auto upnpPortMapper = initializeUpnpPortMapper();
+    updateAddressesList();
 
     qnGlobalSettings->takeFromSettings(MSSettings::roSettings(), m_mediaServer);
     qnCommon->updateModuleInformation();
