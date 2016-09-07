@@ -64,7 +64,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
 
     if (encoders.contains(lit("H264")))
         encoderStr = lit("H264");
-    else if (encoderStr.contains(lit("MJPEG")))
+    else if (encoders.contains(lit("MJPEG")))
         encoderStr = lit("MJPEG");
     else
         return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
