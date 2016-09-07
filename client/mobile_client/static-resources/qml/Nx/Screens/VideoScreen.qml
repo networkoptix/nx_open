@@ -165,6 +165,8 @@ PageBase
         customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
             || videoScreenController.mediaPlayer.aspectRatio)
         videoRotation: videoScreenController.resourceHelper.customRotation
+
+        onClicked: toggleUi()
     }
 
     Loader
@@ -202,6 +204,7 @@ PageBase
 
     MouseArea
     {
+        enabled: dummyLoader.visible
         anchors.fill: parent
         onClicked: toggleUi()
     }
