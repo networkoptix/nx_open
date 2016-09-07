@@ -5,6 +5,7 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <ui/actions/action.h>
 #include <ui/help/help_topics.h>
@@ -342,7 +343,21 @@ void QnUserSettingsDialog::applyChanges()
             applyChangesInternal();
         });
 
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_user->getId());
+    auto accessibleResources = m_model->accessibleResources();
+
+    QnLayoutResourceList layoutsToShare = qnResPool->getResources(accessibleResources)
+        .filtered<QnLayoutResource>(
+            [](const QnLayoutResourcePtr& layout)
+    {
+        return !layout->isFile() && !layout->isShared();
+    });
+
+    for (const auto& layout : layoutsToShare)
+    {
+        menu()->trigger(QnActions::ShareLayoutAction,
+            QnActionParameters(layout).withArgument(Qn::UserResourceRole, m_user));
+    }
+
     qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);
 
     /* We may fill password field to change current user password. */
