@@ -29,7 +29,7 @@ namespace
     const QLatin1String kLogDir( "log/logDir" );
 
     const QLatin1String kSyncLogLevel("syncroLog/logLevel");
-    const QLatin1String kDefaultSyncLogLevel("none");
+    const QLatin1String kDefaultSyncLogLevel("DEBUG2");
     const QLatin1String kSyncLogDir("syncroLog/logDir");
 
     const QLatin1String kEndpointsToListen( "listenOn" );
