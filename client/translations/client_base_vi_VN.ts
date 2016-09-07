@@ -7104,12 +7104,12 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>Giờ: phút: giây</translation>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>Min: sec</translation>
+        <translation>mm:ss</translation>
     </message>
     <message>
         <source>yyyy MMM dd</source>
