@@ -106,6 +106,7 @@ QnSecurityCamResourcePtr extractCamera(QnWorkbenchItem *item)
     const auto id = layoutItemData.resource.id;
     return qnResPool->getResourceById<QnSecurityCamResource>(id);
 };
+
 }
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -1951,8 +1952,9 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value)
     if (!m_currentWidget)
         return;
 
-    if (isLive())
-        value = DATETIME_NOW;
+    bool live = isLive();
+    if (live)
+        value = qnSyncTime->currentMSecsSinceEpoch();
 
     if (m_animatedPosition != value)
     {
@@ -1965,7 +1967,7 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value)
     {
         if (QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader())
         {
-            if (value == DATETIME_NOW)
+            if (live)
             {
                 reader->jumpTo(DATETIME_NOW, 0);
             }
