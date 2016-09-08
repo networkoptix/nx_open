@@ -175,7 +175,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = Unknown;
 
-    if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;
@@ -188,30 +188,34 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     {
         switch (resource->getStatus())
         {
-        case Qn::Online:
-            if (key == Server && resource->getId() == qnCommon->remoteGUID())
-                status = Control;
-            else
-                status = Online;
-            break;
+            case Qn::Online:
+                if (key == Server && resource->getId() == qnCommon->remoteGUID())
+                    status = Control;
+                else
+                    status = Online;
+                break;
 
-        case Qn::Offline:
-            status = Offline;
-            break;
+            case Qn::Offline:
+                status = Offline;
+                break;
 
-        case Qn::Unauthorized:
-            status = Unauthorized;
-            break;
+            case Qn::Unauthorized:
+                status = Unauthorized;
+                break;
 
-        case Qn::Incompatible:
-            if (key == Server && QnMediaServerResource::isFakeServer(resource))
-                status = Online;
-            else
+            case Qn::Incompatible:
+                if (key == Server && resource.staticCast<QnMediaServerResource>()->
+                    getSystemName() != qnCommon->localSystemName())
+                {
+                    status = Online;
+                    break;
+                }
+
                 status = Incompatible;
-            break;
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 
