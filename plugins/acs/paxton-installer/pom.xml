@@ -70,26 +70,37 @@
                 <version>2.6</version>
                 <executions>
                     <execution>
-                        <id>copy-certificates</id>
-                        <phase>process-sources</phase>
+                        <id>copy-parent-certificates</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
                             <resources>          
                                 <resource>
                                     <directory>${environment.dir}/customization/${parent.customization}/wixsetup</directory>
-                                    <filtering>false</filtering>                           
-                                </resource> 
-                                <resource>
-                                    <directory>${environment.dir}/customization/${customization}/wixsetup</directory>
-                                    <filtering>false</filtering>                           
-                                </resource>              
+                                </resource>          
                             </resources>              
-                            <encoding>UTF-8</encoding>
                         </configuration>            
-                    </execution>
+                    </execution>          
+                    <execution>
+                        <id>copy-certificates</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>${environment.dir}/customization/${customization}/wixsetup</directory>    
+                                </resource>             
+                            </resources>              
+                        </configuration>            
+                    </execution>                      
                 </executions>
             </plugin>            
            <plugin>
