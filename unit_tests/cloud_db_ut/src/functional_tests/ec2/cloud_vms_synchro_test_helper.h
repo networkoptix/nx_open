@@ -51,6 +51,11 @@ protected:
     void verifyThatUsersMatchInCloudAndVms(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+    void waitForCloudAndVmsToSyncUsers(
+        bool assertOnFailure = true,
+        bool* const result = nullptr);
+    api::ResultCode fetchCloudTransactionLog(
+        ::ec2::ApiTransactionDataList* const transactionList);
 
 private:
     utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> m_appserver2;

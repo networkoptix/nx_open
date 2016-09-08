@@ -1,8 +1,13 @@
 #include "cloud_vms_synchro_test_helper.h"
 
+#include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_api.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <transaction/transaction.h>
 
 #include <utils/common/app_info.h>
 
@@ -243,7 +248,7 @@ void Ec2MserverCloudSynchronization2::addCloudUserLocally(
     ASSERT_EQ(
         ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
-        ->getUserManager(Qn::kSystemAccess)->saveSync(*accountVmsData));
+            ->getUserManager(Qn::kSystemAccess)->saveSync(*accountVmsData));
 }
 
 void Ec2MserverCloudSynchronization2::waitForUserToAppearInCloud(
@@ -466,6 +471,54 @@ void Ec2MserverCloudSynchronization2::verifyThatUsersMatchInCloudAndVms(
 
     if (result)
         *result = true;
+}
+
+void Ec2MserverCloudSynchronization2::waitForCloudAndVmsToSyncUsers(
+    bool assertOnFailure,
+    bool* const result)
+{
+    for (auto t0 = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::now() - t0 < kMaxTimeToWaitForChangesToBePropagatedToCloud;
+        )
+    {
+        bool syncCompleted = false;
+        verifyThatUsersMatchInCloudAndVms(false, &syncCompleted);
+        if (syncCompleted)
+        {
+            if (result)
+                *result = true;
+            return;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    if (assertOnFailure)
+    {
+        ASSERT_TRUE(false);
+    }
+
+    if (result)
+        *result = false;
+}
+
+api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLog(
+    ::ec2::ApiTransactionDataList* const transactionList)
+{
+    nx_http::HttpClient httpClient;
+    const QUrl url(lm("http://%1/%2?systemID=%3")
+        .str(cdb()->endpoint()).arg("cdb/maintenance/get_transaction_log")
+        .arg(registeredSystemData().id));
+    if (!httpClient.doGet(url))
+        return api::ResultCode::networkError;
+    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        return api::ResultCode::notAuthorized;
+
+    nx::Buffer msgBody;
+    while (!httpClient.eof())
+        msgBody += httpClient.fetchMessageBodyBuffer();
+    *transactionList = QJson::deserialized<::ec2::ApiTransactionDataList>(msgBody);
+
+    return api::ResultCode::ok;
 }
 
 } // namespace cdb

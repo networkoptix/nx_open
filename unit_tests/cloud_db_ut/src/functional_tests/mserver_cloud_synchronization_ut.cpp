@@ -276,5 +276,55 @@ TEST_F(Ec2MserverCloudSynchronization2, mergingOfflineChanges)
     }
 }
 
+TEST_F(Ec2MserverCloudSynchronization2, addingUserInCloudAndRemovingLocally)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    api::AccountData testAccount;
+    std::string testAccountPassword;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->addActivatedAccount(&testAccount, &testAccountPassword));
+
+    //for (int i = 0; i < 5; ++i)
+    {
+        ::ec2::ApiUserData accountVmsData;
+        addCloudUserLocally(testAccount.email, &accountVmsData);
+
+        ASSERT_EQ(
+            ec2::ErrorCode::ok,
+            appserver2()->moduleInstance()->ecConnection()
+                ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
+
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+        waitForCloudAndVmsToSyncUsers();
+
+        api::SystemSharing sharing;
+        sharing.accountEmail = testAccount.email;
+        sharing.systemID = registeredSystemData().id;
+        sharing.accessRole = api::SystemAccessRole::cloudAdmin;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+
+        waitForCloudAndVmsToSyncUsers();
+
+        ASSERT_EQ(
+            ec2::ErrorCode::ok,
+            appserver2()->moduleInstance()->ecConnection()
+                ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
+
+        waitForCloudAndVmsToSyncUsers();
+    }
+
+    ::ec2::ApiTransactionDataList transactionList;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        fetchCloudTransactionLog(&transactionList));
+}
+
 } // namespace cdb
 } // namespace nx

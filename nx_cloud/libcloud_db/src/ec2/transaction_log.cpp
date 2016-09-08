@@ -194,7 +194,8 @@ nx::db::DBResult TransactionLog::fetchTransactions(
         fetchTransactionsOfAPeerQuery.addBindValue(it.key().peerID.toSimpleString());
         fetchTransactionsOfAPeerQuery.addBindValue(it.key().dbID.toSimpleString());
         fetchTransactionsOfAPeerQuery.addBindValue(from.values.value(it.key()));
-        fetchTransactionsOfAPeerQuery.addBindValue(to.values.value(it.key()));
+        fetchTransactionsOfAPeerQuery.addBindValue(
+            to.values.value(it.key(), std::numeric_limits<qint32>::max()));
         if (!fetchTransactionsOfAPeerQuery.exec())
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
@@ -217,7 +218,8 @@ nx::db::DBResult TransactionLog::fetchTransactions(
         }
     }
 
-    outputData->state = to;
+    // TODO #ak currentState is not correct here since it can be limited by "to" and "maxTransactionsToReturn"
+    outputData->state = currentState;
     outputData->resultCode = api::ResultCode::ok;
 
     return nx::db::DBResult::ok;
