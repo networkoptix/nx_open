@@ -204,13 +204,14 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
                 break;
 
             case Qn::Incompatible:
-                if (key == Server && resource.staticCast<QnMediaServerResource>()->
-                    getSystemName() != qnCommon->localSystemName())
+                if (auto server = resource.dynamicCast<QnMediaServerResource>())
                 {
-                    status = Online;
-                    break;
+                    if (server->getSystemName() != qnCommon->localSystemName())
+                    {
+                        status = Online;
+                        break;
+                    }
                 }
-
                 status = Incompatible;
                 break;
 
