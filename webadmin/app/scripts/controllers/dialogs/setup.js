@@ -121,7 +121,7 @@ angular.module('webadminApp')
 
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
-            $log.log("check system configuration");
+            $log.log("check system configuration", user);
 
             $scope.settings.localLogin = user.name || Config.defaultLogin;
 
