@@ -18,7 +18,6 @@ var Config = {
         clientSetupContext: '?from=client&context=setup',
         webadminContext: '?from=webadmin&context=settings',
 
-        portalUrl: 'http://cloud-demo.hdw.mx',
         apiUrl: '/api',
         portalRegisterUrl: '/register',
         portalSystemUrl: '/systems/{systemId}'
@@ -109,7 +108,6 @@ var Config = {
 
         cloudAccountName: {label: 'Cloud owner account', type: 'static'},
         cloudAuthKey: {label: 'Cloud auth key', type: 'static'},
-        cloudPortalUrl: {label: 'Cloud portal url', type: 'text'},
         cloudSystemID: {label: 'Cloud portal url', type: 'static'},
 
         newSystem: {label: 'Server is "New"', type: 'static'},

@@ -150,7 +150,6 @@ angular.module('webadminApp')
                 $log.log("failed to get systemCloudInfo");
                 mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
-
                     checkInternet(false);
                     if(debugMode || $scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
                         $log.log("System is new - go to master");
@@ -724,16 +723,17 @@ angular.module('webadminApp')
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
 
+
+        function readCloudHost(){
+            return mediaserver.getModuleInformation().then(function (r) {
+                Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
+
+                $log.log("Read cloud portal url from module information: " + Config.cloud.portalUrl);
+            });
+        }
         function getAdvancedSettings(){
-            mediaserver.systemSettings().then(function(r){
+            return mediaserver.systemSettings().then(function(r){
                 var systemSettings = r.data.reply.settings;
-                if(r.data.reply.settings.cloudPortalUrl){
-                    Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
-                    $scope.portalUrl = Config.cloud.portalUrl;
-                    $log.log("Read cloud portal url from advanced settings: " + Config.cloud.portalUrl);
-                }else{
-                    $log.log("No cloud portal url in advanced settings");
-                }
                 $scope.systemSettings = {};
 
                 for(var settingName in $scope.Config.settingsConfig){
@@ -762,7 +762,9 @@ angular.module('webadminApp')
         }
         function initWizard(){
             $scope.next(0);
+
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
+                readCloudHost();
                 getAdvancedSettings();
                 discoverSystems();
             },function(error){
