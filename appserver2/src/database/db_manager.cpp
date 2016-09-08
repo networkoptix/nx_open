@@ -1471,6 +1471,11 @@ bool QnDbManager::createDatabase()
 
 QnDbManager::~QnDbManager()
 {
+    if (m_sdbStatic.isOpen())
+    {
+        m_sdbStatic = QSqlDatabase();
+        QSqlDatabase::removeDatabase("QnDbManagerStatic");
+    }
 }
 
 ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
@@ -4541,7 +4546,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& /*tran*/)
 {
     return transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
 }
