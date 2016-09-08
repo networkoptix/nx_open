@@ -67,6 +67,8 @@ struct ApiCameraAttributesData: ApiData
     {
     }
 
+    QnUuid getIdForMerging() { return cameraID; } //< See ApiIdData::getIdForMerging().
+
     QnUuid cameraID; //< TODO: #mike cameraId
     QString cameraName;
     QString userDefinedGroupName;

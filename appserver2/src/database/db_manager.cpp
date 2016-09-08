@@ -657,6 +657,13 @@ bool QnDbManager::queryObjects<ApiMediaServerUserAttributesDataList>(ApiMediaSer
 }
 
 template <>
+bool QnDbManager::queryObjects<ApiCameraAttributesDataList>(ApiCameraAttributesDataList& objects)
+{
+    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
+    return errCode == ErrorCode::ok;
+}
+
+template <>
 bool QnDbManager::queryObjects<ApiClientInfoDataList>(ApiClientInfoDataList& objects)
 {
     ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
@@ -3343,11 +3350,15 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList)
+ErrorCode QnDbManager::doQueryNoLock(
+    const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList)
 {
     //fetching camera user attributes
     QSqlQuery queryCameras(m_sdb);
     queryCameras.setForwardOnly(true);
+    QString filterStr;
+    if (!cameraId.isNull())
+        filterStr = QString("WHERE camera_guid = %1").arg(guidToSqlString(cameraId));
 
     queryCameras.prepare(lit("\
         SELECT                                           \
@@ -3368,9 +3379,10 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttrib
             failover_priority as failoverPriority,       \
             backup_type as backupType                    \
          FROM vms_camera_user_attributes                 \
-         LEFT JOIN vms_resource r on r.guid = camera_guid     \
+         %1 \
+         LEFT JOIN vms_resource r on r.guid = camera_guid \
          ORDER BY camera_guid                            \
-        "));
+        ").arg(filterStr));
 
     if (!queryCameras.exec()) {
         NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
@@ -3505,7 +3517,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
     {
         //fetching server attributes
         ApiMediaServerUserAttributesDataList serverAttrsList;
-        ErrorCode result = doQueryNoLock(QnUuid(), serverAttrsList );
+        ErrorCode result = doQueryNoLock(QnUuid(), serverAttrsList);
         if( result != ErrorCode::ok )
             return result;
 
@@ -4021,7 +4033,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     db_load(data.servers);
     db_load_uuid(data.serversUserAttributesList);
     db_load(data.cameras);
-    db_load(data.cameraUserAttributesList);
+    db_load_uuid(data.cameraUserAttributesList);
     db_load(data.users);
     db_load_uuid(data.userGroups);
     db_load(data.layouts);

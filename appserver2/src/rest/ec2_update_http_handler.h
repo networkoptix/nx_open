@@ -151,7 +151,8 @@ private:
             // Id field), the behavior is the same as before introducing "merge" feature - attempt
             // such incomplete request with default values for omitted json fields.
             auto httpStatusCode = buildRequestDataMergingIfNeeded(
-                requestData, incompleteJsonValue.get(), outResultBody, outSuccess, owner);
+                requestData, incompleteJsonValue.get(), outResultBody, outSuccess, owner,
+                /*sfinae*/ nullptr);
             if (!*outSuccess)
                 return httpStatusCode;
         }
@@ -160,33 +161,41 @@ private:
         return nx_http::StatusCode::ok;
     }
 
-    // Called when RequestData is not inherited from ApiIdData - do not perform merge.
+    /**
+     * Sfinae: Called when RequestData does not provide id for merging or is ApiIdData (because
+     * merging for API parameters of exact type ApiIdData has no sence) - do not perform the merge.
+     */
     template<typename T = RequestData>
     nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
-        T* /*requestData*/,
+        RequestData* /*requestData*/,
         const QJsonValue& /*incompleteJsonValue*/,
         QByteArray* /*outResultBody*/,
         bool* outSuccess,
         const QnRestConnectionProcessor* /*owner*/,
-        typename std::enable_if<!std::is_base_of<ApiIdData, T>::value
-            || std::is_same<ApiIdData, T>::value>::type* = nullptr)
+        ... /*sfinae*/)
     {
         *outSuccess = true;
         return nx_http::StatusCode::ok;
     }
 
-    // Called when RequestData is inherited from ApiIdData - attempt the merge.
+    /**
+     * Sfinae: Called when RequestData provides id for merging and is not ApiIdData (because
+     * merging for API parameters of exact type ApiIdData has no sence) - attempt the merge.
+     *
+     * @param requestData In: potentially incomplete data. Out: merge result.
+     */
     template<typename T = RequestData>
     nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
-        T* requestData,
+        RequestData* requestData,
         const QJsonValue& incompleteJsonValue,
         QByteArray* outResultBody,
         bool* outSuccess,
         const QnRestConnectionProcessor* owner,
-        typename std::enable_if<std::is_base_of<ApiIdData, T>::value
-            && !std::is_same<ApiIdData, T>::value>::type* = nullptr)
+        decltype(&T::getIdForMerging) /*sfinae*/,
+        typename std::enable_if<!std::is_same<ApiIdData, T>::value>::type* = nullptr)
     {
-        if (requestData->id.isNull()) //< Id is omitted from request json - do not perform merge.
+        const QnUuid id = requestData->getIdForMerging();
+        if (id.isNull()) //< Id is omitted from request json - do not perform merge.
         {
             *outSuccess = true;
             return nx_http::StatusCode::ok;
@@ -196,7 +205,7 @@ private:
 
         RequestData existingData;
         bool found = false;
-        switch (processQueryAsync(requestData->id, &existingData, &found, owner))
+        switch (processQueryAsync(id, &existingData, &found, owner, /*sfinae*/ nullptr))
         {
             case ErrorCode::ok:
                 if (!found)
@@ -236,17 +245,24 @@ private:
         return nx_http::StatusCode::ok;
     }
 
-    ApiCommand::Value extractCommandFromPath(const QString& path)
+    static ApiCommand::Value extractCommandFromPath(const QString& path)
     {
         QString commandStr = path.split('/', QString::SkipEmptyParts).last();
         return ApiCommand::fromString(commandStr);
     }
 
+    /**
+     * Sfinae: Used only when RequestData provides id for merging but is not ApiIdData (because
+     * merging for API parameters of exact type ApiIdData has no sence).
+     */
     template<typename T = RequestData>
-    ErrorCode processQueryAsync(const QnUuid& uuid, T* outData, bool* outFound,
+    ErrorCode processQueryAsync(
+        const QnUuid& uuid,
+        RequestData* outData,
+        bool* outFound,
         const QnRestConnectionProcessor* owner,
-        typename std::enable_if<std::is_base_of<ApiIdData, T>::value
-            && !std::is_same<ApiIdData, T>::value>::type* = nullptr)
+        decltype(&T::getIdForMerging) /*sfinae*/,
+        typename std::enable_if<!std::is_same<ApiIdData, T>::value>::type* = nullptr)
     {
         typedef std::vector<RequestData> RequestDataList;
 

@@ -171,8 +171,8 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraAttributesDataList& cameraUserAttributesList ) {
             handler->done( reqID, errorCode, cameraUserAttributesList);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getCameraUserAttributes, nullptr, queryDoneHandler );
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getCameraUserAttributes, QnUuid(), queryDoneHandler );
         return reqID;
     }
 

@@ -400,6 +400,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read additional camera attributes.
      * %// TODO: This function is named inconsistently - should end with 'List'.
      * %param[default] format
+     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
      * %return List of additional camera attributes objects for all cameras in the requested
      *     format.
      *     %// TODO: #mike cameraId
@@ -497,7 +498,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value CameraBackup_Default A default value is used for backup options.
      * %// AbstractCameraManager::getUserAttributes
      */
-    regGet<nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+    regGet<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
 
     // AbstractCameraManager::addCameraHistoryItem
     regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
