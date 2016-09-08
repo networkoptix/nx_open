@@ -21,6 +21,7 @@
 #include "third_party_audio_data_packet.h"
 #include "third_party_video_data_packet.h"
 
+#include <motion/motion_detection.h>
 
 namespace
 {
@@ -120,8 +121,8 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
                 {
                     NX_ASSERT( y < motionMask->width() && x < motionMask->height() );
                     motionMask->setPixel( y, x, sensitivityToMask[sens] );
-                    //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
-                    //m_motionSensMask[x * MD_HEIGHT + y] = sens;
+                    //m_motionMask[x * Qn::kMotionGridHeight + y] = sensitivityToMask[sens];
+                    //m_motionSensMask[x * Qn::kMotionGridHeight + y] = sens;
                 }
         }
     }
@@ -544,7 +545,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 
                         if( motionPicture.pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                         {
-                            NX_ASSERT( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
+                            NX_ASSERT( motionPicture.width() == Qn::kMotionGridHeight && motionPicture.height() == Qn::kMotionGridWidth );
                             NX_ASSERT( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
 
                             motion->assign( motionPicture.data(), srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );

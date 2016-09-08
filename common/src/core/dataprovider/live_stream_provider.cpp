@@ -4,6 +4,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <motion/motion_detection.h>
+
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_properties.h"
 #include "utils/media/h264_utils.h"
@@ -49,8 +51,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
-        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
+        m_motionMaskBinData[i] = (simd128i*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight/8, 32);
+        memset(m_motionMaskBinData[i], 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight/8);
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         m_motionEstimation[i].setChannelNum(i);
 #endif

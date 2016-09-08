@@ -10,6 +10,7 @@
 #include <business/business_event_rule.h>
 #include "utils/common/synctime.h"
 
+#include <motion/motion_detection.h>
 
 static QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 const QString QnStardotResource::MANUFACTURE(lit("Stardot"));
@@ -233,7 +234,7 @@ void QnStardotResource::setMotionMaskPhysical(int channel)
         }
     }
     if (m_motionMaskBinData == 0)
-        m_motionMaskBinData = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
+        m_motionMaskBinData = (simd128i*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight/8, 32);
     QnMetaDataV1::createMask(getMotionMask(0), (char*)m_motionMaskBinData);
 }
 

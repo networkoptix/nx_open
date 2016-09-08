@@ -831,9 +831,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 // TODO: #Elric #enum
 
-/* Motion Detection constants */
-enum {MD_WIDTH = 44, MD_HEIGHT = 32};
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole)(Qn::ConnectionResult),
     (metatype)
