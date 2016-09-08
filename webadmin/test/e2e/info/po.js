@@ -4,9 +4,9 @@ var Page = function () {
     var Helper = require('../helper.js');
     this.helper = new Helper();
 
-    this.versionNode = element(by.id("software-version"));
-    this.archNode = element(by.id("software-architecture"));
-    this.platformNode = element(by.id("software-platform"));
+    this.version = element(by.cssContainingText('tr','Version')).element(by.css('b'));
+    this.architec = element(by.cssContainingText('tr','Architecture')).element(by.css('b'));
+    this.platform = element(by.cssContainingText('tr','Platform')).element(by.css('b'));
     this.storagesNodes = element.all(by.repeater("storage in storages"));
     this.graphCanvas = element(by.css('canvas'));
     this.legendCheckboxes = element.all(by.css('.legend-checkbox'));

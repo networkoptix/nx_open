@@ -14,20 +14,21 @@ var SettingsPage = function () {
     this.dialogButtonClose = element(by.buttonText("Close"));
 
     this.saveButton = element(by.buttonText("Save"));
+    this.changePortButton = element(by.buttonText("Change port"));
     this.mustBeEqualSpan = element(by.id('mustBeEqualSpan'));
     this.mergeButton = element(by.buttonText("Merge Systems"));
 
     this.mediaServersLinks = element.all(by.repeater("server in mediaServers")).all(by.tagName('a'));
-    this.currentMediaServer = element(by.css('ul.serversList')).element(by.cssContainingText('li', '(current)'));
+    this.currentMediaServer = element(by.cssContainingText('div', '(current)'));
     this.currentMediaServerLink = this.currentMediaServer.element(by.css('a'));
 
     this.connectToCloudButton = element(by.buttonText('Connect to Nx Cloud'));
     this.createCloudAccButton = element(by.linkText('Create Nx Cloud Account'));
     this.goToCloudAccButton = element(by.linkText('Go to Nx Cloud Portal'));
     this.cloudEmailInput = this.dialog.element(by.model('settings.cloudEmail'));
-    this.cloudPasswordInput = this.dialog.element(by.model('settings.cloudPassword'));
+    this.cloudPasswordInput = this.dialog.element(by.model('settings.oldPassword'));
     this.dialogConnectButton = this.dialog.element(by.buttonText('Connect System'));
-    this.dialogDisconnectButton = this.dialog.element(by.buttonText('Disconnect System'));
+    this.dialogDisconnectButton = this.dialog.element(by.buttonText('Disconnect'));
     this.dialogCancelButton = this.dialog.element(by.buttonText('Cancel'));
     this.cloudDialogCloseButton = this.dialog.element(by.css('.close'));
     this.dialogMessage = this.dialog.element(by.css('.alert'));
@@ -72,8 +73,12 @@ var SettingsPage = function () {
         this.disconnectFromCloudButton.click();
         this.cloudPasswordInput.sendKeys(cloudPassword);
         this.dialogDisconnectButton.click();
-        expect(this.dialogMessage.getText()).toContain('System was disconnected from ');
-        this.cloudDialogCloseButton.click();
+        expect(this.dialog.getText()).toContain('Create local administrator');
+        this.dialog.element(by.css('[name=password]')).sendKeys(cloudPassword);
+        this.dialog.element(by.css('[name=localPasswordConfirmation]')).sendKeys(cloudPassword);
+        browser.refresh();
+        //expect(this.dialogMessage.getText()).toContain('System was disconnected from ');
+        //this.cloudDialogCloseButton.click();
     }
 };
 

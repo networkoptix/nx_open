@@ -8,22 +8,14 @@ angular.module('webadminApp')
             system: $location.path() === '/settings/system',
             server: $location.path() === '/settings/server'
         };
-        $scope.$watch("active.system",function(){
-            if( $scope.active.system){
-                $location.path('/settings/system');
-            }
-        });
-        $scope.$watch("active.server",function(){
-            if( $scope.active.server){
-                $location.path('/settings/server');
-            }
-        });
 
         mediaserver.getModuleInformation().then(function (r) {
+            Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
 
             if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
                 return;
             }
+
 
             $scope.settings = {
                 systemName: r.data.reply.systemName,
@@ -38,16 +30,26 @@ angular.module('webadminApp')
         });
 
         function checkUserRights() {
-            mediaserver.getUser().then(function (user) {
+            return mediaserver.getUser().then(function (user) {
                 if (!user.isAdmin) {
                     $location.path('/info'); //no admin rights - redirect
-                    return;
+                    return false;
                 }
+
+                $scope.$watch("active.system",function(){
+                    if( $scope.active.system){
+                        $location.path('/settings/system', false);
+                    }
+                });
+                $scope.$watch("active.server",function(){
+                    if( $scope.active.server){
+                        $location.path('/settings/server', false);
+                    }
+                });
 
                 $scope.canMerge = user.isOwner;
 
                 getCloudInfo();
-                readPortalUrl();
                 requestScripts();
             });
         }
@@ -166,17 +168,6 @@ angular.module('webadminApp')
             });
         }
 
-        function readPortalUrl(){
-            mediaserver.systemSettings().then(function(r) {
-                if (r.data.reply.settings.cloudPortalUrl) {
-                    Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
-                    $scope.portalUrl = Config.cloud.portalUrl;
-                    $log.log('Read cloud portal url from advanced settings: ' + Config.cloud.portalUrl);
-                } else {
-                    $log.log('No cloud portal url in advanced settings');
-                }
-            });
-        }
 
         $scope.runClient = function(){
             mediaserver.execute('start_lite_client').then(resultHandler, errorHandler);
