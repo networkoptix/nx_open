@@ -229,6 +229,7 @@ void Ec2MserverCloudSynchronization2::addCloudUserLocally(
 {
     // Adding cloud user locally.
     accountVmsData->id = guidFromArbitraryData(accountEmail);
+    accountVmsData->typeId = QnUuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
     accountVmsData->isCloud = true;
     accountVmsData->isEnabled = true;
     accountVmsData->email = QString::fromStdString(accountEmail);
