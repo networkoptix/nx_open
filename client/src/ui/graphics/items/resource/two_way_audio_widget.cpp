@@ -52,6 +52,8 @@ void QnTwoWayAudioWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
         bool enabled = camera && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
         setEnabled(enabled);
         d->button->setEnabled(enabled);
+        if (!enabled)
+            d->stopStreaming();
         setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
     };
 
