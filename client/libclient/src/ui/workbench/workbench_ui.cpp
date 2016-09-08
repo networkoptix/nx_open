@@ -589,7 +589,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
     }
     else
     {
-        setSliderVisible(sliderVisible, animate);
+        setSliderVisible(sliderVisible, false);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
         setNotificationsVisible(true, animate);
