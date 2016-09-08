@@ -1922,8 +1922,6 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         if (!m_timeSlider->isSelectionValid())
             return;
 
-        m_timeSlider->setValue((m_timeSlider->selectionStart() + m_timeSlider->selectionEnd()) / 2, false);
-        m_timeSlider->finishAnimations();
         m_timeSlider->setWindow(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd(), true);
     }
 }

@@ -457,7 +457,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_oldMaximum(0),
     m_options(0),
     m_zoomAnchor(0),
-    m_animating(false),
+    m_animatingSliderWindow(false),
     m_kineticsHurried(false),
     m_dragMarker(NoMarker),
     m_dragIsClick(false),
@@ -899,7 +899,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate)
         if (animate)
         {
             kineticProcessor()->reset(); /* Stop kinetic zoom. */
-            m_animating = true;
+            m_animatingSliderWindow = true;
             setAnimationStart(start);
             setAnimationEnd(end);
         }
@@ -1098,10 +1098,10 @@ void QnTimeSlider::finishAnimations()
     animateStepValues(10 * 1000);
     animateThumbnails(10 * 1000);
 
-    if (m_animating)
+    if (m_animatingSliderWindow)
     {
         setWindow(animationStart(), animationEnd());
-        m_animating = false;
+        m_animatingSliderWindow = false;
     }
 
     kineticProcessor()->reset();
@@ -1186,7 +1186,7 @@ void QnTimeSlider::generateProgressPatterns()
 
 bool QnTimeSlider::isAnimatingWindow() const
 {
-    return m_animating || kineticProcessor()->isRunning();
+    return m_animatingSliderWindow || kineticProcessor()->isRunning();
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor)
@@ -2713,7 +2713,7 @@ QSizeF QnTimeSlider::sizeHint(Qt::SizeHint which, const QSizeF& constraint) cons
 
 void QnTimeSlider::tick(int deltaMs)
 {
-    if (m_options.testFlag(AdjustWindowToPosition) && !m_animating && !isSliderDown())
+    if (m_options.testFlag(AdjustWindowToPosition) && !m_animatingSliderWindow && !isSliderDown())
     {
         /* Apply window position corrections if no animation or user interaction is in progress. */
         qint64 position = this->sliderPosition();
@@ -2741,39 +2741,27 @@ void QnTimeSlider::tick(int deltaMs)
         }
     }
 
-    if (!m_animating)
+    if (m_animatingSliderWindow)
     {
-        animateStepValues(deltaMs);
-    }
-    else
-    {
-        qint64 animationStart = this->animationStart();
-        qint64 animationEnd = this->animationEnd();
+        /* Simple logarithmic convergence looks the best: */
+        qint64 deltaStart = (animationStart() - m_windowStart) / 2.0;
+        qint64 deltaEnd = (animationEnd() - m_windowEnd) / 2.0;
 
-        qreal distance = qAbs(animationStart - m_windowStart) + qAbs(animationEnd - m_windowEnd);
-        qreal delta = 8.0 * deltaMs / 1000.0 * qMax(distance, 2.0 * static_cast<qreal>(m_windowEnd - m_windowStart));
+        qint64 desiredWindowSize = animationEnd() - animationStart();
+        qint64 maxDelta = qMax(qAbs(deltaStart), qAbs(deltaEnd));
 
-        if (delta > distance)
+        if (maxDelta < qMax(desiredWindowSize / 1000, 1000LL))
         {
-            setWindow(animationStart, animationEnd);
+            m_animatingSliderWindow = false;
+            setWindow(animationStart(), animationEnd());
         }
         else
         {
-            qreal startFraction = (animationStart - m_windowStart) / distance;
-            qreal endFraction  = (animationEnd - m_windowEnd) / distance;
-
-            setWindow(
-                m_windowStart + static_cast<qint64>(delta * startFraction),
-                m_windowEnd + static_cast<qint64>(delta * endFraction)
-            );
+            setWindow(m_windowStart + deltaStart, m_windowEnd + deltaEnd);
         }
-
-        if (animationStart == m_windowStart && animationEnd == m_windowEnd)
-            m_animating = false;
-
-        animateStepValues(8.0 * deltaMs);
     }
 
+    animateStepValues(deltaMs);
     animateThumbnails(deltaMs);
     animateLastMinute(deltaMs);
 }
@@ -2838,10 +2826,10 @@ void QnTimeSlider::sliderChange(SliderChange change)
 
 void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
-    if (m_animating)
+    if (m_animatingSliderWindow)
     {
         event->accept();
-        return; /* Do nothing if animated unzoom is in progress. */
+        return; /* Do nothing if animated zoom is in progress. */
     }
 
     /* delta() returns the distance that the wheel is rotated

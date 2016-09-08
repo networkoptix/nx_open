@@ -427,7 +427,7 @@ private:
     QnBoundedLinearFunction m_boundMapper;
 
     qint64 m_zoomAnchor;
-    bool m_animating;
+    bool m_animatingSliderWindow;
     bool m_kineticsHurried;
     qint64 m_animationStart, m_animationEnd;
     Marker m_dragMarker;
