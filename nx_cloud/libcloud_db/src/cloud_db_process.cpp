@@ -550,8 +550,9 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
             enableWalQuery.prepare("PRAGMA journal_mode = WAL");
             if (!enableWalQuery.exec())
             {
-                NX_LOG(lit("sqlite configure. Failed to enable WAL mode. %1").
-                    arg(connection->lastError().text()), cl_logWARNING);
+                NX_LOG(lit("sqlite configure. Failed to enable WAL mode. %1")
+                    .arg(enableWalQuery.lastError().text()),
+                    cl_logWARNING);
                 return nx::db::DBResult::ioError;
             }
 
@@ -559,8 +560,9 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
             enableFKQuery.prepare("PRAGMA foreign_keys = ON");
             if (!enableFKQuery.exec())
             {
-                NX_LOG(lit("sqlite configure. Failed to enable foreign keys. %1").
-                    arg(connection->lastError().text()), cl_logWARNING);
+                NX_LOG(lit("sqlite configure. Failed to enable foreign keys. %1")
+                    .arg(enableFKQuery.lastError().text()),
+                    cl_logWARNING);
                 return nx::db::DBResult::ioError;
             }
 
@@ -568,8 +570,8 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
             //setLockingModeQuery.prepare("PRAGMA locking_mode = NORMAL");
             //if (!setLockingModeQuery.exec())
             //{
-            //    NX_LOG(lit("sqlite configure. Failed to set locking mode. %1").
-            //        arg(connection->lastError().text()), cl_logWARNING);
+            //    NX_LOG(lit("sqlite configure. Failed to set locking mode. %1")
+            //        .arg(setLockingModeQuery.lastError().text()), cl_logWARNING);
             //    return nx::db::DBResult::ioError;
             //}
 

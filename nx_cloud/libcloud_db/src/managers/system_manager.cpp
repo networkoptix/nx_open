@@ -637,8 +637,9 @@ nx::db::DBResult SystemManager::insertSystemToDB(
         result->systemData.expirationTimeUtc);
     if (!insertSystemQuery.exec())
     {
-        NX_LOG(lm("Could not insert system %1 into DB. %2").
-            arg(newSystem.name).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not insert system %1 into DB. %2")
+            .arg(newSystem.name).arg(insertSystemQuery.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -731,7 +732,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
     if (!markSystemAsRemoved.exec())
     {
         NX_LOG(lm("Error marking system %1 as deleted. %2")
-            .arg(systemId).arg(connection->lastError().text()),
+            .arg(systemId).arg(markSystemAsRemoved.lastError().text()),
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -746,7 +747,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
     if (!removeSystemToAccountBinding.exec())
     {
         NX_LOG(lm("Could not delete system %1 from system_to_account. %2").
-            arg(systemId).arg(connection->lastError().text()), cl_logDEBUG1);
+            arg(systemId).arg(removeSystemToAccountBinding.lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -800,8 +801,9 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
     QnSql::bind(systemID, &removeSystemToAccountBinding);
     if (!removeSystemToAccountBinding.exec())
     {
-        NX_LOG(lm("Could not delete system %1 from system_to_account. %2").
-            arg(systemID.systemID).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not delete system %1 from system_to_account. %2")
+            .arg(systemID.systemID).arg(removeSystemToAccountBinding.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -811,8 +813,9 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
     QnSql::bind(systemID, &removeSystem);
     if (!removeSystem.exec())
     {
-        NX_LOG(lm("Could not delete system %1. %2").
-            arg(systemID.systemID).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not delete system %1. %2")
+            .arg(systemID.systemID).arg(removeSystem.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -870,10 +873,11 @@ nx::db::DBResult SystemManager::updateSharingInDb(
         QnSql::serialized_field(account->id));
     if (!updateRemoveSharingQuery.exec())
     {
-        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4").
-            arg(sharing.systemID).arg(sharing.accountEmail).
-            arg(QnLexical::serialized(sharing.accessRole)).
-            arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4")
+            .arg(sharing.systemID).arg(sharing.accountEmail)
+            .arg(QnLexical::serialized(sharing.accessRole))
+            .arg(updateRemoveSharingQuery.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -984,7 +988,7 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
     {
         NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
             .arg(data.id).arg(data.name)
-            .arg(connection->lastError().text()), cl_logWARNING);
+            .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
 
@@ -1052,7 +1056,7 @@ nx::db::DBResult SystemManager::activateSystem(
     if (!updateSystemStatusQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
-            arg(connection->lastError().text()), cl_logWARNING);
+            arg(updateSystemStatusQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
 
@@ -1188,7 +1192,7 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
     if (!readSystemsQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
-            arg(connection->lastError().text()), cl_logWARNING);
+            arg(readSystemsQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
     
@@ -1226,7 +1230,7 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     if (!readSystemToAccountQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
-            arg(connection->lastError().text()), cl_logWARNING);
+            arg(readSystemToAccountQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
 
@@ -1276,7 +1280,7 @@ nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(QSqlDatabase* connect
     if (!dropExpiredSystems.exec())
     {
         NX_LOGX(lit("Error deleting expired systems from DB. %1").
-            arg(connection->lastError().text()), cl_logWARNING);
+            arg(dropExpiredSystems.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
 

@@ -406,8 +406,8 @@ db::DBResult AccountManager::fetchAccounts(
         "FROM account" );
     if (!readAccountsQuery.exec())
     {
-        NX_LOG( lit( "Failed to read account list from DB. %1" ).
-            arg( connection->lastError().text() ), cl_logWARNING );
+        NX_LOG(lit("Failed to read account list from DB. %1").
+            arg(readAccountsQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
 
@@ -444,8 +444,8 @@ db::DBResult AccountManager::insertAccount(
         static_cast<int>(api::AccountStatus::awaitingActivation) );
     if( !insertAccountQuery.exec() )
     {
-        NX_LOG( lit( "Could not insert account into DB. %1" ).
-            arg( connection->lastError().text() ), cl_logDEBUG1 );
+        NX_LOG(lit("Could not insert account into DB. %1").
+            arg(insertAccountQuery.lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -473,7 +473,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
     if (!fetchActivationCodesQuery.exec())
     {
         NX_LOG(lm("Could not fetch account %1 activation codes from DB. %2").
-            arg(accountEmail).arg(connection->lastError().text()), cl_logDEBUG1);
+            arg(accountEmail).arg(fetchActivationCodesQuery.lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
     if (fetchActivationCodesQuery.next())
@@ -502,8 +502,8 @@ db::DBResult AccountManager::issueAccountActivationCode(
             QDateTime::currentDateTimeUtc().addSecs(kUnconfirmedAccountExpirationSec.count()));
         if( !insertEmailVerificationQuery.exec() )
         {
-            NX_LOG( lit( "Could not insert account verification code into DB. %1" ).
-                arg( connection->lastError().text() ), cl_logDEBUG1 );
+            NX_LOG(lit("Could not insert account verification code into DB. %1").
+                arg(insertEmailVerificationQuery.lastError().text()), cl_logDEBUG1);
             return db::DBResult::ioError;
         }
         resultData->code.assign(
@@ -599,9 +599,10 @@ nx::db::DBResult AccountManager::verifyAccount(
     QnSql::bind( verificationCode, &removeVerificationCode );
     if( !removeVerificationCode.exec() )
     {
-        NX_LOG( lit( "Failed to remove account verification code %1 from DB. %2" ).
-            arg( QString::fromStdString(verificationCode.code) ).arg( connection->lastError().text() ),
-            cl_logDEBUG1 );
+        NX_LOG(lit("Failed to remove account verification code %1 from DB. %2")\
+            .arg(QString::fromStdString(verificationCode.code))
+            .arg(removeVerificationCode.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -613,7 +614,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     if( !updateAccountStatus.exec() )
     {
         NX_LOG(lm("Failed to update account %1 status. %2").
-            arg(accountEmail).arg(connection->lastError().text()),
+            arg(accountEmail).arg(updateAccountStatus.lastError().text()),
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -691,7 +692,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
     if (!updateAccountQuery.exec())
     {
         NX_LOG(lit("Could not update account in DB. %1").
-            arg(connection->lastError().text()), cl_logDEBUG1);
+            arg(updateAccountQuery.lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 

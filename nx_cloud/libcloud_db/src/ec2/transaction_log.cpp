@@ -127,7 +127,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG, 
             lm("Error loading transaction log. %1")
-            .arg(connection->lastError().text()), cl_logERROR);
+            .arg(selectTransactionStateQuery.lastError().text()), cl_logERROR);
         return nx::db::DBResult::ioError;
     }
 
@@ -201,7 +201,7 @@ nx::db::DBResult TransactionLog::fetchTransactions(
                 lm("systemId %1. Error executing fetch_transactions request "
                    "for peer (%2; %3). %4")
                     .arg(it.key().peerID.toSimpleString()).arg(it.key().dbID.toSimpleString())
-                    .arg(connection->lastError().text()),
+                    .arg(fetchTransactionsOfAPeerQuery.lastError().text()),
                 cl_logERROR);
             return nx::db::DBResult::ioError;
         }
@@ -387,7 +387,7 @@ nx::db::DBResult TransactionLog::saveToDb(
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
                 .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-                .str(transaction).arg(transactionHash).arg(connection->lastError().text()),
+                .str(transaction).arg(transactionHash).arg(saveTranQuery.lastError().text()),
             cl_logWARNING);
         return nx::db::DBResult::ioError;
     }

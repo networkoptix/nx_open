@@ -204,7 +204,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
     if (!readPasswordsQuery.exec())
     {
         NX_LOG(lit("Failed to read temporary passwords from DB. %1").
-            arg(connection->lastError().text()), cl_logWARNING);
+            arg(readPasswordsQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
 
@@ -240,8 +240,9 @@ nx::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
         QnSql::serialized_field(tempPasswordData.accessRights.toString()));
     if (!insertTempPassword.exec())
     {
-        NX_LOG(lm("Could not insert temporary password for account %1 into DB. %2").
-            arg(tempPasswordData.accountEmail).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not insert temporary password for account %1 into DB. %2")
+            .arg(tempPasswordData.accountEmail).arg(insertTempPassword.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -283,8 +284,9 @@ nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
     deleteTempPassword.bindValue(":id", QnSql::serialized_field(tempPasswordID));
     if (!deleteTempPassword.exec())
     {
-        NX_LOG(lm("Could not delete temporary password %1 from DB. %2").
-            arg(tempPasswordID).arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not delete temporary password %1 from DB. %2")
+            .arg(tempPasswordID).arg(deleteTempPassword.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
