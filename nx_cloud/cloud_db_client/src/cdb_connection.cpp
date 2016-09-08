@@ -66,7 +66,7 @@ void Connection::setProxyCredentials(
 
 void Connection::setProxyVia(
     const std::string& proxyHost,
-    unsigned short proxyPort)
+    std::uint16_t proxyPort)
 {
     const SocketAddress proxyEndpoint(proxyHost.c_str(), proxyPort);
     m_accountManager->setProxyVia(proxyEndpoint);

@@ -50,7 +50,7 @@ void EventConnection::setProxyCredentials(const std::string& login, const std::s
 
 void EventConnection::setProxyVia(
     const std::string& proxyHost,
-    unsigned short proxyPort)
+    std::uint16_t proxyPort)
 {
     m_auth.proxyEndpoint = SocketAddress(proxyHost.c_str(), proxyPort);
 }

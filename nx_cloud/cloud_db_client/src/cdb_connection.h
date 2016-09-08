@@ -55,7 +55,7 @@ public:
 
     virtual void setProxyVia(
         const std::string& proxyHost,
-        unsigned short proxyPort) override;
+        std::uint16_t proxyPort) override;
 
     //!Implemetation of api::Connection::ping
     virtual void ping(

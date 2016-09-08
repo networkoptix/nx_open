@@ -7,6 +7,7 @@
 #ifndef NX_CDB_API_CONNECTION_H
 #define NX_CDB_API_CONNECTION_H
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
@@ -58,7 +59,7 @@ public:
         const std::string& password) = 0;
     virtual void setProxyVia(
         const std::string& proxyHost,
-        unsigned short proxyPort) = 0;
+        std::uint16_t proxyPort) = 0;
 };
 
 class Connection:
