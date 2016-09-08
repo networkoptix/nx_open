@@ -675,7 +675,7 @@ const QList<QRegion> &QnMediaResourceWidget::motionSelection() const
 bool QnMediaResourceWidget::isMotionSelectionEmpty() const
 {
     using boost::algorithm::all_of;
-    return all_of(m_motionSelection, [](const QRegion& r) { return !r.isEmpty(); });
+    return all_of(m_motionSelection, [](const QRegion& r) { return r.isEmpty(); });
 }
 
 void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
