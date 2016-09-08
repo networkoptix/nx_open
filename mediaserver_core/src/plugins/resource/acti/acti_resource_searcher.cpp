@@ -11,6 +11,7 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
+#include <utils/common/log.h>
 
 
 extern QString getValueFromString(const QString& line);
@@ -242,6 +243,8 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     {
         CLHttpStatus status;
 
+        NX_LOG(lit("ACTI searcher, doing request to %1").arg(devUrl) ,cl_logINFO)
+
         auto serverReport = actiRes->makeActiRequest(
             kActiSystemGroup,
             kActiSystemInfoCommand,
@@ -250,6 +253,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
 
         if (status != CL_HTTP_SUCCESS)
         { 
+            NX_LOG(lit("(2) ACTI searcher, doing request to devicedesc.xml %1").arg(devUrl) ,cl_logINFO);
             /* Trying to get appropriate port from the UPnP device description XML,
              * which is always located on the same port.
              */ 
@@ -257,7 +261,12 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
             auto upnpDevInfo = getDeviceInfoSync(deviceXmlUrl, &upnpDevInfoStatus);
 
             if (!upnpDevInfoStatus)
+            {
+                NX_LOG(lit("No response for devicedesc.xml %1").arg(deviceXmlUrl) ,cl_logINFO);
                 return result;
+            }
+
+            NX_LOG(lit("ACTI searcher, got xml %1").arg(deviceXmlUrl) ,cl_logINFO);
 
             actiRes->setUrl(upnpDevInfo.presentationUrl);
             serverReport = actiRes->makeActiRequest(
@@ -266,8 +275,12 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
                 status,
                 true);
 
+            NX_LOG(lit("ACTI searcher, doing request to System INFO %1").arg(deviceXmlUrl) ,cl_logINFO);
             if(status != CL_HTTP_SUCCESS)
+            {
+                NX_LOG(lit("ACTI searcher, no sytem info retrieved %1").arg(deviceXmlUrl), cl_logINFO);
                 return result;
+            }
         }
 
         auto report = QnActiResource::parseSystemInfo(serverReport);
@@ -303,6 +316,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         m_cachedDevInfo[devUrl] = devInfo;
     }
 
+    NX_LOG(lit("ACTI SEARCHER, creating resource"), cl_logINFO);
     createResource(devInfo.info, devInfo.mac, auth, result);
 
     return result;

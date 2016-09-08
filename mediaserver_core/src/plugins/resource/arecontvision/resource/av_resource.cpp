@@ -143,12 +143,22 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     QString model;
     QString model_release;
 
+    NX_LOG(lit("UPDATING AV RESOURCE"), cl_logINFO);
+
     if (!getParamPhysical(lit("model"), model))
+    {
+        NX_LOG(lit("can't get AV model, updating failed"), cl_logINFO);
         return QnNetworkResourcePtr(0);
+    }
 
+    NX_LOG(lit("AV model is %1, continuing").arg(model), cl_logINFO);
     if (!getParamPhysical(lit("model=releasename"), model_release))
+    {
+        NX_LOG(lit("can't get AV releasemodel, updating failed"), cl_logINFO);
         return QnNetworkResourcePtr(0);
+    }
 
+    NX_LOG(lit("AV releasemodel is %1, continuing").arg(model_release), cl_logINFO);
     if (model_release != model) {
         //this camera supports release name
         model = model_release;
@@ -160,9 +170,11 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
             model = model_release;
     }
 
+    NX_LOG(lit("AV final model after updating is %1, continuing").arg(model), cl_logINFO);
     QnNetworkResourcePtr result(createResourceByName(model));
     if (result)
     {
+        NX_LOG(lit("AV Resource by name is created"), cl_logINFO);
         result->setName(model);
         result->setHostAddress(getHostAddress());
         (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);

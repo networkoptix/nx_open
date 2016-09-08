@@ -267,12 +267,17 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     {
         if (res->unknownResource())
         {
+            NX_LOG(lit("DISCOVERY MANAGER, UNKNOWN RESOURCE: %1").arg(res->getName()), cl_logINFO);
             QnResourcePtr updetedRes = res->updateResource();
             if (updetedRes)
+            {
+                NX_LOG(lit("DISCOVERY MANAGER, no updated resource").arg(res->getName()), cl_logINFO);
                 swapList.push_back(updetedRes);
+            }
         }
         else
         {
+            NX_LOG(lit("DISCOVERY MANAGER ADDING RESOURCE: %1").arg(res->getName()), cl_logINFO);
             swapList.push_back(res);
         }
     }
