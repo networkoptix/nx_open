@@ -86,7 +86,7 @@ angular.module('webadminApp')
             }*/
 
             mediaserver.pingSystem($scope.settings.url, $scope.settings.login, $scope.settings.password).then(function(r){
-                if(r.data.error!=='0'){
+                if(r.data && r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
                         dialogs.alert(L.join.connectionFailed + errorToShow);
@@ -95,6 +95,12 @@ angular.module('webadminApp')
                 }
                 $scope.systems.systemFound = true;
                 $scope.systems.joinSystemName = r.data.reply.systemName;
+            },function(){
+                var errorToShow = L.join.unknownError;
+                if(r.data && r.data.error!=='0') {
+                    errorToShow = errorHandler(r.data.errorString);
+                }
+                dialogs.alert(L.join.connectionFailed + errorToShow);
             });
         };
 

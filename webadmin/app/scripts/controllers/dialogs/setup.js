@@ -102,8 +102,8 @@ angular.module('webadminApp')
             }
 
             mediaserver.checkInternet().then(function(hasInternetOnServer){
-                $log.log("internet on server: " + $scope.hasInternetOnServer);
                 $scope.hasInternetOnServer = hasInternetOnServer;
+                $log.log("internet on server: " + $scope.hasInternetOnServer);
             });
 
             cloudAPI.checkConnection().then(function(){
@@ -273,28 +273,32 @@ angular.module('webadminApp')
             logMediaserverError(error);
 
             var errorMessage = 'Connection error (' + error.status + ')';
-            if(error.data.errorString && error.data.errorString!=''){
+            if(error.data && error.data.errorString && error.data.errorString!='') {
                 errorMessage = formatError(error.data.errorString);
-            }
-            $scope.settings.remoteError = errorMessage;
 
-            switch(classifyError(error.data.errorString)){
-                case 'auth':
-                    $scope.settings.remoteAuthError = true;
-                    $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system',false);
-                    $scope.forms.remoteSystemForm.remotePassword.$setValidity('system',false);
-                    $scope.next('merge');
-                    break;
+                $scope.settings.remoteError = errorMessage;
 
-                case 'system':
-                    $scope.settings.remoteSystemError = true;
-                    $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system',false);
-                    $scope.next('merge');
-                    break;
+                switch (classifyError(error.data.errorString)) {
+                    case 'auth':
+                        $scope.settings.remoteAuthError = true;
+                        $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system', false);
+                        $scope.forms.remoteSystemForm.remotePassword.$setValidity('system', false);
+                        $scope.next('merge');
+                        break;
 
-                default:
-                    $scope.next('mergeFailure');
-                    break;
+                    case 'system':
+                        $scope.settings.remoteSystemError = true;
+                        $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system', false);
+                        $scope.next('merge');
+                        break;
+
+                    default:
+                        $scope.next('mergeFailure');
+                        break;
+                }
+            }else{
+                $scope.settings.remoteError = L.join.unknownError;
+                $scope.next('mergeFailure');
             }
         }
 

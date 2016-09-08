@@ -47,6 +47,7 @@ var L = {
         cloudHostConflict: 'Can\'t merge systems, because servers are built with different cloud hosts',
         licenceError: 'Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.',
         connectionFailed: 'Connection failed: ',
+        unknownError: 'Unknown error',
         mergeFailed: 'Merge failed: ',
         mergeSucceed: 'Merge succeed.'
     },
