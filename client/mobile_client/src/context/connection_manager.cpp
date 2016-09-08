@@ -14,6 +14,7 @@
 #include <utils/common/util.h>
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
+#include <network/connection_validator.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
@@ -21,17 +22,10 @@
 
 namespace {
 
-    const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
     const QString kCloudConnectionScheme = lit("cloud");
     const QString kLiteClientConnectionScheme = lit("liteclient");
 
     enum { kInvalidHandle = -1 };
-
-    bool isCompatibleProducts(const QString &product1, const QString &product2) {
-        return  product1.isEmpty() ||
-                product2.isEmpty() ||
-                product1.left(product1.indexOf(lit("_"))) == product2.left(product2.indexOf(lit("_")));
-    }
 
     QnConnectionManager::ConnectionType connectionTypeByScheme(const QString& scheme)
     {
@@ -256,12 +250,13 @@ void QnConnectionManagerPrivate::resume() {
     doConnect();
 }
 
-void QnConnectionManagerPrivate::doConnect() {
+void QnConnectionManagerPrivate::doConnect()
+{
     if (!url.isValid())
     {
         Q_Q(QnConnectionManager);
         updateConnectionState();
-        emit q->connectionFailed(QnConnectionManager::NetworkError, QVariant());
+        emit q->connectionFailed(Qn::ConnectionResult::NetworkError, QVariant());
         return;
     }
 
@@ -270,82 +265,84 @@ void QnConnectionManagerPrivate::doConnect() {
     auto connectUrl = url;
     connectUrl.setScheme(lit("http"));
 
-    QnEc2ConnectionRequestResult *result = new QnEc2ConnectionRequestResult(this);
+    auto result = new QnEc2ConnectionRequestResult(this);
     connectionHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
-        connectUrl, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
+        connectUrl,
+        ec2::ApiClientInfoData(),
+        result,
+        &QnEc2ConnectionRequestResult::processEc2Reply);
 
     updateConnectionState();
 
-    connect(result, &QnEc2ConnectionRequestResult::replyProcessed,
-            this, [this, result, connectUrl]()
-    {
-        result->deleteLater();
+    connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this,
+        [this, result, connectUrl]()
+        {
+            result->deleteLater();
 
-        if (connectionHandle != result->handle())
-            return;
+            if (connectionHandle != result->handle())
+                return;
 
-        connectionHandle = kInvalidHandle;
+            connectionHandle = kInvalidHandle;
 
-        ec2::ErrorCode errorCode = ec2::ErrorCode(result->status());
+            const auto errorCode = ec2::ErrorCode(result->status());
+            const auto connectionInfo = result->reply<QnConnectionInfo>();
 
-        QnConnectionInfo connectionInfo = result->reply<QnConnectionInfo>();
-        auto status = QnConnectionManager::Success;
-        QVariant infoParameter;
+            auto status = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
+            QVariant infoParameter;
 
-        if (errorCode == ec2::ErrorCode::unauthorized) {
-            status = QnConnectionManager::Unauthorized;
-        } else if (errorCode != ec2::ErrorCode::ok) {
-            status = QnConnectionManager::NetworkError;
-        } else if (!isCompatibleProducts(connectionInfo.brand, QnAppInfo::productNameShort())) {
-            status = QnConnectionManager::InvalidServer;
-        } else if (connectionInfo.version < minimalSupportedVersion) {
-            status = QnConnectionManager::InvalidVersion;
-            infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
-        }
+            if (status == Qn::ConnectionResult::IncompatibleVersion)
+                infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
+            else if (status == Qn::ConnectionResult::IncompatibleProtocol)
+                status = Qn::ConnectionResult::Success; // In mobile client it should be ignored
 
-        Q_Q(QnConnectionManager);
+            Q_Q(QnConnectionManager);
 
-        if (status != QnConnectionManager::Success) {
+            if (status != Qn::ConnectionResult::Success)
+            {
+                updateConnectionState();
+                emit q->connectionFailed(status, infoParameter);
+                return;
+            }
+
+            const auto ec2Connection = result->connection();
+
+            QnAppServerConnectionFactory::setUrl(connectUrl);
+            QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+            QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
+
+            QnMobileClientMessageProcessor::instance()->init(ec2Connection);
+
+            QnSessionManager::instance()->start();
+
+            connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged,
+                this, [this, ec2Connection](const QnPeerRuntimeInfo& info)
+                {
+                    if (info.uuid == qnCommon->moduleGUID())
+                        ec2Connection->sendRuntimeData(info.data);
+                });
+
+            connect(
+                ec2Connection->getTimeNotificationManager().get(),
+                &ec2::AbstractTimeNotificationManager::timeChanged,
+                QnSyncTime::instance(),
+                static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
+
+            qnCommon->setLocalSystemName(connectionInfo.systemName);
+            qnCommon->instance<QnUserWatcher>()->setUserName(
+                connectionInfo.effectiveUserName.isEmpty()
+                    ? url.userName()
+                    : connectionInfo.effectiveUserName);
+
             updateConnectionState();
-            emit q->connectionFailed(status, infoParameter);
-            return;
-        }
 
-        ec2::AbstractECConnectionPtr ec2Connection = result->connection();
+            storeConnection(connectionInfo.systemName, url, true);
+            qnSettings->setLastUsedSystemId(connectionInfo.systemName);
+            url.setPassword(QString());
+            qnSettings->setLastUsedUrl(url);
 
-        QnAppServerConnectionFactory::setUrl(connectUrl);
-        QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
-        QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
-
-        QnMobileClientMessageProcessor::instance()->init(ec2Connection);
-
-        QnSessionManager::instance()->start();
-
-        connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, [this, ec2Connection](const QnPeerRuntimeInfo &info) {
-            if (info.uuid == qnCommon->moduleGUID())
-                ec2Connection->sendRuntimeData(info.data);
+            connectionVersion = connectionInfo.version;
+            emit q->connectionVersionChanged();
         });
-
-        connect(
-            ec2Connection->getTimeNotificationManager().get(),
-            &ec2::AbstractTimeNotificationManager::timeChanged,
-            QnSyncTime::instance(),
-            static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
-
-        qnCommon->setLocalSystemName(connectionInfo.systemName);
-        qnCommon->instance<QnUserWatcher>()->setUserName(
-            connectionInfo.effectiveUserName.isEmpty() ? url.userName() : connectionInfo.effectiveUserName);
-
-        updateConnectionState();
-
-        storeConnection(connectionInfo.systemName, url, true);
-        qnSettings->setLastUsedSystemId(connectionInfo.systemName);
-        url.setPassword(QString());
-        qnSettings->setLastUsedUrl(url);
-
-        connectionVersion = connectionInfo.version;
-        emit q->connectionVersionChanged();
-    });
 }
 
 void QnConnectionManagerPrivate::doDisconnect(bool force) {

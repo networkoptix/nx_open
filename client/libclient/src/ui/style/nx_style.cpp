@@ -46,6 +46,7 @@ namespace
 {
     const char* kDelegateClassBackupId = "delegateClass";
     const char* kViewportMarginsBackupId = "viewportMargins";
+    const char* kContentsMarginsBackupId = "contentsMargins";
 
     const char* kHoveredChildProperty = "_qn_hoveredChild";
 
@@ -54,6 +55,8 @@ namespace
     const char* kPopupShadowCompanion = "popupShadow";
 
     const char* kLinkHoverProcessorCompanion = "linkHoverProcessor";
+
+    const int kQtHeaderIconMargin = 2; // a margin between item view header's icon and label used by Qt
 
     const int kCompactTabFocusMargin = 2;
 
@@ -680,7 +683,7 @@ void QnNxStyle::drawPrimitive(
         * QTreeView draws in PE_PanelItemViewItem:
         *  - selection markers for items (but not branch area)
         *
-        * All views draw in PE_PanelItemViewRow:
+        * All other views draw in PE_PanelItemViewItem:
         *  - hover markers
         *  - selection markers
         */
@@ -699,7 +702,7 @@ void QnNxStyle::drawPrimitive(
                     if (widget->property(Properties::kSuppressHoverPropery).toBool() ||
                         (qobject_cast<const QTreeView*>(widget) && item->state.testFlag(State_Enabled)))
                     {
-                        /* Itemviews with kSuppressHoverPropery should suppress hover. */
+                        /* Itemviews with kSuppressHoverProperty should suppress hover. */
                         /* Enabled items of treeview already have hover painted in PE_PanelItemViewRow. */
                         hasHover = false;
                     }
@@ -729,6 +732,19 @@ void QnNxStyle::drawPrimitive(
                 return;
             }
             break;
+        }
+
+        case PE_PanelTipLabel:
+        {
+            QnScopedPainterPenRollback penRollback(painter, QPen(option->palette.toolTipText(), 0));
+            QnScopedPainterBrushRollback brushRollback(painter, option->palette.toolTipBase());
+            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+
+            static const qreal kToolTipRoundingRadius = 2.5;
+            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5),
+                kToolTipRoundingRadius, kToolTipRoundingRadius);
+
+            return;
         }
 
         case PE_FrameGroupBox:
@@ -774,24 +790,22 @@ void QnNxStyle::drawPrimitive(
             rect.setLeft(option->rect.left());
             rect.setRight(option->rect.right());
 
-            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(3);
-
             QnScopedPainterPenRollback penRollback(painter);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
             if (shape == TabShape::Default)
             {
-                painter->fillRect(rect, mainColor);
+                painter->fillRect(rect, option->palette.color(QPalette::Mid));
 
-                painter->setPen(mainColor.darker(3));
+                painter->setPen(option->palette.color(QPalette::Window));
                 painter->drawLine(rect.topLeft(), rect.topRight());
 
-                painter->setPen(option->palette.base().color());
+                painter->setPen(option->palette.color(QPalette::Base));
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
             else
             {
-                painter->setPen(mainColor);
+                painter->setPen(option->palette.color(QPalette::Mid));
                 painter->drawLine(rect.bottomLeft(), rect.bottomRight());
             }
 #if 0
@@ -937,7 +951,7 @@ void QnNxStyle::drawPrimitive(
         }
 
         default:
-            return;
+            break;
     }
 
     base_type::drawPrimitive(element, option, painter, widget);
@@ -1018,7 +1032,8 @@ void QnNxStyle::drawComplexControl(
                 QRectF handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
                 const bool horizontal = slider->orientation == Qt::Horizontal;
-                const bool hovered = slider->state.testFlag(State_MouseOver);
+                const bool enabled = slider->state.testFlag(State_Enabled);
+                const bool hovered = enabled && slider->state.testFlag(State_MouseOver);
 
                 QnPaletteColor mainDark = findColor(slider->palette.color(QPalette::Window));
                 QnPaletteColor mainLight = findColor(slider->palette.color(QPalette::WindowText));
@@ -1035,7 +1050,10 @@ void QnNxStyle::drawComplexControl(
                     painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
                     painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
-                    SliderFeatures features = static_cast<SliderFeatures>(option->styleObject ? option->styleObject->property(Properties::kSliderFeatures).toInt() : 0);
+                    SliderFeatures features = static_cast<SliderFeatures>(option->styleObject
+                        ? option->styleObject->property(Properties::kSliderFeatures).toInt()
+                        : 0);
+
                     if (features.testFlag(SliderFeature::FillingUp))
                     {
                         QRectF fillDrawRect = grooveRect.adjusted(1, 1, -1, -1);
@@ -1141,13 +1159,15 @@ void QnNxStyle::drawComplexControl(
                     QColor borderColor = mainLight;
                     QColor fillColor = mainDark;
 
-                    if (option->activeSubControls.testFlag(SC_SliderHandle))
+                    if (enabled && option->activeSubControls.testFlag(SC_SliderHandle))
                         borderColor = mainLight.lighter(4);
                     else if (hovered)
                         borderColor = mainLight.lighter(2);
 
                     if (option->state.testFlag(State_Sunken))
                         fillColor = mainDark.lighter(3);
+
+                    fillColor.setAlphaF(1.0);
 
                     painter->setPen(QPen(borderColor, dp(2)));
                     painter->setBrush(QBrush(fillColor));
@@ -1557,7 +1577,7 @@ void QnNxStyle::drawControl(
                     {
                         if (!tab->state.testFlag(State_Selected) && isTabHovered(tab, widget))
                         {
-                            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(4);
+                            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Mid)).lighter(1);
                             painter->fillRect(tab->rect.adjusted(0, 1, 0, -1), mainColor);
 
                             QnScopedPainterPenRollback penRollback(painter, mainColor.darker(3).color());
@@ -1569,7 +1589,7 @@ void QnNxStyle::drawControl(
                     case TabShape::Rectangular:
                     {
                         QnPaletteColor mainColor = findColor(
-                                option->palette.window().color()).lighter(4);
+                            option->palette.color(QPalette::Mid)).lighter(1);
 
                         QColor color = mainColor;
 
@@ -1661,7 +1681,7 @@ void QnNxStyle::drawControl(
                         {
                             color = mainColor.lighter(2);
                             painter->fillRect(rect, findColor(
-                                option->palette.window().color()).lighter(6));
+                                option->palette.color(QPalette::Mid)).lighter(3));
                         }
                         else
                         {
@@ -1862,6 +1882,7 @@ void QnNxStyle::drawControl(
 
                     if (progressBar->orientation == Qt::Horizontal)
                     {
+                        pos += rect.left();
                         if (progressBar->invertedAppearance)
                             rect.setLeft(pos);
                         else
@@ -1869,6 +1890,7 @@ void QnNxStyle::drawControl(
                     }
                     else
                     {
+                        pos += rect.top();
                         if (progressBar->invertedAppearance)
                             rect.setTop(pos);
                         else
@@ -2021,22 +2043,30 @@ void QnNxStyle::drawControl(
             if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
             {
                 bool checkable = isCheckableButton(option);
-                bool leftAligned = widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
+                bool leftAligned = checkable
+                    || widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
 
-                /* If button is standard, break to standard drawing: */
-                if (!checkable && !leftAligned)
-                    break;
+                bool customForeground = widget && widget->foregroundRole() != QPalette::ButtonText;
 
-                /* Calculate minimal label width: */
-                int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
-                if (!buttonOption->icon.isNull())
-                    minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
-                if (!buttonOption->text.isEmpty())
-                    minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
-
-                /* Draw standard button content left-aligned: */
                 QStyleOptionButton newOpt(*buttonOption);
-                newOpt.rect.setWidth(minLabelWidth);
+
+                if (leftAligned)
+                {
+                    /* Calculate minimal label width: */
+                    int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
+                    if (!buttonOption->icon.isNull())
+                        minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
+                    if (!buttonOption->text.isEmpty())
+                        minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
+
+                    /* Draw standard button content left-aligned: */
+                    newOpt.rect.setWidth(minLabelWidth);
+                }
+
+                /* Support for custom foreground role for buttons: */
+                if (customForeground)
+                    newOpt.palette.setColor(QPalette::ButtonText, newOpt.palette.color(widget->foregroundRole()));
+
                 base_type::drawControl(element, &newOpt, painter, widget);
 
                 /* Draw switch right-aligned: */
@@ -2438,7 +2468,7 @@ QRect QnNxStyle::subElementRect(
         {
             if (auto progressBar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
             {
-                const bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
+                const bool hasText = progressBar->textVisible;
                 const int kProgressBarWidth = dp(4);
                 QSize size = progressBar->rect.size();
 
@@ -2473,8 +2503,7 @@ QRect QnNxStyle::subElementRect(
         {
             if (auto progressBar = qstyleoption_cast<const QStyleOptionProgressBar *>(option))
             {
-                const bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
-                if (!hasText)
+                if (!progressBar->textVisible)
                     break;
 
                 if (progressBar->orientation == Qt::Horizontal)
@@ -2494,9 +2523,12 @@ QRect QnNxStyle::subElementRect(
                 QRect rect = base_type::subElementRect(subElement, option, widget);
 
                 if (tabShape(tabWidget->tabBar()) == TabShape::Compact)
-                    rect.adjust(-hspace + kCompactTabFocusMargin, 0, -hspace + kCompactTabFocusMargin, 0);
+                    rect.moveLeft(rect.left() - hspace + kCompactTabFocusMargin);
                 else
-                    rect.adjust(hspace, 0, hspace, 0);
+                    rect.moveLeft(rect.left() + hspace);
+
+                int indent = tabWidget->property(Properties::kTabBarIndent).toInt();
+                rect.moveLeft(rect.left() + indent);
 
                 if (rect.right() > option->rect.right())
                     rect.setRight(option->rect.right());
@@ -2591,9 +2623,9 @@ QRect QnNxStyle::subElementRect(
             if (auto header = qstyleoption_cast<const QStyleOptionHeader *>(option))
             {
                 QRect rect = header->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0);
-
                 Qt::Alignment arrowAlignment =
                     static_cast<Qt::Alignment>(styleHint(SH_Header_ArrowAlignment, header, widget));
+
                 if (arrowAlignment.testFlag(Qt::AlignLeft))
                 {
                     int margin = pixelMetric(PM_HeaderMargin, header, widget);
@@ -2603,6 +2635,18 @@ QRect QnNxStyle::subElementRect(
 
                 int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
                 rect = option->fontMetrics.boundingRect(rect, flags, header->text);
+
+                if (!header->icon.isNull())
+                {
+                    /* To match Qt standard drawing: */
+                    int iconSize = proxy()->pixelMetric(QStyle::PM_SmallIconSize, header, widget);
+                    QSize size = header->icon.actualSize(widget->windowHandle(), QSize(iconSize, iconSize),
+                        header->state.testFlag(State_Enabled) ? QIcon::Normal : QIcon::Disabled);
+
+                    rect.setWidth(rect.width() + size.width() + kQtHeaderIconMargin);
+                    rect.setHeight(qMax(rect.height(), size.height()));
+                }
+
                 return rect;
             }
             break;
@@ -2749,6 +2793,12 @@ QSize QnNxStyle::sizeFromContents(
                     width += pixelMetric(PM_HeaderMarkSize, header, widget);
                 }
 
+                if (!header->icon.isNull())
+                {
+                    int iconSize = proxy()->pixelMetric(QStyle::PM_SmallIconSize, header, widget);
+                    width += iconSize + kQtHeaderIconMargin;
+                }
+
                 return QSize(width, qMax(textSize.height(), Metrics::kHeaderSize));
             }
             break;
@@ -2776,8 +2826,7 @@ QSize QnNxStyle::sizeFromContents(
         {
             if (auto progressBar = qstyleoption_cast<const QStyleOptionProgressBar*>(option))
             {
-                bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
-                if (!hasText)
+                if (!progressBar->textVisible)
                 {
                     QStyleOptionProgressBar subOption(*progressBar);
                     subOption.rect.setSize(size);
@@ -2895,7 +2944,7 @@ int QnNxStyle::pixelMetric(
             return dp(8);
 
         case PM_SplitterWidth:
-            return dp(Metrics::kDefaultTopLevelMargin*2 + 1);
+            return dp(5);
 
         case PM_TabBarTabHSpace:
         case PM_TabBarTabVSpace:
@@ -2910,6 +2959,9 @@ int QnNxStyle::pixelMetric(
 
         case PM_ToolBarIconSize:
             return dp(32);
+
+        case PM_ToolTipLabelFrameWidth:
+            return dp(1);
 
         case PM_SmallIconSize:
         case PM_ListViewIconSize:
@@ -2983,10 +3035,34 @@ QIcon QnNxStyle::standardIcon(StandardPixmap iconId, const QStyleOption* option,
     switch (iconId)
     {
         case SP_LineEditClearButton:
-            return qnSkin->icon("theme/input_clear.png");
+            return qnSkin->icon("standard_icons/sp_line_edit_clear_button.png");
+        case SP_ArrowBack:
+            return qnSkin->icon("standard_icons/sp_arrow_back.png");
+        case SP_ArrowForward:
+            return qnSkin->icon("standard_icons/sp_arrow_forward.png");
+        case SP_FileDialogToParent:
+            return qnSkin->icon("standard_icons/sp_file_dialog_to_parent.png");
+        case SP_FileDialogListView:
+            return qnSkin->icon("standard_icons/sp_file_dialog_list_view.png");
+        case SP_FileDialogDetailedView:
+            return qnSkin->icon("standard_icons/sp_file_dialog_detailed_view.png");
+        case SP_FileDialogNewFolder:
+            return qnSkin->icon("standard_icons/sp_file_dialog_new_folder.png");
+        case SP_MessageBoxInformation:
+            return qnSkin->icon("standard_icons/sp_message_box_information.png");
+        case SP_MessageBoxQuestion:
+            return qnSkin->icon("standard_icons/sp_message_box_question.png");
+        case SP_MessageBoxWarning:
+            return qnSkin->icon("standard_icons/sp_message_box_warning.png");
+        case SP_MessageBoxCritical:
+            return qnSkin->icon("standard_icons/sp_message_box_critical.png");
 
         default:
-            return base_type::standardIcon(iconId, option, widget);
+            auto baseIcon = base_type::standardIcon(iconId, option, widget);
+            /* Let leave it here for now to make sure we will not miss important icons. */
+            if (!baseIcon.isNull())
+                qDebug() << "Requested NOT_NULL standard icon!!!!" << iconId;
+            return baseIcon;
     }
 }
 
@@ -3063,6 +3139,27 @@ void QnNxStyle::polish(QWidget *widget)
             font.setPixelSize(dp(14));
             widget->setFont(font);
         }
+    }
+
+    /* Polish tooltips: */
+    if ((widget->windowFlags() & Qt::ToolTip) == Qt::ToolTip
+        && widget->contentsMargins().isNull()
+        && qobject_cast<QLabel*>(widget))
+    {
+        QnTypedPropertyBackup<QMargins, QWidget>::backup(widget, &QWidget::contentsMargins,
+            QN_SETTER(QWidget::setContentsMargins), kContentsMarginsBackupId);
+
+        int qtTooltipMargin = 1 + proxy()->pixelMetric(PM_ToolTipLabelFrameWidth, 0, widget);
+
+        int h = qMax(Metrics::kStandardPadding - qtTooltipMargin, 0);
+        int v = qMax((Metrics::kToolTipHeight - widget->fontMetrics().height() + 1) / 2
+            - qtTooltipMargin, 0);
+
+        widget->setContentsMargins(h, v, h, v);
+
+        /* To have rounded corners without using a window mask: */
+        widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
+        widget->setAttribute(Qt::WA_TranslucentBackground);
     }
 
     if (auto comboBox = qobject_cast<QComboBox*>(widget))
@@ -3214,6 +3311,9 @@ void QnNxStyle::unpolish(QWidget* widget)
 
     if (qobject_cast<QPlainTextEdit*>(widget) || qobject_cast<QTextEdit*>(widget))
         QnAbstractPropertyBackup::restore(widget, kViewportMarginsBackupId);
+
+    if ((widget->windowFlags() & Qt::ToolTip) == Qt::ToolTip)
+        QnAbstractPropertyBackup::restore(widget, kContentsMarginsBackupId);
 
     QWidget* popupWithCustomizedShadow = nullptr;
 

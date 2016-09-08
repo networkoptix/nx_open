@@ -32,7 +32,10 @@ public:
     bool hasFile(const QString& name) const;
     bool hasFile(const char* name) const;
 
-    QIcon icon(const QString& name, const QString& checkedName = QString(), int numModes = -1, const QPair<QIcon::Mode, QString>* modes = nullptr);
+
+    QIcon icon(const QString& name,
+        const QString& checkedName = QString(),
+        const QnIcon::SuffixesList* suffixes = nullptr);
     QIcon icon(const char* name, const char* checkedName = nullptr);
     QIcon icon(const QIcon& icon);
 

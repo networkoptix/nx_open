@@ -1,7 +1,7 @@
 #include "storage_manager.h"
 
+#include <stdio.h>
 #include <QtCore/QDir>
-
 
 #include <utils/fs/file.h>
 #include <utils/common/util.h>
@@ -114,6 +114,88 @@ bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath)
         return true;
     }
     return false;
+}
+
+#if defined(Q_OS_WIN)
+const QString& getDevicePath(const QString& path)
+{
+    return path;
+}
+
+const QString& sysDrivePath()
+{
+    static QString deviceString;
+
+    if (!deviceString.isNull())
+        return deviceString;
+
+    const DWORD bufSize = MAX_PATH + 1;
+    TCHAR buf[bufSize];
+    GetWindowsDirectory(buf, bufSize);
+
+    deviceString = QString::fromWCharArray(buf, bufSize).left(2);
+
+    return deviceString;
+}
+
+#elif defined(Q_OS_LINUX)
+
+const QString getDevicePath(const QString& path)
+{
+    QString command = lit("df ") + path;
+    FILE* pipe;
+    char buf[BUFSIZ];
+
+    if (( pipe = popen(command.toLatin1().constData(), "r")) == NULL)
+    {
+        NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        return QString();
+    }
+
+    if (fgets(buf, BUFSIZ, pipe) == NULL) // header line
+    {
+        pclose(pipe);
+        return QString();
+    }
+
+    if (fgets(buf, BUFSIZ, pipe) == NULL) // data
+    {
+        pclose(pipe);
+        return QString();
+    }
+
+    auto dataString = QString::fromUtf8(buf);
+    QString deviceString = dataString.section(QRegularExpression("\\s+"), 0, 0);
+
+    pclose(pipe);
+
+    return deviceString;
+}
+
+const QString& sysDrivePath()
+{
+    static QString devicePath = getDevicePath(lit("/root"));
+    return devicePath;
+}
+
+#else // Unsupported OS so far
+
+const QString& getDevicePath(const QString& path)
+{
+    return path;
+}
+
+const QString& sysDrivePath()
+{
+    return QString();
+}
+
+#endif
+
+bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
+{
+    QString sysPath = sysDrivePath();
+    return sysPath.isNull() ? false : getDevicePath(storage->getUrl()).startsWith(sysDrivePath());
 }
 
 } // namespace <anonymous>
@@ -509,7 +591,7 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
 
     for (const auto &camera : camerasToAdd)
     {
-        ec2::ErrorCode errCode = 
+        ec2::ErrorCode errCode =
             QnAppserverResourceProcessor::addAndPropagateCamResource(
                 camera.coreData
             );
@@ -597,7 +679,7 @@ void QnStorageManager::subtractSpaceInfoOccupiedValue(int storageIndex, qint64 v
 	});
 }
 
-qint64 QnStorageManager::getSpaceInfoOccupiedValue(int storageIndex) 
+qint64 QnStorageManager::getSpaceInfoOccupiedValue(int storageIndex)
 {
 	qint64 result = 0;
 	applySpaceInfoAction(storageIndex, [&result] (StorageSpaceInfoMap::iterator it) {
@@ -1255,7 +1337,7 @@ bool QnStorageManager::isArchiveTimeExistsInternal(const QString& cameraUniqueId
     return catalog && catalog->containTime(period);
 }
 
-QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
+QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnSecurityCamResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
                                                       const QList<QnServer::ChunksCatalog> &catalogs, int limit)
 {
     std::vector<QnTimePeriodList> periods;
@@ -1266,12 +1348,12 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
 
 void QnStorageManager::getRecordedPeriodsInternal(
     std::vector<QnTimePeriodList>& periods,
-    const QnVirtualCameraResourceList &cameras,
+    const QnSecurityCamResourceList &cameras,
     qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
     const QList<QnServer::ChunksCatalog> &catalogs,
     int /*limit*/)
 {
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
+    for (const QnSecurityCamResourcePtr &camera: cameras) {
         QString cameraUniqueId = camera->getUniqueId();
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
             QnServer::ChunksCatalog catalog = static_cast<QnServer::ChunksCatalog> (i);
@@ -1525,7 +1607,7 @@ void QnStorageManager::clearSpace(bool forced)
     bool allStoragesReady = true;
     QSet<QnStorageResourcePtr> storages;
 
-    for (const auto& storage: getWritableStorages()) {
+    for (const auto& storage: getUsedWritableStorages()) {
         if (!storage->hasFlags(Qn::storage_fastscan)) {
             storages << storage;
         } else {
@@ -1661,7 +1743,7 @@ QnStorageManager::StorageMap QnStorageManager::getAllStorages() const
 bool QnStorageManager::hasRebuildingStorages() const
 {
     bool result = false;
-    for (const auto &storage : getWritableStorages())
+    for (const auto &storage : getUsedWritableStorages())
     {
         if (storage->hasFlags(Qn::storage_fastscan))
         {
@@ -1892,7 +1974,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
             if (storage->getStatus() == Qn::ResourceStatus::Offline)
                 return false;
         }
-        // reset Chunk 
+        // reset Chunk
         deletedChunk = DeviceFileCatalog::Chunk();
     }
 
@@ -1929,7 +2011,27 @@ bool QnStorageManager::isWritableStoragesAvailable() const
     return m_isWritableStorageAvail;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
+QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
+{
+    return getWritableStorages(
+        [](const QnStorageResourcePtr& storage)
+    {
+        return storage->getStatus() != Qn::Offline;
+    });
+}
+
+QSet<QnStorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
+{
+    return getWritableStorages(
+        [](const QnStorageResourcePtr& storage)
+        {
+            return storage->getStatus() != Qn::Offline &&
+                   storage->isUsedForWriting();
+        });
+}
+
+QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages(
+    std::function<bool (const QnStorageResourcePtr& storage)> filter) const
 {
     QSet<QnStorageResourcePtr> result;
 
@@ -1937,8 +2039,8 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     qint64 bigStorageThreshold = 0;
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
-        if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting())
+        QnStorageResourcePtr fileStorage = itr.value();
+        if (filter(fileStorage))
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             bigStorageThreshold = qMax(bigStorageThreshold, available);
@@ -1948,14 +2050,38 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
-        QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());
-        if (fileStorage && fileStorage->getStatus() != Qn::Offline && fileStorage->isUsedForWriting())
+        QnStorageResourcePtr fileStorage = itr.value();
+        if (filter(fileStorage))
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)
                 result << fileStorage;
         }
     }
+
+    const qint64 kSystemStorageTreshold = 5;
+
+    qint64 totalNonSystemStoragesSpace = 0;
+    qint64 systemStorageSpace = 0;
+    std::vector<QSet<QnStorageResourcePtr>::iterator> systemStorageItVec;
+
+    for (auto it = result.begin(); it != result.end(); ++it)
+    {
+        if (!isStorageOnSystemDrive(*it))
+            totalNonSystemStoragesSpace += (*it)->getTotalSpace();
+        else
+        {
+            systemStorageItVec.push_back(it);
+            systemStorageSpace += (*it)->getTotalSpace();
+        }
+    }
+
+    if (totalNonSystemStoragesSpace > systemStorageSpace * kSystemStorageTreshold && !systemStorageItVec.empty())
+    {
+        for (auto it : systemStorageItVec)
+            result.remove(*it);
+    }
+
     if (!result.empty())
         m_isWritableStorageAvail = true;
     else
@@ -2001,7 +2127,7 @@ void QnStorageManager::resetCameraInfoSavedFlagsForStorage(const QnStorageResour
 
 void QnStorageManager::writeCameraInfoFiles()
 {
-    for (auto &storage : getWritableStorages())
+    for (auto &storage : getUsedWritableStorages())
     {
         auto storageUrl = storage->getUrl();
         auto separator  = getPathSeparator(storageUrl);
@@ -2169,7 +2295,7 @@ void QnStorageManager::stopAsyncTasks()
 
 void QnStorageManager::updateStorageStatistics()
 {
-    QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    QSet<QnStorageResourcePtr> storages = getUsedWritableStorages();
     int64_t totalSpace = 0;
 
     for (auto itr = storages.constBegin();
@@ -2180,9 +2306,9 @@ void QnStorageManager::updateStorageStatistics()
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
 
         qint64 storageSpace = std::max(
-			qint64(1), 
+			qint64(1),
 			static_cast<qint64>(
-				fileStorage->getFreeSpace() + 
+				fileStorage->getFreeSpace() +
 				getSpaceInfoOccupiedValue(qnStorageDbPool->getStorageIndex(fileStorage))) -
 				fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
@@ -2192,11 +2318,11 @@ void QnStorageManager::updateStorageStatistics()
     {
         QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
 		int storageIndex = qnStorageDbPool->getStorageIndex(fileStorage);
-		
+
         qint64 storageSpace = std::max(
             qint64(1),
             static_cast<qint64>(
-				fileStorage->getFreeSpace() + 
+				fileStorage->getFreeSpace() +
 				getSpaceInfoOccupiedValue(storageIndex) -
 				fileStorage->getSpaceLimit()));
 		setSpaceInfoUsageCoeff(storageIndex, (double)storageSpace / totalSpace);
@@ -2212,7 +2338,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     updateStorageStatistics();
 
     QSet<QnStorageResourcePtr> storages;
-    for (const auto& storage: getWritableStorages())
+    for (const auto& storage: getUsedWritableStorages())
         if (pred(storage))
             storages << storage;
 
@@ -2267,7 +2393,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 			int storageIndex = qnStorageDbPool->getStorageIndex(storage);
 			NX_LOG(lit("Selecting storage for recording. Candidate: %1. Usage likeness coeff: %2")
 					   .arg(storage->getUrl())
-					   .arg(getSpaceInfoUsageCoeff(storageIndex)), 
+					   .arg(getSpaceInfoUsageCoeff(storageIndex)),
 				   cl_logDEBUG2);
 
             writedCoeffPartialSum += getSpaceInfoUsageCoeff(storageIndex);

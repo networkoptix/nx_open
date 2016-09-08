@@ -95,7 +95,21 @@ def fix_mocables(root):
         itemGroupNode.append(Element('ClInclude', include))
         indent(itemGroupNode, 1)
             
-
+def enable_fastlink(root):
+    """Set GenerateDebugInformation to DebugFastLink for debug build"""
+    kFastLink = 'DebugFastLink'
+    xpath = "./ms:ItemDefinitionGroup/ms:Link/ms:GenerateDebugInformation"
+    debugInfoNodes = root.findall(xpath, namespaces_dict)
+    nodes = [node for node in debugInfoNodes if node.text.lower() == 'true']
+    if len(nodes) < 1:
+        return
+        
+    print "Enabling FastLink"  
+    for node in nodes:
+        defGroup = parent_map[parent_map[node]]
+        if 'debug' in defGroup.get('Condition').lower():
+            node.text = kFastLink
+            
 def fix_qrc(root):
     """Removing additional inputs from qrc, since we rebuild it manually."""
     #xpath = "./Project/ItemGroup/CustomBuild[contains(@Include,'.qrc')]/AdditionalInputs"
@@ -141,6 +155,7 @@ def patch_project(project):
     fix_mocables(root)
     add_prebuild_events(root)
     add_qt_path(root)
+    #enable_fastlink(root)
     tree.write(project, encoding="utf-8", xml_declaration=True)
 
 def main():

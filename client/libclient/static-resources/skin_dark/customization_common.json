@@ -118,29 +118,29 @@
                 "link":             "blue12",
                 "linkVisited":      "blue11",
                 "alternateBase":    "dark7",
-                "toolTipBase":      "#f0f0f0",
-                "toolTipText":      "#222222"
+                "toolTipBase":      "light4",
+                "toolTipText":      "dark4"
             },
             "disabled": {
-                "windowText":       "light16.setAlpha(75)",
-                "button":           "dark11.setAlpha(75)",
-                "light":            "light10.setAlpha(75)",
-                "midlight":         "dark13.setAlpha(75)",
-                "dark":             "dark9.setAlpha(75)",
-                "mid":              "dark10.setAlpha(75)",
-                "text":             "light4.setAlpha(75)",
-                "brightText":       "light1.setAlpha(75)",
-                "buttonText":       "light4.setAlpha(75)",
-                "base":             "dark7.setAlpha(75)",
+                "windowText":       "light16.setAlpha(77)",
+                "button":           "dark11.setAlpha(77)",
+                "light":            "light10.setAlpha(77)",
+                "midlight":         "dark13.setAlpha(77)",
+                "dark":             "dark9.setAlpha(77)",
+                "mid":              "dark10.setAlpha(77)",
+                "text":             "light4.setAlpha(77)",
+                "brightText":       "light1.setAlpha(77)",
+                "buttonText":       "light4.setAlpha(77)",
+                "base":             "dark7.setAlpha(77)",
                 "window":           "dark7",
-                "shadow":           "dark5.setAlpha(75)",
+                "shadow":           "dark5.setAlpha(77)",
                 "highlight":        "brand_core",
-                "highlightedText":  "brand_contrast.setAlpha(75)",
-                "link":             "blue12.setAlpha(75)",
-                "linkVisited":      "blue11.setAlpha(75)",
-                "alternateBase":    "dark7.setAlpha(75)",
-                "toolTipBase":      "#f0f0f0",
-                "toolTipText":      "#222222"
+                "highlightedText":  "brand_contrast.setAlpha(77)",
+                "link":             "blue12.setAlpha(77)",
+                "linkVisited":      "blue11.setAlpha(77)",
+                "alternateBase":    "dark7.setAlpha(77)",
+                "toolTipBase":      "light4",
+                "toolTipText":      "dark4"
             }
         }
     },
@@ -152,6 +152,14 @@
             },
             "inactive": {
                 "link":             "blue12"
+            }
+        }
+    },
+
+    "QSlider": {
+        "palette": {
+            "disabled": {
+                "window":           "dark7.setAlpha(77)"
             }
         }
     },
@@ -171,8 +179,8 @@
                 "midlight":         "dark11"
             },
             "disabled": {
-                "windowText":       "light4.setAlpha(75)",
-                "buttonText":       "light12.setAlpha(75)"
+                "windowText":       "light4.setAlpha(77)",
+                "buttonText":       "light12.setAlpha(77)"
             }
         }
     },
@@ -197,21 +205,21 @@
         "palette": {
             "default": {
                 "base":             "transparent",
-                "midlight":         "dark12.setAlpha(102)",
+                "midlight":         "dark10.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10",
                 "highlightedText":  "light4"
             },
             "disabled": {
                 "base":             "transparent",
-                "midlight":         "dark12.setAlpha(102)",
+                "midlight":         "dark10.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
-                "text":             "light10.setAlpha(75)",
-                "highlightedText":  "light4.setAlpha(75)"
+                "text":             "light10.setAlpha(77)",
+                "highlightedText":  "light4.setAlpha(77)"
             },
             "inactive": {
                 "base":             "transparent",
-                "midlight":         "dark12.setAlpha(102)",
+                "midlight":         "dark10.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(102)",
                 "text":             "light10",
                 "highlightedText":  "light4"
@@ -250,7 +258,7 @@
                 "base":             "dark4"
             },
             "disabled": {
-                "base":             "dark4.setAlpha(75)"
+                "base":             "dark4.setAlpha(77)"
             }
         }
     },
@@ -300,7 +308,8 @@
     "QnPanel": {
         "palette": {
             "default": {
-                "window": "dark8"
+                "window": "dark8",
+                "alternateBase": "#61282B"
             }
         }
     },
@@ -401,14 +410,6 @@
         "palette": { "default": { "window": "dark4" } }
     },
 
-    "QnControlBackgroundWidget": {
-        "_": "Background for ui panels (resource tree, notifications panel).",
-
-        "colors": ["dark4.setAlpha(128)"],
-        "frameColor": "dark8",
-        "frameWidth": 1.0
-    },
-
     "QnGraphicsView": {
         "palette": {
             "default": {
@@ -419,17 +420,32 @@
         }
     },
 
-    "QnResourceWidget": {
-        "palette": { "default": { "highlight": "selection" } },
-        "frameColors": {
-            "normal": "dark8",
-            "active": "#c0c0c0c0",
-            "selected": "selection"
+    "QnControlBackgroundWidget": {
+        "_": "Background for ui panels (resource tree, notifications panel).",
+
+        "colors": ["dark4.setAlpha(217)"],
+        "frameColor": "dark8",
+        "frameWidth": 1.0
+    },
+
+    "QnResourceBrowserWidget": {
+        "palette": {
+            "default": {
+                "mid": "dark8"
+            }
         }
     },
 
-    "QnMediaResourceWidget": {
-        "palette": { "default": { "window": "dark4" } }
+    "QnNotificationsCollectionWidget": {
+        "palette": {
+            "default": {
+                "mid": "dark8"
+            }
+        }
+    },
+
+    "QnResourceWidget": {
+        "palette": { "default": { "highlight": "selection" } }
     },
 
     "QnServerResourceWidget": {
@@ -453,12 +469,12 @@
     },
 
     "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
+        "colors": ["yellow_core", "green_l2", "red_l2"]
     },
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "dark4.setAlpha(75)",
+            "window": "dark4.setAlpha(77)",
             "windowText": "#801010c0"
         }}
     },
@@ -544,6 +560,14 @@
             "frame": "#007ed4ff",
             "window": "#004b80cc",
             "text": "#ccccccff"
+        }
+    },
+
+    "QnEdgeShadowWidget": {
+        "palette": {
+            "default": {
+                "window": "dark1.setAlpha(38)"
+            }
         }
     },
 
@@ -651,6 +675,7 @@
     },
 
     "QnMediaResourceWidget": {
+        "palette": { "default": { "window": "dark4" } },
         "motionSensitivityColors": [
             "light16",
             "#627cd6",
@@ -663,6 +688,10 @@
             "#d24729",
             "#c22626"
         ]
+    },
+
+    "QnFisheyeCalibrationWidget": {
+        "palette": { "default": { "window": "dark4" } }
     }
 }
 

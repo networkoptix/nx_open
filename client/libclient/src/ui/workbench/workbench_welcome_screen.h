@@ -5,10 +5,12 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
-#include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/style/generic_palette.h>
+
 #include <nx/utils/raii_guard.h>
+#include <utils/common/connective.h>
+#include <utils/common/credentials.h>
 
 class QnCloudStatusWatcher;
 typedef QList<QUrl> UrlsList;
@@ -127,11 +129,10 @@ signals:
     void globalPreloaderVisibleChanged();
 
 private:
-    void connectToLocalSystemImpl(
+    void connectToSystemInternal(
         const QString& systemId,
-        const QString& serverUrl,
-        const QString& userName,
-        const QString& password,
+        const QUrl& serverUrl,
+        const QnCredentials& credentials,
         bool storePassword,
         bool autoLogin,
         const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());

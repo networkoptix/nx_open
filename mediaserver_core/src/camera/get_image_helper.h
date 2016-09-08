@@ -16,7 +16,7 @@ public:
     QnGetImageHelper() {}
 
     static QSharedPointer<CLVideoDecoderOutput> getImage(
-          const QnVirtualCameraResourcePtr &camera
+          const QnSecurityCamResourcePtr &camera
         , qint64 timeUsec
         , const QSize& size
         , QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod
@@ -29,15 +29,15 @@ private:
           qint64 timeUsec
         , bool useHQ
         , QnThumbnailRequestData::RoundMethod roundMethod
-        , const QnVirtualCameraResourcePtr &camera
+        , const QnSecurityCamResourcePtr &camera
         , QnServerArchiveDelegate &serverDelegate
         , int prefferedChannel);
 
-    static QSize updateDstSize(const QSharedPointer<QnVirtualCameraResource>& res, const QSize& dstSize, QSharedPointer<CLVideoDecoderOutput> outFrame);
+    static QSize updateDstSize(const QSharedPointer<QnSecurityCamResource>& res, const QSize& dstSize, QSharedPointer<CLVideoDecoderOutput> outFrame);
 
     static QSharedPointer<CLVideoDecoderOutput> getImageWithCertainQuality(
           bool useHQ
-        , const QnVirtualCameraResourcePtr &camera
+        , const QnSecurityCamResourcePtr &camera
         , qint64 timeUsec
         , const QSize& size
         , QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod

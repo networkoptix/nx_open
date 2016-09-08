@@ -145,6 +145,16 @@ APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_status by resource id */ \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
+                       ModifyResourceAccess(true), /* save permission checker */ \
+                       ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -1028,6 +1038,16 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
+                       true, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       ResourceNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(4001, getClientInfos, ApiClientInfoDataList, \
                        false, \
                        false, \

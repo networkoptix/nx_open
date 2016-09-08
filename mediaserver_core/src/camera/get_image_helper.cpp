@@ -4,7 +4,7 @@
 #include "transcoding/filters/tiled_image_filter.h"
 #include "transcoding/filters/scale_image_filter.h"
 #include "transcoding/filters/rotate_image_filter.h"
-#include "core/resource/camera_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "camera/camera_pool.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include <decoders/video/ffmpeg_video_decoder.h>
@@ -39,7 +39,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     return video;
 }
 
-QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnVirtualCameraResource>& res, const QSize& srcSize, QSharedPointer<CLVideoDecoderOutput> outFrame)
+QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnSecurityCamResource>& res, const QSize& srcSize, QSharedPointer<CLVideoDecoderOutput> outFrame)
 {
     QSize dstSize(srcSize);
     double sar = outFrame->sample_aspect_ratio;
@@ -73,7 +73,7 @@ QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnVirtualCameraResour
 QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
                                                                    bool useHQ,
                                                                    QnThumbnailRequestData::RoundMethod roundMethod,
-                                                                   const QnVirtualCameraResourcePtr &res,
+                                                                   const QnSecurityCamResourcePtr &res,
                                                                    QnServerArchiveDelegate& serverDelegate,
                                                                    int prefferedChannel)
 {
@@ -152,7 +152,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
     return outFrame;
 }
 
-QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnVirtualCameraResourcePtr& res, qint64 time, const QSize& size, QnThumbnailRequestData::RoundMethod roundMethod, int rotation)
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnSecurityCamResourcePtr& res, qint64 time, const QSize& size, QnThumbnailRequestData::RoundMethod roundMethod, int rotation)
 {
     if (!res)
         return QSharedPointer<CLVideoDecoderOutput>();
@@ -241,7 +241,7 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
 }
 
 QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQuality(
-    bool useHQ, const QnVirtualCameraResourcePtr& res, qint64 time,
+    bool useHQ, const QnSecurityCamResourcePtr& res, qint64 time,
     const QSize& size, QnThumbnailRequestData::RoundMethod roundMethod, int rotation )
 {
     QSize dstSize = size;

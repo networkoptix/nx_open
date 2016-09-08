@@ -18,6 +18,7 @@
 #include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -383,7 +384,8 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
             break;
 
         default:
-            menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user));
+            menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user)
+                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage));
     }
 }
 
@@ -400,10 +402,11 @@ bool QnUserManagementWidget::enableUser(const QnUserResourcePtr& user, bool enab
     if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
         return false;
 
-    qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user)
-    {
-        user->setEnabled(enabled);
-    });
+    qnResourcesChangesManager->saveUser(user,
+        [enabled](const QnUserResourcePtr &user)
+        {
+            user->setEnabled(enabled);
+        });
 
     return true;
 }

@@ -39,6 +39,7 @@ namespace style
         static const QMargins kGroupBoxContentMargins;  /**< Group box content margins, frame width included */
         static const qreal kGroupBoxCornerRadius;       /**< Group box corner rounding radius */
         static const int kDefaultIconSize;              /**< Default size of UI icon */
+        static const int kToolTipHeight;                /**< Height of a single line tooltip */
     };
 
     class Hints
@@ -61,6 +62,7 @@ namespace style
         static const char* kSideIndentation;        /**< Name of a property to hold overridden leftmost and rightmost itemview item margins (QnIndentation). */
         static const char* kCheckBoxAsButton;       /**< Name of a property to change checkbox appearance to switch button (bool). */
         static const char* kButtonMarginProperty;   /**< Name of a property to hold a custom push button margin (int). Buttons with this property are left-aligned. */
+        static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
     };
 
     /** Flags of additional slider features */

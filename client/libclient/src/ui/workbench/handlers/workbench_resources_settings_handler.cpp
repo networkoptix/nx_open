@@ -43,7 +43,8 @@ QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
 {
-    QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+    const auto parameters =  menu()->currentParameters(sender());
+    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     if (cameras.isEmpty())
         return;
 
@@ -51,14 +52,22 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     dialogConstructor.setDontFocus(true);
 
     m_cameraSettingsDialog->setCameras(cameras);
+
+    if (parameters.hasArgument(Qn::FocusTabRole))
+    {
+        auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+        m_cameraSettingsDialog->setCurrentTab(static_cast<Qn::CameraSettingsTab>(tab));
+    }
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 {
-    QnMediaServerResourceList servers = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>([](const QnMediaServerResourcePtr &server)
-    {
-        return !QnMediaServerResource::isFakeServer(server);
-    });
+    QnActionParameters params = menu()->currentParameters(sender());
+    QnMediaServerResourceList servers = params.resources().filtered<QnMediaServerResource>(
+        [](const QnMediaServerResourcePtr &server)
+        {
+            return !QnMediaServerResource::isFakeServer(server);
+        });
 
     NX_ASSERT(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
     if(servers.isEmpty())
@@ -74,6 +83,8 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
     dialogConstructor.setDontFocus(true);
 
     m_serverSettingsDialog->setServer(server);
+    if (params.hasArgument(Qn::FocusTabRole))
+        m_serverSettingsDialog->setCurrentPage(params.argument<int>(Qn::FocusTabRole), true);
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
@@ -85,6 +96,7 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
     QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog, mainWindow());
    // dialogConstructor.setDontFocus(true);
     m_userSettingsDialog->setUser(user);
+    m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
@@ -98,10 +110,13 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     if (!hasAccess)
         return;
 
-    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog, mainWindow());
+    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog,
+        mainWindow());
     dialogConstructor.setDontFocus(true);
 
     m_userSettingsDialog->setUser(user);
+    if (params.hasArgument(Qn::FocusTabRole))
+        m_userSettingsDialog->setCurrentPage(params.argument<int>(Qn::FocusTabRole), true);
 
     //dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
 }

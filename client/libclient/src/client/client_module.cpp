@@ -288,21 +288,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
     /* Just to feel safe */
-    QScopedPointer<QnCloudStatusWatcher> cloudStatusWatcher(new QnCloudStatusWatcher());
-    cloudStatusWatcher->setStayConnected(!qnSettings->cloudPassword().isEmpty());
-    cloudStatusWatcher->setCloudEndpoint(clientSettings->cdbEndpoint());
-    cloudStatusWatcher->setCloudCredentials(clientSettings->cloudLogin(), clientSettings->cloudPassword(), true);
-    common->store<QnCloudStatusWatcher>(cloudStatusWatcher.take());
-
-    connect(qnSettings, &QnClientSettings::valueChanged, this,
-        [this, common](int id)
-    {
-        if (id != QnClientSettings::CLOUD_PASSWORD)
-            return;
-
-        if (auto cloudWatcher = common->instance<QnCloudStatusWatcher>())
-            cloudWatcher->setStayConnected(!qnSettings->cloudPassword().isEmpty());
-    });
+    common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
@@ -475,11 +461,12 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    QnModuleFinder* moduleFinder(new QnModuleFinder(true, qnRuntime->isDevMode())); //TODO: #GDM make it common way via scoped pointer somehow
+    QnModuleFinder* moduleFinder(new QnModuleFinder(true)); //TODO: #GDM make it common way via scoped pointer somehow
     moduleFinder->start();
     qnCommon->store<QnModuleFinder>(moduleFinder);
 

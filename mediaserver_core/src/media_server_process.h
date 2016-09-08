@@ -93,7 +93,7 @@ private:
     void dumpSystemUsageStats();
     void saveAdminPswdHash();
     bool isStopping() const;
-
+    void resetCloudParams(CloudConnectionManager* const cloudConnectionManager);
 private:
     int m_argc;
     char** m_argv;

@@ -461,6 +461,9 @@
        <item>
         <widget class="QWidget" name="motionControlsWidget" native="true">
          <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+          <property name="spacing">
+           <number>16</number>
+          </property>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>

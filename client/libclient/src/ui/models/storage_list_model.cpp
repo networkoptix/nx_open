@@ -174,10 +174,12 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
 
             return path;
         }
-
-        case StoragePoolColumn:
-            return !storageData.isWritable ? tr("Inaccessible")
-                  : storageData.isBackup ? tr("Backup") : tr("Main");
+		case StoragePoolColumn:
+	    	if (!storageData.isOnline)
+           		return tr("Inaccessible");
+	        if (!storageData.isWritable)
+            	return lit("");
+            return storageData.isBackup ? tr("Backup") : tr("Main");
 
         case TypeColumn:
             return storageData.storageType;
@@ -399,7 +401,7 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
     if (isStoragePoolInRebuild(data))
         return false;
 
-    return data.isExternal || !data.isWritable;
+    return data.isExternal;
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const

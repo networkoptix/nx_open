@@ -6,18 +6,18 @@
 
 #include <core/resource/server_backup_schedule.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
     class BackupScheduleDialog;
 }
 
-class QnBackupScheduleDialog: public QnWorkbenchStateDependentButtonBoxDialog
+class QnBackupScheduleDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
     Q_PROPERTY(QnBackupScheduleColors colors READ colors WRITE setColors)
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     QnBackupScheduleDialog(QWidget *parent = NULL);

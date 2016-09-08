@@ -1,28 +1,33 @@
 #include "noptix_icon_loader.h"
 
 #include "skin.h"
-#include "icon.h"
 #include "icon_pixmap_accessor.h"
 
-namespace
+namespace {
+
+void decompose(const QString& path, QString* prefix, QString* suffix)
 {
-    void decompose(const QString& path, QString* prefix, QString* suffix)
-    {
-        QFileInfo info(path);
-        *prefix = info.path() + L'/' + info.baseName();
-        *suffix = info.completeSuffix();
-        if (!suffix->isEmpty())
-            *suffix = L'.' + *suffix;
-    }
+    QFileInfo info(path);
+    *prefix = info.path() + L'/' + info.baseName();
+    *suffix = info.completeSuffix();
+    if (!suffix->isEmpty())
+        *suffix = L'.' + *suffix;
 }
+
+static const QnIcon::SuffixesList kDefaultSuffixes({
+    {QnIcon::Active,   lit("hovered")},
+    {QnIcon::Disabled, lit("disabled")},
+    {QnIcon::Selected, lit("selected")},
+    {QnIcon::Pressed,  lit("pressed")}
+});
+
+} //namespace
 
 // -------------------------------------------------------------------------- //
 // QnIconBuilder
 // -------------------------------------------------------------------------- //
 class QnIconBuilder
 {
-    typedef QHash<QPair<QIcon::Mode, QIcon::State>, QPixmap> container_type;
-
 public:
     void addPixmap(const QPixmap& pixmap, QIcon::Mode mode)
     {
@@ -32,29 +37,35 @@ public:
 
     void addPixmap(const QPixmap& pixmap, QIcon::State state)
     {
-        addPixmap(pixmap, QnIcon::Normal,   state);
+        addPixmap(pixmap, QnIcon::Normal, state);
         addPixmap(pixmap, QnIcon::Disabled, state);
-        addPixmap(pixmap, QnIcon::Active,   state);
+        addPixmap(pixmap, QnIcon::Active, state);
         addPixmap(pixmap, QnIcon::Selected, state);
-        addPixmap(pixmap, QnIcon::Pressed,  state);
+        addPixmap(pixmap, QnIcon::Pressed, state);
     }
 
     void addPixmap(const QPixmap& pixmap, QIcon::Mode mode, QIcon::State state)
     {
-        m_pixmaps[qMakePair(mode, state)] = pixmap;
+        m_pixmaps[{mode, state}] = pixmap;
+    }
+
+    QPixmap pixmap(QIcon::Mode mode, QIcon::State state) const
+    {
+        return m_pixmaps[{mode, state}];
     }
 
     QIcon createIcon() const
     {
-        QIcon icon(m_pixmaps.value(qMakePair(QIcon::Normal, QIcon::Off)));
+        QIcon icon(m_pixmaps.value({QIcon::Normal, QIcon::Off}));
 
-        for (container_type::const_iterator pos = m_pixmaps.begin(), end = m_pixmaps.end(); pos != end; pos++)
+        for (auto pos = m_pixmaps.begin(), end = m_pixmaps.end(); pos != end; pos++)
             icon.addPixmap(pos.value(), pos.key().first, pos.key().second);
 
         return icon;
     }
 
 private:
+    using container_type = QHash<QPair<QIcon::Mode, QIcon::State>, QPixmap>;
     container_type m_pixmaps;
 };
 
@@ -62,7 +73,8 @@ private:
 // -------------------------------------------------------------------------- //
 // QnNoptixIconLoader
 // -------------------------------------------------------------------------- //
-QnNoptixIconLoader::QnNoptixIconLoader(QObject* parent): base_type(parent)
+QnNoptixIconLoader::QnNoptixIconLoader(QObject* parent):
+    base_type(parent)
 {
 }
 
@@ -94,15 +106,11 @@ QIcon QnNoptixIconLoader::polish(const QIcon& icon)
     return load(pixmapName.mid(index + 1));
 }
 
-QIcon QnNoptixIconLoader::load(const QString& name, const QString& checkedName, int numModes, const QPair<QIcon::Mode, QString>* modes)
+QIcon QnNoptixIconLoader::load(
+    const QString& name,
+    const QString& checkedName,
+    const QnIcon::SuffixesList* suffixes)
 {
-    static const QVector<QPair<QIcon::Mode, QString> > kDefaultModes({
-        qMakePair(QnIcon::Active,   lit("hovered")),
-        qMakePair(QnIcon::Disabled, lit("disabled")),
-        qMakePair(QnIcon::Selected, lit("selected")),
-        qMakePair(QnIcon::Pressed,  lit("pressed"))
-    });
-
     static const QString kSeparator = lit("=^_^=");
 
     QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
@@ -110,55 +118,65 @@ QIcon QnNoptixIconLoader::load(const QString& name, const QString& checkedName, 
         return QIcon();
 
     QString key = name + kSeparator + checkedName;
-    if (numModes < 0)
+    if (!suffixes)
     {
         key += kSeparator + lit("_default");
-        numModes = kDefaultModes.size();
-        modes = &kDefaultModes.front();
+        suffixes = &kDefaultSuffixes;
     }
     else
     {
         key += kSeparator;
-        for (int i = 0; i < numModes; ++i)
-            key += lit("_%1:%2").arg(static_cast<int>(modes[i].first)).arg(modes[i].second);
+        for (auto suffix: *suffixes)
+            key += lit("_%1:%2").arg(static_cast<int>(suffix.first)).arg(suffix.second);
     }
 
-    if (m_iconByKey.contains(key))
-        return m_iconByKey.value(key);
+    if (!m_iconByKey.contains(key))
+        loadIconInternal(key, name, checkedName, suffixes);
 
+    NX_ASSERT(m_iconByKey.contains(key));
+    return m_iconByKey.value(key);
+}
+
+void QnNoptixIconLoader::loadIconInternal(
+    const QString& key,
+    const QString& name,
+    const QString& checkedName,
+    const QnIcon::SuffixesList* suffixes)
+{
     QnSkin* skin = qnSkin;
 
-    QString prefix, suffix, path;
+    QString prefix, extension, path;
 
-    decompose(name, &prefix, &suffix);
+    decompose(name, &prefix, &extension);
 
     /* Create normal icon. */
     QnIconBuilder builder;
     builder.addPixmap(skin->pixmap(name), QnIcon::Normal, QnIcon::Off);
 
-    for (int i = 0; i < numModes; ++i)
+    for (auto suffix: *suffixes)
     {
-        path = prefix + lit("_") + modes[i].second + suffix;
+        path = prefix + lit("_") + suffix.second + extension;
         if (skin->hasFile(path))
-            builder.addPixmap(skin->pixmap(path), modes[i].first, QnIcon::Off);
+            builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::Off);
     }
 
-    decompose(checkedName.isEmpty() ? prefix + lit("_checked") + suffix : checkedName, &prefix, &suffix);
+    decompose(checkedName.isEmpty()
+        ? prefix + lit("_checked") + extension
+        : checkedName,
+        &prefix, &extension);
 
-    /* Create checked icon. */
-    path = prefix + suffix;
+    path = prefix + extension;
     if (skin->hasFile(path))
         builder.addPixmap(skin->pixmap(path), QnIcon::On);
 
-    for (int i = 0; i < numModes; ++i)
+    for (auto suffix: *suffixes)
     {
-        path = prefix + lit("_") + modes[i].second + suffix;
+        path = prefix + lit("_") + suffix.second + extension;
         if (skin->hasFile(path))
-            builder.addPixmap(skin->pixmap(path), modes[i].first, QnIcon::On);
+            builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::On);
     }
 
     QIcon icon = builder.createIcon();
     m_iconByKey.insert(key, icon);
     m_cacheKeys.insert(icon.cacheKey());
-    return icon;
 }

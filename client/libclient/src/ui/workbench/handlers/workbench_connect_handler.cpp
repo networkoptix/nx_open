@@ -74,11 +74,9 @@
 
 namespace {
 
-const int videowallReconnectTimeoutMSec = 5000;
-const int videowallCloseTimeoutMSec = 10000;
 
-const int maxReconnectTimeout = 10 * 1000;                      // 10 seconds
-const int maxVideowallReconnectTimeout = 96 * 60 * 60 * 1000;   // 4 days
+static const int kVideowallCloseTimeoutMSec = 10000;
+
 
 void storeSystemConnection(const QString &systemName, QUrl url,
     bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
@@ -331,10 +329,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
             if (connectToServer(url, settings, true) != ec2::ErrorCode::ok)
             {
                 QnGraphicsMessageBox* incompatibleMessageBox =
-                    QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1...")
-                        , videowallCloseTimeoutMSec);
-                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished
-                    , action(QnActions::ExitAction), &QAction::trigger);
+                    QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."),
+                        kVideowallCloseTimeoutMSec);
+                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished,
+                    action(QnActions::ExitAction), &QAction::trigger);
             }
         }
         else
@@ -469,8 +467,8 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!
-    QnConnectionDiagnosticsHelper::Result status = silent
-        ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
+    auto status = silent
+        ? QnConnectionValidator::validateConnection(connectionInfo, errCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
 
     const auto systemName = connectionInfo.systemName;
@@ -485,9 +483,9 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     switch (status)
     {
-        case QnConnectionDiagnosticsHelper::Result::Success:
+        case Qn::ConnectionResult::Success:
             break;
-        case QnConnectionDiagnosticsHelper::Result::RestartRequested:
+        case Qn::ConnectionResult::IncompatibleProtocol:
             storeConnection();
             menu()->trigger(QnActions::DelayedForcedExitAction);
             return ec2::ErrorCode::ok; // to avoid cycle
@@ -501,19 +499,19 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
 
 
+    QUrl ecUrl = connectionInfo.ecUrl;
+    if (connectionInfo.allowSslConnections)
+        ecUrl.setScheme(lit("https"));
 
     if (connectionInfo.newSystem)
     {
         storeConnection();
         showWelcomeScreen();
         auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setupFactorySystem(connectionInfo.ecUrl.toString());
+        /* Method is called from QML where we are passing QString. */
+        welcomeScreen->setupFactorySystem(ecUrl.toString());
         return ec2::ErrorCode::ok;
     }
-
-    QUrl ecUrl = connectionInfo.ecUrl;
-    if (connectionInfo.allowSslConnections)
-        ecUrl.setScheme(lit("https"));
 
     QnAppServerConnectionFactory::setUrl(ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
@@ -661,10 +659,16 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
             break;
         }
 
-        //TODO: #dklychkov #GDM When client tries to reconnect to a single server very often we can get "unauthorized" reply,
-        //      because we try to connect before the server initialized its auth classes.
-
-        if (errCode == ec2::ErrorCode::incompatiblePeer || errCode == ec2::ErrorCode::unauthorized)
+        //TODO: #ak fix server behavior
+        /* When client tries to reconnect to a single server very fast we can
+         * get "unauthorized" reply, because we try to connect before the
+         * server have initialized its auth classes. Need to return
+         * temporaryUnauthorized error code in this case.
+         * Ignoring this issue in videowall mode as it is hard to restart.
+         */
+        if (errCode == ec2::ErrorCode::incompatiblePeer)
+            reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
+        else if (errCode == ec2::ErrorCode::unauthorized && !qnRuntime->isVideoWallMode())
             reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
 
         /* Find next valid server for reconnect. */

@@ -2,7 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnServerSettingsWidget;
 class QnStorageAnalyticsWidget;
@@ -12,10 +12,10 @@ namespace Ui {
     class ServerSettingsDialog;
 }
 
-class QnServerSettingsDialog: public QnWorkbenchStateDependentTabbedDialog {
+class QnServerSettingsDialog: public QnSessionAwareTabbedDialog {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentTabbedDialog base_type;
+    typedef QnSessionAwareTabbedDialog base_type;
 
 public:
     enum DialogPage
@@ -52,3 +52,5 @@ private:
     QnStorageConfigWidget* m_storagesPage;
     QPushButton* m_webPageButton;
 };
+
+Q_DECLARE_METATYPE(QnServerSettingsDialog::DialogPage)

@@ -52,12 +52,18 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     ui->createAccountButton->setText(tr("Create %1 Account").arg(QnAppInfo::cloudName()));
     ui->linkButton->setText(tr("Connect System to %1").arg(QnAppInfo::cloudName()));
 
-    ui->promo1TextLabel->setText(tr("1. Create %1\nAccount").arg(QnAppInfo::cloudName()));
-    ui->promo2TextLabel->setText(tr("2. Connect System\nto %1").arg(QnAppInfo::cloudName()));
-    ui->promo3TextLabel->setText(tr("3. Connect to Your Systems\nfrom Anywhere with any\nDevices"));
+    ui->promo1TextLabel->setText(tr("1. Create %1\naccount").arg(QnAppInfo::cloudName()));
+    ui->promo2TextLabel->setText(tr("2. Connect system\nto %1").arg(QnAppInfo::cloudName()));
+    ui->promo3TextLabel->setText(tr("3. Connect to your systems\nfrom anywhere with any\ndevices"));
 
-    ui->learnMoreLabel->setText(makeHref(tr("Learn more about %1").arg(QnAppInfo::cloudName()),
-                                         QnCloudUrlHelper::aboutUrl()));
+    using nx::vms::utils::SystemUri;
+    QnCloudUrlHelper urlHelper(
+        SystemUri::ReferralSource::DesktopClient,
+        SystemUri::ReferralContext::SettingsDialog);
+
+    ui->learnMoreLabel->setText(
+        makeHref(tr("Learn more about %1").arg(
+            QnAppInfo::cloudName()), urlHelper.aboutUrl()));
 
     connect(ui->goToCloudButton,     &QPushButton::clicked, action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
     connect(ui->createAccountButton, &QPushButton::clicked, action(QnActions::OpenCloudRegisterUrl),   &QAction::trigger);

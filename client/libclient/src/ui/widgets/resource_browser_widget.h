@@ -2,6 +2,7 @@
 #define QN_RESOURCE_BROWSER_WIDGET_H
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
@@ -25,25 +26,26 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
-class QnProxyLabel;
-class QnClickableProxyLabel;
 class HoverFocusProcessor;
 
 class QnResourceCriterion;
+class QnResourcePreviewWidget;
 class QnResourceTreeModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
 class QnCameraThumbnailManager;
+class QnTextEditLabel;
 
 namespace Ui {
     class ResourceBrowserWidget;
 }
 
-class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget {
+class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget
+{
     Q_OBJECT
+    using base_type = QnStyledTooltipWidget;
 
-    typedef QnStyledTooltipWidget base_type;
 public:
     QnResourceBrowserToolTipWidget(QGraphicsItem* parent = nullptr);
 
@@ -53,12 +55,11 @@ public:
      * \reimp
      */
     void setText(const QString& text);
-    void setPixmap(const QPixmap& pixmap);
 
     void setThumbnailVisible(bool visible);
 
-    void setResourceId(const QnUuid& id);
-    QnUuid resourceId() const;
+    void setResource(const QnResourcePtr& resource);
+    const QnResourcePtr& resource() const;
 
     //reimp
     void pointTo(const QPointF& pos);
@@ -67,12 +68,15 @@ public:
 signals:
     void thumbnailClicked();
 
+protected:
+    virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
+
 private:
-    QnProxyLabel* m_textLabel;
-    QnClickableProxyLabel* m_thumbnailLabel;
+    QGraphicsProxyWidget* m_proxyWidget;
+    QWidget* m_embeddedWidget;
+    QnTextEditLabel* m_textLabel;
+    QnResourcePreviewWidget* m_previewWidget;
     QPointF m_pointTo;
-    bool m_thumbnailVisible;
-    QnUuid m_resourceId;
 };
 
 
@@ -142,11 +146,13 @@ protected:
     void showContextMenuAt(const QPoint& pos, bool ignoreSelection = false);
 
     void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
+
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
     void hideToolTip();
     void showToolTip();
+    void updateIcons();
 
     void forceUpdateFilter() { updateFilter(true); }
 
@@ -159,8 +165,8 @@ private slots:
     void at_layout_itemAdded(QnWorkbenchItem* item);
     void at_layout_itemRemoved(QnWorkbenchItem* item);
 
-    void at_thumbnailReady(QnUuid resourceId, const QPixmap& pixmap);
     void at_thumbnailClicked();
+
 private:
     QScopedPointer<Ui::ResourceBrowserWidget> ui;
 
@@ -170,8 +176,6 @@ private:
     QnResourceTreeModel* m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
-
-    QnCameraThumbnailManager* m_thumbnailManager;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
 };

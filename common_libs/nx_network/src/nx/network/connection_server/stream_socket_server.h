@@ -179,6 +179,11 @@ public:
                                         std::placeholders::_1, std::placeholders::_2));
     }
 
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        m_socket->bindToAioThread(aioThread);
+    }
+
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) = 0;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <nx/utils/singleton.h>
 
@@ -25,11 +26,10 @@ private:
     void updateModelsData();
 
 private:
-    typedef QSet<QnRecentUserConnectionsModel*> UnboundModelsSet;
-    typedef QHash<QString, QnRecentUserConnectionsModel*> BoundModelsHash;
-    typedef QHash<QString, QnUserRecentConnectionDataList> DataCache;
+    using QnRecentUserConnectionsModelPtr = QPointer<QnRecentUserConnectionsModel>;
+    using DataCache = QHash<QString, QnUserRecentConnectionDataList>;
 
-    UnboundModelsSet m_unbound;
-    BoundModelsHash m_bound;
+    QList<QnRecentUserConnectionsModelPtr> m_models;
     DataCache m_dataCache;
+    bool m_updating;
 };

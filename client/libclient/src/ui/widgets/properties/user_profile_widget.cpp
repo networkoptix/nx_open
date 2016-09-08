@@ -46,9 +46,17 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
-    ui->manageAccountLabel->setText(makeHref(tr("Manage account..."), QnCloudUrlHelper::accountManagementUrl()));
+    using nx::vms::utils::SystemUri;
+    QnCloudUrlHelper urlHelper(
+        SystemUri::ReferralSource::DesktopClient,
+        SystemUri::ReferralContext::SettingsDialog);
 
-    connect(ui->emailInputField, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
+    ui->manageAccountLabel->setText(makeHref(tr("Manage account..."), urlHelper.accountManagementUrl()));
+
+    connect(ui->nameInputField, &QnInputField::textChanged, this,
+        &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->emailInputField, &QnInputField::textChanged, this,
+        &QnUserProfileWidget::hasChangesChanged);
 
     connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
     {

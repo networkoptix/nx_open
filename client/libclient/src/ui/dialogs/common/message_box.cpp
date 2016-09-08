@@ -417,29 +417,33 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
 
     d->icon = icon;
 
-    QString pixmapFile;
-
-    switch (icon)
-    {
-    case Information:
-        pixmapFile = lit("standard_icons/messagebox_info.png");
-        break;
-    case Warning:
-        pixmapFile = lit("standard_icons/messagebox_warning.png");
-        break;
-    case Critical:
-        pixmapFile = lit("standard_icons/messagebox_critical.png");
-        break;
-    case Question:
-        pixmapFile = lit("standard_icons/messagebox_question.png");
-        break;
-    default:
-        break;
-    }
+    auto standardPixmap =
+        [this](QStyle::StandardPixmap pixmapId) -> QPixmap
+        {
+            return qnSkin->maximumSizePixmap(style()->standardIcon(pixmapId));
+        };
 
     QPixmap pixmap;
-    if (!pixmapFile.isEmpty())
-        pixmap = qnSkin->pixmap(pixmapFile);
+    switch (icon)
+    {
+        case Information:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxInformation);
+            break;
+        case Warning:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxWarning);
+            break;
+        case Critical:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxCritical);
+            break;
+        case Question:
+            pixmap = standardPixmap(QStyle::SP_MessageBoxQuestion);
+            break;
+        case Success:
+            pixmap = qnSkin->pixmap("standard_icons/message_box_success.png");
+            break;
+        default:
+            break;
+    }
 
     ui->iconLabel->setVisible(!pixmap.isNull());
     ui->iconLabel->setPixmap(pixmap);
@@ -589,6 +593,39 @@ QDialogButtonBox::StandardButton QnMessageBox::information(
                           text,
                           buttons,
                           defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::success(
+    QWidget *parent,
+    int helpTopicId,
+    const QString &title,
+    const QString& text,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execMessageBox(parent,
+        Success,
+        helpTopicId,
+        title,
+        text,
+        buttons,
+        defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::success(
+    QWidget *parent,
+    const QString &title,
+    const QString &text,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execMessageBox(parent,
+        Success,
+        Qn::Empty_Help,
+        title,
+        text,
+        buttons,
+        defaultButton);
 }
 
 QDialogButtonBox::StandardButton QnMessageBox::question(

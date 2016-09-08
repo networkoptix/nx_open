@@ -1,5 +1,7 @@
 #include "ptz_rest_handler.h"
 
+#include <QtConcurrent/QtConcurrent>
+
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <network/tcp_connection_priv.h>
@@ -13,18 +15,17 @@
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
-
-#include <QtConcurrent/QtConcurrent>
-
-static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
-
-
-QMap<QString, QnPtzRestHandler::AsyncExecInfo> QnPtzRestHandler::m_workers;
-QnMutex QnPtzRestHandler::m_asyncExecMutex;
+#include <api/helpers/camera_id_helper.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
-bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnVirtualCameraResourcePtr& camera, Qn::PtzCommand command)
+static const QString kCameraIdParam = lit("cameraId");
+static const QString kDeprecatedResourceIdParam = lit("resourceId");
+
+static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
+
+bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnSecurityCamResourcePtr& camera, Qn::PtzCommand command)
 {
     switch (command)
     {
@@ -72,7 +73,10 @@ bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnVirtualCame
     return true;
 }
 
-} //anonymous namespace
+} // namespace
+
+QMap<QString, QnPtzRestHandler::AsyncExecInfo> QnPtzRestHandler::m_workers;
+QnMutex QnPtzRestHandler::m_asyncExecMutex;
 
 void QnPtzRestHandler::cleanupOldSequence()
 {
@@ -135,41 +139,53 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* processor)
+int QnPtzRestHandler::executePost(
+    const QString& path, const QnRequestParams& params, const QByteArray& body,
+    QnJsonRestResult& result, const QnRestConnectionProcessor* processor)
 {
+    NX_LOG(lit("QnPtzRestHandler: received request %1").arg(path), cl_logDEBUG1);
+
     QString sequenceId;
     int sequenceNumber = -1;
     Qn::PtzCommand command;
-    QString resourceId;
-    if (
-        !requireParameter(params, lit("command"), result, &command) ||
-        !requireParameter(params, lit("resourceId"), result, &resourceId) ||
+
+    if (!requireParameter(params, lit("command"), result, &command) ||
         !requireParameter(params, lit("sequenceId"), result, &sequenceId, true) ||
-        !requireParameter(params, lit("sequenceNumber"), result, &sequenceNumber, true)
-        )
+        !requireParameter(params, lit("sequenceNumber"), result, &sequenceNumber, true))
     {
         return CODE_INVALID_PARAMETER;
     }
 
-    QString hash = QString(lit("%1-%2")).arg(params.value("resourceId")).arg(params.value("sequenceId"));
+    QString hash = QString(lit("%1-%2"))
+        .arg(params.value(kDeprecatedResourceIdParam)).arg(params.value("sequenceId"));
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(resourceId).dynamicCast<QnVirtualCameraResource>();
+    QString notFoundCameraId = QString::null;
+    QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        &notFoundCameraId, params, {kCameraIdParam, kDeprecatedResourceIdParam});
     if (!camera)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' not found.").arg(resourceId));
+        QString errStr;
+        if (notFoundCameraId.isNull())
+            errStr = lit("Missing 'cameraId' param.");
+        else
+            errStr = lit("Requested camera %1 not found.").arg(notFoundCameraId);
+        result.setError(QnJsonRestResult::InvalidParameter, errStr);
         return CODE_INVALID_PARAMETER;
     }
+    const QString cameraId = camera->getId().toString();
 
     if (camera->getStatus() == Qn::Offline || camera->getStatus() == Qn::Unauthorized)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' is not ready yet.").arg(resourceId));
+        result.setError(QnJsonRestResult::InvalidParameter,
+            lit("Camera resource '%1' is not ready yet.").arg(cameraId));
         return CODE_INVALID_PARAMETER;
     }
 
     QnPtzControllerPtr controller = qnPtzPool->controller(camera);
     if (!controller)
     {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("PTZ is not supported by camera '%1'.").arg(resourceId));
+        result.setError(QnJsonRestResult::InvalidParameter,
+            lit("PTZ is not supported by camera '%1'.").arg(cameraId));
         return CODE_INVALID_PARAMETER;
     }
 

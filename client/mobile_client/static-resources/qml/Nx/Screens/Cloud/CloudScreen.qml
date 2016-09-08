@@ -68,7 +68,6 @@ Page
             id: credentialsEditor
 
             learnMoreLinkVisible: false
-            warningPanel: cloudScreen.warningPanel
 
             onLoggedIn:
             {

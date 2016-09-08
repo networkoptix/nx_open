@@ -1,4 +1,3 @@
-
 #include "udt_socket.h"
 
 #ifdef _WIN32
@@ -66,7 +65,7 @@ public:
         UDTSocketImpl(socket)
     {
     }
-    
+
     ~UdtSocketImpl()
     {
     }
@@ -571,7 +570,7 @@ bool UdtStreamSocket::connect(
             return false;
     }
     int ret = UDT::connect(m_impl->udtHandle, ADDR_(&addr), sizeof(addr));
-    // The UDT connect will always return zero even if such operation is async which is 
+    // The UDT connect will always return zero even if such operation is async which is
     // different with the existed Posix/Win32 socket design. So if we meet an non-zero
     // value, the only explanation is an error happened which cannot be solved.
     if (ret != 0)
@@ -592,7 +591,26 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         return -1;
     }
 
-    int sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    int sz;
+    if (flags & MSG_DONTWAIT)
+    {
+        bool value;
+        if (!getNonBlockingMode(&value))
+            return -1;
+
+        if (!setNonBlockingMode(true))
+            return -1;
+
+        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags & ~MSG_DONTWAIT);
+
+        if (!setNonBlockingMode(&value))
+            return -1;
+    }
+    else
+    {
+        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    }
+
     if (sz == UDT::ERROR)
     {
         const int udtErrorCode = UDT::getlasterror().getErrorCode();
@@ -871,7 +889,7 @@ void UdtStreamServerSocket::cancelIOSync()
     m_aioHelper->cancelIOSync();
 }
 
-void UdtStreamServerSocket::pleaseStop( 
+void UdtStreamServerSocket::pleaseStop(
     nx::utils::MoveOnlyFunc< void() > handler )
 {
     m_aioHelper->cancelIOAsync( std::move( handler ) );

@@ -1137,20 +1137,39 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
-    //checking remote server protocol version
-    nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
-        client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
+    if (!m_localPeer.isMobileClient())
+    {
+        //checking remote server protocol version
+        nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
+            client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
 
-    if (!m_localPeer.isMobileClient()) {
         const int remotePeerEcProtoVersion = ec2ProtoVersionIter == client->response()->headers.end()
              ? nx_ec::INITIAL_EC2_PROTO_VERSION
              : ec2ProtoVersionIter->second.toInt();
 
-        if (nx_ec::EC2_PROTO_VERSION != remotePeerEcProtoVersion) {
+        if (nx_ec::EC2_PROTO_VERSION != remotePeerEcProtoVersion)
+        {
             NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
                 "Local peer version: %2, remote peer version: %3").
-                arg(client->url().toString()).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
+                arg(client->url().toString(QUrl::RemovePassword)).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
                 cl_logWARNING );
+            cancelConnecting();
+            return;
+        }
+
+        nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
+            client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
+
+        const QString remotePeerCloudHost = ec2CloudHostItr == client->response()->headers.end()
+            ? QnAppInfo::defaultCloudHost()
+            : QString::fromUtf8(ec2CloudHostItr->second);
+
+        if (QnAppInfo::defaultCloudHost() != remotePeerCloudHost)
+        {
+            NX_LOG(QString::fromLatin1("Cannot connect to server %1 because they have different built in cloud host setting. "
+                "Local peer host: %2, remote peer host: %3").
+                arg(client->url().toString(QUrl::RemovePassword)).arg(QnAppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
+                cl_logWARNING);
             cancelConnecting();
             return;
         }

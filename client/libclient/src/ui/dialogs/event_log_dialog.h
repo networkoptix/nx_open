@@ -11,7 +11,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnEventLogModel;
 
@@ -19,11 +19,11 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public QnWorkbenchStateDependentButtonBoxDialog
+class QnEventLogDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     explicit QnEventLogDialog(QWidget *parent);

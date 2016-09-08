@@ -7,6 +7,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 
+#include <utils/common/credentials.h>
+
 class QSettings;
 
 struct QnCloudSystem
@@ -35,8 +37,7 @@ class QnCloudStatusWatcherPrivate;
 class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>
 {
     Q_OBJECT
-    Q_PROPERTY(QString cloudLogin READ cloudLogin WRITE setCloudLogin NOTIFY loginChanged)
-    Q_PROPERTY(QString cloudPassword READ cloudPassword WRITE setCloudPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString effectiveUserName READ effectiveUserName WRITE setEffectiveUserName NOTIFY effectiveUserNameChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool stayConnected READ stayConnected WRITE setStayConnected NOTIFY stayConnectedChanged)
@@ -65,19 +66,23 @@ public:
     explicit QnCloudStatusWatcher(QObject *parent = nullptr);
     ~QnCloudStatusWatcher();
 
-    QString cloudLogin() const;
-    void setCloudLogin(const QString &login);
+    QnCredentials credentials() const;
+    void setCredentials(const QnCredentials& value);
 
-    QString cloudPassword() const;
-    void setCloudPassword(const QString &password);
+    // These getters are for qml
+    Q_INVOKABLE QString cloudLogin() const;
+    Q_INVOKABLE QString cloudPassword() const;
+
+    QString effectiveUserName() const;
+    void setEffectiveUserName(const QString& value);
 
     bool stayConnected() const;
     void setStayConnected(bool value);
 
-    void setCloudCredentials(const QString &login, const QString &password, bool initial = false);
+    void resetCloudCredentials();
+    void setCloudCredentials(const QnCredentials& credentials, bool initial = false);
 
-    QString temporaryLogin() const;
-    QString temporaryPassword() const;
+    QnCredentials createTemporaryCredentials() const;
 
     QString cloudEndpoint() const;
     void setCloudEndpoint(const QString &endpoint);
@@ -95,6 +100,7 @@ public:
 signals:
     void loginChanged();
     void passwordChanged();
+    void effectiveUserNameChanged();
     void statusChanged(Status status);
     void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
     void recentCloudSystemsChanged();

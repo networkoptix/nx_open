@@ -27,11 +27,14 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/properties/camera_settings_tab.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -46,6 +49,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+
+#include <ui/workaround/hidpi_workarounds.h>
 
 namespace
 {
@@ -116,7 +121,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-    ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->loadingProgressBar->hide();
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
@@ -673,7 +678,8 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId)
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId,
+    int selectedPage)
 {
     QnResourceList resList;
     for (const auto& id: record->resources)
@@ -690,6 +696,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
     }
 
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
+    params.setArgument(Qn::FocusTabRole, selectedPage);
     context()->menu()->trigger(ActionId, params);
 }
 
@@ -704,11 +711,17 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
     if (record->isPlaybackType())
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
-        triggerAction(record, QnActions::UserSettingsAction);
+        triggerAction(record,
+            QnActions::UserSettingsAction,
+            QnUserSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_ServerUpdate)
-        triggerAction(record, QnActions::ServerSettingsAction);
+        triggerAction(record,
+            QnActions::ServerSettingsAction,
+            QnServerSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-        triggerAction(record, QnActions::CameraSettingsAction);
+        triggerAction(record,
+            QnActions::CameraSettingsAction,
+            Qn::GeneralSettingsTab);
 
     if (isMaximized())
         showNormal();
@@ -869,7 +882,7 @@ void QnAuditLogDialog::setDateRange(const QDate& from, const QDate& to)
 
 void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
 {
-    QMenu* menu = 0;
+    QScopedPointer<QMenu> menu;
     QTableView* gridMaster = (QTableView*) sender();
     QModelIndex idx = gridMaster->currentIndex();
     if (idx.isValid())
@@ -882,7 +895,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            menu = manager->newMenu(Qn::TreeScope, this, parameters);
+            menu.reset(manager->newMenu(Qn::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -890,7 +903,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     if (menu)
         menu->addSeparator();
     else
-        menu = new QMenu(this);
+        menu.reset(new QMenu());
 
     m_clipboardAction->setEnabled(gridMaster->selectionModel()->hasSelection());
     m_exportAction->setEnabled(gridMaster->selectionModel()->hasSelection());
@@ -901,8 +914,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
-    menu->exec(QCursor::pos());
-    menu->deleteLater();
+    QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
 QTableView* QnAuditLogDialog::currentGridView() const

@@ -13,6 +13,7 @@
 #include <ui/processors/drag_info.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
@@ -38,6 +39,8 @@ QnFisheyeCalibrationImageWidget::QnFisheyeCalibrationImageWidget(QWidget *parent
     m_animation.stage = Idle;
     m_animation.circle = new QnFisheyeAnimatedCircle(this);
     connect(m_animation.circle, SIGNAL(changed()),this, SLOT(repaint()));
+
+    setAutoFillBackground(false);
 }
 
 QnFisheyeCalibrationImageWidget::~QnFisheyeCalibrationImageWidget() {
@@ -182,7 +185,6 @@ void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect
     if (qFuzzyIsNull(relativeRadius))
         return;
 
-    int halfLineWidth = m_lineWidth / 2;
     qreal radiusX = relativeRadius * targetRect.width();
     qreal radiusY = radiusX / xStretch;
     QPointF center(relativeCenter.x() * targetRect.width(), relativeCenter.y() * targetRect.height());
@@ -193,7 +195,6 @@ void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect
         pen.setWidth(m_lineWidth);
         pen.setColor(m_lineColor);
         QnScopedPainterPenRollback penRollback(painter, pen);
-        Q_UNUSED(penRollback)
 
         QColor brushColor1(toTransparent(m_lineColor, 0.6));
         QColor brushColor2(toTransparent(m_lineColor, 0.3));
@@ -203,16 +204,14 @@ void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect
         QBrush brush(gradient);
 
         QnScopedPainterBrushRollback brushRollback(painter, brush);
-        Q_UNUSED(brushRollback)
 
         QPainterPath path;
         path.addEllipse(center, radiusX, radiusY);
         path.addEllipse(center, m_lineWidth, m_lineWidth);
 
         /* Adjust again to not draw over frame */
-        painter->setClipRect(targetRect.adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth));
+        QnScopedPainterClipRegionRollback clipRollback(painter, targetRect);
         painter->drawPath(path);
-        painter->setClipping(false);
     }
 }
 
@@ -253,7 +252,8 @@ void QnFisheyeCalibrationImageWidget::dragMove(DragInfo *info) {
     emit centerModified(newCenter);
 }
 
-void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
+void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent* event)
+{
     QN_UNUSED(event);
 
     if (m_image.isNull())
@@ -261,10 +261,15 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
 
     QScopedPointer<QPainter> painter(new QPainter(this));
 
-    int halfLineWidth = m_lineWidth / 2;
-    QRect targetRect = rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
+    if (!isEnabled())
+        painter->setOpacity(style::Hints::kDisabledItemOpacity);
 
-    if (targetRect != m_cachedRect || m_cachedImage.isNull()) {
+    painter->fillRect(rect(), palette().color(QPalette::Window));
+
+    QRect targetRect = rect().adjusted(1, 1, -1, -1);
+
+    if (targetRect != m_cachedRect || m_cachedImage.isNull())
+    {
         m_cachedRect = targetRect;
         m_cachedImage = m_image.scaled(targetRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
@@ -280,16 +285,6 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
 
     if (m_lineWidth == 0)
         return;
-
-    {   /* Drawing frame */
-        QPen pen;
-        pen.setWidth(m_lineWidth);
-        pen.setColor(m_frameColor);
-        QnScopedPainterPenRollback penRollback(painter.data(), pen);
-        Q_UNUSED(penRollback)
-
-        painter->drawRect(targetRect);
-    }
 
     if (m_animation.stage == Idle)
         paintCircle(painter.data(), targetRect, m_center, m_radius, m_stretch);

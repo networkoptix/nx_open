@@ -4,17 +4,17 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/camera_bookmark_fwd.h>
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
 class QnCameraBookmarkDialog;
 }
 
-class QnCameraBookmarkDialog : public QnWorkbenchStateDependentButtonBoxDialog
+class QnCameraBookmarkDialog : public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     explicit QnCameraBookmarkDialog(QWidget *parent = 0);

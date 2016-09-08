@@ -27,6 +27,8 @@ QnCloudSystemInformationWatcher::QnCloudSystemInformationWatcher(QObject* parent
             this, &QnCloudSystemInformationWatcher::ownerDescriptionChanged);
     connect(this, &QnCloudSystemInformationWatcher::ownerFullNameChanged,
             this, &QnCloudSystemInformationWatcher::ownerDescriptionChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged, this,
+        &QnCloudSystemInformationWatcher::ownerDescriptionChanged);
 }
 
 QnCloudSystemInformationWatcher::~QnCloudSystemInformationWatcher()
@@ -57,7 +59,7 @@ QString QnCloudSystemInformationWatcher::ownerDescription() const
     if (d->ownerEmail.isEmpty() || d->ownerFullName.isEmpty())
         return QString();
 
-    const bool yourSystem = qnClientCoreSettings->cloudLogin() == d->ownerEmail;
+    const bool yourSystem = qnCloudStatusWatcher->effectiveUserName() == d->ownerEmail;
 
     return yourSystem ? tr("Your system")
                       : tr("%1's system").arg(d->ownerFullName);

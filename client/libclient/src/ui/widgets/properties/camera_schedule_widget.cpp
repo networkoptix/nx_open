@@ -163,8 +163,8 @@ static const int kDangerousMinArchiveDays = 5;
 static const int kDefaultMaxArchiveDays = 30;
 static const int kRecordingTypeLabelFontSize = 12;
 static const int kRecordingTypeLabelFontWeight = QFont::DemiBold;
-static const int kDefaultBeforeThresholdSec = 10;
-static const int kDefaultAfterThresholdSec = 10;
+static const int kDefaultBeforeThresholdSec = 5;
+static const int kDefaultAfterThresholdSec = 5;
 static const int kRecordedDaysDontChange = std::numeric_limits<int>::max();
 
 }

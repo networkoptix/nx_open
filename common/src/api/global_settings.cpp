@@ -54,6 +54,7 @@ namespace
     const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
     const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
     const QString kNameNewSystem(lit("newSystem"));
+    const QString kCloudHostName(lit("cloudHost"));
 
     const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
     const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
@@ -88,7 +89,7 @@ namespace
     const int kProxyConnectTimeoutDefault = 5;
 
     const QString kMaxRecorderQueueSizeBytesName(lit("maxRecordQueueSizeBytes"));
-    const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 42;
+    const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 24;
     const QString kMaxRecorderQueueSizePacketsName(lit("maxRecordQueueSizeElements"));
     const int kMaxRecorderQueueSizePacketsDefault = 1000;
 
@@ -296,6 +297,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
     m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
     m_newSystemAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameNewSystem, false, this);
+    m_cloudHostAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kCloudHostName, QString(), this);
 
     m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
@@ -331,6 +333,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_backupNewCamerasByDefaultAdaptor
         << m_upnpPortMappingEnabledAdaptor
         << m_newSystemAdaptor
+        << m_cloudHostAdaptor
         << m_arecontRtspEnabledAdaptor
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
@@ -785,6 +788,16 @@ bool QnGlobalSettings::isNewSystem() const
 void QnGlobalSettings::setNewSystem(bool value)
 {
     m_newSystemAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::cloudHost() const
+{
+    return m_cloudHostAdaptor->value();
+}
+
+void QnGlobalSettings::setCloudHost(const QString& value)
+{
+    m_cloudHostAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::arecontRtspEnabled() const

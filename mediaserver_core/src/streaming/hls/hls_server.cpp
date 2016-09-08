@@ -80,7 +80,6 @@ namespace nx_hls
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
-            m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
             m_chunkInputStream.reset();
             m_currentChunk.reset();
@@ -231,14 +230,21 @@ namespace nx_hls
         const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
-        //searching for requested resource
-        QnResourcePtr resource = qnResPool->getResourceByUniqueId( shortFileName.toString() );
-        if( !resource )
-            resource = QnResourcePool::instance()->getResourceByMacAddress( shortFileName.toString() );
-        if( !resource )
+        // Searching for requested resource.
+        const QString& resId = shortFileName.toString();
+        QnResourcePtr resource;
+        const QnUuid uuid = QnUuid::fromStringSafe(resId);
+        if (!uuid.isNull())
+            resource = qnResPool->getResourceById(uuid);
+        if (!resource)
+            resource = qnResPool->getResourceByUniqueId(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByMacAddress(resId);
+        if (!resource)
+            resource = qnResPool->getResourceByUrl(resId);
+        if (!resource)
         {
-            NX_LOG( lit("HLS. Requested resource %1 not found").
-                arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
+            NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);
             return nx_http::StatusCode::notFound;
         }
 
@@ -348,7 +354,7 @@ namespace nx_hls
         m_state = sSending;
     }
 
-    QString formatGUID(const QnUuid& guid)
+    static QString formatGUID(const QnUuid& guid)
     {
         QString rez = guid.toString();
         if (rez.startsWith(L'{'))
@@ -359,6 +365,8 @@ namespace nx_hls
 
     bool QnHttpLiveStreamingProcessor::prepareDataToSend()
     {
+        static const int kMaxBytesToRead = 1024*1024;
+
         NX_ASSERT( m_writeBuffer.isEmpty() );
 
         if( !m_chunkInputStream )
@@ -370,19 +378,19 @@ namespace nx_hls
             m_switchToChunkedTransfer = false;
         }
 
-        QnMutexLocker lk( &m_mutex );
+        //QnMutexLocker lk( &m_mutex );
         for( ;; )
         {
             //reading chunk data
             const int sizeBak = m_writeBuffer.size();
-            if( m_chunkInputStream->tryRead( &m_writeBuffer ) )
+            if( m_chunkInputStream->tryRead( &m_writeBuffer, kMaxBytesToRead ) )
             {
                 NX_LOG( lit("Read %1 bytes from streaming chunk %2").arg(m_writeBuffer.size()-sizeBak).arg((size_t)m_currentChunk.get(), 0, 16), cl_logDEBUG1 );
                 return !m_writeBuffer.isEmpty();
             }
 
             //waiting for data to arrive to chunk
-            m_cond.wait( lk.mutex() );
+            m_chunkInputStream->waitForSomeDataAvailable();
         }
     }
 
@@ -732,17 +740,21 @@ namespace nx_hls
         else if( durationSecIter != requestParams.end() )
             chunkDuration = durationSecIter->second.toLongLong() * MSEC_IN_SEC * USEC_IN_MSEC;
 
-        if( aliasIter != requestParams.end() )
+        bool requestIsAPartOfHlsSession = false;
         {
-            std::multimap<QString, QString>::const_iterator sessionIDIter = requestParams.find( StreamingParams::SESSION_ID_PARAM_NAME );
-            const QString& sessionID = sessionIDIter != requestParams.end()
-                ? sessionIDIter->second
-                : HLSSessionPool::generateUniqueID();
-            HLSSessionPool::ScopedSessionIDLock lk( HLSSessionPool::instance(), sessionID );
-            HLSSession* session = HLSSessionPool::instance()->find( sessionID );
-            if( session ) {
-                session->updateAuditInfo(startTimestamp);
-                session->getChunkByAlias( streamQuality, aliasIter->second, &startTimestamp, &chunkDuration );
+            std::multimap<QString, QString>::const_iterator sessionIDIter =
+                requestParams.find(StreamingParams::SESSION_ID_PARAM_NAME);
+            if (sessionIDIter != requestParams.end())
+            {
+                HLSSessionPool::ScopedSessionIDLock lk(HLSSessionPool::instance(), sessionIDIter->second);
+                HLSSession* hlsSession = HLSSessionPool::instance()->find(sessionIDIter->second);
+                if (hlsSession)
+                {
+                    requestIsAPartOfHlsSession = true;
+                    hlsSession->updateAuditInfo(startTimestamp);
+                    if (aliasIter != requestParams.end())
+                        hlsSession->getChunkByAlias(streamQuality, aliasIter->second, &startTimestamp, &chunkDuration);
+                }
             }
         }
 
@@ -771,23 +783,24 @@ namespace nx_hls
         if( m_currentChunk )
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
-            m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
         }
 
         m_currentChunk = chunk;
-        connect(
-            m_currentChunk.get(), &StreamingChunk::newDataIsAvailable,
-            this,                 &QnHttpLiveStreamingProcessor::chunkDataAvailable,
-            Qt::DirectConnection );
         m_chunkInputStream.reset( new StreamingChunkInputStream( m_currentChunk.get() ) );
 
         //using this simplified test for accept-encoding since hls client do not use syntax with q= ...
-        nx_http::header::AcceptEncodingHeader acceptEncoding( nx_http::getHeaderValue( request.headers, "Accept-Encoding" ) );
+        const auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
+        nx_http::header::AcceptEncodingHeader acceptEncoding(
+            acceptEncodingHeaderIter == request.headers.end()
+            ? nx_http::StringType()
+            : acceptEncodingHeaderIter->second);
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
-        if( acceptEncoding.encodingIsAllowed("chunked") )
+        if( acceptEncoding.encodingIsAllowed("chunked")
+            || (acceptEncodingHeaderIter == request.headers.end() 
+                && request.requestLine.version == nx_http::http_1_1) )  //if no Accept-Encoding then it is supported by HTTP/1.1
         {
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
             response->statusLine.version = nx_http::http_1_1;
@@ -795,16 +808,29 @@ namespace nx_hls
         }
         else if( acceptEncoding.encodingIsAllowed("identity") )
         {
-            //if client requests identity encoding, MUST return identity
-            m_currentChunk->waitForChunkReady();    //waiting for chunk to be prepared
+            //in case of hls enabling caching of full chunk since it may be required by hls client
+            if (requestIsAPartOfHlsSession)
+                m_currentChunk->disableInternalBufferLimit();
+
+            //if chunk exceeds maximum allowed size then proving 
+            //  it in streaming mode. That means no Content-Length in response
+            const bool chunkCompleted = m_currentChunk->waitForChunkReadyOrInternalBufferFilled();
+
             //chunk is ready, using it
-            NX_LOG( lit("Streaming chunk %1 with size %2").arg((size_t)m_currentChunk.get(), 0, 16).arg(m_currentChunk->sizeInBytes()), cl_logDEBUG1 );
+            NX_LOG( lit("Streaming %1 chunk %2 with size %3")
+                .arg(chunkCompleted ? lit("complete") : lit("incomplete"))
+                .arg((size_t)m_currentChunk.get(), 0, 16).arg(m_currentChunk->sizeInBytes()),
+                cl_logDEBUG1 );
 
             auto rangeIter = request.headers.find( "Range" );
-            if( rangeIter == request.headers.end() )
+            if( rangeIter == request.headers.end() || !chunkCompleted )
             {
+                // < If whole chunk does not fit in memory then disabling partial request support.
                 response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
-                response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
+                if (chunkCompleted)
+                    response->headers.insert( make_pair(
+                        "Content-Length",
+                        nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
                 response->statusLine.version = request.requestLine.version; //do not require HTTP/1.1 here
                 return nx_http::StatusCode::ok;
             }
@@ -963,17 +989,11 @@ namespace nx_hls
             //estimating bitrate as we can
             QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High, 0);
             if( videoFrame )
-                bandwidth = (int) videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
+                bandwidth = (int)(videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps());
         }
         if( bandwidth == -1 )
             bandwidth = DEFAULT_PRIMARY_STREAM_BITRATE;
         return bandwidth;
-    }
-
-    void QnHttpLiveStreamingProcessor::chunkDataAvailable( StreamingChunkPtr /*chunk*/, quint64 /*newSizeBytes*/ )
-    {
-        QnMutexLocker lk( &m_mutex );
-        m_cond.wakeAll();
     }
 
     void QnHttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality )

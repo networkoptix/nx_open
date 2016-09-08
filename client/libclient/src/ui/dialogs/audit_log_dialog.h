@@ -8,7 +8,7 @@
 #include <api/model/audit/audit_record.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
@@ -21,11 +21,11 @@ namespace Ui
     class AuditLogDialog;
 }
 
-class QnAuditLogDialog: public QnWorkbenchStateDependentButtonBoxDialog
+class QnAuditLogDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
     explicit QnAuditLogDialog(QWidget* parent);
@@ -77,7 +77,7 @@ private:
     QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
-    void triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId);
+    void triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId, int selectedPage);
     QnAuditRecordRefList applyFilter();
     void makeSessionData();
     void makeCameraData();

@@ -293,7 +293,8 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 /* Users block                                                          */
 /************************************************************************/
 
-void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges)
+void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
+    UserChangesFunction applyChanges)
 {
     if (!applyChanges)
         return;
@@ -320,48 +321,23 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 
     connection->getUserManager(Qn::kSystemAccess)->save(apiUser, user->getPassword(), this,
         [this, user, userId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
-    {
-        Q_UNUSED(reqID);
+        {
+            Q_UNUSED(reqID);
 
-        /* Check if all OK */
-        if (errorCode == ec2::ErrorCode::ok)
-            return;
+            /* Check if all OK */
+            if (errorCode == ec2::ErrorCode::ok)
+                return;
 
-        /* Check if we have already changed session or attributes pool was recreated. */
-        if (qnCommon->runningInstanceGUID() != sessionGuid)
-            return;
+            /* Check if we have already changed session or attributes pool was recreated. */
+            if (qnCommon->runningInstanceGUID() != sessionGuid)
+                return;
 
-        QnUserResourcePtr existingUser = qnResPool->getResourceById<QnUserResource>(userId);
-        if (existingUser)
-            ec2::fromApiToResource(backup, existingUser);
+            QnUserResourcePtr existingUser = qnResPool->getResourceById<QnUserResource>(userId);
+            if (existingUser)
+                ec2::fromApiToResource(backup, existingUser);
 
-        emit saveChangesFailed(QnResourceList() << user);
-    } );
-
-    //TODO: #GDM #access #low code duplication with saveAccessibleResources, arch change is required
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(userId);
-    ec2::ApiAccessRightsData accessRights;
-    accessRights.userId = userId;
-    for (const auto &id : accessibleResources)
-        accessRights.resourceIds.push_back(id);
-
-    connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
-        [this, user, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
-    {
-        QN_UNUSED(reqID);
-
-        /* Check if all OK */
-        if (errorCode == ec2::ErrorCode::ok)
-            return;
-
-        /* Check if we have already changed session or attributes pool was recreated. */
-        if (qnCommon->runningInstanceGUID() != sessionGuid)
-            return;
-
-        qnResourceAccessManager->setAccessibleResources(user->getId(), accessibleResourcesBackup);
-
-        emit saveChangesFailed(QnResourceList() << user);
-    });
+            emit saveChangesFailed(QnResourceList() << user);
+        } );
 }
 
 void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,

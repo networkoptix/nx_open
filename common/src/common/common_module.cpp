@@ -18,14 +18,14 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
-#include <utils/common/product_features.h>
 #include "core/resource/camera_user_attribute_pool.h"
 #include "core/resource/media_server_user_attributes.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
-#include "utils/common/synctime.h"
 
+#include "utils/common/synctime.h"
+#include <utils/common/app_info.h>
 
 #include <nx/network/socket_global.h>
 
@@ -84,7 +84,6 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent)
     QnCommonMetaTypes::initialize();
 
     /* Init statics. */
-    qnProductFeatures();
     store<nx::utils::TimerManager>(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();

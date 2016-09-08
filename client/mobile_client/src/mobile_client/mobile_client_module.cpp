@@ -79,18 +79,13 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnAvailableCamerasWatcher>(availableCamerasWatcher);
     connect(userWatcher, &QnUserWatcher::userChanged, availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
-    auto cloudStatusWatcher = new QnCloudStatusWatcher();
-    cloudStatusWatcher->setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
-    cloudStatusWatcher->setCloudCredentials(qnClientCoreSettings->cloudLogin(),
-                                            qnClientCoreSettings->cloudPassword(),
-                                            true);
-    common->store<QnCloudStatusWatcher>(cloudStatusWatcher);
+    common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
 
-    QnModuleFinder *moduleFinder = new QnModuleFinder(true, false);
+    auto moduleFinder = new QnModuleFinder(true);
     common->store<QnModuleFinder>(moduleFinder);
     moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
     moduleFinder->start();

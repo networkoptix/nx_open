@@ -8,6 +8,7 @@
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
+#include <network/connection_validator.h>
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
@@ -88,7 +89,10 @@ namespace
             const QnModuleInformation &moduleInformation,
             Qn::ResourceStatus currentStatus = Qn::Online)
     {
-        Qn::ResourceStatus status = moduleInformation.isCompatibleToCurrentSystem() ? Qn::Online : Qn::Incompatible;
+        Qn::ResourceStatus status =
+            QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation)
+            ? Qn::Online
+            : Qn::Incompatible;
         if (status == Qn::Online && currentStatus == Qn::Unauthorized)
             status = Qn::Unauthorized;
 
@@ -96,7 +100,7 @@ namespace
     }
 }
 
-QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
+QnModuleFinder::QnModuleFinder(bool clientMode) :
     m_itemsMutex(QnMutex::Recursive),
     m_elapsedTimer(),
     m_timer(new QTimer(this)),
@@ -105,9 +109,6 @@ QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_helper(new QnDirectModuleFinderHelper(this, clientMode))
 {
-    m_multicastModuleFinder->setCompatibilityMode(compatibilityMode);
-    m_directModuleFinder->setCompatibilityMode(compatibilityMode);
-
     connect(m_multicastModuleFinder.data(), &QnMulticastModuleFinder::responseReceived,     this, &QnModuleFinder::at_responseReceived);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::responseReceived,        this, &QnModuleFinder::at_responseReceived);
 
@@ -132,11 +133,6 @@ QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
 QnModuleFinder::~QnModuleFinder()
 {
     pleaseStop();
-}
-
-bool QnModuleFinder::isCompatibilityMode() const
-{
-    return m_multicastModuleFinder->isCompatibilityMode();
 }
 
 QnMulticastModuleFinder *QnModuleFinder::multicastModuleFinder() const
@@ -256,6 +252,15 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) co
     return m_moduleItemById.value(moduleId).moduleInformation;
 }
 
+QnModuleInformation QnModuleFinder::moduleInformation(const QnMediaServerResourcePtr& server) const
+{
+    auto id = server->getOriginalGuid();
+    if (id.isNull())
+        id = server->getId();
+
+    return moduleInformation(id);
+}
+
 QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const
 {
     QnMutexLocker lk(&m_itemsMutex);
@@ -289,7 +294,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     {
         NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 since peer id mismatch (old %2, new %3)")
             .arg(endpoint.toString()).arg(oldId.toString()).arg(moduleInformation.id.toString()),
-            cl_logDEBUG1);
+            cl_logDEBUG2);
         removeAddress(endpoint, true, ignoredUrlsForServer(oldId));
     }
 
@@ -313,12 +318,13 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     if (!item.moduleInformation.id.isNull() &&
         (item.moduleInformation.runtimeId != moduleInformation.runtimeId) &&
         !item.addresses.contains(endpoint)) // Same ip:port with different runtime id means that
-                                            // server was restarted    
+                                            // server was restarted
     {
         bool oldModuleIsValid = item.moduleInformation.systemName == qnCommon->localSystemName();
         bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
 
-        if (oldModuleIsValid == newModuleIsValid) {
+        if (oldModuleIsValid == newModuleIsValid)
+        {
             oldModuleIsValid = item.moduleInformation.customization == QnAppInfo::customizationName();
             newModuleIsValid = moduleInformation.customization == QnAppInfo::customizationName();
         }
@@ -358,7 +364,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         foreach (const SocketAddress &endpoint, item.addresses)
         {
             NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 due to server conflict")
-                .arg(endpoint.toString()), cl_logDEBUG1);
+                .arg(endpoint.toString()), cl_logDEBUG2);
             removeAddress(endpoint, true);
         }
     }
@@ -378,7 +384,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
                 if (endpoint.port == item.moduleInformation.port)
                 {
                     NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 due to module information change")
-                        .arg(endpoint.toString()), cl_logDEBUG1);
+                        .arg(endpoint.toString()), cl_logDEBUG2);
                     removeAddress(endpoint, true);
                 }
             }
@@ -433,7 +439,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         }
 
         NX_LOGX(lit("New module URL: %1 %2")
-               .arg(moduleInformation.id.toString()).arg(endpoint.toString()), cl_logDEBUG1);
+               .arg(moduleInformation.id.toString()).arg(endpoint.toString()), cl_logDEBUG2);
 
         emit moduleAddressFound(moduleInformation, endpoint);
     }
@@ -456,7 +462,7 @@ void QnModuleFinder::at_timer_timeout()
         QnUuid id = m_idByAddress.value(address);
         QSet<QUrl> ignoredUrls = ignoredUrlsForServer(id);
         NX_LOG(lit("QnModuleFinder::at_timer_timeout. Removing address %1 by timeout")
-            .arg(address.toString()), cl_logDEBUG1);
+            .arg(address.toString()), cl_logDEBUG2);
         removeAddress(address, false, ignoredUrls);
     }
 }
@@ -474,7 +480,7 @@ void QnModuleFinder::at_server_auxUrlsChanged(const QnResourcePtr &resource)
     {
         const SocketAddress addr(url.host(), url.port(port));
         NX_LOG(lit("QnModuleFinder::at_server_auxUrlsChanged. Removing address %1")
-            .arg(addr.toString()), cl_logDEBUG1);
+            .arg(addr.toString()), cl_logDEBUG2);
         removeAddress(addr, false, ignoredUrls);
     }
 }
@@ -498,7 +504,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
 
     bool alreadyLost = it->primaryAddress.isNull();
 
-    if (it->primaryAddress == address) 
+    if (it->primaryAddress == address)
     {
         updatePrimaryAddress(*it, pickPrimaryAddress(it->addresses, ignoredUrls));
         alreadyLost = it->primaryAddress.isNull();
@@ -519,7 +525,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
     }
 
     NX_LOGX(lit("Module URL lost: %1 %2:%3")
-           .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);
+           .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG2);
 
     emit moduleAddressLost(moduleInformation, address);
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
@@ -528,7 +534,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
     if (!it->addresses.isEmpty())
         return;
 
-    NX_LOGX(lit("Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+    NX_LOGX(lit("Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG2);
 
     QnModuleInformation moduleInformationCopy = moduleInformation;
     SocketAddress primaryAddress = it->primaryAddress;
@@ -607,7 +613,7 @@ void QnModuleFinder::removeModule(const QnUuid &id)
     for (const SocketAddress &address : addresses)
     {
         NX_LOG(lit("QnModuleFinder::removeModule(%1). Removing address %2")
-            .arg(id.toString()).arg(address.toString()), cl_logDEBUG1);
+            .arg(id.toString()).arg(address.toString()), cl_logDEBUG2);
         removeAddress(address, false);
     }
 }

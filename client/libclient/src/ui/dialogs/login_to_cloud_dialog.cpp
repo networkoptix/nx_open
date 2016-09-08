@@ -1,7 +1,7 @@
 #include "login_to_cloud_dialog.h"
 #include "ui_login_to_cloud_dialog.h"
 
-#include <client/client_settings.h>
+#include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
 
@@ -66,10 +66,15 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
     connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
 
-    ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
-    ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), QnCloudUrlHelper::restorePasswordUrl()));
+    using nx::vms::utils::SystemUri;
+    QnCloudUrlHelper urlHelper(
+        SystemUri::ReferralSource::DesktopClient,
+        SystemUri::ReferralContext::SettingsDialog);
 
-    ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), QnCloudUrlHelper::aboutUrl()));
+    ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
+    ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
+
+    ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
 
@@ -161,14 +166,16 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     showCredentialsError(false);
 
-    qnCloudStatusWatcher->setCloudCredentials(QString(), QString());
+    qnCloudStatusWatcher->resetCloudCredentials();
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
-    qnCloudStatusWatcher->setCloudCredentials(q->ui->loginInputField->text().trimmed(),
-        q->ui->passwordInputField->text().trimmed());
+
+    qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+        q->ui->loginInputField->text().trimmed(),
+        q->ui->passwordInputField->text().trimmed()));
 }
 
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status)
@@ -183,9 +190,10 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
     Q_Q(QnLoginToCloudDialog);
 
-    qnSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
+    //TODO: #GDM Store temporary credentials?
+    qnClientCoreSettings->setCloudLogin(q->ui->loginInputField->text().trimmed());
     const bool stayLoggedIn = q->ui->stayLoggedInChackBox->isChecked();
-    qnSettings->setCloudPassword(stayLoggedIn
+    qnClientCoreSettings->setCloudPassword(stayLoggedIn
         ? q->ui->passwordInputField->text().trimmed()
         : QString());
 

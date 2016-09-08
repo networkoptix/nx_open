@@ -2,7 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnUserProfileWidget;
 class QnUserSettingsWidget;
@@ -16,11 +16,11 @@ namespace Ui
     class UserSettingsDialog;
 }
 
-class QnUserSettingsDialog: public QnWorkbenchStateDependentTabbedDialog
+class QnUserSettingsDialog: public QnSessionAwareTabbedDialog
 {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentTabbedDialog base_type;
+    typedef QnSessionAwareTabbedDialog base_type;
 
 public:
     enum DialogPage
@@ -44,12 +44,12 @@ protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
     virtual void retranslateUi() override;
 
-    virtual bool hasChanges() const override;
     virtual void applyChanges() override;
 
     virtual void showEvent(QShowEvent* event) override;
 
 private:
+    void applyChangesInternal();
     void updateControlsVisibility();
     void permissionsChanged();
 
@@ -72,4 +72,4 @@ private:
 
 };
 
-
+Q_DECLARE_METATYPE(QnUserSettingsDialog::DialogPage)

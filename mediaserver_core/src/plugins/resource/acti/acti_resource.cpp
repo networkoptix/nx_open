@@ -43,7 +43,7 @@ QnActiResource::QnActiResource()
     setVendor(lit("ACTI"));
 
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
-        m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
+        m_availBitrate.push_back(DEFAULT_AVAIL_BITRATE_KBPS[i]);
 }
 
 QnActiResource::~QnActiResource()
@@ -89,10 +89,10 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
         if( msgBody.startsWith("ERROR: bad account") )
             return completionHandler( false );
 
-        QMap<QByteArray, QByteArray> report = QnActiResource::parseSystemInfo( msgBody );
-        QByteArray mac = report.value("mac address");
+        auto report = QnActiResource::parseSystemInfo( msgBody );
+        auto mac = report.value("mac address");
         mac.replace( ':', '-' );
-        completionHandler( mac == resourceMac.toLatin1() );
+        completionHandler(mac == resourceMac);
     };
 
     nx_http::downloadFileAsync(
@@ -193,13 +193,16 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     return result;
 }
 
-QMap<QByteArray, QByteArray> QnActiResource::parseSystemInfo(const QByteArray& report)
+QnActiResource::ActiSystemInfo QnActiResource::parseSystemInfo(const QByteArray& report)
 {
-    QMap<QByteArray, QByteArray> result;
-    QList<QByteArray> lines = report.split('\n');
-    for(const QByteArray& line: lines) {
-        QList<QByteArray> tmp = line.split('=');
-        result.insert(tmp[0].trimmed().toLower(), tmp.size() >= 2 ? tmp[1].trimmed() : "");
+    ActiSystemInfo result;
+    auto lines = report.split('\n');
+    for(const auto& line: lines)
+    {
+        auto tmp = line.split('=');
+        result.insert(
+            QString::fromUtf8(tmp[0]).trimmed().toLower(), 
+            QString::fromUtf8(tmp.size() >= 2 ? tmp[1].trimmed() : ""));
     }
 
     return result;
@@ -251,7 +254,7 @@ QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) co
         if (bitrate.endsWith("M"))
             coeff = 1000;
         bitrate.chop(1);
-        result << bitrate.toFloat()*coeff;
+        result.push_back(bitrate.toFloat()*coeff);
     }
     return result;
 }
@@ -325,14 +328,15 @@ CameraDiagnostics::Result QnActiResource::initInternal()
             QString::fromUtf8(serverReport));
     }
 
-    QMap<QByteArray, QByteArray> report = parseSystemInfo(serverReport);
+    auto report = parseSystemInfo(serverReport);
 
-    setFirmware(QString::fromUtf8(report.value("firmware version")));
-    setMAC(QnMacAddress(QString::fromUtf8(report.value("mac address"))));
+    setFirmware(report.value("firmware version"));
+    setMAC(QnMacAddress(report.value("mac address")));
 
     m_platform = report.value("platform")
         .trimmed()
-        .toUpper();
+        .toUpper()
+        .toLatin1();
 
     bool dualStreaming = report.value("channels").toInt() > 1 ||
         !report.value("video2_resolution_cap").isEmpty() ||
@@ -452,9 +456,12 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     m_hasAudio = report.value("audio").toInt() > 0
         && isRtspAudioSupported(m_platform, getFirmware().toUtf8());
 
-    QByteArray bitrateCap = report.value("video_bitrate_cap");
+    auto bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())
-        m_availBitrate = parseVideoBitrateCap(bitrateCap);
+    {
+        m_availBitrate = parseVideoBitrateCap(bitrateCap.toLatin1());
+        m_rawBitrate = bitrateCap.split(',');
+    }
 
     initializeIO(report);
 
@@ -667,6 +674,44 @@ int QnActiResource::getMaxFps() const
     return m_availFps[0].last();
 }
 
+QString QnActiResource::formatBitrateString(int bitrateKbps) const
+{
+    if (bitrateKbps < 1000)
+    {
+        return lit("%1K").arg(bitrateKbps);
+    }
+    else
+    {
+        bool usePoint = true;
+
+        if (!m_rawBitrate.empty())
+        {
+            int bitrateIndex = -1;
+            for(size_t i=0; i < m_availBitrate.size(); ++i)
+            {
+                if (bitrateKbps == m_availBitrate[i])
+                {
+                    bitrateIndex = i;
+                    break;
+                }
+            }
+
+            if (bitrateIndex != -1 && m_rawBitrate.size() > bitrateIndex)
+            {
+                usePoint = m_rawBitrate[bitrateIndex].indexOf('.') != -1;
+            }
+        }
+
+        QString tpl = usePoint ? lit("%1.%2M") : lit("%1M");
+        QString result = tpl.arg(bitrateKbps/1000);
+
+        if(usePoint)
+            result = result.arg((bitrateKbps%1000)/100);
+
+        return result;
+    }
+}
+
 QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
 {
     return (role == Qn::CR_LiveVideo ? m_resolution[0] : m_resolution[1]);
@@ -802,9 +847,9 @@ void QnActiResource::onTimer( const quint64& timerID )
             TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }
 
-void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )
+void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
 {
-    QMap<QByteArray, QByteArray>::const_iterator it = systemInfo.find( "di" );
+    auto it = systemInfo.find( "di" );
     if( it != systemInfo.end() )
         m_inputCount = it.value().toInt();
     if( m_inputCount > 0 )

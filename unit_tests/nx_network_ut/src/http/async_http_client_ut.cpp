@@ -1,8 +1,3 @@
-/**********************************************************
-* 26 dec 2014
-* a.kolesnikov
-***********************************************************/
-
 #include <condition_variable>
 #include <chrono>
 #include <memory>
@@ -14,8 +9,10 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/future.h>
 #include <utils/media/custom_output_stream.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
@@ -26,14 +23,12 @@
 
 namespace nx_http {
 
-class AsyncHttpClientTest
-:
+class AsyncHttpClientTest:
     public ::testing::Test
 {
 public:
-    AsyncHttpClientTest()
-    :
-        m_testHttpServer( std::make_unique<TestHttpServer>() )
+    AsyncHttpClientTest():
+        m_testHttpServer(std::make_unique<TestHttpServer>())
     {
     }
 
@@ -48,41 +43,43 @@ protected:
 
 //TODO #ak introduce built-in http server to automate AsyncHttpClient tests
 
-void testHttpClientForFastRemove( const QUrl& url )
+namespace {
+static void testHttpClientForFastRemove(const QUrl& url)
 {
-    nx_http::AsyncHttpClient::create()->doGet( url );
+    nx_http::AsyncHttpClient::create()->doGet(url);
 
     // use different delays (10us - 0.5s) to catch problems on different stages
-    for( uint time = 10; time < 500000; time *= 2 )
+    for (uint time = 10; time < 500000; time *= 2)
     {
         const auto client = nx_http::AsyncHttpClient::create();
-        client->doGet( url );
+        client->doGet(url);
 
         // kill the client after some delay
-        std::this_thread::sleep_for( std::chrono::microseconds( time ) );
+        std::this_thread::sleep_for(std::chrono::microseconds(time));
     }
 }
+} // namespace
 
-TEST_F( AsyncHttpClientTest, FastRemove )
+TEST_F(AsyncHttpClientTest, FastRemove)
 {
-    testHttpClientForFastRemove( lit( "http://127.0.0.1/" ) );
-    testHttpClientForFastRemove( lit( "http://localhost/" ) );
-    testHttpClientForFastRemove( lit( "http://doestNotExist.host/" ) );
+    testHttpClientForFastRemove(lit("http://127.0.0.1/"));
+    testHttpClientForFastRemove(lit("http://localhost/"));
+    testHttpClientForFastRemove(lit("http://doestNotExist.host/"));
 }
 
-TEST_F( AsyncHttpClientTest, FastRemoveBadHost )
+TEST_F(AsyncHttpClientTest, FastRemoveBadHost)
 {
-    QUrl url( lit( "http://doestNotExist.host/" ) );
+    QUrl url(lit("http://doestNotExist.host/"));
 
-    for( int i = 0; i < 1000; ++i )
+    for (int i = 0; i < 1000; ++i)
     {
         const auto client = nx_http::AsyncHttpClient::create();
-        client->doGet( url );
-        std::this_thread::sleep_for( std::chrono::microseconds( 100 ) );
+        client->doGet(url);
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 }
 
-TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
+TEST_F(AsyncHttpClientTest, motionJpegRetrieval)
 {
     static const int CONCURRENT_CLIENT_COUNT = 100;
 
@@ -92,24 +89,25 @@ TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
     const nx::String boundary = "fbdr";
 
     const nx::Buffer testFrame =
-        "\r\n--"+boundary+
+        "\r\n--" + boundary +
         "\r\n"
         "Content-Type: image/jpeg\r\n"
         "\r\n"
-        +frame1;
+        + frame1;
 
     m_testHttpServer->registerRequestProcessor<RepeatingBufferSender>(
         "/mjpg",
-        [&]()->std::unique_ptr<RepeatingBufferSender>{
+        [&]()->std::unique_ptr<RepeatingBufferSender>
+        {
             return std::make_unique<RepeatingBufferSender>(
-                "multipart/x-mixed-replace;boundary="+boundary,
-                testFrame );
-        } );
+                "multipart/x-mixed-replace;boundary=" + boundary,
+                testFrame);
+        });
 
-    ASSERT_TRUE( m_testHttpServer->bindAndListen() );
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //fetching mjpeg with async http client
-    const QUrl url( lit("http://127.0.0.1:%1/mjpg").arg( m_testHttpServer->serverAddress().port) );
+    const QUrl url(lit("http://127.0.0.1:%1/mjpg").arg(m_testHttpServer->serverAddress().port));
 
     struct ClientContext
     {
@@ -123,40 +121,42 @@ TEST_F( AsyncHttpClientTest, motionJpegRetrieval )
         nx_http::MultipartContentParser multipartParser;
     };
 
-    std::atomic<size_t> bytesProcessed( 0 );
+    std::atomic<size_t> bytesProcessed(0);
 
-    auto checkReceivedContentFunc = [&]( const QnByteArrayConstRef& data ){
-        ASSERT_EQ( data, frame1 );
+    auto checkReceivedContentFunc = [&](const QnByteArrayConstRef& data) {
+        ASSERT_EQ(data, frame1);
         bytesProcessed += data.size();
     };
 
-    std::vector<ClientContext> clients( CONCURRENT_CLIENT_COUNT );
-    for( ClientContext& clientCtx: clients )
+    std::vector<ClientContext> clients(CONCURRENT_CLIENT_COUNT);
+    for (ClientContext& clientCtx : clients)
     {
         clientCtx.client = nx_http::AsyncHttpClient::create();
-        clientCtx.multipartParser.setNextFilter( makeCustomOutputStream( checkReceivedContentFunc ) );
+        clientCtx.multipartParser.setNextFilter(makeCustomOutputStream(checkReceivedContentFunc));
         QObject::connect(
             clientCtx.client.get(), &nx_http::AsyncHttpClient::responseReceived,
             clientCtx.client.get(),
-            [&]( nx_http::AsyncHttpClientPtr client ) {
-                ASSERT_TRUE( client->response() != nullptr );
-                ASSERT_EQ( client->response()->statusLine.statusCode, nx_http::StatusCode::ok );
-                auto contentTypeIter = client->response()->headers.find( "Content-Type" );
-                ASSERT_TRUE( contentTypeIter != client->response()->headers.end() );
-                clientCtx.multipartParser.setContentType( contentTypeIter->second );
+            [&](nx_http::AsyncHttpClientPtr client)
+            {
+                ASSERT_TRUE(client->response() != nullptr);
+                ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
+                auto contentTypeIter = client->response()->headers.find("Content-Type");
+                ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
+                clientCtx.multipartParser.setContentType(contentTypeIter->second);
             },
-            Qt::DirectConnection );
+            Qt::DirectConnection);
         QObject::connect(
             clientCtx.client.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
             clientCtx.client.get(),
-            [&]( nx_http::AsyncHttpClientPtr client ) {
-                clientCtx.multipartParser.processData( client->fetchMessageBodyBuffer() );
+            [&](nx_http::AsyncHttpClientPtr client)
+            {
+                clientCtx.multipartParser.processData(client->fetchMessageBodyBuffer());
             },
-            Qt::DirectConnection );
-        clientCtx.client->doGet( url );
+            Qt::DirectConnection);
+        clientCtx.client->doGet(url);
     }
 
-    std::this_thread::sleep_for( std::chrono::seconds( 7 ) );
+    std::this_thread::sleep_for(std::chrono::seconds(7));
 
     clients.clear();
 }
@@ -196,17 +196,18 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
         client.get(), &nx_http::AsyncHttpClient::done,
         client.get(),
         [&](nx_http::AsyncHttpClientPtr client)
-    {
-        ASSERT_FALSE(client->failed());
-        ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
-        ASSERT_EQ(client->fetchMessageBodyBuffer(), expectedResponse);
-        auto contentTypeIter = client->response()->headers.find("Content-Type");
-        ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
+        {
+            ASSERT_FALSE(client->failed());
+            ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
+            ASSERT_EQ(client->fetchMessageBodyBuffer(), expectedResponse);
+            auto contentTypeIter = client->response()->headers.find("Content-Type");
+            ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
 
-        QnMutexLocker lock(&mutex);
-        requestFinished = true;
-        waitCond.wakeAll();
-    }, Qt::DirectConnection);
+            QnMutexLocker lock(&mutex);
+            requestFinished = true;
+            waitCond.wakeAll();
+        },
+        Qt::DirectConnection);
 
     static const int kWaitTimeoutMs = 1000 * 10;
     // step 0: check if client reconnect smoothly if server already dropped connection
@@ -245,5 +246,117 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
     }
 }
 
+static QByteArray kBrokenResponse
+(
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Length: 100\r\n\r\n"
+    "not enough content"
+);
+
+TEST_F(AsyncHttpClientTest, ConnectionBreak)
+{
+    nx::utils::promise<int> serverPort;
+    std::thread serverThread(
+        [&]()
+        {
+            const auto server = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+            ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+            ASSERT_TRUE(server->listen());
+            serverPort.set_value(server->getLocalAddress().port);
+
+            std::unique_ptr<AbstractStreamSocket> client(server->accept());
+            ASSERT_TRUE((bool)client);
+
+            QByteArray buffer(1024, Qt::Uninitialized);
+            int size = 0;
+            while (!buffer.contains(QByteArray("\r\n\r\n", 4)))
+            {
+                auto recv = client->recv(buffer.data() + size, buffer.size() - size);
+                ASSERT_GT(recv, 0);
+                size += recv;
+            }
+
+            buffer.resize(size);
+            ASSERT_EQ(client->send(kBrokenResponse.data(), kBrokenResponse.size()), kBrokenResponse.size());
+        });
+
+    auto client = nx_http::AsyncHttpClient::create();
+    nx::utils::promise<void> clientDone;
+    QObject::connect(
+        client.get(), &nx_http::AsyncHttpClient::done,
+        [&](nx_http::AsyncHttpClientPtr client)
+        {
+            EXPECT_TRUE(client->failed());
+            EXPECT_EQ(client->fetchMessageBodyBuffer(), QByteArray("not enough content"));
+            EXPECT_EQ(client->lastSysErrorCode(), SystemError::connectionReset);
+            clientDone.set_value();
+        });
+
+    client->doGet(lit("http://127.0.0.1:%1/test").arg(serverPort.get_future().get()));
+    serverThread.join();
+    clientDone.get_future().wait();
+}
+
+namespace {
+class TestHandler:
+    public nx_http::AbstractHttpRequestHandler
+{
+public:
+    TestHandler(int requestNumber):
+        m_mimeType("text/plain"),
+        m_response("qweqweqwewqeqwe"),
+        m_requestNumber(requestNumber)
+    {
+    }
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const connection,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        std::function<void(
+            const nx_http::StatusCode::Value statusCode,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)> completionHandler)
+    {
+        if (m_requestNumber > 0)
+            connection->closeConnection(SystemError::connectionReset);
+
+        completionHandler(
+            nx_http::StatusCode::ok,
+            std::make_unique< nx_http::BufferSource >(m_mimeType, m_response));
+    }
+
+private:
+    const nx_http::StringType m_mimeType;
+    const QByteArray m_response;
+    int m_requestNumber;
+};
+} // namespace
+
+TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
+{
+    static const char* testPath = "/ConnectionBreakAfterReceivingSecondRequest";
+
+    std::atomic<int> requestCounter(0);
+    ASSERT_TRUE(
+        testHttpServer()->registerRequestProcessor<TestHandler>(
+            testPath,
+            [&requestCounter]() mutable
+            {
+                return std::make_unique<TestHandler>(requestCounter++);
+            }));
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+    QUrl testUrl(lit("http://%1%2")
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(QString::fromLatin1(testPath)));
+
+    nx_http::HttpClient httpClient;
+    ASSERT_TRUE(httpClient.doGet(testUrl));
+    ASSERT_NE(nullptr, httpClient.response());
+    ASSERT_EQ(SystemError::noError, httpClient.lastSysErrorCode());
+    ASSERT_FALSE(httpClient.doGet(testUrl));
+    ASSERT_NE(SystemError::noError, httpClient.lastSysErrorCode());
+}
 
 } // namespace nx_http

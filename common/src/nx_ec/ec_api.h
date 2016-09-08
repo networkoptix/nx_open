@@ -603,6 +603,12 @@ class ECConnectionNotificationManager;
             );
         }
 
+        ErrorCode rebuildTransactionLogSync()
+        {
+            int(AbstractMiscManager::*fn)(impl::SimpleHandlerPtr) = &AbstractMiscManager::rebuildTransactionLog;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, std::placeholders::_1));
+        }
+
         template<class TargetType, class HandlerType> int markLicenseOverflow(bool value, qint64 time, TargetType *target, HandlerType handler) {
             return markLicenseOverflow(value, time, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -617,6 +623,7 @@ class ECConnectionNotificationManager;
     protected:
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
+        virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 
@@ -680,10 +687,10 @@ class ECConnectionNotificationManager;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
-        virtual ECConnectionNotificationManager* notificationManager() 
-        { 
+        virtual ECConnectionNotificationManager* notificationManager()
+        {
             NX_ASSERT(0);
-            return nullptr; 
+            return nullptr;
         }
 
         /*!
@@ -758,8 +765,7 @@ class ECConnectionNotificationManager;
         Q_OBJECT
 
     public:
-        AbstractECConnectionFactory():
-            m_compatibilityMode(false)
+        AbstractECConnectionFactory()
         {}
         virtual ~AbstractECConnectionFactory() {}
 
@@ -787,25 +793,10 @@ class ECConnectionNotificationManager;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
 
-        /**
-        * \returns                         Whether this connection factory is working in compatibility mode.
-        *                                  In this mode all clients are supported regardless of customization.
-        */
-        bool isCompatibilityMode() const {
-            return m_compatibilityMode;
-        }
-
-        //! \param compatibilityMode         New compatibility mode state.
-        void setCompatibilityMode(bool compatibilityMode) {
-            m_compatibilityMode = compatibilityMode;
-        }
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
                                   impl::ConnectHandlerPtr handler ) = 0;
-
-    private:
-        bool m_compatibilityMode;
     };
 }
 

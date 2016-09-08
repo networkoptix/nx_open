@@ -4,6 +4,9 @@
 
 #include <api/app_server_connection.h>
 
+#include <client/desktop_client_message_processor.h>
+#include <client_core/client_core_settings.h>
+
 #include <core/resource/user_resource.h>
 
 #include <common/common_module.h>
@@ -21,7 +24,11 @@
 
 QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_cloudUrlHelper(new QnCloudUrlHelper(
+        nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
+        nx::vms::utils::SystemUri::ReferralContext::CloudMenu,
+        this))
 {
     connect(action(QnActions::LoginToCloud), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_loginToCloudAction_triggered);
@@ -33,9 +40,9 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
         &QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered);
 
     connect(action(QnActions::OpenCloudRegisterUrl), &QAction::triggered, this,
-        []()
+        [this]()
         {
-            QDesktopServices::openUrl(QnCloudUrlHelper::createAccountUrl());
+            QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());
         });
 }
 
@@ -48,7 +55,7 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
     if (!m_loginToCloudDialog)
     {
         m_loginToCloudDialog = new QnLoginToCloudDialog(mainWindow());
-        m_loginToCloudDialog->setLogin(qnSettings->cloudLogin());
+        m_loginToCloudDialog->setLogin(qnClientCoreSettings->cloudLogin());
         m_loginToCloudDialog->show();
 
         connect(m_loginToCloudDialog, &QnLoginToCloudDialog::finished, this,
@@ -64,24 +71,32 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
-    qnSettings->setCloudPassword(QString());
-    qnCloudStatusWatcher->setCloudPassword(QString());
+    qnClientCoreSettings->setCloudPassword(QString());
+
+    /* Updating login if were logged under temporary credentials. */
+    qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
+        qnCloudStatusWatcher->effectiveUserName(), QString()));
+
+    /* Check if we need to logout if logged in under this user. */
+    const auto state = qnDesktopClientMessageProcessor->connectionState();
+    if (state == QnConnectionState::Disconnected)
+        return;
 
     QString currentLogin = QnAppServerConnectionFactory::url().userName();
     if (currentLogin.isEmpty())
         return;
 
-    if (qnCloudStatusWatcher->cloudLogin() == currentLogin)
+    if (qnCloudStatusWatcher->effectiveUserName() == currentLogin)
         menu()->trigger(QnActions::DisconnectAction,
             QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
 void QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered()
 {
-    QDesktopServices::openUrl(QnCloudUrlHelper::mainUrl());
+    QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl());
 }
 
 void QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered()
 {
-    QDesktopServices::openUrl(QnCloudUrlHelper::accountManagementUrl());
+    QDesktopServices::openUrl(m_cloudUrlHelper->accountManagementUrl());
 }

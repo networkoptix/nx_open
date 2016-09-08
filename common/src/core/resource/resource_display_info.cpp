@@ -62,7 +62,7 @@ SocketAddress getServerUrl(const QnMediaServerResourcePtr& server)
             return address;
     }
 
-    return SocketAddress();
+    return primaryUrl;
 }
 
 const QString kFormatTemplate = lit("%1 (%2)");

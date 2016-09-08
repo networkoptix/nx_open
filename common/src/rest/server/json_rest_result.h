@@ -26,7 +26,7 @@ public:
     };
 
     /** Presents error as corresponding text with some arguments.
-        E.g., ErrorDescriptor(MissingParameter, "id").text() 
+        E.g., ErrorDescriptor(MissingParameter, "id").text()
             will return text like "Missing required parameter 'id'".
         \note Introduced for error text unification
     */
@@ -70,6 +70,15 @@ public:
         T result;
         QJson::deserialize(reply, &result);
         return result;
+    }
+
+    /**
+     * Convenience function which creates serialized JSON result.
+     */
+    static void writeError(QByteArray* outBody, Error error, const QString& errorMessage) {
+        QnJsonRestResult jsonRestResult;
+        jsonRestResult.setError(error, errorMessage);
+        *outBody = QJson::serialized(jsonRestResult);
     }
 };
 

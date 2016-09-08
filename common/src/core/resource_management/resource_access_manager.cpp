@@ -450,6 +450,9 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
+    if (!data.groupId.isNull() && m_userGroups.find(data.groupId) == m_userGroups.end())
+        return false;
+
     return canCreateUser(user, data.permissions, data.isAdmin);
 }
 
@@ -767,7 +770,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         case QnUserType::Ldap:
             return permissions &~ (Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
         case QnUserType::Cloud:
-            return permissions &~ (Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+            return permissions &~ (Qn::WritePasswordPermission | Qn::WriteEmailPermission | Qn::WriteFullNamePermission);
         default:
             break;
         }
@@ -940,6 +943,9 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiUserData& update) const
 {
+    if (!update.groupId.isNull() && m_userGroups.find(update.groupId) == m_userGroups.end())
+        return false;
+
     auto userResource = target.dynamicCast<QnUserResource>();
     NX_ASSERT(userResource);
 

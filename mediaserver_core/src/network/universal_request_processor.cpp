@@ -15,6 +15,7 @@
 #include "utils/gzip/gzip_compressor.h"
 #include <nx/network/flash_socket/types.h>
 #include <rest/server/rest_connection_processor.h>
+#include <utils/common/app_info.h>
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
@@ -256,7 +257,8 @@ bool QnUniversalRequestProcessor::needStandardProxy(const nx_http::Request& requ
 
 bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request)
 {
-    return request.requestLine.url.path().startsWith("/cdb") ||
+    return request.requestLine.url.host() == QnAppInfo::defaultCloudHost() ||
+           request.requestLine.url.path().startsWith("/cdb") ||
            request.requestLine.url.path().startsWith("/nxcloud");
 }
 

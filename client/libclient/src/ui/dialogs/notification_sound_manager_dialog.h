@@ -1,26 +1,24 @@
-#ifndef NOTIFICATION_SOUND_MANAGER_DIALOG_H
-#define NOTIFICATION_SOUND_MANAGER_DIALOG_H
-
-#include <QtWidgets/QDialog>
+#pragma once
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
-    class QnNotificationSoundManagerDialog;
+class QnNotificationSoundManagerDialog;
 }
 
-class QnAppServerNotificationCache;
+class QnNotificationSoundModel;
 
-class QnNotificationSoundManagerDialog : public QnWorkbenchStateDependentButtonBoxDialog {
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
-
+class QnNotificationSoundManagerDialog: public QnSessionAwareButtonBoxDialog
+{
     Q_OBJECT
+
+    using base_type = QnSessionAwareButtonBoxDialog;
 public:
     explicit QnNotificationSoundManagerDialog(QWidget *parent = 0);
     ~QnNotificationSoundManagerDialog();
-private slots:
+    private slots:
     void enablePlayButton();
 
     void at_playButton_clicked();
@@ -29,6 +27,5 @@ private slots:
     void at_deleteButton_clicked();
 private:
     QScopedPointer<Ui::QnNotificationSoundManagerDialog> ui;
+    QnNotificationSoundModel* m_model;
 };
-
-#endif // NOTIFICATION_SOUND_MANAGER_DIALOG_H

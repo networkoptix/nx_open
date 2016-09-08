@@ -43,10 +43,6 @@ extern "C" {
 #include <algorithm>
 #include <functional>
 
-/* Boost headers. */
-#include <boost/foreach.hpp>
-#include <boost/array.hpp>
-
 /* QT headers. */
 #include <QtWidgets/QAction>
 

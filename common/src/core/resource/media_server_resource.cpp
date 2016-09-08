@@ -314,7 +314,13 @@ void QnMediaServerResource::setSslAllowed(bool sslAllowed)
 
         m_sslAllowed = sslAllowed;
         if (m_apiConnection)
-            m_apiConnection->setUrl(m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed)));
+        {
+            auto url = m_primaryAddress.isNull()
+                ? m_apiConnection->url()
+                : m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed));
+            url.setScheme(apiUrlScheme(m_sslAllowed));
+            m_apiConnection->setUrl(url);
+        }
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -505,6 +511,7 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
     moduleInformation.type = QnModuleInformation::nxMediaServerId();
+    moduleInformation.brand = QnAppInfo::productName();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     moduleInformation.name = getName();

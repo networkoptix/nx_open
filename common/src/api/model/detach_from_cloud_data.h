@@ -13,4 +13,4 @@ struct DetachFromCloudData: public PasswordData
 
 #define DetachFromCloudData_Fields PasswordData_Fields
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (DetachFromCloudData), (json));
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((DetachFromCloudData), (json))

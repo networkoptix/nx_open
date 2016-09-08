@@ -18,6 +18,9 @@
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/user_watcher.h>
+#include <helpers/cloud_url_helper.h>
+
+using namespace nx::vms::utils;
 
 namespace {
 
@@ -30,7 +33,11 @@ QnContext::QnContext(QObject* parent) :
     m_connectionManager(new QnConnectionManager(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this)),
-    m_uiController(new QnMobileClientUiController(this))
+    m_uiController(new QnMobileClientUiController(this)),
+    m_cloudUrlHelper(new QnCloudUrlHelper(
+        SystemUri::ReferralSource::MobileClient,
+        SystemUri::ReferralContext::WelcomePage,
+        this))
 {
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged,
             this, [this]()
@@ -186,9 +193,10 @@ QString QnContext::getLastUsedUrl() const
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
+    //TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
-    cloudStatusWatcher()->setCloudCredentials(login, password);
+    cloudStatusWatcher()->setCloudCredentials(QnCredentials(login, password));
     qnClientCoreSettings->save();
 }
 

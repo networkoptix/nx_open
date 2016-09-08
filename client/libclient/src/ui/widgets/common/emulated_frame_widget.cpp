@@ -3,11 +3,11 @@
 #include <QtGui/QMouseEvent>
 
 #include <ui/common/frame_section.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 namespace {
 
     const int cursorUpdateTimeoutMSec = 30;
-
 } // anonymous namespace
 
 
@@ -71,10 +71,15 @@ void QnEmulatedFrameWidget::startDragProcess(DragInfo *) {
     m_timer.stop();
 }
 
-void QnEmulatedFrameWidget::dragMove(DragInfo *info) {
-    if(m_section == Qt::TitleBarArea) {
-        move(m_startPosition + info->mouseScreenPos() - info->mousePressScreenPos());
-    } else {
+void QnEmulatedFrameWidget::dragMove(DragInfo *info)
+{
+    if(m_section == Qt::TitleBarArea)
+    {
+        const auto diff = (info->mouseScreenPos() - info->mousePressScreenPos());
+        move(m_startPosition + diff);
+    }
+    else
+    {
         resize(m_startSize + Qn::calculateSizeDelta(info->mouseScreenPos() - info->mousePressScreenPos(), m_section));
         move(pos() + m_startPinPoint - Qn::calculatePinPoint(geometry(), m_section));
     }
@@ -101,7 +106,7 @@ void QnEmulatedFrameWidget::updateCursor(const QPoint &mousePos) {
     } else if(!m_timer.isActive()) {
         m_timer.start(cursorUpdateTimeoutMSec, this);
     }
- 
+
     if(cursor().shape() != shape)
         setCursor(shape);
 
@@ -118,6 +123,5 @@ void QnEmulatedFrameWidget::showNormal() {
     base_type::showNormal();
     m_dragProcessor->setHandler(this);
 }
-
 
 

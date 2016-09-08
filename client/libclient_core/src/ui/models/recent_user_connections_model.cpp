@@ -64,10 +64,10 @@ namespace
 
 }
 
-QnRecentUserConnectionsModel::QnRecentUserConnectionsModel(QObject *parent)
-    : base_type(parent)
-    , m_systemName()
-    , m_data()
+QnRecentUserConnectionsModel::QnRecentUserConnectionsModel(QObject *parent):
+    base_type(parent),
+    m_systemName(),
+    m_data()
 {
     QnClientRecentConnectionsManager::instance()->addModel(this);
 }
@@ -119,9 +119,9 @@ void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataLi
         const auto connectionData = filteredData.at(newIndex);
         const auto it = std::find_if(m_data.begin(), m_data.end(),
             [connectionData](const QnUserRecentConnectionData &data)
-        {
-            return (data.url.userName() == connectionData.url.userName());
-        });
+            {
+                return (data.url.userName() == connectionData.url.userName());
+            });
 
         if (it == m_data.end())
         {

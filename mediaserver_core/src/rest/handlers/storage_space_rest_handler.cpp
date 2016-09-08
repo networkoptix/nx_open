@@ -40,20 +40,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
 
     QnStorageSpaceReply reply;
 
-    auto enoughSpace = [](const QnStorageResourcePtr& storage)
-    {
-        qint64 totalSpace = storage->getTotalSpace();
-
-        /* We should always display invalid storages. */
-        if (totalSpace == QnStorageResource::kUnknownSize)
-            return true;
-
-        return totalSpace >= QnFileStorageResource::calcSpaceLimit(
-            storage->getUrl()
-        );
-    };
-
-    auto enumerate = [enoughSpace, fastRequest, &reply] (const QnStorageResourceList &storages)
+    auto enumerate = [fastRequest, &reply] (
+        const QnStorageResourceList& storages,
+        const QSet<QnStorageResourcePtr>& writableStorages)
     {
         for (const auto& storage: storages)
         {
@@ -61,14 +50,18 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
                 continue;
 
             QnStorageSpaceData data(storage, fastRequest);
-            if (!fastRequest && !enoughSpace(storage))
-                data.isWritable = false;
+            if (!fastRequest)
+                data.isWritable = writableStorages.contains(storage);
             reply.storages.push_back(data);
         }
     };
 
-    enumerate(qnNormalStorageMan->getStorages());
-    enumerate(qnBackupStorageMan->getStorages());
+    enumerate(
+        qnNormalStorageMan->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : qnNormalStorageMan->getAllWritableStorages());
+    enumerate(
+        qnBackupStorageMan->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : qnBackupStorageMan->getAllWritableStorages());
 
     if (!fastRequest)
     {
@@ -159,7 +152,6 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
         if (storage)
         {
             storage->setUrl(data.url); /* createStorage does not fill url. */
-            storage->setSpaceLimit(QnFileStorageResource::calcSpaceLimit(partition.type));
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
             data.isWritable = storage->initOrUpdate() && storage->isWritable();

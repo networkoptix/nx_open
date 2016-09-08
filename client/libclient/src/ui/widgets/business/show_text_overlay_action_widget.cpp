@@ -30,7 +30,6 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
     ui->setupUi(this);
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
-    connect(ui->customTextCheckBox,     &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
 
     connect(ui->useSourceCheckBox,      &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
@@ -55,6 +54,8 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
 
         ui->customTextEdit->setPlainText(useCustomText
             ? m_lastCustomText : getPlaceholderText());
+
+        ui->customTextEdit->setEnabled(useCustomText);
         paramsChanged();
     });
 

@@ -118,7 +118,7 @@ cp $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/libisd_native_plugin.so 
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
-cp ./usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
+cp usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
