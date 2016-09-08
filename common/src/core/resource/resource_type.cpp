@@ -212,15 +212,15 @@ QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, con
     QnMutexLocker lock( &m_mutex );
     QnUuid result;
     int bestLen = -1;
-    NX_LOG(lit("STARTING TO SEARCH RT FOR %1 %2").arg(manufacture).arg(name), cl_logINFO);
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
         if (rt->getManufacture() == manufacture)
         {
-            NX_LOG(lit("CHECKING RT %1").arg(rt->getName()), cl_logINFO);
             int len = rt->getName().length();
             if (len > bestLen && rt->getName() == name.left(len)) {
-                NX_LOG(lit("RT %1 SATISFIES GIVEN CONDITIONS").arg(rt->getName()), cl_logINFO);
+                NX_LOG(lit("RT %1 SATISFIES GIVEN CONDITIONS, UUID IS %2")
+                    .arg(rt->getName())
+                    .arg(rt->getId().toString()), cl_logINFO);
                 result = rt->getId();
                 bestLen = len;
                 if (len == name.length())
@@ -228,7 +228,6 @@ QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, con
             }
         }
     }
-
 
     return result;
 }
