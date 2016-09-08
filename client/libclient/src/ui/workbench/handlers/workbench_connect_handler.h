@@ -42,8 +42,6 @@ public:
     };
 
 private:
-    bool connected() const;
-
     void showLoginDialog();
     void showWelcomeScreen();
 

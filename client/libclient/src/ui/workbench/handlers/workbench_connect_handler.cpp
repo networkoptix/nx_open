@@ -267,7 +267,9 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     auto validState = m_state.state() == QnConnectionState::Connecting
         || m_state.state() == QnConnectionState::Reconnecting;
-    NX_ASSERT(validState);
+    if (!validState)
+        return;
+    //NX_ASSERT(validState);
     m_connectingHandle = 0;
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
@@ -584,8 +586,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
         return;
 
     QUrl currentUrl = QnAppServerConnectionFactory::url();
-    if (connected())
-        disconnectFromServer(true);
+    disconnectFromServer(true);
 
     // Do not store connections in case of reconnection
     m_state.setState(QnConnectionState::Connecting);
@@ -601,18 +602,6 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
     disconnectFromServer(force);
     qnSettings->setAutoLogin(false);
     qnSettings->save();
-}
-
-bool QnWorkbenchConnectHandler::connected() const
-{
-    bool stateful = qnClientMessageProcessor->connectionState() != QnConnectionState::Disconnected;
-    bool localState = m_state.state() != QnConnectionState::Disconnected;
-    bool oldValue = !qnCommon->remoteGUID().isNull();
-    qDebug() << "mp" << QnConnectionStateUtils::toString(qnClientMessageProcessor->connectionState());
-    qDebug() << "local" << QnConnectionStateUtils::toString(m_state.state());
-    NX_ASSERT(stateful == oldValue);
-
-    return oldValue;
 }
 
 QnWorkbenchConnectHandler::ConnectionSettingsPtr
