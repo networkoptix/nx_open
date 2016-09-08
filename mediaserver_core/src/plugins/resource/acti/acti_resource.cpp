@@ -134,7 +134,7 @@ QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
     bool isDigit = params[0].at(0) >= '0' && params[0].at(0) <= '9';
     if (!isDigit)
         params[0] = params[0].mid(1);
-    
+
     return QSize(params[0].trimmed().toInt(), params[1].trimmed().toInt());
 }
 
@@ -171,7 +171,7 @@ CLHttpStatus QnActiResource::makeActiRequest(
         msgBody->clear();
         client.readAll(*msgBody);
         if (msgBody->startsWith("ERROR: bad account"))
-            return CL_HTTP_AUTH_REQUIRED; 
+            return CL_HTTP_AUTH_REQUIRED;
     }
 
     if (!keepAllData)
@@ -204,7 +204,7 @@ QnActiResource::ActiSystemInfo QnActiResource::parseSystemInfo(const QByteArray&
     {
         auto tmp = line.split('=');
         result.insert(
-            QString::fromUtf8(tmp[0]).trimmed().toLower(), 
+            QString::fromUtf8(tmp[0]).trimmed().toLower(),
             QString::fromUtf8(tmp.size() >= 2 ? tmp[1].trimmed() : ""));
     }
 
@@ -263,7 +263,7 @@ QMap<int, QString> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrat
             bitrate.left(bitrate.size() - 1).toDouble() * coeff,
             bitrate);
     }
-    
+
     return result;
 }
 
@@ -272,13 +272,13 @@ QString QnActiResource::bitrateToDefaultString(int bitrateKbps) const
     const int kKbitInMbit = 1000;
     if (bitrateKbps < kKbitInMbit)
         return lit("%1K").arg(bitrateKbps);
-    
+
     return lit("%1.%2M").arg(bitrateKbps / 1000).arg((bitrateKbps % 1000) / 100);
 }
 
 bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const
 {
-    QByteArray rtspAudio[][2] = 
+    QByteArray rtspAudio[][2] =
     {
         {"T",  "4.13"}, // Platform and minimum allowed firmware version
         {"K",  "5.08"},
@@ -318,26 +318,26 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
 
     CLHttpStatus status;
-        
+
     QByteArray resolutions= makeActiRequest(
-        lit("system"), 
-        lit("VIDEO_RESOLUTION_CAP"), 
+        lit("system"),
+        lit("VIDEO_RESOLUTION_CAP"),
         status);
 
-    if (status == CL_HTTP_AUTH_REQUIRED) 
+    if (status == CL_HTTP_AUTH_REQUIRED)
         setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
     {
         return CameraDiagnostics::RequestFailedResult(
-            lit("/cgi-bin/encoder?VIDEO_REOLUTION_CAP"), 
+            lit("/cgi-bin/encoder?VIDEO_REOLUTION_CAP"),
             QString::fromUtf8(resolutions));
     }
 
     QByteArray serverReport = makeActiRequest(
-        lit("system"), 
-        lit("SYSTEM_INFO"), 
-        status, 
+        lit("system"),
+        lit("SYSTEM_INFO"),
+        status,
         true);
 
     if (status != CL_HTTP_SUCCESS)
@@ -389,14 +389,14 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     if (dualStreaming)
     {
-        if (report.contains("streaming mode") 
-            && report.value("streaming mode") != lit("DUAL"))  
+        if (report.contains("streaming mode")
+            && report.value("streaming mode") != lit("DUAL"))
         {
             makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=DUAL"), status);
 
             if (status != CL_HTTP_SUCCESS)
             {
-                auto message = 
+                auto message =
                     lit("Unable to set up dual streaming mode for camera %1, %2")
                     .arg(getModel())
                     .arg(getUrl());
@@ -411,41 +411,41 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     if (dualStreaming) {
         resolutions = makeActiRequest(
-            lit("system"), 
-            lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"), 
+            lit("system"),
+            lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
             status);
 
         if (status == CL_HTTP_SUCCESS)
         {
             availResolutions = parseResolutionStr(resolutions);
-            int maxSecondaryRes = 
-                SECONDARY_STREAM_MAX_RESOLUTION.width() 
+            int maxSecondaryRes =
+                SECONDARY_STREAM_MAX_RESOLUTION.width()
                 * SECONDARY_STREAM_MAX_RESOLUTION.height();
 
             float currentAspect = getResolutionAspectRatio(m_resolution[0]);
 
             m_resolution[1] = getNearestResolution(
-                SECONDARY_STREAM_DEFAULT_RESOLUTION, 
-                currentAspect, 
-                maxSecondaryRes, 
+                SECONDARY_STREAM_DEFAULT_RESOLUTION,
+                currentAspect,
+                maxSecondaryRes,
                 availResolutions);
 
             if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
             {
                 // try to get resolution ignoring aspect ration
                 m_resolution[1] = getNearestResolution(
-                    SECONDARY_STREAM_DEFAULT_RESOLUTION, 
-                    0.0, 
-                    maxSecondaryRes, 
+                    SECONDARY_STREAM_DEFAULT_RESOLUTION,
+                    0.0,
+                    maxSecondaryRes,
                     availResolutions);
             }
-        } 
+        }
     }
 
     // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
     auto response = makeActiRequest(
-        lit("system"), 
-        lit("RTP_B2=1"), 
+        lit("system"),
+        lit("RTP_B2=1"),
         status);
 
     if (status != CL_HTTP_SUCCESS)
@@ -465,8 +465,8 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     }
 
     auto fpsList = fpsString.split(';');
-    
-    for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i) 
+
+    for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i)
     {
         QList<QByteArray> fps = fpsList[i].split(',');
 
@@ -489,7 +489,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
 
-    m_hasAudio = report.value("audio").toInt() > 0 
+    m_hasAudio = report.value("audio").toInt() > 0
         && isRtspAudioSupported(m_platform, getFirmware().toUtf8());
 
     auto bitrateCap = report.value("video_bitrate_cap");
@@ -873,6 +873,11 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
         m_outputCount = it.value().toInt();
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
+
+    auto ports = getInputPortList();
+    for (auto item: getRelayOutputList())
+        ports.push_back(item);
+    setIOPorts(ports);
 }
 
 bool QnActiResource::getParamPhysical(const QString& id, QString& value)
