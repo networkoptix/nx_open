@@ -1895,7 +1895,6 @@ void MediaServerProcess::run()
     {
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
         serverFlags |= Qn::SF_HasLiteClient;
-        // TODO mike: Consider creating LiteClientLayout here (if not yet exists).
     }
 
     if (compatibilityMode) // check compatibilityMode here for testing purpose
