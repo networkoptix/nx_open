@@ -752,6 +752,9 @@ namespace ec2
     {
         using namespace std::placeholders;
 
+        if (transport->remotePeer().peerType != Qn::PT_Server)
+            return;
+
         if( transport->isIncoming() )
         {
             //peer connected to us
