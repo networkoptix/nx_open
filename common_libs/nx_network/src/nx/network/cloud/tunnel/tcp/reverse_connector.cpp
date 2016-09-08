@@ -69,7 +69,13 @@ std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()
     if (buffer.size())
         socket->injectRecvData(std::move(buffer));
 
-    return socket;
+    if (socket->setSendTimeout(0) && socket->setRecvTimeout(0))
+        return socket;
+
+    NX_LOGX(lm("Could not disable timeouts on HTTP socket: %1")
+        .arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+
+    return nullptr;
 }
 
 boost::optional<size_t> ReverseConnector::getPoolSize() const

@@ -129,6 +129,9 @@ void IncomingReverseTunnelConnection::saveConnection(
     }
 
     auto socket = connector->takeSocket();
+    if (!socket)
+        return spawnConnectorIfNeeded();
+
     if (m_keepAliveOptions && !socket->setKeepAlive(m_keepAliveOptions))
     {
         NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2): %3")
