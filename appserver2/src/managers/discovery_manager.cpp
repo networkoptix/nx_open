@@ -7,6 +7,19 @@
 
 namespace ec2 {
 
+ApiDiscoveryData toApiDiscoveryData(
+    const QnUuid &id,
+    const QUrl &url,
+    bool ignore)
+{
+    ApiDiscoveryData params;
+    params.id = id;
+    params.url = url.toString();
+    params.ignore = ignore;
+    return params;
+}
+
+
 void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction)
 {
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
@@ -64,10 +77,13 @@ template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(url);
+    ApiDiscoverPeerData params;
+    params.url = url.toString();
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::discoverPeer,
+        params,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -85,10 +101,10 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(ApiCommand::addDiscoveryInformation, id, url, ignore);
-
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::addDiscoveryInformation,
+        toApiDiscoveryData(id, url, ignore),
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -106,10 +122,10 @@ int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(ApiCommand::removeDiscoveryInformation, id, url, ignore);
-
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::removeDiscoveryInformation,
+        toApiDiscoveryData(id, url, ignore),
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -143,10 +159,11 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(discoveredServer);
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::discoveredServerChanged,
+        discoveredServer,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -162,10 +179,11 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(discoveredServersList);
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::discoveredServersList,
+        discoveredServersList,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -173,51 +191,6 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
     );
 
     return reqId;
-}
-
-template<class QueryProcessorType>
-QnTransaction<ApiDiscoveryData> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value command,
-        const QnUuid &id,
-        const QUrl &url,
-        bool ignore) const
-{
-    QnTransaction<ApiDiscoveryData> transaction(command);
-    transaction.params.id = id;
-    transaction.params.url = url.toString();
-    transaction.params.ignore = ignore;
-
-    return transaction;
-}
-
-template<class QueryProcessorType>
-QnTransaction<ApiDiscoverPeerData> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(
-        const QUrl &url) const
-{
-    QnTransaction<ApiDiscoverPeerData> transaction(ApiCommand::discoverPeer);
-    transaction.params.url = url.toString();
-
-    return transaction;
-}
-
-template<class QueryProcessorType>
-QnTransaction<ApiDiscoveredServerData> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(
-        const ApiDiscoveredServerData &discoveredServer) const
-{
-    QnTransaction<ApiDiscoveredServerData> transaction(ApiCommand::discoveredServerChanged);
-    transaction.params = discoveredServer;
-
-    return transaction;
-}
-
-template<class QueryProcessorType>
-QnTransaction<ApiDiscoveredServerDataList> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(
-        const ApiDiscoveredServerDataList &discoveredServersList) const
-{
-    QnTransaction<ApiDiscoveredServerDataList> transaction(ApiCommand::discoveredServersList);
-    transaction.params = discoveredServersList;
-
-    return transaction;
 }
 
 template class QnDiscoveryManager<ServerQueryProcessorAccess>;

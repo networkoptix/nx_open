@@ -2,11 +2,15 @@
 
 #include <api/model/password_data.h>
 
-#include <utils/common/synctime.h>
 #include <nx/network/http/auth_tools.h>
 
-static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
-static const int MSEC_PER_SEC = 1000;
+#include <utils/common/synctime.h>
+#include <core/resource_management/resource_properties.h>
+
+namespace {
+    static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
+    static const int MSEC_PER_SEC = 1000;
+}
 
 
 QnUserResource::QnUserResource(QnUserType userType):
@@ -289,8 +293,9 @@ void QnUserResource::setEmail(const QString& email)
 
 QString QnUserResource::fullName() const
 {
+    QString result = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
     QnMutexLocker locker(&m_mutex);
-    return m_fullName;
+    return result.isNull() ? m_fullName : result;
 }
 
 void QnUserResource::setFullName(const QString& value)

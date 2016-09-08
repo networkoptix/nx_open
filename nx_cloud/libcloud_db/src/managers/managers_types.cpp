@@ -18,6 +18,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(EntityType,
     (EntityType::system, "system")
     (EntityType::subscription, "subscription")
     (EntityType::product, "product")
+    (EntityType::maintenance, "maintenance")
     )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(DataActionType,
@@ -38,9 +39,15 @@ api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
         case nx::db::DBResult::notFound:
             return api::ResultCode::notFound;
 
+        case nx::db::DBResult::cancelled:
+            return api::ResultCode::retryLater;
+
         case nx::db::DBResult::ioError:
         case nx::db::DBResult::statementError:
             return api::ResultCode::dbError;
+
+        case nx::db::DBResult::retryLater:
+            return api::ResultCode::retryLater;
     }
 
     return api::ResultCode::dbError;

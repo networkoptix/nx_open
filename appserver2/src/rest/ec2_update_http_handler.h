@@ -11,7 +11,6 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/fusion/model_functions.h>
 
-#include <common/common_module.h>
 #include <rest/server/request_handler.h>
 #include <transaction/transaction.h>
 #include <rest/server/json_rest_result.h>
@@ -33,12 +32,12 @@ template<
 class UpdateHttpHandler: public QnRestRequestHandler
 {
 public:
-    typedef std::function<void(const QnTransaction<RequestData>&)> CustomActionFuncType;
+    typedef std::function<void(const RequestData)> CustomActionFunc;
     typedef std::shared_ptr<Connection> ConnectionPtr;
 
     explicit UpdateHttpHandler(
         const ConnectionPtr& connection,
-        CustomActionFuncType customAction = CustomActionFuncType())
+        CustomActionFunc customAction = CustomActionFunc())
         :
         m_connection(connection),
         m_customAction(customAction)
@@ -64,22 +63,23 @@ public:
         QByteArray& contentType,
         const QnRestConnectionProcessor* owner) override
     {
+        const ApiCommand::Value command = extractCommandFromPath(path);
+        if (command == ApiCommand::NotDefined)
+            return nx_http::StatusCode::notFound;
+
         const QByteArray srcFormat = srcBodyContentType.split(';')[0];
 
         const Qn::SerializationFormat format =
             Qn::serializationFormatFromHttpContentType(srcFormat);
 
-        QnTransaction<RequestData> tran;
+        RequestData requestData;
         bool success = false;
-        auto httpStatusCode = buildTransaction(
-            &tran, format, path, body, &resultBody, &contentType, &success, owner);
+        auto httpStatusCode = buildRequestData(
+            &requestData, format, body, &resultBody, &contentType, &success, owner);
         if (!success)
             return httpStatusCode;
 
-        // Replace client GUID to own GUID (take transaction ownership).
-        tran.peerID = qnCommon->moduleGUID();
-
-        switch (processUpdateAsync(tran, owner))
+        switch (processUpdateAsync(command, requestData, owner))
         {
             case ErrorCode::ok: return nx_http::StatusCode::ok;
             case ErrorCode::forbidden: return nx_http::StatusCode::forbidden;
@@ -88,10 +88,9 @@ public:
     }
 
 private:
-    nx_http::StatusCode::Value buildTransaction(
-        QnTransaction<RequestData>* tran,
+    nx_http::StatusCode::Value buildRequestData(
+        RequestData* requestData,
         Qn::SerializationFormat format,
-        const QString& path,
         const QByteArray& body,
         QByteArray* outResultBody,
         QByteArray* outContentType,
@@ -105,42 +104,31 @@ private:
             {
                 *outContentType = "application/json";
 
-                auto httpStatusCode = buildTransactionFromJson(
-                    tran, path, body, outResultBody, outSuccess, owner);
+                auto httpStatusCode = buildRequestDataFromJson(
+                    requestData, body, outResultBody, outSuccess, owner);
                 if (!*outSuccess)
                     return httpStatusCode;
                 break;
             }
             case Qn::UbjsonFormat:
             {
-                *tran = QnUbjson::deserialized<QnTransaction<RequestData>>(
-                    body, QnTransaction<RequestData>(), outSuccess);
+                *requestData = QnUbjson::deserialized<RequestData>(
+                    body, RequestData(), outSuccess);
                 if (!*outSuccess) //< Ubjson deserialization error.
-                    return nx_http::StatusCode::internalServerError;
+                    return nx_http::StatusCode::invalidParameter;
                 break;
             }
             case Qn::UnsupportedFormat:
                 return nx_http::StatusCode::internalServerError;
 
-#if 0 // Deserialization for these formats is not implemented yet.
-            case Qn::CsvFormat:
-                *tran = QnCsv::deserialized<QnTransaction<RequestData>>(body);
-                break;
-            case Qn::XmlFormat:
-                *tran = QnXml::deserialized<QnTransaction<RequestData>>(body);
-                break;
-#endif // 0
-
             default:
                 return nx_http::StatusCode::notAcceptable;
         }
-        *outSuccess = true;
         return nx_http::StatusCode::ok;
     }
 
-    nx_http::StatusCode::Value buildTransactionFromJson(
-        QnTransaction<RequestData>* tran,
-        const QString& path,
+    nx_http::StatusCode::Value buildRequestDataFromJson(
+        RequestData* requestData,
         const QByteArray& body,
         QByteArray* outResultBody,
         bool* outSuccess,
@@ -149,7 +137,7 @@ private:
         *outSuccess = false;
 
         boost::optional<QJsonValue> incompleteJsonValue;
-        if (!QJson::deserializeAllowingOmittedValues(body, &tran->params, &incompleteJsonValue))
+        if (!QJson::deserializeAllowingOmittedValues(body, requestData, &incompleteJsonValue))
         {
             QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::InvalidParameter,
                 "Can't deserialize input Json data to destination object.");
@@ -158,27 +146,15 @@ private:
 
         if (incompleteJsonValue)
         {
-            // If transaction contains incomplete data, but merge is not possible (e.g. Id field is
+            // If requestData contains incomplete data, but merge is not possible (e.g. Id field is
             // omitted, object to merge with is not found in DB by Id, object type does not include
             // Id field), the behavior is the same as before introducing "merge" feature - attempt
-            // such incomplete transaction with default values for omitted json fields.
-            auto httpStatusCode = buildTransactionMergingIfNeeded(
-                incompleteJsonValue.get(), tran, outResultBody, outSuccess, owner, tran->params);
+            // such incomplete request with default values for omitted json fields.
+            auto httpStatusCode = buildRequestDataMergingIfNeeded(
+                requestData, incompleteJsonValue.get(), outResultBody, outSuccess, owner);
             if (!*outSuccess)
                 return httpStatusCode;
         }
-
-        QString commandStr = assignCommandFromLastPathItem(&tran->command, path);
-        if (tran->command == ApiCommand::NotDefined)
-        {
-            QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::InvalidParameter,
-                lit("Unknown API command %1").arg(commandStr));
-            return nx_http::StatusCode::ok;
-        }
-
-        // TODO: Temporary fix. Revert this check after merge with x_VMS-3408_cloud_sync.
-        if (tran->command == ApiCommand::restoreDatabase)
-            tran->isLocal = true;
 
         *outSuccess = true;
         return nx_http::StatusCode::ok;
@@ -186,34 +162,31 @@ private:
 
     // Called when RequestData is not inherited from ApiIdData - do not perform merge.
     template<typename T = RequestData>
-    nx_http::StatusCode::Value buildTransactionMergingIfNeeded(
-        const QJsonValue& incompleteJsonValue,
-        QnTransaction<RequestData>* tran,
-        QByteArray* outResultBody,
+    nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
+        T* /*requestData*/,
+        const QJsonValue& /*incompleteJsonValue*/,
+        QByteArray* /*outResultBody*/,
         bool* outSuccess,
-        const QnRestConnectionProcessor* owner,
-        const T& requestData,
+        const QnRestConnectionProcessor* /*owner*/,
         typename std::enable_if<!std::is_base_of<ApiIdData, T>::value
             || std::is_same<ApiIdData, T>::value>::type* = nullptr)
     {
-        QN_UNUSED(incompleteJsonValue, tran, outResultBody, owner, requestData);
         *outSuccess = true;
         return nx_http::StatusCode::ok;
     }
 
     // Called when RequestData is inherited from ApiIdData - attempt the merge.
     template<typename T = RequestData>
-    nx_http::StatusCode::Value buildTransactionMergingIfNeeded(
+    nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
+        T* requestData,
         const QJsonValue& incompleteJsonValue,
-        QnTransaction<RequestData>* tran,
         QByteArray* outResultBody,
         bool* outSuccess,
         const QnRestConnectionProcessor* owner,
-        const T& requestData,
         typename std::enable_if<std::is_base_of<ApiIdData, T>::value
             && !std::is_same<ApiIdData, T>::value>::type* = nullptr)
     {
-        if (requestData.id.isNull()) //< Id is omitted from request json - do not perform merge.
+        if (requestData->id.isNull()) //< Id is omitted from request json - do not perform merge.
         {
             *outSuccess = true;
             return nx_http::StatusCode::ok;
@@ -223,7 +196,7 @@ private:
 
         RequestData existingData;
         bool found = false;
-        switch (processQueryAsync(requestData.id, &existingData, &found, owner))
+        switch (processQueryAsync(requestData->id, &existingData, &found, owner))
         {
             case ErrorCode::ok:
                 if (!found)
@@ -252,7 +225,7 @@ private:
         QJson::serialize(existingData, &jsonValue);
         mergeJsonValues(&jsonValue, incompleteJsonValue);
 
-        if (!QJson::deserialize<RequestData>(jsonValue, &tran->params))
+        if (!QJson::deserialize<RequestData>(jsonValue, requestData))
         {
             QnJsonRestResult::writeError(outResultBody, QnJsonRestResult::CantProcessRequest,
                 "Unable to deserialize merged Json data to destination object.");
@@ -263,18 +236,10 @@ private:
         return nx_http::StatusCode::ok;
     }
 
-    QString assignCommandFromLastPathItem(ApiCommand::Value* outCommand, const QString& path)
+    ApiCommand::Value extractCommandFromPath(const QString& path)
     {
-        QStringList tmp = path.split('/');
-        while (!tmp.isEmpty() && tmp.last().isEmpty())
-            tmp.pop_back();
-        QString commandStr;
-        if (!tmp.isEmpty())
-        {
-            commandStr = tmp.last();
-            *outCommand = ApiCommand::fromString(commandStr);
-        }
-        return commandStr;
+        QString commandStr = path.split('/', QString::SkipEmptyParts).last();
+        return ApiCommand::fromString(commandStr);
     }
 
     template<typename T = RequestData>
@@ -321,7 +286,9 @@ private:
     }
 
     ErrorCode processUpdateAsync(
-        QnTransaction<RequestData>& tran, const QnRestConnectionProcessor* owner)
+        ApiCommand::Value command,
+        const RequestData& requestData,
+        const QnRestConnectionProcessor* owner)
     {
         ErrorCode errorCode = ErrorCode::ok;
         bool finished = false;
@@ -337,7 +304,7 @@ private:
 
         auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
         processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail
-        processor.processUpdateAsync(tran, queryDoneHandler);
+        processor.processUpdateAsync(command, requestData, queryDoneHandler);
 
         {
             QnMutexLocker lk(&m_mutex);
@@ -346,7 +313,7 @@ private:
         }
 
         if (m_customAction)
-            m_customAction(tran);
+            m_customAction(requestData);
 
         return errorCode;
     }
@@ -410,7 +377,7 @@ private:
     ConnectionPtr m_connection;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
-    CustomActionFuncType m_customAction;
+    CustomActionFunc m_customAction;
 };
 
 } // namespace ec2

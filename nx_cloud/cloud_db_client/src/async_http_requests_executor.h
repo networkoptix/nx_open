@@ -239,10 +239,13 @@ private:
                         return; //request has been cancelled...
                     m_runningRequests.erase(requestIter);
                 }
-                if (errCode != SystemError::noError || !response)
+                if ((errCode != SystemError::noError && errCode != SystemError::invalidData)
+                    || !response)
+                {
                     return completionHandler(
                         api::ResultCode::networkError,
                         OutputData()...);
+                }
 
                 api::ResultCode resultCode = api::ResultCode::ok;
                 const auto resultCodeStrIter =

@@ -74,17 +74,6 @@ void SystemManager::shareSystem(
         completionHandler);
 }
 
-void SystemManager::setSystemUserList(
-    api::SystemSharingList sharings,
-    std::function<void(api::ResultCode)> completionHandler)
-{
-    executeRequest(
-        kSystemSetSystemUserListPath,
-        std::move(sharings),
-        completionHandler,
-        completionHandler);
-}
-
 void SystemManager::getCloudUsersOfSystem(
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {

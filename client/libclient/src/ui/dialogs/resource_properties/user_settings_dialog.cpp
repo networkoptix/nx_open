@@ -330,16 +330,16 @@ void QnUserSettingsDialog::applyChanges()
     if (mode == QnUserSettingsModel::Invalid || mode == QnUserSettingsModel::OtherProfile)
         return;
 
-    if (m_user->getId().isNull())
-        m_user->fillId();
-
     //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
     //TODO: #GDM #access SafeMode what to rollback if we were creating new user
     qnResourcesChangesManager->saveUser(m_user,
         [this, mode](const QnUserResourcePtr& /*user*/)
         {
-            //here accessible resources will also be filled
+            //here accessible resources will also be filled to model
             applyChangesInternal();
+
+            if (m_user->getId().isNull())
+                m_user->fillId();
         });
 
     auto accessibleResources = qnResourceAccessManager->accessibleResources(m_user->getId());

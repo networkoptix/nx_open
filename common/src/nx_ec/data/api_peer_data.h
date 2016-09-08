@@ -27,7 +27,7 @@ namespace ec2
         }
 
         static bool isClient(Qn::PeerType peerType) {
-            return peerType != Qn::PT_Server;
+            return peerType != Qn::PT_Server && peerType != Qn::PT_CloudServer;
         }
 
         bool isClient() const {

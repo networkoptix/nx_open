@@ -89,7 +89,7 @@ public:
     bool hasPermission(
         const Qn::UserAccessData& accessRights,
         const QnResourcePtr& mediaResource,
-        Qn::Permission permissions) const;
+        Qn::Permissions permissions) const;
 
 
     /**

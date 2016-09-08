@@ -243,7 +243,7 @@ ErrorCode QnTransactionLog::saveToDB(
     const QnUuid& hash,
     const QByteArray& data)
 {
-    if (tran.isLocal)
+    if (tran.isLocal())
         return ErrorCode::ok; // local transactions just changes DB without logging
 
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("add transaction to log: %1 hash=%2").arg(tran.toString()).arg(hash.toString()), cl_logDEBUG1);
@@ -255,14 +255,14 @@ ErrorCode QnTransactionLog::saveToDB(
         NX_ASSERT(tran.persistentInfo.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
-    //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
-    query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?, ?, ?)");
     query.addBindValue(tran.peerID.toRfc4122());
     query.addBindValue(tran.persistentInfo.dbID.toRfc4122());
     query.addBindValue(tran.persistentInfo.sequence);
     query.addBindValue(tran.persistentInfo.timestamp);
     query.addBindValue(hash.toRfc4122());
     query.addBindValue(data);
+    query.addBindValue(tran.transactionType);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
@@ -370,8 +370,13 @@ bool QnTransactionLog::contains(const QnTranState& state) const
 
 ErrorCode QnTransactionLog::getTransactionsAfter(
 	const QnTranState& state,
+    bool onlyCloudData,
 	QList<QByteArray>& result)
 {
+    QString extraFilter;
+    if (onlyCloudData)
+        extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
+
     QnReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
     for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
@@ -379,7 +384,9 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
         const QnTranStateKey& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
         query.setForwardOnly(true);
-        query.prepare("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
+        query.prepare(lit("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? \
+            AND db_guid = ? AND sequence > ? \
+            %1 ORDER BY sequence").arg(extraFilter));
         query.addBindValue(key.peerID.toRfc4122());
         query.addBindValue(key.dbID.toRfc4122());
         query.addBindValue(state.values.value(key));
@@ -423,8 +430,9 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
 
 void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
 {
-    if (tran.persistentInfo.isNull()) {
-        if (!tran.isLocal)
+    if (tran.persistentInfo.isNull())
+    {
+        if (!tran.isLocal())
             tran.persistentInfo.sequence = currentSequenceNoLock() + 1;
         tran.persistentInfo.dbID = m_dbManager->getID();
         tran.persistentInfo.timestamp = getTimeStamp();

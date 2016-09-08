@@ -410,44 +410,99 @@ DROP TABLE account_old;                                                         
 
 //#CLOUD-185
 static const char kTemporaryAccountCredentials[] =
-"                                                                                               \
-ALTER TABLE account_password ADD COLUMN login VARCHAR(255);                                     \
-UPDATE account_password SET login=(select email from account where id=account_password.account_id);     \
-UPDATE account_password SET access_rights='+/cdb/account/update';                               \
-";                                                                                              
+R"sql(
+ALTER TABLE account_password ADD COLUMN login VARCHAR(255);
+UPDATE account_password SET login=(select email from account where id=account_password.account_id);
+UPDATE account_password SET access_rights='+/cdb/account/update';
+)sql";
 
 
 //#CLOUD-186
 static const char kTemporaryAccountCredentialsProlongationPeriod[] =
-"                                                                                               \
-ALTER TABLE account_password ADD COLUMN prolongation_period_sec INTEGER DEFAULT 0;              \
-";                                                                                              
+R"sql(
+ALTER TABLE account_password ADD COLUMN prolongation_period_sec INTEGER DEFAULT 0;
+)sql";
 
 
 //#VMS-3018
 static const char kAddCustomAndDisabledAccessRoles[] =
-"                                                                           \
-INSERT INTO access_role(id, description) VALUES(8, 'disabled');             \
-INSERT INTO access_role(id, description) VALUES(9, 'custom');               \
-UPDATE system_to_account SET access_role_id=access_role_id+2;               \
-UPDATE access_role SET description='disabled' WHERE id=1;                   \
-UPDATE access_role SET description='custom' WHERE id=2;                     \
-UPDATE access_role SET description='liveViewer' WHERE id=3;                 \
-UPDATE access_role SET description='viewer' WHERE id=4;                     \
-UPDATE access_role SET description='advancedViewer' WHERE id=5;             \
-UPDATE access_role SET description='localAdmin' WHERE id=6;                 \
-UPDATE access_role SET description='cloudAdmin' WHERE id=7;                 \
-UPDATE access_role SET description='maintenance' WHERE id=8;                \
-UPDATE access_role SET description='owner' WHERE id=9;                      \
-";
+R"sql(
+INSERT INTO access_role(id, description) VALUES(8, 'disabled');
+INSERT INTO access_role(id, description) VALUES(9, 'custom');
+UPDATE system_to_account SET access_role_id=access_role_id+2;
+UPDATE access_role SET description='disabled' WHERE id=1;
+UPDATE access_role SET description='custom' WHERE id=2;
+UPDATE access_role SET description='liveViewer' WHERE id=3;
+UPDATE access_role SET description='viewer' WHERE id=4;
+UPDATE access_role SET description='advancedViewer' WHERE id=5;
+UPDATE access_role SET description='localAdmin' WHERE id=6;
+UPDATE access_role SET description='cloudAdmin' WHERE id=7;
+UPDATE access_role SET description='maintenance' WHERE id=8;
+UPDATE access_role SET description='owner' WHERE id=9;
+)sql";
 
 //#CLOUD-468. Adding more fields to system_to_account
 static const char kAddMoreFieldsToSystemSharing[] =
-"                                                                           \
-ALTER TABLE system_to_account ADD COLUMN group_id VARCHAR(64) NULL;         \
-ALTER TABLE system_to_account ADD COLUMN custom_permissions VARCHAR(1024) NULL;   \
-ALTER TABLE system_to_account ADD COLUMN is_enabled INTEGER NULL;            \
-";
+R"sql(
+ALTER TABLE system_to_account ADD COLUMN group_id VARCHAR(64) NULL;
+ALTER TABLE system_to_account ADD COLUMN custom_permissions VARCHAR(1024) NULL;
+ALTER TABLE system_to_account ADD COLUMN is_enabled INTEGER NULL;
+)sql";
+
+//#CLOUD-486. Implementing saveUser vms transaction
+static const char kAddVmsUserIdToSystemSharing[] =
+R"sql(
+ALTER TABLE system_to_account ADD COLUMN vms_user_id VARCHAR(64) NULL;
+)sql";
+
+//#CLOUD-485. Adding system transaction log
+static const char kAddSystemTransactionLog[] =
+R"sql(
+CREATE TABLE transaction_log (
+    system_id   VARCHAR(64) NOT NULL,
+    peer_guid   VARCHAR(64) NOT NULL,
+    db_guid     VARCHAR(64) NOT NULL,
+    sequence    INTEGER NOT NULL,
+    timestamp   INTEGER NOT NULL,
+    tran_hash   VARCHAR(64) NOT NULL,
+    tran_data   BLOB NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX idx_transaction_key
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_hash
+    ON transaction_log(system_id, tran_hash);
+CREATE INDEX idx_transaction_time
+    ON transaction_log(system_id, timestamp);
+)sql";
+
+/**
+ * #CLOUD-485. Changing timestamp field type to BIGINT so that it can store UTC milliseconds
+ * @warning This script does not update transaction log, but clears it!
+ */
+static const char kChangeTransactionLogTimestampTypeToBigInt[] =
+R"sql(
+DROP TABLE transaction_log;
+
+CREATE TABLE transaction_log (
+    system_id   VARCHAR(64) NOT NULL,
+    peer_guid   VARCHAR(64) NOT NULL,
+    db_guid     VARCHAR(64) NOT NULL,
+    sequence    BIGINT NOT NULL,
+    timestamp   BIGINT NOT NULL,
+    tran_hash   VARCHAR(64) NOT NULL,
+    tran_data   BLOB NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX idx_transaction_log_key
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_log_hash
+    ON transaction_log(system_id, tran_hash);
+CREATE INDEX idx_transaction_log_time
+    ON transaction_log(system_id, timestamp);
+)sql";
 
 }   //db
 }   //cdb

@@ -124,6 +124,7 @@ private:
     void accountAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
+        QSqlDatabase* /*connection*/,
         nx::db::DBResult resultCode,
         data::AccountData accountData,
         data::AccountConfirmationCode resultData,
@@ -131,6 +132,7 @@ private:
     void accountReactivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
+        QSqlDatabase* /*connection*/,
         nx::db::DBResult resultCode,
         std::string email,
         data::AccountConfirmationCode resultData,
@@ -143,6 +145,7 @@ private:
         std::string* const accountEmail);
     void accountVerified(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*connection*/,
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         const std::string accountEmail,
@@ -155,6 +158,7 @@ private:
     void accountUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool authenticatedByEmailCode,
+        QSqlDatabase* /*connection*/,
         nx::db::DBResult resultCode,
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler);

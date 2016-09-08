@@ -68,8 +68,6 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
 
-        QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );
         QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
     };
 }

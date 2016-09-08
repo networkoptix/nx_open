@@ -120,11 +120,15 @@ bool SystemNameUpdate::getAsVariant(int resID, QVariant* const value) const
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemSharing)(SystemID)(SystemNameUpdate),
+    (SystemRegistrationData)(SystemID)(SystemNameUpdate),
     (sql_record),
     _Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemData),
+    (sql_record),
+    _FieldsEx);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemSharing),
     (sql_record),
     _FieldsEx);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

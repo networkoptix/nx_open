@@ -28,6 +28,10 @@
 namespace nx {
 namespace cdb {
 
+namespace conf {
+class Settings;
+}   // namespace conf
+
 class AbstractEmailManager
 {
 public:
@@ -65,7 +69,7 @@ protected:
 private:
     struct SendEmailTask
     {
-        ec2::ApiEmailData email;
+        ::ec2::ApiEmailData email;
         std::function<void( bool )> completionHandler;
     };
     

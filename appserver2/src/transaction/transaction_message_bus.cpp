@@ -82,7 +82,7 @@ struct SendTransactionToTransportFastFuction
         const QnTransactionTransportHeader &transportHeader) const
     {
         Q_UNUSED(bus)
-            return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
+        return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
     }
 };
 
@@ -505,6 +505,9 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
     if (!gotAliveData(tran.params, transport, &ttHeader))
         return; // ignore offline alive tran and resend online tran instead
 
+    if (transport->remotePeer().peerType == Qn::PT_CloudServer)
+        return; //< do not propagate cloud peer alive to other peers. It isn't used yet
+
     QnTransaction<ApiPeerAliveData> modifiedTran(tran);
     NX_ASSERT(!modifiedTran.params.peer.instanceId.isNull());
     modifiedTran.params.persistentState.values.clear(); // do not proxy persistent state to other peers. this checking required for directly connected peers only
@@ -600,7 +603,7 @@ void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* s
 template <class T>
 void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader)
 {
-    NX_ASSERT(!tran.isLocal);
+    NX_ASSERT(!tran.isLocal());
     transport->sendTransaction(tran, transportHeader);
 }
 
@@ -633,7 +636,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING)
         if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transcaction from peer %1 while sync with peer %2 in progress").
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
                 arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING);
         }
 
@@ -739,7 +742,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return;
     }
 
-    if (tran.isLocal && ApiPeerData::isServer(m_localPeerType))
+    if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
     {
         NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject local transaction", tran, transportHeader, sender), cl_logDEBUG1);
         return;
@@ -768,7 +771,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             onGotServerAliveInfo(tran, sender, transportHeader);
             return; // do not proxy. this call contains built in proxy
         case ApiCommand::forcePrimaryTimeServer:
-            TimeSynchronizationManager::instance()->primaryTimeServerChanged(tran);
+            TimeSynchronizationManager::instance()->onGotPrimariTimeServerTran(tran);
             break;
         case ApiCommand::broadcastPeerSystemTime:
             TimeSynchronizationManager::instance()->peerSystemTimeReceived(tran);
@@ -942,6 +945,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(
         tran.params.persistentState,
+        sender->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
         serializedTransactions);
 
     if (errorCode == ErrorCode::ok)
@@ -1226,7 +1230,7 @@ QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModul
         transaction.params.push_back(std::move(serverData));
     }
     transaction.peerID = qnCommon->moduleGUID();
-    transaction.isLocal = true;
+    transaction.transactionType = TransactionType::Local;
     return transaction;
 }
 

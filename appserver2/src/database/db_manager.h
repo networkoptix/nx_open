@@ -84,7 +84,7 @@ namespace detail
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
-            if (!tran.isLocal) {
+            if (!tran.isLocal()) {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
                 if (isContains == QnTransactionLog::Reason_Timestamp)
                     return ErrorCode::containsBecauseTimestamp;
@@ -94,7 +94,7 @@ namespace detail
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
-            if (tran.isLocal)
+            if (tran.isLocal())
                 return ErrorCode::ok;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
@@ -596,8 +596,8 @@ namespace detail
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
+        bool upgradeSerializedTransactions();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
-
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

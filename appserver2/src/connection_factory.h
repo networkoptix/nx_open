@@ -4,6 +4,7 @@
 #include <map>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
@@ -26,7 +27,9 @@ class Ec2DirectConnectionFactory:
     public QnJoinable
 {
 public:
-    Ec2DirectConnectionFactory(Qn::PeerType peerType);
+    Ec2DirectConnectionFactory(
+        Qn::PeerType peerType,
+        nx::utils::TimerManager* const timerManager);
     virtual ~Ec2DirectConnectionFactory();
 
     virtual void pleaseStop() override;

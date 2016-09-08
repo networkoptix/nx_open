@@ -315,7 +315,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         {
             const qint64 seekPos = seekDistribution(gen);
             ASSERT_TRUE(ioDevice->seek(seekPos));
-            ASSERT_TRUE(ioDevice->write(newData, newDataSize) == newDataSize);
+            ASSERT_EQ(newDataSize, ioDevice->write(newData, newDataSize));
             std::copy(newData, newData + newDataSize, data.begin() + seekPos);
         }
 

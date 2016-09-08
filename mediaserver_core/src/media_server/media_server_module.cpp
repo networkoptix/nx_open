@@ -16,6 +16,7 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
+#include "master_server_status_watcher.h"
 
 QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
     QObject(parent)

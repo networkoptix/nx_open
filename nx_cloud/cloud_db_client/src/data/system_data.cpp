@@ -103,8 +103,9 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
         urlQuery.queryItemValue(SystemSharing_groupID_field).toStdString();
     systemSharing->customPermissions =
         urlQuery.queryItemValue(SystemSharing_customPermissions_field).toStdString();
-    systemSharing->isEnabled =
-        urlQuery.queryItemValue(SystemSharing_isEnabled_field) == "true";
+    if (urlQuery.hasQueryItem(SystemSharing_isEnabled_field))
+        systemSharing->isEnabled =
+            urlQuery.queryItemValue(SystemSharing_isEnabled_field) == "true";
     return success;
 }
 
@@ -131,7 +132,7 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 }
 
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing)
+bool loadFromUrlQuery(const QUrlQuery& /*urlQuery*/, SystemSharingList* const /*systemSharing*/)
 {
     //TODO
     NX_EXPECT(false);
@@ -205,15 +206,15 @@ void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (json),
-    _Fields,
-    (optional, false))
+    _Fields/*,
+    (optional, false)*/)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
         (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json),
-    _Fields,
-    (optional, false))
+    _Fields/*,
+    (optional, false)*/)
 
 }   //api
 }   //cdb

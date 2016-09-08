@@ -368,6 +368,7 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath(
 
     //adding active period
     nx::utils::TimerManager::TimerGuard timerGuard(
+        nx::utils::TimerManager::instance(),
         nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnAuthHelper::authenticationExpired, this, authKey, std::placeholders::_1),
             std::chrono::milliseconds(std::min(periodMillis, MAX_AUTHENTICATION_KEY_LIFE_TIME_MS))));

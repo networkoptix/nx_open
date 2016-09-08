@@ -31,7 +31,8 @@ enum class EntityType
     account,
     system,
     subscription,
-    product
+    product,
+    maintenance,
     //...
 };
 

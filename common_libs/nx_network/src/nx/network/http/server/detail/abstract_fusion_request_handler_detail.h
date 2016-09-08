@@ -36,9 +36,7 @@ public:
     }
 
 protected:
-    std::function<void(
-        const nx_http::StatusCode::Value,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> )> m_completionHandler;
+    HttpRequestProcessedHandler m_completionHandler;
     Qn::SerializationFormat m_outputDataFormat;
     nx_http::Method::ValueType m_requestMethod;
 
@@ -63,7 +61,8 @@ protected:
         auto completionHandler = std::move( m_completionHandler );
         completionHandler(
             statusCode,
-            std::move(outputMsgBody) );
+            std::move(outputMsgBody),
+            ConnectionEvents());    //TODO #ak provide it to a upper level?
     }
 
     bool getDataFormat(
@@ -248,18 +247,13 @@ class BaseFusionRequestHandlerWithInput
     public BaseFusionRequestHandlerWithOutput<Output>
 {
 private:
-    typedef std::function<void(
-        const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
-    > RequestCompletionHandlerType;
-
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const /*response*/,
-        RequestCompletionHandlerType completionHandler ) override
+        HttpRequestProcessedHandler completionHandler ) override
     {
         this->m_completionHandler = std::move( completionHandler );
         this->m_requestMethod = request.requestLine.method;

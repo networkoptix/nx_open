@@ -101,6 +101,7 @@ private:
         TemporaryAccountCredentialsEx tempPasswordData);
     void tempPasswordAddedToDb(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*connection*/,
         nx::db::DBResult resultCode,
         TemporaryAccountCredentialsEx tempPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
@@ -110,6 +111,7 @@ private:
         std::string tempPasswordID);
     void tempPasswordDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*connection*/,
         nx::db::DBResult resultCode,
         std::string tempPasswordID,
         std::function<void(api::ResultCode)> completionHandler);

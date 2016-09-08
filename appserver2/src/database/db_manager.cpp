@@ -57,6 +57,22 @@ namespace ec2
 namespace detail
 {
 
+struct QnAbstractTransactionV1
+{
+    ApiCommand::Value command;
+    QnUuid peerID;
+    QnAbstractTransaction::PersistentInfo persistentInfo;
+    bool isLocal;
+};
+#define QnAbstractTransactionV1_Fields (command)(peerID)(persistentInfo)(isLocal)
+QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransactionV1, (ubjson))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnAbstractTransactionV1),
+    (ubjson),
+    _Fields,
+    (optional, false))
+
+
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
@@ -517,10 +533,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
     if( !defaultAdminPassword.isEmpty() )
     {
         if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
-            userResource->getRealm() != QnAppInfo::realm())
+            userResource->getRealm() != QnAppInfo::realm() ||
+            !userResource->isEnabled())
         {
             userResource->setPassword( defaultAdminPassword);
             userResource->generateHash();
+            userResource->setEnabled(true);
             updateUserResource = true;
         }
     }
@@ -994,7 +1012,7 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
     while (query.next()) {
         ApiResourceStatusData data;
         data.id = QnUuid::fromRfc4122(query.value(0).toByteArray());
-        QnUuid hash = transactionLog->transactionHash(data);
+        QnUuid hash = transactionHash(data);
         delQuery.bindValue(0, QnSql::serialized_field(hash));
         if (!delQuery.exec()) {
             qWarning() << Q_FUNC_INFO << __LINE__ << delQuery.lastError();
@@ -1066,7 +1084,7 @@ bool QnDbManager::removeOldCameraHistory()
     updQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1101,7 +1119,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
     updQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1144,7 +1162,7 @@ bool QnDbManager::fixBusinessRules()
     delQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1163,6 +1181,57 @@ bool QnDbManager::fixBusinessRules()
     }
     if (!m_dbJustCreated)
         m_needResyncbRules = true;
+    return true;
+}
+
+bool QnDbManager::upgradeSerializedTransactions()
+{
+    // migrate transaction log
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+
+    QSqlQuery updQuery(m_sdb);
+    updQuery.prepare(QString("UPDATE transaction_log SET tran_data = ?, tran_type = ? WHERE tran_guid = ?"));
+
+    while (query.next())
+    {
+        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        QByteArray srcData = query.value(1).toByteArray();
+        QnUbjsonReader<QByteArray> stream(&srcData);
+
+        QnAbstractTransactionV1 abstractTranV1;
+        const int srcDataSize  = QnUbjson::serialized(abstractTranV1).size();
+        if (!QnUbjson::deserialize(&stream, &abstractTranV1))
+        {
+            qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
+            return false;
+        }
+
+        QnAbstractTransaction updatedTran;
+        updatedTran.command = abstractTranV1.command;
+        updatedTran.peerID = abstractTranV1.peerID;
+        updatedTran.persistentInfo = abstractTranV1.persistentInfo;
+        if (abstractTranV1.isLocal)
+            updatedTran.transactionType = TransactionType::Local;
+
+        QByteArray dstData = QnUbjson::serialized(updatedTran);
+        dstData.append(srcData.mid(srcDataSize));
+
+        updQuery.addBindValue(dstData);
+        updQuery.addBindValue(updatedTran.transactionType);
+        updQuery.addBindValue(QnSql::serialized_field(tranGuid));
+        if (!updQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1321,6 +1390,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/52_fix_onvif_mt.sql"))
     {
         return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
+    }
+    else if (updateName == lit(":/updates/68_add_transaction_type.sql"))
+    {
+        return upgradeSerializedTransactions();
     }
 
     return true;
@@ -3540,16 +3613,18 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 //getUsers
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
-    const QString queryStr = R"(
+    QString queryStr = R"(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
         u.is_superuser as isAdmin, u.email,
         p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions,
-        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud, p.full_name as fullName
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud,
+        coalesce((SELECT value from vms_kvpair WHERE resource_guid = r.guid and name = '%1'), p.full_name) as fullName
         FROM vms_resource r
         JOIN auth_user u on u.id = r.id
         JOIN vms_userprofile p on p.user_id = u.id
         ORDER BY r.guid
     )";
+    queryStr = queryStr.arg(Qn::USER_FULL_NAME);
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);

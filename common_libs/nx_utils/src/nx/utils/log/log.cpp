@@ -156,6 +156,9 @@ private:
 
     void openFileImpl()
     {
+        if (m_file.is_open())
+            return;
+
         #ifdef Q_OS_WIN
             m_file.open(currFileName().toStdWString(), std::ios_base::app | std::ios_base::out);
         #else

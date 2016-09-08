@@ -9,9 +9,10 @@
 #include <include/cdb/connection.h>
 
 #include "account_manager.h"
-#include "async_http_requests_executor.h"
-#include "system_manager.h"
 #include "auth_provider.h"
+#include "async_http_requests_executor.h"
+#include "maintenance_manager.h"
+#include "system_manager.h"
 
 
 namespace nx {
@@ -39,6 +40,8 @@ public:
     virtual api::SystemManager* systemManager() override;
     //!Implemetation of api::Connection::authProvider
     virtual api::AuthProvider* authProvider() override;
+    //!Implemetation of api::Connection::maintenanceManager
+    virtual api::MaintenanceManager* maintenanceManager() override;
 
     //!Implemetation of api::Connection::setCredentials
     virtual void setCredentials(
@@ -50,7 +53,9 @@ public:
         const std::string& login,
         const std::string& password) override;
 
-    virtual void setProxyVia(const SocketAddress& proxyEndpoint) override;
+    virtual void setProxyVia(
+        const std::string& proxyHost,
+        unsigned short proxyPort) override;
 
     //!Implemetation of api::Connection::ping
     virtual void ping(
@@ -60,6 +65,7 @@ private:
     std::unique_ptr<AccountManager> m_accountManager;
     std::unique_ptr<SystemManager> m_systemManager;
     std::unique_ptr<AuthProvider> m_authProvider;
+    std::unique_ptr<MaintenanceManager> m_maintenanceManager;
 };
 
 }   //cl

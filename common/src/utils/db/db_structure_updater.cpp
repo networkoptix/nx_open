@@ -64,10 +64,11 @@ bool DBStructureUpdater::updateStructSync()
 
     //starting async operation
     m_dbManager->executeUpdate(
-        std::bind( &DBStructureUpdater::updateDbInternal, this, std::placeholders::_1 ),
-        [this]( DBResult dbResult ) {
-            m_dbUpdatePromise.set_value( dbResult );
-        } );
+        std::bind(&DBStructureUpdater::updateDbInternal, this, std::placeholders::_1),
+        [this](QSqlDatabase* /*connection*/, DBResult dbResult)
+        {
+            m_dbUpdatePromise.set_value(dbResult);
+        });
 
     //waiting for completion
     future.wait();
