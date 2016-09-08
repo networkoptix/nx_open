@@ -66,16 +66,18 @@ public:
 class CloudConnect
 {
 public:
+    struct TcpReverseOptions
+    {
+        uint16_t port;
+        size_t poolSize;
+        boost::optional<KeepAliveOptions> keepAlive;
+    };
+
     bool replaceHostAddressWithPublicAddress;
     bool allowIpTarget;
     QString fetchPublicIpUrl;
     QString publicIpAddress;
-
-    struct {
-        uint16_t port;
-        size_t poolSize;
-        boost::optional<KeepAliveOptions> keepAlive;
-    } tcpReverse;
+    TcpReverseOptions tcpReverse;
 
     CloudConnect();
 };
