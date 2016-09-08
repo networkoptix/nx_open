@@ -531,6 +531,8 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "fusectl" )
         return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "xfs" )
+        return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "pstore" )
         return QnPlatformMonitor::UnknownPartition;
     else if( fsName == "mqueue" )

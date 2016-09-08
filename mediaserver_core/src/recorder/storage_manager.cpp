@@ -141,7 +141,7 @@ const QString& sysDrivePath()
 
 const QString getDevicePath(const QString& path)
 {
-    QString command = lit("df ") + path;
+    QString command = lit("df '") + path + lit("'");
     FILE* pipe;
     char buf[BUFSIZ];
 
