@@ -1,5 +1,6 @@
 #include "connection_manager.h"
 
+#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_fwd.h>
@@ -172,7 +173,12 @@ void ConnectionManager::createTransactionConnection(
     response->headers.emplace("X-Nx-Cloud", "true");
     response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
 
-    completionHandler(nx_http::StatusCode::ok, nullptr, std::move(connectionEvents));
+    completionHandler(
+        nx_http::StatusCode::ok,
+        std::make_unique<nx_http::EmptyMessageBodySource>(
+            ec2::TransactionTransport::TUNNEL_CONTENT_TYPE,
+            boost::none),
+        std::move(connectionEvents));
 }
 
 void ConnectionManager::pushTransaction(
