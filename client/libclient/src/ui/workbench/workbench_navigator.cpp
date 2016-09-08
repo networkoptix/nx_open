@@ -1429,8 +1429,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             QVector<qint64> indicators;
             for (QnResourceWidget *widget : display()->widgets())
             {
-                if (!widget->resource()->hasFlags(Qn::sync))
+                if (!isSearch && !widget->resource()->hasFlags(Qn::sync))
                     continue;
+
                 QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
                 if (!mediaWidget || mediaWidget == m_currentMediaWidget)
                     continue;
