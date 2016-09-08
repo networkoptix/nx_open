@@ -17,3 +17,13 @@ QnConnectionInfo::QnConnectionInfo():
     cloudHost(QnAppInfo::defaultCloudHost())
 {
 }
+
+QUrl QnConnectionInfo::effectiveUrl() const
+{
+    if (!allowSslConnections)
+        return ecUrl;
+
+    QUrl secure(ecUrl);
+    secure.setScheme(lit("https"));
+    return secure;
+}

@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/synctime.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -28,6 +29,8 @@ const qint64 kWarningTimes[] = {
     0
 };
 
+static const int kMessagesDelayMs = 5000;
+
 } // anonymous namespace
 
 
@@ -36,10 +39,15 @@ QnWorkbenchLicenseNotifier::QnWorkbenchLicenseNotifier(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_checked(false)
 {
-    connect(qnLicensePool, &QnLicensePool::licensesChanged, this,
-        &QnWorkbenchLicenseNotifier::checkLicenses);
+    auto checkLicensesDelayed =
+        [this]()
+        {
+            executeDelayed([this]{checkLicenses();}, kMessagesDelayMs);
+        };
+
+    connect(qnLicensePool, &QnLicensePool::licensesChanged, this, checkLicensesDelayed);
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        &QnWorkbenchLicenseNotifier::checkLicenses);
+        checkLicensesDelayed);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnWorkbenchLicenseNotifier::at_context_userChanged);
 }
@@ -52,6 +60,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
 {
      if (m_checked)
          return;
+     m_checked = true;
 
     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
@@ -127,8 +136,6 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
 
         qnSettings->setLicenseWarningStates(licenseWarningStates);
     }
-
-    m_checked = true;
 }
 
 void QnWorkbenchLicenseNotifier::at_context_userChanged()

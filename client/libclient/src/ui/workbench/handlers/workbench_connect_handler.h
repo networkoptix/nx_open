@@ -6,10 +6,14 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <crash_reporter.h>
 
+#include <client/client_connection_status.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
 class QnGraphicsMessageBox;
+class QnReconnectInfoDialog;
+class QnReconnectHelper;
 struct QnConnectionInfo;
 
 class QnWorkbenchConnectHandler: public Connective<QObject>, public QnWorkbenchContextAware
@@ -51,13 +55,32 @@ private:
     /// @brief Connects to server and stores successful connection data
     /// according to specified settings. If no settings are specified no
     /// connection data will be stored.
-    Qn::ConnectionResult connectToServer(const QUrl &appServerUrl,
-        const ConnectionSettingsPtr &storeSettings,
-        bool silent);
+    void connectToServer(
+        const QUrl &url,
+        const ConnectionSettingsPtr &storeSettings);
 
     bool disconnectFromServer(bool force);
 
-    ec2::AbstractECConnectionPtr connection2() const;
+    void handleConnectReply(
+        int handle,
+        ec2::ErrorCode errorCode,
+        ec2::AbstractECConnectionPtr connection,
+        const ConnectionSettingsPtr &storeSettings);
+
+    void processReconnectingReply(
+        Qn::ConnectionResult status,
+        ec2::AbstractECConnectionPtr connection);
+
+    void establishConnection(
+        ec2::AbstractECConnectionPtr connection);
+
+    void storeConnectionRecord(
+        const QnConnectionInfo& info,
+        const ConnectionSettingsPtr& storeSettings);
+
+    void showWarnMessagesOnce();
+
+    void stopReconnecting();
 
 private:
     void at_messageProcessor_connectionOpened();
@@ -67,12 +90,14 @@ private:
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
 
-    void at_beforeExitAction_triggered();
 private:
-    bool m_processingConnectAction;
     int m_connectingHandle;
+    QnClientConnectionStatus m_state;
 
     /** Flag that we should handle new connection. */
-    bool m_readyForConnection;
+    bool m_warnMessagesDisplayed;
     ec2::CrashReporter m_crashReporter;
+
+    QPointer<QnReconnectInfoDialog> m_reconnectDialog;
+    QScopedPointer<QnReconnectHelper> m_reconnectHelper;
 };

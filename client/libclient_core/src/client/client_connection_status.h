@@ -15,13 +15,18 @@ public:
     static QString toString(QnConnectionState state);
 };
 
-class QnClientConnectionStatus
+class QnClientConnectionStatus: public QObject
 {
+    Q_OBJECT
 public:
-    QnClientConnectionStatus(QnConnectionState state = QnConnectionState::Disconnected);
+    QnClientConnectionStatus(QnConnectionState state = QnConnectionState::Disconnected,
+        QObject* parent = nullptr);
 
     QnConnectionState state() const;
     void setState(QnConnectionState state);
+
+signals:
+    void stateChanged(QnConnectionState value);
 
 private:
     void warn(const QString &message) const;

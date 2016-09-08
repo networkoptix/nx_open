@@ -25,7 +25,6 @@ public:
     static Qn::ConnectionResult validateConnection(
         const QnConnectionInfo &connectionInfo,
         ec2::ErrorCode errorCode,
-        const QUrl &url,
         QWidget* parentWidget);
 
     //TODO: #GDM think about refactoring
@@ -37,7 +36,6 @@ public:
 private:
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,
-        const QUrl &url,
         QWidget* parentWidget);
 
     //TODO: #GDM move all duplicating strings here

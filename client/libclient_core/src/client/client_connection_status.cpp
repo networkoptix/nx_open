@@ -11,6 +11,8 @@
 #define TRACE(...)
 #endif
 
+static int counter = 0;
+
 namespace {
 
 const QMap<QnConnectionState, QString> stateToString
@@ -29,8 +31,9 @@ QString QnConnectionStateUtils::toString(QnConnectionState state)
     return stateToString[state];
 }
 
-QnClientConnectionStatus::QnClientConnectionStatus(QnConnectionState state)
+QnClientConnectionStatus::QnClientConnectionStatus(QnConnectionState state, QObject* parent)
     :
+    QObject(parent),
     m_state(state),
     m_allowedTransactions()
 {
@@ -67,6 +70,7 @@ void QnClientConnectionStatus::setState(QnConnectionState state)
         warn(lit("Invalid state transaction %1 -> %2").arg(stateToString[m_state]).arg(stateToString[state]));
 
     m_state = state;
+    emit stateChanged(state);
 }
 
 void QnClientConnectionStatus::warn(const QString &message) const
