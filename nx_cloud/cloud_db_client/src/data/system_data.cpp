@@ -103,8 +103,9 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
         urlQuery.queryItemValue(SystemSharing_groupID_field).toStdString();
     systemSharing->customPermissions =
         urlQuery.queryItemValue(SystemSharing_customPermissions_field).toStdString();
-    systemSharing->isEnabled =
-        urlQuery.queryItemValue(SystemSharing_isEnabled_field) == "true";
+    if (urlQuery.hasQueryItem(SystemSharing_isEnabled_field))
+        systemSharing->isEnabled =
+            urlQuery.queryItemValue(SystemSharing_isEnabled_field) == "true";
     return success;
 }
 
