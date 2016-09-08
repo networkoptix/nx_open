@@ -388,19 +388,12 @@ int callMount(const QString& commandString)
     FILE* pipe;
     char buf[BUFSIZ];
     int retCode = -1;
-//    int fd;
-//    int flags;
 
     if ((pipe = popen(commandString.toLatin1().constData(), "r")) == NULL)
     {
         NX_LOG(lit("%1 'mount' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
         return -1;
     }
-
-//    fd = fileno(pipe);
-//    flags = fcntl(fd, F_GETFL, 0);
-//    flags |= O_NONBLOCK;
-//    fcntl(fd, F_SETFL, flags);
 
     while (fgets(buf, BUFSIZ, pipe) != NULL) 
     {

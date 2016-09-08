@@ -193,8 +193,11 @@ const QString& sysDrivePath()
 
 bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
 {
+    QString storageUrl = storage->getUrl();
+    if (storageUrl.contains(lit("://")))
+        return false;
     QString sysPath = sysDrivePath();
-    return sysPath.isNull() ? false : getDevicePath(storage->getUrl()).startsWith(sysDrivePath());
+    return sysPath.isNull() ? false : getDevicePath(storageUrl).startsWith(sysDrivePath());
 }
 
 } // namespace <anonymous>
