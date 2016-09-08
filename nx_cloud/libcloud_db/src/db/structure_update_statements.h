@@ -477,6 +477,39 @@ CREATE INDEX idx_transaction_time
     ON transaction_log(system_id, timestamp);
 )sql";
 
+//#CLOUD-485. Changing timestamp field type to BIGINT so that it can store UTC milliseconds
+static const char kChangeTransactionLogTimestampTypeToBigInt[] =
+R"sql(
+DROP INDEX idx_transaction_key;
+DROP INDEX idx_transaction_hash;
+DROP INDEX idx_transaction_time;
+
+ALTER TABLE transaction_log RENAME TO transaction_log_old;
+
+CREATE TABLE transaction_log (
+    system_id   VARCHAR(64) NOT NULL,
+    peer_guid   VARCHAR(64) NOT NULL,
+    db_guid     VARCHAR(64) NOT NULL,
+    sequence    BIGINT NOT NULL,
+    timestamp   BIGINT NOT NULL,
+    tran_hash   VARCHAR(64) NOT NULL,
+    tran_data   BLOB NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+INSERT INTO transaction_log(system_id, peer_guid, db_guid, sequence, timestamp, tran_hash, tran_data)
+SELECT system_id, peer_guid, db_guid, sequence, timestamp, tran_hash, tran_data FROM transaction_log_old;
+
+DROP TABLE transaction_log_old;
+
+CREATE UNIQUE INDEX idx_transaction_key
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_hash
+    ON transaction_log(system_id, tran_hash);
+CREATE INDEX idx_transaction_time
+    ON transaction_log(system_id, timestamp);
+)sql";
+
 }   //db
 }   //cdb
 }   //nx

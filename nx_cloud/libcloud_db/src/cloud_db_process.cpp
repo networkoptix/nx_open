@@ -611,6 +611,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddMoreFieldsToSystemSharing);
     dbStructureUpdater.addUpdateScript(db::kAddVmsUserIdToSystemSharing);
     dbStructureUpdater.addUpdateScript(db::kAddSystemTransactionLog);
+    dbStructureUpdater.addUpdateScript(db::kChangeTransactionLogTimestampTypeToBigInt);
     return dbStructureUpdater.updateStructSync();
 }
 
