@@ -3129,11 +3129,13 @@ void QnTimeSlider::changeEvent(QEvent* event)
 void QnTimeSlider::startDragProcess(DragInfo* info)
 {
     m_dragIsClick = true;
-    setSliderDown(true);
 
     /* We have to use mapping because these events can be caused by the tooltip as well as by the slider itself. */
     if (m_dragMarker == CreateSelectionMarker)
+    {
+        setSliderDown(true);
         setSliderPosition(valueFromPosition(mapFromScene(info->mousePressScenePos())));
+    }
 }
 
 void QnTimeSlider::startDrag(DragInfo* info)
@@ -3143,6 +3145,7 @@ void QnTimeSlider::startDrag(DragInfo* info)
     qint64 pos = valueFromPosition(mousePos + m_dragDelta);
 
     m_dragIsClick = false;
+    setSliderDown(true);
 
     switch (m_dragMarker)
     {
