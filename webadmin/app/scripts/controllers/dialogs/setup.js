@@ -220,10 +220,13 @@ angular.module('webadminApp')
                 // Merge fail:
                 'INCOMPATIBLE':'fail',
                 'SAFE_MODE':'fail',
-                'CONFIGURATION_ERROR':'fail'
+                'CONFIGURATION_ERROR':'fail',
+
+                'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':'fail',
+                'DIFFERENT_CLOUD_HOST':'fail'
             };
             return errorClasses[error] || 'fail';
-        }
+        };
         function formatError(errorToShow){
             var errorMessages = {
 
@@ -232,20 +235,22 @@ angular.module('webadminApp')
                 'password':'Wrong password.',
 
                 // Wrong system:
-                'FAIL':'System is unreachable or doesn\'t exist.',
-                'url':'Unable to connect to specified server.',
-                'INCOMPATIBLE':'Selected system has incompatible version.',
+                'FAIL': L.join.systemIsUnreacheble,
+                'url': L.join.wrongUrl,
+                'INCOMPATIBLE': L.join.incompatibleVersion,
 
                 // Merge fail:
-                'SAFE_MODE':'Can\'t connect to a system. Remote system is in safe mode.',
-                'CONFIGURATION_ERROR':'Can\'t connect to a system. Maybe one of the systems is in safe mode.',
+                'SAFE_MODE': L.join.safeMode,
+                'CONFIGURATION_ERROR': L.join.configError,
 
 
+                'DEPENDENT_SYSTEM_BOUND_TO_CLOUD': L.join.cloudError,
+                'DIFFERENT_CLOUD_HOST':L.join.cloudHostConflict,
 
-                'currentPassword':'Incorrect current password',
+                'currentPassword': L.join.incorrectCurrentPassword,
 
                 // Cloud errors:
-                'notAuthorized': 'Login or password are incorrect',
+                'notAuthorized': L.join.incorrectRemotePassword,
                 'accountNotActivated': 'Please, confirm your account first',
                 'unknown': 'Something went wrong'
             };
