@@ -649,7 +649,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
         {
             QString new_name = name.mid(2);
             rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
-            if (!rt.isNull())
+            if (rt.isNull())
             {
                 NX_LOG( lit("Unsupported AV resource found: %1").arg(name), cl_logERROR);
                 return 0;

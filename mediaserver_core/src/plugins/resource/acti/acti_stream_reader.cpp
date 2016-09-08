@@ -41,7 +41,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     QString SET_FPS(QLatin1String("CHANNEL=%1&VIDEO_FPS_NUM=%2"));
     QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2&VIDEO_MAX_BITRATE=%2"));
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
-    QString SET_STREAMING_METHOD(QLatin1String("CHANNEL=%1&STREAMING_METHOD_CURRENT=%1"));
+    QString SET_STREAMING_METHOD(QLatin1String("CHANNEL=%1&STREAMING_METHOD_CURRENT=%2"));
 
     const int kStreamingMethodTcpOnly = 0;
     const int kStreamingMethodMulticast = 1;
