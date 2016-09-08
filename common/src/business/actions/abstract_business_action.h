@@ -100,7 +100,7 @@ class QnBusinessActionData
 public:
     // TODO: #EC2 Add comments. Maybe remove the flag altogether. What is it for? Which actions?
     enum Flags {
-        MotionExists = 1
+        VideoLinkExists = 1
     };
 
     QnBusinessActionData(): actionType(QnBusiness::UndefinedAction), flags(0) {}

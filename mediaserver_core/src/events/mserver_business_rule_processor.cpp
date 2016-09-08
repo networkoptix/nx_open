@@ -656,7 +656,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
-    if (eventType == QnBusiness::CameraMotionEvent)
+    if (eventType == QnBusiness::CameraMotionEvent ||
+        eventType == QnBusiness::CameraInputEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
         qnCameraHistoryPool->updateCameraHistorySync(camRes);
