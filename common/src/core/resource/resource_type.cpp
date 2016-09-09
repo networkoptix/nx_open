@@ -93,39 +93,50 @@ bool QnResourceType::hasParam(const QString& name) const
 
 QString QnResourceType::defaultValue(const QString& key) const
 {
+    NX_LOG (lit("QnResourceType::defaultValue %1, Trying to acquire mutex").arg(key), cl_logINFO);
     QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    NX_LOG (lit("QnResourceType::defaultValue, getting default value for key %1").arg(key), cl_logINFO);
     return paramTypeListUnsafe().value(key);
 }
 
 const ParamTypeMap QnResourceType::paramTypeList() const
 {
+    NX_LOG(lit("parmTypeList for type1 %1, trying to acquire mutex").arg(getId().toString()), cl_logINFO);
     QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    NX_LOG(lit("parmTypeList for type1 %1, mutex acquired").arg(getId().toString()), cl_logINFO);
     return paramTypeListUnsafe();
 }
 
 const ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
 {
+    NX_LOG(lit("Inside paramTypeListUnsafe"), cl_logINFO);
     if (m_allParamTypeListCache.isNull())
     {
+        NX_LOG(lit("Before weird check"), cl_logINFO);
         if (!m_allParamTypeListCache.isNull())
             return *(m_allParamTypeListCache.data());
 
         QSharedPointer<ParamTypeMap> allParamTypeListCache(new ParamTypeMap());
         *allParamTypeListCache = m_paramTypeList;
-
+        NX_LOG(lit("Before iterating parent list"), cl_logINFO);
         for (const QnUuid& parentId: allParentList()) {
             if (parentId.isNull()) {
+                NX_LOG(lit("Parent id is null, continuing"), cl_logINFO);
                 continue;
             }
-
+            NX_LOG(lit("Retrieving parent resource type %1").arg(parentId.toString()), cl_logINFO);
             if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) 
             {   // Note. Copy below, should be thread safe.
+                NX_LOG(lit("Calling param type list on parent %1").arg(parentId.toString()), cl_logINFO);
                 ParamTypeMap parentData = parent->paramTypeList();
+                NX_LOG(lit("Got param type list for parent type %1").arg(parentId.toString()), cl_logINFO);
                 for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
                     if (!allParamTypeListCache->contains(itr.key()))
                         allParamTypeListCache->insert(itr.key(), itr.value());
                 }
+                NX_LOG(lit("Iterating over parent list ended"), cl_logINFO);
             } else {
+                NX_LOG(lit("parentId is %1 but there is no such parent in database").arg(parentId.toString()), cl_logINFO)
                 qWarning() << "parentId is" << parentId.toString() << "but there is no such parent in database";
             }
         }
@@ -133,6 +144,7 @@ const ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
         m_allParamTypeListCache = allParamTypeListCache;
     }
 
+    NX_LOG(lit("Returnning param types list"), cl_logINFO);
     return *m_allParamTypeListCache.data();
 }
 

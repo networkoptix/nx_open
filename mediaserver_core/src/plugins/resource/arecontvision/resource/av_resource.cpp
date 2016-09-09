@@ -703,8 +703,9 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUui
 
 bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 {
-    NX_LOG(lit("AV calling isPanoramic"), cl_logINFO);
+    NX_LOG(lit("AV calling isPanoramic, resTypeId %1").arg(resType->getId().toString()), cl_logINFO);
     QString layoutStr = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    NX_LOG(lit("GOT DEFAULT VALUE OF VIDEO LAYOUT: %1").arg(layoutStr), cl_logINFO);
     return !layoutStr.isEmpty() && QnCustomResourceVideoLayout::fromString(layoutStr)->channelCount() > 1;
 };
 

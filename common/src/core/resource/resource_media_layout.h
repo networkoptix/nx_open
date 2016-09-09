@@ -11,6 +11,7 @@
 #include <core/datapacket/abstract_media_context.h>
 
 #include <common/common_globals.h>
+#include <utils/common/log.h>
 
 class QnResourceLayout {
 public:
@@ -121,7 +122,9 @@ class QnCustomResourceVideoLayout : public QnResourceVideoLayout {
 public:
     static QnCustomResourceVideoLayoutPtr fromString(const QString &value)
     {
+        NX_LOG(lit("Calling video layout, fromString"), cl_logINFO);
         QStringList params = value.split(QLatin1Char(';'));
+        NX_LOG(lit("fromString splitted params size %1").arg(params.size()), cl_logINFO);
         int width = 1;
         int height = 1;
         QStringList sensors;
@@ -138,10 +141,11 @@ public:
                 sensors = values[1].split(QLatin1Char(','));
             }
         }
-
+        NX_LOG(lit("fromString cycle done"), cl_logINFO);
         QnCustomResourceVideoLayoutPtr result( new QnCustomResourceVideoLayout(QSize(width, height)) );
         for (int i = 0; i < sensors.size(); ++i)
             result->setChannel(i, sensors[i].toInt());
+        NX_LOG(lit("fromString cycle2 done"), cl_logINFO);
         return result;
     }
 
