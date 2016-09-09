@@ -133,7 +133,7 @@ public:
 
     virtual void pleaseStop()
     {
-        m_socket->pleaseStopSync();
+        m_socket->pleaseStopSync(true);
     }
 
     //!Binds to specified addresses

@@ -16,6 +16,8 @@ public:
         aio::AbstractAioThread* aioThread,
         std::shared_ptr<ReverseConnectionHolder> connectionHolder);
 
+    ~OutgoingReverseTunnelConnection();
+
     void stopWhileInAioThread() override;
 
     void establishNewConnection(

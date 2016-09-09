@@ -17,6 +17,11 @@ OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
 {
 }
 
+OutgoingReverseTunnelConnection::~OutgoingReverseTunnelConnection()
+{
+    stopWhileInAioThread();
+}
+
 void OutgoingReverseTunnelConnection::stopWhileInAioThread()
 {
     m_asyncGuard.reset();

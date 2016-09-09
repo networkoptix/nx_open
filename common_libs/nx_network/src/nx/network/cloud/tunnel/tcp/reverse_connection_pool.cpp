@@ -25,7 +25,7 @@ ReverseConnectionPool::ReverseConnectionPool(
 
 ReverseConnectionPool::~ReverseConnectionPool()
 {
-    pleaseStopSync();
+    pleaseStopSync(true);
 }
 
 bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool waitForRegistration)

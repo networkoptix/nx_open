@@ -29,10 +29,10 @@ AsyncClient::~AsyncClient()
     }
 
     if (baseConnection)
-        baseConnection->pleaseStopSync();
+        baseConnection->pleaseStopSync(true);
 
     if( connectingSocket )
-        connectingSocket->pleaseStopSync();
+        connectingSocket->pleaseStopSync(true);
 
     m_timer.pleaseStopSync(true);
 }
