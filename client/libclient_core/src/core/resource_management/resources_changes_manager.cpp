@@ -308,12 +308,9 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     ec2::ApiUserData backup;
     ec2::fromResourceToApi(user, backup);
 
+    applyChanges(user);
     QnUuid userId = user->getId();
 
-    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(userId);
-
-    /* AccessibleResources are also updated here. */
-    applyChanges(user);
     NX_ASSERT(!(user->isCloud() && user->getEmail().isEmpty()));
 
     ec2::ApiUserData apiUser;
