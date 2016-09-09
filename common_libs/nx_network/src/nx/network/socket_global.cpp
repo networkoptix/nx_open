@@ -51,13 +51,19 @@ void SocketGlobals::init()
 
 void SocketGlobals::deinit()
 {
-    QnMutexLocker lock(&s_mutex);
-    if (--s_counter == 0) // last out
+    SocketGlobals* instanceToDestroy = nullptr;
     {
-        delete s_instance;
-        s_isInitialized = false; // allow creating Pollable(s) in destructor
+        QnMutexLocker lock(&s_mutex);
+        if (--s_counter == 0) // last out
+        {
+            instanceToDestroy = s_instance;
+            s_instance = nullptr;
+            s_isInitialized = false; // allow creating Pollable(s) in destructor
+        }
     }
+    delete instanceToDestroy;
 }
+
 void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(

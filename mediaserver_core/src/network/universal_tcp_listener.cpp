@@ -132,10 +132,16 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 void QnUniversalTcpListener::destroyServerSocket(
     AbstractStreamServerSocket* serverSocket)
 {
-    QnMutexLocker lk(&m_mutex);
+    decltype(m_serverSocket) serverSocketToDestroy;
+    {
+        QnMutexLocker lk(&m_mutex);
 
-    NX_ASSERT(m_serverSocket.get() == serverSocket);
-    m_serverSocket.reset();
+        NX_ASSERT(m_serverSocket.get() == serverSocket);
+        std::swap(m_serverSocket, serverSocketToDestroy);
+    }
+
+    serverSocketToDestroy->pleaseStopSync();
+    serverSocketToDestroy.reset();
 }
 
 void QnUniversalTcpListener::onCloudBindingStatusChanged(
