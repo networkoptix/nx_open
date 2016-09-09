@@ -799,7 +799,7 @@ QnAbstractPtzController *QnResource::createPtzController() {
                 .arg(getName())
                 .arg(getUrl());
 
-        qDebug << message;
+        qDebug() << message;
         NX_LOG(message.toLatin1(), cl_logERROR);
     }
     
