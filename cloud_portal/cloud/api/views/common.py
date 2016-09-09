@@ -38,6 +38,7 @@ def get_cloud_modules():
                'connection_mediator_port': connection_mediator_port,
            }
 
+
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 def cloud_modules(request):
@@ -45,9 +46,17 @@ def cloud_modules(request):
                     get_cloud_modules(),
                     content_type='application/xml')
 
+
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 def cloud_modules2(request):
     return render(request, 'cloud_modules2.xml',
                     get_cloud_modules(),
                     content_type='application/xml')
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def cloud_modules_json(request):
+    return api_success(get_cloud_modules())
+
