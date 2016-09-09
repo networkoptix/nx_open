@@ -25,6 +25,7 @@ class MaintenanceManager
 {
 public:
     MaintenanceManager(
+        const QnUuid& moduleGuid,
         const ec2::ConnectionManager& connectionManager,
         ec2::TransactionLog* const transactionLog);
     ~MaintenanceManager();
@@ -45,6 +46,7 @@ public:
             ::ec2::ApiTransactionDataList)> completionHandler);
 
 private:
+    const QnUuid m_moduleGuid;
     const ec2::ConnectionManager& m_connectionManager;
     ec2::TransactionLog* const m_transactionLog;
     nx::network::aio::Timer m_timer;

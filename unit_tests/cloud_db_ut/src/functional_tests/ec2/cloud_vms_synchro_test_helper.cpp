@@ -52,9 +52,13 @@ const CdbLauncher* Ec2MserverCloudSynchronization2::cdb() const
 
 api::ResultCode Ec2MserverCloudSynchronization2::bindRandomSystem()
 {
-    api::ResultCode result = m_cdb.addActivatedAccount(&m_account, &m_accountPassword);
-    if (result != api::ResultCode::ok)
-        return result;
+    api::ResultCode result = api::ResultCode::ok;
+    if (m_account.email.empty())    //< Account is not registered yet
+    {
+        result = m_cdb.addActivatedAccount(&m_account, &m_accountPassword);
+        if (result != api::ResultCode::ok)
+            return result;
+    }
 
     // Adding system1 to account1.
     result = m_cdb.bindRandomSystem(m_account.email, m_accountPassword, &m_system);
@@ -62,21 +66,9 @@ api::ResultCode Ec2MserverCloudSynchronization2::bindRandomSystem()
         return result;
 
     // Saving cloud credentials to vms db.
-    ec2::ApiUserDataList users;
-    if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
-        ->getUsersSync(&users) != ec2::ErrorCode::ok)
-    {
-        return api::ResultCode::unknownError;
-    }
-
     QnUuid adminUserId;
-    for (const auto& user : users)
-    {
-        if (user.name == "admin")
-            adminUserId = user.id;
-    }
-    if (adminUserId.isNull())
-        return api::ResultCode::notFound;
+    if (!findAdminUserId(&adminUserId))
+        return api::ResultCode::unknownError;
 
     ec2::ApiResourceParamWithRefDataList params;
     params.emplace_back(ec2::ApiResourceParamWithRefData(
@@ -89,12 +81,69 @@ api::ResultCode Ec2MserverCloudSynchronization2::bindRandomSystem()
         QString::fromStdString(m_system.authKey)));
     ec2::ApiResourceParamWithRefDataList outParams;
     if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-        ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
+            ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
 
     return api::ResultCode::ok;
+}
+
+api::ResultCode Ec2MserverCloudSynchronization2::unbindSystem()
+{
+    api::ResultCode result = m_cdb.unbindSystem(m_account.email, m_accountPassword, m_system.id);
+    if (result != api::ResultCode::ok)
+        return result;
+
+    // Removing cloud users
+    ec2::ApiUserDataList users;
+    if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
+            ->getUsersSync(&users) != ec2::ErrorCode::ok)
+    {
+        return api::ResultCode::unknownError;
+    }
+
+    for (const auto& user: users)
+    {
+        if (!user.isCloud)
+            continue;
+        if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
+                ->removeSync(user.id) != ec2::ErrorCode::ok)
+        {
+            return api::ResultCode::unknownError;
+        }
+    }
+
+    QnUuid adminUserId;
+    if (!findAdminUserId(&adminUserId))
+        return api::ResultCode::unknownError;
+
+    ec2::ApiResourceParamWithRefDataList params;
+    params.emplace_back(ec2::ApiResourceParamWithRefData(
+        adminUserId,
+        "cloudSystemID",
+        QString()));
+    params.emplace_back(ec2::ApiResourceParamWithRefData(
+        adminUserId,
+        "cloudAuthKey",
+        QString()));
+    ec2::ApiResourceParamWithRefDataList outParams;
+    if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
+            ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
+    {
+        return api::ResultCode::unknownError;
+    }
+
+    return api::ResultCode::ok;
+}
+
+api::ResultCode Ec2MserverCloudSynchronization2::rebindSystem()
+{
+    auto resultCode = unbindSystem();
+    if (resultCode != api::ResultCode::ok)
+        return resultCode;
+
+    return bindRandomSystem();
 }
 
 const api::AccountData& Ec2MserverCloudSynchronization2::ownerAccount() const
@@ -519,6 +568,28 @@ api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLog(
     *transactionList = QJson::deserialized<::ec2::ApiTransactionDataList>(msgBody);
 
     return api::ResultCode::ok;
+}
+
+bool Ec2MserverCloudSynchronization2::findAdminUserId(QnUuid* const id)
+{
+    ec2::ApiUserDataList users;
+    if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
+            ->getUsersSync(&users) != ec2::ErrorCode::ok)
+    {
+        return false;
+    }
+
+    QnUuid adminUserId;
+    for (const auto& user : users)
+    {
+        if (user.name == "admin")
+            adminUserId = user.id;
+    }
+    if (adminUserId.isNull())
+        return false;
+
+    *id = adminUserId;
+    return true;
 }
 
 } // namespace cdb

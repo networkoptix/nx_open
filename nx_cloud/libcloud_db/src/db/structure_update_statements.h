@@ -504,6 +504,20 @@ CREATE INDEX idx_transaction_log_time
     ON transaction_log(system_id, timestamp);
 )sql";
 
+/**
+ * #CLOUD-540. Cloud peer transaction sequence MUST be global
+ */
+static const char kAddPeerSequence[] =
+R"sql(
+
+CREATE TABLE cloud_db_transaction_sequence (
+    max_sequence BIGINT NOT NULL
+);
+
+INSERT INTO cloud_db_transaction_sequence(max_sequence) VALUES(1000);
+
+)sql";
+
 }   //db
 }   //cdb
 }   //nx

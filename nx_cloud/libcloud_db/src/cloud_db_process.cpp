@@ -115,7 +115,7 @@ const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
     return m_httpEndpoints;
 }
 
-static const QnUuid kCdbGuid("{674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB}");
+static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
 #ifdef USE_QAPPLICATION
 int CloudDBProcess::executeApplication()
@@ -250,6 +250,7 @@ int CloudDBProcess::exec()
         m_authProvider = &authProvider;
 
         MaintenanceManager maintenanceManager(
+            kCdbGuid,
             ec2ConnectionManager,
             &transactionLog);
 
@@ -612,6 +613,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddVmsUserIdToSystemSharing);
     dbStructureUpdater.addUpdateScript(db::kAddSystemTransactionLog);
     dbStructureUpdater.addUpdateScript(db::kChangeTransactionLogTimestampTypeToBigInt);
+    dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
     return dbStructureUpdater.updateStructSync();
 }
 

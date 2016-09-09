@@ -23,6 +23,8 @@ public:
     CdbLauncher* cdb();
     const CdbLauncher* cdb() const;
     api::ResultCode bindRandomSystem();
+    api::ResultCode unbindSystem();
+    api::ResultCode rebindSystem();
     const api::AccountData& ownerAccount() const;
     const std::string& ownerAccountPassword() const;
     const api::SystemData& registeredSystemData() const;
@@ -63,6 +65,8 @@ private:
     api::AccountData m_account;
     std::string m_accountPassword;
     api::SystemData m_system;
+
+    bool findAdminUserId(QnUuid* const id);
 };
 
 } // namespace cdb

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <vector>
 
 #include <nx/network/buffer.h>
@@ -29,7 +30,7 @@ namespace ec2 {
 class OutgoingTransactionDispatcher;
 
 // TODO: #ak this constant should be stored in DB and generated 
-static const QnUuid kDbInstanceGuid("{DFD33CCE-92E5-48E4-AB7E-D4F164B2A94E}");
+static const QnUuid kDbInstanceGuid("{dfd33cce-92e5-48e4-ab7e-d4f164b2a94e}");
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
@@ -249,6 +250,7 @@ private:
     mutable QnMutex m_mutex;
     std::map<QSqlDatabase*, DbTransactionContext> m_dbTransactionContexts;
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
+    std::atomic<std::uint64_t> m_transactionSequence;
 
     /** Fills transaction state cache. Throws in case of error. */
     nx::db::DBResult fillCache();

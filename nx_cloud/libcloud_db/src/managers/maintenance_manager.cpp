@@ -9,9 +9,11 @@ namespace nx {
 namespace cdb {
 
 MaintenanceManager::MaintenanceManager(
+    const QnUuid& moduleGuid,
     const ec2::ConnectionManager& connectionManager,
     ec2::TransactionLog* const transactionLog)
     :
+    m_moduleGuid(moduleGuid),
     m_connectionManager(connectionManager),
     m_transactionLog(transactionLog)
 {
@@ -91,7 +93,7 @@ void MaintenanceManager::onTransactionLogRead(
     ::ec2::ApiTransactionDataList outData;
     for (const auto& transactionContext: serializedTransactions)
     {
-        ::ec2::ApiTransactionData tran;
+        ::ec2::ApiTransactionData tran(m_moduleGuid);
         tran.tranGuid = QnUuid::fromStringSafe(transactionContext.hash);
         nx::Buffer serializedTransaction =
             transactionContext.serializer->serialize(Qn::UbjsonFormat);

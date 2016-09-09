@@ -22,7 +22,8 @@ TransactionLog::TransactionLog(
 :
     m_peerId(peerId),
     m_dbManager(dbManager),
-    m_outgoingTransactionDispatcher(outgoingTransactionDispatcher)
+    m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
+    m_transactionSequence(0)
 {
     if (fillCache() != nx::db::DBResult::ok)
         throw std::runtime_error("Error loading transaction log from DB");
@@ -153,6 +154,27 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
         vmsTranLog.transactionHashToUpdateAuthor[tranHash] = 
             UpdateHistoryData{tranStateKey, timestamp};
     }
+
+    QSqlQuery selectMaxTransactionSequence(*connection);
+    selectMaxTransactionSequence.setForwardOnly(true);
+    selectMaxTransactionSequence.prepare(
+        R"sql(
+        SELECT max_sequence FROM cloud_db_transaction_sequence;
+        )sql");
+    if (!selectMaxTransactionSequence.exec() ||
+        !selectMaxTransactionSequence.next())
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Error fetching max sequence from transaction log. %1")
+            .arg(selectMaxTransactionSequence.lastError().text()), cl_logERROR);
+        return nx::db::DBResult::ioError;
+    }
+    
+    m_transactionSequence = selectMaxTransactionSequence.value(0).toLongLong();
+
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("Selected max sequence %1 from transaction log")
+        .arg(m_transactionSequence.load()), cl_logINFO);
 
     return nx::db::DBResult::ok;
 }
@@ -394,6 +416,29 @@ nx::db::DBResult TransactionLog::saveToDb(
         return nx::db::DBResult::ioError;
     }
 
+    if (transaction.peerID == m_peerId)
+    {
+        // Updating cloud_db sequence in DB
+        QSqlQuery updateCdbSequence(*connection);
+        updateCdbSequence.prepare(
+            R"sql(
+            UPDATE cloud_db_transaction_sequence
+            SET max_sequence = :newSequence
+            WHERE max_sequence < :newSequence
+            )sql");
+        updateCdbSequence.bindValue(":newSequence", transaction.persistentInfo.sequence);
+        if (!updateCdbSequence.exec())
+        {
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
+                lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. "
+                    "Error updating cdb sequence. %5")
+                .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
+                .str(transaction).arg(transactionHash).arg(saveTranQuery.lastError().text()),
+                cl_logWARNING);
+            return nx::db::DBResult::ioError;
+        }
+    }
+
     // Modifying transaction log cache.
     QnMutexLocker lk(&m_mutex);
     DbTransactionContext& dbTranContext = m_dbTransactionContexts[connection];
@@ -410,14 +455,16 @@ nx::db::DBResult TransactionLog::saveToDb(
 
 int TransactionLog::generateNewTransactionSequence(
     QSqlDatabase* /*connection*/,
-    const nx::String& systemId)
+    const nx::String& /*systemId*/)
 {
-    QnMutexLocker lk(&m_mutex);
-    int& currentSequence =
-        m_systemIdToTransactionLog[systemId].transactionState.
-            values[::ec2::QnTranStateKey(m_peerId, kDbInstanceGuid)];
-    ++currentSequence;
-    return currentSequence;
+    return ++m_transactionSequence;
+
+    //QnMutexLocker lk(&m_mutex);
+    //int& currentSequence =
+    //    m_systemIdToTransactionLog[systemId].transactionState.
+    //        values[::ec2::QnTranStateKey(m_peerId, kDbInstanceGuid)];
+    //++currentSequence;
+    //return currentSequence;
 }
 
 qint64 TransactionLog::generateNewTransactionTimestamp(
