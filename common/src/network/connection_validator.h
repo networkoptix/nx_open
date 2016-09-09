@@ -28,8 +28,11 @@ public:
     static Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
         ec2::ErrorCode networkError);
 
+    static bool isCompatibleToCurrentSystem(const QnModuleInformation& info);
+
 protected:
     static Qn::ConnectionResult validateConnectionInternal(
+        const QString& brand,
         const QString& customization,
         int protoVersion,
         const QnSoftwareVersion& version,

@@ -107,7 +107,6 @@ public:
         addArg(value);
     }
 
-protected:
     const std::unique_ptr<ModuleProcessType>& moduleInstance()
     {
         return m_moduleInstance;

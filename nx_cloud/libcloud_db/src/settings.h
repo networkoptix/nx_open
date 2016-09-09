@@ -98,6 +98,7 @@ public:
     QString dataDir() const;
     
     const Logging& logging() const;
+    const Logging& vmsSynchronizationLogging() const;
     const db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
     const Notification& notification() const;
@@ -117,6 +118,7 @@ private:
     bool m_showHelp;
 
     Logging m_logging;
+    Logging m_vmsSynchronizationLogging;
     db::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
     Notification m_notification;

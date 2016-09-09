@@ -140,7 +140,7 @@ void AccountManager::addAccount(
         std::bind(&AccountManager::accountAdded, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
                     requestSourceSecured,
-                    _1, _2, _3, std::move(completionHandler)) );
+                    _1, _2, _3, _4, std::move(completionHandler)) );
 }
 
 void AccountManager::activate(
@@ -154,7 +154,7 @@ void AccountManager::activate(
         std::move(emailVerificationCode),
         std::bind(&AccountManager::accountVerified, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, _3, std::move(completionHandler)));
+                    _1, _2, _3, _4, std::move(completionHandler)));
 }
 
 void AccountManager::getAccount(
@@ -202,7 +202,7 @@ void AccountManager::updateAccount(
         std::move(updateDataWithEmail),
         std::bind(&AccountManager::accountUpdated, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
-                    authenticatedByEmailCode, _1, _2, std::move(completionHandler)));
+                    authenticatedByEmailCode, _1, _2, _3, std::move(completionHandler)));
 }
 
 void AccountManager::resetPassword(
@@ -241,7 +241,7 @@ void AccountManager::resetPassword(
     data::AccountConfirmationCode confirmationCode;
     auto resetCodeStr = tempPasswordData.password + ":" + accountEmail.email;
     confirmationCode.code = QByteArray::fromRawData(
-        resetCodeStr.data(), resetCodeStr.size()).toBase64().constData();
+        resetCodeStr.data(), (int)resetCodeStr.size()).toBase64().constData();
 
     //adding temporary password
     m_tempPasswordManager->registerTemporaryCredentials(
@@ -288,7 +288,7 @@ void AccountManager::reactivateAccount(
         std::bind(&AccountManager::accountReactivated, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             requestSourceSecured,
-            _1, _2, _3, std::move(completionHandler)));
+            _1, _2, _3, _4, std::move(completionHandler)));
 }
 
 void AccountManager::createTemporaryCredentials(
@@ -380,27 +380,34 @@ db::DBResult AccountManager::fillCache()
     //starting async operation
     using namespace std::placeholders;
     m_dbManager->executeSelect<int>(
-        std::bind( &AccountManager::fetchAccounts, this, _1, _2 ),
-        [&cacheFilledPromise]( db::DBResult dbResult, int /*dummyResult*/ ) {
+        std::bind(&AccountManager::fetchAccounts, this, _1, _2),
+        [&cacheFilledPromise](
+            QSqlDatabase* /*connection*/,
+            db::DBResult dbResult,
+            int /*dummyResult*/ )
+        {
             cacheFilledPromise.set_value( dbResult );
-        } );
+        });
 
     //waiting for completion
     future.wait();
     return future.get();
 }
 
-db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const /*dummyResult*/ )
+db::DBResult AccountManager::fetchAccounts( 
+    QSqlDatabase* connection,
+    int* const /*dummyResult*/ )
 {
     QSqlQuery readAccountsQuery(*connection);
+    readAccountsQuery.setForwardOnly(true);
     readAccountsQuery.prepare(
         "SELECT id, email, password_ha1 as passwordHa1, "
                "full_name as fullName, customization, status_code as statusCode "
         "FROM account" );
     if (!readAccountsQuery.exec())
     {
-        NX_LOG( lit( "Failed to read account list from DB. %1" ).
-            arg( connection->lastError().text() ), cl_logWARNING );
+        NX_LOG(lit("Failed to read account list from DB. %1").
+            arg(readAccountsQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
 
@@ -437,8 +444,8 @@ db::DBResult AccountManager::insertAccount(
         static_cast<int>(api::AccountStatus::awaitingActivation) );
     if( !insertAccountQuery.exec() )
     {
-        NX_LOG( lit( "Could not insert account into DB. %1" ).
-            arg( connection->lastError().text() ), cl_logDEBUG1 );
+        NX_LOG(lit("Could not insert account into DB. %1").
+            arg(insertAccountQuery.lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -455,6 +462,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 {
     //removing already-existing activation codes
     QSqlQuery fetchActivationCodesQuery(*connection);
+    fetchActivationCodesQuery.setForwardOnly(true);
     fetchActivationCodesQuery.prepare(
         "SELECT verification_code "
         "FROM email_verification "
@@ -465,7 +473,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
     if (!fetchActivationCodesQuery.exec())
     {
         NX_LOG(lm("Could not fetch account %1 activation codes from DB. %2").
-            arg(accountEmail).arg(connection->lastError().text()), cl_logDEBUG1);
+            arg(accountEmail).arg(fetchActivationCodesQuery.lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
     if (fetchActivationCodesQuery.next())
@@ -494,8 +502,8 @@ db::DBResult AccountManager::issueAccountActivationCode(
             QDateTime::currentDateTimeUtc().addSecs(kUnconfirmedAccountExpirationSec.count()));
         if( !insertEmailVerificationQuery.exec() )
         {
-            NX_LOG( lit( "Could not insert account verification code into DB. %1" ).
-                arg( connection->lastError().text() ), cl_logDEBUG1 );
+            NX_LOG(lit("Could not insert account verification code into DB. %1").
+                arg(insertEmailVerificationQuery.lastError().text()), cl_logDEBUG1);
             return db::DBResult::ioError;
         }
         resultData->code.assign(
@@ -518,6 +526,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 void AccountManager::accountAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
+    QSqlDatabase* /*connection*/,
     db::DBResult resultCode,
     data::AccountData accountData,
     data::AccountConfirmationCode resultData,
@@ -545,6 +554,7 @@ void AccountManager::accountAdded(
 void AccountManager::accountReactivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     std::string /*email*/,
     data::AccountConfirmationCode resultData,
@@ -566,6 +576,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     std::string* const resultAccountEmail )
 {
     QSqlQuery getAccountByVerificationCode( *connection );
+    getAccountByVerificationCode.setForwardOnly(true);
     getAccountByVerificationCode.prepare(
         "SELECT a.email "
         "FROM email_verification ev, account a "
@@ -588,9 +599,10 @@ nx::db::DBResult AccountManager::verifyAccount(
     QnSql::bind( verificationCode, &removeVerificationCode );
     if( !removeVerificationCode.exec() )
     {
-        NX_LOG( lit( "Failed to remove account verification code %1 from DB. %2" ).
-            arg( QString::fromStdString(verificationCode.code) ).arg( connection->lastError().text() ),
-            cl_logDEBUG1 );
+        NX_LOG(lit("Failed to remove account verification code %1 from DB. %2")\
+            .arg(QString::fromStdString(verificationCode.code))
+            .arg(removeVerificationCode.lastError().text()),
+            cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -602,7 +614,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     if( !updateAccountStatus.exec() )
     {
         NX_LOG(lm("Failed to update account %1 status. %2").
-            arg(accountEmail).arg(connection->lastError().text()),
+            arg(accountEmail).arg(updateAccountStatus.lastError().text()),
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -614,6 +626,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 
 void AccountManager::accountVerified(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -679,7 +692,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
     if (!updateAccountQuery.exec())
     {
         NX_LOG(lit("Could not update account in DB. %1").
-            arg(connection->lastError().text()), cl_logDEBUG1);
+            arg(updateAccountQuery.lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
@@ -689,6 +702,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 void AccountManager::accountUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool activateAccountIfNotActive,
+    QSqlDatabase* /*connection*/,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)

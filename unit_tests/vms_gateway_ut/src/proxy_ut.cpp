@@ -34,9 +34,7 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+        nx_http::HttpRequestProcessedHandler completionHandler )
     {
         QUrlQuery requestQuery(request.requestLine.url.query());
 
@@ -50,20 +48,23 @@ public:
                     nx_http::StatusCode::ok,
                     std::make_unique< nx_http::BufferSource >(
                         testMsgContentType,
-                        nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n"));
+                        nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n"),
+                    nx_http::ConnectionEvents());
             }
             else
             {
                 completionHandler(
                     nx_http::StatusCode::ok,
-                    std::make_unique< nx_http::BufferSource >(testMsgContentType, testMsgBody));
+                    std::make_unique< nx_http::BufferSource >(testMsgContentType, testMsgBody),
+                    nx_http::ConnectionEvents());
             }
         }
         else
         {
             completionHandler(
                 nx_http::StatusCode::badRequest,
-                nullptr);
+                nullptr,
+                nx_http::ConnectionEvents());
         }
     }
 };

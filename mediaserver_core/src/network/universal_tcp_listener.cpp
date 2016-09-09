@@ -135,7 +135,6 @@ void QnUniversalTcpListener::destroyServerSocket(
     QnMutexLocker lk(&m_mutex);
 
     NX_ASSERT(m_serverSocket.get() == serverSocket);
-    m_serverSocket->pleaseStopSync();
     m_serverSocket.reset();
 }
 

@@ -66,7 +66,7 @@ public:
     virtual ~TestConnection();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync() override;
+    virtual void pleaseStopSync(bool doNotCheckForLocks = false) override;
 
     int id() const;
     void setLocalAddress(SocketAddress addr);

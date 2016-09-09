@@ -9,7 +9,6 @@
 
 #include <utils/image_provider.h>
 #include <nx/utils/math/fuzzy.h>
-#include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 

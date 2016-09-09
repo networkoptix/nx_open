@@ -2393,10 +2393,16 @@ void QnActionManager::at_menu_destroyed(QObject *menu)
 
 bool QnActionManager::eventFilter(QObject *watched, QEvent *event)
 {
-    if (event->type() != QEvent::MouseButtonRelease)
-        return false;
+    switch (event->type())
+    {
+        case QEvent::ShortcutOverride:
+        case QEvent::MouseButtonRelease:
+            break;
+        default:
+            return false;
+    }
 
-    if (!dynamic_cast<QMenu*>(watched))
+    if (!qobject_cast<QMenu*>(watched))
         return false;
 
     m_lastClickedMenu = watched;

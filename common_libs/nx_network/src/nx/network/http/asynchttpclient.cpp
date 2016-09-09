@@ -85,7 +85,7 @@ namespace nx_http
 
     AsyncHttpClient::~AsyncHttpClient()
     {
-        terminate();
+        pleaseStopSync();
     }
 
     const std::unique_ptr<AbstractStreamSocket>& AsyncHttpClient::socket()
@@ -106,11 +106,6 @@ namespace nx_http
         return result;
     }
 
-    void AsyncHttpClient::terminate()
-    {
-        pleaseStopSync();
-    }
-
     //TODO #ak move pleaseStop and pleaseStopSync to some common base class
 
     void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -123,19 +118,19 @@ namespace nx_http
         });
     }
 
-    void AsyncHttpClient::pleaseStopSync()
+    void AsyncHttpClient::pleaseStopSync(bool doNotCheckForLocks)
     {
         if (m_aioThreadBinder.isInSelfAioThread())
             stopWhileInAioThread();
         else
-            QnStoppableAsync::pleaseStopSync();
+            QnStoppableAsync::pleaseStopSync(doNotCheckForLocks);
     }
 
     void AsyncHttpClient::stopWhileInAioThread()
     {
         m_terminated = true;
         if (m_socket)
-            m_socket->pleaseStopSync();
+            m_socket->pleaseStopSync(true);
     }
 
     nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const

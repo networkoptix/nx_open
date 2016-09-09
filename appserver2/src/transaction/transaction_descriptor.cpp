@@ -9,7 +9,22 @@
 #include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 
+#include "managers/business_event_manager.h"
+#include "managers/camera_manager.h"
+#include "managers/discovery_manager.h"
+#include "managers/layout_manager.h"
+#include "managers/license_manager.h"
+#include "managers/media_server_manager.h"
+#include "managers/misc_manager.h"
+#include "managers/resource_manager.h"
+#include "managers/stored_file_manager.h"
+#include "managers/updates_manager.h"
+#include "managers/user_manager.h"
+#include "managers/videowall_manager.h"
+#include "managers/webpage_manager.h"
 
 namespace ec2 {
 namespace detail {
@@ -386,7 +401,7 @@ struct AllowForAllAccessOut
     RemotePeerAccess operator()(const Qn::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
 };
 
-bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& resourceId, Qn::Permission permission)
+bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& resourceId, Qn::Permissions permissions)
 {
     if (hasSystemAccess(accessData))
         return true;
@@ -396,11 +411,11 @@ bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& re
     if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
         return true;
 
-    if (permission == Qn::ReadPermission
+    if (permissions == Qn::ReadPermission
         && accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             return true;
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permission);
+    return qnResourceAccessManager->hasPermission(userResource, target, permissions);
 }
 
 struct ModifyResourceAccess
@@ -489,7 +504,13 @@ struct ModifyResourceParamAccess
             return qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
                 qnResPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
-        return resourceAccessHelper(accessData, param.resourceId, Qn::SavePermission);
+
+        Qn::Permissions permissions = Qn::SavePermission;
+        if (param.name == Qn::USER_FULL_NAME)
+            permissions |= Qn::WriteFullNamePermission;
+
+        return resourceAccessHelper(accessData, param.resourceId, permissions);
+
     }
 
     bool isRemove;
@@ -831,6 +852,57 @@ struct ReadListAccessOut
     }
 };
 
+struct RegularTransactionType
+{
+    template<typename Param>
+    ec2::TransactionType::Value operator()(const Param&)
+    {
+        return TransactionType::Regular;
+    }
+};
+
+struct LocalTransactionType
+{
+    template<typename Param>
+    ec2::TransactionType::Value operator()(const Param&)
+    {
+        return TransactionType::Local;
+    }
+};
+
+struct SetStatusTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
+    {
+        QnResourcePtr resource = qnResPool->getResourceById<QnResource>(params.id);
+        if (!resource)
+            return TransactionType::Unknown;
+        if(resource.dynamicCast<QnMediaServerResource>())
+            return TransactionType::Local;
+        else
+            return TransactionType::Regular;
+    }
+};
+
+struct SaveUserTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiUserData& params)
+    {
+        return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
+    }
+};
+
+struct RemoveUserTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiIdData& params)
+    {
+        auto user = qnResPool->getResourceById<QnUserResource>(params.id);
+        if (!user)
+            return TransactionType::Unknown;
+        return user->isCloud() ? TransactionType::Cloud : TransactionType::Regular;
+    }
+};
+
 #define TRANSACTION_DESCRIPTOR_APPLY( \
     _, \
     Key, \
@@ -843,7 +915,8 @@ struct ReadListAccessOut
     checkReadPermissionFunc, \
     filterBySavePermissionFunc, \
     filterByReadPermissionFunc, \
-    checkRemotePeerAccessFunc \
+    checkRemotePeerAccessFunc, \
+	getTransactionTypeFunc \
     ) \
     std::make_shared<TransactionDescriptor<ParamType>>( \
         ApiCommand::Key, \
@@ -859,8 +932,8 @@ struct ReadListAccessOut
         checkReadPermissionFunc, \
         filterBySavePermissionFunc, \
         filterByReadPermissionFunc, \
-        checkRemotePeerAccessFunc),
-
+        checkRemotePeerAccessFunc, \
+        getTransactionTypeFunc),
 
 DescriptorBaseContainer transactionDescriptors = {
     TRANSACTION_DESCRIPTOR_LIST(TRANSACTION_DESCRIPTOR_APPLY)

@@ -7,13 +7,21 @@ namespace ec2
 {
     static QAtomicInt qn_transportHeader_sequence(1);
 
+    void QnTransactionTransportHeader::fillSequence(
+        const QnUuid& moduleId,
+        const QnUuid& runningInstanceGUID)
+    {
+        if (sequence == 0)
+        {
+            sequence = qn_transportHeader_sequence.fetchAndAddAcquire(1);
+            sender = moduleId;
+            senderRuntimeID = runningInstanceGUID;
+        }
+    }
+
     void QnTransactionTransportHeader::fillSequence()
     {
-        if (sequence == 0) {
-            sequence = qn_transportHeader_sequence.fetchAndAddAcquire(1);
-            sender = qnCommon->moduleGUID();
-            senderRuntimeID = qnCommon->runningInstanceGUID();
-        }
+        fillSequence(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID());
     }
 
     QString toString(const QnTransactionTransportHeader& header)

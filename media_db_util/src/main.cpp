@@ -72,11 +72,11 @@ void printCameraName(const DeviceFileCatalogPtr &fileCatalog)
 void printCameraData(const DeviceFileCatalogPtr &fileCatalog)
 {
     printCameraName(fileCatalog);
-    for (const auto &chunk : fileCatalog->getChunks())
+    for (const auto &chunk : fileCatalog->getChunksUnsafe())
         outStream << "\t{ startTime: " << chunk.startTimeMs << ", duration: " << chunk.durationMs
                   << ", storageIndex: " << chunk.storageIndex << ", timezone: " << chunk.timeZone
                   << ", fileSize: " << chunk.getFileSize() << " }" << endl;
-    outStream << "\tTotal chunks: " << fileCatalog->getChunks().size() << endl << endl;
+    outStream << "\tTotal chunks: " << fileCatalog->getChunksUnsafe().size() << endl << endl;
 }
 
 } // namespace detail

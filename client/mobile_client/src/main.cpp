@@ -35,6 +35,8 @@
 
 #include <nx/media/decoder_registrar.h>
 #include <resource_allocator.h>
+#include <nx/utils/timer_manager.h>
+
 #include "config.h"
 using mobile_client::conf;
 
@@ -163,8 +165,9 @@ int runUi(QGuiApplication *application) {
 }
 
 int runApplication(QGuiApplication *application, const QnUuid& videowallInstanceGuid) {
+    NX_ASSERT(nx::utils::TimerManager::instance());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(Qn::PT_MobileClient));
+        getConnectionFactory(Qn::PT_MobileClient, nx::utils::TimerManager::instance()));
 
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
@@ -175,6 +178,7 @@ int runApplication(QGuiApplication *application, const QnUuid& videowallInstance
         ? Qn::PT_LiteClient : Qn::PT_MobileClient;
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.customization = QnAppInfo::customizationName();
     if (!videowallInstanceGuid.isNull())
         runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);

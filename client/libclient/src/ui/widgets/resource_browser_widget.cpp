@@ -59,7 +59,6 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -247,11 +246,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
     ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
     ui->tabWidget->tabBar()->setMaximumHeight(32);
-
-    //TODO: #vkutin Change to something more adequate:
-    QColor color = palette().color(QPalette::Shadow);
-    color.setAlphaF(0.4);
-    setPaletteColor(ui->tabWidget, QPalette::Window, color);
 
     connect(workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));

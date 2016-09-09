@@ -9,6 +9,7 @@
 #include <chrono>
 
 #include <QtCore/QString>
+#include <QtSql/QSqlDatabase>
 
 
 namespace nx {
@@ -19,7 +20,9 @@ enum class DBResult
     ok,
     statementError,
     ioError,
-    notFound
+    notFound,
+    cancelled,
+    retryLater,
 };
 
 

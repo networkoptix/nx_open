@@ -447,7 +447,9 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;
 
-    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(clientPeerType));
+    NX_ASSERT(nx::utils::TimerManager::instance());
+    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
+        getConnectionFactory(clientPeerType, nx::utils::TimerManager::instance()));
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.data());
     qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory.take());
 
@@ -462,10 +464,11 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
     runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    QnModuleFinder* moduleFinder(new QnModuleFinder(true, qnRuntime->isDevMode())); //TODO: #GDM make it common way via scoped pointer somehow
+    QnModuleFinder* moduleFinder(new QnModuleFinder(true)); //TODO: #GDM make it common way via scoped pointer somehow
     moduleFinder->start();
     qnCommon->store<QnModuleFinder>(moduleFinder);
 

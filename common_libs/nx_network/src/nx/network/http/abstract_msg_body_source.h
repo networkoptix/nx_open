@@ -8,11 +8,11 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
 #include <utils/common/systemerror.h>
 
 #include "httptypes.h"
-#include "../aio/abstract_pollable.h"
 
 
 namespace nx_http
@@ -24,7 +24,7 @@ namespace nx_http
     */
     class NX_NETWORK_API AbstractMsgBodySource
     :
-        public nx::network::aio::AbstractPollable
+        public nx::network::aio::BasicPollable
     {
     public:
         virtual ~AbstractMsgBodySource() {}

@@ -17,6 +17,11 @@
 #include "thread_util.h"
 #include <nx/utils/log/log.h>
 
+#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+    static bool kDoAnalyseForDeadlock = true;
+#else
+    static bool kDoAnalyseForDeadlock = false;
+#endif
 
 ////////////////////////////////////////////////////////////
 //// class MutexLockKey
@@ -200,11 +205,12 @@ static std::uintptr_t lockedThread = 0;
 
 void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
 {
-    QWriteLocker lk( &m_mutex );
-
-    lockedThread = ::currentThreadSystemId();
-
-    m_lockDigraph.removeVertice( mutex );
+    if (kDoAnalyseForDeadlock)
+    {
+        QWriteLocker lk( &m_mutex );
+        lockedThread = ::currentThreadSystemId();
+        m_lockDigraph.removeVertice( mutex );
+    }
 }
 
 void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition )
@@ -227,7 +233,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
     ThreadContext& threadContext = iter->second;
     
-    if( threadContext.currentLockPath.empty() )
+    if( threadContext.currentLockPath.empty() || !kDoAnalyseForDeadlock )
     {
         threadContext.currentLockPath.push_front( mutexLockPosition );
         return;
@@ -241,7 +247,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
             ++threadContext.currentLockPath.front().lockRecursionDepth;
             return;     //ignoring recursive lock
         }
-        
+
         threadContext.currentLockPath.push_front( mutexLockPosition );
         const QString& deadLockMsg = QString::fromLatin1(
             "Detected deadlock. Double mutex lock. Path:\n"
@@ -258,7 +264,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
     threadContext.currentLockPath.push_front( mutexLockPosition );
 
-    LockGraphEdgeData::TwoMutexLockData curMutexLockData( 
+    LockGraphEdgeData::TwoMutexLockData curMutexLockData(
         curThreadID,
         prevLock,
         mutexLockPosition );
@@ -275,7 +281,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
     std::list<LockGraphEdgeData> edgesTravelled;
     //travelling edges containing any thread different from current
     //    This is needed to avoid reporting deadlock in case of loop in the same thread.
-    //    Consider following: m1->m2, m2->m1. But both lock happen in the same thread only, 
+    //    Consider following: m1->m2, m2->m1. But both lock happen in the same thread only,
     //    so deadlock is possible.
     //    NOTE: recursive locking is handled separately
     if( m_lockDigraph.findAnyPathIf(
@@ -297,7 +303,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
         //    - from {mtx1, line 10} to {mtx2, line 20}, thread 1
         //    - from {mtx2, line 30} to {mtx3, line 40}, thread 1
         //    - from {mtx3, line 50} to {mtx4, line 60}, thread 2
-        //Such path is not connected since mtx3 cannot be locked with mtx1 locked with such path. 
+        //Such path is not connected since mtx3 cannot be locked with mtx1 locked with such path.
         //Consider connected path (check mtx2):
         //    - from {mtx1, line 10} to {mtx2, line 20}, thread 1
         //    - from {mtx2, line 20} to {mtx3, line 40}, thread 1
@@ -330,6 +336,25 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
     std::pair<LockGraphEdgeData*, bool> p = m_lockDigraph.addEdge(
         prevLock.mutexPtr, mutexLockPosition.mutexPtr, LockGraphEdgeData() );
     p.first->lockPositions.insert( std::move(curMutexLockData) );
+}
+
+void MutexLockAnalyzer::expectNoLocks()
+{
+    QReadLocker readLock( &m_mutex );
+    const auto thread = ::currentThreadSystemId();
+    const auto it = m_threadContext.find(thread);
+    if (it == m_threadContext.end())
+        return;
+
+    std::vector<MutexLockKey> path;
+    for (const auto& key: it->second.currentLockPath)
+    {
+        if (!key.mutexPtr->isRecursive())
+            path.push_back(key);
+    }
+
+    NX_ASSERT(path.empty(), lm("Unexpected mutex locks: \n%1")
+        .container(path, QString::fromLatin1("\n"), QString(), QString()));
 }
 
 void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPosition )

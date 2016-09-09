@@ -35,10 +35,13 @@ namespace ec2 {
 
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
-Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(Qn::PeerType peerType):
+Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
+    Qn::PeerType peerType,
+    nx::utils::TimerManager* const timerManager)
+    :
     // dbmanager is initialized by direct connection.
     m_dbManager(peerType == Qn::PT_Server ? new detail::QnDbManager() : nullptr),
-    m_timeSynchronizationManager(new TimeSynchronizationManager(peerType)),
+    m_timeSynchronizationManager(new TimeSynchronizationManager(peerType, timerManager)),
     m_transactionMessageBus(new QnTransactionMessageBus(peerType)),
     m_terminated(false),
     m_runningRequests(0),
@@ -397,6 +400,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read additional camera attributes.
      * %// TODO: This function is named inconsistently - should end with 'List'.
      * %param[default] format
+     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
      * %return List of additional camera attributes objects for all cameras in the requested
      *     format.
      *     %// TODO: #mike cameraId
@@ -494,7 +498,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value CameraBackup_Default A default value is used for backup options.
      * %// AbstractCameraManager::getUserAttributes
      */
-    regGet<nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+    regGet<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
 
     // AbstractCameraManager::addCameraHistoryItem
     regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
@@ -685,7 +689,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      */
     regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
 
-    regGet<nullptr_t, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
+    regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     // AbstractBusinessEventManager::save
     regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);
@@ -1402,8 +1406,11 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     QnConnectionInfo* const connectionInfo,
     nx_http::Response* response)
 {
+    auto localInfo = qnRuntimeInfoManager->localInfo().data;
+
     connectionInfo->version = qnCommon->engineVersion();
-    connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
+    connectionInfo->brand = localInfo.brand;
+    connectionInfo->customization = localInfo.customization;
     connectionInfo->systemName = qnCommon->localSystemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
     #if defined(__arm__)
@@ -1436,9 +1443,8 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
             return ErrorCode::ok;
         }
 
-        QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
         m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-            transaction,
+            ApiCommand::saveClientInfo, clientInfo,
             [&](ErrorCode result)
             {
                 if (result == ErrorCode::ok)

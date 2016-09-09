@@ -1,6 +1,7 @@
-
 #include "abstract_socket.h"
 
+#include <nx/network/aio/pollable.h>
+#include <nx/utils/thread/mutex_lock_analyzer.h>
 
 ////////////////////////////////////////////////////////////
 //// class AbstractSocket
@@ -69,8 +70,17 @@ void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> han
     cancelIOAsync(nx::network::aio::EventType::etNone, std::move(handler));
 }
 
-void AbstractCommunicatingSocket::pleaseStopSync()
+void AbstractCommunicatingSocket::pleaseStopSync(bool doNotCheckForLocks)
 {
+    #ifdef USE_OWN_MUTEX
+        if (!doNotCheckForLocks)
+        {
+            const auto pollablePtr = pollable();
+            if (!pollablePtr || !pollablePtr->isInSelfAioThread())
+                MutexLockAnalyzer::instance()->expectNoLocks();
+        }
+    #endif
+
     cancelIOSync(nx::network::aio::EventType::etNone);
 }
 

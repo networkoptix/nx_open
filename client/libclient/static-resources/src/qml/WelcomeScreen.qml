@@ -180,8 +180,7 @@ Rectangle
                         isCloudTile: model.isCloudSystem
 
                         wrongVersion: model.wrongVersion
-                        wrongCustomization: model.wrongCustomization
-                        isCompatibleCloudHost: model.isCompatibleCloudHost
+                        isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
 
                         Component.onCompleted: { grid.watcher.addItem(this); }

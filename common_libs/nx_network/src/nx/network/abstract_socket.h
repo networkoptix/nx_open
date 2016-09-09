@@ -346,7 +346,7 @@ public:
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of QnStoppable::pleaseStopSync
-    virtual void pleaseStopSync() override;
+    virtual void pleaseStopSync(bool doNotCheckForLocks = false) override;
 
 private:
     void readAsyncAtLeastImpl(

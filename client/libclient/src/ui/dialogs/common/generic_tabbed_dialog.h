@@ -29,8 +29,10 @@ public:
 
     /**
      * @brief setCurrentPage                    Select current page by key.
+     * \param adjust                            If set to true, nearest available page will be
+     *                                          selected if target page is disabled or hidden.
      */
-    void setCurrentPage(int page);
+    void setCurrentPage(int page, bool adjust = false);
 
     /**
       * @brief reject                           Overriding default reject method. Here the dialog will try to revert
@@ -59,6 +61,7 @@ protected:
         QnAbstractPreferencesWidget* widget;
 
         Page(): key(-1), visible(true), enabled(true), widget(nullptr) {}
+        bool isValid() const { return visible && enabled; }
     };
 
     /**

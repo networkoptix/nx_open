@@ -60,9 +60,7 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            std::function<void(
-                const nx_http::StatusCode::Value code,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)> handler) override;
+            nx_http::HttpRequestProcessedHandler handler) override;
 
     private:
         const ReverseAcceptor* m_acceptor;

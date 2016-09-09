@@ -1,29 +1,13 @@
 #include "reverse_acceptor.h"
 
+#include <nx/network/http/empty_message_body_source.h>
+
 #include "reverse_headers.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
 namespace tcp {
-
-namespace {
-
-struct UpgradeMsgBody: nx_http::AbstractMsgBodySource
-{
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()>) override {}
-
-    aio::AbstractAioThread* getAioThread() const override { return nullptr; }
-    void bindToAioThread(aio::AbstractAioThread*) override {}
-    void post(nx::utils::MoveOnlyFunc<void()>) override {}
-    void dispatch(nx::utils::MoveOnlyFunc<void()>) override {}
-
-    String mimeType() const override { return String(); }
-    boost::optional<uint64_t> contentLength() const override { return boost::none; }
-    void readAsync(utils::MoveOnlyFunc<void(SystemError::ErrorCode, Buffer)>) override {}
-};
-
-} // namespace
 
 ReverseAcceptor::ReverseAcceptor(String selfHostName, ConnectHandler connectHandler):
     m_selfHostName(std::move(selfHostName)),
@@ -135,17 +119,21 @@ void ReverseAcceptor::NxRcHandler::processRequest(
     stree::ResourceContainer,
     nx_http::Request request,
     nx_http::Response* const response,
-    std::function<void(
-        const nx_http::StatusCode::Value code,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> handler)
+    nx_http::HttpRequestProcessedHandler handler)
 {
     auto connectionIt = request.headers.find(kConnection);
     if (connectionIt == request.headers.end() || connectionIt->second != kUpgrade)
-        return handler(nx_http::StatusCode::notAcceptable, nullptr);
+        return handler(
+            nx_http::StatusCode::notAcceptable,
+            nullptr,
+            nx_http::ConnectionEvents());
 
     auto upgradeIt = request.headers.find(kUpgrade);
     if (upgradeIt == request.headers.end() || !upgradeIt->second.startsWith(kNxRc))
-        return handler(nx_http::StatusCode::notImplemented, nullptr);
+        return handler(
+            nx_http::StatusCode::notImplemented,
+            nullptr,
+            nx_http::ConnectionEvents());
 
     String upgrade = upgradeIt->second + ", ";
     request.requestLine.version.serialize(&upgrade);
@@ -154,7 +142,10 @@ void ReverseAcceptor::NxRcHandler::processRequest(
 
     auto hostNameIt = request.headers.find(kNxRcHostName);
     if (hostNameIt == request.headers.end() || hostNameIt->second.isEmpty())
-        return handler(nx_http::StatusCode::badRequest, nullptr);
+        return handler(
+            nx_http::StatusCode::badRequest,
+            nullptr,
+            nx_http::ConnectionEvents());
 
     NX_LOGX(lm("Request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
     connection->setSendCompletionHandler(
@@ -166,7 +157,10 @@ void ReverseAcceptor::NxRcHandler::processRequest(
         });
 
     m_acceptor->fillNxRcHeaders(&response->headers);
-    handler(nx_http::StatusCode::upgrade, std::make_unique<UpgradeMsgBody>());
+    handler(
+        nx_http::StatusCode::upgrade,
+        std::make_unique<nx_http::EmptyMessageBodySource>(nx::String(), boost::none),
+        nx_http::ConnectionEvents());
 }
 
 } // namespace tcp

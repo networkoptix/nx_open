@@ -556,7 +556,8 @@ bool CLH264RtpParser::processData(
                 --curPtr;
                 *curPtr = nalUnitType;
             }
-            m_chunks.emplace_back(curPtr-rtpBufferBase, bufferEnd - curPtr, m_packetPerNal == 0);
+            m_chunks.emplace_back(
+                (int) (curPtr-rtpBufferBase), bufferEnd - curPtr, m_packetPerNal == 0);
             m_videoFrameSize += bufferEnd - curPtr + (m_packetPerNal == 0 ? 4 : 0);
             break;
         }

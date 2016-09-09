@@ -113,7 +113,7 @@ TEST_F(AsyncHttpClientTest, motionJpegRetrieval)
     {
         ~ClientContext()
         {
-            client->terminate();
+            client->pleaseStopSync();
             client.reset(); //ensuring client removed before multipartParser
         }
 
@@ -314,16 +314,15 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)> completionHandler)
+        nx_http::HttpRequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
             connection->closeConnection(SystemError::connectionReset);
 
         completionHandler(
             nx_http::StatusCode::ok,
-            std::make_unique< nx_http::BufferSource >(m_mimeType, m_response));
+            std::make_unique< nx_http::BufferSource >(m_mimeType, m_response),
+            nx_http::ConnectionEvents());
     }
 
 private:

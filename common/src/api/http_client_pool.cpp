@@ -33,7 +33,7 @@ ClientPool::~ClientPool()
         std::swap(dataCopy, m_connectionPool);
     }
     for (auto itr = dataCopy.begin(); itr != dataCopy.end(); ++itr)
-        itr->second->client->terminate();
+        itr->second->client->pleaseStopSync();
     staticInstance = nullptr;
 }
 
@@ -95,7 +95,7 @@ void ClientPool::terminate(int handle)
             connection->handle = 0;
             sendNextRequestUnsafe();
             lock.unlock();
-            client->terminate();
+            client->pleaseStopSync();
             break;
         }
     }

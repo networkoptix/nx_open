@@ -109,10 +109,8 @@ namespace nx_http
         /*!
         \note No signal is emitted after this call
         */
-        virtual void terminate();
-
         virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-        virtual void pleaseStopSync() override;
+        virtual void pleaseStopSync(bool doNotCheckForLocks = false) override;
 
         virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
         virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -397,7 +395,7 @@ namespace nx_http
         {
             //MUST call terminate BEFORE shared pointer destruction to allow for async handlers to complete
             if (m_obj.use_count() == 1)
-                m_obj->terminate();
+                m_obj->pleaseStopSync();
             m_obj.reset();
         }
 

@@ -181,7 +181,9 @@ public:
     }
     virtual nx::network::Pollable* pollable() override
     {
-        NX_CRITICAL(m_delegate, "Not supported");
+        if (!m_delegate)
+            return nullptr;
+
         return m_delegate->pollable();
     }
     virtual aio::AbstractAioThread* getAioThread() const override

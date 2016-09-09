@@ -44,6 +44,7 @@ CdbLauncher::CdbLauncher(QString tmpDir)
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
     addArg("-log/logLevel"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    addArg("-syncroLog/logLevel"); addArg("DEBUG2");
 
     addArg("-db/driverName");
     if (!sConnectionOptions.driverName.isEmpty())
@@ -675,24 +676,6 @@ api::ResultCode CdbLauncher::ping(
     return resCode;
 }
 
-api::ResultCode CdbLauncher::setSystemUserList(
-    const std::string& systemID,
-    const std::string& authKey,
-    api::SystemSharingList sharings)
-{
-    auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(systemID, authKey);
-
-    api::ResultCode resCode = api::ResultCode::ok;
-    std::tie(resCode) = makeSyncCall<nx::cdb::api::ResultCode>(
-        std::bind(
-            &nx::cdb::api::SystemManager::setSystemUserList,
-            connection->systemManager(),
-            std::move(sharings),
-            std::placeholders::_1));
-    return resCode;
-}
-
 const api::SystemSharingEx& CdbLauncher::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
@@ -736,6 +719,21 @@ api::ResultCode CdbLauncher::fetchSystemData(
         }
     }
     return api::ResultCode::notFound;
+}
+
+api::ResultCode CdbLauncher::getVmsConnections(
+    api::VmsConnectionDataList* const vmsConnections)
+{
+    auto connection = connectionFactory()->createConnection();
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *vmsConnections) =
+        makeSyncCall<nx::cdb::api::ResultCode, api::VmsConnectionDataList>(
+            std::bind(
+                &nx::cdb::api::MaintenanceManager::getConnectionsFromVms,
+                connection->maintenanceManager(),
+                std::placeholders::_1));
+    return resCode;
 }
 
 void CdbLauncher::setTemporaryDirectoryPath(const QString& path)

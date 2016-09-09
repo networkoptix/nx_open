@@ -15,31 +15,13 @@ namespace nx_http
     {
     }
 
-    void BufferSource::pleaseStop(
-        nx::utils::MoveOnlyFunc<void()> completionHandler)
+    BufferSource::~BufferSource()
     {
-        m_aioBinder.pleaseStop(std::move(completionHandler));
+        stopWhileInAioThread();
     }
 
-    nx::network::aio::AbstractAioThread* BufferSource::getAioThread() const
+    void BufferSource::stopWhileInAioThread()
     {
-        return m_aioBinder.getAioThread();
-    }
-
-    void BufferSource::bindToAioThread(
-        nx::network::aio::AbstractAioThread* aioThread)
-    {
-        m_aioBinder.bindToAioThread(aioThread);
-    }
-
-    void BufferSource::post(nx::utils::MoveOnlyFunc<void()> func)
-    {
-        m_aioBinder.post(std::move(func));
-    }
-
-    void BufferSource::dispatch(nx::utils::MoveOnlyFunc<void()> func)
-    {
-        m_aioBinder.dispatch(std::move(func));
     }
 
     StringType BufferSource::mimeType() const

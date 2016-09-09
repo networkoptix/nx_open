@@ -1,11 +1,15 @@
-
 #include "stoppable.h"
 
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/mutex_lock_analyzer.h>
 
-
-void QnStoppableAsync::pleaseStopSync()
+void QnStoppableAsync::pleaseStopSync(bool doNotCheckForLocks)
 {
+    #ifdef USE_OWN_MUTEX
+        if (!doNotCheckForLocks)
+            MutexLockAnalyzer::instance()->expectNoLocks();
+    #endif
+
     nx::utils::promise<void> promise;
     auto fut = promise.get_future();
     pleaseStop( [&](){ promise.set_value(); } );

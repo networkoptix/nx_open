@@ -46,8 +46,6 @@ void QnAsyncHttpClientReply::at_client_done(const nx_http::AsyncHttpClientPtr &c
     if (client != m_client)
         return;
 
-    client->terminate();
-
     m_url = client->url();
 
     if (!(m_failed = client->failed())) {
@@ -58,5 +56,6 @@ void QnAsyncHttpClientReply::at_client_done(const nx_http::AsyncHttpClientPtr &c
 
     lock.unlock();
 
+    client->pleaseStopSync();
     emit finished(this);
 }

@@ -39,7 +39,11 @@ public:
 
 protected:
     virtual bool hasChanges() const override;
+    virtual void loadDataToUi() override;
     virtual void applyChanges() override;
+
+private:
+    void accessibleLayoutsChanged();
 
 private:
     Q_DISABLE_COPY(QnUserGroupsDialog)

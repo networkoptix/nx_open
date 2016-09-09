@@ -7,11 +7,13 @@
 
 #include <network/module_information.h>
 #include <network/networkoptixmodulerevealcommon.h>
+#include <network/connection_validator.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <rest/server/json_rest_result.h>
 
 #include <utils/common/app_info.h>
+
 #include <nx/utils/log/log.h>
 
 #include <nx/fusion/model_functions.h>
@@ -54,20 +56,11 @@ namespace {
 QnDirectModuleFinder::QnDirectModuleFinder(QObject* parent)
 :
     QObject(parent),
-    m_compatibilityMode(false),
     m_maxConnections(kDefaultMaxConnections),
     m_checkTimer(new QTimer(this))
 {
     m_checkTimer->setInterval(kTimerIntervalMs);
     connect(m_checkTimer, &QTimer::timeout, this, &QnDirectModuleFinder::at_checkTimer_timeout);
-}
-
-void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
-    m_compatibilityMode = compatibilityMode;
-}
-
-bool QnDirectModuleFinder::isCompatibilityMode() const {
-    return m_compatibilityMode;
 }
 
 void QnDirectModuleFinder::addUrl(const QUrl &url) {
@@ -120,7 +113,7 @@ void QnDirectModuleFinder::pleaseStop() {
     m_checkTimer->stop();
     m_requestQueue.clear();
     for (QnAsyncHttpClientReply *reply: m_activeRequests) {
-        reply->asyncHttpClient()->terminate();
+        reply->asyncHttpClient()->pleaseStopSync();
         reply->deleteLater();
     }
     m_activeRequests.clear();
@@ -214,11 +207,15 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
         return;
     }
 
-    //TODO: #GDM #isCompatibleCustomization VMS-2163
-    if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
+    auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
+    if (connectionResult == Qn::ConnectionResult::IncompatibleInternal)
     {
-        NX_LOG(lit("QnDirectModuleFinder. Received reply from imcompatible server: url %1, customization %2. Ignoring reply...")
-            .arg(url.toString()).arg(moduleInformation.customization), cl_logDEBUG2);
+        NX_LOG(lit("QnDirectModuleFinder. Received reply from incompatible server: url %1, "
+            "customization %2, cloud host %3. Ignoring reply...")
+            .arg(url.toString())
+            .arg(moduleInformation.customization)
+            .arg(moduleInformation.cloudHost),
+             cl_logDEBUG2);
         return;
     }
 

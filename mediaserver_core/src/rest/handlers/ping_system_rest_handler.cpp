@@ -7,6 +7,7 @@
 #include "network/module_finder.h"
 #include "network/module_information.h"
 #include "network/tcp_connection_priv.h"
+#include <network/connection_validator.h>
 #include "utils/common/app_info.h"
 #include <nx/network/simple_http_client.h>
 #include <http/custom_headers.h>
@@ -76,11 +77,8 @@ int QnPingSystemRestHandler::executeGet(
 
     result.setReply(moduleInformation);
 
-    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName() ||
-                           moduleInformation.customization.isEmpty() ||
-                           QnModuleFinder::instance()->isCompatibilityMode();
-
-    if (!moduleInformation.hasCompatibleVersion() || !customizationOK)
+    auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
+    if (connectionResult != Qn::ConnectionResult::Success)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;

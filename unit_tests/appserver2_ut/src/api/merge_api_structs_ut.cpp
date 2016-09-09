@@ -130,7 +130,7 @@ public:
 
     typedef std::function<void(ErrorCode)> UpdateHandler;
     typedef std::function<void(
-        QnTransaction<ApiMockData>& tran, UpdateHandler handler)> UpdateCallback;
+        ApiCommand::Value cmdCode, const ApiMockData& tran, UpdateHandler handler)> UpdateCallback;
 
     MockConnection(QueryCallback queryCallback, UpdateCallback updateCallback):
         m_queryCallback(queryCallback), m_updateCallback(updateCallback)
@@ -146,9 +146,9 @@ public:
     }
 
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiMockData>& tran, HandlerType handler)
+    void processUpdateAsync(ApiCommand::Value cmdCode, const ApiMockData& tranData, HandlerType handler)
     {
-        m_updateCallback(tran, handler);
+        m_updateCallback(cmdCode, tranData, handler);
     }
 
     MockConnection* queryProcessor() { return this; }
@@ -272,20 +272,20 @@ private:
         handler(ErrorCode::ok, list);
     }
 
-    void handleUpdate(QnTransaction<ApiMockData>& tran, MockConnection::UpdateHandler handler)
+    void handleUpdate(ec2::ApiCommand::Value command, const ApiMockData& tranData, MockConnection::UpdateHandler handler)
     {
         ASSERT_FALSE(m_wasHandleUpdateCalled) << "handleUpdate() called twice";
         m_wasHandleUpdateCalled = true;
-        ASSERT(tran.command == kMockApiCommand);
+        ASSERT(command == kMockApiCommand);
 
-        LOG(lit("Transaction: %1").arg(tran.params.toJsonString().c_str()));
+        LOG(lit("Transaction: %1").arg(tranData.toJsonString().c_str()));
 
-        if (m_expectedData != tran.params)
+        if (m_expectedData != tranData)
         {
             ADD_FAILURE() << "Expected ApiMockData:\n"
                 << m_expectedData.toJsonString() << "\n"
                 << "Actual ApiMockData:\n"
-                << tran.params.toJsonString();
+                << tranData.toJsonString();
         }
 
         handler(ErrorCode::ok);
@@ -296,7 +296,7 @@ private:
 
     std::shared_ptr<MockConnection> m_connection{new MockConnection(
         std::bind(&StructMergingTest::handleQuery, this, _1, _2, _3),
-        std::bind(&StructMergingTest::handleUpdate, this, _1, _2))};
+        std::bind(&StructMergingTest::handleUpdate, this, _1, _2, _3))};
 
     QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ nullptr};
 

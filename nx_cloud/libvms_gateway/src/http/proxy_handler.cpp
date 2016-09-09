@@ -30,14 +30,15 @@ void ProxyHandler::processRequest(
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
-    std::function<void(
-        const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)> completionHandler)
+    nx_http::HttpRequestProcessedHandler completionHandler)
 {
     auto requestOptions = cutTargetFromRequest(*connection, &request);
     if (!nx_http::StatusCode::isSuccessCode(requestOptions.status))
     {
-        completionHandler(requestOptions.status, nullptr);
+        completionHandler(
+            requestOptions.status,
+            nullptr,
+            nx_http::ConnectionEvents());
         return;
     }
 
@@ -55,7 +56,10 @@ void ProxyHandler::processRequest(
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("Failed to set socket options. %1")
             .arg(SystemError::toString(osErrorCode)), cl_logINFO);
-        completionHandler(nx_http::StatusCode::internalServerError, nullptr);
+        completionHandler(
+            nx_http::StatusCode::internalServerError,
+            nullptr,
+            nx_http::ConnectionEvents());
         return;
     }
 
@@ -81,7 +85,10 @@ void ProxyHandler::closeConnection(
     NX_ASSERT(m_requestCompletionHandler);
 
     auto handler = std::move(m_requestCompletionHandler);
-    handler(nx_http::StatusCode::serviceUnavailable, nullptr);  //TODO #ak better status code
+    handler(
+        nx_http::StatusCode::serviceUnavailable,
+        nullptr,
+        nx_http::ConnectionEvents());  //TODO #ak better status code
 }
 
 ProxyHandler::TargetWithOptions::TargetWithOptions(
@@ -221,15 +228,13 @@ void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
             .arg(m_request.requestLine.url.toString()),
             cl_logDEBUG1);
         auto handler = std::move(m_requestCompletionHandler);
-        if (errorCode == SystemError::hostNotFound ||
-            errorCode == SystemError::hostUnreach)
-        {
-            handler(nx_http::StatusCode::notFound, nullptr);
-        }
-        else
-        {
-            handler(nx_http::StatusCode::serviceUnavailable, nullptr);
-        }
+        handler(
+            (errorCode == SystemError::hostNotFound ||
+                errorCode == SystemError::hostUnreach)
+                ? nx_http::StatusCode::notFound
+                : nx_http::StatusCode::serviceUnavailable,
+            nullptr,
+            nx_http::ConnectionEvents());
         return;
     }
 
@@ -261,7 +266,10 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
             .str(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
 
         auto handler = std::move(m_requestCompletionHandler);
-        handler(nx_http::StatusCode::serviceUnavailable, nullptr);  //TODO #ak better status code
+        handler(
+            nx_http::StatusCode::serviceUnavailable,
+            nullptr,
+            nx_http::ConnectionEvents());  //TODO #ak better status code
         return;
     }
 
@@ -289,7 +297,10 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
 
     *response() = std::move(*message.response);
     auto handler = std::move(m_requestCompletionHandler);
-    handler(static_cast<nx_http::StatusCode::Value>(statusCode), std::move(msgBody));
+    handler(
+        static_cast<nx_http::StatusCode::Value>(statusCode),
+        std::move(msgBody),
+        nx_http::ConnectionEvents());
 }
 
 }   //namespace gateway

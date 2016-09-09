@@ -40,7 +40,7 @@
          </property>
          <widget class="QWidget" name="statsTab">
           <attribute name="title">
-           <string>Current statistics</string>
+           <string>Current Statistics</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="topMargin">
@@ -96,7 +96,7 @@
          </widget>
          <widget class="QWidget" name="forecastTab">
           <attribute name="title">
-           <string>Forecast for full storage usage</string>
+           <string>Forecast for Full Storage Usage</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
            <property name="topMargin">

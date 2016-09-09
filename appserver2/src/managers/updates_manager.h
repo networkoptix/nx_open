@@ -42,10 +42,6 @@ namespace ec2 {
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-
-        QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const;
-        QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnUuid &peerId, int chunks) const;
-        QnTransaction<ApiUpdateInstallData> prepareTransaction(const QString &updateId) const;
     };
 
 } // namespace ec2

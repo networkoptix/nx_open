@@ -34,6 +34,7 @@ void QnValidateUpdatePeerTask::validateCloudHost()
     const auto cloudHost = QnAppInfo::defaultCloudHost();
 
     QSet<QnUuid> failedPeers;
+    bool linkedToCloud = false;
 
     for (const auto& id: peers())
     {
@@ -43,11 +44,13 @@ void QnValidateUpdatePeerTask::validateCloudHost()
             continue;
 
         const auto moduleInformation = moduleFinder->moduleInformation(server);
+        if (!moduleInformation.cloudSystemId.isEmpty())
+            linkedToCloud = true;
         if (moduleInformation.cloudHost != cloudHost)
             failedPeers.insert(server->getId());
     }
 
-    if (failedPeers.isEmpty())
+    if (failedPeers.isEmpty() || !linkedToCloud)
         finish(NoError);
     else
         finish(CloudHostConflict, failedPeers);

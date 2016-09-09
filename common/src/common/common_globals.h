@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef BOOST_BIND_NO_PLACEHOLDERS
 #define BOOST_BIND_NO_PLACEHOLDERS
+#endif // BOOST_BIND_NO_PLACEHOLDERS
 #include <cassert>
 #include <limits>
 
@@ -525,6 +527,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_VideowallClient = 2,
         PT_MobileClient = 3,
         PT_LiteClient = 4,
+        PT_CloudServer = 5,
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -820,7 +823,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TemporaryUnauthorized,      /*< LDAP server is not accessible. */
         IncompatibleInternal,       /*< Server has incompatible customization or cloud host. */
         IncompatibleVersion,        /*< Server version is too low. */
-        CompatibilityMode           /*< Client should be restarted in compatibility mode.*/
+        IncompatibleProtocol        /*< Ec2 protocol versions differs.*/
     };
 
     /**

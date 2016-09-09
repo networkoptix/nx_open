@@ -30,7 +30,7 @@ public:
 
     /** Shall be called before the last shared_pointer is gone */
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    void pleaseStopSync() override;
+    void pleaseStopSync(bool doNotCheckForLocks = false) override;
 
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);

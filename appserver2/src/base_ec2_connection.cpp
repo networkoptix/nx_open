@@ -328,13 +328,10 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
 {
     const int reqID = generateRequestID();
 
-    QnTransaction<ApiDatabaseDumpData> tran(ApiCommand::restoreDatabase);
-    tran.isLocal = true;
-    tran.params = data;
-
     using namespace std::placeholders;
     m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
-        tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1));
+        ApiCommand::restoreDatabase, data,
+        std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1));
 
     return reqID;
 }

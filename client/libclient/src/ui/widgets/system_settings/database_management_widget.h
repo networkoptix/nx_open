@@ -1,5 +1,4 @@
-#ifndef QN_DATABASE_MANAGEMENT_WIDGET_H
-#define QN_DATABASE_MANAGEMENT_WIDGET_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
@@ -10,14 +9,14 @@
 struct QnHTTPRawResponse;
 
 namespace Ui {
-    class DatabaseManagementWidget;
+class DatabaseManagementWidget;
 }
 
-class QnDatabaseManagementWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
+class QnDatabaseManagementWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
-    typedef QnAbstractPreferencesWidget base_type;
-
+    using base_type = QnAbstractPreferencesWidget;
 public:
     QnDatabaseManagementWidget(QWidget *parent = NULL);
     virtual ~QnDatabaseManagementWidget();
@@ -29,13 +28,10 @@ public:
 protected:
     void setReadOnlyInternal(bool readOnly) override;
 
-private slots:
-    void at_backupButton_clicked();
-    void at_restoreButton_clicked();
+private:
+    void backupDb();
+    void restoreDb();
 
 private:
     QScopedPointer<Ui::DatabaseManagementWidget> ui;
 };
-
-
-#endif // QN_DATABASE_MANAGEMENT_WIDGET_H
