@@ -111,13 +111,10 @@ std::unordered_map<int, qint64> DeviceFileCatalog::calcSpaceByStorage() const
 
     for (auto catalogIt = m_chunks.cbegin(); catalogIt != m_chunks.cend(); ++catalogIt)
     {
-        auto resultIt = result.find(catalogIt->storageIndex);
+        std::unordered_map<int, qint64>::iterator resultIt;
         bool emplaceResult = false;
 
-        if (resultIt == result.cend())
-            std::tie(resultIt, emplaceResult) = result.emplace(catalogIt->storageIndex, 0);
-
-        NX_ASSERT(emplaceResult);
+        std::tie(resultIt, emplaceResult) = result.emplace(catalogIt->storageIndex, 0);
         resultIt->second += catalogIt->getFileSize();
     }
     return result;
