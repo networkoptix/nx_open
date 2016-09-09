@@ -211,20 +211,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_unzoomedOpenedPanels(),
 
     m_timeline(),
-
-    m_treeWidget(nullptr),
-    m_treeResizerWidget(nullptr),
-    m_ignoreTreeResizerGeometryChanges(false),
-    m_updateTreeResizerGeometryLater(false),
-    m_treeItem(nullptr),
-    m_treeBackgroundItem(nullptr),
-    m_treeShowButton(nullptr),
-    m_treePinButton(nullptr),
-    m_treeHidingProcessor(nullptr),
-    m_treeShowingProcessor(nullptr),
-    m_treeOpacityProcessor(nullptr),
-    m_treeOpacityAnimatorGroup(nullptr),
-    m_treeXAnimator(nullptr),
+    m_tree(),
 
     m_titleItem(nullptr),
     m_titleShowButton(nullptr),
@@ -392,7 +379,7 @@ void QnWorkbenchUi::storeSettings()
 
     QnPaneSettings& tree = settings[Qn::WorkbenchPane::Tree];
     tree.state = makePaneState(isTreeOpened(), isTreePinned());
-    tree.span = m_treeItem->geometry().width();
+    tree.span = m_tree.item->geometry().width();
 
     QnPaneSettings& notifications = settings[Qn::WorkbenchPane::Notifications];
     notifications.state = makePaneState(isNotificationsOpened(), isNotificationsPinned());
@@ -480,7 +467,7 @@ QnImageButtonWidget* QnWorkbenchUi::newPinButton(QGraphicsItem* parent, QAction*
 Qn::ActionScope QnWorkbenchUi::currentScope() const
 {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
-    if (focusItem == m_treeItem)
+    if (focusItem == m_tree.item)
         return Qn::TreeScope;
 
     if (focusItem == m_timeline.item)
@@ -502,7 +489,7 @@ QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
     switch (scope)
     {
         case Qn::TreeScope:
-            return m_treeWidget ? m_treeWidget->currentParameters(scope) : QnActionParameters();
+            return m_tree.widget ? m_tree.widget->currentParameters(scope) : QnActionParameters();
         case Qn::SliderScope:
             return QnActionParameters(navigator()->currentWidget());
         case Qn::SceneScope:
@@ -522,8 +509,8 @@ QnWorkbenchUi::Flags QnWorkbenchUi::flags() const
 void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled)
 {
     //TODO: #GDM #optimization disable other masked proxy widgets as well
-    if (m_treeItem)
-        m_treeItem->setUpdatesEnabled(updatesEnabled);
+    if (m_tree.item)
+        m_tree.item->setUpdatesEnabled(updatesEnabled);
 }
 
 void QnWorkbenchUi::enableProxyUpdates()
@@ -641,8 +628,8 @@ void QnWorkbenchUi::updateViewportMargins()
     else
     {
         display()->setViewportMargins(calculateViewportMargins(
-            m_treeXAnimator ? (m_treeXAnimator->isRunning() ? m_treeXAnimator->targetValue().toReal() : m_treeItem->pos().x()) : 0.0,
-            m_treeItem ? m_treeItem->size().width() : 0.0,
+            m_tree.xAnimator ? (m_tree.xAnimator->isRunning() ? m_tree.xAnimator->targetValue().toReal() : m_tree.item->pos().x()) : 0.0,
+            m_tree.item ? m_tree.item->size().width() : 0.0,
             m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
             m_titleItem ? m_titleItem->size().height() : 0.0,
             m_timeline.yAnimator->isRunning() ? m_timeline.yAnimator->targetValue().toReal() : m_timeline.item->pos().y(),
@@ -661,7 +648,7 @@ bool QnWorkbenchUi::isHovered() const
 {
     return
         (m_timeline.opacityProcessor        && m_timeline.opacityProcessor->isHovered())
-        || (m_treeOpacityProcessor          && m_treeOpacityProcessor->isHovered())
+        || (m_tree.opacityProcessor          && m_tree.opacityProcessor->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered())
         || (m_calendarOpacityProcessor      && m_calendarOpacityProcessor->isHovered())
@@ -931,14 +918,14 @@ void QnWorkbenchUi::createControlsWidget()
 
 void QnWorkbenchUi::setTreeShowButtonUsed(bool used)
 {
-    m_treeShowButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+    m_tree.showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
 void QnWorkbenchUi::setTreeVisible(bool visible, bool animate)
 {
     ensureAnimationAllowed(animate);
 
-    if (!m_treeItem)
+    if (!m_tree.item)
         return;
 
     bool changed = m_treeVisible != visible;
@@ -956,23 +943,23 @@ void QnWorkbenchUi::setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpac
 
     if (animate)
     {
-        m_treeOpacityAnimatorGroup->pause();
-        opacityAnimator(m_treeItem)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_treePinButton)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_treeBackgroundItem)->setTargetValue(backgroundOpacity);
-        opacityAnimator(m_treeShowButton)->setTargetValue(backgroundOpacity);
-        m_treeOpacityAnimatorGroup->start();
+        m_tree.opacityAnimatorGroup->pause();
+        opacityAnimator(m_tree.item)->setTargetValue(foregroundOpacity);
+        opacityAnimator(m_tree.pinButton)->setTargetValue(foregroundOpacity);
+        opacityAnimator(m_tree.backgroundItem)->setTargetValue(backgroundOpacity);
+        opacityAnimator(m_tree.showButton)->setTargetValue(backgroundOpacity);
+        m_tree.opacityAnimatorGroup->start();
     }
     else
     {
-        m_treeOpacityAnimatorGroup->stop();
-        m_treeItem->setOpacity(foregroundOpacity);
-        m_treePinButton->setOpacity(foregroundOpacity);
-        m_treeBackgroundItem->setOpacity(backgroundOpacity);
-        m_treeShowButton->setOpacity(backgroundOpacity);
+        m_tree.opacityAnimatorGroup->stop();
+        m_tree.item->setOpacity(foregroundOpacity);
+        m_tree.pinButton->setOpacity(foregroundOpacity);
+        m_tree.backgroundItem->setOpacity(backgroundOpacity);
+        m_tree.showButton->setOpacity(backgroundOpacity);
     }
 
-    m_treeResizerWidget->setVisible(!qFuzzyIsNull(foregroundOpacity));
+    m_tree.resizerWidget->setVisible(!qFuzzyIsNull(foregroundOpacity));
 }
 
 void QnWorkbenchUi::updateTreeOpacity(bool animate)
@@ -1030,28 +1017,28 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
 {
     ensureAnimationAllowed(animate);
 
-    if (!m_treeItem)
+    if (!m_tree.item)
         return;
 
     m_inFreespace &= !opened;
 
-    m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
+    m_tree.showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(QnActions::ToggleTreeAction)->setChecked(opened);
 
-    qreal newX = opened ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case. */;
+    qreal newX = opened ? 0.0 : -m_tree.item->size().width() - 1.0 /* Just in case. */;
     if (animate)
     {
-        m_treeXAnimator->animateTo(newX);
+        m_tree.xAnimator->animateTo(newX);
     }
     else
     {
-        m_treeXAnimator->stop();
-        m_treeItem->setX(newX);
+        m_tree.xAnimator->stop();
+        m_tree.item->setX(newX);
     }
 
-    static_cast<ResizerWidget*>(m_treeResizerWidget)->setEnabled(opened);
+    static_cast<ResizerWidget*>(m_tree.resizerWidget)->setEnabled(opened);
 }
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
@@ -1071,15 +1058,15 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
 
 void QnWorkbenchUi::updateTreeGeometry()
 {
-    if (!m_treeItem)
+    if (!m_tree.item)
         return;
 
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedTreeGeometry(m_treeItem->geometry(), m_titleItem->geometry(), m_timeline.item->geometry());
-    m_treeItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
+    QRectF geometry = updatedTreeGeometry(m_tree.item->geometry(), m_titleItem->geometry(), m_timeline.item->geometry());
+    m_tree.item->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
-    m_treeItem->setPos(geometry.topLeft());
+    m_tree.item->setPos(geometry.topLeft());
 
     /* Whether actual size change should be deferred. */
     bool defer = false;
@@ -1117,42 +1104,42 @@ void QnWorkbenchUi::updateTreeGeometry()
     }
 
     /* Calculate target geometry. */
-    geometry = updatedTreeGeometry(m_treeItem->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_timeline.item->size()));
-    if (qFuzzyEquals(geometry, m_treeItem->geometry()))
+    geometry = updatedTreeGeometry(m_tree.item->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_timeline.item->size()));
+    if (qFuzzyEquals(geometry, m_tree.item->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
-    if (defer && geometry.height() < m_treeItem->size().height())
+    if (defer && geometry.height() < m_tree.item->size().height())
         return;
 
-    m_treeItem->resize(geometry.size());
+    m_tree.item->resize(geometry.size());
 }
 
 void QnWorkbenchUi::updateTreeResizerGeometry()
 {
-    if (m_updateTreeResizerGeometryLater)
+    if (m_tree.updateResizerGeometryLater)
     {
         QTimer::singleShot(1, this, &QnWorkbenchUi::updateTreeResizerGeometry);
         return;
     }
 
-    QRectF treeRect = m_treeItem->rect();
+    QRectF treeRect = m_tree.item->rect();
 
     QRectF treeResizerGeometry = QRectF(
-        m_controlsWidget->mapFromItem(m_treeItem, treeRect.topRight()),
-        m_controlsWidget->mapFromItem(m_treeItem, treeRect.bottomRight()));
+        m_controlsWidget->mapFromItem(m_tree.item, treeRect.topRight()),
+        m_controlsWidget->mapFromItem(m_tree.item, treeRect.bottomRight()));
 
     treeResizerGeometry.moveTo(treeResizerGeometry.topRight());
     treeResizerGeometry.setWidth(8);
 
-    if (!qFuzzyEquals(treeResizerGeometry, m_treeResizerWidget->geometry()))
+    if (!qFuzzyEquals(treeResizerGeometry, m_tree.resizerWidget->geometry()))
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updateTreeResizerGeometryLater, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_tree.updateResizerGeometryLater, true);
 
-        m_treeResizerWidget->setGeometry(treeResizerGeometry);
+        m_tree.resizerWidget->setGeometry(treeResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_treeResizerWidget->setPos(treeResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
+        m_tree.resizerWidget->setPos(treeResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
 }
 
@@ -1167,19 +1154,19 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource)
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged()
 {
-    QRectF paintGeometry = m_treeItem->paintGeometry();
+    QRectF paintGeometry = m_tree.item->paintGeometry();
 
     /* Don't hide tree item here. It will repaint itself when shown, which will
      * degrade performance. */
 
-    m_treeBackgroundItem->setGeometry(paintGeometry);
+    m_tree.backgroundItem->setGeometry(paintGeometry);
 
-    m_treeShowButton->setPos(QPointF(
+    m_tree.showButton->setPos(QPointF(
         qMax(m_controlsWidgetRect.left(), paintGeometry.right()),
-        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_treeShowButton->size().height()) / 2.0));
+        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_tree.showButton->size().height()) / 2.0));
 
-    m_treePinButton->setPos(QPointF(
-        paintGeometry.right() - m_treePinButton->size().width() - 1.0,
+    m_tree.pinButton->setPos(QPointF(
+        paintGeometry.right() - m_tree.pinButton->size().width() - 1.0,
         paintGeometry.top() + 1.0));
 
     updateTreeResizerGeometry();
@@ -1188,20 +1175,20 @@ void QnWorkbenchUi::at_treeItem_paintGeometryChanged()
 
 void QnWorkbenchUi::at_treeResizerWidget_geometryChanged()
 {
-    if (m_ignoreTreeResizerGeometryChanges)
+    if (m_tree.ignoreResizerGeometryChanges)
         return;
 
-    QRectF resizerGeometry = m_treeResizerWidget->geometry();
+    QRectF resizerGeometry = m_tree.resizerWidget->geometry();
     if (!resizerGeometry.isValid())
     {
         updateTreeResizerGeometry();
         return;
     }
 
-    QRectF treeGeometry = m_treeItem->geometry();
+    QRectF treeGeometry = m_tree.item->geometry();
 
-    qreal targetWidth = m_treeResizerWidget->geometry().left() - treeGeometry.left();
-    qreal minWidth = m_treeItem->effectiveSizeHint(Qt::MinimumSize).width();
+    qreal targetWidth = m_tree.resizerWidget->geometry().left() - treeGeometry.left();
+    qreal minWidth = m_tree.item->effectiveSizeHint(Qt::MinimumSize).width();
 
     //TODO #vkutin Think how to do it differently.
     // At application startup m_controlsWidget has default (not maximized) size, so we cannot use its width here.
@@ -1214,9 +1201,9 @@ void QnWorkbenchUi::at_treeResizerWidget_geometryChanged()
         treeGeometry.setWidth(targetWidth);
         treeGeometry.setLeft(0);
 
-        QN_SCOPED_VALUE_ROLLBACK(&m_ignoreTreeResizerGeometryChanges, true);
-        m_treeWidget->resize(targetWidth, m_treeWidget->height());
-        m_treeItem->setPaintGeometry(treeGeometry);
+        QN_SCOPED_VALUE_ROLLBACK(&m_tree.ignoreResizerGeometryChanges, true);
+        m_tree.widget->resize(targetWidth, m_tree.widget->height());
+        m_tree.item->setPaintGeometry(treeGeometry);
     }
 
     updateTreeResizerGeometry();
@@ -1233,8 +1220,8 @@ void QnWorkbenchUi::at_treeShowingProcessor_hoverEntered()
         QTimer::singleShot(kButtonInactivityTimeoutMs, this, [this]() { setTreeShowButtonUsed(true); });
     }
 
-    m_treeHidingProcessor->forceHoverEnter();
-    m_treeOpacityProcessor->forceHoverEnter();
+    m_tree.hidingProcessor->forceHoverEnter();
+    m_tree.opacityProcessor->forceHoverEnter();
 }
 
 void QnWorkbenchUi::at_pinTreeAction_toggled(bool checked)
@@ -1247,70 +1234,71 @@ void QnWorkbenchUi::at_pinTreeAction_toggled(bool checked)
 
 void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
 {
-    m_treeWidget = new QnResourceBrowserWidget(nullptr, context());
-    m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
+    m_tree.widget = new QnResourceBrowserWidget(nullptr, context());
+    m_tree.widget->setAttribute(Qt::WA_TranslucentBackground);
 
-    QPalette defaultPalette = m_treeWidget->palette();
-    setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
-    setPaletteColor(m_treeWidget, QPalette::Base, Qt::transparent);
-    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
+    QPalette defaultPalette = m_tree.widget->palette();
+    setPaletteColor(m_tree.widget, QPalette::Window, Qt::transparent);
+    setPaletteColor(m_tree.widget, QPalette::Base, Qt::transparent);
+    setPaletteColor(m_tree.widget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
 
-    m_treeBackgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
-    m_treeBackgroundItem->setFrameBorders(Qt::RightEdge);
+    m_tree.backgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
+    m_tree.backgroundItem->setFrameBorders(Qt::RightEdge);
 
-    m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
-    m_treeItem->setWidget(m_treeWidget);
-    m_treeWidget->installEventFilter(m_treeItem);
-    m_treeWidget->setToolTipParent(m_treeItem);
-    m_treeItem->setFocusPolicy(Qt::StrongFocus);
-    m_treeItem->setProperty(Qn::NoHandScrollOver, true);
-    m_treeItem->resize(settings.span, 0.0);
+    m_tree.item = new QnMaskedProxyWidget(m_controlsWidget);
+    m_tree.item->setWidget(m_tree.widget);
+    m_tree.widget->installEventFilter(m_tree.item);
+    m_tree.widget->setToolTipParent(m_tree.item);
+    m_tree.item->setFocusPolicy(Qt::StrongFocus);
+    m_tree.item->setProperty(Qn::NoHandScrollOver, true);
+    m_tree.item->resize(settings.span, 0.0);
 
     const auto pinTreeAction = action(QnActions::PinTreeAction);
     pinTreeAction->setChecked(settings.state != Qn::PaneState::Unpinned);
-    m_treePinButton = newPinButton(m_controlsWidget, pinTreeAction);
-    m_treePinButton->setFocusProxy(m_treeItem);
+    m_tree.pinButton = newPinButton(m_controlsWidget, pinTreeAction);
+    m_tree.pinButton->setFocusProxy(m_tree.item);
 
     const auto toggleTreeAction = action(QnActions::ToggleTreeAction);
     toggleTreeAction->setChecked(settings.state == Qn::PaneState::Opened);
-    m_treeShowButton = newShowHideButton(m_controlsWidget, toggleTreeAction);
-    m_treeShowButton->setFocusProxy(m_treeItem);
-    m_treeShowButton->stackBefore(m_treeItem);
+    m_tree.showButton = newShowHideButton(m_controlsWidget, toggleTreeAction);
+    m_tree.showButton->setFocusProxy(m_tree.item);
+    m_tree.showButton->stackBefore(m_tree.item);
 
-    m_treeResizerWidget = new ResizerWidget(Qt::Horizontal, m_controlsWidget);
-    m_treeResizerWidget->setProperty(Qn::NoHandScrollOver, true);
-    m_treeResizerWidget->stackBefore(m_treeShowButton);
+    m_tree.resizerWidget = new ResizerWidget(Qt::Horizontal, m_controlsWidget);
+    m_tree.resizerWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_tree.resizerWidget->stackBefore(m_tree.showButton);
 
-    m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_treeOpacityProcessor->addTargetItem(m_treeItem);
-    m_treeOpacityProcessor->addTargetItem(m_treeShowButton);
+    m_tree.opacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_tree.opacityProcessor->addTargetItem(m_tree.item);
+    m_tree.opacityProcessor->addTargetItem(m_tree.showButton);
 
-    m_treeHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_treeHidingProcessor->addTargetItem(m_treeItem);
-    m_treeHidingProcessor->addTargetItem(m_treeShowButton);
-    m_treeHidingProcessor->addTargetItem(m_treeResizerWidget);
-    m_treeHidingProcessor->setHoverLeaveDelay(kCloseControlsTimeoutMs);
-    m_treeHidingProcessor->setFocusLeaveDelay(kCloseControlsTimeoutMs);
+    m_tree.hidingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_tree.hidingProcessor->addTargetItem(m_tree.item);
+    m_tree.hidingProcessor->addTargetItem(m_tree.showButton);
+    m_tree.hidingProcessor->addTargetItem(m_tree.resizerWidget);
+    m_tree.hidingProcessor->setHoverLeaveDelay(kCloseControlsTimeoutMs);
+    m_tree.hidingProcessor->setFocusLeaveDelay(kCloseControlsTimeoutMs);
 
-    m_treeShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_treeShowingProcessor->addTargetItem(m_treeShowButton);
-    m_treeShowingProcessor->setHoverEnterDelay(kShowControlsTimeoutMs);
+    m_tree.showingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_tree.showingProcessor->addTargetItem(m_tree.showButton);
+    m_tree.showingProcessor->setHoverEnterDelay(kShowControlsTimeoutMs);
 
-    m_treeXAnimator = new VariantAnimator(this);
-    m_treeXAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_treeXAnimator->setTargetObject(m_treeItem);
-    m_treeXAnimator->setAccessor(new PropertyAccessor("x"));
-    m_treeXAnimator->setSpeed(qMax(1.0, m_treeItem->size().width() * 2.0));
-    m_treeXAnimator->setTimeLimit(500);
+    m_tree.xAnimator = new VariantAnimator(this);
+    m_tree.xAnimator->setTimer(m_instrumentManager->animationTimer());
+    m_tree.xAnimator->setTargetObject(m_tree.item);
+    m_tree.xAnimator->setAccessor(new PropertyAccessor("x"));
+    m_tree.xAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+    m_tree.xAnimator->setSpeed(qMax(1.0, m_tree.item->size().width() * 2.0));
+    m_tree.xAnimator->setTimeLimit(500);
 
-    m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_treeOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeItem));
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBackgroundItem)); /* Speed of 1.0 is OK here. */
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
-    m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treePinButton));
+    m_tree.opacityAnimatorGroup = new AnimatorGroup(this);
+    m_tree.opacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
+    m_tree.opacityAnimatorGroup->addAnimator(opacityAnimator(m_tree.item));
+    m_tree.opacityAnimatorGroup->addAnimator(opacityAnimator(m_tree.backgroundItem)); /* Speed of 1.0 is OK here. */
+    m_tree.opacityAnimatorGroup->addAnimator(opacityAnimator(m_tree.showButton));
+    m_tree.opacityAnimatorGroup->addAnimator(opacityAnimator(m_tree.pinButton));
 
-    connect(m_treeHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_tree.hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
         [this]
         {
             /* Do not auto-hide tree if we have opened context menu. */
@@ -1318,28 +1306,28 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
                 setTreeOpened(false);
         });
 
-    connect(menu(), &QnActionManager::menuAboutToHide, m_treeHidingProcessor,
+    connect(menu(), &QnActionManager::menuAboutToHide, m_tree.hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
 
-    connect(m_treeWidget, &QnResourceBrowserWidget::selectionChanged,
+    connect(m_tree.widget, &QnResourceBrowserWidget::selectionChanged,
         action(QnActions::SelectionChangeAction), &QAction::trigger);
-    connect(m_treeWidget, &QnResourceBrowserWidget::activated, this,
+    connect(m_tree.widget, &QnResourceBrowserWidget::activated, this,
         &QnWorkbenchUi::at_treeWidget_activated);
-    connect(m_treeOpacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+    connect(m_tree.opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &QnWorkbenchUi::updateTreeOpacityAnimated);
-    connect(m_treeOpacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+    connect(m_tree.opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &QnWorkbenchUi::updateTreeOpacityAnimated);
-    connect(m_treeOpacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+    connect(m_tree.opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_treeOpacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+    connect(m_tree.opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_treeShowingProcessor, &HoverFocusProcessor::hoverEntered, this,
+    connect(m_tree.showingProcessor, &HoverFocusProcessor::hoverEntered, this,
         &QnWorkbenchUi::at_treeShowingProcessor_hoverEntered);
-    connect(m_treeItem, &QnMaskedProxyWidget::paintRectChanged, this,
+    connect(m_tree.item, &QnMaskedProxyWidget::paintRectChanged, this,
         &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
-    connect(m_treeItem, &QGraphicsWidget::geometryChanged, this,
+    connect(m_tree.item, &QGraphicsWidget::geometryChanged, this,
         &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
-    connect(m_treeResizerWidget, &QGraphicsWidget::geometryChanged, this,
+    connect(m_tree.resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &QnWorkbenchUi::at_treeResizerWidget_geometryChanged, Qt::QueuedConnection);
     connect(toggleTreeAction, &QAction::toggled, this,
         [this](bool checked)
@@ -1352,7 +1340,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::at_pinNotificationsAction_toggled);
 
     /* Create a shadow: */
-    new QnEdgeShadowWidget(m_treeItem, Qt::RightEdge, kShadowThickness);
+    new QnEdgeShadowWidget(m_tree.item, Qt::RightEdge, kShadowThickness);
 }
 
 #pragma endregion Tree widget methods

@@ -13,6 +13,7 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/workbench/ui/timeline.h>
+#include <ui/workbench/ui/resource_tree.h>
 
 #include <client/client_globals.h>
 
@@ -29,7 +30,6 @@ class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
-class QnResourceBrowserWidget;
 class QnProxyLabel;
 class QnDebugProxyLabel;
 
@@ -314,42 +314,8 @@ private:
     /** Navigation item. */
     QnWorkbenchUiTimeline m_timeline;
 
-    /* Tree-related state. */
-
-    /** Navigation tree widget. */
-    QnResourceBrowserWidget *m_treeWidget;
-    QGraphicsWidget *m_treeResizerWidget;
-    bool m_ignoreTreeResizerGeometryChanges;
-    bool m_updateTreeResizerGeometryLater;
-
-    /** Proxy widget for navigation tree widget. */
-    QnMaskedProxyWidget *m_treeItem;
-
-    /** Item that provides background for the tree. */
-    QnFramedWidget *m_treeBackgroundItem;
-
-    /** Button to show/hide the tree. */
-    QnImageButtonWidget *m_treeShowButton;
-
-    /** Button to pin the tree. */
-    QnImageButtonWidget *m_treePinButton;
-
-    /** Hover processor that is used to hide the tree when the mouse leaves it. */
-    HoverFocusProcessor *m_treeHidingProcessor;
-
-    /** Hover processor that is used to show the tree when the mouse hovers over it. */
-    HoverFocusProcessor *m_treeShowingProcessor;
-
-    /** Hover processor that is used to change tree opacity when mouse hovers over it. */
-    HoverFocusProcessor *m_treeOpacityProcessor;
-
-    /** Animator group for tree's opacity. */
-    AnimatorGroup *m_treeOpacityAnimatorGroup;
-
-    /** Animator for tree's position. */
-    VariantAnimator *m_treeXAnimator;
-
-
+    /* Resources tree. */
+    QnWorkbenchUiResourceTree m_tree;
 
     /* Title-related state. */
 
