@@ -71,20 +71,12 @@
          <property name="text">
           <string>Add</string>
          </property>
-         <property name="icon">
-          <iconset resource="../../../x64/build/client.qrc">
-           <normaloff>:/skin/buttons/add.png</normaloff>:/skin/buttons/add.png</iconset>
-         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="deleteRuleButton">
          <property name="text">
           <string>Delete</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../../x64/build/client.qrc">
-           <normaloff>:/skin/buttons/remove.png</normaloff>:/skin/buttons/remove.png</iconset>
          </property>
         </widget>
        </item>
