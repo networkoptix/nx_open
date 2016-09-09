@@ -18,6 +18,8 @@ public:
     QnClientMessageProcessor();
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
 
+    const QnClientConnectionStatus* connectionStatus() const;
+
     void setHoldConnection(bool holdConnection);
 
 protected:

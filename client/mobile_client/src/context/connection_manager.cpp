@@ -377,19 +377,19 @@ void QnConnectionManagerPrivate::updateConnectionState()
     }
     else
     {
-        switch (qnClientMessageProcessor->connectionState())
+        switch (qnClientMessageProcessor->connectionStatus()->state())
         {
-        case QnConnectionState::Connecting:
-        case QnConnectionState::Reconnecting:
-            newState = QnConnectionManager::Connecting;
-            break;
-        case QnConnectionState::Connected:
-        case QnConnectionState::Ready:
-            newState = QnConnectionManager::Connected;
-            break;
-        default:
-            newState = QnConnectionManager::Disconnected;
-            break;
+            case QnConnectionState::Connecting:
+            case QnConnectionState::Reconnecting:
+                newState = QnConnectionManager::Connecting;
+                break;
+            case QnConnectionState::Connected:
+            case QnConnectionState::Ready:
+                newState = QnConnectionManager::Connected;
+                break;
+            default:
+                newState = QnConnectionManager::Disconnected;
+                break;
         }
     }
 
