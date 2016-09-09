@@ -261,7 +261,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
 
-    NX_LOG(lit("Iterating over found resources"), cl_logINFO);
+
     QnResourceList swapList;
     for(const QnResourcePtr &res: resources)
     {
@@ -271,7 +271,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnResourcePtr updetedRes = res->updateResource();
             if (updetedRes)
             {
-                NX_LOG(lit("DISCOVERY MANAGER, got updated resource %1").arg(updetedRes->getName()), cl_logINFO);
+                NX_LOG(lit("DISCOVERY MANAGER, no updated resource").arg(res->getName()), cl_logINFO);
                 swapList.push_back(updetedRes);
             }
         }
@@ -289,10 +289,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     {
         NX_LOG("Discovery---- Final result: ", cl_logINFO);
         printInLogNetResources(resources);
-    }
-    else
-    {
-        NX_LOG(lit("No resources found"), cl_logINFO);
     }
     return true;
 }

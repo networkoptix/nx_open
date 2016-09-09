@@ -187,7 +187,6 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
         NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
     }
 
-    NX_LOG(lit("AV Resource updated"), cl_logINFO);
     return result;
 }
 
@@ -643,7 +642,6 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString &id, const QString
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
-    NX_LOG(lit("Creating resource by name %1").arg(name), cl_logINFO);
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
     {
@@ -659,7 +657,6 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
         }
     }
 
-    NX_LOG(lit("Creating AV resource by typeId"), cl_logINFO);
     return createResourceByTypeId(rt);
 
 }
@@ -667,7 +664,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUuid rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
-    NX_LOG(lit("Creating AV resource by typeId (2)"), cl_logINFO);
+
     if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
         NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
@@ -677,19 +674,12 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUui
     QnPlAreconVisionResource* res = 0;
 
     if (isPanoramic(resourceType))
-    {
-        NX_LOG(lit("Creating panoramic AV resource by with type name %1").arg(resourceType->getName()), cl_logINFO);
         res = new QnArecontPanoramicResource(resourceType->getName());
-    }
     else
-    {
-        NX_LOG(lit("Creating single sensor AV resource with type name %1").arg(resourceType->getName()), cl_logINFO);
         res = new CLArecontSingleSensorResource(resourceType->getName());
-    }
 
     res->setTypeId(rt);
 
-    NX_LOG(lit("return AV resource (createResourceByTypeId)"));
     return res;
 }
 
