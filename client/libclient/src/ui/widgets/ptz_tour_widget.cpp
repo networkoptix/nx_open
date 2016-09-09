@@ -7,6 +7,7 @@
 
 #include <ui/models/ptz_tour_spots_model.h>
 #include <ui/delegates/ptz_tour_item_delegate.h>
+#include <ui/style/skin.h>
 
 #include <utils/common/event_processors.h>
 
@@ -27,18 +28,30 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     ui->tableView->setCurrentIndex(QModelIndex());
 
     // TODO: #Elric replace with a single connect call
-    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
+    auto resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
     ui->tableView->viewport()->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
+    connect(resizeSignalizer, &QnSingleEventSignalizer::activated, this,
+        &QnPtzTourWidget::at_tableViewport_resizeEvent, Qt::QueuedConnection);
 
 
     connect(m_model, &QnPtzTourSpotsModel::spotsChanged, this, &QnPtzTourWidget::tourSpotsChanged);
 
-    connect(ui->addSpotButton,      SIGNAL(clicked()), this, SLOT(at_addSpotButton_clicked()));
-    connect(ui->deleteSpotButton,   SIGNAL(clicked()), this, SLOT(at_deleteSpotButton_clicked()));
-    connect(ui->moveSpotUpButton,   SIGNAL(clicked()), this, SLOT(at_moveSpotUpButton_clicked()));
-    connect(ui->moveSpotDownButton, SIGNAL(clicked()), this, SLOT(at_moveSpotDownButton_clicked()));
+    ui->addSpotButton->setIcon(qnSkin->icon("buttons/plus.png"));
+    connect(ui->addSpotButton, &QPushButton::clicked, this,
+        &QnPtzTourWidget::at_addSpotButton_clicked);
+
+    ui->deleteSpotButton->setIcon(qnSkin->icon("buttons/minus.png"));
+    connect(ui->deleteSpotButton, &QPushButton::clicked, this,
+        &QnPtzTourWidget::at_deleteSpotButton_clicked);
+
+    ui->moveSpotUpButton->setIcon(qnSkin->icon("buttons/up.png"));
+    connect(ui->moveSpotUpButton, &QPushButton::clicked, this,
+        &QnPtzTourWidget::at_moveSpotUpButton_clicked);
+
+    ui->moveSpotDownButton->setIcon(qnSkin->icon("buttons/down.png"));
+    connect(ui->moveSpotDownButton, &QPushButton::clicked, this,
+        &QnPtzTourWidget::at_moveSpotDownButton_clicked);
 }
 
 QnPtzTourWidget::~QnPtzTourWidget() {

@@ -28,6 +28,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/skin.h>
 
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -126,14 +127,31 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
 
     //connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
-    connect(ui->savePositionButton, &QPushButton::clicked, this, &QnPtzManageDialog::at_savePositionButton_clicked);
-    connect(ui->goToPositionButton, &QPushButton::clicked, this, &QnPtzManageDialog::at_goToPositionButton_clicked);
-    connect(ui->addTourButton, &QPushButton::clicked, this, &QnPtzManageDialog::at_addTourButton_clicked);
-    connect(ui->startTourButton, &QPushButton::clicked, this, &QnPtzManageDialog::at_startTourButton_clicked);
-    connect(ui->deleteButton, &QPushButton::clicked, this, &QnPtzManageDialog::at_deleteButton_clicked);
-    connect(ui->getPreviewButton, &QPushButton::clicked, this, &QnPtzManageDialog::at_getPreviewButton_clicked);
+    ui->savePositionButton->setIcon(qnSkin->icon("buttons/ok.png"));
+    connect(ui->savePositionButton, &QPushButton::clicked, this,
+        &QnPtzManageDialog::at_savePositionButton_clicked);
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnAbstractPtzDialog::saveChanges);
+    ui->goToPositionButton->setIcon(qnSkin->icon("buttons/to_position.png"));
+    connect(ui->goToPositionButton, &QPushButton::clicked, this,
+        &QnPtzManageDialog::at_goToPositionButton_clicked);
+
+    ui->addTourButton->setIcon(qnSkin->icon("buttons/plus.png"));
+    connect(ui->addTourButton, &QPushButton::clicked, this,
+        &QnPtzManageDialog::at_addTourButton_clicked);
+
+    ui->startTourButton->setIcon(qnSkin->icon("buttons/play.png"));
+    connect(ui->startTourButton, &QPushButton::clicked, this,
+        &QnPtzManageDialog::at_startTourButton_clicked);
+
+    ui->deleteButton->setIcon(qnSkin->icon("buttons/delete.png"));
+    connect(ui->deleteButton, &QPushButton::clicked, this,
+        &QnPtzManageDialog::at_deleteButton_clicked);
+
+    connect(ui->getPreviewButton, &QPushButton::clicked, this,
+        &QnPtzManageDialog::at_getPreviewButton_clicked);
+
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
+        &QnAbstractPtzDialog::saveChanges);
 
     setHelpTopic(ui->tourGroupBox, Qn::PtzManagement_Tour_Help);
 
