@@ -2050,8 +2050,11 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
     if (animate)
     {
         /* Skip off-screen part. */
-        if (m_timeline.item->y() > m_controlsWidgetRect.bottom())
+        if (opened && m_timeline.item->y() > m_controlsWidgetRect.bottom())
+        {
+            QSignalBlocker blocker(m_timeline.item);
             m_timeline.item->setY(m_controlsWidgetRect.bottom());
+        }
 
         m_timeline.yAnimator->animateTo(newY);
     }
