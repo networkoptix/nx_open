@@ -83,7 +83,7 @@ public:
     //!Implementation of QnStoppableAsync::pleaseStopAsync
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
-        m_httpClient->terminate();
+        m_httpClient->pleaseStopSync();
         handler();
     }
 

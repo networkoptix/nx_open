@@ -28,18 +28,12 @@ void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler
         });
 }
 
-void BasicPollable::pleaseStopSync()
+void BasicPollable::pleaseStopSync(bool doNotCheckForLocks)
 {
     if (m_timer.isInSelfAioThread())
-    {
         stopWhileInAioThread();
-    }
     else
-    {
-        nx::utils::promise<void> stoppedPromise;
-        pleaseStop([&stoppedPromise]{ stoppedPromise.set_value(); });
-        stoppedPromise.get_future().wait();
-    }
+        QnStoppableAsync::pleaseStopSync(doNotCheckForLocks);
 }
 
 aio::AbstractAioThread* BasicPollable::getAioThread() const

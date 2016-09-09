@@ -40,7 +40,7 @@ public:
     /** Stops object's asynchronous operations and waits for completion.
         Default implementation calls \a QnStoppableAsync::pleaseStop and waits for completion
     */
-    virtual void pleaseStopSync();
+    virtual void pleaseStopSync(bool doNotCheckForLocks = false);
 
     typedef std::unique_ptr< QnStoppableAsync > UniquePtr;
 

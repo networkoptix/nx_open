@@ -32,8 +32,8 @@ class NX_NETWORK_API BasicPollable
 public:
     BasicPollable(aio::AbstractAioThread* aioThread = nullptr);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler);
-    virtual void pleaseStopSync();
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    void pleaseStopSync(bool doNotCheckForLocks = false) override;
 
     virtual aio::AbstractAioThread* getAioThread() const override;
     /** Generally, binding to aio thread can be done just after 

@@ -15,9 +15,9 @@ void Timer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
     m_internalSocket.pleaseStop(std::move(completionHandler));
 }
 
-void Timer::pleaseStopSync()
+void Timer::pleaseStopSync(bool doNotCheckForLocks)
 {
-    m_internalSocket.pleaseStopSync();
+    m_internalSocket.pleaseStopSync(doNotCheckForLocks);
 }
 
 void Timer::post(nx::utils::MoveOnlyFunc<void()> funcToCall)

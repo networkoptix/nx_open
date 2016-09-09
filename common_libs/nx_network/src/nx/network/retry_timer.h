@@ -75,7 +75,7 @@ public:
     virtual ~RetryTimer();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    virtual void pleaseStopSync() override;
+    virtual void pleaseStopSync(bool doNotCheckForLocks = false) override;
 
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

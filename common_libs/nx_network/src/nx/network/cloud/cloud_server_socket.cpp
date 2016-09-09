@@ -77,7 +77,7 @@ CloudServerSocket::~CloudServerSocket()
     if (m_mediatorConnection->isInSelfAioThread())
     {
         // Will not block as all delegates are in the same AIO thread
-        pleaseStopSync();
+        pleaseStopSync(true);
     }
     else
     {

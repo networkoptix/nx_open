@@ -163,6 +163,8 @@ public:
     void afterMutexLocked( const MutexLockKey& mutexLockPosition );
     void beforeMutexUnlocked( const MutexLockKey& mutexLockPosition );
 
+    void expectNoLocks();
+
     //!Should be called just after a new thread has been started
     void threadStarted( std::uintptr_t sysThreadID );
     //!Should be called just before a thread descriptor is freed

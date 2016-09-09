@@ -113,7 +113,7 @@ TEST_F(AsyncHttpClientTest, motionJpegRetrieval)
     {
         ~ClientContext()
         {
-            client->terminate();
+            client->pleaseStopSync();
             client.reset(); //ensuring client removed before multipartParser
         }
 

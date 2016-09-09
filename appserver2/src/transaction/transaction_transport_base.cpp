@@ -246,12 +246,12 @@ QnTransactionTransportBase::~QnTransactionTransportBase()
     {
         auto httpClientLocal = m_httpClient;
         if( httpClientLocal )
-            httpClientLocal->terminate();
+            httpClientLocal->pleaseStopSync();
     }
     {
         auto outgoingTranClientLocal = m_outgoingTranClient;
         if( outgoingTranClientLocal )
-            outgoingTranClientLocal->terminate();
+            outgoingTranClientLocal->pleaseStopSync();
     }
 
     {
