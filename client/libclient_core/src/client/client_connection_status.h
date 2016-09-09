@@ -25,6 +25,9 @@ public:
     QnConnectionState state() const;
     void setState(QnConnectionState state);
 
+    bool operator==(QnConnectionState state) const;
+    QnClientConnectionStatus& operator=(QnConnectionState state);
+
 signals:
     void stateChanged(QnConnectionState value);
 

@@ -20,13 +20,6 @@ public:
 
     void setHoldConnection(bool holdConnection);
 
-    QnConnectionState connectionState() const;
-
-    void setConnectionState(QnConnectionState state);
-
-signals:
-    void connectionStateChanged();
-
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;

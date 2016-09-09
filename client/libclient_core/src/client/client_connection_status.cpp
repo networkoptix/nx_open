@@ -3,15 +3,13 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
-//#define STRICT_STATE_CONTROL
+#define STRICT_STATE_CONTROL
 #define DEBUG_CLIENT_CONNECTION_STATUS
 #ifdef DEBUG_CLIENT_CONNECTION_STATUS
 #define TRACE(...) qDebug() << "QnClientConnectionStatus: " << __VA_ARGS__;
 #else
 #define TRACE(...)
 #endif
-
-static int counter = 0;
 
 namespace {
 
@@ -38,24 +36,23 @@ QnClientConnectionStatus::QnClientConnectionStatus(QnConnectionState state, QObj
     m_allowedTransactions()
 {
     /* Default way. */
-    m_allowedTransactions.insert(QnConnectionState::Disconnected,   QnConnectionState::Connecting);
-    m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Connected);
-    m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Ready);
-    m_allowedTransactions.insert(QnConnectionState::Ready,          QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Disconnected, QnConnectionState::Connecting);
+    m_allowedTransactions.insert(QnConnectionState::Connecting,   QnConnectionState::Connected);
+    m_allowedTransactions.insert(QnConnectionState::Connected,    QnConnectionState::Ready);
 
     /* Auto-reconnect. */
-    m_allowedTransactions.insert(QnConnectionState::Ready,          QnConnectionState::Reconnecting);
-    m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Reconnecting);
-    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Connected);      /*< Reconnected to current server. */
-    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Connecting);     /*< Trying another server. */
+    m_allowedTransactions.insert(QnConnectionState::Ready,        QnConnectionState::Reconnecting);
+    m_allowedTransactions.insert(QnConnectionState::Connected,    QnConnectionState::Reconnecting);
+    m_allowedTransactions.insert(QnConnectionState::Reconnecting, QnConnectionState::Connected);
 
     /* Cancelled connect. */
-    m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Disconnected);
-    m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Disconnected);
-    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Connecting,   QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Connected,    QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Reconnecting, QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Ready,        QnConnectionState::Disconnected);
 
     /* Double-checked disconnect is allowed. */
-    m_allowedTransactions.insert(QnConnectionState::Disconnected,   QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Disconnected, QnConnectionState::Disconnected);
 }
 
 QnConnectionState QnClientConnectionStatus::state() const
@@ -65,12 +62,23 @@ QnConnectionState QnClientConnectionStatus::state() const
 
 void QnClientConnectionStatus::setState(QnConnectionState state)
 {
-    TRACE("setState" << stateToString[m_state]);
+    //TRACE("setState" << stateToString[state]);
     if (!m_allowedTransactions.values(m_state).contains(state))
         warn(lit("Invalid state transaction %1 -> %2").arg(stateToString[m_state]).arg(stateToString[state]));
 
     m_state = state;
     emit stateChanged(state);
+}
+
+QnClientConnectionStatus& QnClientConnectionStatus::operator=(QnConnectionState state)
+{
+    setState(state);
+    return *this;
+}
+
+bool QnClientConnectionStatus::operator==(QnConnectionState state) const
+{
+    return m_state == state;
 }
 
 void QnClientConnectionStatus::warn(const QString &message) const

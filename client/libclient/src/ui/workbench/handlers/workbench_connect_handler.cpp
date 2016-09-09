@@ -159,6 +159,12 @@ ec2::AbstractECConnectionPtr connection2()
     return QnAppServerConnectionFactory::getConnection2();
 }
 
+void trace(const QString& message)
+{
+    qDebug() << "QnWorkbenchConnectHandler: " << message;
+    NX_LOG(lit("QnWorkbenchConnectHandler: ") + message);
+}
+
 } //anonymous namespace
 
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
@@ -176,12 +182,17 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         [this]
         {
+            /* We could get here if server advanced settings were changed so peer was reset. */
+            if (m_state.state() == QnConnectionState::Ready)
+                return;
+
             NX_ASSERT(m_state.state() == QnConnectionState::Connected);
             if (m_state.state() != QnConnectionState::Connected)
             {
                 disconnectFromServer(true);
                 return;
             }
+            trace(lit("resources received, state -> Ready"));
             m_state.setState(QnConnectionState::Ready);
 
             /* Reload all dialogs and dependent data. */
@@ -213,6 +224,22 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         [this]
         {
             disconnectFromServer(true);
+        });
+
+    connect(action(QnActions::LogoutFromCloud), &QAction::triggered, this,
+        [this]
+        {
+            /* Check if we need to logout if logged in under this user. */
+            if (m_state.state() == QnConnectionState::Disconnected)
+                return;
+
+            QString currentLogin = QnAppServerConnectionFactory::url().userName();
+            NX_ASSERT(!currentLogin.isEmpty());
+            if (currentLogin.isEmpty())
+                return;
+
+            if (qnCloudStatusWatcher->effectiveUserName() == currentLogin)
+                disconnectFromServer(true);
         });
 
     context()->instance<QnAppServerNotificationCache>();
@@ -267,9 +294,9 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     auto validState = m_state.state() == QnConnectionState::Connecting
         || m_state.state() == QnConnectionState::Reconnecting;
+    NX_ASSERT(validState);
     if (!validState)
         return;
-    //NX_ASSERT(validState);
     m_connectingHandle = 0;
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
@@ -413,7 +440,6 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
         return;
     }
 
-    //m_state.setState(QnConnectionState::Connected);
     auto connectionInfo = connection->connectionInfo();
 
     QUrl url = connectionInfo.effectiveUrl();
@@ -479,6 +505,7 @@ void QnWorkbenchConnectHandler::stopReconnecting()
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 {
+    trace(lit("connection opened, state -> Connected"));
     m_state.setState(QnConnectionState::Connected);
     action(QnActions::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
@@ -558,6 +585,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
 
     if (url.isValid())
     {
+        trace(lit("state -> Connecting"));
         m_state.setState(QnConnectionState::Connecting);
         connectToServer(url, settings);
     }
@@ -573,6 +601,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
             const auto connectionSettings = ConnectionSettings::create(
                 false, true, false, settings->completionWatcher);
 
+            trace(lit("state -> Connecting"));
             m_state.setState(QnConnectionState::Connecting);
             connectToServer(url, connectionSettings);
         }
@@ -589,6 +618,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
     disconnectFromServer(true);
 
     // Do not store connections in case of reconnection
+    trace(lit("state -> Connecting"));
     m_state.setState(QnConnectionState::Connecting);
     connectToServer(currentUrl, ConnectionSettingsPtr());
 }
@@ -687,6 +717,7 @@ void QnWorkbenchConnectHandler::showWelcomeScreen()
 
 void QnWorkbenchConnectHandler::clearConnection()
 {
+    trace(lit("state -> Disconnected"));
     m_state.setState(QnConnectionState::Disconnected);
     m_connectingHandle = 0;
     stopReconnecting();
@@ -761,6 +792,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
     m_reconnectDialog->setServers(m_reconnectHelper->servers());
     m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
     QnDialog::show(m_reconnectDialog);
+    trace(lit("state -> Reconnecting"));
     m_state.setState(QnConnectionState::Reconnecting);
     connectToServer(m_reconnectHelper->currentUrl(), ConnectionSettingsPtr());
     return true;

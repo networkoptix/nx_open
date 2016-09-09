@@ -15,12 +15,17 @@
 
 #include <utils/common/app_info.h>
 
-#define DEBUG_CLIENT_MESSAGE_PROCESSOR
-#ifdef DEBUG_CLIENT_MESSAGE_PROCESSOR
-#define TRACE(...) qDebug() << "QnClientMessageProcessor: " << __VA_ARGS__;
-#else
-#define TRACE(...)
-#endif
+#include <nx/utils/log/log.h>
+
+namespace {
+
+void trace(const QString& message)
+{
+    qDebug() << "QnClientMessageProcessor: " << message;
+    //NX_LOG(lit("QnClientMessageProcessor: ") + message), cl_logDEBUG1);
+}
+
+}
 
 QnClientMessageProcessor::QnClientMessageProcessor()
     :
@@ -56,13 +61,24 @@ QnClientMessageProcessor::QnClientMessageProcessor()
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection)
 {
-    setConnectionState(connection
-        ? QnConnectionState::Connecting
-        : QnConnectionState::Disconnected);
+    if (connection)
+    {
+        if (m_status.state() != QnConnectionState::Reconnecting)
+        {
+            trace(lit("init, state -> Connecting"));
+            m_status.setState(QnConnectionState::Connecting);
+        }
+    }
+    else
+    {
+        trace(lit("init NULL, state -> Disconnected"));
+        m_status.setState(QnConnectionState::Disconnected);
+    }
+
 
     if (connection)
     {
-        TRACE("Connection established to " << connection->connectionInfo().ecsGuid);
+        trace(lit("Connection established to %1").arg(connection->connectionInfo().ecsGuid));
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
         //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     }
@@ -81,20 +97,6 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     }
 
     QnCommonMessageProcessor::init(connection);
-}
-
-QnConnectionState QnClientMessageProcessor::connectionState() const
-{
-    return m_status.state();
-}
-
-void QnClientMessageProcessor::setConnectionState(QnConnectionState state)
-{
-    if (m_status.state() == state)
-        return;
-
-    m_status.setState(state);
-    emit connectionStateChanged();
 }
 
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
@@ -173,6 +175,11 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data)
 {
     base_type::handleRemotePeerFound(data);
+
+    /* Avoiding double connectionOpened() if reconnecting while client was on breakpoint */
+    if (m_connected && !m_waitingForPeerReconnect)
+        return;
+
     if (qnCommon->remoteGUID().isNull())
     {
         qWarning() << "at_remotePeerFound received while disconnected";
@@ -182,7 +189,8 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    setConnectionState(QnConnectionState::Connected);
+    trace(lit("peer found, state -> Connected"));
+    m_status.setState(QnConnectionState::Connected);
     m_connected = true;
 
     if (m_waitingForPeerReconnect)
@@ -209,10 +217,11 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         that were not sent as TransactionMessageBus was stopped. Peer id is the same if we are
         connecting to the same server we are already connected to (and just disconnected).
     */
-    if (connectionState() == QnConnectionState::Connecting)
+    if (m_status.state() == QnConnectionState::Connecting)
         return;
 
-    setConnectionState(QnConnectionState::Reconnecting);
+    trace(lit("peer lost, state -> Reconnecting"));
+    m_status.setState(QnConnectionState::Reconnecting);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
     QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
@@ -235,9 +244,11 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
+    trace(lit("resources received, state -> Ready"));
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    setConnectionState(QnConnectionState::Ready);
-    TRACE("Received initial notification while connected to " << qnCommon->remoteGUID().toString());
+    m_status.setState(QnConnectionState::Ready);
+    trace(lit("Received initial notification while connected to %1")
+        .arg(qnCommon->remoteGUID().toString()));
     NX_EXPECT(qnCommon->currentServer());
 
     /* Get server time as soon as we setup connection. */
