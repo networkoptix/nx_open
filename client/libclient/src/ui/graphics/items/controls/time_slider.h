@@ -395,10 +395,10 @@ private:
 
     void setThumbnailSelecting(qint64 time, bool selecting);
 
-    void setAnimationStart(qint64 start);
-    void setAnimationEnd(qint64 end);
-    qint64 animationStart();
-    qint64 animationEnd();
+    void setTargetStart(qint64 start);
+    void setTargetEnd(qint64 end);
+    qint64 targetStart();
+    qint64 targetEnd();
 
     void generateProgressPatterns();
 
@@ -429,7 +429,7 @@ private:
     qint64 m_zoomAnchor;
     bool m_animatingSliderWindow;
     bool m_kineticsHurried;
-    qint64 m_animationStart, m_animationEnd;
+    qint64 m_targetStart, m_targetEnd;
     Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;

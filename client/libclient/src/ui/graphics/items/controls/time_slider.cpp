@@ -900,8 +900,8 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate)
         {
             kineticProcessor()->reset(); /* Stop kinetic zoom. */
             m_animatingSliderWindow = true;
-            setAnimationStart(start);
-            setAnimationEnd(end);
+            setTargetStart(start);
+            setTargetEnd(end);
         }
         else
         {
@@ -1100,7 +1100,7 @@ void QnTimeSlider::finishAnimations()
 
     if (m_animatingSliderWindow)
     {
-        setWindow(animationStart(), animationEnd());
+        setWindow(targetStart(), targetEnd());
         m_animatingSliderWindow = false;
     }
 
@@ -1119,24 +1119,24 @@ void QnTimeSlider::hurryKineticAnimations()
     updateKineticProcessor();
 }
 
-void QnTimeSlider::setAnimationStart(qint64 start)
+void QnTimeSlider::setTargetStart(qint64 start)
 {
-    m_animationStart = start == minimum() ? std::numeric_limits<qint64>::min() : start;
+    m_targetStart = start == minimum() ? std::numeric_limits<qint64>::min() : start;
 }
 
-void QnTimeSlider::setAnimationEnd(qint64 end)
+void QnTimeSlider::setTargetEnd(qint64 end)
 {
-    m_animationEnd = end == maximum() ? std::numeric_limits<qint64>::max() : end;
+    m_targetEnd = end == maximum() ? std::numeric_limits<qint64>::max() : end;
 }
 
-qint64 QnTimeSlider::animationStart()
+qint64 QnTimeSlider::targetStart()
 {
-    return m_animationStart == std::numeric_limits<qint64>::min() ? minimum() : m_animationStart;
+    return m_targetStart == std::numeric_limits<qint64>::min() ? minimum() : m_targetStart;
 }
 
-qint64 QnTimeSlider::animationEnd()
+qint64 QnTimeSlider::targetEnd()
 {
-    return m_animationEnd == std::numeric_limits<qint64>::max() ? maximum() : m_animationEnd;
+    return m_targetEnd == std::numeric_limits<qint64>::max() ? maximum() : m_targetEnd;
 }
 
 void QnTimeSlider::generateProgressPatterns()
@@ -2743,22 +2743,22 @@ void QnTimeSlider::tick(int deltaMs)
 
     if (m_animatingSliderWindow)
     {
-        /* Simple logarithmic convergence looks the best: */
-        qint64 deltaStart = (animationStart() - m_windowStart) / 2.0;
-        qint64 deltaEnd = (animationEnd() - m_windowEnd) / 2.0;
+        /* 0.5^t convergence: */
+        static const qreal kHalfwayTimeMs = 15.0;
+        qreal timeFactor = pow(0.5, deltaMs / kHalfwayTimeMs);
+        qint64 untilStart = static_cast<qint64>((targetStart() - m_windowStart) * timeFactor);
+        qint64 untilEnd = static_cast<qint64>((targetEnd() - m_windowEnd) * timeFactor);
 
-        qint64 desiredWindowSize = animationEnd() - animationStart();
-        qint64 maxDelta = qMax(qAbs(deltaStart), qAbs(deltaEnd));
+        qint64 desiredWindowSize = targetEnd() - targetStart();
+        qint64 maxRemainder = qMax(qAbs(untilStart), qAbs(untilEnd));
 
-        if (maxDelta < qMax(desiredWindowSize / 1000, 1000LL))
+        if (maxRemainder < qMax(desiredWindowSize / 1000, 1000LL))
         {
             m_animatingSliderWindow = false;
-            setWindow(animationStart(), animationEnd());
+            untilStart = untilEnd = 0;
         }
-        else
-        {
-            setWindow(m_windowStart + deltaStart, m_windowEnd + deltaEnd);
-        }
+
+        setWindow(targetStart() - untilStart, targetEnd() - untilEnd);
     }
 
     animateStepValues(deltaMs);
