@@ -21,13 +21,8 @@
 
 #include "auth_tools.h"
 
-//TODO: #ak persistent connection support
-//TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
-//TODO: #ak reconnect support
-
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
-//static const int DEFAULT_HTTP_PORT = 80;
 
 using std::make_pair;
 
