@@ -610,9 +610,7 @@ module.exports = function (grunt) {
                 command: 'hg parent'
             }
 
-        },
-
-        scp: grunt.file.readJSON('publish.json')
+        }
     });
 
 
@@ -807,20 +805,7 @@ module.exports = function (grunt) {
         'copy:publish'
     ]);
 
-    grunt.registerTask('fr', [
-        'build',
-        'scp:frontend'
-    ]);
-
-
-    grunt.registerTask('deploy', [
-        'publish',
-        'scp:all'
-    ]);
-
-
     grunt.registerTask('pub', [
         'publish'
     ]);
-
 };
