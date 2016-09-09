@@ -1669,7 +1669,7 @@ void QnTimeSlider::setLiveSupported(bool value)
 
 bool QnTimeSlider::isLive() const
 {
-    return m_liveSupported && value() == maximum();
+    return m_liveSupported && !m_selecting && value() == maximum();
 }
 
 qreal QnTimeSlider::msecsPerPixel() const

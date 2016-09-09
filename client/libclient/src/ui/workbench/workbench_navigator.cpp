@@ -393,15 +393,14 @@ void QnWorkbenchNavigator::initialize()
     if (!isValid())
         return;
 
-    connect(workbench(), &QnWorkbench::currentLayoutChanged
-        , this, &QnWorkbenchNavigator::updateSliderOptions);
+    connect(workbench(), &QnWorkbench::currentLayoutChanged,
+        this, &QnWorkbenchNavigator::updateSliderOptions);
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged
-        , this, [this](const QnSecurityCamResourcePtr & /* camera */)
-    {
-        updateHasArchiveState();
-    });
-
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this,
+        [this](const QnSecurityCamResourcePtr & /* camera */)
+        {
+            updateHasArchiveState();
+        });
 
     connect(display(), SIGNAL(widgetChanged(Qn::ItemRole)), this, SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(), SIGNAL(widgetAdded(QnResourceWidget *)), this, SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -415,7 +414,6 @@ void QnWorkbenchNavigator::initialize()
     connect(m_timeSlider, SIGNAL(rangeChanged(qint64, qint64)), this, SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider, SIGNAL(windowChanged(qint64, qint64)), this, SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider, SIGNAL(windowChanged(qint64, qint64)), this, SLOT(updateCalendarFromSlider()));
-    connect(m_timeSlider, SIGNAL(selectionReleased()), this, SLOT(at_timeSlider_selectionReleased()));
     connect(m_timeSlider, SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
     connect(m_timeSlider, SIGNAL(selectionPressed()), this, SLOT(at_timeSlider_selectionPressed()));
     connect(m_timeSlider, SIGNAL(thumbnailsVisibilityChanged()), this, SLOT(updateTimeSliderWindowSizePolicy()));
@@ -1861,6 +1859,8 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event)
 
 void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos)
 {
+    Q_UNUSED(screenPos);
+
     if (!context() || !context()->menu())
     {
         qnWarning("Requesting context menu for a time slider while no menu manager instance is available.");
@@ -2032,21 +2032,10 @@ void QnWorkbenchNavigator::at_timeSlider_selectionPressed()
 
     if (m_lastPlaying)
         setPlayingTemporary(true);
+
     setPlaying(false);
 
     m_pausedOverride = true;
-}
-
-void QnWorkbenchNavigator::at_timeSlider_selectionReleased()
-{
-    if (!m_timeSlider->isSelectionValid())
-        return;
-
-    if (m_timeSlider->selectionStart() == m_timeSlider->selectionEnd())
-        return;
-
-    if (m_timeSlider->windowEnd() == m_timeSlider->maximum() && (m_currentWidgetFlags & WidgetSupportsLive))
-        m_timeSlider->setWindowEnd(m_timeSlider->maximum() - 1); /* Go out of live. */
 }
 
 void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked()
