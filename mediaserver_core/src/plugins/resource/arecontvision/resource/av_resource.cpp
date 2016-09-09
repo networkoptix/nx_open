@@ -668,12 +668,19 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUui
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
     NX_LOG(lit("Creating AV resource by typeId (2)"), cl_logINFO);
-    if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
+
+    bool rtIsNull = resourceType.isNull();
+    NX_LOG(lit("AV resource type is checked for null"), cl_logINFO);
+
+    bool invalidManufacture = (resourceType->getManufacture() != MANUFACTURE);
+    NX_LOG(lit("AV resource type is checked for manufacture"), cl_logINFO); 
+
+    if (rtIsNull || invalidManufacture)
     {
         NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
         return 0;
     }
-
+    NX_LOG(lit("AV resource type is valid"), cl_logINFO);
     QnPlAreconVisionResource* res = 0;
 
     if (isPanoramic(resourceType))
@@ -687,14 +694,16 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUui
         res = new CLArecontSingleSensorResource(resourceType->getName());
     }
 
+    NX_LOG(lit("Setting resource type"), cl_logINFO);
     res->setTypeId(rt);
 
-    NX_LOG(lit("return AV resource (createResourceByTypeId)"));
+    NX_LOG(lit("return AV resource (createResourceByTypeId)"), cl_logINFO);
     return res;
 }
 
 bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 {
+    NX_LOG(lit("AV calling isPanoramic"), cl_logINFO);
     QString layoutStr = resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME);
     return !layoutStr.isEmpty() && QnCustomResourceVideoLayout::fromString(layoutStr)->channelCount() > 1;
 };
