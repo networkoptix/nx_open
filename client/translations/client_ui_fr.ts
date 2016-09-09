@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>Cette caméra n&apos;a pas de paramètres avancés</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -887,32 +892,32 @@
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
-        <translation type="unfinished"></translation>
+        <translation>Contenu HTTP</translation>
     </message>
     <message>
         <location/>
         <source>HTTP url</source>
-        <translation type="unfinished"></translation>
+        <translation>URL HTTP</translation>
     </message>
     <message>
         <location/>
         <source>Login to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifiant d&apos;authentification (facultatif)</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifiant</translation>
     </message>
     <message>
         <location/>
         <source>Password to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>MDP d&apos;authentification (facultatif)</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe</translation>
     </message>
 </context>
 <context>
@@ -928,27 +933,27 @@
     <message>
         <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
         <source>Export Rapid Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter Analyse Rapide</translation>
     </message>
     <message>
         <location/>
         <source>Initial Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Durée de la vidéo Initial</translation>
     </message>
     <message>
         <location/>
         <source>Exported Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Durée de la vidéo exportée</translation>
     </message>
     <message>
         <location/>
         <source>Rapid Review speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse Analyse Rapide</translation>
     </message>
     <message>
         <location/>
         <source>Frames Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalle d&apos;image</translation>
     </message>
 </context>
 <context>
@@ -1670,7 +1675,7 @@
     <message>
         <location/>
         <source>Play to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Jouer à l&apos;utilisateur</translation>
     </message>
 </context>
 <context>
@@ -2454,7 +2459,7 @@
     <message>
         <location/>
         <source>Speak to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Parler à l&apos;utilisateur</translation>
     </message>
 </context>
 <context>

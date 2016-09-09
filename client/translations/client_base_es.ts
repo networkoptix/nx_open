@@ -1713,7 +1713,7 @@ para ver los marcadores</translation>
         <source>Source and %n more cameras</source>
         <translation type="unfinished">
             <numerusform>Fuente y %n más cámaras</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Fuente y %n más cámaras</numerusform>
         </translation>
     </message>
     <message>
@@ -2014,6 +2014,13 @@ para ver los marcadores</translation>
     <message>
         <source>Applying changes...</source>
         <translation>Aplicando los cambios...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2930,10 +2937,10 @@ para ver los marcadores</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation type="unfinished">
-            <numerusform>y %1 usuario(s) más...</numerusform>
-            <numerusform></numerusform>
+            <numerusform>y %n usuario(s) más...</numerusform>
+            <numerusform>y %n usuario(s) más...</numerusform>
         </translation>
     </message>
 </context>
@@ -2985,40 +2992,30 @@ para ver los marcadores</translation>
         <source>days</source>
         <translation type="unfinished">dias</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation type="unfinished">ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation type="unfinished">s</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation type="unfinished">m</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation type="unfinished">h</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation type="unfinished">d</translation>
     </message>
 </context>
 <context>
@@ -4912,21 +4909,21 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>&lt;%n device(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n dispositivo(s)&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform>&lt;%n dispositivo(s)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n cámara(s)&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform>&lt;%n cámara(s)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
         <translation type="unfinished">
             <numerusform>&lt;%n Módulo(s) de E/S&gt;</numerusform>
-            <numerusform></numerusform>
+            <numerusform>&lt;%n Módulo(s) de E/S&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -5691,15 +5688,15 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <message numerus="yes">
         <source>%n Camera(s)</source>
         <translation type="unfinished">
-            <numerusform>%n Cámara(s)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n Cámara</numerusform>
+            <numerusform>%n Cámaras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
         <translation type="unfinished">
-            <numerusform>%n Dispositivo(s)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n Dispositivo</numerusform>
+            <numerusform>%n Dispositivos</numerusform>
         </translation>
     </message>
     <message>
@@ -6799,7 +6796,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Are you sure you want to delete these %n bookmarks?</source>
         <translation type="unfinished">
             <numerusform>¿Está seguro que desea eliminar estos marcadores de %n?</numerusform>
-            <numerusform></numerusform>
+            <numerusform>¿Está seguro que desea eliminar estos marcadores de %n?</numerusform>
         </translation>
     </message>
 </context>

@@ -1993,6 +1993,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
@@ -2892,9 +2899,9 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation type="unfinished">
-            <numerusform>多 %1 個使用者...</numerusform>
+            <numerusform>多 %n 個使用者...</numerusform>
         </translation>
     </message>
 </context>
@@ -2946,35 +2953,30 @@ to view more bookmarks</source>
         <source>days</source>
         <translation type="unfinished">日</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation type="unfinished">毫秒</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation type="unfinished">秒</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation type="unfinished">分</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation type="unfinished">時</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation type="unfinished">日</translation>
     </message>
 </context>
 <context>

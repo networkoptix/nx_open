@@ -301,6 +301,9 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setVendor( vendor );
+
+    resource->setId(resource->uniqueIdToId(resource->getPhysicalId()));
+
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );
     if( strlen(cameraInfo.firmware) > 0 )

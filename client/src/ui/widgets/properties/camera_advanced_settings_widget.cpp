@@ -23,10 +23,6 @@ namespace {
         return status == Qn::Online || status == Qn::Recording;
     }
 
-    //TODO: #GDM #2.6 #tr
-    /* Untranslatable for now. */
-    const QByteArray kLoadingWebPage = "Loading...";
-
 }
 
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
@@ -67,17 +63,21 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page) {
 
     m_page = page;
 
-    auto widgetByPage = [this] ()-> QWidget* {
-        switch (m_page) {
-        case Page::Empty:
-            return ui->noSettingsPage;
-        case Page::Manual:
-            return ui->manualPage;
-        case Page::Web:
-            return ui->webPage;
-        }
-        return nullptr;
-    };
+    auto widgetByPage =
+        [this] ()-> QWidget*
+        {
+            switch (m_page) {
+            case Page::Empty:
+                return ui->noSettingsPage;
+            case Page::Manual:
+                return ui->manualPage;
+            case Page::Web:
+                return ui->webPage;
+            case Page::Unavailable:
+                return ui->unavailablePage;
+            }
+            return nullptr;
+        };
 
     ui->stackedWidget->setCurrentWidget(widgetByPage());
 }
@@ -85,32 +85,37 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page) {
 
 void QnCameraAdvancedSettingsWidget::updatePage() {
 
-    auto calculatePage = [this]{
-        if (!m_camera)
+    auto calculatePage =
+        [this]
+        {
+            if (!m_camera || !isStatusValid(m_camera->getStatus()))
+                return Page::Unavailable;
+
+            QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+            bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
+            if (hasWebPage)
+                return Page::Web;
+
+            if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
+                return Page::Manual;
+
             return Page::Empty;
-
-        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
-        bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
-        if (hasWebPage)
-            return Page::Web;
-
-        if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
-            return Page::Manual;
-
-        return Page::Empty;
-    };
+        };
 
     Page newPage = calculatePage();
     setPage(newPage);
 }
 
-void QnCameraAdvancedSettingsWidget::reloadData() {
+void QnCameraAdvancedSettingsWidget::reloadData()
+{
     updatePage();
 
-    if (!m_camera || !isStatusValid(m_camera->getStatus()))
-        return;
+    if (m_page == Page::Web)
+    {
+        Q_ASSERT(m_camera);
+        if (!m_camera)
+            return;
 
-    if (m_page == Page::Web) {
         // QUrl doesn't work if it isn't constructed from QString and uses credentials. It stays invalid with error code 'AuthorityPresentAndPathIsRelative' --rvasilenko, Qt 5.2.1
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         QUrl targetUrl = QString(lit("http://%1:%2/%3"))
@@ -125,7 +130,9 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
         ui->webView->reload();
         ui->webView->load( QNetworkRequest(targetUrl) );
         ui->webView->show();
-    } else if (m_page == Page::Manual) {
+    }
+    else if (m_page == Page::Manual)
+    {
         ui->cameraAdvancedParamsWidget->loadValues();
     }
 }
@@ -153,14 +160,14 @@ void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 
     ui->webView->triggerPageAction(QWebPage::Stop);
     ui->webView->triggerPageAction(QWebPage::StopScheduledPageRefresh);
-    ui->webView->setContent(kLoadingWebPage);
+    ui->webView->setContent(tr("Loading...").toUtf8());
 }
 
 void QnCameraAdvancedSettingsWidget::initWebView() {
     m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
 
-    ui->webView->setContent(kLoadingWebPage);
+    ui->webView->setContent(tr("Loading...").toUtf8());
 
     QStyle* style = QStyleFactory().create(lit("fusion"));
     ui->webView->setStyle(style);

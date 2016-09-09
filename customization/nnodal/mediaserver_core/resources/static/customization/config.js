@@ -11,13 +11,13 @@ Config.helpLinks.push({
 });
 
 Config.helpLinks.push({
-    url: "https://itunes.apple.com/eg/app/hd-witness/id648369716?mt=8",
+    url: "https://itunes.apple.com/eg/app/id1090089231",
     title: "iOS Client",
     target: "new" // new|frame
 });
 
 Config.helpLinks.push({
-    url: "https://play.google.com/store/apps/details?id=com.networkoptix.hdwitness",
+    url: "https://play.google.com/store/apps/details?id=com.nvision.nvisionmobile",
     title: "Android Client",
     target: "new" // new|frame
 });

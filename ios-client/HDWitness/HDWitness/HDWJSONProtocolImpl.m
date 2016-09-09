@@ -18,6 +18,7 @@
 #import "NSString+BasicAuthUtils.h"
 #import "NSString+Base64.h"
 #import "NSString+MD5.h"
+#import "HDWCompatibility.h"
 
 #define DEBUG_URLS
 
@@ -192,6 +193,17 @@ enum HDWTransacionCommand {
     connectInfo.version = connectInfoDict[@"version"];
     connectInfo.brand = connectInfoDict[@"brand"];
     connectInfo.serverGuid = [[HDWUUID alloc] initWithUUIDString:connectInfoDict[@"ecsGuid"]];
+    
+    if ([connectInfoDict objectForKey:@"compatibilityItems"]) {
+        NSMutableArray* items = [NSMutableArray array];
+        for (NSDictionary *ci in connectInfoDict[@"compatibilityItems"]) {
+            HDWCompatibilityItem *item = [HDWCompatibilityItem itemForVersion:ci[@"ver1"] ofComponent:ci[@"comp1"] andSystemVersion:ci[@"ver2"]];
+            [items addObject:item];
+        }
+        
+        connectInfo.compatibilityItems = items;
+    }
+
     return connectInfo;
 }
 

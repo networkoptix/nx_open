@@ -1214,7 +1214,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter Aperçu Rapide...</translation>
     </message>
 </context>
 <context>
@@ -1712,9 +1712,9 @@ pour voir plus de signets</translation>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Source et %n caméra</numerusform>
             <numerusform>Source et %n caméras</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2021,16 +2021,23 @@ pour voir plus de signets</translation>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Chargement...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner Périphérique</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 ne supporte pas l&apos;audio bidirectionnelle</numerusform>
+            <numerusform>%1 ne supporte pas l&apos;audio bidirectionnelle</numerusform>
         </translation>
     </message>
 </context>
@@ -2731,19 +2738,19 @@ pour voir plus de signets</translation>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">Ne peut pas trouver l&apos;encodeur audio %1.</translation>
+        <translation>Ne peut pas trouver l&apos;encodeur audio &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">Ne peut pas initialiser l&apos;encodeur audio.</translation>
+        <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique audio primaire non sélectionné.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Format d&apos;échantillon du périphérique d&apos;entré %1 n&apos;est pas supporté.</translation>
     </message>
 </context>
 <context>
@@ -2940,10 +2947,10 @@ pour voir plus de signets</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform>et plus %1 utilisateur(s)...</numerusform>
-            <numerusform></numerusform>
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>et plus %n utilisateur...</numerusform>
+            <numerusform>et plus %n utilisateurs...</numerusform>
         </translation>
     </message>
 </context>
@@ -2981,54 +2988,44 @@ pour voir plus de signets</translation>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">sec</translation>
+        <translation>sec</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">min</translation>
+        <translation>min</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">hrs</translation>
+        <translation>hrs</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">jours</translation>
+        <translation>jours</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>s</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>m</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>h</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>j</translation>
     </message>
 </context>
 <context>
@@ -4352,7 +4349,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Audio</translation>
     </message>
 </context>
 <context>
@@ -4748,7 +4745,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Débit</translation>
     </message>
 </context>
 <context>
@@ -4928,28 +4925,28 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n Périphérique(s)&gt;</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;%n Périphérique&gt;</numerusform>
+            <numerusform>&lt;%n Périphériques&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n Caméra(s)&gt;</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;%n Caméra&gt;</numerusform>
+            <numerusform>&lt;%n Caméras&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n module(s) I/O &gt;</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;%n module I/O &gt;</numerusform>
+            <numerusform>&lt;%n modules I/O &gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">Exporter Signet...</translation>
+        <translation>Exporter Signet...</translation>
     </message>
 </context>
 <context>
@@ -5528,7 +5525,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">Ne peut pas effectuer un test.</translation>
+        <translation>Ne peut pas effectuer un test.</translation>
     </message>
 </context>
 <context>
@@ -5708,16 +5705,16 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform>%n Caméra(s)</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Caméra</numerusform>
+            <numerusform>%n Caméras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform>%n Périphérique(s)</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Périphérique</numerusform>
+            <numerusform>%n Périphériques</numerusform>
         </translation>
     </message>
     <message>
@@ -6148,19 +6145,19 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique d&apos;entré non sélectionné.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>La diffusion n&apos;est pas encore prête, S.V.P. essayez plus tard.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur Réseau.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>Tenir pour parler</translation>
     </message>
 </context>
 <context>
@@ -6766,19 +6763,19 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a détecté que vous avez un écran haute résolution, se qui résulte que %1 ne s&apos;affichera peut--etre pas correctement.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nous sommes conscients de ce problème et un correctif sera dans la v3.0.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>En attendant, S.V.P. régler la résolution de votre écran si nécessaire pour une meilleure expérience.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Avertissement Support d&apos;Écran HiDpi</translation>
     </message>
 </context>
 <context>
@@ -6817,9 +6814,9 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Êtes-vous sûr de vouloir effacer ce %n signet?</numerusform>
             <numerusform>Êtes-vous sûr de vouloir effacer ces %n signets?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -7073,7 +7070,7 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>La période sélectionnée est trop courte et ne peut pas être exportée comme Aperçu Rapide.</translation>
     </message>
 </context>
 <context>

@@ -34,6 +34,7 @@
 #include "http/http_transaction_receiver.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
+#include "compatibility.h"
 
 
 static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
@@ -1267,6 +1268,7 @@ namespace ec2
         const ApiLoginData& loginInfo,
         QnConnectionInfo* const connectionInfo )
     {
+        connectionInfo->compatibilityItems = localCompatibilityItems();
         connectionInfo->version = qnCommon->engineVersion();
         connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
         connectionInfo->systemName = qnCommon->localSystemName();
@@ -1278,35 +1280,35 @@ namespace ec2
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
 
-		if (!loginInfo.clientInfo.id.isNull())
+        if (!loginInfo.clientInfo.id.isNull())
         {
-			auto clientInfo = loginInfo.clientInfo;
-			clientInfo.parentId = qnCommon->moduleGUID();
+            auto clientInfo = loginInfo.clientInfo;
+            clientInfo.parentId = qnCommon->moduleGUID();
 
-			ApiClientInfoDataList infos;
-			auto result = dbManager->doQuery(clientInfo.id, infos);
-			if (result != ErrorCode::ok)
-				return result;
+            ApiClientInfoDataList infos;
+            auto result = dbManager->doQuery(clientInfo.id, infos);
+            if (result != ErrorCode::ok)
+                return result;
 
             if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
-			{
-				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
-					cl_logDEBUG2);
-				return ErrorCode::ok;
-			}
+            {
+                NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
+                    cl_logDEBUG2);
+                return ErrorCode::ok;
+            }
 
             QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
             m_serverQueryProcessor.processUpdateAsync(transaction,
                 [&](ErrorCode result) {
-					if (result == ErrorCode::ok) {
-						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
-							cl_logINFO);
-					}
-					else {
-						NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
-							.arg(toString(result)), cl_logERROR);
-					}
-				});
+                    if (result == ErrorCode::ok) {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
+                            cl_logINFO);
+                    }
+                    else {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+                            .arg(toString(result)), cl_logERROR);
+                    }
+                });
         }
 
         return ErrorCode::ok;
