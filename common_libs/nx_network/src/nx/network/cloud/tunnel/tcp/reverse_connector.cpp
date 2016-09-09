@@ -41,6 +41,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             if (!handler)
                 return;
 
+            m_handler = nullptr;
             if (m_httpClient->failed() || !m_httpClient->response())
                 return handler(SystemError::connectionRefused);
 

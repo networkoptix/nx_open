@@ -20,7 +20,6 @@ OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
 void OutgoingReverseTunnelConnection::stopWhileInAioThread()
 {
     m_asyncGuard.reset();
-    timer()->pleaseStopSync();
 }
 
 void OutgoingReverseTunnelConnection::establishNewConnection(

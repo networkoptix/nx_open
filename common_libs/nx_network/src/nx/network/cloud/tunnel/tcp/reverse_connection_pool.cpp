@@ -74,7 +74,7 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
 
             // Holders are need to be stopped here, as other shared_ptrs are not primary.
             for (auto& holder: m_connectionHolders)
-                holder.second->stopWhileInAioThread();
+                holder.second->pleaseStopSync();
 
             m_connectionHolders.clear();
             handler();

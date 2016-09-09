@@ -15,7 +15,6 @@ ReverseConnectionHolder::ReverseConnectionHolder(aio::AbstractAioThread* aioThre
 
 void ReverseConnectionHolder::stopWhileInAioThread()
 {
-    timer()->pleaseStopSync();
 }
 
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
