@@ -292,6 +292,10 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     if (m_connectingHandle != handle)
         return;
 
+    /* We've got another connectionOpened() because client was on a breakpoint. */
+    if (m_state == QnConnectionState::Connected)
+        return;
+
     auto validState = m_state.state() == QnConnectionState::Connecting
         || m_state.state() == QnConnectionState::Reconnecting;
     NX_ASSERT(validState);
