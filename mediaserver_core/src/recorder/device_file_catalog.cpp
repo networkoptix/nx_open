@@ -104,6 +104,25 @@ DeviceFileCatalog::DeviceFileCatalog(
 {
 }
 
+std::unordered_map<int, qint64> DeviceFileCatalog::calcSpaceByStorage() const
+{
+    std::unordered_map<int, qint64> result;
+    QnMutexLocker lock(&m_mutex);
+
+    for (auto catalogIt = m_chunks.cbegin(); catalogIt != m_chunks.cend(); ++catalogIt)
+    {
+        auto resultIt = result.find(catalogIt->storageIndex);
+        bool emplaceResult = false;
+
+        if (resultIt == result.cend())
+            std::tie(resultIt, emplaceResult) = result.emplace(catalogIt->storageIndex, 0);
+
+        NX_ASSERT(emplaceResult);
+        resultIt->second += catalogIt->getFileSize();
+    }
+    return result;
+}
+
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
     QString result = prefix;
