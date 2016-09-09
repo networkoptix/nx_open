@@ -9,9 +9,12 @@
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
 
+namespace {
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
+static const int kMaxDroppedFrames = 5;
+}
 
 
 static qint64& movigAverage(qint64& accumulator, qint64 value)
@@ -194,8 +197,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         const auto& codingTime = m_averageCodingTimePerFrame;
         if (codingTime + (codingTime >> m_droppedFrames) > m_averageVideoTimePerFrame)
         {
-            ++m_droppedFrames;
-            return 0;
+            if (++m_droppedFrames < kMaxDroppedFrames)
+                return 0;
         }
     }
 
