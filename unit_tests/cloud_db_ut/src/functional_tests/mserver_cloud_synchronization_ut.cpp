@@ -326,5 +326,30 @@ TEST_F(Ec2MserverCloudSynchronization2, addingUserInCloudAndRemovingLocally)
         fetchCloudTransactionLog(&transactionList));
 }
 
+TEST_F(Ec2MserverCloudSynchronization2, syncFromCloud)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    api::AccountData testAccount;
+    std::string testAccountPassword;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->addActivatedAccount(&testAccount, &testAccountPassword));
+
+    api::SystemSharing sharing;
+    sharing.accountEmail = testAccount.email;
+    sharing.systemID = registeredSystemData().id;
+    sharing.accessRole = api::SystemAccessRole::cloudAdmin;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+    waitForCloudAndVmsToSyncUsers();
+}
+
 } // namespace cdb
 } // namespace nx
