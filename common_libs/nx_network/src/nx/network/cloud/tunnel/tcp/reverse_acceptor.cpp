@@ -18,6 +18,11 @@ ReverseAcceptor::ReverseAcceptor(String selfHostName, ConnectHandler connectHand
 {
 }
 
+ReverseAcceptor::~ReverseAcceptor()
+{
+    m_httpServer.reset();
+}
+
 bool ReverseAcceptor::start(const SocketAddress& address, aio::AbstractAioThread* aioThread)
 {
     if (aioThread)
@@ -33,6 +38,12 @@ bool ReverseAcceptor::start(const SocketAddress& address, aio::AbstractAioThread
 
     NX_CRITICAL(registration);
     return m_httpServer->bind(address) && m_httpServer->listen();
+}
+
+void ReverseAcceptor::pleaseStop()
+{
+    m_connectHandler = nullptr;
+    m_httpServer->pleaseStop();
 }
 
 SocketAddress ReverseAcceptor::address() const
@@ -69,7 +80,7 @@ void ReverseAcceptor::fillNxRcHeaders(nx_http::HttpHeaders* headers) const
         headers->emplace(kNxRcKeepAliveOptions, m_keepAliveOptions->toString().toUtf8());
 }
 
-void ReverseAcceptor::newClient(String hostName, nx_http::HttpServerConnection* connection) const
+void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnection* connection) const
 {
     auto socket = connection->takeSocket();
     connection->closeConnection(SystemError::badDescriptor);
@@ -77,8 +88,25 @@ void ReverseAcceptor::newClient(String hostName, nx_http::HttpServerConnection* 
     auto rawSocket = dynamic_cast<AbstractStreamSocket*>(socket.get());
     NX_CRITICAL(rawSocket);
 
+    {
+        QnMutexLocker lk(&m_dataMutex);
+        if (m_keepAliveOptions && !rawSocket->setKeepAlive(m_keepAliveOptions))
+        {
+            NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2)")
+                .arg(m_keepAliveOptions).arg(socket), cl_logWARNING);
+
+            return;
+        }
+    }
+
     socket.release();
-    m_connectHandler(hostName, std::unique_ptr<AbstractStreamSocket>(rawSocket));
+    m_httpServer->post(
+        [this, hostName=std::move(hostName),
+            socket = std::unique_ptr<AbstractStreamSocket>(rawSocket)]() mutable
+        {
+            if (m_connectHandler)
+                m_connectHandler(hostName, std::move(socket));
+        });
 }
 
 ReverseAcceptor::NxRcHandler::NxRcHandler(const ReverseAcceptor* acceptor):
@@ -119,13 +147,13 @@ void ReverseAcceptor::NxRcHandler::processRequest(
             nullptr,
             nx_http::ConnectionEvents());
 
-    NX_LOGX(lm("request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
+    NX_LOGX(lm("Request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
     connection->setSendCompletionHandler(
         [connection, acceptor = m_acceptor, hostName = std::move(hostNameIt->second)](
             SystemError::ErrorCode code)
         {
             if (code == SystemError::noError)
-                acceptor->newClient(hostName, connection);
+                acceptor->saveConnection(hostName, connection);
         });
 
     m_acceptor->fillNxRcHeaders(&response->headers);

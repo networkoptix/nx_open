@@ -12,6 +12,7 @@ SocketGlobals::SocketGlobals()
     , m_mediatorConnector(new hpm::api::MediatorConnector)
     , m_addressResolver(m_mediatorConnector->clientConnection())
     , m_addressPublisher(m_mediatorConnector->systemConnection())
+    , m_tcpReversePool(m_mediatorConnector->clientConnection())
 {
 }
 
@@ -27,6 +28,7 @@ SocketGlobals::~SocketGlobals()
         m_addressPublisher.pleaseStop( barrier.fork() );
         m_mediatorConnector->pleaseStop( barrier.fork() );
         m_outgoingTunnelPool.pleaseStop( barrier.fork() );
+        m_tcpReversePool.pleaseStop( barrier.fork() );
     }
 
     promise.get_future().wait();

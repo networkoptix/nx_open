@@ -50,6 +50,7 @@ namespace methods
         connectionResult,
         udpHolePunchingSyn,
         tunnelConnectionChosen,
+        clientBind,
     };
 
     NX_NETWORK_API nx::String toString(Value val);
@@ -103,11 +104,20 @@ namespace attrs
         udtHpEndpointList,
         connectionMethods,
         ignoreSourceAddress,
+        tcpReverseEndpointList,
+        isPersistent,
 
         udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
         rendezvousConnectTimeout,
         udpTunnelKeepAliveInterval,
         udpTunnelKeepAliveRetries,
+        tcpReverseRetryMaxCount,
+        tcpReverseRetryInitialDelay,
+        tcpReverseRetryDelayMultiplier,
+        tcpReverseRetryMaxDelay,
+        tcpReverseHttpSendTimeout,
+        tcpReverseHttpReadTimeout,
+        tcpReverseHttpMsgBodyTimeout,
 
         systemErrorCode = stun::attrs::userDefined + 0x500,
     };
@@ -215,6 +225,12 @@ namespace attrs
             : EndpointList( TYPE, endpoints ) {}
     };
 
+    struct NX_NETWORK_API TcpReverseEndpointList : EndpointList
+    {
+        static const AttributeType TYPE = tcpReverseEndpointList;
+        TcpReverseEndpointList( const std::list< SocketAddress >& endpoints )
+            : EndpointList( TYPE, endpoints ) {}
+    };
 
     /** Base class for string list based attributes */
     struct NX_NETWORK_API StringList : StringAttribute

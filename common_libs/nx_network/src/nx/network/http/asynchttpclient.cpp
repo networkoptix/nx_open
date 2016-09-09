@@ -34,12 +34,23 @@ namespace nx_http
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
 
-    AsyncHttpClient::Timeouts::Timeouts()
-        :
-        sendTimeout(kDefaultSendTimeout),
-        responseReadTimeout(kDefaultResponseReadTimeout),
-        messageBodyReadTimeout(kDefaultMessageBodyReadTimeout)
+    AsyncHttpClient::Timeouts::Timeouts(
+        std::chrono::milliseconds send,
+        std::chrono::milliseconds recv,
+        std::chrono::milliseconds msgBody)
+    :
+        sendTimeout(send),
+        responseReadTimeout(recv),
+        messageBodyReadTimeout(msgBody)
     {
+    }
+
+
+    bool AsyncHttpClient::Timeouts::operator==(const Timeouts& rhs) const
+    {
+        return sendTimeout == rhs.sendTimeout
+            && responseReadTimeout == rhs.responseReadTimeout
+            && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
     }
 
     AsyncHttpClient::AsyncHttpClient()

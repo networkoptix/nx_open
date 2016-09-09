@@ -227,5 +227,15 @@ data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
     return result;
 }
 
+std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
+{
+    QnMutexLocker lk(&m_mutex);
+    std::vector<ConnectionWeakRef> connections;
+    for (const auto peer: m_peers)
+        connections.push_back(peer.second.peerConnection);
+
+    return connections;
+}
+
 }   //hpm
 }   //nx

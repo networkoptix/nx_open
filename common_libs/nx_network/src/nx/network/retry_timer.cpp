@@ -39,6 +39,14 @@ RetryPolicy::RetryPolicy(
 {
 }
 
+bool RetryPolicy::operator==(const RetryPolicy& rhs) const
+{
+    return m_maxRetryCount == rhs.m_maxRetryCount
+        && m_initialDelay == rhs.m_initialDelay
+        && m_delayMultiplier == rhs.m_delayMultiplier
+        && m_maxDelay == rhs.m_maxDelay;
+}
+
 void RetryPolicy::setMaxRetryCount(unsigned int retryCount)
 {
     m_maxRetryCount = retryCount;
