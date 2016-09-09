@@ -16,16 +16,26 @@ def ping(request):
 
 
 def get_cloud_modules():
-    r = requests.get('http://172.17.0.1:8500/v1/catalog/service/connection_mediator-3345')
+    connection_mediator_port = os.environ['CONNECTION_MEDIATOR_PORT']
+    r = requests.get('http://consul:8500/v1/catalog/service/connection_mediator-{}'.format(connection_mediator_port))
     connection_mediator_hosts = [service['ServiceAddress'] for service in r.json() if service['ServiceTags'] is not None and 'udp' in service['ServiceTags']]
 
-    cloud_db_host = os.getenv('CLOUD_DB_HOST', '')
-    cloud_portal_host = os.getenv('CLOUD_PORTAL_HOST', '')
+    cloud_portal_host = os.environ['CLOUD_PORTAL_HOST']
+    cloud_portal_port = os.environ['CLOUD_PORTAL_PORT']
+    cloud_db_host = os.environ['CLOUD_DB_HOST']
+    cloud_db_port = os.environ['CLOUD_DB_PORT']
+    vms_gateway_host = os.environ['VMS_GATEWAY_HOST']
+    vms_gateway_port = os.environ['VMS_GATEWAY_PORT']
 
     return {
                'cloud_db_host': cloud_db_host,
+               'cloud_db_port': cloud_db_port,
                'cloud_portal_host': cloud_portal_host,
+               'cloud_portal_port': cloud_portal_port,
+               'vms_gateway_host': vms_gateway_host,
+               'vms_gateway_port': vms_gateway_port,
                'connection_mediator_hosts': connection_mediator_hosts,
+               'connection_mediator_port': connection_mediator_port,
            }
 
 @api_view(['GET'])
