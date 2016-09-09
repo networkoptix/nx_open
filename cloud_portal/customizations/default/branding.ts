@@ -7,6 +7,10 @@
       <translation>Nx Cloud</translation>
     </message>
     <message>
+      <source>CLIENT_PROTOCOL</source>
+      <translation>nx-vms</translation>
+    </message>
+    <message>
       <source>VMS_NAME</source>
       <translation>Nx Witness</translation>
     </message>

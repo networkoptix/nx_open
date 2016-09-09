@@ -33,8 +33,8 @@ angular.module('cloudApp')
 
                 $.extend(settings,linkSettings);
 
-                var protocol = settings.native?Config.clientProtocol:location.protocol;
-                var host = settings.native?Config.nativeDomain:location.host;
+                var protocol = settings.native?L.clientProtocol:location.protocol;
+                var host = settings.native?L.clientDomain:location.host;
 
                 var getParams = $.extend({},settings.actionParameters);
 

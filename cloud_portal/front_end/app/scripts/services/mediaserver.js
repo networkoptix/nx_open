@@ -38,7 +38,7 @@ angular.module('cloudApp')
                 },
                 
                 _get:function(url){
-                    var auth =  this.auth();
+                    var auth = this.auth();
                     if(auth){
                         if(url.indexOf('?') == -1){
                             url += '?auth=';

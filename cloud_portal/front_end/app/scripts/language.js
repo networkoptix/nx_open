@@ -2,6 +2,9 @@
 
 var L = {
     productName: 'PRODUCT_NAME',
+    clientProtocol: 'CLIENT_PROTOCOL:',
+    clientDomain: '{{portalDomain}}',
+
     dialogs:{
         okButton: 'Ok',
         loginTitle: 'Login to PRODUCT_NAME'

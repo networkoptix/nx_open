@@ -3,9 +3,9 @@
 var Config = {
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
+
     gatewayUrl: 'http://cloud-demo.hdw.mx:3347',
-    clientProtocol: 'nx-vms:',
-    nativeDomain: 'cloud-demo.hdw.mx',
+
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds
     updateInterval:  30 * 1000, // Update content on pages every 30 seconds 
 
@@ -16,7 +16,7 @@ var Config = {
     redirectUnauthorised:'/', // Page for redirecting all unauthorised users by default
 
     systemStatuses: {
-        onlineStatus: 'online',
+        onlineStatus: 'online', //'offline', - special hack for a bug
         sortOrder: [
             'online',
             'offline',
