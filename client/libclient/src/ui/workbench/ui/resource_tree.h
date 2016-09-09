@@ -1,13 +1,17 @@
 #pragma once
 
 class QnResourceBrowserWidget;
+class QnResizerWidget;
 class QGraphicsWidget;
 class QnMaskedProxyWidget;
-class QnFramedWidget;
+class QnControlBackgroundWidget;
 class QnImageButtonWidget;
 class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
+class AnimationTimer;
+struct QnPaneSettings;
+class QnWorkbenchContext;
 
 struct QnWorkbenchUiResourceTree
 {
@@ -15,7 +19,7 @@ struct QnWorkbenchUiResourceTree
 
     /** Navigation tree widget. */
     QnResourceBrowserWidget* widget;
-    QGraphicsWidget* resizerWidget;
+    QnResizerWidget* resizerWidget;
     bool ignoreResizerGeometryChanges;
     bool updateResizerGeometryLater;
 
@@ -23,7 +27,7 @@ struct QnWorkbenchUiResourceTree
     QnMaskedProxyWidget* item;
 
     /** Item that provides background for the tree. */
-    QnFramedWidget* backgroundItem;
+    QnControlBackgroundWidget* backgroundItem;
 
     /** Button to show/hide the tree. */
     QnImageButtonWidget* showButton;
@@ -45,4 +49,12 @@ struct QnWorkbenchUiResourceTree
 
     /** Animator for tree's position. */
     VariantAnimator* xAnimator;
+
+    void initialize(
+        QGraphicsWidget* sceneWidget,
+        AnimationTimer* animationTimer,
+        const QnPaneSettings& settings,
+        QnWorkbenchContext* context);
+
+    void setOpened(bool opened, bool animate);
 };

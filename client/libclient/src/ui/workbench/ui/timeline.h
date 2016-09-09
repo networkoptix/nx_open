@@ -1,6 +1,7 @@
 #pragma once
 
 class QnNavigationItem;
+class QnResizerWidget;
 class QGraphicsWidget;
 class HoverFocusProcessor;
 class VariantAnimator;
@@ -16,7 +17,7 @@ struct QnWorkbenchUiTimeline
     bool opened;
 
     QnNavigationItem* item;
-    QGraphicsWidget* resizerWidget;
+    QnResizerWidget* resizerWidget;
 
     bool ignoreResizerGeometryChanges;
     bool updateResizerGeometryLater;
