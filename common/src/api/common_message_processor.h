@@ -119,11 +119,11 @@ private slots:
     void on_userGroupRemoved(const QnUuid& groupId);
 
     void on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& userAttributes);
-    void on_cameraUserAttributesRemoved(const QnUuid& cameraID);
+    void on_cameraUserAttributesRemoved(const QnUuid& cameraId);
     void on_cameraHistoryChanged(const ec2::ApiServerFootageData &cameraHistory);
 
     void on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& userAttributes);
-    void on_mediaServerUserAttributesRemoved(const QnUuid& serverID);
+    void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
 
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);

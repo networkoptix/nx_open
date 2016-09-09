@@ -209,7 +209,7 @@ namespace detail
         //get resource status
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
-        //getCameraUserAttributes
+        //getCameraUserAttributesList
         ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
@@ -260,7 +260,7 @@ namespace detail
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
 
-        //getServerUserAttributes
+        //getMediaServerUserAttributesList
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
 
         //getTransactionLog

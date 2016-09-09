@@ -188,10 +188,10 @@ public:
     void processUpdateAsync(
         QnTransaction<ApiMediaServerUserAttributesDataList>& tran, HandlerType handler)
     {
-        NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributesList);
         return processMultiUpdateAsync<
             ApiMediaServerUserAttributesDataList, ApiMediaServerUserAttributesData>(
-                tran, handler, ApiCommand::saveServerUserAttributes);
+                tran, handler, ApiCommand::saveMediaServerUserAttributes);
     }
 
     /**

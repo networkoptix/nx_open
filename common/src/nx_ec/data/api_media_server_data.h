@@ -68,9 +68,9 @@ namespace ec2
     struct ApiMediaServerUserAttributesData: ApiData
     {
         ApiMediaServerUserAttributesData();
-        QnUuid getIdForMerging() { return serverID; } //< See ApiIdData::getIdForMerging().
+        QnUuid getIdForMerging() { return serverId; } //< See ApiIdData::getIdForMerging().
 
-        QnUuid          serverID;
+        QnUuid          serverId;
         QString         serverName;
         int             maxCameras;
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
@@ -94,7 +94,7 @@ namespace ec2
     (backupBitrate)                                     \
 
 #define ApiMediaServerUserAttributesData_Fields     \
-    (serverID)                                      \
+    (serverId)                                      \
     (serverName)                                    \
     ApiMediaServerUserAttributesData_Fields_Short
 

@@ -1028,7 +1028,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
                 m_outgoingTranClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &QnTransactionTransportBase::postTransactionDone,
                 Qt::DirectConnection );
-            
+
             if (m_remotePeerCredentials.isNull())
             {
                 fillAuthInfo( m_outgoingTranClient, true );
@@ -1457,7 +1457,7 @@ bool QnTransactionTransportBase::skipTransactionForMobileClient(ApiCommand::Valu
     case ApiCommand::setResourceParam:
     case ApiCommand::setResourceParams:
     case ApiCommand::saveCameraUserAttributes:
-    case ApiCommand::saveServerUserAttributes:
+    case ApiCommand::saveMediaServerUserAttributes:
     case ApiCommand::getCameraHistoryItems:
     case ApiCommand::addCameraHistoryItem:
         return false;

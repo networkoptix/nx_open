@@ -172,7 +172,7 @@ namespace ec2
             handler->done( reqID, errorCode, cameraUserAttributesList);
         };
         m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getCameraUserAttributes, QnUuid(), queryDoneHandler );
+            ( ApiCommand::getCameraUserAttributesList, QnUuid(), queryDoneHandler );
         return reqID;
     }
 

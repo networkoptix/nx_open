@@ -468,7 +468,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 return false;
         }
         if (m_needResyncServerUserAttributes) {
-            if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveServerUserAttributes))
+            if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
                 return false;
         }
         if (m_needResyncLayout) {
@@ -720,7 +720,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
         return false;
-    if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveServerUserAttributes))
+    if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
         return false;
     if (!fillTransactionLogInternal<ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
         return false;
@@ -1737,7 +1737,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             backup_type                     \
             )                               \
          VALUES (                           \
-            :cameraID,                      \
+            :cameraId,                      \
             :cameraName,                    \
             :userDefinedGroupName,          \
             :audioEnabled,                  \
@@ -1767,7 +1767,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
     QSqlQuery renameQuery(m_sdb);
     renameQuery.prepare("UPDATE vms_resource set name = ? WHERE guid = ?");
     renameQuery.addBindValue(data.cameraName);
-    renameQuery.addBindValue(QnSql::serialized_field(data.cameraID));
+    renameQuery.addBindValue(QnSql::serialized_field(data.cameraId));
     if( !renameQuery.exec() )
     {
         NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(renameQuery.lastError().text()), cl_logWARNING );
@@ -2125,7 +2125,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             backup_bitrate                                       \
         )                                                        \
         VALUES(                                                  \
-            :serverID,                                           \
+            :serverId,                                           \
             :serverName,                                         \
             :maxCameras,                                         \
             :allowAutoRedundancy,                                \
@@ -3367,7 +3367,7 @@ ErrorCode QnDbManager::doQueryNoLock(
 
     queryCameras.prepare(lit("\
         SELECT                                           \
-            camera_guid as cameraID,                     \
+            camera_guid as cameraId,                     \
             camera_name as cameraName,                   \
             group_name as userDefinedGroupName,          \
             audio_enabled as audioEnabled,               \
@@ -3406,7 +3406,7 @@ ErrorCode QnDbManager::doQueryNoLock(
         cameraUserAttributesList,
         scheduleTaskList,
         &ApiCameraAttributesData::scheduleTasks,
-        &ApiCameraAttributesData::cameraID,
+        &ApiCameraAttributesData::cameraId,
         &ApiScheduleTaskWithRefData::sourceId );
 
     return ErrorCode::ok;
@@ -3531,7 +3531,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
             serverExList,
             serverAttrsList,
             &ApiMediaServerDataEx::id,
-            &ApiMediaServerUserAttributesData::serverID,
+            &ApiMediaServerUserAttributesData::serverId,
             []( ApiMediaServerDataEx& server, ApiMediaServerUserAttributesData& serverAttrs )
                 {
                     ((ApiMediaServerUserAttributesData&)server) = std::move(serverAttrs);
@@ -3583,7 +3583,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
 
     query.prepare( lit("\
         SELECT                                                      \
-            server_guid as serverID,                                \
+            server_guid as serverId,                                \
             server_name as serverName,                              \
             max_cameras as maxCameras,                              \
             redundancy as allowAutoRedundancy,                      \
@@ -4614,8 +4614,8 @@ bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
         case ApiCommand::saveMediaServer:
         case ApiCommand::saveStorage:
         case ApiCommand::saveStorages:
-        case ApiCommand::saveServerUserAttributes:
-        case ApiCommand::saveServerUserAttributesList:
+        case ApiCommand::saveMediaServerUserAttributes:
+        case ApiCommand::saveMediaServerUserAttributesList:
         case ApiCommand::setResourceStatus:
         case ApiCommand::setResourceParam:
         case ApiCommand::setResourceParams:

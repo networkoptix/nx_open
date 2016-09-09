@@ -184,7 +184,7 @@ QnUuid createHashForServerFootageDataHelper(const ApiServerFootageData &params)
 
 QnUuid createHashForApiCameraAttributesDataHelper(const ApiCameraAttributesData &params)
 {
-    return QnTransactionLog::makeHash(params.cameraID.toRfc4122(), "camera_attributes");
+    return QnTransactionLog::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
 }
 
 QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
@@ -199,7 +199,7 @@ QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)
 
 QnUuid createHashForApiMediaServerUserAttributesDataHelper(const ApiMediaServerUserAttributesData &params)
 {
-    return QnTransactionLog::makeHash(params.serverID.toRfc4122(), "server_attributes");
+    return QnTransactionLog::makeHash(params.serverId.toRfc4122(), "server_attributes");
 }
 
 QnUuid createHashForApiStoredFileDataHelper(const ApiStoredFileData &params)
@@ -546,7 +546,7 @@ struct ReadCameraAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::ReadPermission);
+        return resourceAccessHelper(accessData, param.cameraId, Qn::ReadPermission);
     }
 };
 
@@ -554,7 +554,7 @@ struct ReadCameraAttributesAccessOut
 {
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraID, Qn::ReadPermission)
+        return resourceAccessHelper(accessData, param.cameraId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -566,26 +566,26 @@ struct ModifyCameraAttributesAccess
         if (accessData == Qn::kSystemAccess)
             return true;
 
-        if (!resourceAccessHelper(accessData, param.cameraID, Qn::SavePermission))
+        if (!resourceAccessHelper(accessData, param.cameraId, Qn::SavePermission))
         {
-            qWarning() << "save ApiCameraAttributesData forbidden because no save permissions. id=" << param.cameraID;
+            qWarning() << "save ApiCameraAttributesData forbidden because no save permissions. id=" << param.cameraId;
             return false;
         }
 
         QnCamLicenseUsageHelper licenseUsageHelper;
         QnVirtualCameraResourceList cameras;
 
-        auto camera = qnResPool->getResourceById(param.cameraID).dynamicCast<QnVirtualCameraResource>();
+        auto camera = qnResPool->getResourceById(param.cameraId).dynamicCast<QnVirtualCameraResource>();
         if (!camera)
         {
-            qWarning() << "save ApiCameraAttributesData forbidden because camera object is not exists. id=" << param.cameraID;
+            qWarning() << "save ApiCameraAttributesData forbidden because camera object is not exists. id=" << param.cameraId;
             return false;
         }
 
         licenseUsageHelper.propose(camera, param.scheduleEnabled);
         if (licenseUsageHelper.isOverflowForCamera(camera))
         {
-            qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraID;
+            qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraId;
             return false;
         }
 
@@ -601,7 +601,7 @@ struct ModifyCameraAttributesListAccess
             return;
 
         for (const auto& p : param)
-            if (!resourceAccessHelper(accessData, p.cameraID, Qn::SavePermission))
+            if (!resourceAccessHelper(accessData, p.cameraId, Qn::SavePermission))
             {
                 param = ApiCameraAttributesDataList();
                 return;
@@ -612,7 +612,7 @@ struct ModifyCameraAttributesListAccess
 
         for (const auto& p : param)
         {
-            auto camera = qnResPool->getResourceById(p.cameraID).dynamicCast<QnVirtualCameraResource>();
+            auto camera = qnResPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource>();
             if (!camera)
             {
                 param = ApiCameraAttributesDataList();
@@ -635,7 +635,7 @@ struct ReadServerAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverID, Qn::ReadPermission);
+        return resourceAccessHelper(accessData, param.serverId, Qn::ReadPermission);
     }
 };
 
@@ -643,7 +643,7 @@ struct ReadServerAttributesAccessOut
 {
     RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverID, Qn::ReadPermission)
+        return resourceAccessHelper(accessData, param.serverId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -653,7 +653,7 @@ struct ModifyServerAttributesAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverID, Qn::SavePermission);
+        return resourceAccessHelper(accessData, param.serverId, Qn::SavePermission);
     }
 };
 

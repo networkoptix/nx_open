@@ -756,7 +756,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     ec2::ApiMediaServerUserAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return server;
-    userAttrsData.serverID = server->getId();
+    userAttrsData.serverId = server->getId();
 
     ec2::ApiMediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);

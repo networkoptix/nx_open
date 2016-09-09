@@ -67,9 +67,9 @@ struct ApiCameraAttributesData: ApiData
     {
     }
 
-    QnUuid getIdForMerging() { return cameraID; } //< See ApiIdData::getIdForMerging().
+    QnUuid getIdForMerging() { return cameraId; } //< See ApiIdData::getIdForMerging().
 
-    QnUuid cameraID; //< TODO: #mike cameraId
+    QnUuid cameraId;
     QString cameraName;
     QString userDefinedGroupName;
     bool scheduleEnabled;
@@ -103,6 +103,6 @@ struct ApiCameraAttributesData: ApiData
     (preferedServerId) \
     (failoverPriority) \
     (backupType)
-#define ApiCameraAttributesData_Fields (cameraID)(cameraName) ApiCameraAttributesData_Fields_Short
+#define ApiCameraAttributesData_Fields (cameraId)(cameraName) ApiCameraAttributesData_Fields_Short
 
 } // namespace ec2

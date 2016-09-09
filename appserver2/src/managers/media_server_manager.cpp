@@ -10,14 +10,14 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
     {
-        NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributesList);
         for (const ec2::ApiMediaServerUserAttributesData& attrs: tran.params)
             emit userAttributesChanged(attrs);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesData>& tran)
     {
-        NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributes);
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributes);
         emit userAttributesChanged(tran.params);
     }
 
@@ -110,7 +110,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::saveServerUserAttributesList, serverAttrs,
+            ApiCommand::saveMediaServerUserAttributesList, serverAttrs,
             [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
@@ -152,7 +152,7 @@ namespace ec2
             handler->done( reqID, errorCode, serverUserAttributesList);
         };
         m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerUserAttributesDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getServerUserAttributes, mediaServerId, queryDoneHandler );
+            ( ApiCommand::getMediaServerUserAttributesList, mediaServerId, queryDoneHandler );
         return reqID;
     }
 

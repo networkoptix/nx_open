@@ -374,7 +374,7 @@ APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
                        FilterListByAccess<ReadCameraAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadCameraAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
+APPLY(312, getCameraUserAttributesList, ApiCameraAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -440,7 +440,7 @@ APPLY(402, removeMediaServer, ApiIdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(403, saveServerUserAttributes, ApiMediaServerUserAttributesData, \
+APPLY(403, saveMediaServerUserAttributes, ApiMediaServerUserAttributesData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        &createHashForApiMediaServerUserAttributesDataHelper, /* getHash*/ \
@@ -451,7 +451,7 @@ APPLY(403, saveServerUserAttributes, ApiMediaServerUserAttributesData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadServerAttributesAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(404, saveServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
+APPLY(404, saveMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
@@ -462,7 +462,7 @@ APPLY(404, saveServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
                        FilterListByAccess<ReadServerAttributesAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadServerAttributesAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(405, getServerUserAttributes, ApiMediaServerUserAttributesDataList, \
+APPLY(405, getMediaServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
