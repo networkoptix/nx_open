@@ -122,17 +122,14 @@ QPixmap QnSkin::pixmap(const QString& name,
     static const auto kHiDpiSuffix = lit("@2x");
     static const bool kIsHiDpi = (QApplication::desktop()->devicePixelRatio() > 1);
 
-    if (kIsHiDpi)
-    {
-        // Try to load 2x icons if it is hidpi mode
-        QFileInfo info(name);
-        const auto suffix = info.completeSuffix();
-        const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
-            + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
-        auto result = getPixmapInternal(newName, size, aspectMode, mode);
-        if (!result.isNull())
-            return result;
-    }
+    QFileInfo info(name);
+    const auto suffix = info.completeSuffix();
+    const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
+        + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
+    auto result = getPixmapInternal(newName, size, aspectMode, mode);
+    if (!result.isNull())
+        return result;
+
     return getPixmapInternal(name, size, aspectMode, mode);
 }
 
@@ -146,6 +143,7 @@ QPixmap QnSkin::getPixmapInternal(const QString& name, const QSize& size, Qt::As
     if (!QPixmapCache::find(key, &pixmap))
     {
         pixmap = QPixmap::fromImage(QImage(path(name)), Qt::OrderedDither | Qt::OrderedAlphaDither);
+        pixmap.setDevicePixelRatio(1); // Force to use not scaled images
         if (!pixmap.isNull())
         {
             if (!size.isEmpty() && size != pixmap.size())

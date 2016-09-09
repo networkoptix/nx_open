@@ -22,14 +22,18 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::CameraSettings_Dewarping_Help);
 
-    ui->sizeIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/circle_small.png")));
-    ui->sizeIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/circle_big.png")));
-    ui->xOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_left.png")));
-    ui->xOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_right.png")));
-    ui->yOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_down.png")));
-    ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png")));
-    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png")));
-    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png")));
+    static const QSize kPixmapSize(48, 48);
+
+    ui->sizeIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/circle_small.png"), kPixmapSize));
+    ui->sizeIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/circle_big.png"), kPixmapSize));
+    ui->xOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_left.png"), kPixmapSize));
+    ui->xOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_right.png"), kPixmapSize));
+    ui->yOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_down.png"), kPixmapSize));
+    ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png"), kPixmapSize));
+    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png"), kPixmapSize));
+    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png"), kPixmapSize));
+
+
 
     connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this, &QnFisheyeSettingsWidget::dataChanged);
