@@ -1,5 +1,6 @@
 #include "media_server_connection.h"
 
+#include <QtGui/QImage>
 #include <QtCore/QSharedPointer>
 #include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
