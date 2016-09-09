@@ -22,6 +22,7 @@ TestHttpServer::TestHttpServer()
 
 TestHttpServer::~TestHttpServer()
 {
+    m_httpServer->pleaseStop();
 }
 
 bool TestHttpServer::bindAndListen()
