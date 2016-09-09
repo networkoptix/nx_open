@@ -162,7 +162,7 @@ ec2::AbstractECConnectionPtr connection2()
 void trace(const QString& message)
 {
     qDebug() << "QnWorkbenchConnectHandler: " << message;
-    NX_LOG(lit("QnWorkbenchConnectHandler: ") + message);
+    //NX_LOG(lit("QnWorkbenchConnectHandler: ") + message, cl_logDEBUG1);
 }
 
 } //anonymous namespace
