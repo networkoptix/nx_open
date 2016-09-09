@@ -6,6 +6,8 @@
 
 #include <camera/loaders/caching_camera_data_loader.h>
 
+#include <nx/utils/log/log.h>
+
 QnCameraDataManager::QnCameraDataManager(QObject *parent /*= 0*/):
     QObject(parent)
 {
@@ -14,7 +16,7 @@ QnCameraDataManager::QnCameraDataManager(QObject *parent /*= 0*/):
         {
             if (QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>())
             {
-                qDebug() << "removing loader" << resource->getName();
+                NX_LOG(lit("removing loader %1").arg(resource->getName()), cl_logDEBUG1);
                 m_loaderByResource.remove(mediaResource);
             }
         });
