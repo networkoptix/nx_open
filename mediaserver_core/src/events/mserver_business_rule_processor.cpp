@@ -656,21 +656,24 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
-    if (eventType == QnBusiness::CameraMotionEvent)
+    if (eventType == QnBusiness::CameraMotionEvent ||
+        eventType == QnBusiness::CameraInputEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
         qnCameraHistoryPool->updateCameraHistorySync(camRes);
+        if (camRes->hasVideo(nullptr) &&
+            QnStorageManager::isArchiveTimeExists(camRes->getUniqueId(), params.eventTimestampUsec))
+        {
+            contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
+            contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
 
-        contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
-        contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
-
-        QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
-        if (!screenshotData.isNull()) {
-            QBuffer screenshotStream(&screenshotData);
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+            QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
+            if (!screenshotData.isNull()) {
+                QBuffer screenshotStream(&screenshotData);
+                attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+                contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+            }
         }
-
     }
     else if (eventType == QnBusiness::UserDefinedEvent)
     {

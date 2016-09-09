@@ -18,6 +18,7 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/common/log.h>
+#include <core/resource/param.h>
 
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
@@ -33,8 +34,8 @@ static int actiEventPort = 0;
 
 static int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
 
-QnActiResource::QnActiResource()
-:
+QnActiResource::QnActiResource() :
+    m_desiredTransport(RtpTransport::_auto),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -44,7 +45,11 @@ QnActiResource::QnActiResource()
     setVendor(lit("ACTI"));
 
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
-        m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
+    {
+        m_availableBitrates.insert(
+            DEFAULT_AVAIL_BITRATE_KBPS[i],
+            bitrateToDefaultString(DEFAULT_AVAIL_BITRATE_KBPS[i]));
+    }
 }
 
 QnActiResource::~QnActiResource()
@@ -87,10 +92,10 @@ bool QnActiResource::checkIfOnlineAsync( std::function<void(bool)>&& completionH
         if( msgBody.startsWith("ERROR: bad account") )
             return completionHandler( false );
 
-        QMap<QByteArray, QByteArray> report = QnActiResource::parseSystemInfo( msgBody );
-        QByteArray mac = report.value("mac address");
+        auto report = QnActiResource::parseSystemInfo( msgBody );
+        auto mac = report.value("mac address");
         mac.replace( ':', '-' );
-        completionHandler( mac == resourceMac.toLatin1() );
+        completionHandler(mac == resourceMac);
     };
 
     return nx_http::downloadFileAsync(
@@ -129,7 +134,7 @@ QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
     bool isDigit = params[0].at(0) >= '0' && params[0].at(0) <= '9';
     if (!isDigit)
         params[0] = params[0].mid(1);
-    
+
     return QSize(params[0].trimmed().toInt(), params[1].trimmed().toInt());
 }
 
@@ -166,7 +171,7 @@ CLHttpStatus QnActiResource::makeActiRequest(
         msgBody->clear();
         client.readAll(*msgBody);
         if (msgBody->startsWith("ERROR: bad account"))
-            return CL_HTTP_AUTH_REQUIRED; 
+            return CL_HTTP_AUTH_REQUIRED;
     }
 
     if (!keepAllData)
@@ -191,13 +196,16 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     return result;
 }
 
-QMap<QByteArray, QByteArray> QnActiResource::parseSystemInfo(const QByteArray& report)
+QnActiResource::ActiSystemInfo QnActiResource::parseSystemInfo(const QByteArray& report)
 {
-    QMap<QByteArray, QByteArray> result;
-    QList<QByteArray> lines = report.split('\n');
-    for(const QByteArray& line: lines) {
-        QList<QByteArray> tmp = line.split('=');
-        result.insert(tmp[0].trimmed().toLower(), tmp.size() >= 2 ? tmp[1].trimmed() : "");
+    ActiSystemInfo result;
+    auto lines = report.split('\n');
+    for(const auto& line: lines)
+    {
+        auto tmp = line.split('=');
+        result.insert(
+            QString::fromUtf8(tmp[0]).trimmed().toLower(),
+            QString::fromUtf8(tmp.size() >= 2 ? tmp[1].trimmed() : ""));
     }
 
     return result;
@@ -239,24 +247,38 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
         qnSyncTime->currentUSecsSinceEpoch() );
 }
 
-QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
+QMap<int, QString> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
 {
-    QList<int> result;
-    for(QByteArray bitrate: bitrateCap.split(','))
+    QMap<int, QString> result;
+    int coeff = 1;
+    for(auto bitrate: bitrateCap.split(','))
     {
         bitrate = bitrate.trimmed().toUpper();
-        int coeff = 1;
         if (bitrate.endsWith("M"))
             coeff = 1000;
-        bitrate.chop(1);
-        result << bitrate.toFloat()*coeff;
+        else
+            coeff = 1;
+
+        result.insert(
+            bitrate.left(bitrate.size() - 1).toDouble() * coeff,
+            bitrate);
     }
+
     return result;
+}
+
+QString QnActiResource::bitrateToDefaultString(int bitrateKbps) const
+{
+    const int kKbitInMbit = 1000;
+    if (bitrateKbps < kKbitInMbit)
+        return lit("%1K").arg(bitrateKbps);
+
+    return lit("%1.%2M").arg(bitrateKbps / 1000).arg((bitrateKbps % 1000) / 100);
 }
 
 bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const
 {
-    QByteArray rtspAudio[][2] = 
+    QByteArray rtspAudio[][2] =
     {
         {"T",  "4.13"}, // Platform and minimum allowed firmware version
         {"K",  "5.08"},
@@ -293,27 +315,29 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
     CLHttpStatus status;
-        
+
     QByteArray resolutions= makeActiRequest(
-        lit("system"), 
-        lit("VIDEO_RESOLUTION_CAP"), 
+        lit("system"),
+        lit("VIDEO_RESOLUTION_CAP"),
         status);
 
-    if (status == CL_HTTP_AUTH_REQUIRED) 
+    if (status == CL_HTTP_AUTH_REQUIRED)
         setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
     {
         return CameraDiagnostics::RequestFailedResult(
-            lit("/cgi-bin/encoder?VIDEO_REOLUTION_CAP"), 
+            lit("/cgi-bin/encoder?VIDEO_REOLUTION_CAP"),
             QString::fromUtf8(resolutions));
     }
 
     QByteArray serverReport = makeActiRequest(
-        lit("system"), 
-        lit("SYSTEM_INFO"), 
-        status, 
+        lit("system"),
+        lit("SYSTEM_INFO"),
+        status,
         true);
 
     if (status != CL_HTTP_SUCCESS)
@@ -323,14 +347,32 @@ CameraDiagnostics::Result QnActiResource::initInternal()
             QString::fromUtf8(serverReport));
     }
 
-    QMap<QByteArray, QByteArray> report = parseSystemInfo(serverReport);
+    auto report = parseSystemInfo(serverReport);
 
-    setFirmware(QString::fromUtf8(report.value("firmware version")));
-    setMAC(QnMacAddress(QString::fromUtf8(report.value("mac address"))));
+    setFirmware(report.value("firmware version"));
+    setMAC(QnMacAddress(report.value("mac address")));
 
     m_platform = report.value("platform")
         .trimmed()
-        .toUpper();
+        .toUpper()
+        .toLatin1();
+
+    auto encodersStr = report.value("encoder_cap");
+
+    if (!encodersStr.isEmpty())
+    {
+        auto encoders = encodersStr.split(',');
+        for (const auto& encoder: encoders)
+            m_availableEncoders.insert(encoder.trimmed());
+    }
+    else
+    {
+        //Try to use h264 if no codecs defined;
+        m_availableEncoders.insert(lit("H264"));
+    }
+
+    auto desiredTransport = resData.value<QString>(Qn::DESIRED_TRANSPORT_PARAM_NAME, RtpTransport::_auto);
+    m_desiredTransport = RtpTransport::fromString(desiredTransport);
 
     bool dualStreaming = report.value("channels").toInt() > 1 ||
         !report.value("video2_resolution_cap").isEmpty() ||
@@ -347,14 +389,14 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     if (dualStreaming)
     {
-        if (report.contains("streaming mode") 
-            && report.value("streaming mode") != lit("DUAL"))  
+        if (report.contains("streaming mode")
+            && report.value("streaming mode") != lit("DUAL"))
         {
             makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=DUAL"), status);
 
             if (status != CL_HTTP_SUCCESS)
             {
-                auto message = 
+                auto message =
                     lit("Unable to set up dual streaming mode for camera %1, %2")
                     .arg(getModel())
                     .arg(getUrl());
@@ -369,41 +411,41 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     if (dualStreaming) {
         resolutions = makeActiRequest(
-            lit("system"), 
-            lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"), 
+            lit("system"),
+            lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
             status);
 
         if (status == CL_HTTP_SUCCESS)
         {
             availResolutions = parseResolutionStr(resolutions);
-            int maxSecondaryRes = 
-                SECONDARY_STREAM_MAX_RESOLUTION.width() 
+            int maxSecondaryRes =
+                SECONDARY_STREAM_MAX_RESOLUTION.width()
                 * SECONDARY_STREAM_MAX_RESOLUTION.height();
 
             float currentAspect = getResolutionAspectRatio(m_resolution[0]);
 
             m_resolution[1] = getNearestResolution(
-                SECONDARY_STREAM_DEFAULT_RESOLUTION, 
-                currentAspect, 
-                maxSecondaryRes, 
+                SECONDARY_STREAM_DEFAULT_RESOLUTION,
+                currentAspect,
+                maxSecondaryRes,
                 availResolutions);
 
             if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
             {
                 // try to get resolution ignoring aspect ration
                 m_resolution[1] = getNearestResolution(
-                    SECONDARY_STREAM_DEFAULT_RESOLUTION, 
-                    0.0, 
-                    maxSecondaryRes, 
+                    SECONDARY_STREAM_DEFAULT_RESOLUTION,
+                    0.0,
+                    maxSecondaryRes,
                     availResolutions);
             }
-        } 
+        }
     }
 
     // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
     auto response = makeActiRequest(
-        lit("system"), 
-        lit("RTP_B2=1"), 
+        lit("system"),
+        lit("RTP_B2=1"),
         status);
 
     if (status != CL_HTTP_SUCCESS)
@@ -423,8 +465,8 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     }
 
     auto fpsList = fpsString.split(';');
-    
-    for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i) 
+
+    for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i)
     {
         QList<QByteArray> fps = fpsList[i].split(',');
 
@@ -447,12 +489,12 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
 
-    m_hasAudio = report.value("audio").toInt() > 0 
+    m_hasAudio = report.value("audio").toInt() > 0
         && isRtspAudioSupported(m_platform, getFirmware().toUtf8());
 
-    QByteArray bitrateCap = report.value("video_bitrate_cap");
+    auto bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())
-        m_availBitrate = parseVideoBitrateCap(bitrateCap);
+        m_availableBitrates = parseVideoBitrateCap(bitrateCap.toLatin1());
 
     initializeIO(report);
 
@@ -666,6 +708,24 @@ int QnActiResource::getMaxFps() const
     return m_availFps[0].last();
 }
 
+QString QnActiResource::formatBitrateString(int bitrateKbps) const
+{
+    if (m_availableBitrates.contains(bitrateKbps))
+        return m_availableBitrates[bitrateKbps];
+
+    return bitrateToDefaultString(bitrateKbps);
+}
+
+QSet<QString> QnActiResource::getAvailableEncoders() const
+{
+    return m_availableEncoders;
+}
+
+RtpTransport::Value QnActiResource::getDesiredTransport() const
+{
+    return m_desiredTransport;
+}
+
 QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
 {
     return (role == Qn::CR_LiveVideo ? m_resolution[0] : m_resolution[1]);
@@ -679,7 +739,7 @@ int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
     for (int i = 0; i < availFps.size(); ++i)
     {
         int distance = qAbs(availFps[i] - srcFps);
-        if (distance <= minDistance) { // preffer higher fps if same distance
+        if (distance <= minDistance) { // prefer higher fps if same distance
             minDistance = distance;
             result = availFps[i];
         }
@@ -692,12 +752,14 @@ int QnActiResource::roundBitrate(int srcBitrateKbps) const
 {
     int minDistance = INT_MAX;
     int result = srcBitrateKbps;
-    for (int i = 0; i < m_availBitrate.size(); ++i)
+
+    for (const auto& bitrate: m_availableBitrates.keys())
     {
-        int distance = qAbs(m_availBitrate[i] - srcBitrateKbps);
-        if (distance <= minDistance) { // preffer higher bitrate if same distance
+        int distance = qAbs(bitrate - srcBitrateKbps);
+        if (distance <= minDistance)
+        {
             minDistance = distance;
-            result = m_availBitrate[i];
+            result = bitrate;
         }
     }
 
@@ -798,9 +860,9 @@ void QnActiResource::onTimer( const quint64& timerID )
             TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }
 
-void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )
+void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
 {
-    QMap<QByteArray, QByteArray>::const_iterator it = systemInfo.find( "di" );
+    auto it = systemInfo.find( "di" );
     if( it != systemInfo.end() )
         m_inputCount = it.value().toInt();
     if( m_inputCount > 0 )
@@ -811,6 +873,11 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
         m_outputCount = it.value().toInt();
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
+
+    auto ports = getInputPortList();
+    for (auto item: getRelayOutputList())
+        ports.push_back(item);
+    setIOPorts(ports);
 }
 
 bool QnActiResource::getParamPhysical(const QString& id, QString& value)
