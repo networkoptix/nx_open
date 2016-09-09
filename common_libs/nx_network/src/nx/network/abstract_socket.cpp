@@ -72,12 +72,14 @@ void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> han
 
 void AbstractCommunicatingSocket::pleaseStopSync(bool doNotCheckForLocks)
 {
-    if (!doNotCheckForLocks)
-    {
-        const auto pollablePtr = pollable();
-        if (!pollablePtr || !pollablePtr->isInSelfAioThread())
-            MutexLockAnalyzer::instance()->expectNoLocks();
-    }
+    #ifdef USE_OWN_MUTEX
+        if (!doNotCheckForLocks)
+        {
+            const auto pollablePtr = pollable();
+            if (!pollablePtr || !pollablePtr->isInSelfAioThread())
+                MutexLockAnalyzer::instance()->expectNoLocks();
+        }
+    #endif
 
     cancelIOSync(nx::network::aio::EventType::etNone);
 }

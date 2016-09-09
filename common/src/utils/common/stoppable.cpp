@@ -5,8 +5,10 @@
 
 void QnStoppableAsync::pleaseStopSync(bool doNotCheckForLocks)
 {
-    if (!doNotCheckForLocks)
-        MutexLockAnalyzer::instance()->expectNoLocks();
+    #ifdef USE_OWN_MUTEX
+        if (!doNotCheckForLocks)
+            MutexLockAnalyzer::instance()->expectNoLocks();
+    #endif
 
     nx::utils::promise<void> promise;
     auto fut = promise.get_future();
