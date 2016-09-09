@@ -1066,7 +1066,11 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses << SocketAddress(host.first, host.second);
 
     if (!m_publicAddress.isNull())
-        serverAddresses << SocketAddress(m_publicAddress.toString());
+    {
+        serverAddresses << SocketAddress(
+            m_publicAddress.host().toString(),
+            m_mediaServer->getPort());
+    }
 
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
