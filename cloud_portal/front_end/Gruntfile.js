@@ -13,6 +13,8 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
 
+    var cloudHost = 'cloud-test.hdw.mx';  // 'cloud-local' // For local vagrant
+
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
 
@@ -89,32 +91,9 @@ module.exports = function (grunt) {
                 {from: '^/static/(.*)$', to: '/$1'}
             ],
             proxies: [
-                // Local pyhton manage.py runserver
-                /*{context: '/api/',    host: '127.0.0.1', port: 8000},
-                {context: '/notifications/',    host: '127.0.0.1', port: 8000}/**/
-
-
                 // cloud-demo.hdw.mx
-                {context: '/api/',    host: 'cloud-demo.hdw.mx', port: 80},
-                {context: '/notifications/',    host: 'cloud-demo.hdw.mx', port: 80}/**/
-
-
-                // Local vagrant
-                /*{context: '/api/',    host: 'cloud-local', port: 80},
-                {context: '/notifications/',    host: 'cloud-local', port: 80}/**/
-
-
-                // Hack to avoid gateway - don't work :(
-                /*{
-                    context: '/ec2/',
-                    host: '10.1.5.142',
-                    port: 7001,
-                    headers: { //admin:admin
-                        'Authorization': 'Basic YWRtaW46YWRtaW4='
-                    }
-                    // Use https://www.base64encode.org/ to calculate signature as base64(user:password)
-                }*/
-
+                {context: '/api/',    host: cloudHost, port: 80},
+                {context: '/notifications/',    host: cloudHost, port: 80}/**/
             ],
             livereload: {
                 options: {

@@ -25,7 +25,7 @@ angular.module('cloudApp')
 
         system.prototype.updateSystemAuth = function(){
             var self = this;
-            return cloudApi.getSystemNonce().then(function(data){
+            return cloudApi.getSystemNonce(self.id).then(function(data){
                 return self.mediaserver.login(data.data.nonce);
             })
         };
@@ -61,12 +61,12 @@ angular.module('cloudApp')
             }
         };
         system.prototype.getInfoAndPermissions = function(){
+            var self = this;
             return cloudApi.system(self.id).then(function(result){
                 var error = false
                 if (error = cloudApi.checkResponseHasError(result)){
                     return $q.reject(error);
                 }
-
 
                 if(self.info){
                     $.extend(true, self.info, result.data[0]); // Update

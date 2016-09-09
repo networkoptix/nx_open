@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('mediaserver', ['$http', '$q', 'uuid2', '$localStorage', function ($http, $q, uuid2, $localStorage) {
+    .factory('mediaserver', ['$http', '$q', 'uuid2', '$localStorage','$base64', function ($http, $q, uuid2, $localStorage, $base64) {
 
         function gateway(serverId){
             return Config.apiBase + '/systems/' + serverId  + '/proxy';
@@ -21,7 +21,7 @@ angular.module('cloudApp')
                     var digest = md5(login + ':' + realm + ':' + password);
                     var method = md5('GET:');
                     var authDigest = md5(digest + ':' + nonce + ':' + method);
-                    var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+                    var auth = $base64.encode(login + ':' + nonce + ':' + authDigest);
                     return auth;
                 },
                 login:function(nonce){
