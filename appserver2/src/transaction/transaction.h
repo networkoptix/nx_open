@@ -1475,10 +1475,25 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
             QnUbjson::deserialize(stream, &transaction->params);
     }
 
+    struct ApiTranLogFilter
+    {
+        bool cloudOnly;
+
+        ApiTranLogFilter(): cloudOnly(false) {}
+    };
+
     struct ApiTransactionData: public ApiData
     {
         QnUuid tranGuid;
         QnAbstractTransaction tran;
+
+        ApiTransactionData() {}
+        ApiTransactionData(const QnUuid& peerGuid): tran(peerGuid) {}
+
+        ApiTransactionData(const ApiTransactionData&) = default;
+        ApiTransactionData& operator=(const ApiTransactionData&) = default;
+        ApiTransactionData(ApiTransactionData&&) = default;
+        ApiTransactionData& operator=(ApiTransactionData&&) = default;
     };
 #define ApiTransactionData_Fields (tranGuid)(tran)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))

@@ -3728,11 +3728,14 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessR
 
 
 //getTransactionLog
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t&, ApiTransactionDataList& tranList)
+ErrorCode QnDbManager::doQueryNoLock(const ApiTranLogFilter& filter, ApiTransactionDataList& tranList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log order by peer_guid, db_guid, sequence"));
+    QString whereClause;
+    if (filter.cloudOnly)
+        whereClause = lit("WHERE tran_type=%1").arg(TransactionType::Cloud);
+    query.prepare(lit("SELECT tran_guid, tran_data from transaction_log %1 order by peer_guid, db_guid, sequence").arg(whereClause));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;

@@ -689,7 +689,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      */
     regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
 
-    regGet<nullptr_t, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
+    regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     // AbstractBusinessEventManager::save
     regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);

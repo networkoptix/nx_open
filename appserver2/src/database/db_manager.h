@@ -264,7 +264,7 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
 
         //getTransactionLog
-        ErrorCode doQueryNoLock(const nullptr_t&, ApiTransactionDataList& tranList);
+        ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
         //getClientInfos
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);

@@ -53,9 +53,13 @@ void QnConnectToCloudWatcher::at_updateConnection()
         {
             if (statusCode != nx_http::StatusCode::ok || endpoint->isNull())
             {
+                NX_LOGX(lm("Error fetching cloud_db endpoint. %1").str(statusCode), cl_logDEBUG2);
                 m_timer.start(); //< try once more later
                 return;
             }
+
+            NX_LOGX(lm("Creating transaction connection to cloud_db at %1")
+                .str(endpoint), cl_logDEBUG1);
 
             m_cloudUrl = QUrl(lit("http://%1:%2/ec2/events").
                 arg(endpoint->address.toString()).

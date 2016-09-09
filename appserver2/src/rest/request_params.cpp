@@ -9,7 +9,9 @@
 
 #include <nx_ec/data/api_connection_data.h>
 #include <nx_ec/data/api_stored_file_data.h>
+#include <nx_ec/data/api_stored_file_data.h>
 #include <nx/fusion/serialization/lexical_functions.h>
+#include <transaction/transaction.h>
 
 
 namespace ec2
@@ -105,6 +107,20 @@ namespace ec2
             serialize(data.clientInfo.openGLVendor,    lit("info_openGLVendor"),    query);
             serialize(data.clientInfo.openGLRenderer,  lit("info_openGLRenderer"),  query);
         }
+    }
+
+    bool parseHttpRequestParams(
+        const QString& /*command*/,
+        const QnRequestParamList& params,
+        ApiTranLogFilter* tranLogFilter)
+    {
+        deserialize(params, lit("cloud_only"), &tranLogFilter->cloudOnly);
+        return true;
+    }
+
+    void toUrlParams(const ApiTranLogFilter& tranLogFilter, QUrlQuery* query)
+    {
+        serialize(tranLogFilter.cloudOnly, lit("cloud_only"), query);
     }
 
     bool parseHttpRequestParams(const QString&, const QnRequestParamList &, std::nullptr_t *) { return true; }
