@@ -229,6 +229,7 @@ QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, con
         }
     }
 
+    NX_LOG(lit("Returning UUID for %1 %2: %3").arg(manufacture).arg(name).arg(result.toString()), cl_logINFO);
     return result;
 }
 
