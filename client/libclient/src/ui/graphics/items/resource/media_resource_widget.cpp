@@ -1,6 +1,7 @@
 #include "media_resource_widget.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QVarLengthArray>
 #include <QtGui/QPainter>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -176,36 +177,48 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
     if (value == 0)
         return;
 
-    int xBegin = at.x(), xEnd = at.x() + 1;
+    QVarLengthArray<QPoint> pointStack;
+    grid[at.y()][at.x()] = 0;
+    pointStack.push_back(at);
 
-    while (xBegin >= 0 && grid[at.y()][xBegin] == value)
-        grid[at.y()][xBegin--] = 0;
-
-    ++xBegin;
-
-    while (xEnd < grid[0].size() && grid[at.y()][xEnd] == value)
-        grid[at.y()][xEnd++] = 0;
-
-    int yPrev = at.y() - 1;
-    if (yPrev >= 0)
+    while (!pointStack.empty())
     {
-        for (int x = xBegin; x < xEnd; ++x)
+        QPoint p = pointStack.back();
+        pointStack.pop_back();
+
+        /* Spread left: */
+        int x = p.x() - 1;
+        if (x >= 0 && grid[p.y()][x] == value)
         {
-            if (grid[yPrev][x] == value)
-                clearSensitivityRegion(grid, { x, yPrev });
+            grid[p.y()][x] = 0;
+            pointStack.push_back({ x, p.y() });
+        }
+
+        /* Spread right: */
+        x = p.x() + 1;
+        if (x < grid[0].size() && grid[p.y()][x] == value)
+        {
+            grid[p.y()][x] = 0;
+            pointStack.push_back({ x, p.y() });
+        }
+
+        /* Spread up: */
+        int y = p.y() - 1;
+        if (y >= 0 && grid[y][p.x()] == value)
+        {
+            grid[y][p.x()] = 0;
+            pointStack.push_back({ p.x(), y });
+        }
+
+        /* Spread down: */
+        y = p.y() + 1;
+        if (y < grid.size() && grid[y][p.x()] == value)
+        {
+            grid[y][p.x()] = 0;
+            pointStack.push_back({ p.x(), y });
         }
     }
-
-    int yNext = at.y() + 1;
-    if (yNext < grid.size())
-    {
-        for (int x = xBegin; x < xEnd; ++x)
-        {
-            if (grid[yNext][x] == value)
-                clearSensitivityRegion(grid, { x, yNext });
-        }
-    }
-}
+};
 
 } // anonymous namespace
 
