@@ -272,12 +272,6 @@ bool QnPlAxisResource::isInputPortMonitored() const
     return m_ioHttpMonitor[0].httpClient.get() != nullptr;
 }
 
-bool QnPlAxisResource::isInitialized() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return isIOModule() ? base_type::isInitialized() : !m_resolutionList.isEmpty();
-}
-
 void QnPlAxisResource::clear()
 {
     m_resolutionList.clear();
@@ -515,6 +509,10 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
                 }
             }
         }
+
+        if (!isIOModule() && m_resolutionList.isEmpty())
+            return CameraDiagnostics::CameraInvalidParams("Failed to read resolution list");
+
     }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
             //m_initMutex is locked up the stack
     if (hasVideo(0))
