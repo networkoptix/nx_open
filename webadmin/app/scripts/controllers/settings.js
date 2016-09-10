@@ -46,12 +46,12 @@ angular.module('webadminApp')
 
                 $scope.$watch("active.system",function(){
                     if( $scope.active.system){
-                        $location.path('/settings/system', false);
+                        $location.path('/settings/system');
                     }
                 });
                 $scope.$watch("active.server",function(){
                     if( $scope.active.server){
-                        $location.path('/settings/server', false);
+                        $location.path('/settings/server');
                     }
                 });
 
