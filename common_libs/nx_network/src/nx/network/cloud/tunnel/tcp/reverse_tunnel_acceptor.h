@@ -12,7 +12,7 @@ namespace tcp {
  * Initiates IncomingReverseTunnelConnection(s) for each endpoint and returns first successfull one
  * or error (if no one was successfull)
  */
-class NX_NETWORK_API ReverseTunnelAcceptor
+class ReverseTunnelAcceptor
 :
     public AbstractTunnelAcceptor
 {
