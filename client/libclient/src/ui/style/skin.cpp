@@ -120,15 +120,18 @@ QPixmap QnSkin::pixmap(const QString& name,
     Qt::TransformationMode mode)
 {
     static const auto kHiDpiSuffix = lit("@2x");
-    static const bool kIsHiDpi = (QApplication::desktop()->devicePixelRatio() > 1);
+    static const bool kIsHiDpi = (qApp->devicePixelRatio() > 1);
 
-    QFileInfo info(name);
-    const auto suffix = info.completeSuffix();
-    const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
-        + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
-    auto result = getPixmapInternal(newName, size, aspectMode, mode);
-    if (!result.isNull())
-        return result;
+    if (kIsHiDpi)
+    {
+        QFileInfo info(name);
+        const auto suffix = info.completeSuffix();
+        const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
+            + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
+        auto result = getPixmapInternal(newName, size, aspectMode, mode);
+        if (!result.isNull())
+            return result;
+    }
 
     return getPixmapInternal(name, size, aspectMode, mode);
 }
