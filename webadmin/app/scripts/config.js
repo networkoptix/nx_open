@@ -23,7 +23,6 @@ var Config = {
         portalSystemUrl: '/systems/{systemId}'
     },
 
-    webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
