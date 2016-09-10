@@ -56,6 +56,7 @@ QPixmap QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &
     if(iconMode == QIcon::Disabled) {
         QImage image = QImage(pixmap.size(), QImage::Format_ARGB32);
         image.fill(qRgba(0, 0, 0, 0));
+        image.setDevicePixelRatio(pixmap.devicePixelRatio());
 
         QPainter painter(&image);
 #ifdef Q_OS_LINUX
