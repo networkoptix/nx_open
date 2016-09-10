@@ -274,7 +274,12 @@
             "nxDeviceName": "Nx-Fisheye",
             "nxDeviceModel": "Nx-Fisheye-05925"
         },
-
+        {
+            "keys": [
+                "ACTI|ACM3411", "ACTI|ACM3401"
+            ],
+            "desiredTransport":"UDP"
+        },
         {
             "keys": [
                 "VISTA|*",

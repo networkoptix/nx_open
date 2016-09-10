@@ -18,6 +18,7 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/common/log.h>
+#include <core/resource/param.h>
 
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
@@ -33,8 +34,8 @@ static int actiEventPort = 0;
 
 static int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
 
-QnActiResource::QnActiResource()
-:
+QnActiResource::QnActiResource() :
+    m_desiredTransport(RtpTransport::_auto),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -314,6 +315,8 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
     CLHttpStatus status;
 
     QByteArray resolutions= makeActiRequest(
@@ -354,7 +357,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         .toUpper()
         .toLatin1();
 
-    auto encodersStr = report.value("ENCODER_CAP");
+    auto encodersStr = report.value("encoder_cap");
 
     if (!encodersStr.isEmpty())
     {
@@ -367,6 +370,9 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         //Try to use h264 if no codecs defined;
         m_availableEncoders.insert(lit("H264"));
     }
+
+    auto desiredTransport = resData.value<QString>(Qn::DESIRED_TRANSPORT_PARAM_NAME, RtpTransport::_auto);
+    m_desiredTransport = RtpTransport::fromString(desiredTransport);
 
     bool dualStreaming = report.value("channels").toInt() > 1 ||
         !report.value("video2_resolution_cap").isEmpty() ||
@@ -713,6 +719,11 @@ QString QnActiResource::formatBitrateString(int bitrateKbps) const
 QSet<QString> QnActiResource::getAvailableEncoders() const
 {
     return m_availableEncoders;
+}
+
+RtpTransport::Value QnActiResource::getDesiredTransport() const
+{
+    return m_desiredTransport;
 }
 
 QSize QnActiResource::getResolution(Qn::ConnectionRole role) const

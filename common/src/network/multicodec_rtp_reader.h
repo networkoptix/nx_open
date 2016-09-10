@@ -27,6 +27,16 @@ namespace RtpTransport
     static QLatin1String _auto( "AUTO" );
     static QLatin1String udp( "UDP" );
     static QLatin1String tcp( "TCP" );
+
+    static Value fromString(const QString& str)
+    {
+        if (str == RtpTransport::udp)
+            return RtpTransport::udp;
+        else if (str == RtpTransport::tcp)
+            return RtpTransport::tcp;
+        else
+            return RtpTransport::_auto;
+    }
 };
 
 class QnRtpStreamParser;
