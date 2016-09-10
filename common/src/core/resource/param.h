@@ -20,6 +20,7 @@ namespace Qn
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
     static const QString FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
+    static const QString DESIRED_TRANSPORT_PARAM_NAME = lit("desiredTransport");
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver

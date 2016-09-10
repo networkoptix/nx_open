@@ -274,7 +274,12 @@
             "nxDeviceName": "Nx-Fisheye",
             "nxDeviceModel": "Nx-Fisheye-05925"
         },
-
+        {
+            "keys": [
+                "ACTI|ACM3411", "ACTI|ACM3401"
+            ],
+            "desiredTransport":"UDP"
+        },
         {
             "keys": [
                 "VISTA|*",
@@ -320,7 +325,13 @@
                 "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
                 "ACTI|V32", "ACTi Corporation|V32",
-                "BOSCH|VIP-X1600-XFM4"
+                "BOSCH|VIP-X1600-XFM4",
+                "Axis|AXISM7014",
+                "Axis|AXISM7016",
+                "Axis|AXISQ7404",
+                "Axis|M7014",
+                "Axis|M7016",
+                "Axis|Q7404"
             ],
             "analogEncoder": true
         },

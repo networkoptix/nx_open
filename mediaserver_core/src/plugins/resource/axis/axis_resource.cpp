@@ -272,12 +272,6 @@ bool QnPlAxisResource::isInputPortMonitored() const
     return m_ioHttpMonitor[0].httpClient.get() != nullptr;
 }
 
-bool QnPlAxisResource::isInitialized() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return isIOModule() ? base_type::isInitialized() : !m_resolutionList.isEmpty();
-}
-
 void QnPlAxisResource::clear()
 {
     m_resolutionList.clear();
@@ -423,7 +417,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         // enable send motion into H.264 stream
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"));
-        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=").append(isAudioEnabled() ? "yes" : "no"));
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
@@ -515,6 +509,10 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
                 }
             }
         }
+
+        if (!isIOModule() && m_resolutionList.isEmpty())
+            return CameraDiagnostics::CameraInvalidParams("Failed to read resolution list");
+
     }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
             //m_initMutex is locked up the stack
     if (hasVideo(0))

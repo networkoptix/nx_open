@@ -26,6 +26,7 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "core/resource/resource_name.h"
+#include "database/server_db.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -172,7 +173,12 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         {
             // execute say to client once and before proxy
             if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+            {
                 broadcastBusinessAction(action);
+                // This actions marked as requiredCameraResource, but can be performed to client without camRes
+                if (resources.isEmpty())
+                    qnServerDb->saveActionToDB(action);
+            }
             break;
         }
 

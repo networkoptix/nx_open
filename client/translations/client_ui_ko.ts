@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.0" language="ko" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -504,11 +504,6 @@
         <source>This camera has no advanced settings</source>
         <translation>이 카메라는 상세 설정이 없습니다.</translation>
     </message>
-    <message>
-        <location/>
-        <source>Advanced settings are unavailable</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -891,32 +886,32 @@
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP content</translation>
     </message>
     <message>
         <location/>
         <source>HTTP url</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP url</translation>
     </message>
     <message>
         <location/>
         <source>Login to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 로그인(옵션)</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>로그인</translation>
     </message>
     <message>
         <location/>
         <source>Password to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>인증을위한 비밀번호(옵션)</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호</translation>
     </message>
 </context>
 <context>
@@ -932,27 +927,27 @@
     <message>
         <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
         <source>Export Rapid Review</source>
-        <translation type="unfinished"></translation>
+        <translation>빠른검토 내보내기</translation>
     </message>
     <message>
         <location/>
         <source>Initial Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>초기 영상길이</translation>
     </message>
     <message>
         <location/>
         <source>Exported Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>추출된 영상 길이</translation>
     </message>
     <message>
         <location/>
         <source>Rapid Review speed</source>
-        <translation type="unfinished"></translation>
+        <translation>빠른 검토 속도</translation>
     </message>
     <message>
         <location/>
         <source>Frames Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>프레임 간격</translation>
     </message>
 </context>
 <context>
@@ -1674,7 +1669,7 @@
     <message>
         <location/>
         <source>Play to user</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 지정</translation>
     </message>
 </context>
 <context>
@@ -2456,7 +2451,7 @@
     <message>
         <location/>
         <source>Speak to user</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자에게 말하기</translation>
     </message>
 </context>
 <context>

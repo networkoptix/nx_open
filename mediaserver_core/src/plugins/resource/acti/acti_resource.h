@@ -15,6 +15,7 @@
 #include "utils/network/simple_http_client.h"
 #include <utils/network/http/multipartcontentparser.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+#include <network/multicodec_rtp_reader.h>
 
 
 
@@ -69,6 +70,7 @@ public:
     QString formatBitrateString(int bitrateKbps) const;
 
     QSet<QString> getAvailableEncoders() const;
+    RtpTransport::Value getDesiredTransport() const;
 
     bool isAudioSupported() const;
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
@@ -203,6 +205,7 @@ private:
     QList<int> m_availFps[MAX_STREAMS];
     QMap<int, QString> m_availableBitrates;
     QSet<QString> m_availableEncoders;
+    RtpTransport::Value m_desiredTransport;
 
     int m_rtspPort;
     bool m_hasAudio;
