@@ -72,15 +72,12 @@ angular.module('webadminApp', [
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'
         })
-        .when('/webclient', {
-            templateUrl: 'views/webclient.html',
-            controller: 'WebclientCtrl',
-            reloadOnSearch: false
-        }).when('/view/', {
+        .when('/view/', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
-        }).when('/view/:cameraId', {
+        })
+        .when('/view/:cameraId', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
