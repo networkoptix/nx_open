@@ -109,7 +109,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     QList<QnCameraUserAttributes> backup;
     for(const QnCameraUserAttributesPtr& cameraAttrs: pool->getAttributesList(idList))
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs->cameraID );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs->cameraId );
         backup << *(*userAttributesLock);
     }
 
@@ -142,10 +142,10 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
         for( const QnCameraUserAttributes& cameraAttrs: backup ) {
             QSet<QByteArray> modifiedFields;
             {
-                QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs.cameraID );
+                QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs.cameraId );
                 (*userAttributesLock)->assign( cameraAttrs, &modifiedFields );
             }
-            if( const QnResourcePtr& res = qnResPool->getResourceById(cameraAttrs.cameraID) )   //it is OK if resource is missing
+            if( const QnResourcePtr& res = qnResPool->getResourceById(cameraAttrs.cameraId) )   //it is OK if resource is missing
                 res->emitModificationSignals( modifiedFields );
         }
 
@@ -231,7 +231,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 
     QList<QnMediaServerUserAttributes> backup;
     for(const QnMediaServerUserAttributesPtr& serverAttrs: pool->getAttributesList(idList)) {
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs->serverID );
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs->serverId );
         backup << *(*userAttributesLock);
     }
 
@@ -265,11 +265,11 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
         for( const QnMediaServerUserAttributes& serverAttrs: backup ) {
             QSet<QByteArray> modifiedFields;
             {
-                QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs.serverID );
+                QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs.serverId);
                 (*userAttributesLock)->assign( serverAttrs, &modifiedFields );
             }
             if (!modifiedFields.isEmpty()) {
-                if( const QnResourcePtr& res = qnResPool->getResourceById(serverAttrs.serverID) )   //it is OK if resource is missing
+                if( const QnResourcePtr& res = qnResPool->getResourceById(serverAttrs.serverId) )   //it is OK if resource is missing
                     res->emitModificationSignals( modifiedFields );
                 somethingWasChanged = true;
             }
