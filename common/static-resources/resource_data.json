@@ -323,7 +323,10 @@
                 "BOSCH|VIP-X1600-XFM4",
                 "Axis|AXISM7014",
                 "Axis|AXISM7016",
-                "Axis|AXISQ7404"
+                "Axis|AXISQ7404",
+                "Axis|M7014",
+                "Axis|M7016",
+                "Axis|Q7404"
             ],
             "analogEncoder": true
         },
