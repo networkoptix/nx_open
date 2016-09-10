@@ -1,13 +1,21 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
+    .controller('SettingsCtrl', function ($scope,$rootScope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
 
 
-        $scope.active={
-            system: $location.path() === '/settings/system',
-            server: $location.path() === '/settings/server'
-        };
+        function updateActive(){
+            $scope.active={
+                system: $location.path() === '/settings/system',
+                server: $location.path() === '/settings/server'
+            };
+        }
+        updateActive();
+
+        var killSubscription = $rootScope.$on('$routeChangeStart', updateActive);
+        $scope.$on( '$destroy', function( ) {
+            killSubscription();
+        });
 
         mediaserver.getModuleInformation().then(function (r) {
             Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
