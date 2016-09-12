@@ -165,7 +165,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
     const auto ids = hostName.split('.');
     if (ids.size() == 2)
     {
-        //hostName is serverID.systemID
+        //hostName is serverId.systemId
         const auto& systemId = ids[1];
         const auto& serverId = ids[0];
 

@@ -12,11 +12,15 @@ namespace tcp {
  * Initiates IncomingReverseTunnelConnection(s) for each endpoint and returns first successfull one
  * or error (if no one was successfull)
  */
-class ReverseTunnelAcceptor
-:
+class NX_NETWORK_API ReverseTunnelAcceptor:
     public AbstractTunnelAcceptor
 {
 public:
+    ReverseTunnelAcceptor(const ReverseTunnelAcceptor&) = delete;
+    ReverseTunnelAcceptor(ReverseTunnelAcceptor&&) = delete;
+    ReverseTunnelAcceptor& operator=(const ReverseTunnelAcceptor&) = delete;
+    ReverseTunnelAcceptor& operator=(ReverseTunnelAcceptor&&) = delete;
+
     ReverseTunnelAcceptor(
         std::list<SocketAddress> targetEndpoints,
         nx::hpm::api::ConnectionParameters connectionParametes);

@@ -11,8 +11,8 @@ namespace tcp {
 /**
  * Keeps all user NXRC connections and moniors if they close.
  */
-class ReverseConnectionHolder
-    : public aio::BasicPollable
+class NX_NETWORK_API ReverseConnectionHolder: 
+    public aio::BasicPollable
 {
 public:
     explicit ReverseConnectionHolder(aio::AbstractAioThread* aioThread);

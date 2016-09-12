@@ -15,7 +15,7 @@ namespace tcp {
  * Is is safe to remove this object from any thread (destructor blocks to wait connection
  * handlers).
  */
-class ReverseAcceptor
+class NX_NETWORK_API ReverseAcceptor
 {
 public:
     typedef utils::MoveOnlyFunc<void(
