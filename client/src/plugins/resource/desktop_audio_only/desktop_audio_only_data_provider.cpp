@@ -193,8 +193,14 @@ bool QnDesktopAudioOnlyDataProvider::initInputDevices()
 
     if (primaryAudioDevice.isNull())
     {
-        m_lastErrorStr = tr("Primary audio device isn't selected.");
-        return false;
+        if (secondaryAudioDevice.isNull())
+        {
+            m_lastErrorStr = tr("Primary audio device isn't selected.");
+            return false;
+        }
+
+        primaryAudioDevice = secondaryAudioDevice;
+        secondaryAudioDevice = QnAudioDeviceInfo();
     }
 
     AudioSourceInfoPtr sourceInfo(new AudioSourceInfo());
