@@ -3377,17 +3377,19 @@ ErrorCode QnDbManager::doQueryNoLock(
             motion_type as motionType,                   \
             secondary_quality as secondaryStreamQuality, \
             dewarping_params as dewarpingParams,         \
-            min_archive_days as minArchiveDays,          \
-            max_archive_days as maxArchiveDays,          \
+            ifnull(min_archive_days, %1) as minArchiveDays,             \
+            ifnull(max_archive_days, %2) as maxArchiveDays,             \
             prefered_server_id as preferedServerId,      \
             license_used as licenseUsed,                 \
             failover_priority as failoverPriority,       \
             backup_type as backupType                    \
          FROM vms_camera_user_attributes                 \
-         %1 \
+         %3 \
          LEFT JOIN vms_resource r on r.guid = camera_guid \
          ORDER BY camera_guid                            \
-        ").arg(filterStr));
+        ").arg(-ec2::kDefaultMinArchiveDays)
+          .arg(-ec2::kDefaultMaxArchiveDays)
+          .arg(filterStr));
 
     if (!queryCameras.exec()) {
         NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
@@ -3432,8 +3434,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
             cu.motion_type as motionType,                      \
             cu.secondary_quality as secondaryStreamQuality,    \
             cu.dewarping_params as dewarpingParams,            \
-            ifnull(nullif(cu.min_archive_days, 0), %1) as minArchiveDays,             \
-            ifnull(nullif(cu.max_archive_days, 0), %2) as maxArchiveDays,             \
+            ifnull(cu.min_archive_days, %1) as minArchiveDays,             \
+            ifnull(cu.max_archive_days, %2) as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
             cu.license_used as licenseUsed,                    \
             cu.failover_priority as failoverPriority,          \
