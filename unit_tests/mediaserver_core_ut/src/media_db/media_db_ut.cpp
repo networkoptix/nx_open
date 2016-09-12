@@ -913,8 +913,8 @@ TEST(MediaDbTest, StorageDB)
          catalogIt != dbChunkCatalogs.cend();
          ++catalogIt)
     {
-        for (auto chunkIt = (*catalogIt)->getChunks().cbegin();
-             chunkIt != (*catalogIt)->getChunks().cend();
+        for (auto chunkIt = (*catalogIt)->getChunksUnsafe().cbegin();
+             chunkIt != (*catalogIt)->getChunksUnsafe().cend();
              ++chunkIt)
         {
             TestChunkManager::TestChunkCont::iterator tcmIt = 
@@ -1022,7 +1022,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
         {
             QSqlQuery query(*sqlDb);
             ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
-            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunks().at(j);
+            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunksUnsafe().at(j);
 
             query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
             query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
@@ -1057,7 +1057,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
         {
             sdb->addRecord(referenceCatalogs[i]->cameraUniqueId(),
                            referenceCatalogs[i]->getCatalog(),
-                           referenceCatalogs[i]->getChunks().at(j));
+                           referenceCatalogs[i]->getChunksUnsafe().at(j));
         }
     }
 
@@ -1071,7 +1071,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
                                      { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() && 
                                               c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
-        ASSERT_TRUE((*mergedIt)->getChunks() == referenceCatalogs[i]->getChunks());
+        ASSERT_TRUE((*mergedIt)->getChunksUnsafe() == referenceCatalogs[i]->getChunksUnsafe());
     }
 }
 
