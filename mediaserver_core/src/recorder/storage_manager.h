@@ -99,13 +99,12 @@ public:
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(
-        QnAbstractMediaStreamDataProvider                   *provider,
-        std::function<bool(const QnStorageResourcePtr &)>   pred =
+        QnAbstractMediaStreamDataProvider *provider,
+        std::function<bool(const QnStorageResourcePtr &)> pred =
             [](const QnStorageResourcePtr &storage) {
                 return !storage->hasFlags(Qn::storage_fastscan) ||
                         storage->getFreeSpace() > storage->getSpaceLimit();
-            }
-    );
+            });
 
     QnStorageResourceList getStorages() const;
 
@@ -167,9 +166,6 @@ public slots:
     void testOfflineStorages();
 private:
     friend class TestStorageThread;
-
-    QSet<QnStorageResourcePtr> getWritableStorages(
-        std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
 
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnVirtualCameraResourceList &cameras,
