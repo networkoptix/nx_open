@@ -25,7 +25,7 @@
 #include <utils/license_usage_helper.h>
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
-    base_type(parent),
+    base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
     m_ignoreAccept(false)
 {
     m_settingsWidget = new QnCameraSettingsWidget(this);
