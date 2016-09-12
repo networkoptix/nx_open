@@ -321,7 +321,7 @@ private:
             storage->setUrl(m_storageUrls[i]);
             storage->setId(QnUuid::createUuid());
             storage->setUsedForWriting(true);
-            ASSERT_TRUE(storage->initOrUpdate());
+            ASSERT_EQ(storage->initOrUpdate(), Qn::StorageInit_Ok);
             if (i % 2 == 0)
                 qnNormalStorageMan->addStorage(storage);
             else

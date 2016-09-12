@@ -5,6 +5,8 @@
 
 #include "cdb_connection.h"
 
+#include <nx/network/socket_common.h>
+
 #include "cdb_request_path.h"
 #include "data/module_info.h"
 
@@ -21,7 +23,7 @@ Connection::Connection(
     m_accountManager = std::make_unique<AccountManager>(endPointFetcher);
     m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
     m_authProvider = std::make_unique<AuthProvider>(endPointFetcher);
-
+    m_maintenanceManager = std::make_unique<MaintenanceManager>(endPointFetcher);
 }
 
 api::AccountManager* Connection::accountManager()
@@ -37,6 +39,11 @@ api::SystemManager* Connection::systemManager()
 api::AuthProvider* Connection::authProvider()
 {
     return m_authProvider.get();
+}
+
+api::MaintenanceManager* Connection::maintenanceManager()
+{
+    return m_maintenanceManager.get();
 }
 
 void Connection::setCredentials(
@@ -57,8 +64,11 @@ void Connection::setProxyCredentials(
     m_authProvider->setProxyCredentials(login, password);
 }
 
-void Connection::setProxyVia(const SocketAddress& proxyEndpoint)
+void Connection::setProxyVia(
+    const std::string& proxyHost,
+    std::uint16_t proxyPort)
 {
+    const SocketAddress proxyEndpoint(proxyHost.c_str(), proxyPort);
     m_accountManager->setProxyVia(proxyEndpoint);
     m_systemManager->setProxyVia(proxyEndpoint);
     m_authProvider->setProxyVia(proxyEndpoint);

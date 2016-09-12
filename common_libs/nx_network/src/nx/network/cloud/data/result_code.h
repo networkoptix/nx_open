@@ -41,6 +41,8 @@ ResultCode NX_NETWORK_API fromStunErrorToResultCode(
     const nx::stun::attrs::ErrorDescription& errorDescription);
 int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);
 
+QString NX_NETWORK_API toString(ResultCode code);
+
 } // namespace api
 } // namespace hpm
 } // namespace nx

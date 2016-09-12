@@ -20,39 +20,15 @@ namespace nx_http {
 
     MultipartMessageBodySource::~MultipartMessageBodySource()
     {
-        doCleanup();
+        stopWhileInAioThread();
     }
 
-    void MultipartMessageBodySource::pleaseStop(
-        nx::utils::MoveOnlyFunc<void()> handler)
+    void MultipartMessageBodySource::stopWhileInAioThread()
     {
-        m_aioThreadBinder.pleaseStop(
-            [this, handler = std::move(handler)]
-            {
-                doCleanup();
-                handler();
-            });
-    }
-
-    nx::network::aio::AbstractAioThread* MultipartMessageBodySource::getAioThread() const
-    {
-        return m_aioThreadBinder.getAioThread();
-    }
-
-    void MultipartMessageBodySource::bindToAioThread(
-        nx::network::aio::AbstractAioThread* aioThread)
-    {
-        m_aioThreadBinder.bindToAioThread(aioThread);
-    }
-
-    void MultipartMessageBodySource::post(nx::utils::MoveOnlyFunc<void()> func)
-    {
-        m_aioThreadBinder.post(std::move(func));
-    }
-
-    void MultipartMessageBodySource::dispatch(nx::utils::MoveOnlyFunc<void()> func)
-    {
-        m_aioThreadBinder.dispatch(std::move(func));
+        auto onBeforeDestructionHandler = std::move(m_onBeforeDestructionHandler);
+        m_onBeforeDestructionHandler = nullptr;
+        if (onBeforeDestructionHandler)
+            onBeforeDestructionHandler();
     }
 
     StringType MultipartMessageBodySource::mimeType() const
@@ -70,7 +46,7 @@ namespace nx_http {
             void(SystemError::ErrorCode, BufferType)
         > completionHandler)
     {
-        m_aioThreadBinder.post(
+        post(
             [this, completionHandler = std::move(completionHandler)]() mutable
             {
                 NX_ASSERT(!m_readCompletionHandler);
@@ -106,7 +82,7 @@ namespace nx_http {
         NX_ASSERT(!data.isEmpty());
 
         const bool eof = m_multipartBodySerializer.eof();
-        m_aioThreadBinder.post(
+        post(
             [this, dataBuf = (QByteArray)data, eof]() mutable
             {
                 m_eof = eof;
@@ -121,14 +97,6 @@ namespace nx_http {
                     m_dataBuffer += std::move(dataBuf);
                 }
             });
-    }
-
-    void MultipartMessageBodySource::doCleanup()
-    {
-        auto onBeforeDestructionHandler = std::move(m_onBeforeDestructionHandler);
-        m_onBeforeDestructionHandler = nullptr;
-        if (onBeforeDestructionHandler)
-            onBeforeDestructionHandler();
     }
 
 }   //namespace nx_http

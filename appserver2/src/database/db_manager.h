@@ -84,7 +84,7 @@ namespace detail
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
-            if (!tran.isLocal) {
+            if (!tran.isLocal()) {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
                 if (isContains == QnTransactionLog::Reason_Timestamp)
                     return ErrorCode::containsBecauseTimestamp;
@@ -94,7 +94,7 @@ namespace detail
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
-            if (tran.isLocal)
+            if (tran.isLocal())
                 return ErrorCode::ok;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
@@ -209,8 +209,8 @@ namespace detail
         //get resource status
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
-        //getCameraUserAttributes
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList);
+        //getCameraUserAttributesList
+        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
@@ -260,11 +260,11 @@ namespace detail
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
 
-        //getServerUserAttributes
+        //getMediaServerUserAttributesList
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
 
         //getTransactionLog
-        ErrorCode doQueryNoLock(const nullptr_t&, ApiTransactionDataList& tranList);
+        ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
         //getClientInfos
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
@@ -596,8 +596,8 @@ namespace detail
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
+        bool upgradeSerializedTransactions();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
-
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

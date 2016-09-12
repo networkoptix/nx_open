@@ -34,6 +34,13 @@ extern const char* kSubscribeToSystemEventsPath;
 
 extern const char* kPingPath;
 
+extern const char* kEstablishEc2TransactionConnectionPath;
+extern const char* kPushEc2TransactionPath;
+
+/** Maintenance. */
+extern const char* kMaintenanceGetVmsConnections;
+extern const char* kMaintenanceGetTransactionLog;
+
 }   //cdb
 }   //nx
 

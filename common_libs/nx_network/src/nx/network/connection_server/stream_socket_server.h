@@ -133,7 +133,7 @@ public:
 
     virtual void pleaseStop()
     {
-        m_socket->pleaseStopSync();
+        m_socket->pleaseStopSync(false);
     }
 
     //!Binds to specified addresses
@@ -182,6 +182,11 @@ public:
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
     {
         m_socket->bindToAioThread(aioThread);
+    }
+
+    void post(nx::utils::MoveOnlyFunc<void()> handler)
+    {
+        m_socket->post(std::move(handler));
     }
 
 protected:

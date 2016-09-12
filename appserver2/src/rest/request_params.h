@@ -29,6 +29,9 @@ namespace ec2
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, ApiLoginData *loginInfo);
     void toUrlParams(const ApiLoginData &, QUrlQuery *query);
 
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, ApiTranLogFilter* tranLogFilter);
+    void toUrlParams(const ApiTranLogFilter&, QUrlQuery *query);
+
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, std::nullptr_t *);
     void toUrlParams(const std::nullptr_t &, QUrlQuery *query);
 }

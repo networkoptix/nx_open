@@ -39,7 +39,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
     ErrorCode errorCode = processMultiUpdateSync(
         ApiCommand::removeResourceParam,
-        tran.isLocal,
+        tran.transactionType,
         resourceParams,
         transactionsToSend);
 
@@ -59,7 +59,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
+    const AbstractECConnectionPtr& /*connection*/,
     std::list<std::function<void()>>* const transactionsToSend)
 {
     QnTransaction<ApiIdData> removeObjAccessRightsTran(ApiCommand::removeAccessRights, ApiIdData(id));
@@ -72,12 +72,12 @@ ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
+    const AbstractECConnectionPtr& /*connection*/,
     std::list<std::function<void()>>* const transactionsToSend,
-    bool isLocal)
+    TransactionType::Value transactionType)
 {
     QnTransaction<ApiIdData> removeResourceStatusTran(ApiCommand::removeResourceStatus, ApiIdData(id));
-    removeResourceStatusTran.isLocal = isLocal;
+    removeResourceStatusTran.transactionType = transactionType;
     ErrorCode errorCode = processUpdateSync(removeResourceStatusTran, transactionsToSend, 0);
     if (errorCode != ErrorCode::ok)
         return errorCode;

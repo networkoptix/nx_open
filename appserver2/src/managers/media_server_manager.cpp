@@ -10,14 +10,14 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
     {
-        NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributesList);
         for (const ec2::ApiMediaServerUserAttributesData& attrs: tran.params)
             emit userAttributesChanged(attrs);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesData>& tran)
     {
-        NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributes);
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributes);
         emit userAttributesChanged(tran.params);
     }
 
@@ -83,8 +83,9 @@ namespace ec2
     int QnMediaServerManager<T>::save(const ec2::ApiMediaServerData& server, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiMediaServerData> tran(ApiCommand::saveMediaServer, server);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveMediaServer,
+            server, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -95,8 +96,9 @@ namespace ec2
     int QnMediaServerManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiIdData> tran( ApiCommand::removeMediaServer, id );
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeMediaServer, ApiIdData(id),
+            [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -107,8 +109,9 @@ namespace ec2
     int QnMediaServerManager<T>::saveUserAttributes(const ec2::ApiMediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiMediaServerUserAttributesDataList> tran(ApiCommand::saveServerUserAttributesList, serverAttrs);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveMediaServerUserAttributesList, serverAttrs,
+            [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -119,8 +122,9 @@ namespace ec2
     int QnMediaServerManager<T>::saveStorages( const ec2::ApiStorageDataList& storages, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ec2::ApiStorageDataList> tran(ApiCommand::saveStorages, storages);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveStorages, storages,
+            [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -131,8 +135,9 @@ namespace ec2
     int QnMediaServerManager<T>::removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiIdDataList> tran(ApiCommand::removeStorages, storages);
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeStorages, storages,
+            [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -147,7 +152,7 @@ namespace ec2
             handler->done( reqID, errorCode, serverUserAttributesList);
         };
         m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerUserAttributesDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getServerUserAttributes, mediaServerId, queryDoneHandler );
+            ( ApiCommand::getMediaServerUserAttributesList, mediaServerId, queryDoneHandler );
         return reqID;
     }
 

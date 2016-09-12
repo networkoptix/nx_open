@@ -93,7 +93,7 @@ public:
     template<typename T, typename ... Args>
     QnLogMessage container(const T& a, Args ... args)
     {
-        return arg(containerString(a, std::forward(args) ...));
+        return arg(containerString(a, std::forward<Args>(args) ...));
     }
 
     template<typename T, typename ... Args>

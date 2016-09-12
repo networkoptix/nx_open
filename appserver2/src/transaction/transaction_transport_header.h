@@ -27,6 +27,10 @@ namespace ec2 {
             flags(Qn::TT_None), 
             distance(0) {}
 
+        void fillSequence(
+            const QnUuid& moduleId,
+            const QnUuid& runningInstanceGUID);
+        /** Calls previous method passing it value from \a qnCommon. */
         void fillSequence();
 
         QnPeerSet processedPeers;

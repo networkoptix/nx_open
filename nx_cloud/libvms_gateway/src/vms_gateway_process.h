@@ -91,7 +91,9 @@ private:
         const conf::RunTimeOptions& runTimeOptions,
         nx_http::MessageDispatcher* const msgDispatcher);
 
-    void publicAddressFetched(const QHostAddress& publicAddress);
+    void publicAddressFetched(
+        const conf::Settings& settings,
+        const QString& publicAddress);
 };
 
 }   //namespace cloud

@@ -7,8 +7,10 @@
 
 #include <chrono>
 
-#include "stun_message_data.h"
+#include <nx/network/retry_timer.h>
+#include <nx/network/http/asynchttpclient.h>
 
+#include "stun_message_data.h"
 
 namespace nx {
 namespace hpm {
@@ -35,7 +37,11 @@ public:
     */
     int udpTunnelKeepAliveRetries;
 
+    nx::network::RetryPolicy tcpReverseRetryPolicy;
+    nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
+
     ConnectionParameters();
+    bool operator==(const ConnectionParameters& rhs) const;
 
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;

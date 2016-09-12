@@ -60,7 +60,7 @@ namespace detail
         if( !m_httpClient )
             return;
 
-        m_httpClient->terminate();
+        m_httpClient->pleaseStopSync();
     }
 
     void GetFileOperation::pleaseStop()
@@ -77,7 +77,7 @@ namespace detail
 
         if( m_httpClient )
         {
-            m_httpClient->terminate();
+            m_httpClient->pleaseStopSync();
             m_httpClient.reset();
         }
 
@@ -250,7 +250,7 @@ namespace detail
                     m_remoteFileSize = contentLengthStr.toLongLong();
                 }
 
-                m_httpClient->terminate();
+                m_httpClient->pleaseStopSync();
                 m_httpClient.reset();
 
                 if( m_localFileSize )
@@ -268,7 +268,7 @@ namespace detail
                 {
                     setResult( ResultCode::downloadFailure );
                     setErrorText( httpClient->response()->statusLine.reasonPhrase );
-                    m_httpClient->terminate();
+                    m_httpClient->pleaseStopSync();
                     m_state = State::sInterrupted;
                     lk.unlock();
                     m_handler->operationDone( shared_from_this() );
@@ -281,7 +281,7 @@ namespace detail
                 {
                     setResult( ResultCode::writeFailure );
                     setErrorText( SystemError::getLastOSErrorText() );
-                    m_httpClient->terminate();
+                    m_httpClient->pleaseStopSync();
                     m_state = State::sInterrupted;
                     lk.unlock();
                     m_handler->operationDone( shared_from_this() );

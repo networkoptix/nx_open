@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <cstdint>
@@ -13,7 +12,6 @@
 
 #include "guard.h"
 
-
 namespace nx {
 namespace utils {
 
@@ -21,16 +19,17 @@ typedef std::size_t SubscriptionId;
 
 constexpr static const SubscriptionId kInvalidSubscriptionId = 0;
 
-/** Subscribtion-notification model event.
-    \note All methods are thread-safe
-*/
+/**
+ * Subscription-notification model event.
+ * @note All methods are thread-safe.
+ */
 template <typename... Data>
 class Subscription
 {
     typedef Subscription<Data...> SelfType;
 
 public:
-    /** Notification callback */
+    /** Notification callback. */
     typedef nx::utils::MoveOnlyFunc<void(Data...)> Handler;
 
     Subscription()
@@ -48,9 +47,10 @@ public:
         NX_CRITICAL(m_runningSubscriptionId == kInvalidSubscriptionId);
     }
 
-    /** Subscribes @param hadler for this event.
-     *  @param subscriptionId This value can be used to unsubscribe
-     *  NOTE: do not use blocking operations inside @param hadler
+    /** 
+     * Subscribes @param hadler for this event.
+     * @param subscriptionId This value can be used to unsubscribe
+     * NOTE: do not use blocking operations inside @param handler.
      */
     void subscribe(Handler handler, SubscriptionId* const subscriptionId)
     {
@@ -62,26 +62,28 @@ public:
     }
 
     /** 
-        @param subscriptionId Value returned by \a Subscription::subscribe
-        \note Can be safely called with in event handler
-        \note If event handler is running in another thread, blocks until handler has returned
-    */
+     * @param subscriptionId Value returned by \a Subscription::subscribe
+     * @note Can be safely called with in event handler
+     * @note If event handler is running in another thread, blocks until handler has returned
+     */
     void removeSubscription(SubscriptionId subscriptionId)
     {
         QnMutexLocker lk(&m_mutex);
 
-        while (m_eventReportingThread != 0 &&        //event handler is running
-            m_eventReportingThread != currentThreadSystemId() &&      //running not in current thread
+        while (m_eventReportingThread != 0 &&        //< Event handler is running.
+            m_eventReportingThread != currentThreadSystemId() &&      //< Running not in current thread.
             m_runningSubscriptionId == subscriptionId)
         {
-            //waiting for handler to complete
+            // Waiting for handler to complete.
             m_cond.wait(lk.mutex());
         }
 
         m_handlers.erase(subscriptionId);
     }
 
-    /** Notifies all subscribers about the event */
+    /** 
+     * Notifies all subscribers about the event.
+     */
     void notify(Data... data)
     {
         QnMutexLocker lk(&m_mutex);
@@ -116,5 +118,5 @@ private:
     SubscriptionId m_runningSubscriptionId;
 };
 
-}   //namespace utils
-}   //namespace nx
+} // namespace utils
+} // namespace nx

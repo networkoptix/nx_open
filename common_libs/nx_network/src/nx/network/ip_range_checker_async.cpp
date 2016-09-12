@@ -113,7 +113,7 @@ void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
     if( httpClient->bytesRead() > 0 )
         m_openedIPs.push_back( httpClient->url().host() );
 
-    httpClient->terminate();
+    httpClient->pleaseStopSync();
     m_socketsBeingScanned.erase( it );
 
     launchHostCheck();

@@ -21,13 +21,8 @@
 
 #include "auth_tools.h"
 
-//TODO: #ak persistent connection support
-//TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
-//TODO: #ak reconnect support
-
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
-//static const int DEFAULT_HTTP_PORT = 80;
 
 using std::make_pair;
 
@@ -39,12 +34,23 @@ namespace nx_http
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
 
-    AsyncHttpClient::Timeouts::Timeouts()
-        :
-        sendTimeout(kDefaultSendTimeout),
-        responseReadTimeout(kDefaultResponseReadTimeout),
-        messageBodyReadTimeout(kDefaultMessageBodyReadTimeout)
+    AsyncHttpClient::Timeouts::Timeouts(
+        std::chrono::milliseconds send,
+        std::chrono::milliseconds recv,
+        std::chrono::milliseconds msgBody)
+    :
+        sendTimeout(send),
+        responseReadTimeout(recv),
+        messageBodyReadTimeout(msgBody)
     {
+    }
+
+
+    bool AsyncHttpClient::Timeouts::operator==(const Timeouts& rhs) const
+    {
+        return sendTimeout == rhs.sendTimeout
+            && responseReadTimeout == rhs.responseReadTimeout
+            && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
     }
 
     AsyncHttpClient::AsyncHttpClient()
@@ -74,7 +80,7 @@ namespace nx_http
 
     AsyncHttpClient::~AsyncHttpClient()
     {
-        terminate();
+        pleaseStopSync();
     }
 
     const std::unique_ptr<AbstractStreamSocket>& AsyncHttpClient::socket()
@@ -95,11 +101,6 @@ namespace nx_http
         return result;
     }
 
-    void AsyncHttpClient::terminate()
-    {
-        pleaseStopSync();
-    }
-
     //TODO #ak move pleaseStop and pleaseStopSync to some common base class
 
     void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -112,19 +113,19 @@ namespace nx_http
         });
     }
 
-    void AsyncHttpClient::pleaseStopSync()
+    void AsyncHttpClient::pleaseStopSync(bool checkForLocks)
     {
         if (m_aioThreadBinder.isInSelfAioThread())
             stopWhileInAioThread();
         else
-            QnStoppableAsync::pleaseStopSync();
+            QnStoppableAsync::pleaseStopSync(checkForLocks);
     }
 
     void AsyncHttpClient::stopWhileInAioThread()
     {
         m_terminated = true;
         if (m_socket)
-            m_socket->pleaseStopSync();
+            m_socket->pleaseStopSync(false);
     }
 
     nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const
@@ -175,6 +176,7 @@ namespace nx_http
     */
     void AsyncHttpClient::doGet(const QUrl& url)
     {
+        NX_ASSERT(!url.host().isEmpty());
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
@@ -396,8 +398,10 @@ namespace nx_http
             return;
 
         m_state = sFailed;
+        const auto requestSequenceBak = m_requestSequence;
         emit done(sharedThis);
-        m_socket.reset();   //closing failed socket so that it is not reused
+        if (m_requestSequence == requestSequenceBak)
+            m_socket.reset();   //< Closing failed socket so that it is not reused.
     }
 
     void AsyncHttpClient::asyncSendDone(AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten)
@@ -422,8 +426,10 @@ namespace nx_http
             NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
+            const auto requestSequenceBak = m_requestSequence;
             emit done(sharedThis);
-            m_socket.reset();
+            if (m_requestSequence == requestSequenceBak)
+                m_socket.reset();
             return;
         }
 
@@ -454,8 +460,10 @@ namespace nx_http
         {
             NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
             m_state = sFailed;
+            const auto requestSequenceBak = m_requestSequence;
             emit done(sharedThis);
-            m_socket.reset();
+            if (m_requestSequence == requestSequenceBak)
+                m_socket.reset();   //< Closing failed socket so that it is not reused.
             return;
         }
 
@@ -477,17 +485,28 @@ namespace nx_http
 
         if (errorCode != SystemError::noError)
         {
-            if (reconnectIfAppropriate())
-                return;
-            NX_LOGX(lit("Error reading (state %1) http response from %2. %3").arg(m_state).arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-            m_state =
-                ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
+            const auto stateBak = m_state;
+            if ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
-                ? sDone
-                : sFailed;
+            {
+                m_state = sDone;
+            }
+            else
+            {
+                // Reconnecting only in case of failure.
+                if (reconnectIfAppropriate())
+                    return;
+                m_state = sFailed;
+            }
+
+            NX_LOGX(lit("Error reading (state %1) http response from %2. %3")
+                .arg(stateBak).arg(m_url.toString()).arg(SystemError::toString(errorCode)),
+                cl_logDEBUG1);
             m_lastSysErrorCode = errorCode;
+            const auto requestSequenceBak = m_requestSequence;
             emit done(sharedThis);
-            m_socket.reset();
+            if (m_requestSequence == requestSequenceBak)
+                m_socket.reset();   //< Closing failed socket so that it is not reused.
             return;
         }
 

@@ -74,6 +74,7 @@ public:
         nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler);
 
     hpm::api::ResultCode registerOnMediatorSync();
+    void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
     /** test only */
     void moveToListeningState();
@@ -111,6 +112,7 @@ protected:
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> m_savedAcceptHandler;
+    hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default
 };
 
 } // namespace cloud

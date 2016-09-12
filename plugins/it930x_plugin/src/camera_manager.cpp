@@ -23,7 +23,7 @@ namespace ite
     CameraManager::CameraManager(const RxDevicePtr &rxDev)
     :   m_rxDevice(rxDev),
         m_errorStr(nullptr),
-        m_cameraID(rxDev->getTxDevice()->txID())
+        m_cameraId(rxDev->getTxDevice()->txID())
     {
         m_rxDevice->setCamera(this);
         m_info = m_rxDevice->getCameraInfo();

@@ -578,7 +578,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing)
         if (reader->isRealTimeSource())
         {
             /* Media was paused while on live. Jump to archive when resumed. */
-            qint64 time = camDisplay->getCurrentTime();
+            qint64 time = m_currentMediaWidget->display()->camera()->getCurrentTime();
             reader->resumeMedia();
             if (time != (qint64)AV_NOPTS_VALUE && !reader->isReverseMode())
                 reader->directJumpToNonKeyFrame(time + 1);

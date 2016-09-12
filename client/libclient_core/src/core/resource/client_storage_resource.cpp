@@ -96,10 +96,10 @@ QIODevice* QnClientStorageResource::open(const QString&, QIODevice::OpenMode)
     return NULL;
 }
 
-bool QnClientStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnClientStorageResource::initOrUpdate() const
 {
     NX_ASSERT(false);
-    return 0;
+    return Qn::StorageInit_CreateFailed;
 }
 
 QnAbstractStorageResource::FileInfoList QnClientStorageResource::getFileList(const QString&)

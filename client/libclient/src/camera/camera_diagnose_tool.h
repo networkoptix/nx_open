@@ -53,7 +53,7 @@ namespace CameraDiagnostics
             sDone
         };
 
-        DiagnoseTool( const QnUuid& cameraID, QObject *parent = NULL );
+        DiagnoseTool( const QnUuid& cameraId, QObject *parent = nullptr );
         virtual ~DiagnoseTool();
 
         //!Starts diagnostics and returns immediately
@@ -94,7 +94,7 @@ namespace CameraDiagnostics
         void diagnosticsDone( CameraDiagnostics::Step::Value finalStep, bool result, const QString &errorMessage );
 
     private:
-        const QnUuid m_cameraID;
+        const QnUuid m_cameraId;
         State m_state;
         Step::Value m_step;
         QString m_serverHostAddress;

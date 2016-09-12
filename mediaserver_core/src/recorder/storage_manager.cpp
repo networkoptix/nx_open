@@ -109,8 +109,7 @@ bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath)
     }
     else if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
     {
-        QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        dbFolderPath = fileStorage ? fileStorage->getLocalPath() : storage->getPath();
+        dbFolderPath = storage->getPath();
         return true;
     }
     return false;
@@ -142,7 +141,7 @@ const QString& sysDrivePath()
 
 const QString getDevicePath(const QString& path)
 {
-    QString command = lit("df ") + path;
+    QString command = lit("df '") + path + lit("'");
     FILE* pipe;
     char buf[BUFSIZ];
 
@@ -499,7 +498,7 @@ public:
                 break;
 
             QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->initOrUpdate() ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status = fileStorage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
 
@@ -613,8 +612,15 @@ void QnStorageManager::calculateOccupiedSpace()
 	auto calcOccupiedSpaceInfoForCatalogs = [this, &tmpSpaceInfo] (const QMap<QString, DeviceFileCatalogPtr>& catalogMap)
 	{
 		for (auto catalogMapIt = catalogMap.cbegin(); catalogMapIt != catalogMap.cend(); ++catalogMapIt)
-			for (auto catalogIt = catalogMapIt.value()->getChunks().cbegin(); catalogIt != catalogMapIt.value()->getChunks().cend(); ++catalogIt)
-				tmpSpaceInfo[catalogIt->storageIndex].occupiedSpace += catalogIt->getFileSize();
+        {
+            auto catalogSpaceInfo = catalogMapIt.value()->calcSpaceByStorage();
+            for (auto& tmpSpaceInfoPair: tmpSpaceInfo)
+            {
+                auto catalogSpaceInfoIt = catalogSpaceInfo.find(tmpSpaceInfoPair.first);
+                if (catalogSpaceInfoIt != catalogSpaceInfo.cend())
+                    tmpSpaceInfoPair.second.occupiedSpace += catalogSpaceInfoIt->second;
+            }
+        }
 	};
 
 	{
@@ -767,7 +773,10 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
-    QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+    QString fileName =
+        closeDirPath(dbPath) +
+        QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+
     if (!QFile::exists(fileName))
     {
         if (QFile::exists(oldFileName))
@@ -779,11 +788,18 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             return;
     }
 
-    QSqlDatabase sqlDb = QSqlDatabase::addDatabase(lit("QSQLITE"), QString("QnStorageManager_%1").arg(fileName));
+    QSqlDatabase sqlDb = QSqlDatabase::addDatabase(
+        lit("QSQLITE"),
+        QString("QnStorageManager_%1").arg(fileName));
+
     sqlDb.setDatabaseName(fileName);
     if (!sqlDb.open())
     {
-        NX_LOG(lit("%1 : Migration from sqlite DB failed. Can't open database file %2").arg(Q_FUNC_INFO).arg(fileName), cl_logWARNING);
+        NX_LOG(
+            lit("%1 : Migration from sqlite DB failed. Can't open database file %2")
+                .arg(Q_FUNC_INFO)
+                .arg(fileName),
+            cl_logWARNING);
         return;
     }
     int storageIndex = qnStorageDbPool->getStorageIndex(storage);
@@ -796,7 +812,10 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     if (!query.exec())
     {
-        NX_LOG(lit("%1 : Migration from sqlite DB failed. Select query exec failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_LOG(
+            lit("%1 : Migration from sqlite DB failed. Select query exec failed")
+                .arg(Q_FUNC_INFO),
+            cl_logWARNING);
         return;
     }
     QSqlRecord queryInfo = query.record();
@@ -812,6 +831,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     std::deque<DeviceFileCatalog::Chunk> chunks;
     QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
     QByteArray prevId;
+
     while (query.next())
     {
         QByteArray id = query.value(idFieldIdx).toByteArray();
@@ -827,14 +847,26 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
             prevCatalog = catalog;
             prevId = id;
-            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(QString::fromUtf8(id), catalog, QnServer::StoragePool::None));
+            fileCatalog = DeviceFileCatalogPtr(
+                new DeviceFileCatalog(
+                    QString::fromUtf8(id),
+                    catalog,
+                    QnServer::StoragePool::None));
         }
         qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
         qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
         int timezone = query.value(timezoneFieldIdx).toInt();
         int fileNum = query.value(fileNumFieldIdx).toInt();
         int durationMs = query.value(durationFieldIdx).toInt();
-        chunks.push_back(DeviceFileCatalog::Chunk(startTime, storageIndex, fileNum, durationMs, (qint16)timezone, (quint16)(filesize >> 32), (quint32)filesize));
+        chunks.push_back(
+            DeviceFileCatalog::Chunk(
+                startTime,
+                storageIndex,
+                fileNum,
+                durationMs,
+                (qint16)timezone,
+                (quint16)(filesize >> 32),
+                (quint32)filesize));
     }
     if (fileCatalog)
     {
@@ -854,28 +886,52 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     for (auto const &c : oldCatalogs)
     {
-        auto newCatalogIt = std::find_if(newCatalogs.begin(), newCatalogs.end(),
-                                         [&c](const DeviceFileCatalogPtr &catalog)
-                                         {
-                                             return c->cameraUniqueId() == catalog->cameraUniqueId() &&
-                                                    c->getCatalog() == catalog->getCatalog();
-                                         });
+        auto newCatalogIt = std::find_if(
+            newCatalogs.begin(),
+            newCatalogs.end(),
+            [&c](const DeviceFileCatalogPtr &catalog)
+            {
+                return c->cameraUniqueId() == catalog->cameraUniqueId() &&
+                       c->getCatalog() == catalog->getCatalog();
+            });
+
         if (newCatalogIt == newCatalogs.end())
             catalogsToWrite.push_back(c);
         else
         {
             DeviceFileCatalogPtr newCatalog = *newCatalogIt;
-            DeviceFileCatalogPtr catalogToWrite = DeviceFileCatalogPtr(new DeviceFileCatalog(c->cameraUniqueId(), c->getCatalog(), QnServer::StoragePool::None));
-            NX_ASSERT(std::is_sorted(c->getChunks().cbegin(), c->getChunks().cend()));
-            NX_ASSERT(std::is_sorted(newCatalog->getChunks().cbegin(), newCatalog->getChunks().cend()));
-            std::set_difference(c->getChunks().begin(), c->getChunks().end(), newCatalog->getChunks().begin(), newCatalog->getChunks().end(), std::back_inserter(catalogToWrite->getChunks()));
+            DeviceFileCatalogPtr catalogToWrite = DeviceFileCatalogPtr(
+                new DeviceFileCatalog(
+                    c->cameraUniqueId(),
+                    c->getCatalog(),
+                    QnServer::StoragePool::None));
+
+            // It is safe to use getChunksUnsafe method here
+            // because there is no concurrent access to these
+            // catalogs yet.
+            NX_ASSERT(
+                std::is_sorted(
+                    c->getChunksUnsafe().cbegin(),
+                    c->getChunksUnsafe().cend()));
+            NX_ASSERT(
+                std::is_sorted(
+                    newCatalog->getChunksUnsafe().cbegin(),
+                    newCatalog->getChunksUnsafe().cend()));
+
+            std::set_difference(
+                c->getChunksUnsafe().begin(),
+                c->getChunksUnsafe().end(),
+                newCatalog->getChunksUnsafe().begin(),
+                newCatalog->getChunksUnsafe().end(),
+                std::back_inserter(catalogToWrite->getChunksUnsafe()));
+
             catalogsToWrite.push_back(catalogToWrite);
         }
     }
 
     for (auto const &c : catalogsToWrite)
     {
-        for (auto const &chunk : c->getChunks())
+        for (auto const &chunk : c->getChunksUnsafe())
             sdb->addRecord(c->cameraUniqueId(), c->getCatalog(), chunk);
     }
 }

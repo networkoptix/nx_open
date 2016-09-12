@@ -35,10 +35,13 @@ namespace ec2 {
 
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
-Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(Qn::PeerType peerType):
+Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
+    Qn::PeerType peerType,
+    nx::utils::TimerManager* const timerManager)
+    :
     // dbmanager is initialized by direct connection.
     m_dbManager(peerType == Qn::PT_Server ? new detail::QnDbManager() : nullptr),
-    m_timeSynchronizationManager(new TimeSynchronizationManager(peerType)),
+    m_timeSynchronizationManager(new TimeSynchronizationManager(peerType, timerManager)),
     m_transactionMessageBus(new QnTransactionMessageBus(peerType)),
     m_terminated(false),
     m_runningRequests(0),
@@ -194,11 +197,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     // AbstractMediaServerManager::getServers
     regGet<nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+
     // AbstractMediaServerManager::save
     regUpdate<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
-    /**%apidoc POST /ec2/saveServerUserAttributes
-     * Save user attributes of a server.
+    /**%apidoc POST /ec2/saveMediaServerUserAttributes
+     * Save additional attributes of a server.
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
      * content type "application/json". Example of such object can be seen in
@@ -231,12 +235,79 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     value if not limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
-    regUpdate<ApiMediaServerUserAttributesData>(p, ApiCommand::saveServerUserAttributes);
+    regUpdate<ApiMediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
 
-    // AbstractCameraManager::saveUserAttributes
-    regUpdate<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveServerUserAttributesList);
-    // AbstractCameraManager::getUserAttributes
-    regGet<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getServerUserAttributes);
+    /**%apidoc POST /ec2/saveMediaServerUserAttributesList
+     * Save additional attributes of a number of servers.
+     * <p>
+     * Parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %param serverId Server unique id.
+     * %param serverName Server name.
+     * %param maxCameras Maximum number of cameras on the server.
+     * %param allowAutoRedundancy Whether the server can take cameras from
+     *     an offline server automatically.
+     *     %value false
+     *     %value true
+     * %param backupType Settings for storage redundancy.
+     *     %value Backup_Manual Backup is performed only at user's request.
+     *     %value Backup_RealTime Backup is performed during recording.
+     *     %value Backup_Schedule Backup is performed on schedule.
+     * %param backupDaysOfTheWeek Combination (via "|") of day of week
+     *     names, for which the backup is active.
+     *     %value Monday
+     *     %value Tuesday
+     *     %value Wednesday
+     *     %value Thursday
+     *     %value Friday
+     *     %value Saturday
+     *     %value Sunday
+     * %param backupStart Start time of the backup, in seconds passed from 00:00:00.
+     * %param backupDuration Duration of the synchronization period in seconds.
+     *     -1 if not set.
+     * %param backupBitrate Maximum backup bitrate in bytes per second. Negative
+     *     value if not limited.
+     * %// AbstractMediaServerManager::saveUserAttributes
+     */
+    regUpdate<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
+
+    /**%apidoc GET /ec2/getMediaServerUserAttributesList
+    * Read additional media server attributes.
+    * %param[default] format
+    * %param[opt] id Server unique id. If omitted, return data for all servers.
+    * %return List of objects with additional server attributes for all servers, in the requested
+    *     format.
+    *     %param serverId Server unique id.
+    *     %param serverName Server name.
+    *     %param maxCameras Maximum number of cameras on the server.
+    *     %param allowAutoRedundancy Whether the server can take cameras from
+    *         an offline server automatically.
+    *         %value false
+    *         %value true
+    *     %param backupType Settings for storage redundancy.
+    *         %value Backup_Manual Backup is performed only at user's request.
+    *         %value Backup_RealTime Backup is performed during recording.
+    *         %value Backup_Schedule Backup is performed on schedule.
+    *     %param backupDaysOfTheWeek Combination (via "|") of day of week
+    *         names, for which the backup is active.
+    *         %value Monday
+    *         %value Tuesday
+    *         %value Wednesday
+    *         %value Thursday
+    *         %value Friday
+    *         %value Saturday
+    *         %value Sunday
+    *     %param backupStart Start time of the backup, in seconds passed from 00:00:00.
+    *     %param backupDuration Duration of the synchronization period in seconds.
+    *         -1 if not set.
+    *     %param backupBitrate Maximum backup bitrate in bytes per second. Negative
+    *         value if not limited.
+    * %// AbstractMediaServerManager::getUserAttributes
+    */
+    regGet<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
+
     // AbstractMediaServerManager::remove
     regUpdate<ApiIdData>(p, ApiCommand::removeMediaServer);
 
@@ -284,12 +355,112 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     // AbstractCameraManager::addCamera
     regUpdate<ApiCameraData>(p, ApiCommand::saveCamera);
+
     // AbstractCameraManager::save
     regUpdate<ApiCameraDataList>(p, ApiCommand::saveCameras);
+
     // AbstractCameraManager::getCameras
     regGet<nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
 
-    // AbstractCameraManager::saveUserAttributes
+    /**%apidoc POST /ec2/saveCameraUserAttributesList
+    * Save additional camera attributes for a number of cameras.
+    * <p>
+    * Parameters should be passed as a JSON array of objects in POST message body with
+    * content type "application/json". Example of such object can be seen in
+    * the result of the corresponding GET function.
+    * </p>
+    * %param userDefinedGroupName Name of the user-defined camera group.
+    * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
+    *     %value false
+    *     %value true
+    * %param licenseUsed Whether the license is used for the camera.
+    *     %value false
+    *     %value true
+    * %param motionType Type of motion detection method.
+    *     %value MT_Default Use default method.
+    *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
+    *     %value MT_SoftwareGrid Use motion detection grid implemented by the server.
+    *     %value MT_MotionWindow Use motion detection window implemented by the camera.
+    *     %value MT_NoMotion Do not perform motion detection.
+    * %param motionMask List of motion detection areas and their
+    *     sensitivity. The format is proprietary and is likely to change in
+    *     future API versions. Currently, this string defines several rectangles separated with
+    *     ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+    *     left top corner), width, height.
+    * %param scheduleTasks List of scheduleTask objects which define the camera recording
+    *     schedule.
+    *     %param scheduleTask.startTime Time of day to start backup as
+    *         seconds passed from the day's 00:00:00.
+    *     %param scheduleTask.endTime: Time of day to end backup as
+    *         seconds passed from the day's 00:00:00.
+    *     %param scheduleTask.recordAudio Whether to record the sound.
+    *         %value false
+    *         %value true
+    *     %param scheduleTask.recordingType
+    *         %value RT_Always Record always.
+    *         %value RT_MotionOnly Record only when the motion is detected.
+    *         %value RT_Never Never record.
+    *         %value RT_MotionAndLowQuality Always record low quality
+    *             stream, and record high quality stream on motion.
+    *     %param scheduleTask.dayOfWeek Day of week for the recording task.
+    *         %value 1 Monday
+    *         %value 2 Tuesday
+    *         %value 3 Wednesday
+    *         %value 4 Thursday
+    *         %value 5 Friday
+    *         %value 6 Saturday
+    *         %value 7 Sunday
+    *     %param scheduleTask.beforeThreshold The number of seconds before a motion event to
+    *         record the video for.
+    *     %param scheduleTask.afterThreshold The number of seconds after a motion event to
+    *         record the video for.
+    *     %param scheduleTask.streamQuality Quality of the recording.
+    *         %value QualityLowest
+    *         %value QualityLow
+    *         %value QualityNormal
+    *         %value QualityHigh
+    *         %value QualityHighest
+    *         %value QualityPreSet
+    *         %value QualityNotDefined
+    *     %param scheduleTask.fps Frames per second (integer).
+    * %param audioEnabled Whether the audio is enabled on the camera.
+    *     %value false
+    *     %value true
+    * %param secondaryStreamQuality
+    *     %value SSQualityLow Low quality second stream.
+    *     %value SSQualityMedium Medium quality second stream.
+    *     %value SSQualityHigh High quality second stream.
+    *     %value SSQualityNotDefined Second stream quality is not defined.
+    *     %value SSQualityDontUse Second stream is not used for the camera.
+    * %param controlEnabled Whether server will manage the camera (change resolution, fps, create
+    *     profiles, etc).
+    *     %value false
+    *     %value true
+    * %param dewarpingParams Image dewarping parameters.
+    *     The format is proprietary and is likely to change in future API
+    *     versions.
+    * %param minArchiveDays Minimum number of days to keep the archive for.
+    *     If the value is less than or equal to zero, it is not used.
+    * %param maxArchiveDays Maximum number of days to keep the archive for.
+    *     If the value is less than or equal to zero, it is not used.
+    * %param preferedServerId Unique id of a server which is preferred for
+    *     the camera for failover.
+    *     %// TODO: Typo in parameter name: "prefered" -> "preferred".
+    * %param failoverPriority Priority for the camera for being transferred
+    *     to another server for failover.
+    *     %value FP_Never Will never be transferred to another server.
+    *     %value FP_Low Low priority against other cameras.
+    *     %value FP_Medium Medium priority against other cameras.
+    *     %value FP_High High priority against other cameras.
+    * %param backupType Combination (via "|") of flags defining backup options.
+    *     %value CameraBackup_Disabled Backup is disabled.
+    *     %value CameraBackup_HighQuality Backup is in high quality.
+    *     %value CameraBackup_LowQuality Backup is in low quality.
+    *     %value CameraBackup_Both
+    *         Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+    *     %value CameraBackup_Default A default value is used for backup options.
+    * %// AbstractCameraManager::saveUserAttributes
+    */
     regUpdate<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
 
     /**%apidoc POST /ec2/saveCameraUserAttributes
@@ -393,14 +564,13 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      */
     regUpdate<ApiCameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
 
-    /**%apidoc GET /ec2/getCameraUserAttributes
+    /**%apidoc GET /ec2/getCameraUserAttributesList
      * Read additional camera attributes.
-     * %// TODO: This function is named inconsistently - should end with 'List'.
      * %param[default] format
-     * %return List of additional camera attributes objects for all cameras in the requested
+     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
+     * %return List of objects with additional camera attributes for all cameras, in the requested
      *     format.
-     *     %// TODO: #mike cameraId
-     *     %param cameraID Camera unique id.
+     *     %param cameraId Camera unique id.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
@@ -494,7 +664,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value CameraBackup_Default A default value is used for backup options.
      * %// AbstractCameraManager::getUserAttributes
      */
-    regGet<nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+    regGet<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributesList);
 
     // AbstractCameraManager::addCameraHistoryItem
     regUpdate<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
@@ -514,7 +684,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[default] format
      * %return List of objects with camera information formatted in the requested format.
      *     %// From struct ApiResourceData:
-     *     %// TODO: #mike cameraId
      *     %param id Camera unique Id.
      *     %param parentId Unique Id of a camera's server.
      *     %param name Camera name.
@@ -525,11 +694,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         can be obtained via GET /ec2/getResourceTypes request.
      *
      *     %// From struct ApiCameraData (inherited from ApiResourceData):
-     *     %// TODO: #mike cameraId
      *     %param mac Camera MAC address.
-     *     %// TODO: #mike cameraId
-     *     %param physicalId Camera unique identifier. This identifier is used in some requests
-     *        related to a camera, for instance, in RTSP requests.
+     *     %param physicalId Camera unique identifier. This identifier can used in some requests
+     *        related to a camera.
      *     %param manuallyAdded Whether the user added the camera manually.
      *         %value false
      *         %value true
@@ -542,8 +709,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param vendor Camera manufacturer.
      *
      *     %// From struct ApiCameraAttributesData:
-     *     %// TODO: #mike cameraId
-     *     %param cameraID Camera unique id.
+     *     %param cameraId Camera unique id.
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
@@ -685,7 +851,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      */
     regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
 
-    regGet<nullptr_t, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
+    regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     // AbstractBusinessEventManager::save
     regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);
@@ -932,7 +1098,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc POST /ec2/saveLayouts
      * Save the list of layouts.
      * <p>
-     * Parameters should be passed as a JSON object in POST message body with
+     * Parameters should be passed as a JSON array of objects in POST message body with
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
@@ -1439,9 +1605,8 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
             return ErrorCode::ok;
         }
 
-        QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
         m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-            transaction,
+            ApiCommand::saveClientInfo, clientInfo,
             [&](ErrorCode result)
             {
                 if (result == ErrorCode::ok)

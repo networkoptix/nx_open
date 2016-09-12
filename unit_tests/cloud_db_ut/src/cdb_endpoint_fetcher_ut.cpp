@@ -60,7 +60,7 @@ TEST(CloudModuleEndPointFetcher, cancellation)
             std::string s;
             operation.get(
                 [&s](
-                    nx_http::StatusCode::Value resCode,
+                    nx_http::StatusCode::Value /*resCode*/,
                     SocketAddress endpoint)
                 {
                     //if called after s desruction, will get segfault here

@@ -53,6 +53,10 @@ bool QnMutex::tryLock()
     return false;
 }
 
+bool QnMutex::isRecursive() const
+{
+    return m_impl->recursive;
+}
 
 ////////////////////////////////////////////////////////////
 //// class QnMutexLocker

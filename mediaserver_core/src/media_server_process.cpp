@@ -87,6 +87,7 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
+#include <nx/network/socket.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -230,11 +231,11 @@
 #include "rest/handlers/script_list_rest_handler.h"
 #include "cloud/cloud_connection_manager.h"
 #include "cloud/cloud_system_name_updater.h"
-#include "cloud/user_list_synchronizer.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
-#include <nx/network/socket.h>
+#include <media_server/master_server_status_watcher.h>
+#include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 
 #if !defined(EDGE_SERVER)
@@ -456,7 +457,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 
     auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
     storage->setSpaceLimit(spaceLimit);
-    storage->setUsedForWriting(storage->initOrUpdate() && storage->isWritable());
+    storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     NX_ASSERT(resType);
@@ -755,7 +756,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     ec2::ApiMediaServerUserAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return server;
-    userAttrsData.serverID = server->getId();
+    userAttrsData.serverId = server->getId();
 
     ec2::ApiMediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
@@ -1064,6 +1065,9 @@ void MediaServerProcess::updateAddressesList()
     for (const auto& host : m_forwardedAddresses )
         serverAddresses << SocketAddress(host.first, host.second);
 
+    if (!m_publicAddress.isNull())
+        serverAddresses << SocketAddress(m_publicAddress.toString(), m_mediaServer->getPort());
+
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
             .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
@@ -1140,6 +1144,11 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             qnServerAdditionalAddressesDictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
             messageProcessor->updateResource(mediaServer);
         }
+        do {
+            if (needToStop())
+                return;
+        } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
+
 
         // read resource status
         ec2::ApiResourceStatusDataList statusList;
@@ -1404,6 +1413,8 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 
         if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
             propertyDictionary->saveParams(server->getId());
+
+        updateAddressesList();
     }
 }
 
@@ -1782,15 +1793,13 @@ void MediaServerProcess::run()
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
-
+    QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher());
+    QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher());
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
-
-
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
     CloudSystemNameUpdater cloudSystemNameUpdater(&cloudConnectionManager);
-    CloudUserListSynchonizer cloudUserListSynchonizer(&cloudConnectionManager);
     auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
@@ -1886,7 +1895,6 @@ void MediaServerProcess::run()
     {
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
         serverFlags |= Qn::SF_HasLiteClient;
-        // TODO mike: Consider creating LiteClientLayout here (if not yet exists).
     }
 
     if (compatibilityMode) // check compatibilityMode here for testing purpose
@@ -1963,7 +1971,10 @@ void MediaServerProcess::run()
     runtimeData.hardwareIds = m_hardwareGuidList;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
+        getConnectionFactory(
+            Qn::PT_Server,
+            nx::utils::TimerManager::instance()));
 
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
@@ -2269,12 +2280,6 @@ void MediaServerProcess::run()
         return;
     }
 
-    do {
-        if (needToStop())
-            return;
-    } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
-
-
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     qnResPool->addResource(m_mediaServer);
 
@@ -2380,6 +2385,7 @@ void MediaServerProcess::run()
     qnGlobalSettings->synchronizeNow();
 
     auto upnpPortMapper = initializeUpnpPortMapper();
+    updateAddressesList();
 
     qnGlobalSettings->takeFromSettings(MSSettings::roSettings(), m_mediaServer);
     qnCommon->updateModuleInformation();

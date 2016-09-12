@@ -42,7 +42,9 @@ public:
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
+    /** Returns guid without {}. */
     QString toSimpleString() const;
+    QByteArray toSimpleByteArray() const;
     std::string toStdString() const;
     QUuid toQUuid() const;
 
@@ -64,8 +66,9 @@ public:
     /*! Construct QnUuid from string representation.
      * If the string is not a valid UUID null QnUuid will be returned.
      */
-    static QnUuid fromStringSafe( const QString& uuid );
-    static QnUuid fromStringSafe( const QByteArray& uuid );
+    static QnUuid fromStringSafe(const QString& uuid);
+    static QnUuid fromStringSafe(const QByteArray& uuid);
+    static QnUuid fromStringSafe(const std::string& uuid);
 
 private:
     QUuid m_uuid;

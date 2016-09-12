@@ -14,6 +14,13 @@ namespace ec2 {
     {
         ApiIdData() {}
         ApiIdData(const QnUuid& id): id(id) {}
+
+        /**
+         * Used by deserialization, called by name from a template, if this method is defined.
+         * @return Value of a field used for merging with existing data in POST requests.
+         */
+        QnUuid getIdForMerging() { return id; }
+
         QnUuid id;
     };
 #define ApiIdData_Fields (id)

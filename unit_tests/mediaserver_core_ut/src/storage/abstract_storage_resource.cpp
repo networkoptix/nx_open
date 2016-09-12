@@ -54,20 +54,20 @@ protected:
         QString fileStorageUrl = *workDirResource.getDirName();
         QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileStorageUrl));
         fileStorage->setUrl(fileStorageUrl);
-        ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate());
+        ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
 
         storageManager->addStorage(fileStorage);
 
         if (!config.ftpUrl.isEmpty())
         {
             QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.ftpUrl, false));
-            EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate()) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
+            EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
         if (!config.smbUrl.isEmpty())
         {
             QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.smbUrl));
-            EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate());
+            EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
             storageManager->addStorage(smbStorage);
         }
@@ -315,7 +315,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         {
             const qint64 seekPos = seekDistribution(gen);
             ASSERT_TRUE(ioDevice->seek(seekPos));
-            ASSERT_TRUE(ioDevice->write(newData, newDataSize) == newDataSize);
+            ASSERT_EQ(newDataSize, ioDevice->write(newData, newDataSize));
             std::copy(newData, newData + newDataSize, data.begin() + seekPos);
         }
 
@@ -423,9 +423,9 @@ public:
             QnAbstractStorageResource::cap::ListFile;
     }
 
-    virtual bool initOrUpdate() const override {
+    virtual Qn::StorageInitResult initOrUpdate() const override {
         NX_ASSERT(0);
-        return true;
+        return Qn::StorageInit_Ok;
     }
 
     virtual void setUrl(const QString& url) override {
@@ -537,18 +537,28 @@ TEST(Storage_load_balancing_algorithm_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    auto storage1 = QnStorageResourcePtr(new MockStorageResource1); 
-    storage1->setUrl("url1");
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+    QString basePath = *workDirResource.getDirName();
+
+    auto storage1 = QnStorageResourcePtr(new MockStorageResource1);
+    QString storage1Path = basePath + lit("/s1");
+    ASSERT_TRUE(QDir().mkdir(storage1Path));
+    storage1->setUrl(storage1Path);
     storage1->setId(QnUuid("{45FF0AD9-649B-4EDC-B032-13603EA37077}"));
     storage1->setUsedForWriting(true);
 
     QnStorageResourcePtr storage2 = QnStorageResourcePtr(new MockStorageResource2);
-    storage2->setUrl("url2");
+    QString storage2Path = basePath + lit("/s2");
+    ASSERT_TRUE(QDir().mkdir(storage2Path));
+    storage2->setUrl(storage2Path);
     storage2->setId(QnUuid("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}"));
     storage2->setUsedForWriting(true);
 
     QnStorageResourcePtr storage3 = QnStorageResourcePtr(new MockStorageResource3);
-    storage3->setUrl("url3");
+    QString storage3Path = basePath + lit("/s3");
+    ASSERT_TRUE(QDir().mkdir(storage3Path));
+    storage3->setUrl(storage3Path);
     storage3->setId(QnUuid("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}"));
     storage3->setUsedForWriting(true);
 
@@ -564,10 +574,9 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 
     const int kMaxStorageUseInARow = 15;
     const int kMaxUseInARowOverflowCount = 5;
-    const int kWriteCount = 1000 * 10;
+    const int kWriteCount = 500;
 	const int kWrittenBlock = 10 * 1024;
 	const size_t kRecordersCount = 10;
-    const double kMaxUsageDelta = 50;
 
 	struct StorageUseStats
 	{

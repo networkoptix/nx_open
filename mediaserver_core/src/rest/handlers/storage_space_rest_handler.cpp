@@ -88,10 +88,10 @@ QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
 {
     QList<QString> storagePaths;
     for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>())
-        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
     for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>())
-        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
     return storagePaths;
 }
@@ -154,7 +154,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
             storage->setUrl(data.url); /* createStorage does not fill url. */
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
-            data.isWritable = storage->initOrUpdate() && storage->isWritable();
+            data.isWritable = storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable();
         }
 
         result.push_back(data);

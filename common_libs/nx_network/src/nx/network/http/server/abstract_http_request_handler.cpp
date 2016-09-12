@@ -23,11 +23,7 @@ namespace nx_http
         nx_http::HttpServerConnection* const connection,
         nx_http::Message&& requestMsg,
         stree::ResourceContainer&& authInfo,
-        std::function<
-            void(
-                nx_http::Message&&,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> )
-            > completionHandler )
+        ResponseIsReadyHandler completionHandler )
     {
         NX_ASSERT( requestMsg.type == nx_http::MessageType::request );
 
@@ -39,19 +35,25 @@ namespace nx_http
         m_responseMsg = std::move( responseMsg );
         m_completionHandler = std::move( completionHandler );
 
-        auto sendResponseFunc = [/*reqID,*/ this](
-            nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
-        {
-            requestDone( /*reqID,*/ statusCode, std::move( dataSource ) );
-        };
+        auto httpRequestProcessedHandler =
+            [/*reqID,*/ this](
+                nx_http::StatusCode::Value statusCode,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+                ConnectionEvents connectionEvents)
+            {
+                requestDone(
+                    /*reqID,*/
+                    statusCode,
+                    std::move(dataSource),
+                    std::move(connectionEvents));
+            };
 
         processRequest(
             connection,
             std::move(authInfo),
             std::move(std::move(*requestMsg.request)),
             m_responseMsg.response,
-            sendResponseFunc);
+            std::move(httpRequestProcessedHandler));
         return true;
     }
 
@@ -63,19 +65,21 @@ namespace nx_http
     void AbstractHttpRequestHandler::requestDone(
         //size_t reqID,
         const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
+        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+        ConnectionEvents connectionEvents)
     {
         m_responseMsg.response->statusLine.statusCode = statusCode;
-        m_responseMsg.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
+        m_responseMsg.response->statusLine.reasonPhrase = StatusCode::toString(statusCode);
 
         //this object is allowed to be removed within m_completionHandler, 
         //  so creating local data
-        auto completionHandlerLocal = std::move( m_completionHandler );
-        auto responseMsgLocal = std::move( m_responseMsg );
-        auto dataSourceLocal = std::move( dataSource );
+        auto completionHandlerLocal = std::move(m_completionHandler);
+        auto responseMsgLocal = std::move(m_responseMsg);
+        auto dataSourceLocal = std::move(dataSource);
 
         completionHandlerLocal(
-            std::move( responseMsgLocal ),
-            std::move( dataSourceLocal ) );
+            std::move(responseMsgLocal),
+            std::move(dataSourceLocal),
+            std::move(connectionEvents));
     }
 }

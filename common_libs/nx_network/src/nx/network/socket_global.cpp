@@ -12,6 +12,7 @@ SocketGlobals::SocketGlobals()
     , m_mediatorConnector(new hpm::api::MediatorConnector)
     , m_addressResolver(m_mediatorConnector->clientConnection())
     , m_addressPublisher(m_mediatorConnector->systemConnection())
+    , m_tcpReversePool(m_mediatorConnector->clientConnection())
 {
 }
 
@@ -27,6 +28,7 @@ SocketGlobals::~SocketGlobals()
         m_addressPublisher.pleaseStop( barrier.fork() );
         m_mediatorConnector->pleaseStop( barrier.fork() );
         m_outgoingTunnelPool.pleaseStop( barrier.fork() );
+        m_tcpReversePool.pleaseStop( barrier.fork() );
     }
 
     promise.get_future().wait();
@@ -51,13 +53,19 @@ void SocketGlobals::init()
 
 void SocketGlobals::deinit()
 {
-    QnMutexLocker lock(&s_mutex);
-    if (--s_counter == 0) // last out
+    SocketGlobals* instanceToDestroy = nullptr;
     {
-        delete s_instance;
-        s_isInitialized = false; // allow creating Pollable(s) in destructor
+        QnMutexLocker lock(&s_mutex);
+        if (--s_counter == 0) // last out
+        {
+            instanceToDestroy = s_instance;
+            delete instanceToDestroy;
+            s_instance = nullptr;
+            s_isInitialized = false; // allow creating Pollable(s) in destructor
+        }
     }
 }
+
 void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(
