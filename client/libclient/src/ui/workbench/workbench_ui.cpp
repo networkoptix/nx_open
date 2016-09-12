@@ -267,8 +267,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Connect to display. */
     display()->view()->addAction(action(QnActions::FreespaceAction));
-    connect(display(), &QnWorkbenchDisplay::viewportGrabbed, this, &QnWorkbenchUi::disableProxyUpdates);
-    connect(display(), &QnWorkbenchDisplay::viewportUngrabbed, this, &QnWorkbenchUi::enableProxyUpdates);
     connect(display(), &QnWorkbenchDisplay::widgetChanged, this, &QnWorkbenchUi::at_display_widgetChanged);
 
     connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
@@ -407,23 +405,6 @@ QnWorkbenchUi::Flags QnWorkbenchUi::flags() const
     return m_flags;
 }
 
-void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled)
-{
-    //TODO: #GDM #optimization disable other masked proxy widgets as well
-    if (m_tree)
-        m_tree->item->setUpdatesEnabled(updatesEnabled);
-}
-
-void QnWorkbenchUi::enableProxyUpdates()
-{
-    setProxyUpdatesEnabled(true);
-}
-
-void QnWorkbenchUi::disableProxyUpdates()
-{
-    setProxyUpdatesEnabled(false);
-}
-
 void QnWorkbenchUi::updateControlsVisibility(bool animate)
 {    // TODO
     ensureAnimationAllowed(animate);
@@ -549,7 +530,7 @@ bool QnWorkbenchUi::isHovered() const
 {
     return
         (m_timeline.opacityProcessor        && m_timeline.opacityProcessor->isHovered())
-        || (m_tree && m_tree->opacityProcessor->isHovered())
+        || (m_tree && m_tree->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered())
         || (m_calendarOpacityProcessor      && m_calendarOpacityProcessor->isHovered())
@@ -833,21 +814,6 @@ bool QnWorkbenchUi::isTreeVisible() const
     return m_tree && m_tree->isVisible();
 }
 
-bool QnWorkbenchUi::isSliderVisible() const
-{
-    return m_timeline.visible;
-}
-
-bool QnWorkbenchUi::isTitleVisible() const
-{
-    return m_titleVisible;
-}
-
-bool QnWorkbenchUi::isNotificationsVisible() const
-{
-    return m_notificationsVisible;
-}
-
 bool QnWorkbenchUi::isTreeOpened() const
 {
     return m_tree && m_tree->isOpened();
@@ -980,13 +946,9 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
         &QnWorkbenchUi::updateTreeGeometry);
 
-//     connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
-//         &QnWorkbenchUi::updateTreeOpacityAnimated);
-//     connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
-//         &QnWorkbenchUi::updateTreeOpacityAnimated);
-    connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+    connect(m_tree, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+    connect(m_tree, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(m_tree->item, &QnMaskedProxyWidget::paintRectChanged, this,
@@ -996,14 +958,16 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
 
     connect(action(QnActions::PinTreeAction), &QAction::toggled, this,
             &QnWorkbenchUi::at_pinTreeAction_toggled);
-    connect(action(QnActions::PinNotificationsAction), &QAction::toggled, this,
-        &QnWorkbenchUi::at_pinNotificationsAction_toggled);
-
 }
 
 #pragma endregion Tree widget methods
 
 #pragma region TitleWidget
+
+bool QnWorkbenchUi::isTitleVisible() const
+{
+    return m_titleVisible;
+}
 
 void QnWorkbenchUi::setTitleUsed(bool used)
 {
@@ -1165,6 +1129,12 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 #pragma endregion Title methods
 
 #pragma region NotificationsWidget
+
+bool QnWorkbenchUi::isNotificationsVisible() const
+{
+    return m_notificationsVisible;
+}
+
 
 bool QnWorkbenchUi::isNotificationsOpened() const
 {
@@ -1400,6 +1370,8 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     const auto pinNotificationsAction = action(QnActions::PinNotificationsAction);
     m_notificationsPinButton = NxUi::newPinButton(m_controlsWidget, context(), pinNotificationsAction);
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
+    connect(pinNotificationsAction, &QAction::toggled, this,
+        &QnWorkbenchUi::at_pinNotificationsAction_toggled);
 
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
     context()->statisticsModule()->registerButton(lit("notifications_collection_widget_toggle"), blinker);
@@ -1826,6 +1798,11 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 #pragma endregion Calendar and DayTime widget methods
 
 #pragma region SliderWidget
+
+bool QnWorkbenchUi::isSliderVisible() const
+{
+    return m_timeline.visible;
+}
 
 void QnWorkbenchUi::setSliderShowButtonUsed(bool used)
 {

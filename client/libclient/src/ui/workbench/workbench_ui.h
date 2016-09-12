@@ -126,10 +126,6 @@ public:
     bool isCalendarVisible() const;
 
 public slots:
-    void setProxyUpdatesEnabled(bool updatesEnabled);
-    void enableProxyUpdates();
-    void disableProxyUpdates();
-
     void setTitleUsed(bool titleUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 

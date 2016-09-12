@@ -24,17 +24,24 @@ public:
 
     virtual qreal opacity() const = 0;
     virtual void setOpacity(qreal opacity, bool animate = true) = 0;
-
     void updateOpacity(bool animate = true);
+
+    virtual bool isHovered() const = 0;
+
 signals:
     void openedChanged(bool value);
     void visibleChanged(bool value);
+
+    void hoverEntered();
+    void hoverLeft();
 
 protected:
     /** Make sure animation is allowed, set animate to false otherwise. */
     void ensureAnimationAllowed(bool* animate);
 
     AnimationTimer* animationTimer() const;
+
+    virtual void setProxyUpdatesEnabled(bool updatesEnabled);
 };
 
 }

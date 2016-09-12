@@ -13,7 +13,16 @@ AbstractWorkbenchPanel::AbstractWorkbenchPanel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-
+    connect(display(), &QnWorkbenchDisplay::viewportGrabbed, this,
+        [this]
+        {
+            setProxyUpdatesEnabled(false);
+        });
+    connect(display(), &QnWorkbenchDisplay::viewportUngrabbed, this,
+        [this]
+        {
+            setProxyUpdatesEnabled(true);
+        });
 }
 
 void AbstractWorkbenchPanel::updateOpacity(bool animate)
@@ -31,6 +40,10 @@ void AbstractWorkbenchPanel::ensureAnimationAllowed(bool* animate)
 AnimationTimer* AbstractWorkbenchPanel::animationTimer() const
 {
     return display()->instrumentManager()->animationTimer();
+}
+
+void AbstractWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)
+{
 }
 
 } //namespace NxUi
