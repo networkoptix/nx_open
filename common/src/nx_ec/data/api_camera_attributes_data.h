@@ -51,6 +51,9 @@ struct ApiScheduleTaskWithRefData: ApiScheduleTaskData
 
 //-------------------------------------------------------------------------------------------------
 
+const int kDefaultMinArchiveDays = 1;
+const int kDefaultMaxArchiveDays = 30;
+
 struct ApiCameraAttributesData: ApiData
 {
     ApiCameraAttributesData():
@@ -60,8 +63,8 @@ struct ApiCameraAttributesData: ApiData
         audioEnabled(false),
         secondaryStreamQuality(Qn::SSQualityNotDefined),
         controlEnabled(true),
-        minArchiveDays(0),
-        maxArchiveDays(0),
+        minArchiveDays(-kDefaultMinArchiveDays),
+        maxArchiveDays(-kDefaultMaxArchiveDays),
         failoverPriority(Qn::FP_Medium),
         backupType(Qn::CameraBackup_Default)
     {
