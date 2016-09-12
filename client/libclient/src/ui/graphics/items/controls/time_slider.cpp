@@ -702,6 +702,11 @@ void QnTimeSlider::enumerateSteps(QVector<QnTimeStep>& steps)
         steps[i].index = i;
 }
 
+void QnTimeSlider::invalidateWindow()
+{
+    m_oldMaximum = m_oldMinimum = -1;
+}
+
 int QnTimeSlider::lineCount() const
 {
     return m_lineCount;
@@ -2770,10 +2775,22 @@ void QnTimeSlider::sliderChange(SliderChange change)
 {
     base_type::sliderChange(change);
 
-    switch(change)
+    switch (change)
     {
-    case SliderRangeChange:
+        case SliderRangeChange:
         {
+            /* If a window was invalidated: */
+            if (m_oldMinimum < 0 && m_oldMinimum == m_oldMaximum)
+            {
+                m_oldMinimum = minimum();
+                m_oldMaximum = maximum();
+                m_zoomAnchor = (m_oldMinimum + m_oldMaximum) / 2;
+                setWindow(m_oldMinimum, m_oldMaximum);
+                setSelectionValid(false);
+                finishAnimations();
+                break;
+            }
+
             qint64 windowStart = m_windowStart;
             qint64 windowEnd = m_windowEnd;
 
@@ -2814,13 +2831,13 @@ void QnTimeSlider::sliderChange(SliderChange change)
             break;
         }
 
-    case SliderValueChange:
-        updateToolTipVisibility();
-        updateToolTipText();
-        break;
+        case SliderValueChange:
+            updateToolTipVisibility();
+            updateToolTipText();
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 

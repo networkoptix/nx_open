@@ -151,11 +151,14 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
         [this, timelinePlaceholder]()
         {
             bool isTimeline = isTimelineRelevant();
+            bool reset = m_timeSlider->isVisible() != isTimeline;
             m_timeSlider->setVisible(isTimeline);
             m_timeScrollBar->setVisible(isTimeline);
             timelinePlaceholder->setVisible(!isTimeline);
             m_separators->setFrameColor(palette().color(isTimeline ? QPalette::Shadow : QPalette::Midlight));
             m_separators->setFrameWidth(isTimeline ? 2.0 : 1.0);
+            if (reset)
+                m_timeSlider->invalidateWindow();
         };
 
     connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,      this, updateTimelineMode);

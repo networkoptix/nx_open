@@ -130,6 +130,8 @@ public:
 
     virtual ~QnTimeSlider();
 
+    void invalidateWindow();
+
     int lineCount() const;
     void setLineCount(int lineCount);
 
