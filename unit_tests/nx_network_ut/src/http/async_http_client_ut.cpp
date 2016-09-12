@@ -17,6 +17,7 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include "repeating_buffer_sender.h"
 
@@ -356,6 +357,57 @@ TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
     ASSERT_EQ(SystemError::noError, httpClient.lastSysErrorCode());
     ASSERT_FALSE(httpClient.doGet(testUrl));
     ASSERT_NE(SystemError::noError, httpClient.lastSysErrorCode());
+}
+
+TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
+{
+    static const char* testPath = "/ReusingExistingConnection";
+    testHttpServer()->setForceConnectionClose(true);
+    ASSERT_TRUE(
+        testHttpServer()->registerStaticProcessor(
+            testPath,
+            "qwade324dwfasd123sdf23sdfsdf",
+            "text/plain"));
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+    const QUrl testUrl(lm("http://%1%2")
+        .str(testHttpServer()->serverAddress()).arg(testPath));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        nx::utils::SyncQueue<nx_http::Response> responseQueue;
+        std::atomic<int> responseCount(0);
+
+        auto httpClient = AsyncHttpClient::create();
+        httpClient->setSendTimeoutMs(1000);
+        QObject::connect(
+            httpClient.get(), &AsyncHttpClient::done,
+            [&testUrl, &responseQueue, &responseCount](AsyncHttpClientPtr client)
+            {
+                ++responseCount;
+                if (client->response())
+                    responseQueue.push(*client->response());
+                else
+                    responseQueue.push(nx_http::Response());
+                if (responseCount >= 2)
+                    return;
+                client->doGet(testUrl);
+            });
+        if (i == 1)
+        {
+            // Testing connection to a bad url.
+            httpClient->doGet(QUrl("http://example.com:58249/test"));
+        }
+        else
+        {
+            httpClient->doGet(testUrl);
+        }
+
+        constexpr const auto responseWaitDelay = std::chrono::seconds(2);
+
+        ASSERT_TRUE(responseQueue.pop(responseWaitDelay));
+        ASSERT_TRUE(responseQueue.pop(responseWaitDelay));
+    }
 }
 
 } // namespace nx_http
