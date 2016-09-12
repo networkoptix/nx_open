@@ -545,34 +545,36 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         QnAppInfo::beta())
         context->action(QnActions::BetaVersionMessageAction)->trigger();
 
-    const auto devicePixelCustomAspect =
+    const bool isHiDpiSupported =
 #if defined(Q_OS_MACX)
-        // Manually set device pixel ratio aspect to 2 on mac os
-        (QnBundleHelpers::isInHiDpiMode(QCoreApplication::applicationDirPath()) ? 1 : 2);
+        QnBundleHelpers::isHiDpiSupported();
 #else
-        1;
-#endif
-
-    for (const auto screen: QApplication::screens())
-    {
-        static const qreal kMinHiDpiRatio = 1.49;  //< At least 1.5x
-        static const int kFullHdScreenWidth = 1980;
-        static const int kMinHiDpi = 150;
-
-        const auto pysicalDpi = screen->physicalDotsPerInch();
-        const auto logicalDpi = screen->logicalDotsPerInch();
-        const auto dpiAspect = (qFuzzyIsNull(pysicalDpi) ? 1 : logicalDpi / pysicalDpi);
-        const auto targetRatio = std::max(dpiAspect,
-            screen->devicePixelRatio() * devicePixelCustomAspect);
-
-        if ((targetRatio > kMinHiDpiRatio)
-            || (pysicalDpi > kMinHiDpi)
-            || (screen->size().width() > kFullHdScreenWidth))
+        []() -> bool
         {
-            context->action(QnActions::HiDpiSupportMessageAction)->trigger();
-            break;
-        }
-    }
+            for (const auto screen: QApplication::screens())
+            {
+                static const qreal kMinHiDpiRatio = 1.49;  //< At least 1.5x
+                static const int kFullHdScreenWidth = 1980;
+                static const int kMinHiDpi = 150;
+
+                const auto pysicalDpi = screen->physicalDotsPerInch();
+                const auto logicalDpi = screen->logicalDotsPerInch();
+                const auto dpiAspect = (qFuzzyIsNull(pysicalDpi) ? 1 : logicalDpi / pysicalDpi);
+                const auto targetRatio = std::max(dpiAspect,
+                    screen->devicePixelRatio() * devicePixelCustomAspect);
+
+                if ((targetRatio > kMinHiDpiRatio)
+                    || (pysicalDpi > kMinHiDpi)
+                    || (screen->size().width() > kFullHdScreenWidth))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }();
+#endif
+    if (isHiDpiSupported)
+        context->action(QnActions::HiDpiSupportMessageAction)->trigger();
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
