@@ -1,4 +1,4 @@
-#include "timeline.h"
+#include "timeline_workbench_panel.h"
 
 namespace {
 

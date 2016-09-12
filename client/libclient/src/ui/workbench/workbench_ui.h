@@ -12,7 +12,7 @@
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/workbench/panels/timeline.h>
+#include <ui/workbench/panels/timeline_workbench_panel.h>
 
 #include <client/client_globals.h>
 
