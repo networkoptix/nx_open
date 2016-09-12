@@ -1389,9 +1389,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             if (m_previousMediaPosition != timeMSec || isTimelineCatchingUp())
             {
                 qint64 delta = timeMSec - m_animatedPosition;
-                if (qAbs(delta) < m_timeSlider->msecsPerPixel())
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel() || delta * speed() < 0)
                 {
-                    /* If distance is less than 1 pixel we catch-up instantly: */
+                    /* If distance is less than 1 pixel or we catch up backwards, do it instantly: */
                     m_animatedPosition = timeMSec;
                     timelineAdvance();
                 }
