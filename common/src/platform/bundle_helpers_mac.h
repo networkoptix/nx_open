@@ -1,5 +1,8 @@
-
 #pragma once
+
+#include <QtCore/QString>
+
+#if defined(Q_OS_MACX)
 
 class QnBundleHelpers
 {
@@ -12,3 +15,5 @@ private:
     QnBundleHelpers() = default;
     ~QnBundleHelpers() = default;
 };
+
+#endif // defined(Q_OS_MACX)
