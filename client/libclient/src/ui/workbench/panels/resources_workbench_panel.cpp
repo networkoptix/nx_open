@@ -25,14 +25,6 @@ namespace {
 static const int kShowAnimationDurationMs = 300;
 static const int kHideAnimationDurationMs = 200;
 
-enum ZOrder
-{
-    BackgroundItem,
-    Item,
-    Resizer,
-    Controls
-};
-
 }
 
 namespace NxUi {
@@ -70,7 +62,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     setPaletteColor(widget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
 
     m_backgroundItem->setFrameBorders(Qt::RightEdge);
-    m_backgroundItem->setZValue(ZOrder::BackgroundItem);
+    m_backgroundItem->setZValue(BackgroundItemZOrder);
 
     item->setWidget(widget);
     widget->installEventFilter(item);
@@ -78,15 +70,15 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     item->setFocusPolicy(Qt::StrongFocus);
     item->setProperty(Qn::NoHandScrollOver, true);
     item->resize(settings.span, 0.0);
-    item->setZValue(ZOrder::Item);
+    item->setZValue(ContentItemZOrder);
     connect(item, &QnMaskedProxyWidget::paintRectChanged, this,
-        &ResourceTreeWorkbenchPanel::at_paintGeometryChanged);
+        &ResourceTreeWorkbenchPanel::updateControlsGeometry);
     connect(item, &QGraphicsWidget::geometryChanged, this,
-        &ResourceTreeWorkbenchPanel::at_paintGeometryChanged);
+        &ResourceTreeWorkbenchPanel::updateControlsGeometry);
 
     action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setFocusProxy(item);
-    m_showButton->setZValue(ZOrder::Controls);
+    m_showButton->setZValue(ControlItemZOrder);
     connect(action(QnActions::ToggleTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -96,7 +88,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
 
     action(QnActions::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     m_pinButton->setFocusProxy(item);
-    m_pinButton->setZValue(ZOrder::Controls);
+    m_pinButton->setZValue(ControlItemZOrder);
     connect(action(QnActions::PinTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -108,7 +100,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
     connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged, Qt::QueuedConnection);
-    m_resizerWidget->setZValue(ZOrder::Resizer);
+    m_resizerWidget->setZValue(ResizerItemZOrder);
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
@@ -190,7 +182,8 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
         item->setX(newX);
 
     m_resizerWidget->setEnabled(opened);
-    emit openedChanged(opened);
+
+    emit openedChanged(opened, animate);
 }
 
 bool ResourceTreeWorkbenchPanel::isVisible() const
@@ -208,7 +201,7 @@ void ResourceTreeWorkbenchPanel::setVisible(bool visible, bool animate)
 
     updateOpacity(animate);
     if (changed)
-        emit visibleChanged(visible);
+        emit visibleChanged(visible, animate);
 }
 
 qreal ResourceTreeWorkbenchPanel::opacity() const
@@ -340,19 +333,16 @@ void ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered()
     m_opacityProcessor->forceHoverEnter();
 }
 
-void ResourceTreeWorkbenchPanel::at_paintGeometryChanged()
+void ResourceTreeWorkbenchPanel::updateControlsGeometry()
 {
     QRectF paintGeometry = item->paintGeometry();
-
-    /* Don't hide tree item here. It will repaint itself when shown, which will
-    * degrade performance. */
+    auto parentWidgetRect = m_parentWidget->rect();
 
     m_backgroundItem->setGeometry(paintGeometry);
 
     m_showButton->setPos(QPointF(
-        qMax(m_parentWidgetRect.left(), paintGeometry.right()),
-        (m_parentWidgetRect.top() + m_parentWidgetRect.bottom() - m_showButton->size().height())
-            / 2.0));
+        qMax(parentWidgetRect.left(), paintGeometry.right()),
+        (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height())/2.0));
 
     m_pinButton->setPos(QPointF(
         paintGeometry.right() - m_pinButton->size().width() - 1.0,

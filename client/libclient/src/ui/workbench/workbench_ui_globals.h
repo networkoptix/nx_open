@@ -20,4 +20,16 @@ static const qreal kOpaque = 1.0;
 /** Opacity value for hidden items. */
 static const qreal kHidden = 0.0;
 
-} //namespace NxUi
+/**
+ * Z-order for workbench panel controls.
+ */
+enum ItemZOrder
+{
+    BackgroundItemZOrder,
+    ContentItemZOrder,
+    ResizerItemZOrder,
+    ControlItemZOrder,
+    TooltipItemZOrder,
+};
+
+} // namespace NxUi

@@ -29,13 +29,13 @@ public:
 
     virtual qreal opacity() const = 0;
     virtual void setOpacity(qreal opacity, bool animate = true) = 0;
-    void updateOpacity(bool animate = true);
+    virtual void updateOpacity(bool animate = true);
 
     virtual bool isHovered() const = 0;
 
 signals:
-    void openedChanged(bool value);
-    void visibleChanged(bool value);
+    void openedChanged(bool value, bool animated);
+    void visibleChanged(bool value, bool animated);
 
     void hoverEntered();
     void hoverLeft();
@@ -52,7 +52,6 @@ protected:
 
 protected:
     const QGraphicsWidget* m_parentWidget;
-    QRectF m_parentWidgetRect;
 };
 
 }

@@ -29,13 +29,6 @@ namespace {
 static const int kShowAnimationDurationMs = 300;
 static const int kHideAnimationDurationMs = 200;
 
-enum ZOrder
-{
-    BackgroundItem,
-    Item,
-    Controls
-};
-
 }
 
 namespace NxUi {
@@ -63,17 +56,17 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 {
     /* Notifications panel. */
     backgroundItem->setFrameBorders(Qt::LeftEdge);
-    backgroundItem->setZValue(ZOrder::BackgroundItem);
+    backgroundItem->setZValue(BackgroundItemZOrder);
 
-    item->setZValue(ZOrder::Item);
+    item->setZValue(ContentItemZOrder);
     item->setProperty(Qn::NoHandScrollOver, true);
     setHelpTopic(item, Qn::MainWindow_Notifications_Help);
     connect(item, &QGraphicsWidget::geometryChanged, this,
-        &NotificationsWorkbenchPanel::at_item_geometryChanged);
+        &NotificationsWorkbenchPanel::updateControlsGeometry);
 
     action(QnActions::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     pinButton->setFocusProxy(item);
-    pinButton->setZValue(ZOrder::Controls);
+    pinButton->setZValue(ControlItemZOrder);
     connect(action(QnActions::PinNotificationsAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -85,7 +78,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     action(QnActions::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
     showButton->setTransform(QTransform::fromScale(-1, 1));
     showButton->setFocusProxy(item);
-    showButton->setZValue(ZOrder::Controls);
+    showButton->setZValue(ControlItemZOrder);
     setHelpTopic(showButton, Qn::MainWindow_Pin_Help);
     item->setBlinker(showButton);
     connect(action(QnActions::ToggleNotificationsAction), &QAction::toggled, this,
@@ -131,6 +124,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     /* Create a shadow: */
     new QnEdgeShadowWidget(item, Qt::LeftEdge, NxUi::kShadowThickness);
+
+    updateControlsGeometry();
 }
 
 bool NotificationsWorkbenchPanel::isPinned() const
@@ -160,7 +155,7 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
     xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
 
     qreal width = item->size().width();
-    qreal newX = m_parentWidgetRect.right()
+    qreal newX = m_parentWidget->rect().right()
         + (opened ? -width : 1.0 /* Just in case. */);
 
     if (animate)
@@ -168,7 +163,7 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
     else
         item->setX(newX);
 
-    emit openedChanged(opened);
+    emit openedChanged(opened, animate);
 }
 
 bool NotificationsWorkbenchPanel::isVisible() const
@@ -186,7 +181,7 @@ void NotificationsWorkbenchPanel::setVisible(bool visible, bool animate)
 
     updateOpacity(animate);
     if (changed)
-        emit visibleChanged(visible);
+        emit visibleChanged(visible, animate);
 }
 
 qreal NotificationsWorkbenchPanel::opacity() const
@@ -227,16 +222,17 @@ void NotificationsWorkbenchPanel::setShowButtonUsed(bool used)
     showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
-void NotificationsWorkbenchPanel::at_item_geometryChanged()
+void NotificationsWorkbenchPanel::updateControlsGeometry()
 {
+    auto parentWidgetRect = m_parentWidget->rect();
     QRectF headerGeometry = m_parentWidget->mapRectFromItem(item, item->headerGeometry());
     QRectF backgroundGeometry = m_parentWidget->mapRectFromItem(item, item->visibleGeometry());
 
     QRectF paintGeometry = item->geometry();
     backgroundItem->setGeometry(paintGeometry);
     showButton->setPos(QPointF(
-        qMin(m_parentWidgetRect.right(), paintGeometry.left()),
-        (m_parentWidgetRect.top() + m_parentWidgetRect.bottom() - showButton->size().height()) / 2
+        qMin(parentWidgetRect.right(), paintGeometry.left()),
+        (parentWidgetRect.top() + parentWidgetRect.bottom() - showButton->size().height()) / 2
     ));
     pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
 

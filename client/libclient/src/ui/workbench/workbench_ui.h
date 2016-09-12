@@ -12,7 +12,6 @@
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/workbench/panels/timeline_workbench_panel.h>
 
 #include <client/client_globals.h>
 
@@ -45,6 +44,7 @@ namespace NxUi {
 
 class ResourceTreeWorkbenchPanel;
 class NotificationsWorkbenchPanel;
+class TimelineWorkbenchPanel;
 
 }
 
@@ -168,8 +168,7 @@ protected:
     QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
 
-    void setSliderOpacity(qreal opacity, bool animate);
-    void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+    void setTitleOpacity(qreal opacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
     void setSliderZoomButtonsOpacity(qreal opacity, bool animate);
 
@@ -204,14 +203,12 @@ private:
     void updateCursor();
 
 private slots:
-    void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
     void updateCalendarOpacity(bool animate = true);
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
     void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
     void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
@@ -287,8 +284,8 @@ private:
 
     /* Slider-related state. */
 
-    /** Navigation item. */
-    QnWorkbenchUiTimeline m_timeline;
+    /** Timeline. */
+    NxUi::TimelineWorkbenchPanel* m_timeline;
 
     /* Resources tree. */
     NxUi::ResourceTreeWorkbenchPanel* m_tree;

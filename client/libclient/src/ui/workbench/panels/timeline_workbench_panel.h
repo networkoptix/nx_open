@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ui/workbench/panels/abstract_workbench_panel.h>
+
 class QnNavigationItem;
 class QnResizerWidget;
 class QGraphicsWidget;
@@ -8,13 +10,20 @@ class VariantAnimator;
 class QnImageButtonWidget;
 class AnimatorGroup;
 
-struct QnWorkbenchUiTimeline
-{
-    QnWorkbenchUiTimeline();
+namespace NxUi {
 
-    bool visible;
+class TimelineWorkbenchPanel: public AbstractWorkbenchPanel
+{
+    using base_type = AbstractWorkbenchPanel;
+
+    Q_OBJECT
+public:
+    TimelineWorkbenchPanel(
+        const QnPaneSettings& settings,
+        QGraphicsWidget* parentWidget,
+        QObject* parent = nullptr);
+
     bool pinned;
-    bool opened;
 
     QnNavigationItem* item;
     QnResizerWidget* resizerWidget;
@@ -49,4 +58,25 @@ struct QnWorkbenchUiTimeline
     QTimer* autoHideTimer;
 
     qreal lastThumbnailsHeight;
+
+public:
+    virtual bool isPinned() const override;
+
+    virtual bool isOpened() const override;
+    virtual void setOpened(bool opened = true, bool animate = true) override;
+
+    virtual bool isVisible() const override;
+    virtual void setVisible(bool visible = true, bool animate = true) override;
+
+    virtual qreal opacity() const override;
+    virtual void setOpacity(qreal opacity, bool animate = true) override;
+    virtual void updateOpacity(bool animate) override;
+
+    virtual bool isHovered() const override;
+
+private:
+    bool m_visible;
+    bool m_opened;
 };
+
+} //namespace NxUi

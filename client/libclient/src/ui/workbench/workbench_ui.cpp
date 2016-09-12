@@ -106,6 +106,7 @@
 #include "workbench_pane_settings.h"
 #include <ui/workbench/panels/resources_workbench_panel.h>
 #include <ui/workbench/panels/notifications_workbench_panel.h>
+#include <ui/workbench/panels/timeline_workbench_panel.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -122,10 +123,7 @@ Qn::PaneState makePaneState(bool opened, bool pinned = true)
 }
 
 const int kHideControlsTimeoutMs = 2000;
-const int kShowTimelineTimeoutMs = 100;
-const int kCloseTimelineTimeoutMs = 250;
 
-const int kVideoWallTimelineAutoHideTimeoutMs = 10000;
 
 } // anonymous namespace
 
@@ -290,7 +288,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setNotificationsOpened(settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, false);
     setCalendarOpened(settings[Qn::WorkbenchPane::Calendar].state == Qn::PaneState::Opened, false);
 
-    m_timeline.lastThumbnailsHeight = settings[Qn::WorkbenchPane::Thumbnails].span;
+    m_timeline->lastThumbnailsHeight = settings[Qn::WorkbenchPane::Thumbnails].span;
     setThumbnailsVisible(settings[Qn::WorkbenchPane::Thumbnails].state == Qn::PaneState::Opened);
 
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this,
@@ -331,17 +329,17 @@ void QnWorkbenchUi::storeSettings()
     notifications.state = makePaneState(isNotificationsOpened(), isNotificationsPinned());
 
     QnPaneSettings& navigation = settings[Qn::WorkbenchPane::Navigation];
-    if (m_timeline.pinned)
+    if (m_timeline->pinned)
         navigation.state = Qn::PaneState::Opened;
     else
-        navigation.state = m_timeline.opened ? Qn::PaneState::Unpinned : Qn::PaneState::Closed;
+        navigation.state = m_timeline->isOpened() ? Qn::PaneState::Unpinned : Qn::PaneState::Closed;
 
     QnPaneSettings& calendar = settings[Qn::WorkbenchPane::Calendar];
     calendar.state = makePaneState(isCalendarOpened(), isCalendarPinned());
 
     QnPaneSettings& thumbnails = settings[Qn::WorkbenchPane::Thumbnails];
     thumbnails.state = makePaneState(isThumbnailsVisible());
-    thumbnails.span = m_timeline.lastThumbnailsHeight;
+    thumbnails.span = m_timeline->lastThumbnailsHeight;
 
     qnSettings->setPaneSettings(settings);
 }
@@ -361,7 +359,7 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const
     if (m_tree && focusItem == m_tree->item)
         return Qn::TreeScope;
 
-    if (focusItem == m_timeline.item)
+    if (focusItem == m_timeline->item)
         return Qn::SliderScope;
 
     if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
@@ -506,7 +504,7 @@ void QnWorkbenchUi::updateViewportMargins()
             m_tree ? m_tree->item->size().width() : 0.0,
             m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
             m_titleItem ? m_titleItem->size().height() : 0.0,
-            m_timeline.yAnimator->isRunning() ? m_timeline.yAnimator->targetValue().toReal() : m_timeline.item->pos().y(),
+            m_timeline->yAnimator->isRunning() ? m_timeline->yAnimator->targetValue().toReal() : m_timeline->item->pos().y(),
             m_notifications ? m_notifications->xAnimator->isRunning() ? m_notifications->xAnimator->targetValue().toReal() : m_notifications->item->pos().x() : 0.0
         ));
     }
@@ -521,7 +519,7 @@ void QnWorkbenchUi::updateActivityInstrumentState()
 bool QnWorkbenchUi::isHovered() const
 {
     return
-        (m_timeline.opacityProcessor        && m_timeline.opacityProcessor->isHovered())
+        (m_timeline->opacityProcessor        && m_timeline->opacityProcessor->isHovered())
         || (m_tree && m_tree->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notifications && m_notifications->isHovered())
@@ -576,13 +574,13 @@ void QnWorkbenchUi::initGraphicsMessageBox()
 
 void QnWorkbenchUi::tick(int deltaMSecs)
 {
-    if (!m_timeline.zoomingIn && !m_timeline.zoomingOut)
+    if (!m_timeline->zoomingIn && !m_timeline->zoomingOut)
         return;
 
     if (!display()->scene())
         return;
 
-    QnTimeSlider *slider = m_timeline.item->timeSlider();
+    QnTimeSlider *slider = m_timeline->item->timeSlider();
 
     QPointF pos;
     if (slider->windowStart() <= slider->sliderPosition() && slider->sliderPosition() <= slider->windowEnd())
@@ -591,7 +589,7 @@ void QnWorkbenchUi::tick(int deltaMSecs)
         pos = slider->rect().center();
 
     QGraphicsSceneWheelEvent event(QEvent::GraphicsSceneWheel);
-    event.setDelta(360 * 8 * (m_timeline.zoomingIn ? deltaMSecs : -deltaMSecs) / 1000); /* 360 degrees per sec, x8 since delta is measured in in eighths (1/8s) of a degree. */
+    event.setDelta(360 * 8 * (m_timeline->zoomingIn ? deltaMSecs : -deltaMSecs) / 1000); /* 360 degrees per sec, x8 since delta is measured in in eighths (1/8s) of a degree. */
     event.setPos(pos);
     event.setScenePos(slider->mapToScene(pos));
     display()->scene()->sendEvent(slider, &event);
@@ -674,7 +672,6 @@ void QnWorkbenchUi::at_activityStarted()
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
 {
-    //QnResourceWidget *oldWidget = m_widgetByRole[role];
     bool alreadyZoomed = m_widgetByRole[role] != nullptr;
 
     QnResourceWidget *newWidget = display()->widget(role);
@@ -702,7 +699,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
             display()->fitInView();
         }
 
-        m_timeline.showWidget->setVisible(newWidget);
+        m_timeline->showWidget->setVisible(newWidget);
     }
 
     if (qnRuntime->isVideoWallMode())
@@ -742,11 +739,11 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     /* We lay everything out manually. */
 
-    m_timeline.item->setGeometry(QRectF(
+    m_timeline->item->setGeometry(QRectF(
         0.0,
-        m_timeline.item->pos().y() - oldRect.height() + rect.height(),
+        m_timeline->item->pos().y() - oldRect.height() + rect.height(),
         rect.width(),
-        m_timeline.item->size().height()));
+        m_timeline->item->size().height()));
 
     if (m_titleItem)
     {
@@ -826,7 +823,7 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
 
     QSizeF size(
         treeGeometry.width(),
-        ((!m_timeline.visible && isTreeVisible())
+        ((!m_timeline->isVisible() && isTreeVisible())
             ? m_controlsWidgetRect.bottom()
             : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y());
 
@@ -839,7 +836,7 @@ void QnWorkbenchUi::updateTreeGeometry()
         return;
 
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedTreeGeometry(m_tree->item->geometry(), m_titleItem->geometry(), m_timeline.item->geometry());
+    QRectF geometry = updatedTreeGeometry(m_tree->item->geometry(), m_titleItem->geometry(), m_timeline->item->geometry());
     m_tree->item->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
@@ -850,18 +847,18 @@ void QnWorkbenchUi::updateTreeGeometry()
 
     /* Calculate slider target position. */
     QPointF sliderPos;
-    if (!m_timeline.visible && isTreeVisible())
+    if (!m_timeline->isVisible() && isTreeVisible())
     {
-        sliderPos = QPointF(m_timeline.item->pos().x(), m_controlsWidgetRect.bottom());
+        sliderPos = QPointF(m_timeline->item->pos().x(), m_controlsWidgetRect.bottom());
     }
-    else if (m_timeline.yAnimator->isRunning())
+    else if (m_timeline->yAnimator->isRunning())
     {
-        sliderPos = QPointF(m_timeline.item->pos().x(), m_timeline.yAnimator->targetValue().toReal());
-        defer |= !qFuzzyEquals(sliderPos, m_timeline.item->pos()); /* If animation is running, then geometry sync should be deferred. */
+        sliderPos = QPointF(m_timeline->item->pos().x(), m_timeline->yAnimator->targetValue().toReal());
+        defer |= !qFuzzyEquals(sliderPos, m_timeline->item->pos()); /* If animation is running, then geometry sync should be deferred. */
     }
     else
     {
-        sliderPos = m_timeline.item->pos();
+        sliderPos = m_timeline->item->pos();
     }
 
     /* Calculate title target position. */
@@ -881,7 +878,7 @@ void QnWorkbenchUi::updateTreeGeometry()
     }
 
     /* Calculate target geometry. */
-    geometry = updatedTreeGeometry(m_tree->item->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_timeline.item->size()));
+    geometry = updatedTreeGeometry(m_tree->item->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_timeline->item->size()));
     if (qFuzzyEquals(geometry, m_tree->item->geometry()))
         return;
 
@@ -990,7 +987,7 @@ bool QnWorkbenchUi::isTitleOpened() const
     return action(QnActions::ToggleTitleBarAction)->isChecked();
 }
 
-void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate)
+void QnWorkbenchUi::setTitleOpacity(qreal opacity, bool animate)
 {
     ensureAnimationAllowed(animate);
 
@@ -1000,22 +997,22 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
     if (animate)
     {
         m_titleOpacityAnimatorGroup->pause();
-        opacityAnimator(m_titleItem)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_titleShowButton)->setTargetValue(backgroundOpacity);
+        opacityAnimator(m_titleItem)->setTargetValue(opacity);
+        opacityAnimator(m_titleShowButton)->setTargetValue(opacity);
         m_titleOpacityAnimatorGroup->start();
     }
     else
     {
         m_titleOpacityAnimatorGroup->stop();
-        m_titleItem->setOpacity(foregroundOpacity);
-        m_titleShowButton->setOpacity(backgroundOpacity);
+        m_titleItem->setOpacity(opacity);
+        m_titleShowButton->setOpacity(opacity);
     }
 }
 
 void QnWorkbenchUi::updateTitleOpacity(bool animate)
 {
     const qreal opacity = m_titleVisible ? NxUi::kOpaque : NxUi::kHidden;
-    setTitleOpacity(opacity, opacity, animate);
+    setTitleOpacity(opacity, animate);
 }
 
 void QnWorkbenchUi::at_titleItem_geometryChanged()
@@ -1059,8 +1056,7 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
     m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: #Elric why height is zero here?
-    m_titleYAnimator->setSpeed(32.0 * 2.0);
+    m_titleYAnimator->setSpeed(1.0);
     m_titleYAnimator->setTimeLimit(500);
 
     m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
@@ -1118,7 +1114,7 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
         notificationsGeometry.x(),
         ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
 
-    const qreal maxHeight = (m_timeline.visible ? sliderGeometry.y() : m_controlsWidgetRect.bottom()) - pos.y();
+    const qreal maxHeight = (m_timeline->isVisible() ? sliderGeometry.y() : m_controlsWidgetRect.bottom()) - pos.y();
 
     QSizeF size(notificationsGeometry.width(), maxHeight);
     return QRectF(pos, size);
@@ -1130,7 +1126,7 @@ void QnWorkbenchUi::updateNotificationsGeometry()
         return;
 
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(), m_titleItem->geometry(), m_timeline.item->geometry());
+    QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(), m_titleItem->geometry(), m_timeline->item->geometry());
 
     /* Always change position. */
     m_notifications->item->setPos(geometry.topLeft());
@@ -1140,18 +1136,18 @@ void QnWorkbenchUi::updateNotificationsGeometry()
 
     /* Calculate slider target position. */
     QPointF sliderPos;
-    if (!m_timeline.visible && isNotificationsVisible())
+    if (!m_timeline->isVisible() && isNotificationsVisible())
     {
-        sliderPos = QPointF(m_timeline.item->pos().x(), m_controlsWidgetRect.bottom());
+        sliderPos = QPointF(m_timeline->item->pos().x(), m_controlsWidgetRect.bottom());
     }
-    else if (m_timeline.yAnimator->isRunning())
+    else if (m_timeline->yAnimator->isRunning())
     {
-        sliderPos = QPointF(m_timeline.item->pos().x(), m_timeline.yAnimator->targetValue().toReal());
-        defer |= !qFuzzyEquals(sliderPos, m_timeline.item->pos()); /* If animation is running, then geometry sync should be deferred. */
+        sliderPos = QPointF(m_timeline->item->pos().x(), m_timeline->yAnimator->targetValue().toReal());
+        defer |= !qFuzzyEquals(sliderPos, m_timeline->item->pos()); /* If animation is running, then geometry sync should be deferred. */
     }
     else
     {
-        sliderPos = m_timeline.item->pos();
+        sliderPos = m_timeline->item->pos();
     }
 
     /* Calculate title target position. */
@@ -1173,7 +1169,7 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     /* Calculate target geometry. */
     geometry = updatedNotificationsGeometry(m_notifications->item->geometry(),
         QRectF(titlePos, m_titleItem->size()),
-        QRectF(sliderPos, m_timeline.item->size()));
+        QRectF(sliderPos, m_timeline->item->size()));
 
     if (qFuzzyEquals(geometry, m_notifications->item->geometry()))
         return;
@@ -1209,11 +1205,6 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-
-//     connect(m_notifications->item, &QGraphicsWidget::geometryChanged, this,
-//         &QnWorkbenchUi::at_notificationsItem_geometryChanged);
-//     connect(m_notifications->item, &QnNotificationsCollectionWidget::visibleSizeChanged, this,
-//         &QnWorkbenchUi::at_notificationsItem_geometryChanged);
 
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateViewportMargins);
@@ -1343,7 +1334,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate)
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & Qn::utc);
     action(QnActions::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
 
-    bool calendarVisible = calendarEnabled && m_timeline.visible && isSliderOpened();
+    bool calendarVisible = calendarEnabled && m_timeline->isVisible() && isSliderOpened();
     setCalendarVisible(calendarVisible && (!m_inactive || isHovered()), animate);
 
     if (!calendarVisible)
@@ -1361,7 +1352,7 @@ QRectF QnWorkbenchUi::updatedCalendarGeometry(const QRectF &sliderGeometry)
 void QnWorkbenchUi::updateCalendarGeometry()
 {
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedCalendarGeometry(m_timeline.item->geometry());
+    QRectF geometry = updatedCalendarGeometry(m_timeline->item->geometry());
     m_calendarItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
@@ -1379,7 +1370,7 @@ QRectF QnWorkbenchUi::updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry,
 void QnWorkbenchUi::updateDayTimeWidgetGeometry()
 {
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedDayTimeWidgetGeometry(m_timeline.item->geometry(), m_calendarItem->geometry());
+    QRectF geometry = updatedDayTimeWidgetGeometry(m_timeline->item->geometry(), m_calendarItem->geometry());
     m_dayTimeItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
@@ -1388,7 +1379,7 @@ void QnWorkbenchUi::updateDayTimeWidgetGeometry()
 
 void QnWorkbenchUi::setCalendarShowButtonUsed(bool used)
 {
-    m_timeline.item->calendarButton()->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+    m_timeline->item->calendarButton()->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
 void QnWorkbenchUi::at_calendarShowingProcessor_hoverEntered()
@@ -1571,18 +1562,18 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 
 bool QnWorkbenchUi::isSliderVisible() const
 {
-    return m_timeline.visible;
+    return m_timeline->isVisible();
 }
 
 void QnWorkbenchUi::setSliderShowButtonUsed(bool used)
 {
-    m_timeline.showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+    m_timeline->showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
 bool QnWorkbenchUi::isThumbnailsVisible() const
 {
-    qreal height = m_timeline.item->geometry().height();
-    return height != 0.0 && !qFuzzyCompare(height, m_timeline.item->effectiveSizeHint(Qt::MinimumSize).height());
+    qreal height = m_timeline->item->geometry().height();
+    return height != 0.0 && !qFuzzyCompare(height, m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height());
 }
 
 void QnWorkbenchUi::setThumbnailsVisible(bool visible)
@@ -1590,26 +1581,26 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible)
     if (visible == isThumbnailsVisible())
         return;
 
-    qreal sliderHeight = m_timeline.item->effectiveSizeHint(Qt::MinimumSize).height();
+    qreal sliderHeight = m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height();
     if (!visible)
-        m_timeline.lastThumbnailsHeight = m_timeline.item->geometry().height() - sliderHeight;
+        m_timeline->lastThumbnailsHeight = m_timeline->item->geometry().height() - sliderHeight;
     else
-        sliderHeight += m_timeline.lastThumbnailsHeight;
+        sliderHeight += m_timeline->lastThumbnailsHeight;
 
-    QRectF geometry = m_timeline.item->geometry();
+    QRectF geometry = m_timeline->item->geometry();
     geometry.setHeight(sliderHeight);
-    m_timeline.item->setGeometry(geometry);
+    m_timeline->item->setGeometry(geometry);
 }
 
 bool QnWorkbenchUi::isSliderOpened() const
 {
-    return m_timeline.opened;
+    return m_timeline->isOpened();
 }
 
 bool QnWorkbenchUi::isSliderPinned() const
 {
     /* Auto-hide slider when some item is zoomed, otherwise - don't. */
-    return m_timeline.pinned ||
+    return m_timeline->isPinned() ||
         m_widgetByRole[Qn::ZoomedRole] == nullptr;
 }
 
@@ -1619,114 +1610,29 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
         opened = true;
 
     /* Do not hide pinned timeline. */
-    if (m_timeline.pinned && !opened)
+    if (m_timeline->pinned && !opened)
         return;
 
-    m_timeline.opened = opened;
-
-    ensureAnimationAllowed(animate);
-
-    m_inFreespace &= !opened;
-
-    qreal newY = m_controlsWidgetRect.bottom()
-        + (opened ? -m_timeline.item->size().height() : 64.0 /* So that tooltips are not opened. */);
-    if (animate)
-    {
-        /* Skip off-screen part. */
-        if (opened && m_timeline.item->y() > m_controlsWidgetRect.bottom())
-        {
-            QSignalBlocker blocker(m_timeline.item);
-            m_timeline.item->setY(m_controlsWidgetRect.bottom());
-        }
-
-        m_timeline.yAnimator->animateTo(newY);
-    }
-    else
-    {
-        m_timeline.yAnimator->stop();
-        m_timeline.item->setY(newY);
-    }
+    m_timeline->setOpened(opened, animate);
 
     updateCalendarVisibility(animate);
-
-    m_timeline.resizerWidget->setEnabled(opened);
+    m_inFreespace &= !opened;
 }
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
 {
-    ensureAnimationAllowed(animate);
-
-    bool changed = m_timeline.visible != visible;
-
-    m_timeline.visible = visible;
-    if (qnRuntime->isVideoWallMode())
-    {
-        if (visible)
-            m_timeline.autoHideTimer->start(kVideoWallTimelineAutoHideTimeoutMs);
-        else
-            m_timeline.autoHideTimer->stop();
-    }
-
-    updateSliderOpacity(animate);
-    if (changed)
-    {
-        updateTreeGeometry();
-        updateNotificationsGeometry();
-        updateCalendarVisibility(animate);
-        m_timeline.item->setEnabled(m_timeline.visible); /* So that it doesn't handle mouse events while disappearing. */
-    }
-}
-
-void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate)
-{
-    ensureAnimationAllowed(animate);
-
-    if (animate)
-    {
-        m_timeline.opacityAnimatorGroup->pause();
-        opacityAnimator(m_timeline.item)->setTargetValue(opacity);
-        opacityAnimator(m_timeline.showButton)->setTargetValue(opacity);
-        m_timeline.opacityAnimatorGroup->start();
-    }
-    else
-    {
-        m_timeline.opacityAnimatorGroup->stop();
-        m_timeline.item->setOpacity(opacity);
-        m_timeline.showButton->setOpacity(opacity);
-    }
-
-    m_timeline.resizerWidget->setVisible(!qFuzzyIsNull(opacity));
-}
-
-void QnWorkbenchUi::setSliderZoomButtonsOpacity(qreal opacity, bool animate)
-{
-    ensureAnimationAllowed(animate);
-
-    if (animate)
-        opacityAnimator(m_timeline.zoomButtonsWidget)->animateTo(opacity);
-    else
-        m_timeline.zoomButtonsWidget->setOpacity(opacity);
-}
-
-void QnWorkbenchUi::updateSliderOpacity(bool animate)
-{
-    const qreal opacity = m_timeline.visible ? NxUi::kOpaque : NxUi::kHidden;
-    setSliderOpacity(opacity, animate);
-
-    bool isButtonOpaque = m_timeline.visible && m_timeline.opacityProcessor && m_timeline.opacityProcessor->isHovered();
-    const qreal buttonsOpacity = isButtonOpaque ? NxUi::kOpaque : NxUi::kHidden;
-    setSliderZoomButtonsOpacity(buttonsOpacity, animate);
+    m_timeline->setVisible(visible, animate);
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry()
 {
-    if (m_timeline.updateResizerGeometryLater)
+    if (m_timeline->updateResizerGeometryLater)
     {
         QTimer::singleShot(1, this, &QnWorkbenchUi::updateSliderResizerGeometry);
         return;
     }
 
-    QnTimeSlider *timeSlider = m_timeline.item->timeSlider();
+    QnTimeSlider *timeSlider = m_timeline->item->timeSlider();
     QRectF timeSliderRect = timeSlider->rect();
 
     QRectF sliderResizerGeometry = QRectF(
@@ -1736,22 +1642,22 @@ void QnWorkbenchUi::updateSliderResizerGeometry()
     sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
     sliderResizerGeometry.setHeight(16);
 
-    if (!qFuzzyEquals(sliderResizerGeometry, m_timeline.resizerWidget->geometry()))
+    if (!qFuzzyEquals(sliderResizerGeometry, m_timeline->resizerWidget->geometry()))
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_timeline.updateResizerGeometryLater, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_timeline->updateResizerGeometryLater, true);
 
-        m_timeline.resizerWidget->setGeometry(sliderResizerGeometry);
+        m_timeline->resizerWidget->setGeometry(sliderResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_timeline.resizerWidget->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
+        m_timeline->resizerWidget->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
 
 }
 
 void QnWorkbenchUi::updateSliderZoomButtonsGeometry()
 {
-    QPointF pos = m_timeline.item->timeSlider()->mapToItem(m_controlsWidget, m_timeline.item->timeSlider()->rect().topLeft());
-    m_timeline.zoomButtonsWidget->setPos(pos);
+    QPointF pos = m_timeline->item->timeSlider()->mapToItem(m_controlsWidget, m_timeline->item->timeSlider()->rect().topLeft());
+    m_timeline->zoomButtonsWidget->setPos(pos);
 }
 
 void QnWorkbenchUi::at_sliderResizerWidget_wheelEvent(QObject *, QEvent *event)
@@ -1759,15 +1665,13 @@ void QnWorkbenchUi::at_sliderResizerWidget_wheelEvent(QObject *, QEvent *event)
     QGraphicsSceneWheelEvent *oldEvent = static_cast<QGraphicsSceneWheelEvent *>(event);
     QGraphicsSceneWheelEvent newEvent(QEvent::GraphicsSceneWheel);
     newEvent.setDelta(oldEvent->delta());
-    newEvent.setPos(m_timeline.item->timeSlider()->mapFromItem(m_timeline.resizerWidget, oldEvent->pos()));
+    newEvent.setPos(m_timeline->item->timeSlider()->mapFromItem(m_timeline->resizerWidget, oldEvent->pos()));
     newEvent.setScenePos(oldEvent->scenePos());
-    display()->scene()->sendEvent(m_timeline.item->timeSlider(), &newEvent);
+    display()->scene()->sendEvent(m_timeline->item->timeSlider(), &newEvent);
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged()
 {
-    setSliderOpened(isSliderOpened(), m_timeline.yAnimator->isRunning()); /* Re-adjust to screen sides. */
-
     updateTreeGeometry();
     updateNotificationsGeometry();
 
@@ -1777,49 +1681,49 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged()
     updateSliderZoomButtonsGeometry();
     updateDayTimeWidgetGeometry();
 
-    QRectF geometry = m_timeline.item->geometry();
+    QRectF geometry = m_timeline->item->geometry();
 
     /* Button is painted rotated, so we taking into account its height, not width. */
     QPointF showButtonPos(
-        (geometry.left() + geometry.right() - m_timeline.showButton->geometry().height()) / 2,
+        (geometry.left() + geometry.right() - m_timeline->showButton->geometry().height()) / 2,
         qMin(m_controlsWidgetRect.bottom(), geometry.top()));
-    m_timeline.showButton->setPos(showButtonPos);
+    m_timeline->showButton->setPos(showButtonPos);
 
     static const int kShowWidgetHeight = 50;
     static const int kShowWidgetHiddenHeight = 12;
 
-    const int showWidgetY = m_timeline.opened
+    const int showWidgetY = m_timeline->isOpened()
         ? geometry.top() - kShowWidgetHeight
         : m_controlsWidgetRect.bottom() - kShowWidgetHiddenHeight;
 
     QRectF showWidgetGeometry(geometry);
     showWidgetGeometry.setTop(showWidgetY);
     showWidgetGeometry.setHeight(kShowWidgetHeight);
-    m_timeline.showWidget->setGeometry(showWidgetGeometry);
+    m_timeline->showWidget->setGeometry(showWidgetGeometry);
 
     if (isThumbnailsVisible())
     {
-        qreal sliderHeight = m_timeline.item->effectiveSizeHint(Qt::MinimumSize).height();
-        m_timeline.lastThumbnailsHeight = m_timeline.item->geometry().height() - sliderHeight;
+        qreal sliderHeight = m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height();
+        m_timeline->lastThumbnailsHeight = m_timeline->item->geometry().height() - sliderHeight;
     }
 }
 
 void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged()
 {
-    if (m_timeline.ignoreResizerGeometryChanges)
+    if (m_timeline->ignoreResizerGeometryChanges)
         return;
 
-    QRectF sliderResizerGeometry = m_timeline.resizerWidget->geometry();
+    QRectF sliderResizerGeometry = m_timeline->resizerWidget->geometry();
     if (!sliderResizerGeometry.isValid())
     {
         updateSliderResizerGeometry();
         return;
     }
 
-    QRectF sliderGeometry = m_timeline.item->geometry();
+    QRectF sliderGeometry = m_timeline->item->geometry();
 
     qreal targetHeight = sliderGeometry.bottom() - sliderResizerGeometry.center().y();
-    qreal minHeight = m_timeline.item->effectiveSizeHint(Qt::MinimumSize).height();
+    qreal minHeight = m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height();
     qreal jmpHeight = minHeight + 48.0;
     qreal maxHeight = minHeight + 196.0;
 
@@ -1836,8 +1740,8 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged()
         sliderGeometry.setHeight(targetHeight);
         sliderGeometry.moveTop(sliderTop);
 
-        QN_SCOPED_VALUE_ROLLBACK(&m_timeline.ignoreResizerGeometryChanges, true);
-        m_timeline.item->setGeometry(sliderGeometry);
+        QN_SCOPED_VALUE_ROLLBACK(&m_timeline->ignoreResizerGeometryChanges, true);
+        m_timeline->item->setGeometry(sliderGeometry);
     }
 
     updateSliderResizerGeometry();
@@ -1847,61 +1751,19 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged()
 
 void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 {
-    m_timeline.resizerWidget = new QnResizerWidget(Qt::Vertical, m_controlsWidget);
-    m_timeline.resizerWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_timeline = new NxUi::TimelineWorkbenchPanel(settings, m_controlsWidget, this);
 
-    m_timeline.item = new QnNavigationItem(m_controlsWidget);
-    m_timeline.item->setProperty(Qn::NoHandScrollOver, true);
-    m_timeline.item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
-    m_timeline.item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
-    m_timeline.item->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
+        [this](bool value, bool animated)
+        {
+            updateTreeGeometry();
+            updateNotificationsGeometry();
+            updateCalendarVisibility(animated);
+        });
 
-    /*
-    Calendar is created before navigation slider (alot of logic relies on that).
-    Therefore we have to bind calendar showing/hiding processors to navigation
-    pane button "CLND" here and not in createCalendarWidget()
-    */
-    m_calendarHidingProcessor->addTargetItem(m_timeline.item->calendarButton());
-    // m_calendarShowingProcessor->addTargetItem(m_timeline.item->calendarButton()); // - show unpinned calendar on hovering its button without pressing
-
-    const auto toggleSliderAction = action(QnActions::ToggleSliderAction);
-    m_timeline.showButton = NxUi::newShowHideButton(m_controlsWidget, context(), toggleSliderAction);
-    {
-        QTransform transform;
-        transform.rotate(-90);
-        m_timeline.showButton->setTransform(transform);
-    }
-    m_timeline.showButton->setFocusProxy(m_timeline.item);
-
-    m_timeline.showWidget = new GraphicsWidget(m_controlsWidget);
-    m_timeline.showWidget->setProperty(Qn::NoHandScrollOver, true);
-    m_timeline.showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
-    m_timeline.showWidget->setVisible(false);
-
-    m_timeline.showingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_timeline.showingProcessor->addTargetItem(m_timeline.showButton);
-    m_timeline.showingProcessor->addTargetItem(m_timeline.showWidget);
-    m_timeline.showingProcessor->addTargetItem(m_timeline.resizerWidget);
-    m_timeline.showingProcessor->setHoverEnterDelay(kShowTimelineTimeoutMs);
-
-    m_timeline.hidingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_timeline.hidingProcessor->addTargetItem(m_timeline.item);
-    m_timeline.hidingProcessor->addTargetItem(m_timeline.showButton);
-    m_timeline.hidingProcessor->addTargetItem(m_timeline.resizerWidget);
-    m_timeline.hidingProcessor->addTargetItem(m_timeline.showWidget);
-    m_timeline.hidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
-    m_timeline.hidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
-
-    if (qnRuntime->isVideoWallMode())
-    {
-        m_timeline.showButton->setVisible(false);
-        m_timeline.autoHideTimer = new QTimer(this);
-        connect(m_timeline.autoHideTimer, &QTimer::timeout, this,
-            [this]
-            {
-                setSliderVisible(false, true);
-            });
-    }
+    m_timeline->item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    m_timeline->item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    m_timeline->item->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
 
     QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
     sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
@@ -1919,96 +1781,88 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     sliderZoomButtonsLayout->addItem(sliderZoomOutButton);
     sliderZoomButtonsLayout->addItem(sliderZoomInButton);
 
-    m_timeline.zoomButtonsWidget = new GraphicsWidget(m_controlsWidget);
-    m_timeline.zoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
-    m_timeline.zoomButtonsWidget->setOpacity(0.0);
+    m_timeline->zoomButtonsWidget = new GraphicsWidget(m_controlsWidget);
+    m_timeline->zoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
+    m_timeline->zoomButtonsWidget->setOpacity(0.0);
 
-    m_timeline.zoomButtonsWidget->setVisible(navigator()->hasArchive());
+    m_timeline->zoomButtonsWidget->setVisible(navigator()->hasArchive());
     connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
         [this]()
         {
-            m_timeline.zoomButtonsWidget->setVisible(navigator()->hasArchive());
+            m_timeline->zoomButtonsWidget->setVisible(navigator()->hasArchive());
         });
 
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
-    auto tooltip = m_timeline.item->timeSlider()->toolTipItem();
-    tooltip->stackBefore(m_timeline.item->timeSlider()->bookmarksViewer());
-    m_timeline.item->stackBefore(tooltip);
-    m_timeline.showButton->stackBefore(m_timeline.item);
-    m_timeline.showWidget->stackBefore(m_timeline.showButton);
-    m_timeline.resizerWidget->stackBefore(m_timeline.showWidget);
+    auto tooltip = m_timeline->item->timeSlider()->toolTipItem();
+    tooltip->setZValue(NxUi::TooltipItemZOrder);
 
-    m_timeline.opacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_timeline->opacityProcessor = new HoverFocusProcessor(m_controlsWidget);
 
     enum { kSliderLeaveTimeout = 100 };
-    m_timeline.opacityProcessor->setHoverLeaveDelay(kSliderLeaveTimeout);
-    m_timeline.item->timeSlider()->bookmarksViewer()->setHoverProcessor(m_timeline.opacityProcessor);
-    m_timeline.opacityProcessor->addTargetItem(m_timeline.item);
-    m_timeline.opacityProcessor->addTargetItem(m_timeline.item->timeSlider()->toolTipItem());
-    m_timeline.opacityProcessor->addTargetItem(m_timeline.showButton);
-    m_timeline.opacityProcessor->addTargetItem(m_timeline.resizerWidget);
-    m_timeline.opacityProcessor->addTargetItem(m_timeline.showWidget);
-    m_timeline.opacityProcessor->addTargetItem(m_timeline.zoomButtonsWidget);
+    m_timeline->opacityProcessor->setHoverLeaveDelay(kSliderLeaveTimeout);
+    m_timeline->item->timeSlider()->bookmarksViewer()->setHoverProcessor(m_timeline->opacityProcessor);
+    m_timeline->opacityProcessor->addTargetItem(m_timeline->item);
+    m_timeline->opacityProcessor->addTargetItem(m_timeline->item->timeSlider()->toolTipItem());
+    m_timeline->opacityProcessor->addTargetItem(m_timeline->showButton);
+    m_timeline->opacityProcessor->addTargetItem(m_timeline->resizerWidget);
+    m_timeline->opacityProcessor->addTargetItem(m_timeline->showWidget);
+    m_timeline->opacityProcessor->addTargetItem(m_timeline->zoomButtonsWidget);
 
-    m_timeline.yAnimator = new VariantAnimator(this);
-    m_timeline.yAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_timeline.yAnimator->setTargetObject(m_timeline.item);
-    m_timeline.yAnimator->setAccessor(new PropertyAccessor("y"));
-    m_timeline.yAnimator->setSpeed(70.0 * 2.0);
-    m_timeline.yAnimator->setTimeLimit(500);
+    m_timeline->yAnimator = new VariantAnimator(this);
+    m_timeline->yAnimator->setTimer(m_instrumentManager->animationTimer());
+    m_timeline->yAnimator->setTargetObject(m_timeline->item);
+    m_timeline->yAnimator->setAccessor(new PropertyAccessor("y"));
+    m_timeline->yAnimator->setSpeed(70.0 * 2.0);
+    m_timeline->yAnimator->setTimeLimit(500);
 
-    m_timeline.opacityAnimatorGroup = new AnimatorGroup(this);
-    m_timeline.opacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_timeline.opacityAnimatorGroup->addAnimator(opacityAnimator(m_timeline.item));
-    m_timeline.opacityAnimatorGroup->addAnimator(opacityAnimator(m_timeline.showButton)); /* Speed of 1.0 is OK here. */
+    m_timeline->opacityAnimatorGroup = new AnimatorGroup(this);
+    m_timeline->opacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
+    m_timeline->opacityAnimatorGroup->addAnimator(opacityAnimator(m_timeline->item));
+    m_timeline->opacityAnimatorGroup->addAnimator(opacityAnimator(m_timeline->showButton)); /* Speed of 1.0 is OK here. */
 
     QnSingleEventEater *sliderWheelEater = new QnSingleEventEater(this);
     sliderWheelEater->setEventType(QEvent::GraphicsSceneWheel);
-    m_timeline.resizerWidget->installEventFilter(sliderWheelEater);
+    m_timeline->resizerWidget->installEventFilter(sliderWheelEater);
 
     QnSingleEventSignalizer *sliderWheelSignalizer = new QnSingleEventSignalizer(this);
     sliderWheelSignalizer->setEventType(QEvent::GraphicsSceneWheel);
-    m_timeline.resizerWidget->installEventFilter(sliderWheelSignalizer);
+    m_timeline->resizerWidget->installEventFilter(sliderWheelSignalizer);
 
     connect(sliderZoomInButton, &QnImageButtonWidget::pressed, this,
         [this]
         {
-            m_timeline.zoomingIn = true;
+            m_timeline->zoomingIn = true;
         });
     connect(sliderZoomInButton, &QnImageButtonWidget::released, this,
         [this]
         {
-            m_timeline.zoomingIn = false;
-            m_timeline.item->timeSlider()->hurryKineticAnimations();
+            m_timeline->zoomingIn = false;
+            m_timeline->item->timeSlider()->hurryKineticAnimations();
         });
     connect(sliderZoomOutButton, &QnImageButtonWidget::pressed, this,
         [this]
         {
-            m_timeline.zoomingOut = true;
+            m_timeline->zoomingOut = true;
         });
     connect(sliderZoomOutButton, &QnImageButtonWidget::released, this,
         [this]
         {
-            m_timeline.zoomingOut = false;
-            m_timeline.item->timeSlider()->hurryKineticAnimations();
+            m_timeline->zoomingOut = false;
+            m_timeline->item->timeSlider()->hurryKineticAnimations();
         });
 
     connect(sliderWheelSignalizer, &QnAbstractEventSignalizer::activated, this,
         &QnWorkbenchUi::at_sliderResizerWidget_wheelEvent);
-    connect(m_timeline.opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::updateSliderOpacityAnimated);
-    connect(m_timeline.opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
-        &QnWorkbenchUi::updateSliderOpacityAnimated);
-    connect(m_timeline.opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+    connect(m_timeline->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_timeline.opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+    connect(m_timeline->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_timeline.item, &QGraphicsWidget::geometryChanged, this,
+    connect(m_timeline->item, &QGraphicsWidget::geometryChanged, this,
         &QnWorkbenchUi::at_sliderItem_geometryChanged);
-    connect(m_timeline.resizerWidget, &QGraphicsWidget::geometryChanged, this,
+    connect(m_timeline->resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &QnWorkbenchUi::at_sliderResizerWidget_geometryChanged);
 
-    connect(m_timeline.showingProcessor, &HoverFocusProcessor::hoverEntered, this,
+    connect(m_timeline->showingProcessor, &HoverFocusProcessor::hoverEntered, this,
         [this]
         {
             if (!isSliderPinned() && !isSliderOpened())
@@ -2020,10 +1874,10 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
                 QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this, [this]() { setSliderShowButtonUsed(true); });
             }
 
-            m_timeline.hidingProcessor->forceHoverEnter();
+            m_timeline->hidingProcessor->forceHoverEnter();
         });
 
-    connect(m_timeline.hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_timeline->hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
         [this]
         {
             /* Do not auto-hide slider if we have opened context menu. */
@@ -2031,7 +1885,15 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
                 setSliderOpened(false);
         });
 
-    connect(menu(), &QnActionManager::menuAboutToHide, m_timeline.hidingProcessor,
+    /*
+    Calendar is created before navigation slider (alot of logic relies on that).
+    Therefore we have to bind calendar showing/hiding processors to navigation
+    pane button "CLND" here and not in createCalendarWidget()
+    */
+    m_calendarHidingProcessor->addTargetItem(m_timeline->item->calendarButton());
+
+
+    connect(menu(), &QnActionManager::menuAboutToHide, m_timeline->hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
@@ -2066,7 +1928,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     connect(action(QnActions::ToggleSliderAction), &QAction::toggled, this,
         [this](bool checked)
         {
-            m_timeline.pinned = checked;
+            m_timeline->pinned = checked;
             setSliderOpened(checked);
         });
 
@@ -2079,7 +1941,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         };
 
     /// TODO: #ynikitenkov move bookmarks-related stuff to new file (BookmarksActionHandler)
-    const auto bookmarksViewer = m_timeline.item->timeSlider()->bookmarksViewer();
+    const auto bookmarksViewer = m_timeline->item->timeSlider()->bookmarksViewer();
 
     const auto updateBookmarkActionsAvailability =
         [this, bookmarksViewer]()
@@ -2129,10 +1991,8 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
             menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
         });
 
-    toggleSliderAction->setChecked(settings.state == Qn::PaneState::Opened);
-
     /* Create a shadow: */
-    new QnEdgeShadowWidget(m_timeline.item, Qt::TopEdge, NxUi::kShadowThickness);
+    new QnEdgeShadowWidget(m_timeline->item, Qt::TopEdge, NxUi::kShadowThickness);
 }
 
 #pragma endregion Slider methods

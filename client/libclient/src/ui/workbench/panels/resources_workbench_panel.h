@@ -57,7 +57,7 @@ private:
 private:
     void at_resizerWidget_geometryChanged();
     void at_showingProcessor_hoverEntered();
-    void at_paintGeometryChanged();
+    void updateControlsGeometry();
 
 private:
     bool m_ignoreClickEvent;
@@ -89,4 +89,4 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 };
 
-}
+} //namespace NxUi

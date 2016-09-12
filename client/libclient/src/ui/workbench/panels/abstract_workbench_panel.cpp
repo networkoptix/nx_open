@@ -31,14 +31,6 @@ AbstractWorkbenchPanel::AbstractWorkbenchPanel(
     {
         setProxyUpdatesEnabled(true);
     });
-
-    connect(m_parentWidget, &QGraphicsWidget::geometryChanged, this,
-        [this]
-        {
-            QRectF rect = m_parentWidget->rect();
-            m_parentWidgetRect = rect;
-        });
-    m_parentWidgetRect = m_parentWidget->rect();
 }
 
 void AbstractWorkbenchPanel::updateOpacity(bool animate)

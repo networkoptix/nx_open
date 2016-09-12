@@ -45,7 +45,7 @@ public:
 
 private:
     void setShowButtonUsed(bool used);
-    void at_item_geometryChanged();
+    void updateControlsGeometry();
 
 private:
     void at_showingProcessor_hoverEntered();
@@ -67,4 +67,4 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 };
 
-}
+} //namespace NxUi
