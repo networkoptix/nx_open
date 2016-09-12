@@ -13,7 +13,6 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/workbench/panels/timeline.h>
-#include <ui/workbench/panels/resource_tree.h>
 
 #include <client/client_globals.h>
 
@@ -39,9 +38,15 @@ class QnImageButtonWidget;
 class QnResourceWidget;
 class QnMaskedProxyWidget;
 class QnFramedWidget;
-class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
 struct QnPaneSettings;
+
+namespace NxUi {
+
+class ResourceTreeWorkbenchPanel;
+class NotificationsWorkbenchPanel;
+
+}
 
 class QnWorkbenchUi:
     public Disconnective<QObject>,
@@ -165,7 +170,6 @@ protected:
 
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-    void setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
     void setSliderZoomButtonsOpacity(qreal opacity, bool animate);
 
@@ -202,7 +206,6 @@ private:
 private slots:
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
-    void updateNotificationsOpacity(bool animate = true);
     void updateCalendarOpacity(bool animate = true);
 
     void updateCalendarVisibility(bool animate = true);
@@ -210,14 +213,12 @@ private slots:
 
     void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
     void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
-    void updateNotificationsOpacityAnimated() { updateNotificationsOpacity(true); }
     void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
     void setSliderShowButtonUsed(bool used);
 
-    void setNotificationsShowButtonUsed(bool used);
     void setCalendarShowButtonUsed(bool used);
 
     void at_freespaceAction_triggered();
@@ -239,7 +240,6 @@ private slots:
 
     void at_titleItem_geometryChanged();
 
-    void at_notificationsShowingProcessor_hoverEntered();
     void at_notificationsItem_geometryChanged();
 
     void at_calendarShowingProcessor_hoverEntered();
@@ -275,8 +275,6 @@ private:
     bool m_titleUsed;
 
     bool m_titleVisible;
-
-    bool m_notificationsVisible;
 
     bool m_calendarVisible;
 
@@ -317,25 +315,7 @@ private:
     HoverFocusProcessor *m_titleOpacityProcessor;
 
     /* Notifications window-related state. */
-
-    QnFramedWidget *m_notificationsBackgroundItem;
-
-    QnNotificationsCollectionWidget *m_notificationsItem;
-
-    QnImageButtonWidget *m_notificationsPinButton;
-
-    QnImageButtonWidget *m_notificationsShowButton;
-
-    HoverFocusProcessor *m_notificationsOpacityProcessor;
-
-    HoverFocusProcessor *m_notificationsHidingProcessor;
-
-    HoverFocusProcessor *m_notificationsShowingProcessor;
-
-    VariantAnimator *m_notificationsXAnimator;
-
-    AnimatorGroup *m_notificationsOpacityAnimatorGroup;
-
+    NxUi::NotificationsWorkbenchPanel* m_notifications;
 
     /* Calendar window-related state. */
 

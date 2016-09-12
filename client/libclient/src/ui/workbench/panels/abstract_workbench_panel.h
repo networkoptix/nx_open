@@ -3,6 +3,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class AnimationTimer;
+class QGraphicsWidget;
+struct QnPaneSettings;
 
 namespace NxUi {
 
@@ -12,7 +14,10 @@ class AbstractWorkbenchPanel: public QObject, public QnWorkbenchContextAware
 
     Q_OBJECT
 public:
-    AbstractWorkbenchPanel(QObject* parent = nullptr);
+    AbstractWorkbenchPanel(
+        const QnPaneSettings& settings,
+        QGraphicsWidget* parentWidget,
+        QObject* parent = nullptr);
 
     virtual bool isPinned() const = 0;
 
@@ -42,6 +47,10 @@ protected:
     AnimationTimer* animationTimer() const;
 
     virtual void setProxyUpdatesEnabled(bool updatesEnabled);
+
+protected:
+    QGraphicsWidget* m_parentWidget;
+    QRectF m_parentWidgetRect;
 };
 
 }

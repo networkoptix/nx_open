@@ -47,6 +47,7 @@
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
@@ -103,6 +104,8 @@
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
 #include "workbench_pane_settings.h"
+#include <ui/workbench/panels/resource_tree.h>
+#include <ui/workbench/panels/notifications_workbench_panel.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -152,7 +155,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_controlsWidget(nullptr),
     m_titleUsed(false),
     m_titleVisible(false),
-    m_notificationsVisible(false),
     m_calendarVisible(false),
     m_dayTimeOpened(false),
     m_ignoreClickEvent(false),
@@ -171,16 +173,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleOpacityAnimatorGroup(nullptr),
     m_titleYAnimator(nullptr),
     m_titleOpacityProcessor(nullptr),
-
-    m_notificationsBackgroundItem(nullptr),
-    m_notificationsItem(nullptr),
-    m_notificationsPinButton(nullptr),
-    m_notificationsShowButton(nullptr),
-    m_notificationsOpacityProcessor(nullptr),
-    m_notificationsHidingProcessor(nullptr),
-    m_notificationsShowingProcessor(nullptr),
-    m_notificationsXAnimator(nullptr),
-    m_notificationsOpacityAnimatorGroup(nullptr),
 
     m_calendarItem(nullptr),
     m_calendarPinButton(nullptr),
@@ -245,7 +237,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         createTitleWidget(settings[Qn::WorkbenchPane::Title]);
 
     /* Notifications. */
-    if (!(qnSettings->lightMode() & Qn::LightModeNoNotifications))
+    if (!qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
         createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]);
 
     /* Calendar. */
@@ -472,7 +464,7 @@ QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal
     QMargins result(
         isTreePinned() ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
-        m_notificationsItem ? std::floor(qMax(0.0, isNotificationsPinned() ? m_controlsWidgetRect.right() - notificationsX : 0.0)) : 0.0,
+        m_notifications ? std::floor(qMax(0.0, isNotificationsPinned() ? m_controlsWidgetRect.right() - notificationsX : 0.0)) : 0.0,
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY)));
 
     if (result.left() + result.right() >= m_controlsWidgetRect.width())
@@ -515,7 +507,7 @@ void QnWorkbenchUi::updateViewportMargins()
             m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
             m_titleItem ? m_titleItem->size().height() : 0.0,
             m_timeline.yAnimator->isRunning() ? m_timeline.yAnimator->targetValue().toReal() : m_timeline.item->pos().y(),
-            m_notificationsItem ? m_notificationsXAnimator->isRunning() ? m_notificationsXAnimator->targetValue().toReal() : m_notificationsItem->pos().x() : 0.0
+            m_notifications ? m_notifications->xAnimator->isRunning() ? m_notifications->xAnimator->targetValue().toReal() : m_notifications->item->pos().x() : 0.0
         ));
     }
 }
@@ -532,7 +524,7 @@ bool QnWorkbenchUi::isHovered() const
         (m_timeline.opacityProcessor        && m_timeline.opacityProcessor->isHovered())
         || (m_tree && m_tree->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
-        || (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered())
+        || (m_notifications && m_notifications->isHovered())
         || (m_calendarOpacityProcessor      && m_calendarOpacityProcessor->isHovered())
         ;
 }
@@ -765,11 +757,12 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
             m_titleItem->size().height()));
     }
 
-    if (m_notificationsItem)
+    if (m_notifications)
     {
-        if (m_notificationsXAnimator->isRunning())
-            m_notificationsXAnimator->stop();
-        m_notificationsItem->setX(rect.right() + (isNotificationsOpened() ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */));
+        qDebug() << "at_controlsWidget_geometryChanged";
+        if (m_notifications->xAnimator->isRunning())
+            m_notifications->xAnimator->stop();
+        m_notifications->item->setX(rect.right() + (isNotificationsOpened() ? -m_notifications->item->size().width() : 1.0 /* Just in case. */));
     }
 
     updateTreeGeometry();
@@ -957,7 +950,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
 
     connect(action(QnActions::PinTreeAction), &QAction::toggled, this,
-            &QnWorkbenchUi::at_pinTreeAction_toggled);
+        &QnWorkbenchUi::at_pinTreeAction_toggled);
 }
 
 #pragma endregion Tree widget methods
@@ -1132,107 +1125,36 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 
 bool QnWorkbenchUi::isNotificationsVisible() const
 {
-    return m_notificationsVisible;
+    return m_notifications && m_notifications->isVisible();
 }
-
 
 bool QnWorkbenchUi::isNotificationsOpened() const
 {
-    return action(QnActions::ToggleNotificationsAction)->isChecked();
+    return m_notifications && m_notifications->isOpened();
 }
 
 bool QnWorkbenchUi::isNotificationsPinned() const
 {
-    return action(QnActions::PinNotificationsAction)->isChecked();
+    return m_notifications && m_notifications->isPinned();
 }
 
 void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate)
 {
-    if (!m_notificationsItem)
-        return;
-
-    ensureAnimationAllowed(animate);
-
-    m_inFreespace &= !opened;
-
-    m_notificationsShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
-
-    qreal newX = m_controlsWidgetRect.right() + (opened ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */);
-    if (animate)
-    {
-        m_notificationsXAnimator->setSpeed(qMax(1.0, m_notificationsItem->size().width() * 2.0));
-        m_notificationsXAnimator->animateTo(newX);
-    }
-    else
-    {
-        m_notificationsXAnimator->stop();
-        m_notificationsItem->setX(newX);
-    }
-
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    m_notificationsShowButton->setChecked(opened);
-
-    action(QnActions::ToggleNotificationsAction)->setChecked(opened);
-}
-
-void QnWorkbenchUi::setNotificationsShowButtonUsed(bool used)
-{
-    m_notificationsShowButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+    if (m_notifications)
+        m_notifications->setOpened(opened, animate);
 }
 
 void QnWorkbenchUi::setNotificationsVisible(bool visible, bool animate)
 {
-    ensureAnimationAllowed(animate);
-
-    if (!m_notificationsItem)
-        return;
-
-    bool changed = m_notificationsVisible != visible;
-
-    m_notificationsVisible = visible;
-
-    updateNotificationsOpacity(animate);
-    if (changed)
-        updateNotificationsGeometry();
-}
-
-void QnWorkbenchUi::setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate)
-{
-    ensureAnimationAllowed(animate);
-
-    if (!m_notificationsItem)
-        return;
-
-    if (animate)
-    {
-        m_notificationsOpacityAnimatorGroup->pause();
-        opacityAnimator(m_notificationsItem)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_notificationsPinButton)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_notificationsBackgroundItem)->setTargetValue(backgroundOpacity);
-        opacityAnimator(m_notificationsShowButton)->setTargetValue(backgroundOpacity);
-        m_notificationsOpacityAnimatorGroup->start();
-    }
-    else
-    {
-        m_notificationsOpacityAnimatorGroup->stop();
-        m_notificationsItem->setOpacity(foregroundOpacity);
-        m_notificationsPinButton->setOpacity(foregroundOpacity);
-        m_notificationsBackgroundItem->setOpacity(backgroundOpacity);
-        m_notificationsShowButton->setOpacity(backgroundOpacity);
-    }
-}
-
-void QnWorkbenchUi::updateNotificationsOpacity(bool animate)
-{
-    const qreal opacity = m_notificationsVisible ? NxUi::kOpaque : NxUi::kHidden;
-    setNotificationsOpacity(opacity, opacity, animate);
+    if (m_notifications)
+        m_notifications->setVisible(visible, animate);
 }
 
 QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
 {
     QPointF pos(
         notificationsGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_notificationsVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
+        ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
 
     const qreal maxHeight = (m_timeline.visible ? sliderGeometry.y() : m_controlsWidgetRect.bottom()) - pos.y();
 
@@ -1242,21 +1164,22 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
 
 void QnWorkbenchUi::updateNotificationsGeometry()
 {
-    if (!m_notificationsItem)
+    if (!m_notifications)
         return;
 
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(), m_titleItem->geometry(), m_timeline.item->geometry());
+    QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(), m_titleItem->geometry(), m_timeline.item->geometry());
 
     /* Always change position. */
-    m_notificationsItem->setPos(geometry.topLeft());
+    qDebug() << "updateNotificationsGeometry to" << geometry.topLeft();
+    m_notifications->item->setPos(geometry.topLeft());
 
     /* Whether actual size change should be deferred. */
     bool defer = false;
 
     /* Calculate slider target position. */
     QPointF sliderPos;
-    if (!m_timeline.visible && m_notificationsVisible)
+    if (!m_timeline.visible && isNotificationsVisible())
     {
         sliderPos = QPointF(m_timeline.item->pos().x(), m_controlsWidgetRect.bottom());
     }
@@ -1272,7 +1195,7 @@ void QnWorkbenchUi::updateNotificationsGeometry()
 
     /* Calculate title target position. */
     QPointF titlePos;
-    if ((!m_titleVisible || !m_titleUsed) && m_notificationsVisible)
+    if ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible())
     {
         titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
     }
@@ -1287,26 +1210,26 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     }
 
     /* Calculate target geometry. */
-    geometry = updatedNotificationsGeometry(m_notificationsItem->geometry(),
+    geometry = updatedNotificationsGeometry(m_notifications->item->geometry(),
         QRectF(titlePos, m_titleItem->size()),
         QRectF(sliderPos, m_timeline.item->size()));
 
-    if (qFuzzyEquals(geometry, m_notificationsItem->geometry()))
+    if (qFuzzyEquals(geometry, m_notifications->item->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
-    if (defer && geometry.height() < m_notificationsItem->size().height())
+    if (defer && geometry.height() < m_notifications->item->size().height())
         return;
 
-    m_notificationsItem->resize(geometry.size());
+    m_notifications->item->resize(geometry.size());
 
     /* All tooltips should fit to rect of maxHeight */
     QRectF tooltipsEnclosingRect(
         m_controlsWidgetRect.left(),
-        m_notificationsItem->y(),
+        m_notifications->item->y(),
         m_controlsWidgetRect.width(),
-        m_notificationsItem->geometry().height());
-    m_notificationsItem->setToolTipsEnclosingRect(m_controlsWidget->mapRectToItem(m_notificationsItem, tooltipsEnclosingRect));
+        m_notifications->item->geometry().height());
+    m_notifications->item->setToolTipsEnclosingRect(m_controlsWidget->mapRectToItem(m_notifications->item, tooltipsEnclosingRect));
 }
 
 void QnWorkbenchUi::at_pinNotificationsAction_toggled(bool checked)
@@ -1317,40 +1240,25 @@ void QnWorkbenchUi::at_pinNotificationsAction_toggled(bool checked)
     updateViewportMargins();
 }
 
-void QnWorkbenchUi::at_notificationsShowingProcessor_hoverEntered()
-{
-    if (!isNotificationsPinned() && !isNotificationsOpened())
-    {
-        setNotificationsOpened(true);
-
-        /* So that the click that may follow won't hide it. */
-        setNotificationsShowButtonUsed(false);
-        QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this, [this]() { setNotificationsShowButtonUsed(true); });
-    }
-
-    m_notificationsHidingProcessor->forceHoverEnter();
-    m_notificationsOpacityProcessor->forceHoverEnter();
-}
-
-
 void QnWorkbenchUi::at_notificationsItem_geometryChanged()
 {
-    QRectF headerGeometry = m_controlsWidget->mapRectFromItem(m_notificationsItem, m_notificationsItem->headerGeometry());
-    QRectF backgroundGeometry = m_controlsWidget->mapRectFromItem(m_notificationsItem, m_notificationsItem->visibleGeometry());
+    NX_ASSERT(m_notifications);
+    QRectF headerGeometry = m_controlsWidget->mapRectFromItem(m_notifications->item, m_notifications->item->headerGeometry());
+    QRectF backgroundGeometry = m_controlsWidget->mapRectFromItem(m_notifications->item, m_notifications->item->visibleGeometry());
 
-    QRectF paintGeometry = m_notificationsItem->geometry();
+    QRectF paintGeometry = m_notifications->item->geometry();
 
     /* Don't hide notifications item here. It will repaint itself when shown, which will
      * degrade performance. */
 
-    m_notificationsBackgroundItem->setGeometry(paintGeometry);
-    m_notificationsShowButton->setPos(QPointF(
+    m_notifications->backgroundItem->setGeometry(paintGeometry);
+    m_notifications->showButton->setPos(QPointF(
         qMin(m_controlsWidgetRect.right(), paintGeometry.left()),
-        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_notificationsShowButton->size().height()) / 2
+        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_notifications->showButton->size().height()) / 2
     ));
-    m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
-    if (isNotificationsOpened())
-        setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
+    m_notifications->pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
+//     if (isNotificationsOpened())
+//         setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 
     updateViewportMargins();
     updateFpsGeometry();
@@ -1358,97 +1266,30 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged()
 
 void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 {
-    /* Notifications panel. */
-    m_notificationsBackgroundItem = new QnControlBackgroundWidget(Qn::RightBorder, m_controlsWidget);
-    m_notificationsBackgroundItem->setFrameBorders(Qt::LeftEdge);
-
-    m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
-    m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
-    setHelpTopic(m_notificationsItem, Qn::MainWindow_Notifications_Help);
-
-    const auto toggleNotificationsAction = action(QnActions::ToggleNotificationsAction);
-    const auto pinNotificationsAction = action(QnActions::PinNotificationsAction);
-    m_notificationsPinButton = NxUi::newPinButton(m_controlsWidget, context(), pinNotificationsAction);
-    m_notificationsPinButton->setFocusProxy(m_notificationsItem);
-    connect(pinNotificationsAction, &QAction::toggled, this,
-        &QnWorkbenchUi::at_pinNotificationsAction_toggled);
-
-    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
-    context()->statisticsModule()->registerButton(lit("notifications_collection_widget_toggle"), blinker);
-
-    m_notificationsShowButton = blinker;
-    m_notificationsShowButton->setCheckable(true);
-    m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
-    m_notificationsShowButton->setProperty(Qn::NoHandScrollOver, true);
-    m_notificationsShowButton->setTransform(QTransform::fromScale(-1, 1));
-    m_notificationsShowButton->setFocusProxy(m_notificationsItem);
-    m_notificationsShowButton->stackBefore(m_notificationsItem);
-    m_notificationsShowButton->setFixedSize(QnSkin::maximumSize(m_notificationsShowButton->icon()));
-
-    setHelpTopic(m_notificationsShowButton, Qn::MainWindow_Pin_Help);
-    m_notificationsItem->setBlinker(blinker);
-
-    m_notificationsOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_notificationsOpacityProcessor->addTargetItem(m_notificationsItem);
-    m_notificationsOpacityProcessor->addTargetItem(m_notificationsShowButton);
-
-    m_notificationsHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_notificationsHidingProcessor->addTargetItem(m_notificationsItem);
-    m_notificationsHidingProcessor->addTargetItem(m_notificationsShowButton);
-    m_notificationsHidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    m_notificationsHidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
-
-    m_notificationsShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_notificationsShowingProcessor->addTargetItem(m_notificationsShowButton);
-    m_notificationsShowingProcessor->setHoverEnterDelay(NxUi::kOpenPanelTimeoutMs);
-
-    m_notificationsXAnimator = new VariantAnimator(this);
-    m_notificationsXAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_notificationsXAnimator->setTargetObject(m_notificationsItem);
-    m_notificationsXAnimator->setAccessor(new PropertyAccessor("x"));
-    m_notificationsXAnimator->setTimeLimit(500);
-
-    m_notificationsOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_notificationsOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsItem));
-    m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsBackgroundItem)); /* Speed of 1.0 is OK here. */
-    m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsShowButton));
-    m_notificationsOpacityAnimatorGroup->addAnimator(opacityAnimator(m_notificationsPinButton));
-
-    connect(m_notificationsShowButton, &QnImageButtonWidget::toggled, this,
-        [this](bool checked)
+    m_notifications = new NxUi::NotificationsWorkbenchPanel(settings, m_controlsWidget, this);
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
+        [this](bool opened)
         {
-            if (!m_ignoreClickEvent)
-                setNotificationsOpened(checked);
+            if (opened)
+                m_inFreespace = false;
         });
-    connect(m_notificationsOpacityProcessor, &HoverFocusProcessor::hoverLeft, this,
-        &QnWorkbenchUi::updateNotificationsOpacityAnimated);
-    connect(m_notificationsOpacityProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::updateNotificationsOpacityAnimated);
-    connect(m_notificationsOpacityProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_notificationsOpacityProcessor, &HoverFocusProcessor::hoverLeft, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_notificationsHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
-        [this]
-        {
-            if (!isNotificationsPinned())
-                setNotificationsOpened(false);
-        });
-    connect(m_notificationsShowingProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::at_notificationsShowingProcessor_hoverEntered);
-    connect(m_notificationsItem, &QGraphicsWidget::geometryChanged, this,
-        &QnWorkbenchUi::at_notificationsItem_geometryChanged);
-    connect(m_notificationsItem, &QnNotificationsCollectionWidget::visibleSizeChanged, this,
-        &QnWorkbenchUi::at_notificationsItem_geometryChanged);
-    connect(m_notificationsItem, &QnNotificationsCollectionWidget::sizeHintChanged, this,
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
         &QnWorkbenchUi::updateNotificationsGeometry);
 
-    toggleNotificationsAction->setChecked(settings.state == Qn::PaneState::Opened);
-    pinNotificationsAction->setChecked(settings.state != Qn::PaneState::Unpinned);
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
+        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
+        &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    /* Create a shadow: */
-    new QnEdgeShadowWidget(m_notificationsItem, Qt::LeftEdge, NxUi::kShadowThickness);
+    connect(action(QnActions::PinNotificationsAction), &QAction::toggled, this,
+        &QnWorkbenchUi::at_pinNotificationsAction_toggled);
+
+    connect(m_notifications->item, &QGraphicsWidget::geometryChanged, this,
+        &QnWorkbenchUi::at_notificationsItem_geometryChanged);
+    connect(m_notifications->item, &QnNotificationsCollectionWidget::visibleSizeChanged, this,
+        &QnWorkbenchUi::at_notificationsItem_geometryChanged);
+    connect(m_notifications->item, &QnNotificationsCollectionWidget::sizeHintChanged, this,
+        &QnWorkbenchUi::updateNotificationsGeometry);
 }
 
 #pragma endregion Notifications widget methods
@@ -2424,8 +2265,8 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible)
 
 void QnWorkbenchUi::updateFpsGeometry()
 {
-    qreal right = m_notificationsBackgroundItem
-        ? m_notificationsBackgroundItem->geometry().left()
+    qreal right = m_notifications
+        ? m_notifications->backgroundItem->geometry().left()
         : m_controlsWidgetRect.right();
 
     QPointF pos = QPointF(

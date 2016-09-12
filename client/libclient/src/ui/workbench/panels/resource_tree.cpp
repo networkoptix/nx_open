@@ -25,7 +25,7 @@ namespace {
 static const int kShowAnimationDurationMs = 300;
 static const int kHideAnimationDurationMs = 200;
 
-enum TreeZOrder
+enum ZOrder
 {
     BackgroundItem,
     Item,
@@ -42,7 +42,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     QGraphicsWidget* parentWidget,
     QObject* parent)
     :
-    base_type(parent),
+    base_type(settings, parentWidget, parent),
     widget(new QnResourceBrowserWidget(nullptr, context())),
     resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
     item(new QnMaskedProxyWidget(parentWidget)),
@@ -51,7 +51,6 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     pinButton(newPinButton(parentWidget, context(), action(QnActions::PinTreeAction))),
     xAnimator(new VariantAnimator(widget)),
 
-    m_parentWidget(parentWidget),
     m_ignoreClickEvent(false),
     m_ignoreResizerGeometryChanges(false),
     m_updateResizerGeometryLater(false),
@@ -61,8 +60,6 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityAnimatorGroup(new AnimatorGroup(widget))
 {
-    NX_ASSERT(m_parentWidget);
-
     widget->setAttribute(Qt::WA_TranslucentBackground);
     connect(widget, &QnResourceBrowserWidget::selectionChanged,
         action(QnActions::SelectionChangeAction), &QAction::trigger);
@@ -73,7 +70,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     setPaletteColor(widget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
 
     backgroundItem->setFrameBorders(Qt::RightEdge);
-    backgroundItem->setZValue(TreeZOrder::BackgroundItem);
+    backgroundItem->setZValue(ZOrder::BackgroundItem);
 
     item->setWidget(widget);
     widget->installEventFilter(item);
@@ -81,20 +78,26 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     item->setFocusPolicy(Qt::StrongFocus);
     item->setProperty(Qn::NoHandScrollOver, true);
     item->resize(settings.span, 0.0);
-    item->setZValue(TreeZOrder::Item);
+    item->setZValue(ZOrder::Item);
 
     action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     showButton->setFocusProxy(item);
-    showButton->setZValue(TreeZOrder::Controls);
+    showButton->setZValue(ZOrder::Controls);
+    connect(action(QnActions::ToggleTreeAction), &QAction::toggled, this,
+        [this](bool checked)
+        {
+            if (!m_ignoreClickEvent)
+                setOpened(checked, true);
+        });
 
     action(QnActions::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     pinButton->setFocusProxy(item);
-    pinButton->setZValue(TreeZOrder::Controls);
+    pinButton->setZValue(ZOrder::Controls);
 
     resizerWidget->setProperty(Qn::NoHandScrollOver, true);
     connect(resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged, Qt::QueuedConnection);
-    resizerWidget->setZValue(TreeZOrder::Resizer);
+    resizerWidget->setZValue(ZOrder::Resizer);
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(showButton);
@@ -136,13 +139,6 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
 
     /* Create a shadow: */
     new QnEdgeShadowWidget(item, Qt::RightEdge, NxUi::kShadowThickness);
-
-    connect(action(QnActions::ToggleTreeAction), &QAction::toggled, this,
-        [this](bool checked)
-        {
-            if (!m_ignoreClickEvent)
-                setOpened(checked, true);
-        });
 }
 
 bool ResourceTreeWorkbenchPanel::isPinned() const

@@ -2,45 +2,31 @@
 
 #include <ui/workbench/panels/abstract_workbench_panel.h>
 
-class QnResourceBrowserWidget;
-class QnResizerWidget;
-class QnMaskedProxyWidget;
 class QnControlBackgroundWidget;
+class QnNotificationsCollectionWidget;
 class QnImageButtonWidget;
+class QnBlinkingImageButtonWidget;
 class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
 
 namespace NxUi {
 
-class ResourceTreeWorkbenchPanel: public AbstractWorkbenchPanel
+class NotificationsWorkbenchPanel: public AbstractWorkbenchPanel
 {
     using base_type = AbstractWorkbenchPanel;
 
     Q_OBJECT
 public:
-    ResourceTreeWorkbenchPanel(
+    NotificationsWorkbenchPanel(
         const QnPaneSettings& settings,
         QGraphicsWidget* parentWidget,
         QObject* parent = nullptr);
 
-    /** Navigation tree widget. */
-    QnResourceBrowserWidget* widget;
-    QnResizerWidget* resizerWidget;
-
-    /** Proxy widget for navigation tree widget. */
-    QnMaskedProxyWidget* item;
-
-    /** Item that provides background for the tree. */
     QnControlBackgroundWidget* backgroundItem;
-
-    /** Button to show/hide the tree. */
-    QnImageButtonWidget* showButton;
-
-    /** Button to pin the tree. */
+    QnNotificationsCollectionWidget* item;
     QnImageButtonWidget* pinButton;
-
-    /** Animator for tree's position. */
+    QnBlinkingImageButtonWidget* showButton;
     VariantAnimator* xAnimator;
 
 public:
@@ -57,22 +43,15 @@ public:
 
     virtual bool isHovered() const override;
 
-    void updateResizerGeometry();
-
-protected:
-    void setProxyUpdatesEnabled(bool updatesEnabled) override;
-
 private:
     void setShowButtonUsed(bool used);
 
 private:
-    void at_resizerWidget_geometryChanged();
     void at_showingProcessor_hoverEntered();
 
 private:
+    QGraphicsWidget* m_parentWidget;
     bool m_ignoreClickEvent;
-    bool m_ignoreResizerGeometryChanges;
-    bool m_updateResizerGeometryLater;
     bool m_visible;
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */

@@ -5,6 +5,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -42,10 +43,10 @@ QnImageButtonWidget* newActionButton(QGraphicsItem *parent, QnWorkbenchContext* 
     return button;
 }
 
-QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context,
-    QAction* action)
+template<class T>
+T* newCustomShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context, QAction* action)
 {
-    QnImageButtonWidget* button = new QnImageButtonWidget(parent);
+    auto button = new T(parent);
     context->statisticsModule()->registerButton(aliasFromAction(action), button);
 
     if (action)
@@ -60,6 +61,17 @@ QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QnWorkbenchContext
 
     setHelpTopic(button, Qn::MainWindow_Pin_Help);
     return button;
+}
+
+QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context,
+    QAction* action)
+{
+    return newCustomShowHideButton<QnImageButtonWidget>(parent, context, action);
+}
+
+QnBlinkingImageButtonWidget* newBlinkingShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context, QAction* action)
+{
+    return newCustomShowHideButton<QnBlinkingImageButtonWidget>(parent, context, action);
 }
 
 QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QnWorkbenchContext* context,

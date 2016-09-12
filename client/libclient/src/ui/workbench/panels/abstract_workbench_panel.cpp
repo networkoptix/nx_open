@@ -9,20 +9,36 @@
 
 namespace NxUi {
 
-AbstractWorkbenchPanel::AbstractWorkbenchPanel(QObject* parent):
+AbstractWorkbenchPanel::AbstractWorkbenchPanel(
+    const QnPaneSettings& /*settings*/, /*< Possibly will be used later. */
+    QGraphicsWidget* parentWidget,
+    QObject* parent)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_parentWidget(parentWidget)
 {
+    NX_ASSERT(m_parentWidget);
+
     connect(display(), &QnWorkbenchDisplay::viewportGrabbed, this,
         [this]
-        {
-            setProxyUpdatesEnabled(false);
-        });
+    {
+        setProxyUpdatesEnabled(false);
+    });
+
     connect(display(), &QnWorkbenchDisplay::viewportUngrabbed, this,
         [this]
+    {
+        setProxyUpdatesEnabled(true);
+    });
+
+    connect(m_parentWidget, &QGraphicsWidget::geometryChanged, this,
+        [this]
         {
-            setProxyUpdatesEnabled(true);
+            QRectF rect = m_parentWidget->rect();
+            m_parentWidgetRect = rect;
         });
+    m_parentWidgetRect = m_parentWidget->rect();
 }
 
 void AbstractWorkbenchPanel::updateOpacity(bool animate)
@@ -42,8 +58,9 @@ AnimationTimer* AbstractWorkbenchPanel::animationTimer() const
     return display()->instrumentManager()->animationTimer();
 }
 
-void AbstractWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)
+void AbstractWorkbenchPanel::setProxyUpdatesEnabled(bool /* updatesEnabled */ )
 {
+    /* This method may be overridden in panels to disable and enable masked widgets. */
 }
 
 } //namespace NxUi
