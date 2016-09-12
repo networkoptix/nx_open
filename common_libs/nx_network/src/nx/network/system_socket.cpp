@@ -755,7 +755,7 @@ int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int 
 
         bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags & ~MSG_DONTWAIT);
 
-        if (!setNonBlockingMode(&value))
+        if (!setNonBlockingMode(value))
             return -1;
     }
     else

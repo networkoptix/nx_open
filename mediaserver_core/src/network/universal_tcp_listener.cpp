@@ -96,9 +96,6 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         return nullptr;
     }
 
-    //auto sslServerSocket = std::make_unique<nx::network::SslServerSocket>(
-    //    tcpServerSocket.release(), true );
-
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
     if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
         return nullptr;
@@ -120,11 +117,10 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     if (m_boundToCloud)
         updateCloudConnectState(&lk);
 
-
     #ifdef ENABLE_SSL
-        m_serverSocket.reset( new nx::network::SslServerSocket( m_serverSocket.release(), true ) );
+        if (sslNeeded)
+            m_serverSocket.reset(new nx::network::SslServerSocket(m_serverSocket.release(), true));
     #endif
-
 
    return m_serverSocket.get();
 }

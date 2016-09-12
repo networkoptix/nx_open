@@ -404,9 +404,8 @@ TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
         }
 
         constexpr const auto responseWaitDelay = std::chrono::seconds(2);
-
-        ASSERT_TRUE(responseQueue.pop(responseWaitDelay));
-        ASSERT_TRUE(responseQueue.pop(responseWaitDelay));
+        ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
+        ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
     }
 }
 
