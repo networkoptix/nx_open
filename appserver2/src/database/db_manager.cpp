@@ -3432,8 +3432,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
             cu.motion_type as motionType,                      \
             cu.secondary_quality as secondaryStreamQuality,    \
             cu.dewarping_params as dewarpingParams,            \
-            cu.min_archive_days as minArchiveDays,             \
-            cu.max_archive_days as maxArchiveDays,             \
+            ifnull(nullif(cu.min_archive_days, 0), %1) as minArchiveDays,             \
+            ifnull(nullif(cu.max_archive_days, 0), %2) as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
             cu.license_used as licenseUsed,                    \
             cu.failover_priority as failoverPriority,          \
@@ -3443,7 +3443,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
         JOIN vms_camera c on c.resource_ptr_id = r.id \
         LEFT JOIN vms_camera_user_attributes cu on cu.camera_guid = r.guid \
         ORDER BY r.guid \
-    "));
+    ").arg(-ec2::kDefaultMinArchiveDays)
+      .arg(-ec2::kDefaultMaxArchiveDays));
 
     if (!queryCameras.exec()) {
         NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
