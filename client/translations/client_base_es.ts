@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -2017,6 +2017,13 @@ para ver los marcadores</translation>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation>Cargando ...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
@@ -2930,10 +2937,10 @@ para ver los marcadores</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>y %1 usuario(s) más...</numerusform>
-            <numerusform>y %1 usuarios más...</numerusform>
+            <numerusform>y %n usuario más...</numerusform>
+            <numerusform>y %n usuarios más...</numerusform>
         </translation>
     </message>
 </context>
@@ -2985,40 +2992,30 @@ para ver los marcadores</translation>
         <source>days</source>
         <translation>dias</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation>
-            <numerusform>%nms</numerusform>
-            <numerusform>%nms</numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation>
-            <numerusform>%ns</numerusform>
-            <numerusform>%ns</numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>s</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation>
-            <numerusform>%nm</numerusform>
-            <numerusform>%nm</numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>m</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation>
-            <numerusform>%nh</numerusform>
-            <numerusform>%nh</numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>h</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation>
-            <numerusform>%nd</numerusform>
-            <numerusform>%nd</numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>d</translation>
     </message>
 </context>
 <context>
