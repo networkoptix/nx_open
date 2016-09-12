@@ -72,6 +72,13 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     action(QnActions::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     pinButton->setFocusProxy(item);
     pinButton->setZValue(ZOrder::Controls);
+    connect(action(QnActions::PinNotificationsAction), &QAction::toggled, this,
+        [this](bool checked)
+        {
+            if (checked)
+                setOpened(true);
+            emit geometryChanged();
+        });
 
     action(QnActions::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
     showButton->setTransform(QTransform::fromScale(-1, 1));

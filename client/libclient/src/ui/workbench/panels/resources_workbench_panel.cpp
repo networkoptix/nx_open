@@ -44,17 +44,17 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     :
     base_type(settings, parentWidget, parent),
     widget(new QnResourceBrowserWidget(nullptr, context())),
-    resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
     item(new QnMaskedProxyWidget(parentWidget)),
-    backgroundItem(new QnControlBackgroundWidget(Qn::LeftBorder, parentWidget)),
-    showButton(newShowHideButton(parentWidget, context(), action(QnActions::ToggleTreeAction))),
-    pinButton(newPinButton(parentWidget, context(), action(QnActions::PinTreeAction))),
     xAnimator(new VariantAnimator(widget)),
 
     m_ignoreClickEvent(false),
     m_ignoreResizerGeometryChanges(false),
     m_updateResizerGeometryLater(false),
     m_visible(false),
+    m_resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
+    m_backgroundItem(new QnControlBackgroundWidget(Qn::LeftBorder, parentWidget)),
+    m_showButton(newShowHideButton(parentWidget, context(), action(QnActions::ToggleTreeAction))),
+    m_pinButton(newPinButton(parentWidget, context(), action(QnActions::PinTreeAction))),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -69,8 +69,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     setPaletteColor(widget, QPalette::Base, Qt::transparent);
     setPaletteColor(widget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
 
-    backgroundItem->setFrameBorders(Qt::RightEdge);
-    backgroundItem->setZValue(ZOrder::BackgroundItem);
+    m_backgroundItem->setFrameBorders(Qt::RightEdge);
+    m_backgroundItem->setZValue(ZOrder::BackgroundItem);
 
     item->setWidget(widget);
     widget->installEventFilter(item);
@@ -79,10 +79,14 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     item->setProperty(Qn::NoHandScrollOver, true);
     item->resize(settings.span, 0.0);
     item->setZValue(ZOrder::Item);
+    connect(item, &QnMaskedProxyWidget::paintRectChanged, this,
+        &ResourceTreeWorkbenchPanel::at_paintGeometryChanged);
+    connect(item, &QGraphicsWidget::geometryChanged, this,
+        &ResourceTreeWorkbenchPanel::at_paintGeometryChanged);
 
     action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
-    showButton->setFocusProxy(item);
-    showButton->setZValue(ZOrder::Controls);
+    m_showButton->setFocusProxy(item);
+    m_showButton->setZValue(ZOrder::Controls);
     connect(action(QnActions::ToggleTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -91,24 +95,31 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
         });
 
     action(QnActions::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
-    pinButton->setFocusProxy(item);
-    pinButton->setZValue(ZOrder::Controls);
+    m_pinButton->setFocusProxy(item);
+    m_pinButton->setZValue(ZOrder::Controls);
+    connect(action(QnActions::PinTreeAction), &QAction::toggled, this,
+        [this](bool checked)
+        {
+            if (checked)
+                setOpened(true);
+            emit geometryChanged();
+        });
 
-    resizerWidget->setProperty(Qn::NoHandScrollOver, true);
-    connect(resizerWidget, &QGraphicsWidget::geometryChanged, this,
+    m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
+    connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged, Qt::QueuedConnection);
-    resizerWidget->setZValue(ZOrder::Resizer);
+    m_resizerWidget->setZValue(ZOrder::Resizer);
 
     m_opacityProcessor->addTargetItem(item);
-    m_opacityProcessor->addTargetItem(showButton);
+    m_opacityProcessor->addTargetItem(m_showButton);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &AbstractWorkbenchPanel::hoverEntered);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &AbstractWorkbenchPanel::hoverLeft);
 
     m_hidingProcessor->addTargetItem(item);
-    m_hidingProcessor->addTargetItem(showButton);
-    m_hidingProcessor->addTargetItem(resizerWidget);
+    m_hidingProcessor->addTargetItem(m_showButton);
+    m_hidingProcessor->addTargetItem(m_resizerWidget);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
     connect(menu(), &QnActionManager::menuAboutToHide, m_hidingProcessor,
@@ -121,7 +132,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
                 setOpened(false);
         });
 
-    m_showingProcessor->addTargetItem(showButton);
+    m_showingProcessor->addTargetItem(m_showButton);
     m_showingProcessor->setHoverEnterDelay(NxUi::kOpenPanelTimeoutMs);
     connect(m_showingProcessor, &HoverFocusProcessor::hoverEntered, this,
         &ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered);
@@ -133,9 +144,9 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
 
     m_opacityAnimatorGroup->setTimer(animationTimer());
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(backgroundItem)); /* Speed of 1.0 is OK here. */
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(showButton));
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(pinButton));
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_backgroundItem)); /* Speed of 1.0 is OK here. */
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
 
     /* Create a shadow: */
     new QnEdgeShadowWidget(item, Qt::RightEdge, NxUi::kShadowThickness);
@@ -178,7 +189,7 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
     else
         item->setX(newX);
 
-    resizerWidget->setEnabled(opened);
+    m_resizerWidget->setEnabled(opened);
     emit openedChanged(opened);
 }
 
@@ -213,21 +224,21 @@ void ResourceTreeWorkbenchPanel::setOpacity(qreal opacity, bool animate)
     {
         m_opacityAnimatorGroup->pause();
         opacityAnimator(item)->setTargetValue(opacity);
-        opacityAnimator(pinButton)->setTargetValue(opacity);
-        opacityAnimator(backgroundItem)->setTargetValue(opacity);
-        opacityAnimator(showButton)->setTargetValue(opacity);
+        opacityAnimator(m_pinButton)->setTargetValue(opacity);
+        opacityAnimator(m_backgroundItem)->setTargetValue(opacity);
+        opacityAnimator(m_showButton)->setTargetValue(opacity);
         m_opacityAnimatorGroup->start();
     }
     else
     {
         m_opacityAnimatorGroup->stop();
         item->setOpacity(opacity);
-        pinButton->setOpacity(opacity);
-        backgroundItem->setOpacity(opacity);
-        showButton->setOpacity(opacity);
+        m_pinButton->setOpacity(opacity);
+        m_backgroundItem->setOpacity(opacity);
+        m_showButton->setOpacity(opacity);
     }
 
-    resizerWidget->setVisible(!qFuzzyIsNull(opacity));
+    m_resizerWidget->setVisible(!qFuzzyIsNull(opacity));
 }
 
 bool ResourceTreeWorkbenchPanel::isHovered() const
@@ -252,14 +263,14 @@ void ResourceTreeWorkbenchPanel::updateResizerGeometry()
     treeResizerGeometry.moveTo(treeResizerGeometry.topRight());
     treeResizerGeometry.setWidth(8);
 
-    if (!qFuzzyEquals(treeResizerGeometry, resizerWidget->geometry()))
+    if (!qFuzzyEquals(treeResizerGeometry, m_resizerWidget->geometry()))
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updateResizerGeometryLater, true);
 
-        resizerWidget->setGeometry(treeResizerGeometry);
+        m_resizerWidget->setGeometry(treeResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        resizerWidget->setPos(treeResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
+        m_resizerWidget->setPos(treeResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
 }
 
@@ -271,7 +282,7 @@ void ResourceTreeWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)
 
 void ResourceTreeWorkbenchPanel::setShowButtonUsed(bool used)
 {
-    showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+    m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
 void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
@@ -279,7 +290,7 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
     if (m_ignoreResizerGeometryChanges)
         return;
 
-    QRectF resizerGeometry = resizerWidget->geometry();
+    QRectF resizerGeometry = m_resizerWidget->geometry();
     if (!resizerGeometry.isValid())
     {
         updateResizerGeometry();
@@ -288,7 +299,7 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
 
     QRectF treeGeometry = item->geometry();
 
-    qreal targetWidth = resizerWidget->geometry().left() - treeGeometry.left();
+    qreal targetWidth = m_resizerWidget->geometry().left() - treeGeometry.left();
     qreal minWidth = item->effectiveSizeHint(Qt::MinimumSize).width();
 
     //TODO #vkutin Think how to do it differently.
@@ -327,6 +338,27 @@ void ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered()
 
     m_hidingProcessor->forceHoverEnter();
     m_opacityProcessor->forceHoverEnter();
+}
+
+void ResourceTreeWorkbenchPanel::at_paintGeometryChanged()
+{
+    QRectF paintGeometry = item->paintGeometry();
+
+    /* Don't hide tree item here. It will repaint itself when shown, which will
+    * degrade performance. */
+
+    m_backgroundItem->setGeometry(paintGeometry);
+
+    m_showButton->setPos(QPointF(
+        qMax(m_parentWidgetRect.left(), paintGeometry.right()),
+        (m_parentWidgetRect.top() + m_parentWidgetRect.bottom() - m_showButton->size().height())
+            / 2.0));
+
+    m_pinButton->setPos(QPointF(
+        paintGeometry.right() - m_pinButton->size().width() - 1.0,
+        paintGeometry.top() + 1.0));
+
+    updateResizerGeometry();
 }
 
 }

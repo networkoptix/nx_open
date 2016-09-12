@@ -26,19 +26,9 @@ public:
 
     /** Navigation tree widget. */
     QnResourceBrowserWidget* widget;
-    QnResizerWidget* resizerWidget;
 
     /** Proxy widget for navigation tree widget. */
     QnMaskedProxyWidget* item;
-
-    /** Item that provides background for the tree. */
-    QnControlBackgroundWidget* backgroundItem;
-
-    /** Button to show/hide the tree. */
-    QnImageButtonWidget* showButton;
-
-    /** Button to pin the tree. */
-    QnImageButtonWidget* pinButton;
 
     /** Animator for tree's position. */
     VariantAnimator* xAnimator;
@@ -57,23 +47,34 @@ public:
 
     virtual bool isHovered() const override;
 
-    void updateResizerGeometry();
-
 protected:
     void setProxyUpdatesEnabled(bool updatesEnabled) override;
 
 private:
     void setShowButtonUsed(bool used);
+    void updateResizerGeometry();
 
 private:
     void at_resizerWidget_geometryChanged();
     void at_showingProcessor_hoverEntered();
+    void at_paintGeometryChanged();
 
 private:
     bool m_ignoreClickEvent;
     bool m_ignoreResizerGeometryChanges;
     bool m_updateResizerGeometryLater;
     bool m_visible;
+
+    QnResizerWidget* m_resizerWidget;
+
+    /** Item that provides background for the tree. */
+    QnControlBackgroundWidget* m_backgroundItem;
+
+    /** Button to show/hide the tree. */
+    QnImageButtonWidget* m_showButton;
+
+    /** Button to pin the tree. */
+    QnImageButtonWidget* m_pinButton;
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
     HoverFocusProcessor* m_hidingProcessor;

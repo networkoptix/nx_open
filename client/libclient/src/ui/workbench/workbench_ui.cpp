@@ -893,39 +893,6 @@ void QnWorkbenchUi::updateTreeGeometry()
     m_tree->item->resize(geometry.size());
 }
 
-void QnWorkbenchUi::at_treeItem_paintGeometryChanged()
-{
-    NX_ASSERT(m_tree);
-    if (!m_tree)
-        return;
-
-    QRectF paintGeometry = m_tree->item->paintGeometry();
-
-    /* Don't hide tree item here. It will repaint itself when shown, which will
-     * degrade performance. */
-
-    m_tree->backgroundItem->setGeometry(paintGeometry);
-
-    m_tree->showButton->setPos(QPointF(
-        qMax(m_controlsWidgetRect.left(), paintGeometry.right()),
-        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_tree->showButton->size().height()) / 2.0));
-
-    m_tree->pinButton->setPos(QPointF(
-        paintGeometry.right() - m_tree->pinButton->size().width() - 1.0,
-        paintGeometry.top() + 1.0));
-
-    m_tree->updateResizerGeometry();
-    updateViewportMargins();
-}
-
-void QnWorkbenchUi::at_pinTreeAction_toggled(bool checked)
-{
-    if (checked)
-        setTreeOpened(true);
-
-    updateViewportMargins();
-}
-
 void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
 {
     m_tree = new NxUi::ResourceTreeWorkbenchPanel(settings, m_controlsWidget, this);
@@ -944,13 +911,9 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(m_tree->item, &QnMaskedProxyWidget::paintRectChanged, this,
-        &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
-    connect(m_tree->item, &QGraphicsWidget::geometryChanged, this,
-        &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
+    connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateViewportMargins);
 
-    connect(action(QnActions::PinTreeAction), &QAction::toggled, this,
-        &QnWorkbenchUi::at_pinTreeAction_toggled);
 }
 
 #pragma endregion Tree widget methods
@@ -1232,14 +1195,6 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     m_notifications->item->setToolTipsEnclosingRect(m_controlsWidget->mapRectToItem(m_notifications->item, tooltipsEnclosingRect));
 }
 
-void QnWorkbenchUi::at_pinNotificationsAction_toggled(bool checked)
-{
-    if (checked)
-        setNotificationsOpened(true);
-
-    updateViewportMargins();
-}
-
 void QnWorkbenchUi::at_notificationsItem_geometryChanged()
 {
     NX_ASSERT(m_notifications);
@@ -1257,8 +1212,6 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged()
         (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_notifications->showButton->size().height()) / 2
     ));
     m_notifications->pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
-//     if (isNotificationsOpened())
-//         setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 
     updateViewportMargins();
     updateFpsGeometry();
@@ -1281,15 +1234,15 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(action(QnActions::PinNotificationsAction), &QAction::toggled, this,
-        &QnWorkbenchUi::at_pinNotificationsAction_toggled);
-
     connect(m_notifications->item, &QGraphicsWidget::geometryChanged, this,
         &QnWorkbenchUi::at_notificationsItem_geometryChanged);
     connect(m_notifications->item, &QnNotificationsCollectionWidget::visibleSizeChanged, this,
         &QnWorkbenchUi::at_notificationsItem_geometryChanged);
     connect(m_notifications->item, &QnNotificationsCollectionWidget::sizeHintChanged, this,
         &QnWorkbenchUi::updateNotificationsGeometry);
+
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateViewportMargins);
 }
 
 #pragma endregion Notifications widget methods

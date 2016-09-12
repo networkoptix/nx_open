@@ -233,11 +233,6 @@ private slots:
     void at_sliderItem_geometryChanged();
     void at_sliderResizerWidget_geometryChanged();
 
-    void at_treeItem_paintGeometryChanged();
-
-    void at_pinTreeAction_toggled(bool checked);
-    void at_pinNotificationsAction_toggled(bool checked);
-
     void at_titleItem_geometryChanged();
 
     void at_notificationsItem_geometryChanged();

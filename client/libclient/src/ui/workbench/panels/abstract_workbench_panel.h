@@ -40,6 +40,8 @@ signals:
     void hoverEntered();
     void hoverLeft();
 
+    void geometryChanged();
+
 protected:
     /** Make sure animation is allowed, set animate to false otherwise. */
     void ensureAnimationAllowed(bool* animate);
