@@ -560,8 +560,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                 const auto pysicalDpi = screen->physicalDotsPerInch();
                 const auto logicalDpi = screen->logicalDotsPerInch();
                 const auto dpiAspect = (qFuzzyIsNull(pysicalDpi) ? 1 : logicalDpi / pysicalDpi);
-                const auto targetRatio = std::max(dpiAspect,
-                    screen->devicePixelRatio() * devicePixelCustomAspect);
+                const auto targetRatio = std::max(dpiAspect, screen->devicePixelRatio());
 
                 if ((targetRatio > kMinHiDpiRatio)
                     || (pysicalDpi > kMinHiDpi)
