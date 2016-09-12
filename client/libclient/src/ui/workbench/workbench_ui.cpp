@@ -104,7 +104,7 @@
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
 #include "workbench_pane_settings.h"
-#include <ui/workbench/panels/resource_tree.h>
+#include <ui/workbench/panels/resources_workbench_panel.h>
 #include <ui/workbench/panels/notifications_workbench_panel.h>
 
 #include <nx/fusion/model_functions.h>

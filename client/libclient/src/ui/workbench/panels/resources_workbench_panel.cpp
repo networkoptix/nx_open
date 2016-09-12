@@ -1,4 +1,4 @@
-#include "resource_tree.h"
+#include "resources_workbench_panel.h"
 
 #include <ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
