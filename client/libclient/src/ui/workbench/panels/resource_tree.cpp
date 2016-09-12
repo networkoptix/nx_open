@@ -25,6 +25,14 @@ namespace {
 static const int kShowAnimationDurationMs = 300;
 static const int kHideAnimationDurationMs = 200;
 
+enum TreeZOrder
+{
+    BackgroundItem,
+    Item,
+    Resizer,
+    Controls
+};
+
 }
 
 namespace NxUi {
@@ -63,6 +71,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     setPaletteColor(widget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
 
     backgroundItem->setFrameBorders(Qt::RightEdge);
+    backgroundItem->setZValue(TreeZOrder::BackgroundItem);
 
     item->setWidget(widget);
     widget->installEventFilter(item);
@@ -70,18 +79,20 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     item->setFocusPolicy(Qt::StrongFocus);
     item->setProperty(Qn::NoHandScrollOver, true);
     item->resize(settings.span, 0.0);
+    item->setZValue(TreeZOrder::Item);
 
     action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     showButton->setFocusProxy(item);
-    showButton->stackBefore(item);
+    showButton->setZValue(TreeZOrder::Controls);
 
     action(QnActions::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     pinButton->setFocusProxy(item);
+    pinButton->setZValue(TreeZOrder::Controls);
 
     resizerWidget->setProperty(Qn::NoHandScrollOver, true);
-    resizerWidget->stackBefore(showButton);
     connect(resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged, Qt::QueuedConnection);
+    resizerWidget->setZValue(TreeZOrder::Resizer);
 
     opacityProcessor->addTargetItem(item);
     opacityProcessor->addTargetItem(showButton);
