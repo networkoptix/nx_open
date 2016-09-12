@@ -10,7 +10,7 @@
 module.exports = function (grunt) {
 
     //var proxy_server_host = '10.1.5.105';  //la_office_test - Burbank
-    var proxy_server_host = '10.1.5.139';  //Parallels - Burbank
+    var proxy_server_host = '10.1.5.107';  //Parallels - Burbank
     var proxy_server_port = 7001;
 
     var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
