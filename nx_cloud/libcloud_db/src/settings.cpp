@@ -28,6 +28,10 @@ namespace
 #endif
     const QLatin1String kLogDir( "log/logDir" );
 
+    const QLatin1String kSyncLogLevel("syncroLog/logLevel");
+    const QLatin1String kDefaultSyncLogLevel("DEBUG2");
+    const QLatin1String kSyncLogDir("syncroLog/logDir");
+
     const QLatin1String kEndpointsToListen( "listenOn" );
     const QLatin1String kDefaultEndpointsToListen( "0.0.0.0:3346" );
 
@@ -154,6 +158,11 @@ const Logging& Settings::logging() const
     return m_logging;
 }
 
+const Logging& Settings::vmsSynchronizationLogging() const
+{
+    return m_vmsSynchronizationLogging;
+}
+
 const db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
@@ -245,8 +254,11 @@ void Settings::loadConfiguration()
     using namespace std::chrono;
 
     //log
-    m_logging.logLevel = m_settings.value( kLogLevel, kDefaultLogLevel ).toString();
-    m_logging.logDir = m_settings.value( kLogDir, dataDir() + lit( "/log/" ) ).toString();
+    m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
+    m_logging.logDir = m_settings.value(kLogDir, dataDir() + lit("/log/")).toString();
+
+    m_vmsSynchronizationLogging.logLevel = m_settings.value(kSyncLogLevel, kDefaultSyncLogLevel).toString();
+    m_vmsSynchronizationLogging.logDir = m_settings.value(kSyncLogDir, dataDir() + lit("/log/")).toString();
 
     //DB
     m_dbConnectionOptions.driverName = m_settings.value( kDbDriverName, kDefaultDbDriverName ).toString();

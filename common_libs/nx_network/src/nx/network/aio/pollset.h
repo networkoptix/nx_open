@@ -21,6 +21,7 @@ namespace aio {
     class PollSetImpl;
     class ConstIteratorImplOld;
 
+    /** NOTE: Do not wait more than a second for posted calls in case of interupt failure. */
     static const int INFINITE_TIMEOUT = -1;
 
     //!Allows to wait for state change on mutiple sockets

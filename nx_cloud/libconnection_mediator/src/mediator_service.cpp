@@ -113,6 +113,7 @@ int MediatorProcess::executeApplication()
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator(
+        settings,
         cloudDataProvider.get(),
         &stunMessageDispatcher,
         &listeningPeerPool);

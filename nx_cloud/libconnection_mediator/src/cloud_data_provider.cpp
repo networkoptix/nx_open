@@ -181,8 +181,9 @@ void CloudDataProvider::updateSystemsAsync()
 
         QnMutexLocker lk( &m_mutex );
         if( !m_isTerminated )
-            m_timerGuard = nx::utils::TimerManager::instance()->addTimer(
-                [ this ]( quint64 ) { updateSystemsAsync(); }, m_updateInterval );
+            m_timerGuard = 
+                nx::utils::TimerManager::instance()->addTimerEx(
+                    [ this ]( quint64 ) { updateSystemsAsync(); }, m_updateInterval );
     } );
 }
 

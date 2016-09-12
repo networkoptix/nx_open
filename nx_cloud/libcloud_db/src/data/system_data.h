@@ -91,6 +91,8 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
+#define SystemSharing_FieldsEx SystemSharing_Fields (vmsUserId)
+
 class SystemSharingList
 :
     public stree::AbstractResourceReader

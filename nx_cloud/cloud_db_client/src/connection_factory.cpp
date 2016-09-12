@@ -42,7 +42,7 @@ std::unique_ptr<api::Connection> ConnectionFactory::createConnection()
 
 std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
     const std::string& username,
-    const std::string password)
+    const std::string& password)
 {
     auto connection = createConnection();
     connection->setCredentials(username, password);
@@ -56,7 +56,7 @@ std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection()
 
 std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection(
     const std::string& username,
-    const std::string password)
+    const std::string& password)
 {
     auto connection = createEventConnection();
     connection->setCredentials(username, password);

@@ -8,8 +8,6 @@
 
 #include "abstract_msg_body_source.h"
 
-#include "nx/network/aio/timer.h"
-
 
 namespace nx_http
 {
@@ -21,15 +19,9 @@ namespace nx_http
         BufferSource(
             StringType mimeType,
             BufferType msgBody);
+        ~BufferSource();
 
-        virtual void pleaseStop(
-            nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-
-        virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
-        virtual void bindToAioThread(
-            nx::network::aio::AbstractAioThread* aioThread) override;
-        virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-        virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+        virtual void stopWhileInAioThread() override;
 
         //!Implementation of AbstractMsgBodySource::mimeType
         virtual StringType mimeType() const override;
@@ -44,7 +36,6 @@ namespace nx_http
     private:
         const StringType m_mimeType;
         BufferType m_msgBody;
-        nx::network::aio::Timer m_aioBinder;
     };
 }
 

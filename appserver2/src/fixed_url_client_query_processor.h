@@ -33,15 +33,15 @@ namespace ec2
         {
         }
 
-        template<class QueryDataType, class HandlerType>
-            void processUpdateAsync( const QnTransaction<QueryDataType>& tran, HandlerType handler )
+        template<class InputData, class HandlerType>
+            void processUpdateAsync(ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl ecUrl;
             {
                 QnMutexLocker lk( &m_mutex );
                 ecUrl = m_ecURL;
             }
-            m_clientProcessor->processUpdateAsync( ecUrl, tran, handler );
+            m_clientProcessor->processUpdateAsync( ecUrl, cmdCode, input, handler );
         }
 
         template<class InputData, class OutputData, class HandlerType>

@@ -212,7 +212,7 @@ void QnTcpListener::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    qWarning() << "QnTcpListener::pleaseStop() called";
+    NX_LOGX(lm("QnTcpListener::pleaseStop() called"), cl_logWARNING);
 }
 
 void QnTcpListener::removeAllConnections()

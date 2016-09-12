@@ -131,7 +131,7 @@ AsyncClient::~AsyncClient()
     }
 
     for (const auto& client: httpClients)
-        client->terminate();
+        client->pleaseStopSync();
 }
 
 bool AsyncClient::Message::isOk() const

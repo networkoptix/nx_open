@@ -119,7 +119,7 @@ void InstallationProcess::cancel()
         m_status = applauncher::api::InstallationStatus::cancelInProgress;
 
         if (m_httpClient) {
-            m_httpClient->terminate();
+            m_httpClient->pleaseStopSync();
             m_httpClient.reset();
         }
 
@@ -207,7 +207,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
 
     auto scopedExitFunc = [this](InstallationProcess* /*pThis*/)
     {
-        m_httpClient->terminate();
+        m_httpClient->pleaseStopSync();
         m_httpClient.reset();
         if( m_status == applauncher::api::InstallationStatus::failed )
         {

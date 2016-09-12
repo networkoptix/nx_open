@@ -141,10 +141,6 @@ public:
     api::ResultCode ping(
         const std::string& systemID,
         const std::string& authKey);
-    api::ResultCode setSystemUserList(
-        const std::string& systemID,
-        const std::string& authKey,
-        api::SystemSharingList sharings);
 
     /** finds sharing of \a systemID to account \a accountEmail.
         \return reference to an element of \a sharings
@@ -162,6 +158,9 @@ public:
         const std::string& accountPassword,
         const std::string& systemId,
         api::SystemDataEx* const systemData);
+
+    api::ResultCode getVmsConnections(
+        api::VmsConnectionDataList* const vmsConnections);
 
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath();

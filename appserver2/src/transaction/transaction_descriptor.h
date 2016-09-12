@@ -45,21 +45,6 @@
 #include "nx_ec/data/api_statistics.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_lock_data.h"
-#include "core/resource/user_resource.h"
-
-#include "managers/business_event_manager.h"
-#include "managers/camera_manager.h"
-#include "managers/discovery_manager.h"
-#include "managers/layout_manager.h"
-#include "managers/license_manager.h"
-#include "managers/media_server_manager.h"
-#include "managers/misc_manager.h"
-#include "managers/resource_manager.h"
-#include "managers/stored_file_manager.h"
-#include "managers/updates_manager.h"
-#include "managers/user_manager.h"
-#include "managers/videowall_manager.h"
-#include "managers/webpage_manager.h"
 
 #include "nx/utils/type_utils.h"
 
@@ -107,6 +92,9 @@ using FilterBySavePermissionFuncType = std::function<void(const Qn::UserAccessDa
 
 template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(const Qn::UserAccessData& accessData, const ParamType&)>;
+
+template<typename ParamType>
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(const ParamType&)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
@@ -176,6 +164,7 @@ struct TransactionDescriptor : TransactionDescriptorBase
     FilterBySavePermissionFuncType<ParamType> filterBySavePermissionFunc;
     FilterByReadPermissionFuncType<ParamType> filterByReadPermissionFunc;
     CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc;
+    GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc;
 
     template<
 		typename GetHashF,
@@ -187,7 +176,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
 		typename CheckReadPermissionFunc,
 		typename FilterBySavePermissionFunc,
 		typename FilterByReadPermissionFunc,
-		typename CheckRemoteAccessFunc
+		typename CheckRemoteAccessFunc,
+        typename GetTransactionTypeFunc
 	>
     TransactionDescriptor(ApiCommand::Value value,
         bool isPersistent,
@@ -202,7 +192,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
         CheckReadPermissionFunc&& checkReadPermissionFunc,
         FilterBySavePermissionFunc&& filterBySavePermissionFunc,
         FilterByReadPermissionFunc&& filterByReadPermissionFunc,
-        CheckRemoteAccessFunc&& checkRemotePeerAccessFunc)
+        CheckRemoteAccessFunc&& checkRemotePeerAccessFunc,
+        GetTransactionTypeFunc&& getTransactionTypeFunc)
         :
         TransactionDescriptorBase(value, isPersistent, isSystem, name),
         getHashFunc(std::forward<GetHashF>(getHashFunc)),
@@ -214,7 +205,8 @@ struct TransactionDescriptor : TransactionDescriptorBase
         checkReadPermissionFunc(std::forward<CheckReadPermissionFunc>(checkReadPermissionFunc)),
         filterBySavePermissionFunc(std::forward<FilterBySavePermissionFunc>(filterBySavePermissionFunc)),
         filterByReadPermissionFunc(std::forward<FilterByReadPermissionFunc>(filterByReadPermissionFunc)),
-        checkRemotePeerAccessFunc(std::forward<CheckRemoteAccessFunc>(checkRemotePeerAccessFunc))
+        checkRemotePeerAccessFunc(std::forward<CheckRemoteAccessFunc>(checkRemotePeerAccessFunc)),
+        getTransactionTypeFunc(std::forward<GetTransactionTypeFunc>(getTransactionTypeFunc))
     {
     }
 };
@@ -270,6 +262,27 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
     }
     NX_ASSERT(0, "Transaciton descriptor for the given param not found");
     return nullptr;
+}
+
+/**
+* Semantics of the transactionHash() function is following:
+* if transaction A follows transaction B and overrides it,
+* their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
+* Obviously, transactionHash() is not needed for the non-persistent transaction.
+*/
+
+template<typename Param>
+static QnUuid transactionHash(const Param &param)
+{
+    for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+    {
+        auto tdBase = (*it).get();
+        auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+        if (td)
+            return td->getHashFunc(param);
+    }
+    NX_ASSERT(0, "Transaction descriptor for the given param not found");
+    return QnUuid();
 }
 
 } //namespace ec2

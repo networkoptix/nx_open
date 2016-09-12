@@ -228,7 +228,7 @@ void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst, cons
 
 void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst)
 {
-    dst->cameraID = src.cameraID;
+    dst->cameraId = src.cameraId;
     dst->name = src.cameraName;
     dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
@@ -244,7 +244,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
     for (const ApiScheduleTaskData& srcTask: src.scheduleTasks)
     {
         tasks.push_back(QnScheduleTask());
-        fromApiToResource(srcTask, tasks.back(), src.cameraID);
+        fromApiToResource(srcTask, tasks.back(), src.cameraId);
     }
     dst->scheduleTasks = tasks;
 
@@ -262,7 +262,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
 {
-    dst.cameraID = src->cameraID;
+    dst.cameraId = src->cameraId;
     dst.cameraName = src->name;
     dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
@@ -626,7 +626,7 @@ void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResou
 ////////////////////////////////////////////////////////////
 void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServerUserAttributesData& dst)
 {
-    dst.serverID = src->serverID;
+    dst.serverId = src->serverId;
     dst.serverName = src->name;
     dst.maxCameras = src->maxCameras;
     dst.allowAutoRedundancy = src->isRedundancyEnabled;
@@ -639,7 +639,7 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
 
 void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst)
 {
-    dst->serverID = src.serverID;
+    dst->serverId = src.serverId;
     dst->name = src.serverName;
     dst->maxCameras = src.maxCameras;
     dst->isRedundancyEnabled = src.allowAutoRedundancy;

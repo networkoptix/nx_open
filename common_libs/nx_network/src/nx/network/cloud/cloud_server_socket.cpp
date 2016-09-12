@@ -6,6 +6,7 @@
 #include <nx/fusion/serialization/lexical.h>
 
 #include "tunnel/udp/acceptor.h"
+#include "tunnel/tcp/reverse_tunnel_acceptor.h"
 
 
 namespace nx {
@@ -30,8 +31,25 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
                     return std::unique_ptr<AbstractTunnelAcceptor>();
 
                 auto acceptor = std::make_unique<udp::TunnelAcceptor>(
-                    std::move(event.udpEndpointList),
-                    event.params);
+                    std::move(event.udpEndpointList), event.params);
+
+                return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
+            }
+
+            return std::unique_ptr<AbstractTunnelAcceptor>();
+        });
+
+    makers.push_back(
+        [](const hpm::api::ConnectionRequestedEvent& event)
+        {
+            using namespace hpm::api::ConnectionMethod;
+            if (event.connectionMethods & reverseConnect)
+            {
+                if (!event.tcpReverseEndpointList.size())
+                    return std::unique_ptr<AbstractTunnelAcceptor>();
+
+                auto acceptor = std::make_unique<tcp::ReverseTunnelAcceptor>(
+                    std::move(event.tcpReverseEndpointList), event.params);
 
                 return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
             }
@@ -77,7 +95,7 @@ CloudServerSocket::~CloudServerSocket()
     if (m_mediatorConnection->isInSelfAioThread())
     {
         // Will not block as all delegates are in the same AIO thread
-        pleaseStopSync();
+        pleaseStopSync(false);
     }
     else
     {
@@ -342,6 +360,11 @@ hpm::api::ResultCode CloudServerSocket::registerOnMediatorSync()
     return promise.get_future().get();
 }
 
+void CloudServerSocket::setSupportedConnectionMethods(hpm::api::ConnectionMethods value)
+{
+    m_supportedConnectionMethods = value;
+}
+
 void CloudServerSocket::moveToListeningState()
 {
     if (!m_tunnelPool)
@@ -481,8 +504,9 @@ void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
     m_mediatorRegistrationRetryTimer.dispatch(
-        [this, event = std::move(event)]
+        [this, event = std::move(event)]() mutable
         {
+            event.connectionMethods &= m_supportedConnectionMethods;
             for (const auto& maker : m_acceptorMakers)
             {
                 if (auto acceptor = maker(event))

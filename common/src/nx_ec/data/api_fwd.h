@@ -77,6 +77,7 @@ namespace ec2 {
     struct ApiConnectionData;
     struct ApiSystemNameData;
     struct ApiTransactionData;
+    struct ApiTranLogFilter;
     struct ApiWebPageData;
     struct ApiDiscoveredServerData;
 

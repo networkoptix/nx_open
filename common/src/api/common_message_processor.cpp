@@ -294,24 +294,24 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCame
 
     QSet<QByteArray> modifiedFields;
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttributes->cameraID );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttributes->cameraId );
         (*userAttributesLock)->assign( *userAttributes, &modifiedFields );
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->cameraID);
+    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->cameraId);
     if( res )   //it is OK if resource is missing
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraID)
+void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraId)
 {
     QSet<QByteArray> modifiedFields;
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraID );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraId );
         //TODO #ak for now, never removing this structure, just resetting to empty value
         (*userAttributesLock)->assign( QnCameraUserAttributes(), &modifiedFields );
-        (*userAttributesLock)->cameraID = cameraID;
+        (*userAttributesLock)->cameraId = cameraId;
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(cameraID);
+    const QnResourcePtr& res = qnResPool->getResourceById(cameraId);
     if( res )
         res->emitModificationSignals( modifiedFields );
 }
@@ -323,23 +323,23 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const ec2::Ap
 
     QSet<QByteArray> modifiedFields;
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), userAttributes->serverID );
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), userAttributes->serverId );
         (*lk)->assign( *userAttributes, &modifiedFields );
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->serverID);
+    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->serverId);
     if( res )   //it is OK if resource is missing
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid& serverID)
+void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid& serverId)
 {
     QSet<QByteArray> modifiedFields;
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), serverID );
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), serverId );
         //TODO #ak for now, never removing this structure, just resetting to empty value
         (*lk)->assign( QnMediaServerUserAttributes(), &modifiedFields );
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(serverID);
+    const QnResourcePtr& res = qnResPool->getResourceById(serverId);
     if( res )   //it is OK if resource is missing
         res->emitModificationSignals( modifiedFields );
 }
@@ -516,7 +516,7 @@ void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMedi
         QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
         fromApiToResource(serverAttrs, dstElement);
 
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs.serverID );
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs.serverId );
         *(*userAttributesLock) = *dstElement;
     }
 }
@@ -529,7 +529,7 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCame
         QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
         fromApiToResource(cameraAttrs, dstElement);
 
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs.cameraID );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs.cameraId );
         *(*userAttributesLock) = *dstElement;
     }
 }

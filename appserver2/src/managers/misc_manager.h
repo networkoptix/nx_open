@@ -32,8 +32,6 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-
-        QnTransaction<ApiSystemNameData> prepareTransaction(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) const;
     };
 
 } // namespace ec2

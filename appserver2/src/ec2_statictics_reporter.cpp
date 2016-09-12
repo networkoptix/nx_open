@@ -151,7 +151,7 @@ namespace ec2
             nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
 
         if (auto client = m_httpClient)
-            client->terminate();
+            client->pleaseStopSync();
 
         {
             QnMutexLocker lk(&m_mutex);

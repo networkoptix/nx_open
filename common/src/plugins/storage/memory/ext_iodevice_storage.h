@@ -39,7 +39,7 @@ public:
     //!Implementation of QnStorageResource::getTotalSpace
     virtual qint64 getTotalSpace() override { return 0; }
     //!Implementation of QnStorageResource::isStorageAvailable
-    virtual bool initOrUpdate() const override { return true; }
+    virtual Qn::StorageInitResult initOrUpdate() const override { return Qn::StorageInit_Ok; }
     //!Implementation of QnStorageResource::removeFile
     virtual bool removeFile( const QString& path ) override;
     //!Implementation of QnStorageResource::removeDir

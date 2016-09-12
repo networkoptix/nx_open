@@ -91,7 +91,7 @@ public:
         bool init( int logID, const QString& logLevelStr );
 
     private:
-        mutable QnMutex m_mutex;
+        mutable std::mutex m_mutex;
         std::map< int, std::unique_ptr< QnLog > > m_logs;
     };
 

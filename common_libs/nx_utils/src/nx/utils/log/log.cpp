@@ -91,7 +91,7 @@ public:
             << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << END_OF_LINE;
 
         {
-            QnMutexLocker mutx( &m_mutex );
+            std::unique_lock<std::mutex> lk( m_mutex );
             if (m_file.fail())
             {
                 switch (logLevel)
@@ -120,7 +120,7 @@ public:
 
     QString syncCurrFileName() const
     {
-        QnMutexLocker lock( &m_mutex );
+        std::unique_lock<std::mutex> lk( m_mutex );
         return m_baseName + QLatin1String(".log");
     }
 
@@ -156,6 +156,9 @@ private:
 
     void openFileImpl()
     {
+        if (m_file.is_open())
+            return;
+
         #ifdef Q_OS_WIN
             m_file.open(currFileName().toStdWString(), std::ios_base::app | std::ios_base::out);
         #else
@@ -199,7 +202,7 @@ private:
     QString m_baseName;
     QnLogLevel m_logLevel;
     std::fstream m_file;
-    mutable QnMutex m_mutex;
+    mutable std::mutex m_mutex;
 };
 
 
@@ -220,7 +223,7 @@ public:
 
     QnLog* get( int logID )
     {
-        QnMutexLocker lk( &m_mutex );
+        std::unique_lock<std::mutex> lk( m_mutex );
         QnLog*& log = m_logs[logID];
         if( !log )
             log = new QnLog();
@@ -229,19 +232,19 @@ public:
 
     bool exists( int logID )
     {
-        QnMutexLocker lk( &m_mutex );
+        std::unique_lock<std::mutex> lk( m_mutex );
         return m_logs.find(logID) != m_logs.cend();
     }
 
     bool put( int logID, QnLog* log )
     {
-        QnMutexLocker lk( &m_mutex );
+        std::unique_lock<std::mutex> lk( m_mutex );
         return m_logs.insert( std::make_pair( logID, log ) ).second;
     }
 
 private:
     std::map<int, QnLog*> m_logs;
-    QnMutex m_mutex;
+    std::mutex m_mutex;
 };
 
 bool QnLog::s_disableLogConfiguration(false);
@@ -385,7 +388,7 @@ QString QnLog::logFileName( int logID )
 
 const std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
 {
-    QnMutexLocker lk( &m_mutex );
+    std::unique_lock<std::mutex> lk( m_mutex );
     //TODO #ak aren't we supposed to explcitly create log with init call?
     auto& log = m_logs[logID];
     if( !log )
@@ -395,13 +398,13 @@ const std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
 
 bool QnLog::Logs::exists(int logID) const
 {
-    QnMutexLocker lk(&m_mutex);
+    std::unique_lock<std::mutex> lk(m_mutex);
     return m_logs.find(logID) != m_logs.end();
 }
 
 bool QnLog::Logs::init( int logID, std::unique_ptr< QnLog > log )
 {
-    QnMutexLocker lk( &m_mutex );
+    std::unique_lock<std::mutex> lk( m_mutex );
     return m_logs.emplace( logID, std::move( log ) ).second;
 }
 

@@ -72,7 +72,9 @@ private:
 
     virtual void setCredentials(const std::string& login, const std::string& password) override;
     virtual void setProxyCredentials(const std::string& login, const std::string& password) override;
-    virtual void setProxyVia(const SocketAddress& proxyEndpoint) override;
+    virtual void setProxyVia(
+        const std::string& proxyHost,
+        std::uint16_t proxyPort) override;
 
 private slots:
     void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);

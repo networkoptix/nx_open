@@ -15,31 +15,13 @@ RepeatingBufferMsgBodySource::RepeatingBufferMsgBodySource(
 {
 }
 
-void RepeatingBufferMsgBodySource::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> handler)
+RepeatingBufferMsgBodySource::~RepeatingBufferMsgBodySource()
 {
-    m_timer.pleaseStop(std::move(handler));
+    stopWhileInAioThread();
 }
 
-nx::network::aio::AbstractAioThread* RepeatingBufferMsgBodySource::getAioThread() const
+void RepeatingBufferMsgBodySource::stopWhileInAioThread()
 {
-    return m_timer.getAioThread();
-}
-
-void RepeatingBufferMsgBodySource::bindToAioThread(
-    nx::network::aio::AbstractAioThread* aioThread)
-{
-    m_timer.bindToAioThread(aioThread);
-}
-
-void RepeatingBufferMsgBodySource::post(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.post(std::move(func));
-}
-
-void RepeatingBufferMsgBodySource::dispatch(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.dispatch(std::move(func));
 }
 
 nx_http::StringType RepeatingBufferMsgBodySource::mimeType() const

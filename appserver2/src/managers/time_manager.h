@@ -118,7 +118,9 @@ namespace ec2
         /*!
             \note \a TimeSynchronizationManager::start MUST be called before using class instance
         */
-        TimeSynchronizationManager( Qn::PeerType peerType );
+        TimeSynchronizationManager(
+            Qn::PeerType peerType,
+            nx::utils::TimerManager* const timerManager);
         virtual ~TimeSynchronizationManager();
 
         //!Implemenattion of QnStoppable::pleaseStop
@@ -135,7 +137,8 @@ namespace ec2
         qint64 getSyncTime() const;
         ApiTimeData getTimeInfo() const;
         //!Called when primary time server has been changed by user
-        void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
+        void onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran);
+        void primaryTimeServerChanged(const ApiIdData& serverId);
         void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
         void knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
         //!Returns synchronized time with time priority key (not local, but the one used)
@@ -246,6 +249,7 @@ namespace ec2
         */
         std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
+        nx::utils::TimerManager* const m_timerManager;
         std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
         bool m_timeSynchronized;
@@ -293,17 +297,17 @@ namespace ec2
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
         void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
         void onBeforeSendingTransaction(
-            QnTransactionTransport* transport,
+            QnTransactionTransportBase* transport,
             nx_http::HttpHeaders* const headers);
         void onTransactionReceived(
-            QnTransactionTransport* transport,
+            QnTransactionTransportBase* transport,
             const nx_http::HttpHeaders& headers);
         void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
         void checkSystemTimeForChange();
         void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
     private slots:
-        void onNewConnectionEstablished(QnTransactionTransport* transport );
+        void onNewConnectionEstablished(QnTransactionTransportBase* transport );
         void onPeerLost( ApiPeerAliveData data );
         void onDbManagerInitialized();
     };

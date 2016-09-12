@@ -145,7 +145,7 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& n
         QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
         mergedSomething = true;
     }
-    //TODO #ak to make minimal influence on existing code, merging only few properties. 
+    //TODO #ak to make minimal influence on existing code, merging only few properties.
 
         //But, perharps, other properties should be processed too (in QnResource)
 
@@ -597,9 +597,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
     else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
 		setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
-    else 
+    else
         setStreamFpsSharingMethod(Qn::NoFpsSharing);
-        
+
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );
@@ -656,14 +656,14 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     std::vector<nxcip::Resolution> selectedEncoderResolutions( m_encoderCount );
     selectedEncoderResolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution( PRIMARY_ENCODER_INDEX );
     mediaStreams.streams.push_back( CameraMediaStreamInfo(
-        PRIMARY_ENCODER_INDEX, 
+        PRIMARY_ENCODER_INDEX,
         QSize(selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].width, selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].height),
         AV_CODEC_ID_H264 ) );
     if( SECONDARY_ENCODER_INDEX < m_encoderCount )
     {
         selectedEncoderResolutions[SECONDARY_ENCODER_INDEX] = getSecondStreamResolution();
         mediaStreams.streams.push_back( CameraMediaStreamInfo(
-            SECONDARY_ENCODER_INDEX, 
+            SECONDARY_ENCODER_INDEX,
             QSize(selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].width, selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].height),
             AV_CODEC_ID_H264 ) );
     }
@@ -678,7 +678,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
             QBuffer dataSource(&paramDescXML);
 
             if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
-                //parsing xml to load param list and get cameraID
+                //parsing xml to load param list and get cameraId
                 QnCameraAdvancedParams params;
                 bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
 #ifdef _DEBUG

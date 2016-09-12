@@ -39,6 +39,14 @@ RetryPolicy::RetryPolicy(
 {
 }
 
+bool RetryPolicy::operator==(const RetryPolicy& rhs) const
+{
+    return m_maxRetryCount == rhs.m_maxRetryCount
+        && m_initialDelay == rhs.m_initialDelay
+        && m_delayMultiplier == rhs.m_delayMultiplier
+        && m_maxDelay == rhs.m_maxDelay;
+}
+
 void RetryPolicy::setMaxRetryCount(unsigned int retryCount)
 {
     m_maxRetryCount = retryCount;
@@ -102,9 +110,9 @@ void RetryTimer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
     m_timer.pleaseStop(std::move(completionHandler));
 }
 
-void RetryTimer::pleaseStopSync()
+void RetryTimer::pleaseStopSync(bool checkForLocks)
 {
-    m_timer.pleaseStopSync();
+    m_timer.pleaseStopSync(checkForLocks);
 }
 
 aio::AbstractAioThread* RetryTimer::getAioThread() const

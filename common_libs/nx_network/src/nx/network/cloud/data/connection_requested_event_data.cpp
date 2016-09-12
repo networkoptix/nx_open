@@ -14,7 +14,8 @@ ConnectionRequestedEvent::ConnectionRequestedEvent()
 :
     StunIndicationData(kMethod),
     connectionMethods(0),
-    cloudConnectVersion(kCurrentCloudConnectVersion)
+    cloudConnectVersion(kCurrentCloudConnectVersion),
+    isPersistent(false)
 {
 }
 
@@ -26,6 +27,8 @@ void ConnectionRequestedEvent::serializeAttributes(nx::stun::Message* const mess
     message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
     params.serializeAttributes(message);
     message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    message->newAttribute<stun::cc::attrs::TcpReverseEndpointList>(std::move(tcpReverseEndpointList));
+    message->addAttribute(stun::cc::attrs::isPersistent, isPersistent);
 }
 
 bool ConnectionRequestedEvent::parseAttributes(const nx::stun::Message& message)
@@ -33,12 +36,18 @@ bool ConnectionRequestedEvent::parseAttributes(const nx::stun::Message& message)
     if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
-    return
+    const auto ret =
         readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
         readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
         readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
         readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&
         params.parseAttributes(message);
+
+    // These do not appear in old versions:
+    readAttributeValue<stun::cc::attrs::TcpReverseEndpointList>(message, &tcpReverseEndpointList);
+    readAttributeValue(message, stun::cc::attrs::isPersistent, &isPersistent);
+
+    return ret;
 }
 
 }   //api
