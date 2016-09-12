@@ -60,7 +60,13 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
     const auto offset = (backwardSearch ? QPoint(targetGeometry.width(), 0) : QPoint());
     const auto factor = appropriate->devicePixelRatio();
     const auto targetTopLeft = targetGeometry.topLeft();
-    return targetTopLeft + offset + pixelPointOnScreen / factor;
+
+    const auto result = targetTopLeft + offset + pixelPointOnScreen / factor;;
+    if (appropriate->geometry().contains(result))
+        return result;
+
+    // Looking for next screen
+    return screenRelatedToGlobal(result, appropriate);
 }
 
 QScreen* getScreen(const QPoint& scaled)
@@ -223,9 +229,11 @@ public:
 
         const auto parentWindow = getParentWindow(properWidget);
         const auto geometry = properWidget->geometry();
+        qDebug() << "1" << parentWindow->screen();
         const auto fixedPos = screenRelatedToGlobal(
             parentWindow->geometry().topLeft(), parentWindow->screen());
         parentWindow->setScreen(getScreen(fixedPos));
+        qDebug() << "2" << parentWindow->screen();
         parentWindow->setPosition(fixedPos);
         return QObject::eventFilter(watched, event);
     }
