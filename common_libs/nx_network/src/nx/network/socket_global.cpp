@@ -59,11 +59,11 @@ void SocketGlobals::deinit()
         if (--s_counter == 0) // last out
         {
             instanceToDestroy = s_instance;
+            delete instanceToDestroy;
             s_instance = nullptr;
             s_isInitialized = false; // allow creating Pollable(s) in destructor
         }
     }
-    delete instanceToDestroy;
 }
 
 void SocketGlobals::verifyInitialization()
