@@ -24,7 +24,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
 
         m_state = code;
         if (m_serverSocket)
-            m_serverSocket->pleaseStopSync(true); // we are in IO thread
+            m_serverSocket->pleaseStopSync(false); // we are in IO thread
 
         if (m_acceptHandler)
         {

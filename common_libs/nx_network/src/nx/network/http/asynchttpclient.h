@@ -110,7 +110,7 @@ namespace nx_http
         \note No signal is emitted after this call
         */
         virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-        virtual void pleaseStopSync(bool doNotCheckForLocks = false) override;
+        virtual void pleaseStopSync(bool checkForLocks = true) override;
 
         virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
         virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;

@@ -3,10 +3,10 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 
-void QnStoppableAsync::pleaseStopSync(bool doNotCheckForLocks)
+void QnStoppableAsync::pleaseStopSync(bool checkForLocks)
 {
     #ifdef USE_OWN_MUTEX
-        if (!doNotCheckForLocks)
+        if (checkForLocks)
             MutexLockAnalyzer::instance()->expectNoLocks();
     #endif
 

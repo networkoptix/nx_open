@@ -63,10 +63,10 @@ void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-void AsyncClientUser::pleaseStopSync(bool doNotCheckForLocks)
+void AsyncClientUser::pleaseStopSync(bool checkForLocks)
 {
     m_asyncGuard.reset();
-    network::aio::Timer::pleaseStopSync(doNotCheckForLocks);
+    network::aio::Timer::pleaseStopSync(checkForLocks);
 }
 
 void AsyncClientUser::sendRequest(

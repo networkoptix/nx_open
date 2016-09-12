@@ -32,7 +32,7 @@ public:
     Timer& operator=(const Timer&) = delete;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    virtual void pleaseStopSync(bool doNotCheckForLocks = false) override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> funcToCall) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> funcToCall) override;
     virtual AbstractAioThread* getAioThread() const override;

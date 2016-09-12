@@ -54,6 +54,8 @@ public:
             m_runningRequests.pop_front();
             lk.unlock();
             request->pleaseStopSync();
+            request.reset();
+            lk.relock();
         }
     }
 

@@ -33,7 +33,7 @@ public:
     BasicPollable(aio::AbstractAioThread* aioThread = nullptr);
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    void pleaseStopSync(bool doNotCheckForLocks = false) override;
+    void pleaseStopSync(bool checkForLocks = true) override;
 
     virtual aio::AbstractAioThread* getAioThread() const override;
     /**

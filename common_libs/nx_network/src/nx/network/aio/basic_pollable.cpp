@@ -28,7 +28,7 @@ void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler
         });
 }
 
-void BasicPollable::pleaseStopSync(bool doNotCheckForLocks)
+void BasicPollable::pleaseStopSync(bool checkForLocks)
 {
     if (m_timer.isInSelfAioThread())
     {
@@ -37,7 +37,7 @@ void BasicPollable::pleaseStopSync(bool doNotCheckForLocks)
     }
     else
     {
-        QnStoppableAsync::pleaseStopSync(doNotCheckForLocks);
+        QnStoppableAsync::pleaseStopSync(checkForLocks);
     }
 }
 

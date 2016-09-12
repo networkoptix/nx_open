@@ -110,9 +110,9 @@ void RetryTimer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
     m_timer.pleaseStop(std::move(completionHandler));
 }
 
-void RetryTimer::pleaseStopSync(bool doNotCheckForLocks)
+void RetryTimer::pleaseStopSync(bool checkForLocks)
 {
-    m_timer.pleaseStopSync(doNotCheckForLocks);
+    m_timer.pleaseStopSync(checkForLocks);
 }
 
 aio::AbstractAioThread* RetryTimer::getAioThread() const

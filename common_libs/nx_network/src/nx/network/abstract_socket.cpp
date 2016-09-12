@@ -70,10 +70,10 @@ void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> han
     cancelIOAsync(nx::network::aio::EventType::etNone, std::move(handler));
 }
 
-void AbstractCommunicatingSocket::pleaseStopSync(bool doNotCheckForLocks)
+void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
 {
     #ifdef USE_OWN_MUTEX
-        if (!doNotCheckForLocks)
+        if (checkForLocks)
         {
             const auto pollablePtr = pollable();
             if (!pollablePtr || !pollablePtr->isInSelfAioThread())

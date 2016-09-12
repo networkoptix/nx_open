@@ -113,19 +113,19 @@ namespace nx_http
         });
     }
 
-    void AsyncHttpClient::pleaseStopSync(bool doNotCheckForLocks)
+    void AsyncHttpClient::pleaseStopSync(bool checkForLocks)
     {
         if (m_aioThreadBinder.isInSelfAioThread())
             stopWhileInAioThread();
         else
-            QnStoppableAsync::pleaseStopSync(doNotCheckForLocks);
+            QnStoppableAsync::pleaseStopSync(checkForLocks);
     }
 
     void AsyncHttpClient::stopWhileInAioThread()
     {
         m_terminated = true;
         if (m_socket)
-            m_socket->pleaseStopSync(true);
+            m_socket->pleaseStopSync(false);
     }
 
     nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const
