@@ -45,12 +45,12 @@ public:
 
 private:
     void setShowButtonUsed(bool used);
+    void at_item_geometryChanged();
 
 private:
     void at_showingProcessor_hoverEntered();
 
 private:
-    QGraphicsWidget* m_parentWidget;
     bool m_ignoreClickEvent;
     bool m_visible;
 

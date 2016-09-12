@@ -51,7 +51,7 @@ protected:
     virtual void setProxyUpdatesEnabled(bool updatesEnabled);
 
 protected:
-    QGraphicsWidget* m_parentWidget;
+    const QGraphicsWidget* m_parentWidget;
     QRectF m_parentWidgetRect;
 };
 

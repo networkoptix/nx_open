@@ -759,7 +759,6 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     if (m_notifications)
     {
-        qDebug() << "at_controlsWidget_geometryChanged";
         if (m_notifications->xAnimator->isRunning())
             m_notifications->xAnimator->stop();
         m_notifications->item->setX(rect.right() + (isNotificationsOpened() ? -m_notifications->item->size().width() : 1.0 /* Just in case. */));
@@ -1134,7 +1133,6 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(), m_titleItem->geometry(), m_timeline.item->geometry());
 
     /* Always change position. */
-    qDebug() << "updateNotificationsGeometry to" << geometry.topLeft();
     m_notifications->item->setPos(geometry.topLeft());
 
     /* Whether actual size change should be deferred. */
@@ -1195,28 +1193,6 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     m_notifications->item->setToolTipsEnclosingRect(m_controlsWidget->mapRectToItem(m_notifications->item, tooltipsEnclosingRect));
 }
 
-void QnWorkbenchUi::at_notificationsItem_geometryChanged()
-{
-    NX_ASSERT(m_notifications);
-    QRectF headerGeometry = m_controlsWidget->mapRectFromItem(m_notifications->item, m_notifications->item->headerGeometry());
-    QRectF backgroundGeometry = m_controlsWidget->mapRectFromItem(m_notifications->item, m_notifications->item->visibleGeometry());
-
-    QRectF paintGeometry = m_notifications->item->geometry();
-
-    /* Don't hide notifications item here. It will repaint itself when shown, which will
-     * degrade performance. */
-
-    m_notifications->backgroundItem->setGeometry(paintGeometry);
-    m_notifications->showButton->setPos(QPointF(
-        qMin(m_controlsWidgetRect.right(), paintGeometry.left()),
-        (m_controlsWidgetRect.top() + m_controlsWidgetRect.bottom() - m_notifications->showButton->size().height()) / 2
-    ));
-    m_notifications->pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
-
-    updateViewportMargins();
-    updateFpsGeometry();
-}
-
 void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 {
     m_notifications = new NxUi::NotificationsWorkbenchPanel(settings, m_controlsWidget, this);
@@ -1234,15 +1210,15 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(m_notifications->item, &QGraphicsWidget::geometryChanged, this,
-        &QnWorkbenchUi::at_notificationsItem_geometryChanged);
-    connect(m_notifications->item, &QnNotificationsCollectionWidget::visibleSizeChanged, this,
-        &QnWorkbenchUi::at_notificationsItem_geometryChanged);
-    connect(m_notifications->item, &QnNotificationsCollectionWidget::sizeHintChanged, this,
-        &QnWorkbenchUi::updateNotificationsGeometry);
+//     connect(m_notifications->item, &QGraphicsWidget::geometryChanged, this,
+//         &QnWorkbenchUi::at_notificationsItem_geometryChanged);
+//     connect(m_notifications->item, &QnNotificationsCollectionWidget::visibleSizeChanged, this,
+//         &QnWorkbenchUi::at_notificationsItem_geometryChanged);
 
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateViewportMargins);
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateFpsGeometry);
 }
 
 #pragma endregion Notifications widget methods

@@ -68,6 +68,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     item->setZValue(ZOrder::Item);
     item->setProperty(Qn::NoHandScrollOver, true);
     setHelpTopic(item, Qn::MainWindow_Notifications_Help);
+    connect(item, &QGraphicsWidget::geometryChanged, this,
+        &NotificationsWorkbenchPanel::at_item_geometryChanged);
 
     action(QnActions::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     pinButton->setFocusProxy(item);
@@ -223,6 +225,22 @@ bool NotificationsWorkbenchPanel::isHovered() const
 void NotificationsWorkbenchPanel::setShowButtonUsed(bool used)
 {
     showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+}
+
+void NotificationsWorkbenchPanel::at_item_geometryChanged()
+{
+    QRectF headerGeometry = m_parentWidget->mapRectFromItem(item, item->headerGeometry());
+    QRectF backgroundGeometry = m_parentWidget->mapRectFromItem(item, item->visibleGeometry());
+
+    QRectF paintGeometry = item->geometry();
+    backgroundItem->setGeometry(paintGeometry);
+    showButton->setPos(QPointF(
+        qMin(m_parentWidgetRect.right(), paintGeometry.left()),
+        (m_parentWidgetRect.top() + m_parentWidgetRect.bottom() - showButton->size().height()) / 2
+    ));
+    pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
+
+    emit geometryChanged();
 }
 
 void NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered()

@@ -235,8 +235,6 @@ private slots:
 
     void at_titleItem_geometryChanged();
 
-    void at_notificationsItem_geometryChanged();
-
     void at_calendarShowingProcessor_hoverEntered();
     void at_calendarItem_paintGeometryChanged();
     void at_dayTimeItem_paintGeometryChanged();
