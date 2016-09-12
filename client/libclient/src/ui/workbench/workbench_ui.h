@@ -159,8 +159,6 @@ protected:
     void updateFpsGeometry();
     void updateCalendarGeometry();
     void updateDayTimeWidgetGeometry();
-    Q_SLOT void updateSliderResizerGeometry();
-    void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
@@ -170,9 +168,6 @@ protected:
 
     void setTitleOpacity(qreal opacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
-
-    bool isThumbnailsVisible() const;
-    void setThumbnailsVisible(bool visible);
 
     bool isHovered() const;
 
@@ -222,10 +217,6 @@ private slots:
     void at_display_widgetChanged(Qn::ItemRole role);
 
     void at_controlsWidget_geometryChanged();
-
-
-    void at_sliderItem_geometryChanged();
-    void at_sliderResizerWidget_geometryChanged();
 
     void at_titleItem_geometryChanged();
 

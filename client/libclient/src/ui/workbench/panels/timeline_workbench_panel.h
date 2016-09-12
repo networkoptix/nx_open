@@ -26,15 +26,9 @@ public:
     bool pinned;
 
     QnNavigationItem* item;
-    QnResizerWidget* resizerWidget;
-
-    bool ignoreResizerGeometryChanges;
-    bool updateResizerGeometryLater;
 
     bool zoomingIn;
     bool zoomingOut;
-
-    QGraphicsWidget* zoomButtonsWidget;
 
     /** Animator for  position. */
     VariantAnimator* yAnimator;
@@ -43,8 +37,6 @@ public:
 
     /** Special widget to show  by hover. */
     QGraphicsWidget* showWidget;
-
-    QTimer* autoHideTimer;
 
     qreal lastThumbnailsHeight;
 
@@ -63,15 +55,29 @@ public:
 
     virtual bool isHovered() const override;
 
-private:
-    void setShowButtonUsed(bool used);
+    bool isThumbnailsVisible() const;
+    void setThumbnailsVisible(bool visible);
 
 private:
+    void setShowButtonUsed(bool used);
+    void updateResizerGeometry();
+    void updateControlsGeometry();
+
+private:
+    void at_resizerWidget_geometryChanged();
     void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
 
 private:
     bool m_visible;
     bool m_opened;
+    bool m_ignoreResizerGeometryChanges;
+    bool m_updateResizerGeometryLater;
+
+    QnResizerWidget* m_resizerWidget;
+
+    QGraphicsWidget* m_zoomButtonsWidget;
+
+    QTimer* m_autoHideTimer;
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
     HoverFocusProcessor* m_hidingProcessor;

@@ -56,7 +56,6 @@
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
-#include <ui/graphics/items/generic/resizer_widget.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/speed_slider.h>
@@ -289,7 +288,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setCalendarOpened(settings[Qn::WorkbenchPane::Calendar].state == Qn::PaneState::Opened, false);
 
     m_timeline->lastThumbnailsHeight = settings[Qn::WorkbenchPane::Thumbnails].span;
-    setThumbnailsVisible(settings[Qn::WorkbenchPane::Thumbnails].state == Qn::PaneState::Opened);
+    m_timeline->setThumbnailsVisible(settings[Qn::WorkbenchPane::Thumbnails].state == Qn::PaneState::Opened);
 
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this,
         [this]
@@ -338,7 +337,7 @@ void QnWorkbenchUi::storeSettings()
     calendar.state = makePaneState(isCalendarOpened(), isCalendarPinned());
 
     QnPaneSettings& thumbnails = settings[Qn::WorkbenchPane::Thumbnails];
-    thumbnails.state = makePaneState(isThumbnailsVisible());
+    thumbnails.state = makePaneState(m_timeline->isThumbnailsVisible());
     thumbnails.span = m_timeline->lastThumbnailsHeight;
 
     qnSettings->setPaneSettings(settings);
@@ -1565,28 +1564,6 @@ bool QnWorkbenchUi::isSliderVisible() const
     return m_timeline->isVisible();
 }
 
-bool QnWorkbenchUi::isThumbnailsVisible() const
-{
-    qreal height = m_timeline->item->geometry().height();
-    return height != 0.0 && !qFuzzyCompare(height, m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height());
-}
-
-void QnWorkbenchUi::setThumbnailsVisible(bool visible)
-{
-    if (visible == isThumbnailsVisible())
-        return;
-
-    qreal sliderHeight = m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height();
-    if (!visible)
-        m_timeline->lastThumbnailsHeight = m_timeline->item->geometry().height() - sliderHeight;
-    else
-        sliderHeight += m_timeline->lastThumbnailsHeight;
-
-    QRectF geometry = m_timeline->item->geometry();
-    geometry.setHeight(sliderHeight);
-    m_timeline->item->setGeometry(geometry);
-}
-
 bool QnWorkbenchUi::isSliderOpened() const
 {
     return m_timeline->isOpened();
@@ -1619,121 +1596,6 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
     m_timeline->setVisible(visible, animate);
 }
 
-void QnWorkbenchUi::updateSliderResizerGeometry()
-{
-    if (m_timeline->updateResizerGeometryLater)
-    {
-        QTimer::singleShot(1, this, &QnWorkbenchUi::updateSliderResizerGeometry);
-        return;
-    }
-
-    QnTimeSlider *timeSlider = m_timeline->item->timeSlider();
-    QRectF timeSliderRect = timeSlider->rect();
-
-    QRectF sliderResizerGeometry = QRectF(
-        m_controlsWidget->mapFromItem(timeSlider, timeSliderRect.topLeft()),
-        m_controlsWidget->mapFromItem(timeSlider, timeSliderRect.topRight()));
-
-    sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
-    sliderResizerGeometry.setHeight(16);
-
-    if (!qFuzzyEquals(sliderResizerGeometry, m_timeline->resizerWidget->geometry()))
-    {
-        QN_SCOPED_VALUE_ROLLBACK(&m_timeline->updateResizerGeometryLater, true);
-
-        m_timeline->resizerWidget->setGeometry(sliderResizerGeometry);
-
-        /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_timeline->resizerWidget->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
-    }
-
-}
-
-void QnWorkbenchUi::updateSliderZoomButtonsGeometry()
-{
-    QPointF pos = m_timeline->item->timeSlider()->mapToItem(m_controlsWidget, m_timeline->item->timeSlider()->rect().topLeft());
-    m_timeline->zoomButtonsWidget->setPos(pos);
-}
-
-void QnWorkbenchUi::at_sliderItem_geometryChanged()
-{
-    updateTreeGeometry();
-    updateNotificationsGeometry();
-
-    updateViewportMargins();
-    updateSliderResizerGeometry();
-    updateCalendarGeometry();
-    updateSliderZoomButtonsGeometry();
-    updateDayTimeWidgetGeometry();
-
-    QRectF geometry = m_timeline->item->geometry();
-
-    /* Button is painted rotated, so we taking into account its height, not width. */
-    QPointF showButtonPos(
-        (geometry.left() + geometry.right() - m_timeline->showButton->geometry().height()) / 2,
-        qMin(m_controlsWidgetRect.bottom(), geometry.top()));
-    m_timeline->showButton->setPos(showButtonPos);
-
-    static const int kShowWidgetHeight = 50;
-    static const int kShowWidgetHiddenHeight = 12;
-
-    const int showWidgetY = m_timeline->isOpened()
-        ? geometry.top() - kShowWidgetHeight
-        : m_controlsWidgetRect.bottom() - kShowWidgetHiddenHeight;
-
-    QRectF showWidgetGeometry(geometry);
-    showWidgetGeometry.setTop(showWidgetY);
-    showWidgetGeometry.setHeight(kShowWidgetHeight);
-    m_timeline->showWidget->setGeometry(showWidgetGeometry);
-
-    if (isThumbnailsVisible())
-    {
-        qreal sliderHeight = m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height();
-        m_timeline->lastThumbnailsHeight = m_timeline->item->geometry().height() - sliderHeight;
-    }
-}
-
-void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged()
-{
-    if (m_timeline->ignoreResizerGeometryChanges)
-        return;
-
-    QRectF sliderResizerGeometry = m_timeline->resizerWidget->geometry();
-    if (!sliderResizerGeometry.isValid())
-    {
-        updateSliderResizerGeometry();
-        return;
-    }
-
-    QRectF sliderGeometry = m_timeline->item->geometry();
-
-    qreal targetHeight = sliderGeometry.bottom() - sliderResizerGeometry.center().y();
-    qreal minHeight = m_timeline->item->effectiveSizeHint(Qt::MinimumSize).height();
-    qreal jmpHeight = minHeight + 48.0;
-    qreal maxHeight = minHeight + 196.0;
-
-    if (targetHeight < (minHeight + jmpHeight) / 2)
-        targetHeight = minHeight;
-    else if (targetHeight < jmpHeight)
-        targetHeight = jmpHeight;
-    else if (targetHeight > maxHeight)
-        targetHeight = maxHeight;
-
-    if (!qFuzzyCompare(sliderGeometry.height(), targetHeight))
-    {
-        qreal sliderTop = sliderGeometry.top();
-        sliderGeometry.setHeight(targetHeight);
-        sliderGeometry.moveTop(sliderTop);
-
-        QN_SCOPED_VALUE_ROLLBACK(&m_timeline->ignoreResizerGeometryChanges, true);
-        m_timeline->item->setGeometry(sliderGeometry);
-    }
-
-    updateSliderResizerGeometry();
-
-    action(QnActions::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
-}
-
 void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 {
     m_timeline = new NxUi::TimelineWorkbenchPanel(settings, m_controlsWidget, this);
@@ -1751,10 +1613,15 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(m_timeline->item, &QGraphicsWidget::geometryChanged, this,
-        &QnWorkbenchUi::at_sliderItem_geometryChanged);
-    connect(m_timeline->resizerWidget, &QGraphicsWidget::geometryChanged, this,
-        &QnWorkbenchUi::at_sliderResizerWidget_geometryChanged);
+    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        [this]
+    {
+        updateTreeGeometry();
+        updateNotificationsGeometry();
+        updateViewportMargins();
+        updateCalendarGeometry();
+        updateDayTimeWidgetGeometry();
+    });
 
     /*
     Calendar is created before navigation slider (alot of logic relies on that).
@@ -1789,7 +1656,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled, this,
         [this](bool checked)
         {
-            setThumbnailsVisible(checked);
+            m_timeline->setThumbnailsVisible(checked);
         });
 
     connect(action(QnActions::ToggleSliderAction), &QAction::toggled, this,
