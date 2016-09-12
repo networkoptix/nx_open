@@ -3377,8 +3377,8 @@ ErrorCode QnDbManager::doQueryNoLock(
             motion_type as motionType,                   \
             secondary_quality as secondaryStreamQuality, \
             dewarping_params as dewarpingParams,         \
-            ifnull(min_archive_days, %1) as minArchiveDays,             \
-            ifnull(max_archive_days, %2) as maxArchiveDays,             \
+            coalesce(min_archive_days, %1) as minArchiveDays,             \
+            coalesce(max_archive_days, %2) as maxArchiveDays,             \
             prefered_server_id as preferedServerId,      \
             license_used as licenseUsed,                 \
             failover_priority as failoverPriority,       \
@@ -3434,8 +3434,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
             cu.motion_type as motionType,                      \
             cu.secondary_quality as secondaryStreamQuality,    \
             cu.dewarping_params as dewarpingParams,            \
-            ifnull(cu.min_archive_days, %1) as minArchiveDays,             \
-            ifnull(cu.max_archive_days, %2) as maxArchiveDays,             \
+            coalesce(cu.min_archive_days, %1) as minArchiveDays,             \
+            coalesce(cu.max_archive_days, %2) as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
             cu.license_used as licenseUsed,                    \
             cu.failover_priority as failoverPriority,          \
