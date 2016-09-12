@@ -53,11 +53,11 @@ protected:
 private:
     void setShowButtonUsed(bool used);
     void updateResizerGeometry();
+    void updateControlsGeometry();
 
 private:
     void at_resizerWidget_geometryChanged();
     void at_showingProcessor_hoverEntered();
-    void updateControlsGeometry();
 
 private:
     bool m_ignoreClickEvent;

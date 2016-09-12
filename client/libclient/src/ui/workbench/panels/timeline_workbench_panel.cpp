@@ -7,13 +7,26 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/navigation_item.h>
+#include <ui/graphics/items/controls/speed_slider.h>
+#include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/controls/volume_slider.h>
+#include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/resizer_widget.h>
+#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
+
+#include <utils/common/event_processors.h>
 
 namespace {
 
@@ -30,7 +43,7 @@ static const int kCloseTimelineTimeoutMs = 250;
 
 namespace NxUi {
 
-NxUi::TimelineWorkbenchPanel::TimelineWorkbenchPanel(
+TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     const QnPaneSettings& settings,
     QGraphicsWidget* parentWidget,
     QObject* parent)
@@ -43,19 +56,19 @@ NxUi::TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     updateResizerGeometryLater(false),
     zoomingIn(false),
     zoomingOut(false),
-    zoomButtonsWidget(nullptr),
-    opacityProcessor(nullptr),
+    zoomButtonsWidget(new GraphicsWidget(parentWidget)),
     yAnimator(nullptr),
     showButton(nullptr),
     showWidget(new GraphicsWidget(parentWidget)),
-    showingProcessor(new HoverFocusProcessor(parentWidget)),
-    hidingProcessor(new HoverFocusProcessor(parentWidget)),
-    opacityAnimatorGroup(nullptr),
     autoHideTimer(nullptr),
     lastThumbnailsHeight(kDefaultThumbnailsHeight),
 
     m_visible(false),
-    m_opened(false)
+    m_opened(false),
+    m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
+    m_showingProcessor(new HoverFocusProcessor(parentWidget)),
+    m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
+    m_opacityAnimatorGroup(new AnimatorGroup(this))
 {
     resizerWidget->setProperty(Qn::NoHandScrollOver, true);
     resizerWidget->setZValue(ResizerItemZOrder);
@@ -79,17 +92,45 @@ NxUi::TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     showWidget->setVisible(false);
     showWidget->setZValue(ControlItemZOrder);
 
-    showingProcessor->addTargetItem(showButton);
-    showingProcessor->addTargetItem(showWidget);
-    showingProcessor->addTargetItem(resizerWidget);
-    showingProcessor->setHoverEnterDelay(kShowTimelineTimeoutMs);
+    m_showingProcessor->addTargetItem(showButton);
+    m_showingProcessor->addTargetItem(showWidget);
+    m_showingProcessor->addTargetItem(resizerWidget);
+    m_showingProcessor->setHoverEnterDelay(kShowTimelineTimeoutMs);
+    connect(m_showingProcessor, &HoverFocusProcessor::hoverEntered, this,
+        [this]
+        {
+            if (!isPinned() && !isOpened())
+            {
+                //TODO: #GDM #high process handlers
+                setOpened(true);
 
-    hidingProcessor->addTargetItem(item);
-    hidingProcessor->addTargetItem(showButton);
-    hidingProcessor->addTargetItem(resizerWidget);
-    hidingProcessor->addTargetItem(showWidget);
-    hidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
-    hidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
+                /* So that the click that may follow won't hide it. */
+                setShowButtonUsed(false);
+                QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this,
+                    [this]
+                    {
+                        setShowButtonUsed(true);
+                    });
+            }
+
+            m_hidingProcessor->forceHoverEnter();
+        });
+
+    m_hidingProcessor->addTargetItem(item);
+    m_hidingProcessor->addTargetItem(showButton);
+    m_hidingProcessor->addTargetItem(resizerWidget);
+    m_hidingProcessor->addTargetItem(showWidget);
+    m_hidingProcessor->setHoverLeaveDelay(kCloseTimelineTimeoutMs);
+    m_hidingProcessor->setFocusLeaveDelay(kCloseTimelineTimeoutMs);
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+        [this]
+        {
+            /* Do not auto-hide slider if we have opened context menu. */
+            if (!isPinned() && isOpened() && !menu()->isMenuVisible())
+                setOpened(false); //TODO: #GDM #high process handlers
+        });
+    connect(menu(), &QnActionManager::menuAboutToHide, m_hidingProcessor,
+        &HoverFocusProcessor::forceFocusLeave);
 
     if (qnRuntime->isVideoWallMode())
     {
@@ -101,6 +142,102 @@ NxUi::TimelineWorkbenchPanel::TimelineWorkbenchPanel(
                 setVisible(false, true);
             });
     }
+
+    item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->timeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
+    item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->speedSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
+    item->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->volumeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
+
+    auto sliderZoomOutButton = new QnImageButtonWidget();
+    sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
+    sliderZoomOutButton->setPreferredSize(19, 16);
+    context()->statisticsModule()->registerButton(lit("slider_zoom_out"), sliderZoomOutButton);
+
+    auto sliderZoomInButton = new QnImageButtonWidget();
+    sliderZoomInButton->setIcon(qnSkin->icon("slider/buttons/zoom_in.png"));
+    sliderZoomInButton->setPreferredSize(19, 16);
+    context()->statisticsModule()->registerButton(lit("slider_zoom_in"), sliderZoomInButton);
+
+    QGraphicsLinearLayout *sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    sliderZoomButtonsLayout->setSpacing(0.0);
+    sliderZoomButtonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    sliderZoomButtonsLayout->addItem(sliderZoomOutButton);
+    sliderZoomButtonsLayout->addItem(sliderZoomInButton);
+
+    zoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
+    zoomButtonsWidget->setOpacity(0.0);
+
+    zoomButtonsWidget->setVisible(navigator()->hasArchive());
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
+        [this]()
+        {
+            zoomButtonsWidget->setVisible(navigator()->hasArchive());
+        });
+
+    enum { kSliderLeaveTimeout = 100 };
+    m_opacityProcessor->setHoverLeaveDelay(kSliderLeaveTimeout);
+    item->timeSlider()->bookmarksViewer()->setHoverProcessor(m_opacityProcessor);
+    m_opacityProcessor->addTargetItem(item);
+    m_opacityProcessor->addTargetItem(item->timeSlider()->toolTipItem());
+    m_opacityProcessor->addTargetItem(showButton);
+    m_opacityProcessor->addTargetItem(resizerWidget);
+    m_opacityProcessor->addTargetItem(showWidget);
+    m_opacityProcessor->addTargetItem(zoomButtonsWidget);
+    connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+        &AbstractWorkbenchPanel::hoverEntered);
+    connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+        &AbstractWorkbenchPanel::hoverLeft);
+
+    yAnimator = new VariantAnimator(this);
+    yAnimator->setTimer(animationTimer());
+    yAnimator->setTargetObject(item);
+    yAnimator->setAccessor(new PropertyAccessor("y"));
+
+    m_opacityAnimatorGroup->setTimer(animationTimer());
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(showButton));
+
+    auto sliderWheelEater = new QnSingleEventEater(this);
+    sliderWheelEater->setEventType(QEvent::GraphicsSceneWheel);
+    resizerWidget->installEventFilter(sliderWheelEater);
+
+    auto sliderWheelSignalizer = new QnSingleEventSignalizer(this);
+    sliderWheelSignalizer->setEventType(QEvent::GraphicsSceneWheel);
+    resizerWidget->installEventFilter(sliderWheelSignalizer);
+
+    connect(sliderZoomInButton, &QnImageButtonWidget::pressed, this,
+        [this]
+        {
+            zoomingIn = true;
+        });
+
+    connect(sliderZoomInButton, &QnImageButtonWidget::released, this,
+        [this]
+        {
+            zoomingIn = false;
+            item->timeSlider()->hurryKineticAnimations();
+        });
+
+    connect(sliderZoomOutButton, &QnImageButtonWidget::pressed, this,
+        [this]
+        {
+            zoomingOut = true;
+        });
+
+    connect(sliderZoomOutButton, &QnImageButtonWidget::released, this,
+        [this]
+        {
+            zoomingOut = false;
+            item->timeSlider()->hurryKineticAnimations();
+        });
+
+    connect(sliderWheelSignalizer, &QnAbstractEventSignalizer::activated, this,
+        &TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent);
+
+    /* Create a shadow: */
+    new QnEdgeShadowWidget(item, Qt::TopEdge, NxUi::kShadowThickness);
 }
 
 bool TimelineWorkbenchPanel::isPinned() const
@@ -188,14 +325,14 @@ void TimelineWorkbenchPanel::setOpacity(qreal opacity, bool animate)
 
     if (animate)
     {
-        opacityAnimatorGroup->pause();
+        m_opacityAnimatorGroup->pause();
         opacityAnimator(item)->setTargetValue(opacity);
         opacityAnimator(showButton)->setTargetValue(opacity);
-        opacityAnimatorGroup->start();
+        m_opacityAnimatorGroup->start();
     }
     else
     {
-        opacityAnimatorGroup->stop();
+        m_opacityAnimatorGroup->stop();
         item->setOpacity(opacity);
         showButton->setOpacity(opacity);
     }
@@ -207,7 +344,7 @@ void TimelineWorkbenchPanel::updateOpacity(bool animate)
 {
     base_type::updateOpacity(animate);
 
-    bool isButtonOpaque = m_visible && opacityProcessor->isHovered();
+    bool isButtonOpaque = m_visible && m_opacityProcessor->isHovered();
     const qreal buttonsOpacity = isButtonOpaque ? NxUi::kOpaque : NxUi::kHidden;
 
     ensureAnimationAllowed(&animate);
@@ -219,7 +356,22 @@ void TimelineWorkbenchPanel::updateOpacity(bool animate)
 
 bool TimelineWorkbenchPanel::isHovered() const
 {
-    return opacityProcessor->isHovered();
+    return m_opacityProcessor->isHovered();
+}
+
+void TimelineWorkbenchPanel::setShowButtonUsed(bool used)
+{
+    showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+}
+
+void TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent(QObject* /*target*/, QEvent* event)
+{
+    auto oldEvent = static_cast<QGraphicsSceneWheelEvent *>(event);
+    QGraphicsSceneWheelEvent newEvent(QEvent::GraphicsSceneWheel);
+    newEvent.setDelta(oldEvent->delta());
+    newEvent.setPos(item->timeSlider()->mapFromItem(resizerWidget, oldEvent->pos()));
+    newEvent.setScenePos(oldEvent->scenePos());
+    display()->scene()->sendEvent(item->timeSlider(), &newEvent);
 }
 
 } //namespace NxUi

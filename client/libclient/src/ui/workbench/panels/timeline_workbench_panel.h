@@ -36,9 +36,6 @@ public:
 
     QGraphicsWidget* zoomButtonsWidget;
 
-    /** Hover processor that is used to change  opacity when mouse is hovered over it. */
-    HoverFocusProcessor* opacityProcessor;
-
     /** Animator for  position. */
     VariantAnimator* yAnimator;
 
@@ -46,14 +43,6 @@ public:
 
     /** Special widget to show  by hover. */
     QGraphicsWidget* showWidget;
-
-    /** Hover processor that is used to show the  when the mouse hovers over it. */
-    HoverFocusProcessor* showingProcessor;
-
-    /** Hover processor that is used to hide the  when the mouse leaves it. */
-    HoverFocusProcessor* hidingProcessor;
-
-    AnimatorGroup* opacityAnimatorGroup;
 
     QTimer* autoHideTimer;
 
@@ -75,8 +64,26 @@ public:
     virtual bool isHovered() const override;
 
 private:
+    void setShowButtonUsed(bool used);
+
+private:
+    void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
+
+private:
     bool m_visible;
     bool m_opened;
+
+    /** Hover processor that is used to hide the panel when the mouse leaves it. */
+    HoverFocusProcessor* m_hidingProcessor;
+
+    /** Hover processor that is used to show the panel when the mouse hovers over show button. */
+    HoverFocusProcessor* m_showingProcessor;
+
+    /** Hover processor that is used to change panel opacity when mouse hovers over it. */
+    HoverFocusProcessor* m_opacityProcessor;
+
+    /** Animator group for panel's opacity. */
+    AnimatorGroup* m_opacityAnimatorGroup;
 };
 
 } //namespace NxUi

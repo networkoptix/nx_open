@@ -170,7 +170,6 @@ protected:
 
     void setTitleOpacity(qreal opacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
-    void setSliderZoomButtonsOpacity(qreal opacity, bool animate);
 
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
@@ -214,8 +213,6 @@ private slots:
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
-    void setSliderShowButtonUsed(bool used);
-
     void setCalendarShowButtonUsed(bool used);
 
     void at_freespaceAction_triggered();
@@ -226,7 +223,7 @@ private slots:
 
     void at_controlsWidget_geometryChanged();
 
-    void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
+
     void at_sliderItem_geometryChanged();
     void at_sliderResizerWidget_geometryChanged();
 

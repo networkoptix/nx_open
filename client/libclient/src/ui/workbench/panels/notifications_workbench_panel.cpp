@@ -114,7 +114,6 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     xAnimator->setTimer(animationTimer());
     xAnimator->setTargetObject(item);
     xAnimator->setAccessor(new PropertyAccessor("x"));
-    xAnimator->setSpeed(1.0);
 
     m_opacityAnimatorGroup->setTimer(animationTimer());
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
