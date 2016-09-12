@@ -118,9 +118,6 @@ Qn::PaneState makePaneState(bool opened, bool pinned = true)
     return pinned ? (opened ? Qn::PaneState::Opened : Qn::PaneState::Closed) : Qn::PaneState::Unpinned;
 }
 
-const qreal kOpaque = 1.0;
-const qreal kHidden = 0.0;
-
 const int kHideControlsTimeoutMs = 2000;
 const int kShowTimelineTimeoutMs = 100;
 const int kCloseTimelineTimeoutMs = 250;
@@ -153,7 +150,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_controlsActivityInstrument(nullptr),
     m_flags(0),
     m_controlsWidget(nullptr),
-    m_treeVisible(false),
     m_titleUsed(false),
     m_titleVisible(false),
     m_notificationsVisible(false),
@@ -823,53 +819,8 @@ void QnWorkbenchUi::createControlsWidget()
 
 void QnWorkbenchUi::setTreeVisible(bool visible, bool animate)
 {
-    ensureAnimationAllowed(animate);
-
-    if (!m_tree)
-        return;
-
-    bool changed = m_treeVisible != visible;
-
-    m_treeVisible = visible;
-
-    updateTreeOpacity(animate);
-    if (changed)
-        updateTreeGeometry();
-}
-
-void QnWorkbenchUi::setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate)
-{
-    NX_ASSERT(m_tree);
-    if (!m_tree)
-        return;
-
-    ensureAnimationAllowed(animate);
-
-    if (animate)
-    {
-        m_tree->opacityAnimatorGroup->pause();
-        opacityAnimator(m_tree->item)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_tree->pinButton)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_tree->backgroundItem)->setTargetValue(backgroundOpacity);
-        opacityAnimator(m_tree->showButton)->setTargetValue(backgroundOpacity);
-        m_tree->opacityAnimatorGroup->start();
-    }
-    else
-    {
-        m_tree->opacityAnimatorGroup->stop();
-        m_tree->item->setOpacity(foregroundOpacity);
-        m_tree->pinButton->setOpacity(foregroundOpacity);
-        m_tree->backgroundItem->setOpacity(backgroundOpacity);
-        m_tree->showButton->setOpacity(backgroundOpacity);
-    }
-
-    m_tree->resizerWidget->setVisible(!qFuzzyIsNull(foregroundOpacity));
-}
-
-void QnWorkbenchUi::updateTreeOpacity(bool animate)
-{
-    const qreal opacity = m_treeVisible ? kOpaque : kHidden;
-    setTreeOpacity(opacity, opacity, animate);
+    if (m_tree)
+        m_tree->setVisible(visible, animate);
 }
 
 bool QnWorkbenchUi::isTreePinned() const
@@ -877,19 +828,9 @@ bool QnWorkbenchUi::isTreePinned() const
     return m_tree && m_tree->isPinned();
 }
 
-bool QnWorkbenchUi::isCalendarPinned() const
-{
-    return action(QnActions::PinCalendarAction)->isChecked();
-}
-
-bool QnWorkbenchUi::isCalendarOpened() const
-{
-    return action(QnActions::ToggleCalendarAction)->isChecked();
-}
-
 bool QnWorkbenchUi::isTreeVisible() const
 {
-    return m_treeVisible;
+    return m_tree && m_tree->isVisible();
 }
 
 bool QnWorkbenchUi::isSliderVisible() const
@@ -905,11 +846,6 @@ bool QnWorkbenchUi::isTitleVisible() const
 bool QnWorkbenchUi::isNotificationsVisible() const
 {
     return m_notificationsVisible;
-}
-
-bool QnWorkbenchUi::isCalendarVisible() const
-{
-    return m_calendarVisible;
 }
 
 bool QnWorkbenchUi::isTreeOpened() const
@@ -928,11 +864,11 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
 {
     QPointF pos(
         treeGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
+        ((!m_titleVisible || !m_titleUsed) && isTreeVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
 
     QSizeF size(
         treeGeometry.width(),
-        ((!m_timeline.visible && m_treeVisible)
+        ((!m_timeline.visible && isTreeVisible())
             ? m_controlsWidgetRect.bottom()
             : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y());
 
@@ -956,7 +892,7 @@ void QnWorkbenchUi::updateTreeGeometry()
 
     /* Calculate slider target position. */
     QPointF sliderPos;
-    if (!m_timeline.visible && m_treeVisible)
+    if (!m_timeline.visible && isTreeVisible())
     {
         sliderPos = QPointF(m_timeline.item->pos().x(), m_controlsWidgetRect.bottom());
     }
@@ -972,7 +908,7 @@ void QnWorkbenchUi::updateTreeGeometry()
 
     /* Calculate title target position. */
     QPointF titlePos;
-    if ((!m_titleVisible || !m_titleUsed) && m_treeVisible)
+    if ((!m_titleVisible || !m_titleUsed) && isTreeVisible())
     {
         titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
     }
@@ -1041,11 +977,13 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
             if (opened)
                 m_inFreespace = false;
         });
+    connect(m_tree, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
+        &QnWorkbenchUi::updateTreeGeometry);
 
-    connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
-        &QnWorkbenchUi::updateTreeOpacityAnimated);
-    connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::updateTreeOpacityAnimated);
+//     connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+//         &QnWorkbenchUi::updateTreeOpacityAnimated);
+//     connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+//         &QnWorkbenchUi::updateTreeOpacityAnimated);
     connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_tree->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -1157,7 +1095,7 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
 
 void QnWorkbenchUi::updateTitleOpacity(bool animate)
 {
-    const qreal opacity = m_titleVisible ? kOpaque : kHidden;
+    const qreal opacity = m_titleVisible ? NxUi::kOpaque : NxUi::kHidden;
     setTitleOpacity(opacity, opacity, animate);
 }
 
@@ -1316,7 +1254,7 @@ void QnWorkbenchUi::setNotificationsOpacity(qreal foregroundOpacity, qreal backg
 
 void QnWorkbenchUi::updateNotificationsOpacity(bool animate)
 {
-    const qreal opacity = m_notificationsVisible ? kOpaque : kHidden;
+    const qreal opacity = m_notificationsVisible ? NxUi::kOpaque : NxUi::kHidden;
     setNotificationsOpacity(opacity, opacity, animate);
 }
 
@@ -1545,6 +1483,21 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 
 #pragma region CalendarWidget
 
+bool QnWorkbenchUi::isCalendarPinned() const
+{
+    return action(QnActions::PinCalendarAction)->isChecked();
+}
+
+bool QnWorkbenchUi::isCalendarOpened() const
+{
+    return action(QnActions::ToggleCalendarAction)->isChecked();
+}
+
+bool QnWorkbenchUi::isCalendarVisible() const
+{
+    return m_calendarVisible;
+}
+
 void QnWorkbenchUi::setCalendarVisible(bool visible, bool animate)
 {
     ensureAnimationAllowed(animate);
@@ -1633,7 +1586,7 @@ void QnWorkbenchUi::setDayTimeWidgetOpened(bool opened, bool animate)
 
 void QnWorkbenchUi::updateCalendarOpacity(bool animate)
 {
-    const qreal opacity = m_calendarVisible ? kOpaque : kHidden;
+    const qreal opacity = m_calendarVisible ? NxUi::kOpaque : NxUi::kHidden;
     setCalendarOpacity(opacity, animate);
 }
 
@@ -2010,11 +1963,11 @@ void QnWorkbenchUi::setSliderZoomButtonsOpacity(qreal opacity, bool animate)
 
 void QnWorkbenchUi::updateSliderOpacity(bool animate)
 {
-    const qreal opacity = m_timeline.visible ? kOpaque : kHidden;
+    const qreal opacity = m_timeline.visible ? NxUi::kOpaque : NxUi::kHidden;
     setSliderOpacity(opacity, animate);
 
     bool isButtonOpaque = m_timeline.visible && m_timeline.opacityProcessor && m_timeline.opacityProcessor->isHovered();
-    const qreal buttonsOpacity = isButtonOpaque ? kOpaque : kHidden;
+    const qreal buttonsOpacity = isButtonOpaque ? NxUi::kOpaque : NxUi::kHidden;
     setSliderZoomButtonsOpacity(buttonsOpacity, animate);
 }
 

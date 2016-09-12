@@ -57,7 +57,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     opacityAnimatorGroup(new AnimatorGroup(widget)),
     xAnimator(new VariantAnimator(widget)),
     m_parentWidget(parentWidget),
-    m_ignoreClickEvent(false)
+    m_ignoreClickEvent(false),
+    m_visible(false)
 {
     NX_ASSERT(m_parentWidget);
 
@@ -178,6 +179,54 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 
     resizerWidget->setEnabled(opened);
     emit openedChanged(opened);
+}
+
+bool ResourceTreeWorkbenchPanel::isVisible() const
+{
+    return m_visible;
+}
+
+void ResourceTreeWorkbenchPanel::setVisible(bool visible, bool animate)
+{
+    ensureAnimationAllowed(&animate);
+
+    bool changed = m_visible != visible;
+
+    m_visible = visible;
+
+    updateOpacity(animate);
+    if (changed)
+        emit visibleChanged(visible);
+}
+
+qreal ResourceTreeWorkbenchPanel::opacity() const
+{
+    return opacityAnimator(item)->targetValue().toDouble();
+}
+
+void ResourceTreeWorkbenchPanel::setOpacity(qreal opacity, bool animate)
+{
+    ensureAnimationAllowed(&animate);
+
+    if (animate)
+    {
+        opacityAnimatorGroup->pause();
+        opacityAnimator(item)->setTargetValue(opacity);
+        opacityAnimator(pinButton)->setTargetValue(opacity);
+        opacityAnimator(backgroundItem)->setTargetValue(opacity);
+        opacityAnimator(showButton)->setTargetValue(opacity);
+        opacityAnimatorGroup->start();
+    }
+    else
+    {
+        opacityAnimatorGroup->stop();
+        item->setOpacity(opacity);
+        pinButton->setOpacity(opacity);
+        backgroundItem->setOpacity(opacity);
+        showButton->setOpacity(opacity);
+    }
+
+    resizerWidget->setVisible(!qFuzzyIsNull(opacity));
 }
 
 void ResourceTreeWorkbenchPanel::updateResizerGeometry()

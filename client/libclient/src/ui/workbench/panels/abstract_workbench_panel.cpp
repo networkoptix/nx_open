@@ -5,6 +5,7 @@
 #include <ui/animation/animation_timer.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_ui_globals.h>
 
 namespace NxUi {
 
@@ -13,6 +14,12 @@ AbstractWorkbenchPanel::AbstractWorkbenchPanel(QObject* parent):
     QnWorkbenchContextAware(parent)
 {
 
+}
+
+void AbstractWorkbenchPanel::updateOpacity(bool animate)
+{
+    const qreal opacity = isVisible() ? NxUi::kOpaque : NxUi::kHidden;
+    setOpacity(opacity, animate);
 }
 
 void AbstractWorkbenchPanel::ensureAnimationAllowed(bool* animate)

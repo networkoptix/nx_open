@@ -66,6 +66,12 @@ public:
     virtual bool isOpened() const override;
     virtual void setOpened(bool opened = true, bool animate = true) override;
 
+    virtual bool isVisible() const override;
+    virtual void setVisible(bool visible = true, bool animate = true) override;
+
+    virtual qreal opacity() const override;
+    virtual void setOpacity(qreal opacity, bool animate = true) override;
+
     void updateResizerGeometry();
 
 private:
@@ -78,6 +84,7 @@ private:
 private:
     QGraphicsWidget* m_parentWidget;
     bool m_ignoreClickEvent;
+    bool m_visible;
 };
 
 }

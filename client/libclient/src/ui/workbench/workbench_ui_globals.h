@@ -14,4 +14,10 @@ static const int kClosePanelTimeoutMs = 2000;
 /** Time span to avoid graphics button double click where we don't need it. */
 static const int kButtonInactivityTimeoutMs = 300;
 
+/** Opacity value for visible items. */
+static const qreal kOpaque = 1.0;
+
+/** Opacity value for hidden items. */
+static const qreal kHidden = 0.0;
+
 } //namespace NxUi

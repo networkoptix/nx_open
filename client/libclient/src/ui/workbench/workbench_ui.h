@@ -167,7 +167,6 @@ protected:
     QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
 
-    void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
@@ -205,7 +204,6 @@ private:
     void updateCursor();
 
 private slots:
-    void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
     void updateNotificationsOpacity(bool animate = true);
@@ -214,7 +212,6 @@ private slots:
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
     void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
     void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
     void updateNotificationsOpacityAnimated() { updateNotificationsOpacity(true); }
@@ -240,7 +237,7 @@ private slots:
     void at_sliderResizerWidget_geometryChanged();
 
     void at_treeItem_paintGeometryChanged();
-    
+
     void at_pinTreeAction_toggled(bool checked);
     void at_pinNotificationsAction_toggled(bool checked);
 
@@ -278,8 +275,6 @@ private:
 
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
-
-    bool m_treeVisible;
 
     bool m_titleUsed;
 
