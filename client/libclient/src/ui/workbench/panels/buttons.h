@@ -14,4 +14,4 @@ QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QnWorkbenchContext
 QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QnWorkbenchContext* context,
     QAction* action, bool smallIcon = false);
 
-}
+} //namespace NxUi

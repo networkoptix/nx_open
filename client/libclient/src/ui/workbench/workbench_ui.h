@@ -12,8 +12,8 @@
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/workbench/ui/timeline.h>
-#include <ui/workbench/ui/resource_tree.h>
+#include <ui/workbench/panels/timeline.h>
+#include <ui/workbench/panels/resource_tree.h>
 
 #include <client/client_globals.h>
 
@@ -153,7 +153,7 @@ protected:
     void updateViewportMargins();
 
     void updateTreeGeometry();
-    Q_SLOT void updateTreeResizerGeometry();
+
     Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
@@ -223,7 +223,7 @@ private slots:
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
     void setSliderShowButtonUsed(bool used);
-    void setTreeShowButtonUsed(bool used);
+
     void setNotificationsShowButtonUsed(bool used);
     void setCalendarShowButtonUsed(bool used);
 
@@ -239,10 +239,8 @@ private slots:
     void at_sliderItem_geometryChanged();
     void at_sliderResizerWidget_geometryChanged();
 
-    void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
-    void at_treeResizerWidget_geometryChanged();
-    void at_treeShowingProcessor_hoverEntered();
+    
     void at_pinTreeAction_toggled(bool checked);
     void at_pinNotificationsAction_toggled(bool checked);
 
@@ -311,7 +309,7 @@ private:
     QnWorkbenchUiTimeline m_timeline;
 
     /* Resources tree. */
-    QnWorkbenchUiResourceTree m_tree;
+    NxUi::ResourceTreeWorkbenchPanel* m_tree;
 
     /* Title-related state. */
 

@@ -22,7 +22,7 @@ QString aliasFromAction(QAction *action)
     return QnLexical::serialized(ourAction->id());
 }
 
-}
+} //namespace
 
 namespace NxUi {
 
@@ -84,4 +84,4 @@ QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QnWorkbenchContext* con
     return button;
 }
 
-}
+} //namespace NxUi

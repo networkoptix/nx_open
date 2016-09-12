@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ui/workbench/panels/abstract_workbench_panel.h>
+
 class QnResourceBrowserWidget;
 class QnResizerWidget;
 class QGraphicsWidget;
@@ -11,11 +13,19 @@ class AnimatorGroup;
 class VariantAnimator;
 class AnimationTimer;
 struct QnPaneSettings;
-class QnWorkbenchContext;
 
-struct QnWorkbenchUiResourceTree
+namespace NxUi {
+
+class ResourceTreeWorkbenchPanel: public AbstractWorkbenchPanel
 {
-    QnWorkbenchUiResourceTree();
+    using base_type = AbstractWorkbenchPanel;
+
+    Q_OBJECT
+public:
+    ResourceTreeWorkbenchPanel(
+        const QnPaneSettings& settings,
+        QGraphicsWidget* parentWidget,
+        QObject* parent = nullptr);
 
     /** Navigation tree widget. */
     QnResourceBrowserWidget* widget;
@@ -50,11 +60,24 @@ struct QnWorkbenchUiResourceTree
     /** Animator for tree's position. */
     VariantAnimator* xAnimator;
 
-    void initialize(
-        QGraphicsWidget* sceneWidget,
-        AnimationTimer* animationTimer,
-        const QnPaneSettings& settings,
-        QnWorkbenchContext* context);
+public:
+    virtual bool isPinned() const override;
 
-    void setOpened(bool opened, bool animate);
+    virtual bool isOpened() const override;
+    virtual void setOpened(bool opened = true, bool animate = true) override;
+
+    void updateResizerGeometry();
+
+private:
+    void setShowButtonUsed(bool used);
+
+private:
+    void at_resizerWidget_geometryChanged();
+    void at_showingProcessor_hoverEntered();
+
+private:
+    QGraphicsWidget* m_parentWidget;
+    bool m_ignoreClickEvent;
 };
+
+}
