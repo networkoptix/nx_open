@@ -326,8 +326,7 @@ void AIOThread::run()
         //calculating delay to the next periodic task
         const int millisToTheNextPeriodicEvent = nextPeriodicEventClock == 0
             ? aio::INFINITE_TIMEOUT    //no periodic task
-            : std::min(qint64(aio::INFINITE_TIMEOUT),
-                nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
+            : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
         //if there are posted calls, just checking sockets state in non-blocking mode
         const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
