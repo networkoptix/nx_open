@@ -35,7 +35,7 @@ public:
 
     QnImageButtonWidget* showButton;
 
-    /** Special widget to show  by hover. */
+    /** Special widget to show by hover. */
     QGraphicsWidget* showWidget;
 
     qreal lastThumbnailsHeight;

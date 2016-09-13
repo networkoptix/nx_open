@@ -58,7 +58,6 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     showButton(NxUi::newShowHideButton(parentWidget, context(),
         action(QnActions::ToggleSliderAction))),
     showWidget(new GraphicsWidget(parentWidget)),
-    m_autoHideTimer(nullptr),
     lastThumbnailsHeight(kDefaultThumbnailsHeight),
 
     m_visible(false),
@@ -67,6 +66,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_updateResizerGeometryLater(false),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_zoomButtonsWidget(new GraphicsWidget(parentWidget)),
+    m_autoHideTimer(nullptr),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
