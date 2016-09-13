@@ -7,6 +7,8 @@
 #include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/config.h>
 
+#include <motion/motion_detection.h>
+
 QnNxRtpParser::QnNxRtpParser()
 :
     QnRtpVideoStreamParser(),
@@ -80,9 +82,9 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             }
             else if (dataType == QnAbstractMediaData::META_V1)
             {
-                if (dataSize != MD_WIDTH*MD_HEIGHT/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
+                if (dataSize != Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
                 {
-                    qWarning() << "Unexpected data size for metadata. got" << dataSize << "expected" << MD_WIDTH*MD_HEIGHT/8 << "bytes. Packet ignored.";
+                    qWarning() << "Unexpected data size for metadata. got" << dataSize << "expected" << Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 << "bytes. Packet ignored.";
                     return false;
                 }
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)

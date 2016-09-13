@@ -12,7 +12,6 @@
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/workbench/ui/timeline.h>
 
 #include <client/client_globals.h>
 
@@ -29,7 +28,6 @@ class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
-class QnResourceBrowserWidget;
 class QnProxyLabel;
 class QnDebugProxyLabel;
 
@@ -39,9 +37,16 @@ class QnImageButtonWidget;
 class QnResourceWidget;
 class QnMaskedProxyWidget;
 class QnFramedWidget;
-class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
 struct QnPaneSettings;
+
+namespace NxUi {
+
+class ResourceTreeWorkbenchPanel;
+class NotificationsWorkbenchPanel;
+class TimelineWorkbenchPanel;
+
+}
 
 class QnWorkbenchUi:
     public Disconnective<QObject>,
@@ -126,10 +131,6 @@ public:
     bool isCalendarVisible() const;
 
 public slots:
-    void setProxyUpdatesEnabled(bool updatesEnabled);
-    void enableProxyUpdates();
-    void disableProxyUpdates();
-
     void setTitleUsed(bool titleUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 
@@ -153,13 +154,11 @@ protected:
     void updateViewportMargins();
 
     void updateTreeGeometry();
-    Q_SLOT void updateTreeResizerGeometry();
+
     Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
     void updateDayTimeWidgetGeometry();
-    Q_SLOT void updateSliderResizerGeometry();
-    void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
@@ -167,15 +166,8 @@ protected:
     QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
 
-    void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-    void setSliderOpacity(qreal opacity, bool animate);
-    void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
-    void setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+    void setTitleOpacity(qreal opacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
-    void setSliderZoomButtonsOpacity(qreal opacity, bool animate);
-
-    bool isThumbnailsVisible() const;
-    void setThumbnailsVisible(bool visible);
 
     bool isHovered() const;
 
@@ -204,31 +196,18 @@ private:
 
     void updateCursor();
 
-    QnImageButtonWidget* newActionButton(QGraphicsItem *parent, QAction* action, int helpTopicId);
-    QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QAction* action);
-    QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QAction* action, bool smallIcon = false);
-
 private slots:
-    void updateTreeOpacity(bool animate = true);
-    void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
-    void updateNotificationsOpacity(bool animate = true);
     void updateCalendarOpacity(bool animate = true);
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
-    void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
     void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
-    void updateNotificationsOpacityAnimated() { updateNotificationsOpacity(true); }
     void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
-    void setSliderShowButtonUsed(bool used);
-    void setTreeShowButtonUsed(bool used);
-    void setNotificationsShowButtonUsed(bool used);
     void setCalendarShowButtonUsed(bool used);
 
     void at_freespaceAction_triggered();
@@ -239,21 +218,7 @@ private slots:
 
     void at_controlsWidget_geometryChanged();
 
-    void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
-    void at_sliderItem_geometryChanged();
-    void at_sliderResizerWidget_geometryChanged();
-
-    void at_treeWidget_activated(const QnResourcePtr &resource);
-    void at_treeItem_paintGeometryChanged();
-    void at_treeResizerWidget_geometryChanged();
-    void at_treeShowingProcessor_hoverEntered();
-    void at_pinTreeAction_toggled(bool checked);
-    void at_pinNotificationsAction_toggled(bool checked);
-
     void at_titleItem_geometryChanged();
-
-    void at_notificationsShowingProcessor_hoverEntered();
-    void at_notificationsItem_geometryChanged();
 
     void at_calendarShowingProcessor_hoverEntered();
     void at_calendarItem_paintGeometryChanged();
@@ -285,13 +250,9 @@ private:
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
 
-    bool m_treeVisible;
-
     bool m_titleUsed;
 
     bool m_titleVisible;
-
-    bool m_notificationsVisible;
 
     bool m_calendarVisible;
 
@@ -311,45 +272,11 @@ private:
 
     /* Slider-related state. */
 
-    /** Navigation item. */
-    QnWorkbenchUiTimeline m_timeline;
+    /** Timeline. */
+    NxUi::TimelineWorkbenchPanel* m_timeline;
 
-    /* Tree-related state. */
-
-    /** Navigation tree widget. */
-    QnResourceBrowserWidget *m_treeWidget;
-    QGraphicsWidget *m_treeResizerWidget;
-    bool m_ignoreTreeResizerGeometryChanges;
-    bool m_updateTreeResizerGeometryLater;
-
-    /** Proxy widget for navigation tree widget. */
-    QnMaskedProxyWidget *m_treeItem;
-
-    /** Item that provides background for the tree. */
-    QnFramedWidget *m_treeBackgroundItem;
-
-    /** Button to show/hide the tree. */
-    QnImageButtonWidget *m_treeShowButton;
-
-    /** Button to pin the tree. */
-    QnImageButtonWidget *m_treePinButton;
-
-    /** Hover processor that is used to hide the tree when the mouse leaves it. */
-    HoverFocusProcessor *m_treeHidingProcessor;
-
-    /** Hover processor that is used to show the tree when the mouse hovers over it. */
-    HoverFocusProcessor *m_treeShowingProcessor;
-
-    /** Hover processor that is used to change tree opacity when mouse hovers over it. */
-    HoverFocusProcessor *m_treeOpacityProcessor;
-
-    /** Animator group for tree's opacity. */
-    AnimatorGroup *m_treeOpacityAnimatorGroup;
-
-    /** Animator for tree's position. */
-    VariantAnimator *m_treeXAnimator;
-
-
+    /* Resources tree. */
+    NxUi::ResourceTreeWorkbenchPanel* m_tree;
 
     /* Title-related state. */
 
@@ -366,25 +293,7 @@ private:
     HoverFocusProcessor *m_titleOpacityProcessor;
 
     /* Notifications window-related state. */
-
-    QnFramedWidget *m_notificationsBackgroundItem;
-
-    QnNotificationsCollectionWidget *m_notificationsItem;
-
-    QnImageButtonWidget *m_notificationsPinButton;
-
-    QnImageButtonWidget *m_notificationsShowButton;
-
-    HoverFocusProcessor *m_notificationsOpacityProcessor;
-
-    HoverFocusProcessor *m_notificationsHidingProcessor;
-
-    HoverFocusProcessor *m_notificationsShowingProcessor;
-
-    VariantAnimator *m_notificationsXAnimator;
-
-    AnimatorGroup *m_notificationsOpacityAnimatorGroup;
-
+    NxUi::NotificationsWorkbenchPanel* m_notifications;
 
     /* Calendar window-related state. */
 

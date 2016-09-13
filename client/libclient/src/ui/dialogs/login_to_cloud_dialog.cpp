@@ -53,7 +53,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
-    ui->loginInputField->setTitle(tr("E-Mail"));
+    ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));

@@ -108,11 +108,11 @@ const QnUserResourcePtr & QnWorkbenchUserWatcher::user() const
     return m_user;
 }
 
-void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect)
+void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool value)
 {
-    m_reconnectOnPasswordChange = reconnect;
-    if (reconnect && m_user && isReconnectRequired(m_user))
-        emit reconnectRequired();
+    m_reconnectOnPasswordChange = value;
+    if (value && m_user && isReconnectRequired(m_user))
+        reconnect();
 }
 
 
@@ -161,20 +161,22 @@ bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user)
     return false;
 }
 
+void QnWorkbenchUserWatcher::reconnect()
+{
+    menu()->trigger(QnActions::ReconnectAction);
+}
+
 void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource)
 {
-    if (!isReconnectRequired(resource.dynamicCast<QnUserResource>()))
-        return;
-
-    emit reconnectRequired();
+    if (isReconnectRequired(resource.dynamicCast<QnUserResource>()))
+        reconnect();
 }
 
 void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &user)
 {
     if (!m_user || user.dynamicCast<QnUserResource>() != m_user)
         return;
-
-    emit reconnectRequired();
+    reconnect();
 }
 
 void QnWorkbenchUserWatcher::at_userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup)
@@ -183,7 +185,7 @@ void QnWorkbenchUserWatcher::at_userGroupAddedOrUpdated(const ec2::ApiUserGroupD
         return;
 
     m_group = userGroup;
-    emit reconnectRequired();
+    reconnect();
 }
 
 void QnWorkbenchUserWatcher::at_userGroupRemoved(const QnUuid& groupId)
@@ -192,6 +194,6 @@ void QnWorkbenchUserWatcher::at_userGroupRemoved(const QnUuid& groupId)
         return;
 
     m_group = ec2::ApiUserGroupData();
-    emit reconnectRequired();
+    reconnect();
 }
 

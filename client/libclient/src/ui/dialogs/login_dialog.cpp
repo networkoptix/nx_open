@@ -221,7 +221,7 @@ void QnLoginDialog::accept()
         m_requestHandle = -1;
         updateUsability();
 
-        auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, this);
         switch (status)
         {
             case Qn::ConnectionResult::Success:

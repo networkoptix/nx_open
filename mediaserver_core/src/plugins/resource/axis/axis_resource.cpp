@@ -23,6 +23,8 @@
 #include "common/common_module.h"
 #include "axis_audio_transmitter.h"
 
+#include <motion/motion_detection.h>
+
 using namespace std;
 
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
@@ -307,17 +309,17 @@ struct WindowInfo
 
 QRect QnPlAxisResource::axisRectToGridRect(const QRect& axisRect)
 {
-    qreal xCoeff = 9999.0 / (MD_WIDTH-1);
-    qreal yCoeff = 9999.0 / (MD_HEIGHT-1);
-    QPoint topLeft(MD_WIDTH - (axisRect.left()/xCoeff + 0.5), MD_HEIGHT - (axisRect.top()/yCoeff + 0.5));
-    QPoint bottomRight(MD_WIDTH - (axisRect.right()/xCoeff + 0.5), MD_HEIGHT - (axisRect.bottom()/yCoeff + 0.5));
+    qreal xCoeff = 9999.0 / (Qn::kMotionGridWidth-1);
+    qreal yCoeff = 9999.0 / (Qn::kMotionGridHeight-1);
+    QPoint topLeft(Qn::kMotionGridWidth - (axisRect.left()/xCoeff + 0.5), Qn::kMotionGridHeight - (axisRect.top()/yCoeff + 0.5));
+    QPoint bottomRight(Qn::kMotionGridWidth - (axisRect.right()/xCoeff + 0.5), Qn::kMotionGridHeight - (axisRect.bottom()/yCoeff + 0.5));
     return QRect(topLeft, bottomRight).normalized();
 }
 
 QRect QnPlAxisResource::gridRectToAxisRect(const QRect& gridRect)
 {
-    qreal xCoeff = 9999.0 / MD_WIDTH;
-    qreal yCoeff = 9999.0 / MD_HEIGHT;
+    qreal xCoeff = 9999.0 / Qn::kMotionGridWidth;
+    qreal yCoeff = 9999.0 / Qn::kMotionGridHeight;
     QPoint topLeft(9999.0 - (gridRect.left()*xCoeff + 0.5), 9999.0 - (gridRect.top()*yCoeff + 0.5));
     QPoint bottomRight(9999.0 - ((gridRect.right()+1)*xCoeff + 0.5), 9999.0 - ((gridRect.bottom()+1)*yCoeff + 0.5));
     return QRect(topLeft, bottomRight).normalized();
@@ -410,7 +412,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
 	QAuthenticator auth = getAuth();
-	
+
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);

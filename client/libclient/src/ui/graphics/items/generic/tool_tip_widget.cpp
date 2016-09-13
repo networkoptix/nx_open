@@ -94,7 +94,9 @@ QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFl
     m_tailWidth(5.0),
     m_roundingRadius(kUseContentMargins),
     m_autoSize(true)
-{}
+{
+    setFlag(QGraphicsItem::ItemIgnoresTransformations);
+}
 
 QnToolTipWidget::~QnToolTipWidget()
 {

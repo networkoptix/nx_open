@@ -27,7 +27,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
-#include <ui/workbench/watchers/current_user_available_cameras_watcher.h>
 
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -160,18 +159,12 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
 
-    const auto camerasWatcher = context()->instance<QnCurrentUserAvailableCamerasWatcher>();
-    connect(camerasWatcher, &QnCurrentUserAvailableCamerasWatcher::userChanged, this, [this]()
-    {
-        resetToAllAvailableCameras();
-        applyModelChanges();
-    });
-
-    connect(camerasWatcher, &QnCurrentUserAvailableCamerasWatcher::availableCamerasChanged, this, [this]()
-    {
-        if (m_allCamerasChoosen)
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        [this]
+        {
             resetToAllAvailableCameras();
-    });
+            applyModelChanges();
+        });
 
     m_ui->filterLineEdit->lineEdit()->setPlaceholderText(tr("Search bookmarks by name, tag or description"));
 }
@@ -347,8 +340,12 @@ void QnSearchBookmarksDialogPrivate::refresh()
 
 QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() const
 {
-    const auto camerasWatcher = context()->instance<QnCurrentUserAvailableCamerasWatcher>();
-    return camerasWatcher->availableCameras();
+    return qnResPool->getAllCameras(QnResourcePtr(), true).filtered(
+        [this](const QnVirtualCameraResourcePtr& camera)
+        {
+            return accessController()->hasPermissions(camera, Qn::ReadPermission);
+        }
+    );
 }
 
 QnVirtualCameraResourcePtr QnSearchBookmarksDialogPrivate::availableCameraByUniqueId(const QString &uniqueId) const
@@ -377,8 +374,8 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
 
     m_model->setCameras(correctCameras);
 
-    const bool isAdmin = currentUserHasAdminPrivileges();
-    setReadOnly(m_ui->cameraButton, !isAdmin);
+    const bool hasAllCameras = currentUserHasAllCameras();
+   // setReadOnly(m_ui->cameraButton, !hasAllCameras);
 
     if (cameras.empty())
     {
@@ -387,7 +384,7 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
         static const auto kAnyMyDevicesStringsSet = QnCameraDeviceStringSet(
             tr("<All My Devices>"), tr("<All My Cameras>"), tr("<All My I/O Modules>"));
 
-        const auto &devicesStringsSet = (isAdmin
+        const auto &devicesStringsSet = (hasAllCameras
             ? kAnyDevicesStringsSet : kAnyMyDevicesStringsSet);
 
         m_ui->cameraButton->setText(QnDeviceDependentStrings::getNameFromSet(
@@ -409,8 +406,8 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
 void QnSearchBookmarksDialogPrivate::chooseCamera()
 {
     /// Do not allow user without administrator privileges to choose cameras
-    if (!currentUserHasAdminPrivileges())
-        return;
+//     if (!currentUserHasAllCameras())
+//         return;
 
     QnResourceSelectionDialog dialog(m_owner);
     dialog.setSelectedResources(m_allCamerasChoosen
@@ -423,9 +420,9 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
     }
 }
 
-bool QnSearchBookmarksDialogPrivate::currentUserHasAdminPrivileges()
+bool QnSearchBookmarksDialogPrivate::currentUserHasAllCameras()
 {
-    return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    return accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission);
 }
 
 void QnSearchBookmarksDialogPrivate::customContextMenuRequested()

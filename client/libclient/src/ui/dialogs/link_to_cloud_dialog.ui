@@ -76,7 +76,7 @@
       <item row="2" column="1">
        <widget class="QLabel" name="invalidCredentialsLabel">
         <property name="text">
-         <string>E-Mail or password is not recognized.</string>
+         <string>Email or password is not recognized.</string>
         </property>
        </widget>
       </item>

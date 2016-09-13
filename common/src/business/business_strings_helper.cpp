@@ -523,7 +523,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
     if (!mserverRes)
         return QString();
 
-	quint64 timeStampMs = timestampUsec / 1000;
+    quint64 timeStampMs = timestampUsec / 1000;
     QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)
         mserverRes = newServer;

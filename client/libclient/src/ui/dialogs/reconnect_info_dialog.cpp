@@ -11,55 +11,45 @@
 #include <ui/widgets/common/progress_widget.h>
 
 namespace {
-    const int maxLabelWidth = 400;
+const int maxLabelWidth = 400;
 }
 
 QnReconnectInfoDialog::QnReconnectInfoDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    ui(new Ui::ReconnectInfoDialog()),
-    m_cancelled(false)
+    ui(new Ui::ReconnectInfoDialog())
 {
     ui->setupUi(this);
 
-    if (qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode()) {
-        ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
+    if (!qnRuntime->isDesktopMode())
         ui->buttonBox->setVisible(false);
-        return;
-    }
-
-    connect(ui->buttonBox,  &QDialogButtonBox::rejected, this, [this]{
-        reject();
-    });
 }
 
 QnReconnectInfoDialog::~QnReconnectInfoDialog()
-{}
-
-
-void QnReconnectInfoDialog::reject() {
-    m_cancelled = true;
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
-    ui->label->setText(tr("Canceling..."));
-    /* We are not closing dialog here intentionally. */
+{
 }
 
-
-bool QnReconnectInfoDialog::wasCanceled() const {
-    return m_cancelled;
-}
-
-QnMediaServerResourcePtr QnReconnectInfoDialog::currentServer() const {
+QnMediaServerResourcePtr QnReconnectInfoDialog::currentServer() const
+{
     return m_currentServer;
 }
 
-void QnReconnectInfoDialog::setCurrentServer(const QnMediaServerResourcePtr &server) {
+void QnReconnectInfoDialog::setCurrentServer(const QnMediaServerResourcePtr &server)
+{
     if (m_currentServer == server)
         return;
     m_currentServer = server;
     emit currentServerChanged(server);
 }
 
-QnMediaServerResourceList QnReconnectInfoDialog::servers() const {
+void QnReconnectInfoDialog::reject()
+{
+    if (!qnRuntime->isDesktopMode())
+        return;
+    base_type::reject();
+}
+
+QnMediaServerResourceList QnReconnectInfoDialog::servers() const
+{
     return m_servers;
 }
 
@@ -67,7 +57,7 @@ void QnReconnectInfoDialog::setServers(const QnMediaServerResourceList &servers)
 {
     m_servers = servers;
     int row = 0;
-    for (const QnMediaServerResourcePtr server: m_servers)
+    for (const auto server : m_servers)
     {
         QString text = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
 
@@ -77,13 +67,16 @@ void QnReconnectInfoDialog::setServers(const QnMediaServerResourceList &servers)
         QLabel *iconLabel = new QLabel(this);
         iconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(18, 18));
 
-        QnProgressWidget* progressWidget = new QnProgressWidget(this);
-        connect(this, &QnReconnectInfoDialog::currentServerChanged, this, [this, progressWidget, nameLabel, server](const QnMediaServerResourcePtr &currentServer) {
-            progressWidget->setVisible(server == currentServer);
-            QFont baseFont = this->font();
-            baseFont.setBold(server == currentServer);
-            nameLabel->setFont(baseFont);
-        });
+        auto progressWidget = new QnProgressWidget(this);
+        connect(this, &QnReconnectInfoDialog::currentServerChanged, this,
+            [this, progressWidget, nameLabel, server]
+            (const QnMediaServerResourcePtr &currentServer)
+            {
+                progressWidget->setVisible(server == currentServer);
+                QFont baseFont = this->font();
+                baseFont.setBold(server == currentServer);
+                nameLabel->setFont(baseFont);
+            });
         progressWidget->setVisible(server == m_currentServer);
 
         ui->gridLayout->addWidget(progressWidget, row, 0);

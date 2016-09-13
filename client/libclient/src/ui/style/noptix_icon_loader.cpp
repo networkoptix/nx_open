@@ -149,6 +149,8 @@ void QnNoptixIconLoader::loadIconInternal(
 
     decompose(name, &prefix, &extension);
 
+    // TODO: #ynikitenkov Add multiple pixmaps mode (for 2x-3x..nx hidpi modes)
+
     /* Create normal icon. */
     QnIconBuilder builder;
     builder.addPixmap(skin->pixmap(name), QnIcon::Normal, QnIcon::Off);

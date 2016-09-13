@@ -14,6 +14,8 @@
 #include <utils/memory/system_allocator.h>
 #include <utils/math/math.h>
 
+#include <motion/motion_detection.h>
+
 #include "aligned_allocator.h"
 #include "abstract_data_packet.h"
 
@@ -158,7 +160,7 @@ struct QnMetaDataV1Light
     quint8 channel;
     quint8 input;
     quint16 reserved;
-    quint8 data[MD_WIDTH*MD_HEIGHT/8];
+    quint8 data[Qn::kMotionGridWidth*Qn::kMotionGridHeight/8];
 };
 #pragma pack(pop)
 bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs);
@@ -191,7 +193,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     void addMotion(QnConstMetaDataV1Ptr data);
 
     // remove part of motion info by motion mask
-    void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
+    void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = Qn::kMotionGridWidth*Qn::kMotionGridHeight/128 - 1);
 
     // ti check if we've got motion at
     static bool isMotionAt(int x, int y, char* mask);
@@ -205,7 +207,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     bool isInput(int index) const
     {
-        //unsigned char b = *((unsigned char*)data.data() + MD_WIDTH * MD_HIGHT/8);
+        //unsigned char b = *((unsigned char*)data.data() + Qn::kMotionGridWidth * MD_HIGHT/8);
         //return (b>>index) & 1 ;
         return (m_input >> index) & 1;
     }
@@ -216,7 +218,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     bool isEmpty() const;
 
     /**
-     * @param data Should contain MD_WIDTH * MD_HEIGHT / CHAR_BIT bytes.
+     * @param data Should contain Qn::kMotionGridWidth * Qn::kMotionGridHeight / CHAR_BIT bytes.
      */
     void assign( const void* data, qint64 timestamp, qint64 duration );
 
@@ -230,7 +232,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     //void deserialize(QIODevice* ioDevice);
     void serialize(QIODevice* ioDevice) const;
 
-    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128 - 1);
 
 
     quint8 m_input;

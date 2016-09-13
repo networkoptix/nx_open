@@ -13,14 +13,16 @@ QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
 {
 }
 
-bool QnMobileClientMessageProcessor::isConnected() const {
-    switch (connectionState()) {
-    case QnConnectionState::Connected:
-    case QnConnectionState::Reconnecting:
-    case QnConnectionState::Ready:
-        return true;
-    default:
-        return false;
+bool QnMobileClientMessageProcessor::isConnected() const
+{
+    switch (connectionStatus()->state())
+    {
+        case QnConnectionState::Connected:
+        case QnConnectionState::Reconnecting:
+        case QnConnectionState::Ready:
+            return true;
+        default:
+            return false;
     }
 }
 

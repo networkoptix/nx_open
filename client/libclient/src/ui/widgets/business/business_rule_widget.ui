@@ -173,10 +173,6 @@
           <property name="text">
            <string>Schedule...</string>
           </property>
-          <property name="icon">
-           <iconset>
-            <normaloff>:/skin/tree/servers.png</normaloff>:/skin/tree/servers.png</iconset>
-          </property>
          </widget>
         </item>
        </layout>

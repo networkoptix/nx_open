@@ -457,7 +457,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_oldMaximum(0),
     m_options(0),
     m_zoomAnchor(0),
-    m_animating(false),
+    m_animatingSliderWindow(false),
     m_kineticsHurried(false),
     m_dragMarker(NoMarker),
     m_dragIsClick(false),
@@ -702,6 +702,11 @@ void QnTimeSlider::enumerateSteps(QVector<QnTimeStep>& steps)
         steps[i].index = i;
 }
 
+void QnTimeSlider::invalidateWindow()
+{
+    m_oldMaximum = m_oldMinimum = -1;
+}
+
 int QnTimeSlider::lineCount() const
 {
     return m_lineCount;
@@ -899,9 +904,9 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate)
         if (animate)
         {
             kineticProcessor()->reset(); /* Stop kinetic zoom. */
-            m_animating = true;
-            setAnimationStart(start);
-            setAnimationEnd(end);
+            m_animatingSliderWindow = true;
+            setTargetStart(start);
+            setTargetEnd(end);
         }
         else
         {
@@ -1098,10 +1103,10 @@ void QnTimeSlider::finishAnimations()
     animateStepValues(10 * 1000);
     animateThumbnails(10 * 1000);
 
-    if (m_animating)
+    if (m_animatingSliderWindow)
     {
-        setWindow(animationStart(), animationEnd());
-        m_animating = false;
+        setWindow(targetStart(), targetEnd());
+        m_animatingSliderWindow = false;
     }
 
     kineticProcessor()->reset();
@@ -1119,24 +1124,24 @@ void QnTimeSlider::hurryKineticAnimations()
     updateKineticProcessor();
 }
 
-void QnTimeSlider::setAnimationStart(qint64 start)
+void QnTimeSlider::setTargetStart(qint64 start)
 {
-    m_animationStart = start == minimum() ? std::numeric_limits<qint64>::min() : start;
+    m_targetStart = start == minimum() ? std::numeric_limits<qint64>::min() : start;
 }
 
-void QnTimeSlider::setAnimationEnd(qint64 end)
+void QnTimeSlider::setTargetEnd(qint64 end)
 {
-    m_animationEnd = end == maximum() ? std::numeric_limits<qint64>::max() : end;
+    m_targetEnd = end == maximum() ? std::numeric_limits<qint64>::max() : end;
 }
 
-qint64 QnTimeSlider::animationStart()
+qint64 QnTimeSlider::targetStart()
 {
-    return m_animationStart == std::numeric_limits<qint64>::min() ? minimum() : m_animationStart;
+    return m_targetStart == std::numeric_limits<qint64>::min() ? minimum() : m_targetStart;
 }
 
-qint64 QnTimeSlider::animationEnd()
+qint64 QnTimeSlider::targetEnd()
 {
-    return m_animationEnd == std::numeric_limits<qint64>::max() ? maximum() : m_animationEnd;
+    return m_targetEnd == std::numeric_limits<qint64>::max() ? maximum() : m_targetEnd;
 }
 
 void QnTimeSlider::generateProgressPatterns()
@@ -1186,7 +1191,7 @@ void QnTimeSlider::generateProgressPatterns()
 
 bool QnTimeSlider::isAnimatingWindow() const
 {
-    return m_animating || kineticProcessor()->isRunning();
+    return m_animatingSliderWindow || kineticProcessor()->isRunning();
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor)
@@ -1669,7 +1674,7 @@ void QnTimeSlider::setLiveSupported(bool value)
 
 bool QnTimeSlider::isLive() const
 {
-    return m_liveSupported && value() == maximum();
+    return m_liveSupported && !m_selecting && value() == maximum();
 }
 
 qreal QnTimeSlider::msecsPerPixel() const
@@ -2713,7 +2718,7 @@ QSizeF QnTimeSlider::sizeHint(Qt::SizeHint which, const QSizeF& constraint) cons
 
 void QnTimeSlider::tick(int deltaMs)
 {
-    if (m_options.testFlag(AdjustWindowToPosition) && !m_animating && !isSliderDown())
+    if (m_options.testFlag(AdjustWindowToPosition) && !m_animatingSliderWindow && !isSliderDown())
     {
         /* Apply window position corrections if no animation or user interaction is in progress. */
         qint64 position = this->sliderPosition();
@@ -2741,39 +2746,27 @@ void QnTimeSlider::tick(int deltaMs)
         }
     }
 
-    if (!m_animating)
+    if (m_animatingSliderWindow)
     {
-        animateStepValues(deltaMs);
-    }
-    else
-    {
-        qint64 animationStart = this->animationStart();
-        qint64 animationEnd = this->animationEnd();
+        /* 0.5^t convergence: */
+        static const qreal kHalfwayTimeMs = 15.0;
+        qreal timeFactor = pow(0.5, deltaMs / kHalfwayTimeMs);
+        qint64 untilStart = static_cast<qint64>((targetStart() - m_windowStart) * timeFactor);
+        qint64 untilEnd = static_cast<qint64>((targetEnd() - m_windowEnd) * timeFactor);
 
-        qreal distance = qAbs(animationStart - m_windowStart) + qAbs(animationEnd - m_windowEnd);
-        qreal delta = 8.0 * deltaMs / 1000.0 * qMax(distance, 2.0 * static_cast<qreal>(m_windowEnd - m_windowStart));
+        qint64 desiredWindowSize = targetEnd() - targetStart();
+        qint64 maxRemainder = qMax(qAbs(untilStart), qAbs(untilEnd));
 
-        if (delta > distance)
+        if (maxRemainder < qMax(desiredWindowSize / 1000, 1000LL))
         {
-            setWindow(animationStart, animationEnd);
-        }
-        else
-        {
-            qreal startFraction = (animationStart - m_windowStart) / distance;
-            qreal endFraction  = (animationEnd - m_windowEnd) / distance;
-
-            setWindow(
-                m_windowStart + static_cast<qint64>(delta * startFraction),
-                m_windowEnd + static_cast<qint64>(delta * endFraction)
-            );
+            m_animatingSliderWindow = false;
+            untilStart = untilEnd = 0;
         }
 
-        if (animationStart == m_windowStart && animationEnd == m_windowEnd)
-            m_animating = false;
-
-        animateStepValues(8.0 * deltaMs);
+        setWindow(targetStart() - untilStart, targetEnd() - untilEnd);
     }
 
+    animateStepValues(deltaMs);
     animateThumbnails(deltaMs);
     animateLastMinute(deltaMs);
 }
@@ -2782,10 +2775,22 @@ void QnTimeSlider::sliderChange(SliderChange change)
 {
     base_type::sliderChange(change);
 
-    switch(change)
+    switch (change)
     {
-    case SliderRangeChange:
+        case SliderRangeChange:
         {
+            /* If a window was invalidated: */
+            if (m_oldMinimum < 0 && m_oldMinimum == m_oldMaximum)
+            {
+                m_oldMinimum = minimum();
+                m_oldMaximum = maximum();
+                m_zoomAnchor = (m_oldMinimum + m_oldMaximum) / 2;
+                setWindow(m_oldMinimum, m_oldMaximum);
+                setSelectionValid(false);
+                finishAnimations();
+                break;
+            }
+
             qint64 windowStart = m_windowStart;
             qint64 windowEnd = m_windowEnd;
 
@@ -2826,22 +2831,22 @@ void QnTimeSlider::sliderChange(SliderChange change)
             break;
         }
 
-    case SliderValueChange:
-        updateToolTipVisibility();
-        updateToolTipText();
-        break;
+        case SliderValueChange:
+            updateToolTipVisibility();
+            updateToolTipText();
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 
 void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
-    if (m_animating)
+    if (m_animatingSliderWindow)
     {
         event->accept();
-        return; /* Do nothing if animated unzoom is in progress. */
+        return; /* Do nothing if animated zoom is in progress. */
     }
 
     /* delta() returns the distance that the wheel is rotated
@@ -3129,11 +3134,13 @@ void QnTimeSlider::changeEvent(QEvent* event)
 void QnTimeSlider::startDragProcess(DragInfo* info)
 {
     m_dragIsClick = true;
-    setSliderDown(true);
 
     /* We have to use mapping because these events can be caused by the tooltip as well as by the slider itself. */
     if (m_dragMarker == CreateSelectionMarker)
+    {
+        setSliderDown(true);
         setSliderPosition(valueFromPosition(mapFromScene(info->mousePressScenePos())));
+    }
 }
 
 void QnTimeSlider::startDrag(DragInfo* info)
@@ -3143,6 +3150,7 @@ void QnTimeSlider::startDrag(DragInfo* info)
     qint64 pos = valueFromPosition(mousePos + m_dragDelta);
 
     m_dragIsClick = false;
+    setSliderDown(true);
 
     switch (m_dragMarker)
     {

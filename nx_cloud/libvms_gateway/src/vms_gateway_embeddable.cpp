@@ -17,6 +17,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
     addArg("-cloudConnect/allowIpTarget", "true");
     addArg("-http/allowTargetEndpointInUrl", "true");
     //addArg("-http/connectSupport", "true");
+    addArg("cloudConnect/tcpReversePoolSize", "0");
 
     if (isSslEnabled)
     {

@@ -115,7 +115,6 @@ public:
     void setToolTipParent(QGraphicsWidget* widget);
 
 signals:
-    void activated(const QnResourcePtr& resource);
     void currentTabChanged();
     void selectionChanged();
 

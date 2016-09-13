@@ -197,7 +197,7 @@ void QnDatabaseManagementWidget::restoreDb()
             tr("Information"),
             tr("Database was successfully restored from file '%1'. Server will be restarted.")
                 .arg(fileName));
-        menu()->trigger(QnActions::ReconnectAction);
+        //menu()->trigger(QnActions::ReconnectAction); // we must be reconnected automatically
     }
     else
     {

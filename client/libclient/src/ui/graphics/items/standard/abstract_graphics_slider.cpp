@@ -8,13 +8,14 @@
 #include <limits>
 
 namespace {
-    bool isInt(qint64 value) {
-        return value >= std::numeric_limits<int>::min() && value <= std::numeric_limits<int>::max();
-    }
+
+    // Max range for QStyleOptionSlider to avoid overflows and Qt's mishandling:
+    const int kStyleRangeLimit = std::numeric_limits<int>::max() / 4;
 
 } // anonymous namespace
 
-void AbstractGraphicsSliderPrivate::setSteps(qint64 single, qint64 page) {
+void AbstractGraphicsSliderPrivate::setSteps(qint64 single, qint64 page)
+{
     Q_Q(AbstractGraphicsSlider);
     single = qAbs(single);
     page = qAbs(page);
@@ -24,32 +25,37 @@ void AbstractGraphicsSliderPrivate::setSteps(qint64 single, qint64 page) {
 
     singleStep = single;
     pageStep = page;
-    
+
     q->sliderChange(AbstractGraphicsSlider::SliderStepsChange);
 
-    if(singleChanged)
+    if (singleChanged)
         emit q->singleStepChanged(singleStep);
-    if(pageChanged)
+    if (pageChanged)
         emit q->pageStepChanged(pageStep);
 }
 
 
-AbstractGraphicsSlider::AbstractGraphicsSlider(QGraphicsItem *parent): 
+AbstractGraphicsSlider::AbstractGraphicsSlider(QGraphicsItem* parent):
     base_type(*new AbstractGraphicsSliderPrivate, parent)
-{}
+{
+}
 
-AbstractGraphicsSlider::AbstractGraphicsSlider(AbstractGraphicsSliderPrivate &dd, QGraphicsItem *parent):
+AbstractGraphicsSlider::AbstractGraphicsSlider(AbstractGraphicsSliderPrivate& dd, QGraphicsItem* parent):
     base_type(dd, parent)
-{}
+{
+}
 
-AbstractGraphicsSlider::~AbstractGraphicsSlider() 
-{}
+AbstractGraphicsSlider::~AbstractGraphicsSlider()
+{
+}
 
-Qt::Orientation AbstractGraphicsSlider::orientation() const {
+Qt::Orientation AbstractGraphicsSlider::orientation() const
+{
     return d_func()->orientation;
 }
 
-void AbstractGraphicsSlider::setOrientation(Qt::Orientation orientation) {
+void AbstractGraphicsSlider::setOrientation(Qt::Orientation orientation)
+{
     Q_D(AbstractGraphicsSlider);
     if (d->orientation == orientation)
         return;
@@ -64,74 +70,90 @@ void AbstractGraphicsSlider::setOrientation(Qt::Orientation orientation) {
     updateGeometry();
 }
 
-qint64 AbstractGraphicsSlider::minimum() const {
+qint64 AbstractGraphicsSlider::minimum() const
+{
     return d_func()->minimum;
 }
 
-void AbstractGraphicsSlider::setMinimum(qint64 min) {
+void AbstractGraphicsSlider::setMinimum(qint64 min)
+{
     setRange(min, qMax(d_func()->maximum, min));
 }
 
-qint64 AbstractGraphicsSlider::maximum() const {
+qint64 AbstractGraphicsSlider::maximum() const
+{
     return d_func()->maximum;
 }
 
-void AbstractGraphicsSlider::setMaximum(qint64 max) {
+void AbstractGraphicsSlider::setMaximum(qint64 max)
+{
     setRange(qMin(d_func()->minimum, max), max);
 }
 
-void AbstractGraphicsSlider::setRange(qint64 min, qint64 max) {
+void AbstractGraphicsSlider::setRange(qint64 min, qint64 max)
+{
     Q_D(AbstractGraphicsSlider);
     qint64 oldMin = d->minimum;
     qint64 oldMax = d->maximum;
     d->minimum = min;
     d->maximum = qMax(min, max);
-    if (oldMin != d->minimum || oldMax != d->maximum) {
+
+    if (oldMin != d->minimum || oldMax != d->maximum)
+    {
         sliderChange(SliderRangeChange);
         Q_EMIT rangeChanged(d->minimum, d->maximum);
         setValue(d->value); // re-bound
     }
 }
 
-qint64 AbstractGraphicsSlider::singleStep() const {
+qint64 AbstractGraphicsSlider::singleStep() const
+{
     return d_func()->singleStep;
 }
 
-void AbstractGraphicsSlider::setSingleStep(qint64 step) {
+void AbstractGraphicsSlider::setSingleStep(qint64 step)
+{
     Q_D(AbstractGraphicsSlider);
     if (step != d->singleStep)
         d->setSteps(step, d->pageStep);
 }
 
-qint64 AbstractGraphicsSlider::pageStep() const {
+qint64 AbstractGraphicsSlider::pageStep() const
+{
     return d_func()->pageStep;
 }
 
-void AbstractGraphicsSlider::setPageStep(qint64 step) {
+void AbstractGraphicsSlider::setPageStep(qint64 step)
+{
     Q_D(AbstractGraphicsSlider);
     if (step != d->pageStep)
         d->setSteps(d->singleStep, step);
 }
 
-bool AbstractGraphicsSlider::hasTracking() const {
+bool AbstractGraphicsSlider::hasTracking() const
+{
     return d_func()->tracking;
 }
 
-void AbstractGraphicsSlider::setTracking(bool enable) {
+void AbstractGraphicsSlider::setTracking(bool enable)
+{
     d_func()->tracking = enable;
 }
 
-bool AbstractGraphicsSlider::isSliderDown() const {
+bool AbstractGraphicsSlider::isSliderDown() const
+{
     return d_func()->pressed;
 }
 
-void AbstractGraphicsSlider::setSliderDown(bool down) {
+void AbstractGraphicsSlider::setSliderDown(bool down)
+{
     Q_D(AbstractGraphicsSlider);
     bool doEmit = d->pressed != down;
 
     d->pressed = down;
 
-    if (doEmit) {
+    if (doEmit)
+    {
         if (down)
             Q_EMIT sliderPressed();
         else
@@ -142,144 +164,176 @@ void AbstractGraphicsSlider::setSliderDown(bool down) {
         triggerAction(SliderMove);
 }
 
-qint64 AbstractGraphicsSlider::sliderPosition() const {
+qint64 AbstractGraphicsSlider::sliderPosition() const
+{
     return d_func()->position;
 }
 
-void AbstractGraphicsSlider::setSliderPosition(qint64 position) {
+void AbstractGraphicsSlider::setSliderPosition(qint64 position)
+{
     Q_D(AbstractGraphicsSlider);
     position = qBound(d->minimum, position, d->maximum);
     if (position == d->position)
         return;
+
     d->position = position;
     if (!d->tracking)
         update();
+
     if (d->pressed)
         Q_EMIT sliderMoved(position);
+
     if (d->tracking && !d->blockTracking)
         triggerAction(SliderMove);
 }
 
-qint64 AbstractGraphicsSlider::value() const {
+qint64 AbstractGraphicsSlider::value() const
+{
     return d_func()->value;
 }
 
-void AbstractGraphicsSlider::setValue(qint64 value) {
+void AbstractGraphicsSlider::setValue(qint64 value)
+{
     Q_D(AbstractGraphicsSlider);
     value = qBound(d->minimum, value, d->maximum);
     if (d->value == value && d->position == value)
         return;
+
     d->value = value;
-    if (d->position != d->value) {
+    if (d->position != d->value)
+    {
         d->position = d->value;
         if (d->pressed)
             Q_EMIT sliderMoved(d->position);
     }
+
     sliderChange(SliderValueChange);
     Q_EMIT valueChanged(d->value);
 }
 
-bool AbstractGraphicsSlider::invertedAppearance() const {
+bool AbstractGraphicsSlider::invertedAppearance() const
+{
     return d_func()->invertedAppearance;
 }
 
-void AbstractGraphicsSlider::setInvertedAppearance(bool invert) {
+void AbstractGraphicsSlider::setInvertedAppearance(bool invert)
+{
     d_func()->invertedAppearance = invert;
     update();
 }
 
-bool AbstractGraphicsSlider::invertedControls() const {
+bool AbstractGraphicsSlider::invertedControls() const
+{
     return d_func()->invertedControls;
 }
 
-void AbstractGraphicsSlider::setInvertedControls(bool invert) {
+void AbstractGraphicsSlider::setInvertedControls(bool invert)
+{
     d_func()->invertedControls = invert;
 }
 
-bool AbstractGraphicsSlider::isWheelingAccelerated() const {
+bool AbstractGraphicsSlider::isWheelingAccelerated() const
+{
     return d_func()->acceleratedWheeling;
 }
 
-void AbstractGraphicsSlider::setWheelingAccelerated(bool enable) {
+void AbstractGraphicsSlider::setWheelingAccelerated(bool enable)
+{
     d_func()->acceleratedWheeling = enable;
 }
 
-void AbstractGraphicsSlider::triggerAction(SliderAction action) {
+void AbstractGraphicsSlider::triggerAction(SliderAction action)
+{
     Q_D(AbstractGraphicsSlider);
     d->blockTracking = true;
-    switch (action) {
-    case SliderSingleStepAdd:
-        setSliderPosition(d->value + d->effectiveSingleStep());
-        break;
-    case SliderSingleStepSub:
-        setSliderPosition(d->value - d->effectiveSingleStep());
-        break;
-    case SliderPageStepAdd:
-        setSliderPosition(d->value + d->pageStep);
-        break;
-    case SliderPageStepSub:
-        setSliderPosition(d->value - d->pageStep);
-        break;
-    case SliderToMinimum:
-        setSliderPosition(d->minimum);
-        break;
-    case SliderToMaximum:
-        setSliderPosition(d->maximum);
-        break;
-    case SliderMove:
-    case SliderNoAction:
-        break;
+
+    switch (action)
+    {
+        case SliderSingleStepAdd:
+            setSliderPosition(d->value + d->effectiveSingleStep());
+            break;
+
+        case SliderSingleStepSub:
+            setSliderPosition(d->value - d->effectiveSingleStep());
+            break;
+
+        case SliderPageStepAdd:
+            setSliderPosition(d->value + d->pageStep);
+            break;
+
+        case SliderPageStepSub:
+            setSliderPosition(d->value - d->pageStep);
+            break;
+
+        case SliderToMinimum:
+            setSliderPosition(d->minimum);
+            break;
+
+        case SliderToMaximum:
+            setSliderPosition(d->maximum);
+            break;
+
+        case SliderMove:
+        case SliderNoAction:
+            break;
     };
+
     Q_EMIT actionTriggered(action);
     d->blockTracking = false;
     setValue(d->position);
 }
 
-AbstractGraphicsSlider::SliderAction AbstractGraphicsSlider::repeatAction() const {
+AbstractGraphicsSlider::SliderAction AbstractGraphicsSlider::repeatAction() const
+{
     return d_func()->repeatAction;
 }
 
 void AbstractGraphicsSlider::setRepeatAction(SliderAction action, int thresholdTime, int repeatTime)
 {
     Q_D(AbstractGraphicsSlider);
-    if ((d->repeatAction = action) == SliderNoAction) {
+    if ((d->repeatAction = action) == SliderNoAction)
+    {
         d->repeatActionTimer.stop();
-    } else {
+    } else
+    {
         d->repeatActionTime = repeatTime;
         d->repeatActionTimer.start(thresholdTime, this);
     }
 }
 
-void AbstractGraphicsSlider::sliderChange(SliderChange) {
+void AbstractGraphicsSlider::sliderChange(SliderChange)
+{
     update();
 }
 
-void AbstractGraphicsSlider::sendPendingMouseMoves(bool checkPosition) {
+void AbstractGraphicsSlider::sendPendingMouseMoves(bool checkPosition)
+{
     sendPendingMouseMoves(d_func()->mouseWidget.data(), checkPosition);
 }
 
-void AbstractGraphicsSlider::sendPendingMouseMoves(QWidget *widget, bool checkPosition) {
+void AbstractGraphicsSlider::sendPendingMouseMoves(QWidget* widget, bool checkPosition)
+{
     Q_D(AbstractGraphicsSlider);
 
-    if(!scene() || scene()->mouseGrabberItem() != this)
+    if (!scene() || scene()->mouseGrabberItem() != this)
         return;
 
-    if(!widget || widget != d->mouseWidget.data())
+    if (!widget || widget != d->mouseWidget.data())
         return;
 
     /* We send only 'repeating' mouse events that do not change current buttons state.
      * Otherwise, synthetic mouse events would end up interfering with the real ones,
      * which may lead to some surprising effects. */
     Qt::MouseButtons buttons = QApplication::mouseButtons();
-    if(buttons == 0 || buttons != d->mouseButtons) 
-        return;
-    
-    QPoint pos = QCursor::pos();
-    if(checkPosition && pos == d->mouseScreenPos)
+    if (buttons == 0 || buttons != d->mouseButtons)
         return;
 
-    QGraphicsView *view = dynamic_cast<QGraphicsView *>(widget->parent());
-    if(!view) 
+    QPoint pos = QCursor::pos();
+    if (checkPosition && pos == d->mouseScreenPos)
+        return;
+
+    QGraphicsView* view = dynamic_cast<QGraphicsView*>(widget->parent());
+    if (!view)
         return;
 
     QGraphicsSceneMouseEvent event(QEvent::GraphicsSceneMouseMove);
@@ -295,19 +349,24 @@ void AbstractGraphicsSlider::sendPendingMouseMoves(QWidget *widget, bool checkPo
     scene()->sendEvent(this, &event);
 }
 
-bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta) {
+bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta)
+{
     Q_Q(AbstractGraphicsSlider);
     qint64 stepsToScroll = 0;
     // in Qt scrolling to the right gives negative values.
     if (orientation == Qt::Horizontal)
         delta = -delta;
+
     qreal offset = qreal(delta) / 120;
 
-    if (modifiers & (Qt::ControlModifier | Qt::ShiftModifier)) {
+    if (modifiers & (Qt::ControlModifier | Qt::ShiftModifier))
+    {
         // Scroll one page regardless of delta:
         stepsToScroll = qBound(-pageStep, qint64(offset * pageStep), pageStep);
         offset_accumulated = 0;
-    } else {
+    }
+    else
+    {
         // Calculate how many lines to scroll. Depending on what delta is (and
         // offset), we might end up with a fraction (e.g. scroll 1.3 lines). We can
         // only scroll whole lines, so we keep the reminder until next event.
@@ -321,13 +380,16 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
             offset_accumulated = 0;
 
         offset_accumulated += stepsToScrollF;
-        if (!acceleratedWheeling) {
+        if (!acceleratedWheeling)
+        {
             // Don't scroll more than one page in any case
             stepsToScroll = qBound(-pageStep, qint64(offset_accumulated), pageStep);
-        } else {
+        } else
+        {
             // Make it able scroll hundreds of lines at a time as a result of acceleration
             stepsToScroll = qint64(offset_accumulated);
         }
+
         offset_accumulated -= qint64(offset_accumulated);
         if (stepsToScroll == 0)
             return false;
@@ -340,7 +402,8 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
 
     q->setSliderPosition(value + stepsToScroll);
 
-    if (prevPosition == position) {
+    if (prevPosition == position)
+    {
         offset_accumulated = 0;
         return false;
     }
@@ -348,16 +411,20 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
     return true;
 }
 
-void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
+void AbstractGraphicsSlider::keyPressEvent(QKeyEvent* event)
 {
     Q_D(AbstractGraphicsSlider);
 
     SliderAction action = SliderNoAction;
 #ifdef QT_KEYPAD_NAVIGATION
-    if (event->isAutoRepeat()) {
+    if (event->isAutoRepeat())
+    {
         if (!d->firstRepeat.isValid())
+        {
             d->firstRepeat.start();
-        else if (1 == d->repeatMultiplier) {
+        }
+        else if (1 == d->repeatMultiplier)
+        {
             // This is the interval in milli seconds which one key repetition
             // takes.
             const int repeatMSecs = d->firstRepeat.elapsed();
@@ -372,13 +439,16 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
 
             d->repeatMultiplier = currentTimeElapse / SliderRepeatElapse;
         }
-    } else if (d->firstRepeat.isValid()) {
+    }
+    else if (d->firstRepeat.isValid())
+    {
         d->firstRepeat.invalidate();
         d->repeatMultiplier = 1;
     }
 #endif
 
-    switch (event->key()) {
+    switch (event->key())
+    {
 #ifdef QT_KEYPAD_NAVIGATION
         case Qt::Key_Select:
             if (QApplication::keypadNavigationEnabled())
@@ -387,11 +457,15 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
                 event->ignore();
             break;
         case Qt::Key_Back:
-            if (QApplication::keypadNavigationEnabled() && hasEditFocus()) {
+            if (QApplication::keypadNavigationEnabled() && hasEditFocus())
+            {
                 setValue(d->origValue);
                 setEditFocus(false);
-            } else
+            }
+            else
+            {
                 event->ignore();
+            }
             break;
 #endif
 
@@ -405,10 +479,12 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
                     && (!hasEditFocus() && QApplication::navigationMode() == Qt::NavigationModeKeypadTabOrder
                     || d->orientation == Qt::Vertical
                     || !hasEditFocus()
-                    && (QWidgetPrivate::canKeypadNavigate(Qt::Horizontal) || QWidgetPrivate::inTabWidget(this)))) {
+                    && (QWidgetPrivate::canKeypadNavigate(Qt::Horizontal) || QWidgetPrivate::inTabWidget(this))))
+            {
                 event->ignore();
                 return;
             }
+
             if (QApplication::keypadNavigationEnabled() && d->orientation == Qt::Vertical)
                 action = d->invertedControls ? SliderSingleStepSub : SliderSingleStepAdd;
             else
@@ -425,7 +501,8 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
                     && (!hasEditFocus() && QApplication::navigationMode() == Qt::NavigationModeKeypadTabOrder
                     || d->orientation == Qt::Vertical
                     || !hasEditFocus()
-                    && (QWidgetPrivate::canKeypadNavigate(Qt::Horizontal) || QWidgetPrivate::inTabWidget(this)))) {
+                    && (QWidgetPrivate::canKeypadNavigate(Qt::Horizontal) || QWidgetPrivate::inTabWidget(this))))
+            {
                 event->ignore();
                 return;
             }
@@ -445,7 +522,8 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
             if (QApplication::keypadNavigationEnabled()
                     && (QApplication::navigationMode() == Qt::NavigationModeKeypadTabOrder
                     || d->orientation == Qt::Horizontal
-                    || !hasEditFocus() && QWidgetPrivate::canKeypadNavigate(Qt::Vertical))) {
+                    || !hasEditFocus() && QWidgetPrivate::canKeypadNavigate(Qt::Vertical)))
+            {
                 event->ignore();
                 break;
             }
@@ -465,18 +543,23 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
 #endif
             action = d->invertedControls ? SliderSingleStepAdd : SliderSingleStepSub;
             break;
+
         case Qt::Key_PageUp:
             action = d->invertedControls ? SliderPageStepSub : SliderPageStepAdd;
             break;
+
         case Qt::Key_PageDown:
             action = d->invertedControls ? SliderPageStepAdd : SliderPageStepSub;
             break;
+
         case Qt::Key_Home:
             action = SliderToMinimum;
             break;
+
         case Qt::Key_End:
             action = SliderToMaximum;
             break;
+
         default:
             event->ignore();
             break;
@@ -485,7 +568,8 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *event)
         triggerAction(action);
 }
 
-void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const {
+void AbstractGraphicsSlider::initStyleOption(QStyleOption* option) const
+{
     Q_D(const AbstractGraphicsSlider);
 
     base_type::initStyleOption(option);
@@ -493,52 +577,54 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const {
     if (d->orientation == Qt::Horizontal)
         option->state |= QStyle::State_Horizontal;
 
-    if (QStyleOptionSlider *sliderOption = qstyleoption_cast<QStyleOptionSlider *>(option)) {
+    if (QStyleOptionSlider *sliderOption = qstyleoption_cast<QStyleOptionSlider*>(option))
+    {
         sliderOption->subControls = QStyle::SC_None;
         sliderOption->activeSubControls = QStyle::SC_None;
         sliderOption->orientation = d->orientation;
+
         sliderOption->upsideDown = d->orientation == Qt::Horizontal
-                                   ? d->invertedAppearance != (option->direction == Qt::RightToLeft)
-                                   : !d->invertedAppearance;
+            ? d->invertedAppearance != (option->direction == Qt::RightToLeft)
+            : !d->invertedAppearance;
+
         sliderOption->direction = Qt::LeftToRight; // we use the upsideDown option instead
 
-        qint64 minimum      = d->minimum;
-        qint64 maximum      = d->maximum;
-        qint64 position     = d->position;
-        qint64 value        = d->value;
-        qint64 singleStep   = d->singleStep;
-        qint64 pageStep     = d->pageStep;
+        qint64 range = d->maximum - d->minimum;
+        NX_ASSERT(range >= 0);
 
-        if(!isInt(maximum) || !isInt(minimum)) {
-            maximum     -= minimum;
-            position    -= minimum;
-            value       -= minimum;
-            minimum      = 0;
+        qint64 base = 0;
+        qreal scale = 1.0;
+
+        if (range > kStyleRangeLimit)
+        {
+            base = d->minimum;
+            scale = static_cast<qreal>(kStyleRangeLimit) / range;
+        }
+        else if (d->minimum < -kStyleRangeLimit || d->maximum > kStyleRangeLimit)
+        {
+            base = d->minimum;
         }
 
-        if(!isInt(maximum + pageStep) || !isInt(maximum + singleStep)) {
-            qint64 k = qMax(qMax(maximum, pageStep), singleStep) >> 16;
+        auto scaled =
+            [scale](qint64 value, qint64 base = 0) -> int
+            {
+                return static_cast<int>((value - base) * scale);
+            };
 
-            minimum     /= k;
-            maximum     /= k;
-            position    /= k;
-            value       /= k;
-            singleStep  /= k;
-            pageStep    /= k;
-        }
-
-        sliderOption->minimum = minimum;
-        sliderOption->maximum = maximum;
-        sliderOption->sliderPosition = position;
-        sliderOption->sliderValue = value;
-        sliderOption->singleStep = singleStep;
-        sliderOption->pageStep = pageStep;
+        sliderOption->minimum = scaled(d->minimum, base);
+        sliderOption->maximum = scaled(d->maximum, base);
+        sliderOption->sliderPosition = scaled(d->position, base);
+        sliderOption->sliderValue = scaled(d->value, base);
+        sliderOption->singleStep = d->singleStep == 0 ? 0 : qMax(scaled(d->singleStep), 1);
+        sliderOption->pageStep = d->pageStep == 0 ? 0 : qMax(scaled(d->pageStep), 1);
     }
 }
 
-bool AbstractGraphicsSlider::event(QEvent *event) {
+bool AbstractGraphicsSlider::event(QEvent* event)
+{
 #ifdef QT_KEYPAD_NAVIGATION
-    if (event->type() == QEvent::FocusIn) {
+    if (event->type() == QEvent::FocusIn)
+    {
         Q_D(AbstractGraphicsSlider);
         d->origValue = d->value;
     }
@@ -547,28 +633,35 @@ bool AbstractGraphicsSlider::event(QEvent *event) {
     return base_type::event(event);
 }
 
-void AbstractGraphicsSlider::changeEvent(QEvent *event) {
-    switch (event->type()) {
-    case QEvent::EnabledChange:
-        if (!isEnabled()) {
-            d_func()->repeatActionTimer.stop();
-            setSliderDown(false);
-        }
-        // fall through
-    default:
-        break;
+void AbstractGraphicsSlider::changeEvent(QEvent* event)
+{
+    switch (event->type())
+    {
+        case QEvent::EnabledChange:
+            if (!isEnabled())
+            {
+                d_func()->repeatActionTimer.stop();
+                setSliderDown(false);
+            }
+            // fall through
+        default:
+            break;
     }
 
     base_type::changeEvent(event);
 }
 
-void AbstractGraphicsSlider::timerEvent(QTimerEvent *event) {
+void AbstractGraphicsSlider::timerEvent(QTimerEvent* event)
+{
     Q_D(AbstractGraphicsSlider);
-    if (event->timerId() == d->repeatActionTimer.timerId()) {
-        if (d->repeatActionTime) { // was threshold time, use repeat time next time
+    if (event->timerId() == d->repeatActionTimer.timerId())
+    {
+        if (d->repeatActionTime) // was threshold time, use repeat time next time
+        {
             d->repeatActionTimer.start(d->repeatActionTime, this);
             d->repeatActionTime = 0;
         }
+
         if (d->repeatAction == SliderPageStepAdd)
             d->setAdjustedSliderPosition(d->value + d->pageStep);
         else if (d->repeatAction == SliderPageStepSub)
@@ -579,20 +672,24 @@ void AbstractGraphicsSlider::timerEvent(QTimerEvent *event) {
 }
 
 #ifndef QT_NO_WHEELEVENT
-void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
+void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
+{
     event->accept();
     d_func()->scrollByDelta(event->orientation(), event->modifiers(), event->delta());
 }
 #endif
 
-void AbstractGraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+void AbstractGraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
     d_func()->mouseEvent(event);
 }
 
-void AbstractGraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void AbstractGraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
     d_func()->mouseEvent(event);
 }
 
-void AbstractGraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+void AbstractGraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
     d_func()->mouseEvent(event);
 }
