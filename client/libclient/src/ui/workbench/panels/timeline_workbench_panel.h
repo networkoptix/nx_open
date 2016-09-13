@@ -23,8 +23,6 @@ public:
         QGraphicsWidget* parentWidget,
         QObject* parent = nullptr);
 
-    bool pinned;
-
     QnNavigationItem* item;
 
     bool zoomingIn;
@@ -58,6 +56,7 @@ public:
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
+    void updateGeometry();
 private:
     void setShowButtonUsed(bool used);
     void updateResizerGeometry();
@@ -67,11 +66,11 @@ private:
 
 private:
     void at_resizerWidget_geometryChanged();
-    void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
+    void at_sliderResizerWidget_wheelEvent(QObject* target, QEvent* event);
 
 private:
+    bool m_ignoreClickEvent;
     bool m_visible;
-    bool m_opened;
 
     /** We are currently in the resize process. */
     bool m_resizing;

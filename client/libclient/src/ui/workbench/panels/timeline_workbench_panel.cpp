@@ -55,7 +55,6 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     QObject* parent)
     :
     base_type(settings, parentWidget, parent),
-    pinned(false),
     item(new QnNavigationItem(parentWidget)),
     zoomingIn(false),
     zoomingOut(false),
@@ -65,8 +64,8 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     showWidget(new GraphicsWidget(parentWidget)),
     lastThumbnailsHeight(kDefaultThumbnailsHeight),
 
+    m_ignoreClickEvent(false),
     m_visible(false),
-    m_opened(false),
     m_resizing(false),
     m_updateResizerGeometryLater(false),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
@@ -95,6 +94,12 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     }
     showButton->setFocusProxy(item);
     showButton->setZValue(ControlItemZOrder);
+    connect(action(QnActions::ToggleSliderAction), &QAction::toggled, this,
+        [this](bool checked)
+        {
+            if (!m_ignoreClickEvent)
+                setOpened(checked, true);
+        });
 
     showWidget->setProperty(Qn::NoHandScrollOver, true);
     showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
@@ -245,24 +250,33 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         &TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent);
 
     /* Create a shadow: */
-    new QnEdgeShadowWidget(item, Qt::TopEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(item, Qt::TopEdge, NxUi::kShadowThickness);
+    shadow->setZValue(NxUi::ShadowItemZOrder);
+
+    updateGeometry();
 }
 
 bool TimelineWorkbenchPanel::isPinned() const
 {
-    return pinned;
+    return true;
 }
 
 bool TimelineWorkbenchPanel::isOpened() const
 {
-    return m_opened;
+    return action(QnActions::ToggleSliderAction)->isChecked();
 }
 
 void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 {
     ensureAnimationAllowed(&animate);
 
-    m_opened = opened;
+    if (!item)
+        return;
+
+    m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
+    action(QnActions::ToggleSliderAction)->setChecked(opened);
 
     yAnimator->stop();
     if (opened)
@@ -386,6 +400,19 @@ void TimelineWorkbenchPanel::setThumbnailsVisible(bool visible)
     setOpened(true, false);
 }
 
+void TimelineWorkbenchPanel::updateGeometry()
+{
+    auto parentWidgetRect = m_parentWidget->rect();
+    qreal newY = parentWidgetRect.bottom()
+        + (isOpened() ? -item->size().height() : kHidePanelOffset);
+
+    item->setGeometry(QRectF(
+        0.0,
+        newY,
+        parentWidgetRect.width(),
+        item->size().height()));
+}
+
 void TimelineWorkbenchPanel::setShowButtonUsed(bool used)
 {
     showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
@@ -402,21 +429,21 @@ void TimelineWorkbenchPanel::updateResizerGeometry()
     QnTimeSlider *timeSlider = item->timeSlider();
     QRectF timeSliderRect = timeSlider->rect();
 
-    QRectF sliderResizerGeometry = QRectF(
+    QRectF resizerGeometry = QRectF(
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topLeft()),
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topRight()));
 
-    sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, kResizerHeight / 2));
-    sliderResizerGeometry.setHeight(kResizerHeight);
+    resizerGeometry.moveTo(resizerGeometry.topLeft() - QPointF(0, kResizerHeight / 2));
+    resizerGeometry.setHeight(kResizerHeight);
 
-    if (!qFuzzyEquals(sliderResizerGeometry, m_resizerWidget->geometry()))
+    if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updateResizerGeometryLater, true);
 
-        m_resizerWidget->setGeometry(sliderResizerGeometry);
+        m_resizerWidget->setGeometry(resizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_resizerWidget->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
+        m_resizerWidget->setPos(resizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
 }
 
@@ -472,15 +499,16 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
     if (m_resizing)
         return;
 
-    QRectF sliderResizerGeometry = m_resizerWidget->geometry();
-    if (!sliderResizerGeometry.isValid())
+    QRectF resizerGeometry = m_resizerWidget->geometry();
+    if (!resizerGeometry.isValid())
     {
         updateResizerGeometry();
         return;
     }
 
+    qreal y = display()->view()->mapFromGlobal(QCursor::pos()).y();
     qreal parentBottom = m_parentWidget->rect().bottom();
-    qreal targetHeight = parentBottom - QCursor::pos().y();
+    qreal targetHeight = parentBottom - y;
     qreal minHeight = minimumHeight();
     qreal jmpHeight = minHeight + kMinThumbnailsHeight;
     qreal maxHeight = minHeight + kMaxThumbnailsHeight;

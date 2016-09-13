@@ -32,6 +32,7 @@ enum ItemZOrder
     ContentItemZOrder,
     ResizerItemZOrder,
     ControlItemZOrder,
+    ShadowItemZOrder,
     TooltipItemZOrder,
 };
 

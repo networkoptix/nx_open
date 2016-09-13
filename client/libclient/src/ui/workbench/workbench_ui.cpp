@@ -246,6 +246,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
         Qt::TopEdge, NxUi::kShadowThickness, true);
+    windowedTitleShadow->setZValue(NxUi::ShadowItemZOrder);
 
 #ifdef QN_DEBUG_WIDGET
     /* Debug overlay */
@@ -328,10 +329,7 @@ void QnWorkbenchUi::storeSettings()
     notifications.state = makePaneState(isNotificationsOpened(), isNotificationsPinned());
 
     QnPaneSettings& navigation = settings[Qn::WorkbenchPane::Navigation];
-    if (m_timeline->pinned)
-        navigation.state = Qn::PaneState::Opened;
-    else
-        navigation.state = m_timeline->isOpened() ? Qn::PaneState::Unpinned : Qn::PaneState::Closed;
+    navigation.state = makePaneState(isSliderOpened(), isSliderPinned());
 
     QnPaneSettings& calendar = settings[Qn::WorkbenchPane::Calendar];
     calendar.state = makePaneState(isCalendarOpened(), isCalendarPinned());
@@ -738,11 +736,8 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     /* We lay everything out manually. */
 
-    m_timeline->item->setGeometry(QRectF(
-        0.0,
-        m_timeline->item->pos().y() - oldRect.height() + rect.height(),
-        rect.width(),
-        m_timeline->item->size().height()));
+    m_timeline->updateGeometry();
+
 
     if (m_titleItem)
     {
@@ -1073,7 +1068,8 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
     toggleTitleBarAction->setChecked(settings.state == Qn::PaneState::Opened);
 
     /* Create a shadow: */
-    new QnEdgeShadowWidget(m_titleItem, Qt::BottomEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(m_titleItem, Qt::BottomEdge, NxUi::kShadowThickness);
+    shadow->setZValue(NxUi::ShadowItemZOrder);
 }
 
 #pragma endregion Title methods
@@ -1657,13 +1653,6 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         [this](bool checked)
         {
             m_timeline->setThumbnailsVisible(checked);
-        });
-
-    connect(action(QnActions::ToggleSliderAction), &QAction::toggled, this,
-        [this](bool checked)
-        {
-            m_timeline->pinned = checked;
-            setSliderOpened(checked);
         });
 
     const auto getActionParamsFunc =
