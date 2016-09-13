@@ -364,55 +364,83 @@ void QnFileStorageResource::removeOldDirs()
 
 #ifndef _WIN32
 
+namespace {
+QString prepareCommandString(const QUrl& url, const QString& localPath)
+{
+    QString cifsOptionsString = lit("rsize=8192,wsize=8192");
+    if (!url.userName().isEmpty())
+        cifsOptionsString +=
+            lit(",username=%2,password=%3")
+                .arg(url.userName())
+                .arg(aux::passwordFromUrl(url));
+    else
+        cifsOptionsString += lit(",password=");
+
+    QString srcString = lit("//") + url.host() + url.path();
+    return lit("mount -t cifs -o %1 %2 %3 2>&1")
+                .arg(cifsOptionsString) 
+                .arg(srcString) 
+                .arg(localPath);
+}
+
+int callMount(const QString& commandString)
+{
+    FILE* pipe;
+    char buf[BUFSIZ];
+    int retCode = -1;
+
+    if ((pipe = popen(commandString.toLatin1().constData(), "r")) == NULL)
+    {
+        NX_LOG(lit("%1 'mount' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        return -1;
+    }
+
+    while (fgets(buf, BUFSIZ, pipe) != NULL) 
+    {
+        QString outputString = QString::fromUtf8(buf);
+        if (outputString.contains(lit("mount error")) && outputString.contains(lit("13")))
+        {
+            retCode = EACCES;
+            break;
+        }
+    }
+
+    int processReturned = pclose(pipe);
+    return retCode == -1 ? processReturned : retCode;
+}
+}
+
 Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlString) const
 {
     QUrl url(urlString);
     if (!url.isValid())
         return Qn::StorageInit_WrongPath;
 
-    QString uncString = url.host() + url.path();
-    uncString.replace(lit("/"), lit("\\"));
+    QString localPath = aux::genLocalPath(getUrl());
+    setLocalPathSafe(localPath);
+    umount(localPath.toLatin1().constData());
+    rmdir(localPath.toLatin1().constData());
 
-    QString cifsOptionsString =
-        lit("rsize=8192,wsize=8192,sec=ntlm,username=%1,password=%2,unc=\\\\%3")
-            .arg(url.userName())
-            .arg(aux::passwordFromUrl(url))
-            .arg(uncString);
-
-    QString srcString = lit("//") + url.host() + url.path();
-    QString localPathCopy = aux::genLocalPath(getUrl());
-
-    setLocalPathSafe(localPathCopy);
-
-    umount(localPathCopy.toLatin1().constData());
-    rmdir(localPathCopy.toLatin1().constData());
-
-    int retCode = mkdir(
-        localPathCopy.toLatin1().constData(),
-        S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
-    );
+    int retCode = mkdir(localPath.toLatin1().constData(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (retCode != 0)
+    {
+        NX_LOG(lit("%1 mkdir %2 failed").arg(Q_FUNC_INFO).arg(localPath), cl_logWARNING);
+        return Qn::StorageInit_WrongPath;
+    }
 
 #if __linux__
-    retCode = mount(
-        srcString.toLatin1().constData(),
-        localPathCopy.toLatin1().constData(),
-        "cifs",
-        MS_NODEV | MS_NOEXEC | MS_NOSUID,
-        cifsOptionsString.toLatin1().constData()
-    );
+    retCode = callMount(prepareCommandString(url, localPath));
 #elif __APPLE__
 #error "TODO BSD-style mount call"
 #endif
 
-    if (retCode == -1)
+    if (retCode != 0)
     {
-        int errnoCode = errno;
-        qWarning()
-            << "Mount SMB resource " << srcString
-            << " to local path " << localPathCopy << " failed"
-            << " retCode: " << retCode << ", errno!: " << errnoCode;
-
-        return errnoCode == EACCES ? Qn::StorageInit_WrongAuth : Qn::StorageInit_WrongPath;
+        NX_LOG(lit("Mount SMB resource call with options '%1' failed with retCode %2")
+                .arg(prepareCommandString(url, localPath))
+                .arg(retCode),
+               cl_logWARNING);
+        return retCode == EACCES ? Qn::StorageInit_WrongAuth : Qn::StorageInit_WrongPath;
     }
 
     return Qn::StorageInit_Ok;
