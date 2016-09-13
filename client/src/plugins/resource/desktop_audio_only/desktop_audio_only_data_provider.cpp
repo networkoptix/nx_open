@@ -31,6 +31,8 @@ QnDesktopAudioOnlyDataProvider::~QnDesktopAudioOnlyDataProvider()
 {
     if (m_encoderBuffer)
         av_free(m_encoderBuffer);
+
+    directDisconnectAll();
     stop();
 }
 
