@@ -479,6 +479,7 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
         basePeriods = appendingPeriods;
         return;
     }
+    basePeriods.reserve(basePeriods.size() + appendingPeriods.size());
 
     iterator iter = basePeriods.begin();
     for (const QnTimePeriod& period : appendingPeriods)
@@ -487,40 +488,35 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
         if (iter != basePeriods.begin())
             --iter;
 
-
         /* Note that there is no need to check for itr != end() here as the container is not empty. */
-        qint64 currentEndTime = iter->endTimeMs();
-
-        /* Space is empty, just inserting period or prepending to next. */
-        if (currentEndTime < period.startTimeMs)
+        if (iter->endTimeMs() < period.startTimeMs)
         {
+            /* Space is empty, just inserting period or prepending to next. */
             ++iter;
             if (iter != basePeriods.end() && iter->startTimeMs <= period.endTimeMs())
                 iter->addPeriod(period);
             else
                 iter = basePeriods.insert(iter, period);
-            continue;
         }
-
-        /* Prepending before the first chunk. */
-        if (iter->startTimeMs > period.endTimeMs())
+        else if (iter->startTimeMs > period.endTimeMs())
         {
+            /* Prepending before the first chunk. */
             iter = basePeriods.insert(iter, period);
-            continue;
         }
-
-        /* Periods are overlapped. */
-        iter->addPeriod(period);
-
-        /* Try to combine with the following */
-        auto next = iter + 1;
-        while (next != basePeriods.end() && next->startTimeMs <= iter->endTimeMs())
+        else
         {
-            iter->addPeriod(*next);
-            next = basePeriods.erase(next);
-            iter = next - 1;
-        }
+            /* Periods are overlapped. */
+            iter->addPeriod(period);
 
+            /* Try to combine with the following */
+            auto next = iter + 1;
+            while (next != basePeriods.end() && next->startTimeMs <= iter->endTimeMs())
+            {
+                iter->addPeriod(*next);
+                next = basePeriods.erase(next);
+                iter = next - 1;
+            }
+        }
     }
 }
 
