@@ -33,7 +33,7 @@ void QnMutexImpl::afterMutexLocked(
     threadHoldingMutex = ::currentThreadSystemId();
     ++recursiveLockCount;
 
-    #if /*defined(_DEBUG) ||*/ defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
+    #if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
         MutexLockKey lockKey(
             sourceFile,
             sourceLine,
@@ -54,7 +54,7 @@ void QnMutexImpl::afterMutexLocked(
 
 void QnMutexImpl::beforeMutexUnlocked()
 {
-    #if /*defined(_DEBUG) ||*/ defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
+    #if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
         MutexLockAnalyzer::instance()->beforeMutexUnlocked( currentLockStack.top() );
         currentLockStack.pop();
     #endif
