@@ -439,7 +439,7 @@ int CEPoll::wait(
             return total;
 
         auto now = CTimer::getTime();
-        if (msTimeOut >= 0 || now - entertime >= (uint64_t) msTimeOut * 1000)
+        if (msTimeOut >= 0 && now - entertime >= (uint64_t) msTimeOut * 1000)
             return 0;
 
         CTimer::waitForEvent();
