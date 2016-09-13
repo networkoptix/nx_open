@@ -150,15 +150,13 @@ int QnWebResourceWidget::calculateButtonsVisibility() const
         | Qn::FullscreenButton | Qn::BackButton | Qn::ReloadPageButton);
 }
 
-Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect )
+Qn::RenderStatus QnWebResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
+    const QRectF& /*channelRect*/, const QRectF& paintRect)
 {
-    Q_UNUSED(painter)
-    Q_UNUSED(channel)
-    Q_UNUSED(channelRect)
-
     if (!paintRect.isValid())
         return Qn::NothingRendered;
 
+    painter->fillRect(paintRect, palette().color(QPalette::Window));
     return Qn::NewFrameRendered;
 }
 
