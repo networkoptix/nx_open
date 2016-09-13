@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1994,6 +1994,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
@@ -2893,9 +2900,9 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>และ %1%n ผู้ใช้งาน(s) เพิ่ม...</numerusform>
+            <numerusform>และ %n ผู้ใช้งาน(s) เพิ่ม...</numerusform>
         </translation>
     </message>
 </context>
@@ -2947,35 +2954,30 @@ to view more bookmarks</source>
         <source>days</source>
         <translation>วัน</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation>
-            <numerusform>%nมิลลิวินาที</numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>มิลลิวินาที</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation>
-            <numerusform>%nที่สอง</numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>ที่สอง</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation>
-            <numerusform>%nนาที</numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>นาที</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation>
-            <numerusform>%nชั่วโมง</numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>ชั่วโมง</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation>
-            <numerusform>%nวัน</numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>วัน</translation>
     </message>
 </context>
 <context>

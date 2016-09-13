@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -503,6 +503,11 @@
         <location/>
         <source>This camera has no advanced settings</source>
         <translation>กล้องนี้ยังไม่มีการตั้งค่าขั้นสูง</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
