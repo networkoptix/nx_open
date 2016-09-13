@@ -135,7 +135,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
 
     m_opacityAnimatorGroup->setTimer(animationTimer());
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_backgroundItem)); /* Speed of 1.0 is OK here. */
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_backgroundItem));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
 
@@ -174,7 +174,7 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
     qreal width = item->size().width();
     xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
 
-    qreal newX = opened ? 0.0 : - width - 1.0 /* Just in case. */;
+    qreal newX = opened ? 0.0 : - width - kHidePanelOffset;
     if (animate)
         xAnimator->animateTo(newX);
     else

@@ -63,6 +63,8 @@ private:
     void updateResizerGeometry();
     void updateControlsGeometry();
 
+    qreal minimumHeight() const;
+
 private:
     void at_resizerWidget_geometryChanged();
     void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
@@ -70,7 +72,10 @@ private:
 private:
     bool m_visible;
     bool m_opened;
-    bool m_ignoreResizerGeometryChanges;
+
+    /** We are currently in the resize process. */
+    bool m_resizing;
+
     bool m_updateResizerGeometryLater;
 
     QnResizerWidget* m_resizerWidget;

@@ -40,6 +40,11 @@ static const int kHideAnimationDurationMs = 160;
 static const int kShowTimelineTimeoutMs = 100;
 static const int kCloseTimelineTimeoutMs = 250;
 
+static const int kMinThumbnailsHeight = 48;
+static const int kMaxThumbnailsHeight = 196;
+
+static const int kResizerHeight = 16;
+
 }
 
 namespace NxUi {
@@ -62,7 +67,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
 
     m_visible(false),
     m_opened(false),
-    m_ignoreResizerGeometryChanges(false),
+    m_resizing(false),
     m_updateResizerGeometryLater(false),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_zoomButtonsWidget(new GraphicsWidget(parentWidget)),
@@ -269,21 +274,13 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()
-        + (opened ? -item->size().height() : 64.0 /* So that tooltips are not opened. */);
+        + (opened ? -item->size().height() : kHidePanelOffset);
+    qDebug() << "set item y by Opened to " << newY << "animated" << animate;
     if (animate)
-    {
-        /* Skip off-screen part. */
-        if (opened && item->y() > parentWidgetRect.bottom())
-        {
-            QSignalBlocker blocker(item);
-            item->setY(parentWidgetRect.bottom());
-        }
         yAnimator->animateTo(newY);
-    }
     else
-    {
         item->setY(newY);
-    }
+
     m_resizerWidget->setEnabled(opened);
 
     emit openedChanged(opened, animate);
@@ -366,7 +363,7 @@ bool TimelineWorkbenchPanel::isThumbnailsVisible() const
 {
     qreal height = item->geometry().height();
     return !qFuzzyIsNull(height)
-        && !qFuzzyCompare(height, item->effectiveSizeHint(Qt::MinimumSize).height());
+        && !qFuzzyCompare(height, minimumHeight());
 }
 
 void TimelineWorkbenchPanel::setThumbnailsVisible(bool visible)
@@ -374,15 +371,19 @@ void TimelineWorkbenchPanel::setThumbnailsVisible(bool visible)
     if (visible == isThumbnailsVisible())
         return;
 
-    qreal sliderHeight = item->effectiveSizeHint(Qt::MinimumSize).height();
+    qreal height = minimumHeight();
     if (!visible)
-        lastThumbnailsHeight = item->geometry().height() - sliderHeight;
+        lastThumbnailsHeight = item->geometry().height() - height;
     else
-        sliderHeight += lastThumbnailsHeight;
+        height += lastThumbnailsHeight;
 
     QRectF geometry = item->geometry();
-    geometry.setHeight(sliderHeight);
+    geometry.setHeight(height);
     item->setGeometry(geometry);
+    qDebug() << "set item geometry by action to " << geometry;
+
+    /* Fix y coord. */
+    setOpened(true, false);
 }
 
 void TimelineWorkbenchPanel::setShowButtonUsed(bool used)
@@ -405,8 +406,8 @@ void TimelineWorkbenchPanel::updateResizerGeometry()
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topLeft()),
         m_parentWidget->mapFromItem(timeSlider, timeSliderRect.topRight()));
 
-    sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
-    sliderResizerGeometry.setHeight(16);
+    sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, kResizerHeight / 2));
+    sliderResizerGeometry.setHeight(kResizerHeight);
 
     if (!qFuzzyEquals(sliderResizerGeometry, m_resizerWidget->geometry()))
     {
@@ -421,6 +422,11 @@ void TimelineWorkbenchPanel::updateResizerGeometry()
 
 void TimelineWorkbenchPanel::updateControlsGeometry()
 {
+    if (m_resizing)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_resizing, true);
+
     QRectF geometry = item->geometry();
     auto parentWidgetRect = m_parentWidget->rect();
 
@@ -448,8 +454,7 @@ void TimelineWorkbenchPanel::updateControlsGeometry()
 
     if (isThumbnailsVisible())
     {
-        qreal sliderHeight = item->effectiveSizeHint(Qt::MinimumSize).height();
-        lastThumbnailsHeight = item->geometry().height() - sliderHeight;
+        lastThumbnailsHeight = item->geometry().height() - minimumHeight();
     }
 
     updateResizerGeometry();
@@ -457,9 +462,14 @@ void TimelineWorkbenchPanel::updateControlsGeometry()
     emit geometryChanged();
 }
 
+qreal TimelineWorkbenchPanel::minimumHeight() const
+{
+    return item->effectiveSizeHint(Qt::MinimumSize).height();
+}
+
 void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
 {
-    if (m_ignoreResizerGeometryChanges)
+    if (m_resizing)
         return;
 
     QRectF sliderResizerGeometry = m_resizerWidget->geometry();
@@ -469,12 +479,11 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
         return;
     }
 
-    QRectF sliderGeometry = item->geometry();
-
-    qreal targetHeight = sliderGeometry.bottom() - sliderResizerGeometry.center().y();
-    qreal minHeight = item->effectiveSizeHint(Qt::MinimumSize).height();
-    qreal jmpHeight = minHeight + 48.0;
-    qreal maxHeight = minHeight + 196.0;
+    qreal parentBottom = m_parentWidget->rect().bottom();
+    qreal targetHeight = parentBottom - QCursor::pos().y();
+    qreal minHeight = minimumHeight();
+    qreal jmpHeight = minHeight + kMinThumbnailsHeight;
+    qreal maxHeight = minHeight + kMaxThumbnailsHeight;
 
     if (targetHeight < (minHeight + jmpHeight) / 2)
         targetHeight = minHeight;
@@ -483,18 +492,17 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
     else if (targetHeight > maxHeight)
         targetHeight = maxHeight;
 
-    if (!qFuzzyCompare(sliderGeometry.height(), targetHeight))
+    QRectF geometry = item->geometry();
+    if (!qFuzzyCompare(geometry.height(), targetHeight))
     {
-        qreal sliderTop = sliderGeometry.top();
-        sliderGeometry.setHeight(targetHeight);
-        sliderGeometry.moveTop(sliderTop);
+        qreal targetTop = parentBottom - targetHeight;
+        geometry.setHeight(targetHeight);
+        geometry.moveTop(targetTop);
 
-        QN_SCOPED_VALUE_ROLLBACK(&m_ignoreResizerGeometryChanges, true);
-        item->setGeometry(sliderGeometry);
+        item->setGeometry(geometry);
     }
 
     updateResizerGeometry();
-
     action(QnActions::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
 }
 

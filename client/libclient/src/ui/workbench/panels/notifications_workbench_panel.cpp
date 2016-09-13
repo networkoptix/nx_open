@@ -117,7 +117,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     m_opacityAnimatorGroup->setTimer(animationTimer());
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(backgroundItem)); /* Speed of 1.0 is OK here. */
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(backgroundItem));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(showButton));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(pinButton));
 
@@ -155,7 +155,7 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 
     qreal width = item->size().width();
     qreal newX = m_parentWidget->rect().right()
-        + (opened ? -width : 1.0 /* Just in case. */);
+        + (opened ? -width : kHidePanelOffset);
 
     if (animate)
         xAnimator->animateTo(newX);

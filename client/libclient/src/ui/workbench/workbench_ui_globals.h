@@ -20,6 +20,9 @@ static const qreal kOpaque = 1.0;
 /** Opacity value for hidden items. */
 static const qreal kHidden = 0.0;
 
+/** Hide panels by 1 pixel behind the screen borders - just in case. */
+static const qreal kHidePanelOffset = 1.0;
+
 /**
  * Z-order for workbench panel controls.
  */
