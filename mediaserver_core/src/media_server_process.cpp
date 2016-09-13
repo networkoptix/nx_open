@@ -1994,7 +1994,7 @@ void MediaServerProcess::run()
         const bool kCleanupDbObjects = true;
         const bool kCleanupTransactionLog = true;
         auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
-        miscManager->cleanupDanglingDbObjectsSync(kCleanupDbObjects, kCleanupTransactionLog);
+        miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
 
     if (needToStop())
@@ -2376,7 +2376,7 @@ void MediaServerProcess::run()
 
             errCode = QnAppServerConnectionFactory::getConnection2()
                 ->getMiscManager(Qn::kSystemAccess)
-                ->cleanupDanglingDbObjectsSync(kCleanupDbObjects, kCleanupTransactionLog);
+                ->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
 
             if (errCode != ec2::ErrorCode::ok)
             {

@@ -24,7 +24,7 @@ namespace ec2
             // nothing to do
         }
 
-        void triggerNotification(const QnTransaction<ApiCleanupDanglingDbObjectsData>& /*tran*/) {
+        void triggerNotification(const QnTransaction<ApiCleanupDatabaseData>& /*tran*/) {
             // nothing to do
         }
 

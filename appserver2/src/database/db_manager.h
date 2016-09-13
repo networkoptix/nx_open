@@ -446,7 +446,7 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDanglingDbObjectsData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateSequenceData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here

@@ -6,13 +6,13 @@
 namespace ec2
 {
 
-struct ApiCleanupDanglingDbObjectsData: ApiData
+struct ApiCleanupDatabaseData: ApiData
 {
     bool cleanupDbObjects;
     bool cleanupTransactionLog;
     QString reserved;
 };
 
-#define ApiCleanupDanglingDbObjectsData_Fields (cleanupDbObjects)(cleanupTransactionLog)(reserved)
+#define ApiCleanupDatabaseData_Fields (cleanupDbObjects)(cleanupTransactionLog)(reserved)
 
 }

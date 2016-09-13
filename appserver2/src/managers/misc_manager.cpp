@@ -82,13 +82,13 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::cleanupDanglingDbObjects(
+int QnMiscManager<QueryProcessorType>::cleanupDatabase(
     bool cleanupDbObjects,
     bool cleanupTransactionLog,
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    QnTransaction<ApiCleanupDanglingDbObjectsData> transaction(ApiCommand::cleanupDanglingDbObjects);
+    QnTransaction<ApiCleanupDatabaseData> transaction(ApiCommand::cleanupDatabase);
     transaction.isLocal = true;
     transaction.params.cleanupDbObjects = cleanupDbObjects;
     transaction.params.cleanupTransactionLog = cleanupTransactionLog;

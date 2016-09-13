@@ -603,9 +603,9 @@ class ECConnectionNotificationManager;
             );
         }
 
-        ErrorCode cleanupDanglingDbObjectsSync(bool cleanupDbObjects, bool cleanupTransactionLog)
+        ErrorCode cleanupDatabaseSync(bool cleanupDbObjects, bool cleanupTransactionLog)
         {
-            int(AbstractMiscManager::*fn)(bool, bool, impl::SimpleHandlerPtr) = &AbstractMiscManager::cleanupDanglingDbObjects;
+            int(AbstractMiscManager::*fn)(bool, bool, impl::SimpleHandlerPtr) = &AbstractMiscManager::cleanupDatabase;
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, cleanupDbObjects, cleanupTransactionLog, std::placeholders::_1));
         }
 
@@ -623,7 +623,7 @@ class ECConnectionNotificationManager;
     protected:
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
-        virtual int cleanupDanglingDbObjects(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) = 0;
+        virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

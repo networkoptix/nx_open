@@ -32,7 +32,7 @@
 #include "nx_ec/data/api_stored_file_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_license_data.h"
-#include "nx_ec/data/api_cleanup_db_objects_data.h"
+#include "nx_ec/data/api_cleanup_db_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_routing_data.h"

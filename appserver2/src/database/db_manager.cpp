@@ -1136,26 +1136,8 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
 
 bool QnDbManager::cleanupDanglingDbObjects()
 {
-    QFile cleanupScript(":/updates/68_cleanup_dangling_attrs.sql");
-
-    if (!cleanupScript.open(QIODevice::ReadOnly | QIODevice::Text))
-        return false;
-
-    QTextStream inStream(&cleanupScript);
-    auto queryStrings = inStream.readAll().split(',');
-
-    if (queryStrings.isEmpty())
-        return false;
-
-    QSqlQuery query(m_sdb);
-
-    for (const auto& queryString : queryStrings)
-    {
-        if (!query.exec(queryString.trimmed()))
-            return false;
-    }
-
-    return true;
+    const QString kCleanupScript(":/updates/68_cleanup_dangling_attrs.sql");
+    return QnDbHelper::execSQLFile(kCleanupScript, m_sdb);
 }
 
 bool QnDbManager::fixBusinessRules()
@@ -4490,7 +4472,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCleanupDanglingDbObjectsData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran)
 {
     ErrorCode result = ErrorCode::ok;
     if (tran.params.cleanupDbObjects)

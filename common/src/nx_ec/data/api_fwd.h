@@ -91,7 +91,7 @@ namespace ec2 {
     struct ApiDatabaseDumpData;
     struct ApiDatabaseDumpToFileData;
     struct ApiLicenseOverflowData;
-    struct ApiCleanupDanglingDbObjectsData;
+    struct ApiCleanupDatabaseData;
 
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
@@ -203,7 +203,7 @@ namespace ec2 {
     (ApiDatabaseDumpData)\
     (ApiDatabaseDumpToFileData)\
     (ApiLicenseOverflowData)\
-    (ApiCleanupDanglingDbObjectsData)\
+    (ApiCleanupDatabaseData)\
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
 
