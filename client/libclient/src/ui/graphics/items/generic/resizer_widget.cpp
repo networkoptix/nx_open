@@ -21,3 +21,10 @@ void QnResizerWidget::setEnabled(bool enabled)
     else
         setCursor(QCursor());
 }
+
+/* This method will never be called while item has ItemHasNoContents flag. */
+void QnResizerWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+    QWidget* /*widget*/)
+{
+    painter->fillRect(option->rect, Qt::red);
+}
