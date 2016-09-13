@@ -606,7 +606,7 @@ begin_label:
     }
 
 
-    if (videoData) // in case of video packet
+    if (videoData || m_eof) // in case of video packet or EOF
     {
         if (reverseMode && !delegateForNegativeSpeed)
         {
@@ -617,22 +617,24 @@ begin_label:
 
 
             FrameTypeExtractor::FrameType frameType = FrameTypeExtractor::UnknownFrameType;
-            if (videoData->context)
+            bool isKeyFrame = false;
+            if (videoData)
             {
-                if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
+                if (videoData->context)
                 {
-                    delete m_frameTypeExtractor;
-                    m_frameTypeExtractor = new FrameTypeExtractor(videoData->context);
+                    if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
+                    {
+                        delete m_frameTypeExtractor;
+                        m_frameTypeExtractor = new FrameTypeExtractor(videoData->context);
+                    }
                 }
 
-                frameType = m_frameTypeExtractor->getFrameType((const quint8*) videoData->data(), static_cast<int>(videoData->dataSize()));
-            }
-            bool isKeyFrame;
+                frameType = m_frameTypeExtractor->getFrameType((const quint8*)videoData->data(), static_cast<int>(videoData->dataSize()));
 
-            if (frameType != FrameTypeExtractor::UnknownFrameType)
-                isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
-            else {
-                isKeyFrame =  m_currentData->flags  & AV_PKT_FLAG_KEY;
+                if (frameType != FrameTypeExtractor::UnknownFrameType)
+                    isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
+                else
+                    isKeyFrame = m_currentData->flags  & AV_PKT_FLAG_KEY;
             }
 
             if (m_eof || (m_currentTime == 0 && m_bottomIFrameTime > 0 && m_topIFrameTime >= m_bottomIFrameTime))
@@ -663,20 +665,23 @@ begin_label:
             }
 
             // multisensor cameras support
-            int ch = videoData->channelNumber;
-            if (ch > 0 && !m_rewSecondaryStarted[ch])
+            if (videoData)
             {
-                if (isKeyFrame) {
-                    videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
-                    m_rewSecondaryStarted[ch] = true;
+                int ch = videoData->channelNumber;
+                if (ch > 0 && !m_rewSecondaryStarted[ch])
+                {
+                    if (isKeyFrame) {
+                        videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+                        m_rewSecondaryStarted[ch] = true;
+                    }
+                    else
+                        goto begin_label; // skip
                 }
-                else
-                    goto begin_label; // skip
             }
 
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
-                if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime)
+                if (videoData && m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime)
                 {
                     m_bottomIFrameTime = m_currentTime;
                     videoData->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;

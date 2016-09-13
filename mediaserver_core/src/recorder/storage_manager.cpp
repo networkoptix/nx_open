@@ -145,7 +145,7 @@ const QString getDevicePath(const QString& path)
     FILE* pipe;
     char buf[BUFSIZ];
 
-    if (( pipe = popen(command.toLatin1().constData(), "r")) == NULL)
+    if ((pipe = popen(command.toLatin1().constData(), "r")) == NULL)
     {
         NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
         return QString();
@@ -193,8 +193,11 @@ const QString& sysDrivePath()
 
 bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
 {
+    QString storageUrl = storage->getUrl();
+    if (storageUrl.contains(lit("://")))
+        return false;
     QString sysPath = sysDrivePath();
-    return sysPath.isNull() ? false : getDevicePath(storage->getUrl()).startsWith(sysDrivePath());
+    return sysPath.isNull() ? false : getDevicePath(storageUrl).startsWith(sysDrivePath());
 }
 
 } // namespace <anonymous>

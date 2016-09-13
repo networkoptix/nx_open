@@ -247,7 +247,12 @@ private:
 
     static ApiCommand::Value extractCommandFromPath(const QString& path)
     {
-        QString commandStr = path.split('/', QString::SkipEmptyParts).last();
+        const auto& parts = path.split('/', QString::SkipEmptyParts);
+
+        if (parts.isEmpty())
+            return ApiCommand::NotDefined;
+
+        QString commandStr = parts.last();
         return ApiCommand::fromString(commandStr);
     }
 

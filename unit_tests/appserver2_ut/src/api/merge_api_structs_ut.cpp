@@ -196,7 +196,7 @@ public:
         QByteArray resultBody;
         QByteArray contentType;
         int httpStatusCode = m_updateHttpHandler->executePost(
-            /*path*/ ApiCommand::toString(kMockApiCommand),
+            /*path*/ "/ec2/" + ApiCommand::toString(kMockApiCommand),
             QnRequestParamList(),
             m_requestJson.json,
             "application/json",
@@ -234,7 +234,7 @@ public:
         QByteArray resultBody;
         QByteArray contentType;
         int httpStatusCode = m_updateHttpHandler->executePost(
-            /*path*/ "",
+            /*path*/ "/ec2/" + ApiCommand::toString(kMockApiCommand),
             QnRequestParamList(),
             m_requestJson.json,
             "application/json",
