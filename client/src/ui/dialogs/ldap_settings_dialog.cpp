@@ -258,8 +258,8 @@ void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, const QnLdapU
     QString result;
     if (status != 0 || !errorString.isEmpty()) {
         result = tr("Test failed");
-	if (!errorString.isEmpty())
-            result += lit(" (%1)").arg(tr(qPrintable(errorString)));
+    if (!errorString.isEmpty())
+        result += lit(" (%1)").arg(errorString);
     } else {
         result = tr("Test completed successfully: %n users found.", 0, users.size());
     }
