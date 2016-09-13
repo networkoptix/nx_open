@@ -2176,7 +2176,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
         mainWindow(),
         tr("Anonymous Usage Statistics"),
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
-            "If you would like to disable this feature you can do so in the System Settings dialog.")
+            "If you would like to disable this feature you can do so in the System Administration dialog.")
         );
 
     qnGlobalSettings->setStatisticsAllowed(true);
