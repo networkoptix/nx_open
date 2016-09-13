@@ -1,5 +1,6 @@
-
 #include "bundle_helpers_mac.h"
+
+#if defined(Q_OS_MACX)
 
 #include <ApplicationServices/ApplicationServices.h>
 
@@ -88,3 +89,5 @@ bool QnBundleHelpers::isInHiDpiMode(const QString& path)
 
     return static_cast<bool>(CFBooleanGetValue(isHiDpiRef.ref()));
 }
+
+#endif // defined(Q_OS_MACX)
