@@ -329,7 +329,7 @@ void VmsGatewayProcess::publicAddressFetched(
         auto& pool = nx::network::SocketGlobals::tcpReversePool();
         pool.setPoolSize(rcSettings.poolSize);
         pool.setKeepAliveOptions(rcSettings.keepAlive);
-        if (pool.start(publicAddress, rcSettings.port, true))
+        if (pool.start(publicAddress, rcSettings.port))
         {
             NX_LOG(lm("TCP reverse pool has started with port=%1, poolSize=%2, keepAlive=%3")
                 .args(pool.port(), rcSettings.poolSize, rcSettings.keepAlive), cl_logALWAYS);
