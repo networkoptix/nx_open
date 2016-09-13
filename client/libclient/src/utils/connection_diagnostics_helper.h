@@ -48,4 +48,5 @@ private:
     };
 
     static QString strings(ErrorStrings id);
+    static QString getErrorString(Qn::ConnectionResult result, const QnConnectionInfo& connectionInfo);
 };

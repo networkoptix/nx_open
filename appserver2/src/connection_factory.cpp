@@ -1543,7 +1543,8 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
 {
     if (errorCode == ErrorCode::ok
         || errorCode == ErrorCode::unauthorized
-        || errorCode == ErrorCode::temporary_unauthorized)
+        || errorCode == ErrorCode::ldap_temporary_unauthorized
+        || errorCode == ErrorCode::cloud_temporary_unauthorized)
     {
         handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);

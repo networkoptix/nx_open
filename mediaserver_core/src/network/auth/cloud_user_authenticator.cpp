@@ -103,8 +103,31 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
             responseHeaders);
     }
 
-    if (!isValidCloudUserName(authorizationHeader.userid()) ||
-        (!m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"])))    //nonce must be valid cloud nonce
+    const QByteArray userName = authorizationHeader.userid().toLower();
+    bool isCloudUser = isValidCloudUserName(userName);
+    bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"]);
+
+    // Server has provided to the client non-cloud nonce for cloud user due to no cloud connection so far
+    if (isCloudUser && !isCloudNonce && m_cloudConnectionManager->boundToCloud())
+    {
+        auto users = qnResPool->getResources<QnUserResource>().filtered(
+            [userName](const QnUserResourcePtr& user)
+        {
+            return user->isCloud() &&
+                   user->isEnabled() &&
+                   user->getName().toUtf8().toLower() == userName;
+        });
+
+        if (!users.isEmpty())
+        {
+            return std::make_tuple<Qn::AuthResult, QnResourcePtr>(
+                Qn::Auth_CloudConnectError,
+                users.first());
+
+        }
+    }
+
+    if (!isCloudUser || !isCloudNonce)    //nonce must be valid cloud nonce
     {
         if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
         {
