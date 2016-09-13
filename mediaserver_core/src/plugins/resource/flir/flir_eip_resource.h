@@ -79,7 +79,6 @@ private:
 
     FlirAlarmMonitoringState m_currentAlarmMonitoringState;
 
-    std::shared_ptr<SimpleEIPClient> m_eipClient;
     std::shared_ptr<EIPAsyncClient> m_eipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_outputEipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_alarmsEipAsyncClient;

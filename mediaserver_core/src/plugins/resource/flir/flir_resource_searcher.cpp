@@ -41,27 +41,23 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
 }
 
 QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
-{
+{    
     QList<QnResourcePtr> result;
     FlirDeviceInfo deviceInfo;
     auto hostname = url.host().isEmpty() ?
-        QHostAddress(url.toString()): QHostAddress(url.host());
+        url.toString(): 
+        url.host();
+
     SimpleEIPClient eipClient(hostname);
 
     if(!url.scheme().isEmpty() && doMultichannelCheck)
         return result;
 
-    if(!eipClient.connect())
-    {
-        qDebug() << "FLIR checkHostAddr Failed to establish connection" << "EIP HOST" << url.host();
-        return  result;
-    }
     if(!eipClient.registerSession())
     {
         qDebug() << "FLIR checkHostAddr failed to register session";
         return result;
     }
-
 
     const auto vendorId = getVendorIdFromDevice(eipClient);
     if(vendorId != kFlirVendorId)
@@ -71,7 +67,12 @@ QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, cons
 
     deviceInfo.model = getModelFromDevice(eipClient);
     deviceInfo.mac = getMACAdressFromDevice(eipClient);
+
+    if (deviceInfo.model.isEmpty() || deviceInfo.mac.isEmpty())
+        return result;
+
     deviceInfo.firmware = getFirmwareFromDevice(eipClient);
+
     deviceInfo.url = url;
     deviceInfo.url.setScheme("http");
 
@@ -93,6 +94,7 @@ quint16 QnFlirResourceSearcher::getVendorIdFromDevice(SimpleEIPClient& eipClient
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
         qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
+        return 0;
     }
 
     return qFromLittleEndian<quint16>(reinterpret_cast<const uchar*>(data.data.constData()));
@@ -111,6 +113,7 @@ QString QnFlirResourceSearcher::getMACAdressFromDevice(SimpleEIPClient& eipClien
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
         qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
+        return QString();
     }
 
     return QString(data.data.toHex());
@@ -129,6 +132,7 @@ QString QnFlirResourceSearcher::getModelFromDevice(SimpleEIPClient& eipClient) c
         data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
         qWarning() << "Flir plugin. Error occured when retrieving model." << data.generalStatus << data.additionalStatus;
+        return QString();
     }
 
     auto model = QString::fromLatin1(data.data.mid(1));
@@ -151,6 +155,13 @@ QString QnFlirResourceSearcher::getFirmwareFromDevice(SimpleEIPClient &eipClient
         0x01,
         0,
         requestData);
+
+    if(data.generalStatus != CIPGeneralStatus::kSuccess &&
+        data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
+    {
+        qWarning() << "Flir plugin. Error occured while retrieving firmware." << data.generalStatus << data.additionalStatus;
+        return QString();
+    }
 
     return QString(QString::fromLatin1(data.data.mid(1)));
 }
