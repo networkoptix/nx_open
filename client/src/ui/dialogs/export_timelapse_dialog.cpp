@@ -296,14 +296,19 @@ QString QnExportTimelapseDialog::durationMsToString(qint64 durationMs)
             {
             case::Qt::Milliseconds:
                 format = msSuffix;
+                break;
             case::Qt::Seconds:
                 format = sSuffix;
+                break;
             case::Qt::Minutes:
                 format = mSuffix;
+                break;
             case::Qt::Hours:
                 format = hSuffix;
+                break;
             case::Qt::Days:
                 format = dSuffix;
+                break;
             default:
                 break;
             }
