@@ -58,19 +58,18 @@ namespace ec2
         m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiLicenseDataList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
         return reqID;
     }
-    
+
     template<class T>
     int QnLicenseManager<T>::addLicenses( const QnLicenseList& licenses, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-
-        //for( QnLicensePtr lic: licenses )
-        //    lic->setId(QnUuid::createUuid());
-
-        auto tran = prepareTransaction( ApiCommand::addLicenses, licenses );
+        ApiLicenseDataList params;
+        fromResourceListToApi(licenses, params);
 
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::addLicenses, params,
+            std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
     }
@@ -79,32 +78,15 @@ namespace ec2
     int QnLicenseManager<T>::removeLicense( const QnLicensePtr& license, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-
-        //for( QnLicensePtr lic: licenses )
-        //    lic->setId(QnUuid::createUuid());
-
-        auto tran = prepareTransaction( ApiCommand::removeLicense, license );
+        ApiLicenseData params;
+        fromResourceToApi(license, params);
 
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeLicense, params,
+            std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
-    }
-
-    template<class T>
-    QnTransaction<ApiLicenseDataList> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses )
-    {
-        QnTransaction<ApiLicenseDataList> tran( cmd);
-        fromResourceListToApi(licenses, tran.params);
-        return tran;
-    }
-
-    template<class T>
-    QnTransaction<ApiLicenseData> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicensePtr& license )
-    {
-        QnTransaction<ApiLicenseData> tran( cmd);
-        fromResourceToApi(license, tran.params);
-        return tran;
     }
 
     template class QnLicenseManager<ServerQueryProcessorAccess>;

@@ -214,7 +214,7 @@ bool QnAxisAudioTransmitter::startTransmission()
     else
     {
         m_state = TransmitterState::Failed;
-        httpClient->terminate();
+        httpClient->pleaseStopSync();
     }
 
     return m_socket != nullptr;

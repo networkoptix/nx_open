@@ -34,9 +34,6 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-
-        QnTransaction<ApiLicenseDataList> prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses );
-        QnTransaction<ApiLicenseData> prepareTransaction( ApiCommand::Value cmd, const QnLicensePtr& license );
     };
 }
 

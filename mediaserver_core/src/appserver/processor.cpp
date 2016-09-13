@@ -206,7 +206,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
             if (!helper.isValid())
                 userAttrCopy->scheduleDisabled = true;
         }
-        userAttrCopy->cameraID = cameraResource->getId();
+        userAttrCopy->cameraId = cameraResource->getId();
 
         ec2::ApiCameraAttributesDataList attrsList;
         fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
@@ -219,10 +219,10 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         }
         QSet<QByteArray> modifiedFields;
         {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraID );
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraId );
             (*userAttributesLock)->assign( *userAttrCopy, &modifiedFields );
         }
-        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraID);
+        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraId);
         if( res )   //it is OK if resource is missing
             res->emitModificationSignals( modifiedFields );
     }

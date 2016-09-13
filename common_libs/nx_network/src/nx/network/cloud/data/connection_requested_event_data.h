@@ -26,9 +26,11 @@ public:
     nx::String connectSessionId;
     nx::String originatingPeerID;
     std::list<SocketAddress> udpEndpointList;   ///< Peer UDP addresses
+    std::list<SocketAddress> tcpReverseEndpointList;
     ConnectionMethods connectionMethods;        ///< All requestd connection types
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
+    bool isPersistent;
 
     ConnectionRequestedEvent();
 

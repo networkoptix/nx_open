@@ -390,12 +390,12 @@ bool QnResourceAccessManager::hasPermission(
 bool QnResourceAccessManager::hasPermission(
     const Qn::UserAccessData& accessRights,
     const QnResourcePtr& mediaResource,
-    Qn::Permission permission) const
+    Qn::Permissions permissions) const
 {
     if (accessRights == Qn::kSystemAccess)
         return true;
     if (accessRights.access == Qn::UserAccessData::Access::ReadAllResources &&
-        permission == Qn::ReadPermission)
+        permissions == Qn::ReadPermission)
     {
         return true;
     }
@@ -404,7 +404,7 @@ bool QnResourceAccessManager::hasPermission(
     if (!userResource)
         return false;
 
-    return hasPermission(userResource, mediaResource, permission);
+    return hasPermission(userResource, mediaResource, permissions);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const
@@ -450,7 +450,7 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
-    if (!data.groupId.isNull() && m_userGroups.find(data.groupId) == m_userGroups.end())
+    if (!data.groupId.isNull() && !m_userGroups.contains(data.groupId))
         return false;
 
     return canCreateUser(user, data.permissions, data.isAdmin);
@@ -943,7 +943,7 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiUserData& update) const
 {
-    if (!update.groupId.isNull() && m_userGroups.find(update.groupId) == m_userGroups.end())
+    if (!update.groupId.isNull() && !m_userGroups.contains(update.groupId))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();

@@ -91,7 +91,7 @@ namespace ite
         //refactor
         int cameraId() const
         {
-            return m_cameraID;
+            return m_cameraId;
         }
 
         std::mutex &get_mutex() {return m_mutex;}
@@ -114,7 +114,7 @@ namespace ite
 
         bool stopStreams(bool force = false);
 
-        const int m_cameraID;
+        const int m_cameraId;
 
         State checkState() const;
     };

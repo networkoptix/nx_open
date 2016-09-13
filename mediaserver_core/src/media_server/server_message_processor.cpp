@@ -159,7 +159,9 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(resource->getId(), Qn::Online);
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto manager = connection->getResourceManager(Qn::kSystemAccess);
+        manager->setResourceStatusSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, true);
     }
     else {
@@ -246,8 +248,9 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     {
         ec2::ApiMediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager(Qn::kSystemAccess)->setResourceStatusLocalSync(apiServer.id, Qn::Online);
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
+        connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(apiServer.id, Qn::Online);
     }
     else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
     {

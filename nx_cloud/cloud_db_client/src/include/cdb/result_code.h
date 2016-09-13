@@ -11,8 +11,17 @@ static const int kErrorCodeBase = 100;
 enum class ResultCode
 {
     ok = 0,
-    notAuthorized = kErrorCodeBase, //< Provided credentials are invalid.
-    forbidden, //< Requested operation is not allowed with credentials provided.
+    /**
+     * Operation succeeded but not full data has been returned 
+     * (e.g., due to memory usage restrictions).
+     * Caller should continue fetching data supplying data offset.
+     */
+    partialContent,
+    /** Provided credentials are invalid. */
+    notAuthorized = kErrorCodeBase,
+
+    /** Requested operation is not allowed with credentials provided. */
+    forbidden,
     accountNotActivated,
     accountBlocked,
     notFound,
@@ -25,8 +34,14 @@ enum class ResultCode
     badRequest,
     invalidNonce,
     serviceUnavailable,
-    credentialsRemovedPermanently, //< Credentials used for authentication are no longer valid.
-    invalidFormat, //< Received data in unexpected/unsupported format.
+
+    /** Credentials used for authentication are no longer valid. */
+    credentialsRemovedPermanently,
+
+    /** Received data in unexpected/unsupported format. */
+    invalidFormat,
+    retryLater,
+
     unknownError
 };
 

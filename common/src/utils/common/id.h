@@ -1,6 +1,8 @@
 #ifndef QN_ID_H
 #define QN_ID_H
 
+#include <string>
+
 #include <QCryptographicHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
@@ -42,6 +44,11 @@ inline QnUuid guidFromArbitraryData(const QByteArray &data) {
 inline QnUuid guidFromArbitraryData(const QString &data)
 {
     return guidFromArbitraryData(data.toUtf8());
+}
+
+inline QnUuid guidFromArbitraryData(const std::string& data)
+{
+    return guidFromArbitraryData(QByteArray::fromRawData(data.data(), (int)data.size()));
 }
 
 #endif // QN_ID_H

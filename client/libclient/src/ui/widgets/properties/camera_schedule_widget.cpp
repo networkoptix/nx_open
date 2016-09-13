@@ -10,6 +10,7 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <nx_ec/data/api_camera_attributes_data.h>
 
 #include <camera/fps_calculator.h>
 
@@ -158,9 +159,7 @@ private:
     bool m_hasVideo;
 };
 
-static const int kDefaultMinArchiveDays = 1;
 static const int kDangerousMinArchiveDays = 5;
-static const int kDefaultMaxArchiveDays = 30;
 static const int kRecordingTypeLabelFontSize = 12;
 static const int kRecordingTypeLabelFontWeight = QFont::DemiBold;
 static const int kDefaultBeforeThresholdSec = 5;
@@ -562,7 +561,7 @@ void QnCameraScheduleWidget::updateScheduleEnabled()
 
 void QnCameraScheduleWidget::updateMinDays()
 {
-    auto calcMinDays = [](int d) { return d == 0 ? kDefaultMinArchiveDays : qAbs(d); };
+    auto calcMinDays = [](int d) { return d == 0 ? ec2::kDefaultMinArchiveDays : qAbs(d); };
 
     const int minDays = m_cameras.isEmpty()
         ? 0
@@ -584,7 +583,7 @@ void QnCameraScheduleWidget::updateMinDays()
 
 void QnCameraScheduleWidget::updateMaxDays()
 {
-    auto calcMaxDays = [](int d) { return d == 0 ? kDefaultMaxArchiveDays : qAbs(d); };
+    auto calcMaxDays = [](int d) { return d == 0 ? ec2::kDefaultMaxArchiveDays : qAbs(d); };
 
     const int maxDays = m_cameras.isEmpty()
         ? 0

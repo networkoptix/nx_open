@@ -165,7 +165,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
     const auto ids = hostName.split('.');
     if (ids.size() == 2)
     {
-        //hostName is serverID.systemID
+        //hostName is serverId.systemId
         const auto& systemId = ids[1];
         const auto& serverId = ids[0];
 
@@ -225,6 +225,16 @@ data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
     }
 
     return result;
+}
+
+std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
+{
+    QnMutexLocker lk(&m_mutex);
+    std::vector<ConnectionWeakRef> connections;
+    for (const auto peer: m_peers)
+        connections.push_back(peer.second.peerConnection);
+
+    return connections;
 }
 
 }   //hpm

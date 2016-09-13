@@ -25,7 +25,7 @@
 class QnCameraUserAttributes
 {
 public:
-    QnUuid cameraID;
+    QnUuid cameraId;
     Qn::MotionType motionType;
     QList<QnMotionRegion> motionRegions;
     bool scheduleDisabled;

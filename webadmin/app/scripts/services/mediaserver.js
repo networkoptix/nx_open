@@ -156,11 +156,12 @@ angular.module('webadminApp')
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
-                        }).then(function(){
+                        }).then(function(data){
                             $localStorage.login = login;
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
+                            return data.data.reply;
                         });
                     });
                 }

@@ -38,11 +38,6 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-
-        QnTransaction<ApiDiscoveryData> prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QUrl &url, bool ignore) const;
-        QnTransaction<ApiDiscoverPeerData> prepareTransaction(const QUrl &url) const;
-        QnTransaction<ApiDiscoveredServerData> prepareTransaction(const ApiDiscoveredServerData &discoveredServer) const;
-        QnTransaction<ApiDiscoveredServerDataList> prepareTransaction(const ApiDiscoveredServerDataList &discoveredServersList) const;
     };
 
 } // namespace ec2

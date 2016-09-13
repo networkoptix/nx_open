@@ -9,8 +9,8 @@
 
 module.exports = function (grunt) {
 
-    var proxy_server_host = '10.1.5.105';  //la_office_test - Burbank
-    //var proxy_server_host = '10.1.5.145';  //Parallels - Burbank
+    //var proxy_server_host = '10.1.5.105';  //la_office_test - Burbank
+    var proxy_server_host = '10.1.5.107';  //Parallels - Burbank
     var proxy_server_port = 7001;
 
     var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
@@ -555,7 +555,8 @@ module.exports = function (grunt) {
         },
         'protractor_webdriver': {
             options:{
-
+                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom',
+                keepAlive : true
             },
             default:{
 
@@ -600,8 +601,8 @@ module.exports = function (grunt) {
         'connect:test',
         'protractor_webdriver',
         'shell:print_version',
-        'protractor:all',
-        'newer:jshint'
+        'protractor:all'
+        //'newer:jshint'
         //'karma'
     ]);
     grunt.registerTask('code', [
@@ -669,6 +670,4 @@ module.exports = function (grunt) {
         'build',
         'scp:demo_fast'
     ]);
-
-
 };

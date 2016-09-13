@@ -92,16 +92,18 @@ bool AuthorizationManager::authorize(
     auxSearchAttrs.put(attr::entity, QnLexical::serialized(requestedEntity));
     auxSearchAttrs.put(attr::action, QnLexical::serialized(requestedAction));
 
-    stree::ResourceWriterProxy<bool> resProxy(authzInfo, attr::authorized);
+    stree::ResourceContainer additionalResourceContainer;
+    stree::ResourceWriterProxy resProxy(authzInfo, &additionalResourceContainer);
     m_stree.search(
         StreeOperation::authorization,
         stree::MultiSourceResourceReader(
             authenticationProperties,
             dataToAuthorize,
-            auxSearchAttrs),
+            auxSearchAttrs,
+            additionalResourceContainer),
         &resProxy);
 
-    if (auto authorized = resProxy.take())
+    if (auto authorized = additionalResourceContainer.get<bool>(attr::authorized))
         return authorized.get();
     //no "autorized" attr has been set. This is actually error in authorization rules xml
     NX_ASSERT(false);

@@ -16,15 +16,15 @@
 
 namespace CameraDiagnostics
 {
-    DiagnoseTool::DiagnoseTool( const QnUuid& cameraID, QObject *parent )
+    DiagnoseTool::DiagnoseTool( const QnUuid& cameraId, QObject *parent )
     :
         QObject(parent),
-        m_cameraID( cameraID ),
+        m_cameraId( cameraId ),
         m_state( sInit ),
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        m_camera = qnResPool->getResourceById<QnVirtualCameraResource>( cameraID );
+        m_camera = qnResPool->getResourceById<QnVirtualCameraResource>( cameraId );
         if( !m_camera )
             return;
 
@@ -94,7 +94,7 @@ namespace CameraDiagnostics
 
         emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
         if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
-                m_cameraID,
+                m_cameraId,
                 static_cast<Step::Value>(m_step+1),
                 this,
                 SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )
@@ -156,7 +156,7 @@ namespace CameraDiagnostics
         emit diagnosticsStepStarted( m_step );
 
         if( m_server->apiConnection()->doCameraDiagnosticsStepAsync(
-                m_cameraID,
+                m_cameraId,
                 m_step,
                 this,
                 SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )

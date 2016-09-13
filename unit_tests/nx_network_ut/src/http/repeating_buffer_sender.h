@@ -15,7 +15,7 @@ class RepeatingBufferSender
     public nx_http::AbstractHttpRequestHandler
 {
 public:
-    RepeatingBufferSender( const nx_http::StringType& mimeType, nx::Buffer buffer );
+    RepeatingBufferSender(const nx_http::StringType& mimeType, nx::Buffer buffer);
 
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
@@ -23,9 +23,7 @@ public:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler ) override;
+        nx_http::HttpRequestProcessedHandler completionHandler) override;
 
 private:
     const nx_http::StringType m_mimeType;

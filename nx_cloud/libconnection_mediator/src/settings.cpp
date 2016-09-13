@@ -77,6 +77,19 @@ namespace
     const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
     constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
         nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
+
+    namespace tcp_reverse_retry_policy {
+    const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
+    const QLatin1String kInitialDelay("cloudConnect/tcpReverseRetryPolicy/initialDelay");
+    const QLatin1String kDelayMultiplier("cloudConnect/tcpReverseRetryPolicy/delayMultiplier");
+    const QLatin1String kMaxDelay("cloudConnect/tcpReverseRetryPolicy/maxDelay");
+    } // namespace tcp_reverse_retry_policy
+
+    namespace tcp_reverse_http_timeouts {
+    const QLatin1String kSend("cloudConnect/tcpReverseHttpTimeouts/send");
+    const QLatin1String kRead("cloudConnect/tcpReverseHttpTimeouts/read");
+    const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
+    } // namespace tcp_reverse_http_timeouts
 }
 
 
@@ -199,6 +212,33 @@ void Settings::loadConfiguration()
         kUdpTunnelKeepAliveRetries,
         kDefaultUdpTunnelKeepAliveRetries).toInt();
 
+    m_connectionParameters.tcpReverseRetryPolicy.setMaxRetryCount(m_settings.value(
+        tcp_reverse_retry_policy::kMaxCount,
+        network::RetryPolicy::kDefaultMaxRetryCount).toInt());
+    m_connectionParameters.tcpReverseRetryPolicy.setInitialDelay(
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_retry_policy::kInitialDelay).toString(),
+        network::RetryPolicy::kDefaultInitialDelay));
+    m_connectionParameters.tcpReverseRetryPolicy.setDelayMultiplier(m_settings.value(
+        tcp_reverse_retry_policy::kDelayMultiplier,
+        network::RetryPolicy::kDefaultDelayMultiplier).toInt());
+    m_connectionParameters.tcpReverseRetryPolicy.setMaxDelay(
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_retry_policy::kMaxDelay).toString(),
+        network::RetryPolicy::kDefaultMaxDelay));
+
+    m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_http_timeouts::kSend).toString(),
+        nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
+    m_connectionParameters.tcpReverseHttpTimeouts.responseReadTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_http_timeouts::kRead).toString(),
+        nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
+    m_connectionParameters.tcpReverseHttpTimeouts.messageBodyReadTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            tcp_reverse_http_timeouts::kBody).toString(),
+        nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
 
     //analyzing values
     if (m_general.dataDir.isEmpty())

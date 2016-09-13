@@ -102,8 +102,8 @@ angular.module('webadminApp')
             }
 
             mediaserver.checkInternet().then(function(hasInternetOnServer){
-                $log.log("internet on server: " + $scope.hasInternetOnServer);
                 $scope.hasInternetOnServer = hasInternetOnServer;
+                $log.log("internet on server: " + $scope.hasInternetOnServer);
             });
 
             cloudAPI.checkConnection().then(function(){
@@ -121,7 +121,7 @@ angular.module('webadminApp')
 
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
-            $log.log("check system configuration");
+            $log.log("check system configuration", user);
 
             $scope.settings.localLogin = user.name || Config.defaultLogin;
 
@@ -150,7 +150,6 @@ angular.module('webadminApp')
                 $log.log("failed to get systemCloudInfo");
                 mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
-
                     checkInternet(false);
                     if(debugMode || $scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
                         $log.log("System is new - go to master");
@@ -221,10 +220,13 @@ angular.module('webadminApp')
                 // Merge fail:
                 'INCOMPATIBLE':'fail',
                 'SAFE_MODE':'fail',
-                'CONFIGURATION_ERROR':'fail'
+                'CONFIGURATION_ERROR':'fail',
+
+                'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':'fail',
+                'DIFFERENT_CLOUD_HOST':'fail'
             };
             return errorClasses[error] || 'fail';
-        }
+        };
         function formatError(errorToShow){
             var errorMessages = {
 
@@ -233,20 +235,22 @@ angular.module('webadminApp')
                 'password':'Wrong password.',
 
                 // Wrong system:
-                'FAIL':'System is unreachable or doesn\'t exist.',
-                'url':'Unable to connect to specified server.',
-                'INCOMPATIBLE':'Selected system has incompatible version.',
+                'FAIL': L.join.systemIsUnreacheble,
+                'url': L.join.wrongUrl,
+                'INCOMPATIBLE': L.join.incompatibleVersion,
 
                 // Merge fail:
-                'SAFE_MODE':'Can\'t connect to a system. Remote system is in safe mode.',
-                'CONFIGURATION_ERROR':'Can\'t connect to a system. Maybe one of the systems is in safe mode.',
+                'SAFE_MODE': L.join.safeMode,
+                'CONFIGURATION_ERROR': L.join.configError,
 
 
+                'DEPENDENT_SYSTEM_BOUND_TO_CLOUD': L.join.cloudError,
+                'DIFFERENT_CLOUD_HOST':L.join.cloudHostConflict,
 
-                'currentPassword':'Incorrect current password',
+                'currentPassword': L.join.incorrectCurrentPassword,
 
                 // Cloud errors:
-                'notAuthorized': 'Login or password are incorrect',
+                'notAuthorized': L.join.incorrectRemotePassword,
                 'accountNotActivated': 'Please, confirm your account first',
                 'unknown': 'Something went wrong'
             };
@@ -269,28 +273,32 @@ angular.module('webadminApp')
             logMediaserverError(error);
 
             var errorMessage = 'Connection error (' + error.status + ')';
-            if(error.data.errorString && error.data.errorString!=''){
+            if(error.data && error.data.errorString && error.data.errorString!='') {
                 errorMessage = formatError(error.data.errorString);
-            }
-            $scope.settings.remoteError = errorMessage;
 
-            switch(classifyError(error.data.errorString)){
-                case 'auth':
-                    $scope.settings.remoteAuthError = true;
-                    $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system',false);
-                    $scope.forms.remoteSystemForm.remotePassword.$setValidity('system',false);
-                    $scope.next('merge');
-                    break;
+                $scope.settings.remoteError = errorMessage;
 
-                case 'system':
-                    $scope.settings.remoteSystemError = true;
-                    $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system',false);
-                    $scope.next('merge');
-                    break;
+                switch (classifyError(error.data.errorString)) {
+                    case 'auth':
+                        $scope.settings.remoteAuthError = true;
+                        $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system', false);
+                        $scope.forms.remoteSystemForm.remotePassword.$setValidity('system', false);
+                        $scope.next('merge');
+                        break;
 
-                default:
-                    $scope.next('mergeFailure');
-                    break;
+                    case 'system':
+                        $scope.settings.remoteSystemError = true;
+                        $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system', false);
+                        $scope.next('merge');
+                        break;
+
+                    default:
+                        $scope.next('mergeFailure');
+                        break;
+                }
+            }else{
+                $scope.settings.remoteError = L.join.unknownError;
+                $scope.next('mergeFailure');
             }
         }
 
@@ -724,16 +732,17 @@ angular.module('webadminApp')
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
 
+
+        function readCloudHost(){
+            return mediaserver.getModuleInformation().then(function (r) {
+                Config.cloud.portalUrl = 'https://' + r.data.reply.cloudHost;
+
+                $log.log("Read cloud portal url from module information: " + Config.cloud.portalUrl);
+            });
+        }
         function getAdvancedSettings(){
-            mediaserver.systemSettings().then(function(r){
+            return mediaserver.systemSettings().then(function(r){
                 var systemSettings = r.data.reply.settings;
-                if(r.data.reply.settings.cloudPortalUrl){
-                    Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
-                    $scope.portalUrl = Config.cloud.portalUrl;
-                    $log.log("Read cloud portal url from advanced settings: " + Config.cloud.portalUrl);
-                }else{
-                    $log.log("No cloud portal url in advanced settings");
-                }
                 $scope.systemSettings = {};
 
                 for(var settingName in $scope.Config.settingsConfig){
@@ -762,7 +771,9 @@ angular.module('webadminApp')
         }
         function initWizard(){
             $scope.next(0);
+
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
+                readCloudHost();
                 getAdvancedSettings();
                 discoverSystems();
             },function(error){

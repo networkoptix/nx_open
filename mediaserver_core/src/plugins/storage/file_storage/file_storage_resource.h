@@ -46,14 +46,10 @@ public:
     virtual qint64 getTotalSpace() override;
 
     virtual int getCapabilities() const override;
-    virtual bool initOrUpdate() const override;
+    virtual Qn::StorageInitResult initOrUpdate() const override;
 
     virtual void setUrl(const QString& url) override;
-
-    QString getLocalPath() const
-    {
-        return m_localPath.isEmpty() ? getPath() : m_localPath;
-    }
+    virtual QString getPath() const override;
 
     qint64 getTotalSpaceWithoutInit();
 
@@ -65,15 +61,14 @@ public:
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
 private:
-    virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
-    bool initOrUpdateInternal() const;
-    bool updatePermissions() const;
+    Qn::StorageInitResult initOrUpdateInternal() const;
+    Qn::StorageInitResult updatePermissions(const QString& url) const;
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
     bool checkDBCap() const;
 #if defined(Q_OS_WIN)
-    bool updatePermissionsHelper(
+    Qn::StorageInitResult updatePermissionsHelper(
         LPWSTR userName,
         LPWSTR password,
         NETRESOURCE* netRes) const;
@@ -86,8 +81,7 @@ private:
     QString translateUrlToRemote(const QString &url) const;
 
     // mounts network (smb) folder to temporary local path
-    // returns not 0 if something went wrong, 0 otherwise
-    int mountTmpDrive() const;
+    Qn::StorageInitResult mountTmpDrive(const QString& url) const;
     bool testWriteCapInternal() const;
 
     void setLocalPathSafe(const QString &path) const;

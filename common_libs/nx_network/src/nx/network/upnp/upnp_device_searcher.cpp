@@ -87,7 +87,7 @@ void DeviceSearcher::pleaseStop()
         it != m_httpClients.end();
         ++it )
     {
-        it->first->terminate();     //this method blocks till event handler returns
+        it->first->pleaseStopSync();     //this method blocks till event handler returns
     }
     m_httpClients.clear();
     m_handlerGuard.reset();
@@ -499,7 +499,7 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
     QMutexLocker lk( &m_mutex );
     if( m_terminated )
         return;
-    httpClient->terminate();
+    httpClient->pleaseStopSync();
     m_httpClients.erase( httpClient );
 }
 

@@ -27,7 +27,7 @@ QnPlSonyResource::~QnPlSonyResource() {
         inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
     }
     if (inputMonitorHttpClient)
-        inputMonitorHttpClient->terminate();
+        inputMonitorHttpClient->pleaseStopSync();
 }
 
 CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
@@ -163,7 +163,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
     if( m_inputMonitorHttpClient )
     {
-        m_inputMonitorHttpClient->terminate();
+        m_inputMonitorHttpClient->pleaseStopSync();
         m_inputMonitorHttpClient.reset();
     }
 
@@ -205,7 +205,7 @@ void QnPlSonyResource::stopInputPortMonitoringAsync()
     }
     //calling terminate with m_inputPortMutex locked can lead to dead-lock with onMonitorResponseReceived method, called from http event thread
     if (inputMonitorHttpClient)
-        inputMonitorHttpClient->terminate();
+        inputMonitorHttpClient->pleaseStopSync();
 }
 
 bool QnPlSonyResource::isInputPortMonitored() const

@@ -17,10 +17,14 @@ namespace {
     {
         const auto port = server->getPort();
         QSet<QString> result;
-        for (const SocketAddress& address : server->getAllAvailableAddresses())
+        for (const SocketAddress& address: server->getAllAvailableAddresses())
         {
-            result << address.address.toString();
+            if (address.port == port)
+                result << address.address.toString();
+            else
+                result << address.toString();
         }
+
         return result;
     }
 }

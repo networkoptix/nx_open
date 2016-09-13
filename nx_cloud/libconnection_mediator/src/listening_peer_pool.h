@@ -112,6 +112,7 @@ public:
         const nx::String& systemId) const;
 
     data::ListeningPeersBySystem getListeningPeers() const;
+    std::vector<ConnectionWeakRef> getAllConnections() const;
 
 private:
     mutable QnMutex m_mutex;

@@ -30,6 +30,7 @@ public:
         int lockID = 0 );
     void unlock();
     bool tryLock();
+    bool isRecursive() const;
 
 private:
     QnMutexImpl* m_impl;

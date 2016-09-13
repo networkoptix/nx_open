@@ -17,6 +17,7 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include "repeating_buffer_sender.h"
 
@@ -113,7 +114,7 @@ TEST_F(AsyncHttpClientTest, motionJpegRetrieval)
     {
         ~ClientContext()
         {
-            client->terminate();
+            client->pleaseStopSync();
             client.reset(); //ensuring client removed before multipartParser
         }
 
@@ -314,16 +315,15 @@ public:
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)> completionHandler)
+        nx_http::HttpRequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
             connection->closeConnection(SystemError::connectionReset);
 
         completionHandler(
             nx_http::StatusCode::ok,
-            std::make_unique< nx_http::BufferSource >(m_mimeType, m_response));
+            std::make_unique< nx_http::BufferSource >(m_mimeType, m_response),
+            nx_http::ConnectionEvents());
     }
 
 private:
@@ -357,6 +357,56 @@ TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
     ASSERT_EQ(SystemError::noError, httpClient.lastSysErrorCode());
     ASSERT_FALSE(httpClient.doGet(testUrl));
     ASSERT_NE(SystemError::noError, httpClient.lastSysErrorCode());
+}
+
+TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
+{
+    static const char* testPath = "/ReusingExistingConnection";
+    testHttpServer()->setForceConnectionClose(true);
+    ASSERT_TRUE(
+        testHttpServer()->registerStaticProcessor(
+            testPath,
+            "qwade324dwfasd123sdf23sdfsdf",
+            "text/plain"));
+    ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+    const QUrl testUrl(lm("http://%1%2")
+        .str(testHttpServer()->serverAddress()).arg(testPath));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        nx::utils::SyncQueue<nx_http::Response> responseQueue;
+        std::atomic<int> responseCount(0);
+
+        auto httpClient = AsyncHttpClient::create();
+        httpClient->setSendTimeoutMs(1000);
+        QObject::connect(
+            httpClient.get(), &AsyncHttpClient::done,
+            [&testUrl, &responseQueue, &responseCount](AsyncHttpClientPtr client)
+            {
+                ++responseCount;
+                if (client->response())
+                    responseQueue.push(*client->response());
+                else
+                    responseQueue.push(nx_http::Response());
+                if (responseCount >= 2)
+                    return;
+                client->doGet(testUrl);
+            });
+        if (i == 1)
+        {
+            // Testing connection to a bad url.
+            httpClient->doGet(QUrl("http://example.com:58249/test"));
+        }
+        else
+        {
+            httpClient->doGet(testUrl);
+        }
+
+        constexpr const auto responseWaitDelay = std::chrono::seconds(2);
+        ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
+        ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
+    }
 }
 
 } // namespace nx_http

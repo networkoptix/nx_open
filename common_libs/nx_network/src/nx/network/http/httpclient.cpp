@@ -22,7 +22,7 @@ HttpClient::HttpClient()
 HttpClient::~HttpClient()
 {
     pleaseStop();
-    m_asyncHttpClient->terminate();
+    m_asyncHttpClient->pleaseStopSync();
 }
 
 void HttpClient::pleaseStop()
@@ -196,7 +196,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         //have to re-establish connection if previous message has not been read up to the end
         if (m_asyncHttpClient)
         {
-            m_asyncHttpClient->terminate();
+            m_asyncHttpClient->pleaseStopSync();
             m_asyncHttpClient.reset();
         }
         instanciateHttpClient();

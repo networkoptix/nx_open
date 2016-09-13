@@ -29,12 +29,12 @@ AsyncClient::~AsyncClient()
     }
 
     if (baseConnection)
-        baseConnection->pleaseStopSync();
+        baseConnection->pleaseStopSync(false);
 
     if( connectingSocket )
-        connectingSocket->pleaseStopSync();
+        connectingSocket->pleaseStopSync(false);
 
-    m_timer.pleaseStopSync();
+    m_timer.pleaseStopSync(false);
 }
 
 void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
@@ -153,7 +153,7 @@ void AsyncClient::closeConnection(
     }
 
     if (baseConnection)
-        baseConnection->pleaseStopSync();
+        baseConnection->pleaseStopSync(false);
 
     NX_ASSERT( !baseConnection || !connection ||
                 connection == baseConnection.get(),

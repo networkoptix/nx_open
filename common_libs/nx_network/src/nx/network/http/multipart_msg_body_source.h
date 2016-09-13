@@ -7,8 +7,6 @@
 
 #include "abstract_msg_body_source.h"
 
-#include "nx/network/aio/timer.h"
-
 #include "multipart_body_serializer.h"
 
 
@@ -25,13 +23,7 @@ namespace nx_http {
         MultipartMessageBodySource(StringType boundary);
         virtual ~MultipartMessageBodySource();
 
-        virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-
-        virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
-        virtual void bindToAioThread(
-            nx::network::aio::AbstractAioThread* aioThread) override;
-        virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-        virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+        virtual void stopWhileInAioThread() override;
 
         virtual StringType mimeType() const override;
         virtual boost::optional<uint64_t> contentLength() const override;
@@ -45,7 +37,6 @@ namespace nx_http {
         MultipartBodySerializer* serializer();
 
     private:
-        nx::network::aio::Timer m_aioThreadBinder;
         MultipartBodySerializer m_multipartBodySerializer;
         nx::utils::MoveOnlyFunc<
             void(SystemError::ErrorCode, BufferType)
@@ -55,7 +46,6 @@ namespace nx_http {
         bool m_eof;
 
         void onSomeDataAvailable(const QnByteArrayConstRef& data);
-        void doCleanup();
     };
 
 }   //namespace nx_http

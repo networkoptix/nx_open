@@ -622,7 +622,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
         m_inputPortCount = portsCount;
 
-        if (portsCount <= MAX_IO_PORTS_PER_DEVICE)
+        if (portsCount <= (int) MAX_IO_PORTS_PER_DEVICE)
         {
             for (int i = 1; i <= portsCount; ++i)
             {
@@ -1545,7 +1545,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         capabilitiesResponse.Capabilities->Device->IO &&
         capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
         *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0  && 
-        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors < MAX_IO_PORTS_PER_DEVICE)
+        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors < (int) MAX_IO_PORTS_PER_DEVICE)
     {
         //camera has input port
         setCameraCapability( Qn::RelayInputCapability, true );

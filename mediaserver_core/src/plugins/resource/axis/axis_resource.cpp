@@ -266,9 +266,8 @@ void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)
     httpClient.swap(value);
 
     lk.unlock();
-    httpClient->terminate();
+    httpClient->pleaseStopSync();
     httpClient.reset();
-    lk.relock();
 }
 
 bool QnPlAxisResource::isInputPortMonitored() const

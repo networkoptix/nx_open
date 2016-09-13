@@ -71,7 +71,7 @@ public:
 			  usageCoeff(0.0)
 		{}
 	};
-	typedef std::unordered_map<int, StorageSpaceInfo> StorageSpaceInfoMap;
+    typedef std::unordered_map<int, StorageSpaceInfo> StorageSpaceInfoMap;
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
