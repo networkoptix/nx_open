@@ -156,6 +156,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
             data.isWritable = storage->initOrUpdate() && storage->isWritable();
+            data.isOnline = true;
         }
 
         result.push_back(data);
