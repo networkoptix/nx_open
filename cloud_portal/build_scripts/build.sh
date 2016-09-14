@@ -35,8 +35,8 @@ do
 
     echo "Build statics"
     pushd ../front_end
-    # grunt setbranding:$CUSTOMIZATION
-    # grunt build
+    grunt setbranding:$CUSTOMIZATION
+    grunt build
     popd
 
     echo "Move front_end to destination"
@@ -84,7 +84,7 @@ do
     popd
 
     echo "clean branding files"
-    rm -rf $dir/*.ts
+    rm -rf $TARGET_DIR/$CUSTOMIZATION/*.ts
 
     echo "Localization success"
 
