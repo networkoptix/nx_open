@@ -226,22 +226,25 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QnPaneSettingsMap settings = qnSettings->paneSettings();
 
     /* Tree panel. */
-    if (!qnRuntime->isActiveXMode())
+    if (qnRuntime->isDesktopMode())
         createTreeWidget(settings[Qn::WorkbenchPane::Tree]);
 
     /* Title bar. */
-    if (!qnRuntime->isActiveXMode())
+    if (qnRuntime->isDesktopMode())
         createTitleWidget(settings[Qn::WorkbenchPane::Title]);
 
     /* Notifications. */
-    if (!qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
+    if (qnRuntime->isDesktopMode()
+        && !qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
+    {
         createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]);
+    }
 
     /* Calendar. */
     createCalendarWidget(settings[Qn::WorkbenchPane::Calendar]);
 
     /* Navigation slider. */
-    createSliderWidget(settings[Qn::WorkbenchPane::Navigation]);
+    createTimelineWidget(settings[Qn::WorkbenchPane::Navigation]);
 
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
@@ -273,7 +276,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Init fields. */
     setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
 
-    setSliderVisible(false, false);
+    setTimelineVisible(false, false);
     setTreeVisible(true, false);
     setTitleVisible(true, false);
     setTitleUsed(false);
@@ -284,7 +287,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     setTreeOpened(settings[Qn::WorkbenchPane::Tree].state == Qn::PaneState::Opened, false);
     setTitleOpened(settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, false);
-    setSliderOpened(settings[Qn::WorkbenchPane::Navigation].state != Qn::PaneState::Closed, false);
+    setTimelineOpened(settings[Qn::WorkbenchPane::Navigation].state != Qn::PaneState::Closed, false);
     setNotificationsOpened(settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, false);
     setCalendarOpened(settings[Qn::WorkbenchPane::Calendar].state == Qn::PaneState::Opened, false);
 
@@ -329,7 +332,7 @@ void QnWorkbenchUi::storeSettings()
     notifications.state = makePaneState(isNotificationsOpened(), isNotificationsPinned());
 
     QnPaneSettings& navigation = settings[Qn::WorkbenchPane::Navigation];
-    navigation.state = makePaneState(isSliderOpened(), isSliderPinned());
+    navigation.state = makePaneState(isTimelineOpened(), isTimelinePinned());
 
     QnPaneSettings& calendar = settings[Qn::WorkbenchPane::Calendar];
     calendar.state = makePaneState(isCalendarOpened(), isCalendarPinned());
@@ -357,7 +360,7 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const
         return Qn::TreeScope;
 
     if (focusItem == m_timeline->item)
-        return Qn::SliderScope;
+        return Qn::TimelineScope;
 
     if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
         return Qn::SceneScope;
@@ -376,7 +379,7 @@ QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
     {
         case Qn::TreeScope:
             return m_tree ? m_tree->widget->currentParameters(scope) : QnActionParameters();
-        case Qn::SliderScope:
+        case Qn::TimelineScope:
             return QnActionParameters(navigator()->currentWidget());
         case Qn::SceneScope:
             return QnActionParameters(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
@@ -396,20 +399,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
 {    // TODO
     ensureAnimationAllowed(animate);
 
-    if (qnRuntime->isVideoWallMode())
-    {
-        bool sliderVisible =
-            navigator()->currentWidget() != nullptr &&
-            !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server));
-
-        setSliderVisible(sliderVisible, animate);
-        setTreeVisible(false, false);
-        setTitleVisible(false, false);
-        setNotificationsVisible(false, false);
-        return;
-    }
-
-    const auto calculateSliderVisible = [this]()
+    const auto calculateTimelineVisible = [this]()
         {
             if (action(QnActions::ToggleTourModeAction)->isChecked())
                 return false;
@@ -433,19 +423,28 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
                 || !navigator()->currentWidget()->resource()->flags().testFlag(Qn::live);   /* Show slider for local files. */
         };
 
-    bool sliderVisible = calculateSliderVisible();
+    bool timelineVisible = calculateTimelineVisible();
+
+    if (qnRuntime->isVideoWallMode())
+    {
+        setTimelineVisible(timelineVisible, animate);
+        setTreeVisible(false, false);
+        setTitleVisible(false, false);
+        setNotificationsVisible(false, false);
+        return;
+    }
 
     if (m_inactive)
     {
         bool hovered = isHovered();
-        setSliderVisible(sliderVisible && hovered, animate);
+        setTimelineVisible(timelineVisible && hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
         setNotificationsVisible(hovered, animate);
     }
     else
     {
-        setSliderVisible(sliderVisible, false);
+        setTimelineVisible(timelineVisible, false);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
         setNotificationsVisible(true, animate);
@@ -529,7 +528,7 @@ QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
     return
         (isTreeOpened() ? TreePanel : NoPanel) |
         (isTitleOpened() ? TitlePanel : NoPanel) |
-        (isSliderOpened() ? SliderPanel : NoPanel) |
+        (isTimelineOpened() ? TimelinePanel : NoPanel) |
         (isNotificationsOpened() ? NotificationsPanel : NoPanel);
 }
 
@@ -539,7 +538,7 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
 
     setTreeOpened(panels & TreePanel, animate);
     setTitleOpened(panels & TitlePanel, animate);
-    setSliderOpened(panels & SliderPanel, animate);
+    setTimelineOpened(panels & TimelinePanel, animate);
     setNotificationsOpened(panels & NotificationsPanel, animate);
 }
 
@@ -577,7 +576,7 @@ void QnWorkbenchUi::tick(int deltaMSecs)
     if (!display()->scene())
         return;
 
-    QnTimeSlider *slider = m_timeline->item->timeSlider();
+    auto slider = m_timeline->item->timeSlider();
 
     QPointF pos;
     if (slider->windowStart() <= slider->sliderPosition() && slider->sliderPosition() <= slider->windowEnd())
@@ -603,7 +602,13 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
     bool isFullscreen = fullScreenAction->isChecked();
 
     if (!m_inFreespace)
-        m_inFreespace = isFullscreen && !isTreeOpened() && !isTitleOpened() && !isNotificationsOpened() && !isSliderOpened();
+    {
+        m_inFreespace = isFullscreen
+           && (isTreePinned() && !isTreeOpened())
+           && !isTitleOpened()
+           && (isNotificationsPinned() && !isNotificationsOpened())
+           && (isTimelinePinned() && !isTimelineOpened());
+    }
 
     if (!m_inFreespace)
     {
@@ -614,7 +619,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
 
         setTreeOpened(false, isFullscreen);
         setTitleOpened(false, isFullscreen);
-        setSliderOpened(false, isFullscreen);
+        setTimelineOpened(false, isFullscreen);
         setNotificationsOpened(false, isFullscreen);
 
         updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
@@ -627,7 +632,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
         QnPaneSettingsMap settings = qnSettings->paneSettings();
         setTreeOpened(settings[Qn::WorkbenchPane::Tree].state == Qn::PaneState::Opened, isFullscreen);
         setTitleOpened(settings[Qn::WorkbenchPane::Title].state == Qn::PaneState::Opened, isFullscreen);
-        setSliderOpened(settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, isFullscreen);
+        setTimelineOpened(settings[Qn::WorkbenchPane::Navigation].state == Qn::PaneState::Opened, isFullscreen);
         setNotificationsOpened(settings[Qn::WorkbenchPane::Notifications].state == Qn::PaneState::Opened, isFullscreen);
 
         updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
@@ -690,13 +695,11 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             /* User may have opened some panels while zoomed,
              * we want to leave them opened even if they were closed before. */
-            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels() | SliderPanel, true);
+            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels() | TimelinePanel, true);
 
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
         }
-
-        m_timeline->showWidget->setVisible(newWidget);
     }
 
     if (qnRuntime->isVideoWallMode())
@@ -708,7 +711,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
                 if (newWidget)
                     updateControlsVisibility(true);
                 else
-                    setSliderVisible(false, true);
+                    setTimelineVisible(false, true);
                 break;
 
             default:
@@ -890,7 +893,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
-            if (opened)
+            if (opened && m_tree->isPinned())
                 m_inFreespace = false;
         });
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
@@ -1190,7 +1193,7 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
         [this](bool opened)
         {
-            if (opened)
+            if (opened && m_notifications->isPinned())
                 m_inFreespace = false;
         });
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
@@ -1329,7 +1332,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate)
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & Qn::utc);
     action(QnActions::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
 
-    bool calendarVisible = calendarEnabled && m_timeline->isVisible() && isSliderOpened();
+    bool calendarVisible = calendarEnabled && m_timeline->isVisible() && isTimelineOpened();
     setCalendarVisible(calendarVisible && (!m_inactive || isHovered()), animate);
 
     if (!calendarVisible)
@@ -1553,33 +1556,29 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 
 #pragma endregion Calendar and DayTime widget methods
 
-#pragma region SliderWidget
+#pragma region TimelineWidget
 
-bool QnWorkbenchUi::isSliderVisible() const
+bool QnWorkbenchUi::isTimelineVisible() const
 {
     return m_timeline->isVisible();
 }
 
-bool QnWorkbenchUi::isSliderOpened() const
+bool QnWorkbenchUi::isTimelineOpened() const
 {
     return m_timeline->isOpened();
 }
 
-bool QnWorkbenchUi::isSliderPinned() const
+bool QnWorkbenchUi::isTimelinePinned() const
 {
     /* Auto-hide slider when some item is zoomed, otherwise - don't. */
     return m_timeline->isPinned() ||
         m_widgetByRole[Qn::ZoomedRole] == nullptr;
 }
 
-void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
+void QnWorkbenchUi::setTimelineOpened(bool opened, bool animate)
 {
     if (qnRuntime->isVideoWallMode())
         opened = true;
-
-    /* Do not hide pinned timeline. */
-    if (m_timeline->isPinned() && !opened)
-        return;
 
     m_timeline->setOpened(opened, animate);
 
@@ -1587,17 +1586,24 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate)
     m_inFreespace &= !opened;
 }
 
-void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
+void QnWorkbenchUi::setTimelineVisible(bool visible, bool animate)
 {
     m_timeline->setVisible(visible, animate);
 }
 
-void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
+void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
 {
     m_timeline = new NxUi::TimelineWorkbenchPanel(settings, m_controlsWidget, this);
 
+    connect(m_timeline, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
+        [this](bool opened)
+        {
+            if (opened && m_timeline->isPinned())
+                m_inFreespace = false;
+        });
+
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        [this](bool value, bool animated)
+        [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
@@ -1611,13 +1617,13 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         [this]
-    {
-        updateTreeGeometry();
-        updateNotificationsGeometry();
-        updateViewportMargins();
-        updateCalendarGeometry();
-        updateDayTimeWidgetGeometry();
-    });
+        {
+            updateTreeGeometry();
+            updateNotificationsGeometry();
+            updateViewportMargins();
+            updateCalendarGeometry();
+            updateDayTimeWidgetGeometry();
+        });
 
     /*
     Calendar is created before navigation slider (alot of logic relies on that).
@@ -1649,16 +1655,10 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled, this,
-        [this](bool checked)
-        {
-            m_timeline->setThumbnailsVisible(checked);
-        });
-
     const auto getActionParamsFunc =
         [this](const QnCameraBookmark &bookmark) -> QnActionParameters
         {
-            QnActionParameters bookmarkParams(currentParameters(Qn::SliderScope));
+            QnActionParameters bookmarkParams(currentParameters(Qn::TimelineScope));
             bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
             return bookmarkParams;
         };
@@ -1716,7 +1716,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 
 }
 
-#pragma endregion Slider methods
+#pragma endregion Timeline methods
 
 #pragma region DebugWidget
 

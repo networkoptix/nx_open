@@ -78,7 +78,7 @@ public:
         NoPanel = 0x0,
         TreePanel = 0x1,
         TitlePanel = 0x2,
-        SliderPanel = 0x4,
+        TimelinePanel = 0x4,
         NotificationsPanel = 0x8
     };
     Q_DECLARE_FLAGS(Panels, Panel)
@@ -105,9 +105,9 @@ public:
     bool isTreePinned() const;
 
     /** Whether navigation slider is opened. */
-    bool isSliderOpened() const;
+    bool isTimelineOpened() const;
 
-    bool isSliderPinned() const;
+    bool isTimelinePinned() const;
 
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
@@ -125,7 +125,7 @@ public:
     bool isCalendarOpened() const;
 
     bool isTreeVisible() const;
-    bool isSliderVisible() const;
+    bool isTimelineVisible() const;
     bool isTitleVisible() const;
     bool isNotificationsVisible() const;
     bool isCalendarVisible() const;
@@ -135,13 +135,13 @@ public slots:
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
-    void setSliderVisible(bool visible = true, bool animate = true);
+    void setTimelineVisible(bool visible = true, bool animate = true);
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
 
     void setTreeOpened(bool opened = true, bool animate = true);
-    void setSliderOpened(bool opened = true, bool animate = true);
+    void setTimelineOpened(bool opened = true, bool animate = true);
     void setTitleOpened(bool opened = true, bool animate = true);
     void setNotificationsOpened(bool opened = true, bool animate = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
@@ -178,7 +178,7 @@ private:
     void createTitleWidget(const QnPaneSettings& settings);
     void createNotificationsWidget(const QnPaneSettings& settings);
     void createCalendarWidget(const QnPaneSettings& settings);
-    void createSliderWidget(const QnPaneSettings& settings);
+    void createTimelineWidget(const QnPaneSettings& settings);
 
 #ifdef _DEBUG
     void createDebugWidget();
@@ -270,7 +270,7 @@ private:
 
     Panels m_unzoomedOpenedPanels;
 
-    /* Slider-related state. */
+    /* Timeline-related state. */
 
     /** Timeline. */
     NxUi::TimelineWorkbenchPanel* m_timeline;

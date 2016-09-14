@@ -26,7 +26,6 @@ public:
     QnControlBackgroundWidget* backgroundItem;
     QnNotificationsCollectionWidget* item;
     QnImageButtonWidget* pinButton;
-    QnBlinkingImageButtonWidget* showButton;
     VariantAnimator* xAnimator;
 
 public:
@@ -53,6 +52,8 @@ private:
 private:
     bool m_ignoreClickEvent;
     bool m_visible;
+
+    QnBlinkingImageButtonWidget* m_showButton;
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
     HoverFocusProcessor* m_hidingProcessor;

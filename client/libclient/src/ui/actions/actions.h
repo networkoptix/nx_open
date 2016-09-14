@@ -1136,7 +1136,7 @@ enum ActionScope
     MainScope = 0x00000001,           /**< Action appears in main menu. */
     SceneScope = 0x00000002,           /**< Action appears in scene context menu and its parameters are taken from the scene. */
     TreeScope = 0x00000004,           /**< Action appears in tree context menu. */
-    SliderScope = 0x00000008,           /**< Action appears in slider context menu. */
+    TimelineScope = 0x00000008,           /**< Action appears in slider context menu. */
     TitleBarScope = 0x00000010,           /**< Action appears title bar context menu. */
     NotificationsScope = 0x00000020,
     ScopeMask = 0x000000FF
@@ -1231,7 +1231,7 @@ enum ActionFlag
     Tree = TreeScope,
 
     /** Action can appear in slider context menu. */
-    Slider = SliderScope | WidgetTarget,
+    Slider = TimelineScope | WidgetTarget,
 
     /** Action can appear in title bar context menu. */
     TitleBar = TitleBarScope | LayoutTarget,

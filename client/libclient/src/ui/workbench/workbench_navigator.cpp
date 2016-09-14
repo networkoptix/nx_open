@@ -474,12 +474,12 @@ void QnWorkbenchNavigator::deinitialize()
 
 Qn::ActionScope QnWorkbenchNavigator::currentScope() const
 {
-    return Qn::SliderScope;
+    return Qn::TimelineScope;
 }
 
 QnActionParameters QnWorkbenchNavigator::currentParameters(Qn::ActionScope scope) const
 {
-    if (scope != Qn::SliderScope)
+    if (scope != Qn::TimelineScope)
         return QnActionParameters();
 
     QnResourceWidgetList result;
@@ -1878,7 +1878,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     qint64 position = m_timeSlider->valueFromPosition(pos);
 
-    QnActionParameters parameters = currentParameters(Qn::SliderScope);
+    QnActionParameters parameters = currentParameters(Qn::TimelineScope);
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
@@ -1889,7 +1889,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::SliderScope, nullptr, parameters));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TimelineScope, nullptr, parameters));
     if (menu->isEmpty())
         return;
 

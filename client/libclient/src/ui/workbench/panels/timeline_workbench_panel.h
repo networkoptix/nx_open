@@ -31,11 +31,6 @@ public:
     /** Animator for  position. */
     VariantAnimator* yAnimator;
 
-    QnImageButtonWidget* showButton;
-
-    /** Special widget to show by hover. */
-    QGraphicsWidget* showWidget;
-
     qreal lastThumbnailsHeight;
 
 public:
@@ -77,7 +72,12 @@ private:
 
     bool m_updateResizerGeometryLater;
 
+    QnImageButtonWidget* m_showButton;
+
     QnResizerWidget* m_resizerWidget;
+
+    /** Special widget to show by hover. */
+    QGraphicsWidget* m_showWidget;
 
     QGraphicsWidget* m_zoomButtonsWidget;
 
