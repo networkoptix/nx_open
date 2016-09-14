@@ -38,6 +38,8 @@ extern "C"
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
+#include <nx/utils/raii_guard.h>
+
 #include <plugins/resource/avi/avi_resource.h>
 
 #include <redass/redass_controller.h>
@@ -137,6 +139,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
     m_lastAdjustTimelineToPosition(false),
+    m_timelineRelevant(false),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -531,7 +534,7 @@ bool QnWorkbenchNavigator::isPlayingSupported() const
 
 bool QnWorkbenchNavigator::isTimelineRelevant() const
 {
-    if (!currentWidget())
+    if (!currentWidget() || !m_currentWidgetLoaded)
         return false;
 
     if (!isPlayingSupported())
@@ -1260,7 +1263,21 @@ bool QnWorkbenchNavigator::isTimelineCatchingUp() const
 
 void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 {
-    if (!m_currentMediaWidget || !m_timeSlider)
+    if (!m_timeSlider)
+        return;
+
+    QnRaiiGuard timelineRelevancyUpdater(QnRaiiGuard::Handler(),
+        [this]()
+        {
+            bool timelineRelevant = isTimelineRelevant();
+            if (m_timelineRelevant == timelineRelevant)
+                return;
+
+            m_timelineRelevant = timelineRelevant;
+            emit timelineRelevancyChanged(timelineRelevant);
+        });
+
+    if (!m_currentMediaWidget)
         return;
 
     if (m_timeSlider->isSliderDown())
@@ -1303,7 +1320,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         {
             startTimeMSec = m_timeSlider->minimum();
             endTimeMSec = m_timeSlider->maximum();
-
         }
         else if (noRecordedPeriodsFound)
         {
@@ -1326,7 +1342,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                     }
                 }
             }
-
         }
         else
         {
@@ -1338,7 +1353,12 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         }
     }
 
+    bool newRange = m_timeSlider->minimum() != startTimeMSec;
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
+
+    if (newRange)
+        m_timeSlider->finishAnimations();
+
     if (m_calendar)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
     if (m_dayTimeWidget)
@@ -1346,7 +1366,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 
     if (!m_pausedOverride)
     {
-
         //TODO: #GDM #refactor logic in 3.0
         auto usecTimeForWidget = [isSearch](QnMediaResourceWidget *mediaWidget) -> qint64
         {
@@ -1373,10 +1392,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
         };
 
-        qint64 timeUSec = usecTimeForWidget(m_currentMediaWidget);
+        qint64 timeUSec = widgetLoaded
+            ? usecTimeForWidget(m_currentMediaWidget)
+            : isLiveSupported() ? DATETIME_NOW : startTimeMSec;
+
         qint64 timeMSec = usecToMsec(timeUSec);
 
-        if (!keepInWindow)
+        if (!keepInWindow || m_sliderDataInvalid)
         {
             /* Position was reset: */
             m_animatedPosition = timeMSec;

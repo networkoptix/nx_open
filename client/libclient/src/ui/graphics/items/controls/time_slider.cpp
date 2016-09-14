@@ -2819,10 +2819,12 @@ void QnTimeSlider::sliderChange(SliderChange change)
             /* If a window was invalidated: */
             if (m_oldMinimum < 0 && m_oldMinimum == m_oldMaximum)
             {
-                m_oldMinimum = minimum();
-                m_oldMaximum = maximum();
-                m_zoomAnchor = (m_oldMinimum + m_oldMaximum) / 2;
-                setWindow(m_oldMinimum, m_oldMaximum);
+                auto min = minimum();
+                auto max = maximum();
+                m_oldMinimum = min;
+                m_oldMaximum = max;
+                m_zoomAnchor = (min + max) / 2;
+                setWindow(min, max);
                 setSelectionValid(false);
                 finishAnimations();
                 break;
