@@ -23,6 +23,8 @@ namespace {
         }
     };
 
+    static const int kOpacityTimeLimitMs = 200;
+
 } // anonymous namespace
 
 
@@ -70,7 +72,7 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed)
     animator->setTimer(animationTimer);
     animator->setAccessor(new OpacityAccessor());
     animator->setTargetObject(item);
-    animator->setTimeLimit(qnGlobals->opacityChangePeriod());
+    animator->setTimeLimit(kOpacityTimeLimitMs);
     animator->setSpeed(speed);
     if(animatedBase)
         animatedBase->registerAnimation(animator);
