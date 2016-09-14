@@ -219,15 +219,6 @@ void Ec2MserverCloudSynchronization2::testSynchronizingCloudOwner()
 
 void Ec2MserverCloudSynchronization2::testSynchronizingUserFromCloudToMediaServer()
 {
-    nx::utils::SyncQueue<::ec2::ApiUserData> newUsersQueue;
-    const auto connection = QObject::connect(
-        appserver2()->moduleInstance()->ecConnection()->getUserNotificationManager().get(),
-        &ec2::AbstractUserNotificationManager::addedOrUpdated,
-        [&newUsersQueue](const ::ec2::ApiUserData& user)
-    {
-        newUsersQueue.push(user);
-    });
-
     // Sharing system with some account.
     api::AccountData account2;
     std::string account2Password;
@@ -246,19 +237,17 @@ void Ec2MserverCloudSynchronization2::testSynchronizingUserFromCloudToMediaServe
         cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharingData));
 
     // Waiting for new cloud user to arrive to local system.
-    for (;;)
+    constexpr const auto maxTimetoWait = std::chrono::seconds(10);
+    for (const auto t0 = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::now() < (t0 + maxTimetoWait);)
     {
-        const auto newUser = newUsersQueue.pop(std::chrono::seconds(10));
-        ASSERT_TRUE(static_cast<bool>(newUser));
-        if (newUser->email.toStdString() == account2.email)
-            break;
+        bool found = false;
+        verifyCloudUserPresenceInLocalDb(sharingData, &found, false);
+        if (found)
+            return;
     }
 
-    bool found = false;
-    verifyCloudUserPresenceInLocalDb(sharingData, &found);
-    ASSERT_TRUE(found);
-
-    QObject::disconnect(connection);
+    ASSERT_TRUE(false);
 }
 
 void Ec2MserverCloudSynchronization2::testSynchronizingUserFromMediaServerToCloud()
@@ -409,6 +398,9 @@ void Ec2MserverCloudSynchronization2::verifyCloudUserPresenceInLocalDb(
     bool* const found,
     bool assertOnUserAbsense)
 {
+    if (found)
+        *found = false;
+
     // Validating data.
     ec2::ApiUserDataList users;
     ASSERT_EQ(
@@ -428,23 +420,46 @@ void Ec2MserverCloudSynchronization2::verifyCloudUserPresenceInLocalDb(
     }
 
     if (userIter == users.cend())
-    {
-        if (found)
-            *found = false;
-    }
+        return;
 
-    ASSERT_EQ(sharingData.accountEmail, userIter->name.toStdString());
-    ASSERT_EQ(sharingData.accountFullName, userIter->fullName.toStdString());
-    ASSERT_TRUE(userIter->isCloud);
-    ASSERT_EQ(sharingData.isEnabled, userIter->isEnabled);
-    ASSERT_EQ("VMS", userIter->realm);
-    ASSERT_EQ(guidFromArbitraryData(sharingData.accountEmail), userIter->id);
-    ASSERT_FALSE(userIter->isLdap);
+    const ec2::ApiUserData& userData = *userIter;
+
+    ASSERT_EQ(sharingData.accountEmail, userData.name.toStdString());
+    //ASSERT_EQ(sharingData.accountFullName, userData.fullName.toStdString());
+    ASSERT_TRUE(userData.isCloud);
+    ASSERT_EQ(sharingData.isEnabled, userData.isEnabled);
+    ASSERT_EQ("VMS", userData.realm);
+    ASSERT_EQ(guidFromArbitraryData(sharingData.accountEmail), userData.id);
+    ASSERT_FALSE(userData.isLdap);
     if (sharingData.accessRole == api::SystemAccessRole::owner)
     {
-        ASSERT_TRUE(userIter->isAdmin);
-        ASSERT_EQ(Qn::GlobalAdminPermissionSet, userIter->permissions);
+        ASSERT_TRUE(userData.isAdmin);
+        ASSERT_EQ(Qn::GlobalAdminPermissionSet, userData.permissions);
     }
+
+    // Verifying user full name.
+    ec2::ApiResourceParamWithRefDataList kvPairs;
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        appserver2()->moduleInstance()->ecConnection()
+            ->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(userData.id, &kvPairs));
+
+    const auto fullNameIter = std::find_if(
+        kvPairs.cbegin(), kvPairs.cend(),
+        [](const ::ec2::ApiResourceParamWithRefData& element)
+        {
+            return element.name == Qn::USER_FULL_NAME;
+        });
+
+    if (assertOnUserAbsense)
+    {
+        ASSERT_TRUE(fullNameIter != kvPairs.cend());
+    }
+    else if (fullNameIter == kvPairs.cend())
+    {
+        return;
+    }
+    ASSERT_EQ(sharingData.accountFullName, fullNameIter->value.toStdString());
 
     // TODO: #ak verify permissions
     if (found)
@@ -530,14 +545,20 @@ void Ec2MserverCloudSynchronization2::waitForCloudAndVmsToSyncUsers(
         std::chrono::steady_clock::now() - t0 < kMaxTimeToWaitForChangesToBePropagatedToCloud;
         )
     {
+        const bool isLastRun = 
+            (std::chrono::steady_clock::now() + std::chrono::seconds(1)) >=
+            (t0 + kMaxTimeToWaitForChangesToBePropagatedToCloud);
+
         bool syncCompleted = false;
-        verifyThatUsersMatchInCloudAndVms(false, &syncCompleted);
+        verifyThatUsersMatchInCloudAndVms(isLastRun, &syncCompleted);
         if (syncCompleted)
         {
             if (result)
                 *result = true;
             return;
         }
+        if (isLastRun)
+            break;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
