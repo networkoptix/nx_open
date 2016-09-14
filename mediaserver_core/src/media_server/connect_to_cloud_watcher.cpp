@@ -17,6 +17,11 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher():
         "cdb",
         std::make_unique<RandomEndpointSelector>()))
 {
+    m_timer.setSingleShot(true);
+    m_timer.setInterval(kUpdateIfFailIntervalMs);
+
+    connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
+
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
@@ -28,9 +33,14 @@ QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
     m_cdbEndPointFetcher->pleaseStopSync();
 }
 
+void QnConnectToCloudWatcher::restartTimer()
+{
+    m_timer.start();
+}
+
 void QnConnectToCloudWatcher::at_updateConnection()
 {
-    m_timerID.reset();
+    m_timer.stop();
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     bool needCloudConnect =
@@ -52,13 +62,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
             {
                 NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1").str(statusCode), cl_logWARNING);
                 // try once more later
-                m_timerID =
-                    nx::utils::TimerManager::TimerGuard(
-                        nx::utils::TimerManager::instance(),
-                        nx::utils::TimerManager::instance()->addTimer(
-                            std::bind(&QnConnectToCloudWatcher::at_updateConnection, this),
-                            std::chrono::milliseconds(kUpdateIfFailIntervalMs)));
-
+                metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                 return;
             }
 
