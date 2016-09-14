@@ -15,17 +15,8 @@ container_text = open('container.mustache.template').read()
 css_content = open('styles.css').read()
 
 
-def get_config():
-    conf_dir = os.getenv('CLOUD_PORTAL_CONF_DIR')
-    if not conf_dir:
-        raise RuntimeError('CLOUD_PORTAL_CONF_DIR environment variable is undefined')
-    return yaml.safe_load(open(join(conf_dir, 'cloud_portal.yaml')))
-
-
 def read_branding(content):
-    conf = get_config()
-    customization = conf['customization']
-    branding_file = open(join('..', '..', '..', '..', '..', 'customizations', customization, 'front_end', 'styles', '_custom_palette.scss')).read()
+    branding_file = open('_custom_palette.scss').read()
     pattern = re.compile("(\$.+?)\s*:\s*(#[0-9a-sA-F]{3,6})\s*;")
     for match in re.finditer(pattern, branding_file):
         groups = match.groups()
