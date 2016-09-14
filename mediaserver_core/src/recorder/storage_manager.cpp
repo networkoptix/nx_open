@@ -1646,6 +1646,12 @@ QSet<QnStorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
     for (const auto& storage: allWritableStorages)
         if (storage->isUsedForWriting())
             result.insert(storage);
+
+    if (!result.empty())
+        m_isWritableStorageAvail = true;
+    else
+        m_isWritableStorageAvail = false;
+
     return result;
 }
 
@@ -1700,10 +1706,6 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
             result.remove(*it);
     }
 
-    if (!result.empty())
-        m_isWritableStorageAvail = true;
-    else
-        m_isWritableStorageAvail = false;
     return result;
 }
 
