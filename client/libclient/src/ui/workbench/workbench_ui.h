@@ -45,6 +45,7 @@ namespace NxUi {
 class ResourceTreeWorkbenchPanel;
 class NotificationsWorkbenchPanel;
 class TimelineWorkbenchPanel;
+class CalendarWorkbenchPanel;
 
 }
 
@@ -203,10 +204,10 @@ private slots:
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
-    void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
-    void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
-    void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
+    void updateTitleOpacityAnimated();
+    void updateCalendarOpacityAnimated();
+    void updateCalendarVisibilityAnimated();
+    void updateControlsVisibilityAnimated();
 
     void setCalendarShowButtonUsed(bool used);
 
@@ -254,10 +255,6 @@ private:
 
     bool m_titleVisible;
 
-    bool m_calendarVisible;
-
-    bool m_dayTimeOpened;
-
     bool m_ignoreClickEvent;
 
     bool m_inactive;
@@ -296,35 +293,7 @@ private:
     NxUi::NotificationsWorkbenchPanel* m_notifications;
 
     /* Calendar window-related state. */
-
-    QnMaskedProxyWidget *m_calendarItem;
-
-    QnImageButtonWidget *m_calendarPinButton;
-
-    QnImageButtonWidget *m_dayTimeMinimizeButton;
-
-    VariantAnimator *m_calendarSizeAnimator;
-
-    AnimatorGroup *m_calendarOpacityAnimatorGroup;
-
-    HoverFocusProcessor *m_calendarOpacityProcessor;
-
-    HoverFocusProcessor *m_calendarHidingProcessor;
-
-    HoverFocusProcessor *m_calendarShowingProcessor;
-
-    bool m_inCalendarGeometryUpdate;
-
-    bool m_inDayTimeGeometryUpdate;
-
-    QnMaskedProxyWidget *m_dayTimeItem;
-
-    QnDayTimeWidget *m_dayTimeWidget;
-
-    VariantAnimator *m_dayTimeSizeAnimator;
-
-    QPoint m_calendarPinOffset;
-    QPoint m_dayTimeOffset;
+    NxUi::CalendarWorkbenchPanel* m_calendar;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)
