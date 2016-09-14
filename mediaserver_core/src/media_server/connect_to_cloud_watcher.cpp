@@ -17,10 +17,6 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher():
         "cdb",
         std::make_unique<RandomEndpointSelector>()))
 {
-    m_timer.setSingleShot(true);
-    m_timer.setInterval(kUpdateIfFailIntervalMs);
-
-    connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
@@ -34,12 +30,13 @@ QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
 
 void QnConnectToCloudWatcher::at_updateConnection()
 {
-    m_timer.stop();
+    m_timerID.reset();
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     bool needCloudConnect =
         localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync) &&
-        !qnGlobalSettings->cloudSystemID().isEmpty();
+        !qnGlobalSettings->cloudSystemID().isEmpty() &&
+		!qnGlobalSettings->cloudAuthKey().isEmpty();
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
@@ -53,8 +50,15 @@ void QnConnectToCloudWatcher::at_updateConnection()
         {
             if (statusCode != nx_http::StatusCode::ok || endpoint->isNull())
             {
-                NX_LOGX(lm("Error fetching cloud_db endpoint. %1").str(statusCode), cl_logDEBUG2);
-                m_timer.start(); //< try once more later
+                NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1").str(statusCode), cl_logWARNING);
+                // try once more later
+                m_timerID =
+                    nx::utils::TimerManager::TimerGuard(
+                        nx::utils::TimerManager::instance(),
+                        nx::utils::TimerManager::instance()->addTimer(
+                            std::bind(&QnConnectToCloudWatcher::at_updateConnection, this),
+                            std::chrono::milliseconds(kUpdateIfFailIntervalMs)));
+
                 return;
             }
 
