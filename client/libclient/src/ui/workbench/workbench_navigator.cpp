@@ -1353,10 +1353,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         }
     }
 
-    bool newRange = m_timeSlider->minimum() != startTimeMSec;
+    bool brandNewRange = m_timeSlider->minimum() != startTimeMSec;
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
 
-    if (newRange)
+    if (brandNewRange)
         m_timeSlider->finishAnimations();
 
     if (m_calendar)
