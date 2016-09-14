@@ -27,5 +27,5 @@ QList<QnPlatformMonitor::PartitionSpace> QnPlatformMonitor::totalPartitionSpaceI
     (QnPlatformMonitor::NetworkPartition,      "network")   \
     (QnPlatformMonitor::UnknownPartition,      "unknown")
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionType, LEXICAL_VALUES_FOR_PT)
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionTypes, LEXICAL_VALUES_FOR_PT)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor, PartitionType, LEXICAL_VALUES_FOR_PT)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor, PartitionTypes, LEXICAL_VALUES_FOR_PT)
