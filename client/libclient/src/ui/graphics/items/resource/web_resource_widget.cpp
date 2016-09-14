@@ -150,14 +150,13 @@ int QnWebResourceWidget::calculateButtonsVisibility() const
         | Qn::FullscreenButton | Qn::BackButton | Qn::ReloadPageButton);
 }
 
-Qn::RenderStatus QnWebResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
-    const QRectF& /*channelRect*/, const QRectF& paintRect)
+Qn::RenderStatus QnWebResourceWidget::paintChannelBackground(QPainter* painter, int channel,
+    const QRectF& channelRect, const QRectF& paintRect)
 {
     if (!paintRect.isValid())
         return Qn::NothingRendered;
 
-    painter->fillRect(paintRect, palette().color(QPalette::Window));
-    return Qn::NewFrameRendered;
+    return base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
 }
 
 QString QnWebResourceWidget::calculateDetailsText() const
