@@ -332,7 +332,7 @@ void QnWorkbenchUi::storeSettings()
     notifications.state = makePaneState(isNotificationsOpened(), isNotificationsPinned());
 
     QnPaneSettings& navigation = settings[Qn::WorkbenchPane::Navigation];
-    navigation.state = makePaneState(isTimelineOpened(), isTimelinePinned());
+    navigation.state = makePaneState(isTimelineOpened(), true);
 
     QnPaneSettings& calendar = settings[Qn::WorkbenchPane::Calendar];
     calendar.state = makePaneState(isCalendarOpened(), isCalendarPinned());
