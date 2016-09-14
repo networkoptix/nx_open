@@ -51,7 +51,7 @@
 
 #include <utils/common/log.h>
 
-namespace {
+
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
         (StorageStatusObject,      "storageStatus")
         (StorageSpaceObject,       "storageSpace")
@@ -114,6 +114,7 @@ namespace {
         (MergeLdapUsersObject,     "mergeLdapUsers")
     );
 
+namespace {
     void trace(int handle, int obj, const QString& message = QString())
     {
         RequestObject object = static_cast<RequestObject>(obj);
