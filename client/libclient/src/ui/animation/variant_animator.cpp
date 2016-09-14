@@ -148,7 +148,7 @@ QVariant VariantAnimator::toExternal(const QVariant &internal) const {
 void VariantAnimator::setTargetValue(const QVariant &targetValue)
 {
     QVariant internalTargetValue = toInternal(targetValue);
-    if (targetValue.type() == QMetaType::Float || targetValue.type() == QMetaType::Double)
+    if (targetValue.type() == QVariant::Double)
     {
         if (qFuzzyEquals(m_internalTargetValue.toDouble(), internalTargetValue.toDouble()))
             return;
