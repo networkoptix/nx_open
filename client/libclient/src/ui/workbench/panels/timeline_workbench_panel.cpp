@@ -60,7 +60,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     zoomingOut(false),
     yAnimator(new VariantAnimator(this)),
     showButton(NxUi::newShowHideButton(parentWidget, context(),
-        action(QnActions::ToggleSliderAction))),
+        action(QnActions::ToggleTimelineAction))),
     showWidget(new GraphicsWidget(parentWidget)),
     lastThumbnailsHeight(kDefaultThumbnailsHeight),
 
@@ -86,7 +86,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::updateControlsGeometry);
 
-    action(QnActions::ToggleSliderAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(QnActions::ToggleTimelineAction)->setChecked(settings.state == Qn::PaneState::Opened);
     {
         QTransform transform;
         transform.rotate(-90);
@@ -94,7 +94,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     }
     showButton->setFocusProxy(item);
     showButton->setZValue(ControlItemZOrder);
-    connect(action(QnActions::ToggleSliderAction), &QAction::toggled, this,
+    connect(action(QnActions::ToggleTimelineAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (!m_ignoreClickEvent)
@@ -263,7 +263,7 @@ bool TimelineWorkbenchPanel::isPinned() const
 
 bool TimelineWorkbenchPanel::isOpened() const
 {
-    return action(QnActions::ToggleSliderAction)->isChecked();
+    return action(QnActions::ToggleTimelineAction)->isChecked();
 }
 
 void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -276,7 +276,7 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleSliderAction)->setChecked(opened);
+    action(QnActions::ToggleTimelineAction)->setChecked(opened);
 
     yAnimator->stop();
     if (opened)
