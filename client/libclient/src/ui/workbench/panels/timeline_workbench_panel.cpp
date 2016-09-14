@@ -303,13 +303,13 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()
         + (opened ? -item->size().height() : kHidePanelOffset);
-    qDebug() << "set item y by Opened to " << newY << "animated" << animate;
     if (animate)
         yAnimator->animateTo(newY);
     else
         item->setY(newY);
 
     m_resizerWidget->setEnabled(opened);
+    item->timeSlider()->setTooltipVisible(opened);
 
     emit openedChanged(opened, animate);
 }
@@ -408,7 +408,6 @@ void TimelineWorkbenchPanel::setThumbnailsVisible(bool visible)
     QRectF geometry = item->geometry();
     geometry.setHeight(height);
     item->setGeometry(geometry);
-    qDebug() << "set item geometry by action to " << geometry;
 
     /* Fix y coord. */
     setOpened(true, false);

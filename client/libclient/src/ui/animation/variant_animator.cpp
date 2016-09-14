@@ -7,6 +7,7 @@
 #include <utils/common/warnings.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/magnitude.h>
+#include <nx/utils/math/fuzzy.h>
 
 VariantAnimator::VariantAnimator(QObject *parent):
     AbstractAnimator(parent),
@@ -144,7 +145,21 @@ QVariant VariantAnimator::toExternal(const QVariant &internal) const {
     return converter()->convertTargetToSource(internal);
 }
 
-void VariantAnimator::setTargetValue(const QVariant &targetValue) {
+void VariantAnimator::setTargetValue(const QVariant &targetValue)
+{
+    QVariant internalTargetValue = toInternal(targetValue);
+    if (targetValue.type() == QMetaType::Float || targetValue.type() == QMetaType::Double)
+    {
+        if (qFuzzyEquals(m_internalTargetValue.toDouble(), internalTargetValue.toDouble()))
+            return;
+    }
+
+    if (targetValue.canConvert(QMetaType::LongLong))
+    {
+        if (m_internalTargetValue.toLongLong() == internalTargetValue.toLongLong())
+            return;
+    }
+
     bool running = isRunning();
     if(running)
         pause();
