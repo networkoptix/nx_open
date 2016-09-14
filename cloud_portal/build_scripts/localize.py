@@ -21,6 +21,7 @@ def get_config():
 
     return yaml.safe_load(open(join(conf_dir, 'cloud_portal.yaml')))
 
+
 def read_branding():
     print "read_branding"
     conf = get_config()

@@ -17,6 +17,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic.base import TemplateView
+import settings
 # from django.views.generic.base import RedirectView
 
 urlpatterns = [
@@ -24,9 +25,13 @@ urlpatterns = [
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
 
-    url(r'^apple-app-site-association', TemplateView.as_view(template_name="static/apple-app-site-association", content_type='application/json')),
-    url(r'^\.well-known/apple-app-site-association', TemplateView.as_view(template_name="static/apple-app-site-association", content_type='application/json')),
-
-    url(r'.*', TemplateView.as_view(template_name="static/index.html"))
+    url(r'^apple-app-site-association',
+        TemplateView.as_view(template_name=settings.STATIC_LOCATION+"/apple-app-site-association",
+                             content_type='application/json')),
+    url(r'^\.well-known/apple-app-site-association',
+        TemplateView.as_view(template_name=settings.STATIC_LOCATION+"/apple-app-site-association",
+                             content_type='application/json')),
+    url(r'.*',
+        TemplateView.as_view(template_name=settings.STATIC_LOCATION+"/index.html"))
 ]
 

@@ -2,6 +2,9 @@ from util.config import get_config
 
 conf = get_config()
 
+
+TEMPLATES_LOCATION = os.path.join(BASE_DIR, "static", conf['customization'], "templates")
+
 notifications_config = {
     'activate_account': {
         'engine': 'email',

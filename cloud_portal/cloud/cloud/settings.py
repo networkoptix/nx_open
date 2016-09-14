@@ -174,9 +174,10 @@ LOGGING = {
 
 STATIC_URL = '/static/'
 
+STATIC_LOCATION = os.path.join(BASE_DIR, "static", conf['customization'], "static")
+
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "static"),
-    os.path.join(BASE_DIR, "../static"),
+    STATIC_LOCATION
 )
 
 
