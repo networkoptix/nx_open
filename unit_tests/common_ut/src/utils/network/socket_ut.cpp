@@ -243,6 +243,19 @@ TEST( Socket, HostNameResolve3 )
                 &resolvedAddress,
                 AF_INET));
     }
+
+    {
+        HostAddress resolvedAddress("ya.ru");
+        ASSERT_TRUE(
+            HostAddressResolver::instance()->resolveAddressSync(
+                resolvedAddress.toString(),
+                &resolvedAddress,
+                AF_INET));
+
+        ASSERT_TRUE((bool)resolvedAddress.ipV4());
+        ASSERT_TRUE((bool)resolvedAddress.ipV6());
+        ASSERT_NE(resolvedAddress.ipV4()->s_addr, 0);
+    }
 }
 
 TEST( Socket, HostNameResolveCancellation )

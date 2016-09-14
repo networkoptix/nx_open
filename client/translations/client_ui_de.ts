@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<TS version="2.0" language="de" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -509,11 +509,6 @@
         <location/>
         <source>This camera has no advanced settings</source>
         <translation>Diese Kamera hat keine erweiterten Einstellungen</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Advanced settings are unavailable</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1686,7 +1681,7 @@
     <message>
         <location/>
         <source>Play to user</source>
-        <translation>Nutzer abspielen</translation>
+        <translation>Soundausgabe</translation>
     </message>
 </context>
 <context>
@@ -2468,7 +2463,7 @@
     <message>
         <location/>
         <source>Speak to user</source>
-        <translation>Nutzer ansprechen</translation>
+        <translation>Sprachausgabe</translation>
     </message>
 </context>
 <context>
