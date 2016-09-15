@@ -27,6 +27,12 @@ static const QSize kDayTimeWidgetSize(250, 120);
 
 static const qreal kClosedPositionOffsetY = 20;
 
+/* Offset of pin button - in calendar header size count o_O */
+static const int kPinOffsetCellsCount = 2;
+
+/* Time to show/hide calendar. */
+static const int kShowHideAnimationPeriodMs = 50;
+
 }
 
 namespace NxUi {
@@ -37,43 +43,46 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     QObject* parent)
     :
     base_type(settings, parentWidget, parent),
-    inGeometryUpdate(false),
-    inDayTimeGeometryUpdate(false),
-    dayTimeOpened(false),
+    item(new QnMaskedProxyWidget(parentWidget)),
+    hidingProcessor(new HoverFocusProcessor(parentWidget)),
 
     m_ignoreClickEvent(false),
-    m_visible(false)
+    m_visible(false),
+    m_origin(parentWidget->geometry().bottomRight()),
+    m_widget(new QnCalendarWidget()),
+    m_pinButton(newPinButton(parentWidget, context(),
+        action(QnActions::PinCalendarAction), true)),
+    m_dayTimeMinimizeButton(newActionButton(parentWidget, context(),
+        action(QnActions::MinimizeDayTimeViewAction), Qn::Empty_Help)),
+    m_yAnimator(new VariantAnimator(this)),
+    m_pinOffset(-kPinOffsetCellsCount * m_widget->headerHeight(), 0.0),
+    m_dayTimeOpened(true),
+    m_dayTimeItem(new QnMaskedProxyWidget(parentWidget)),
+    m_dayTimeWidget(new QnDayTimeWidget()),
+    m_dayTimeOffset(-m_dayTimeWidget->headerHeight(), 0),
+    m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
+    m_opacityAnimatorGroup(new AnimatorGroup(this))
 {
-    widget = new QnCalendarWidget();
-    setHelpTopic(widget, Qn::MainWindow_Calendar_Help);
-    navigator()->setCalendar(widget);
-    connect(widget, &QnCalendarWidget::dateClicked, this,
+    setHelpTopic(m_widget, Qn::MainWindow_Calendar_Help);
+    navigator()->setCalendar(m_widget);
+    connect(m_widget, &QnCalendarWidget::dateClicked, this,
         &CalendarWorkbenchPanel::at_widget_dateClicked);
 
-    dayTimeWidget = new QnDayTimeWidget();
-    setHelpTopic(dayTimeWidget, Qn::MainWindow_DayTimePicker_Help);
-    navigator()->setDayTimeWidget(dayTimeWidget);
+    setHelpTopic(m_dayTimeWidget, Qn::MainWindow_DayTimePicker_Help);
+    navigator()->setDayTimeWidget(m_dayTimeWidget);
 
-    static const int kCellsCountOffset = 2;
-    const int size = widget->headerHeight();
-    pinOffset = QPoint(-kCellsCountOffset * size, 0.0);
-    dayTimeOffset = QPoint(-dayTimeWidget->headerHeight(), 0);
-
-    item = new QnMaskedProxyWidget(parentWidget);
-    item->setWidget(widget);
-    widget->installEventFilter(item);
+    item->setWidget(m_widget);
     item->resize(kCalendarSize);
-    opacityAnimator(item)->setTimeLimit(50);
-
+    item->setProperty(Qn::NoHandScrollOver, true);
+    item->setZValue(ContentItemZOrder);
+    opacityAnimator(item)->setTimeLimit(kShowHideAnimationPeriodMs);
+    m_widget->installEventFilter(item);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &CalendarWorkbenchPanel::updateControlsGeometry);
 
-    item->setProperty(Qn::NoHandScrollOver, true);
-
-    const auto pinCalendarAction = action(QnActions::PinCalendarAction);
-    pinCalendarAction->setChecked(settings.state != Qn::PaneState::Unpinned);
-    pinButton = newPinButton(parentWidget, context(), pinCalendarAction, true);
-    pinButton->setFocusProxy(item);
+    action(QnActions::PinCalendarAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
+    m_pinButton->setFocusProxy(item);
+    m_pinButton->setZValue(ControlItemZOrder);
 
     const auto toggleCalendarAction = action(QnActions::ToggleCalendarAction);
     toggleCalendarAction->setChecked(settings.state == Qn::PaneState::Opened);
@@ -84,37 +93,35 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
                 setOpened(checked, true);
         });
 
-    dayTimeItem = new QnMaskedProxyWidget(parentWidget);
-    dayTimeItem->setWidget(dayTimeWidget);
-    dayTimeWidget->installEventFilter(item);
-    dayTimeItem->resize(kDayTimeWidgetSize);
-    dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
-    dayTimeItem->stackBefore(item);
+    m_dayTimeItem->setWidget(m_dayTimeWidget);
+    m_dayTimeWidget->installEventFilter(item);
+    m_dayTimeItem->resize(kDayTimeWidgetSize);
+    m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
+    m_dayTimeItem->setZValue(ContentItemZOrder);
+    opacityAnimator(m_dayTimeItem)->setTimeLimit(kShowHideAnimationPeriodMs);
 
-    connect(dayTimeItem, &QnMaskedProxyWidget::paintRectChanged, this,
-        &CalendarWorkbenchPanel::at_dayTimeItem_paintGeometryChanged);
-    connect(dayTimeItem, &QGraphicsWidget::geometryChanged, this,
-        &CalendarWorkbenchPanel::at_dayTimeItem_paintGeometryChanged);
-
-    dayTimeMinimizeButton = newActionButton(parentWidget, context(),
-        action(QnActions::MinimizeDayTimeViewAction), Qn::Empty_Help);
-    dayTimeMinimizeButton->setFocusProxy(dayTimeItem);
+    m_dayTimeMinimizeButton->setFocusProxy(m_dayTimeItem);
+    m_dayTimeMinimizeButton->setZValue(ControlItemZOrder);
+    opacityAnimator(m_dayTimeMinimizeButton)->setTimeLimit(kShowHideAnimationPeriodMs);
     connect(action(QnActions::MinimizeDayTimeViewAction), &QAction::triggered, this,
         [this]
         {
             setDayTimeWidgetOpened(false, true);
         });
 
-    opacityProcessor = new HoverFocusProcessor(parentWidget);
-    opacityProcessor->addTargetItem(item);
-    opacityProcessor->addTargetItem(dayTimeItem);
-    opacityProcessor->addTargetItem(pinButton);
-    opacityProcessor->addTargetItem(dayTimeMinimizeButton);
+    m_opacityProcessor->addTargetItem(item);
+    m_opacityProcessor->addTargetItem(m_dayTimeItem);
+    m_opacityProcessor->addTargetItem(m_pinButton);
+    m_opacityProcessor->addTargetItem(m_dayTimeMinimizeButton);
+    connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+        &AbstractWorkbenchPanel::hoverEntered);
+    connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+        &AbstractWorkbenchPanel::hoverLeft);
 
-    hidingProcessor = new HoverFocusProcessor(parentWidget);
     hidingProcessor->addTargetItem(item);
-    hidingProcessor->addTargetItem(dayTimeItem);
-    hidingProcessor->addTargetItem(pinButton);
+    hidingProcessor->addTargetItem(m_dayTimeItem);
+    hidingProcessor->addTargetItem(m_pinButton);
+    hidingProcessor->addTargetItem(m_dayTimeMinimizeButton);
     hidingProcessor->setHoverLeaveDelay(kClosePanelTimeoutMs);
     hidingProcessor->setFocusLeaveDelay(kClosePanelTimeoutMs);
     connect(hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -124,25 +131,15 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
                 setOpened(false);
         });
 
-    yAnimator = new VariantAnimator(this);
-    yAnimator->setTimer(animationTimer());
-    yAnimator->setTargetObject(item);
-    yAnimator->setAccessor(new PropertyAccessor("y"));
-    yAnimator->setTimeLimit(50);
+    m_yAnimator->setTimer(animationTimer());
+    m_yAnimator->setTargetObject(item);
+    m_yAnimator->setAccessor(new PropertyAccessor("y"));
+    m_yAnimator->setTimeLimit(kShowHideAnimationPeriodMs);
 
-    dayTimeSizeAnimator = new VariantAnimator(this);
-    dayTimeSizeAnimator->setTimer(animationTimer());
-    dayTimeSizeAnimator->setTargetObject(dayTimeItem);
-    dayTimeSizeAnimator->setAccessor(new PropertyAccessor("paintSize"));
-    dayTimeSizeAnimator->setTimeLimit(50);
-
-    opacityAnimatorGroup = new AnimatorGroup(this);
-    opacityAnimatorGroup->setTimer(animationTimer());
-    opacityAnimatorGroup->addAnimator(opacityAnimator(item));
-    opacityAnimatorGroup->addAnimator(opacityAnimator(dayTimeItem));
-    opacityAnimatorGroup->addAnimator(opacityAnimator(pinButton));
-    opacityAnimatorGroup->addAnimator(opacityAnimator(dayTimeMinimizeButton));
-    opacityAnimatorGroup->setTimeLimit(50);
+    m_opacityAnimatorGroup->setTimer(animationTimer());
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
+    m_opacityAnimatorGroup->setTimeLimit(kShowHideAnimationPeriodMs);
 }
 
 bool CalendarWorkbenchPanel::isEnabled() const
@@ -199,21 +196,20 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
     if (!opened)
         newY += kClosedPositionOffsetY;
 
-    setVisible(opened, animate);
-
-    yAnimator->stop();
+    m_yAnimator->stop();
     if (opened)
-        yAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::OutCubic);
     else
-        yAnimator->setEasingCurve(QEasingCurve::InCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::InCubic);
 
     if (animate)
-        yAnimator->animateTo(newY);
+        m_yAnimator->animateTo(newY);
     else
         item->setY(newY);
 
+    setVisible(opened, animate);
     if (!opened)
-        setDayTimeWidgetOpened(opened, animate);
+        setDayTimeWidgetOpened(false, animate);
 
     emit openedChanged(opened, animate);
 }
@@ -247,57 +243,52 @@ void CalendarWorkbenchPanel::setOpacity(qreal opacity, bool animate)
 
     if (animate)
     {
-        opacityAnimatorGroup->pause();
+        m_opacityAnimatorGroup->pause();
         opacityAnimator(item)->setTargetValue(opacity);
-        opacityAnimator(dayTimeItem)->setTargetValue(opacity);
-        opacityAnimator(pinButton)->setTargetValue(opacity);
-        opacityAnimator(dayTimeMinimizeButton)->setTargetValue(opacity);
-        opacityAnimatorGroup->start();
+        opacityAnimator(m_pinButton)->setTargetValue(opacity);
+        m_opacityAnimatorGroup->start();
     }
     else
     {
-        opacityAnimatorGroup->stop();
+        m_opacityAnimatorGroup->stop();
         item->setOpacity(opacity);
-        dayTimeItem->setOpacity(opacity);
-        pinButton->setOpacity(opacity);
-        dayTimeMinimizeButton->setOpacity(opacity);
+        m_pinButton->setOpacity(opacity);
     }
 }
 
 bool CalendarWorkbenchPanel::isHovered() const
 {
-    return opacityProcessor->isHovered();
+    return m_opacityProcessor->isHovered();
 }
-
 
 QRectF CalendarWorkbenchPanel::effectiveGeometry() const
 {
     QRectF geometry = item->geometry();
-    if (yAnimator->isRunning())
-        geometry.moveTop(yAnimator->targetValue().toReal());
-    if (dayTimeOpened)
-        geometry.setTop(geometry.top() - dayTimeItem->geometry().height());
+    if (m_yAnimator->isRunning())
+        geometry.moveTop(m_yAnimator->targetValue().toReal());
+    if (m_dayTimeOpened)
+        geometry.setTop(geometry.top() - m_dayTimeItem->geometry().height());
     return geometry;
 }
 
 void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
 {
+    if (m_dayTimeOpened == opened)
+        return;
+    m_dayTimeOpened = opened;
+    qDebug() << "set daytime opened" << opened;
+
     ensureAnimationAllowed(&animate);
-
-    dayTimeOpened = opened;
-
-    QSizeF newSize(dayTimeItem->size());
-    if (!opened)
-        newSize.setHeight(0.0);
-
+    qreal opacity = opened ? kOpaque : kHidden;
     if (animate)
     {
-        dayTimeSizeAnimator->animateTo(newSize);
+        opacityAnimator(m_dayTimeItem)->animateTo(opacity);
+        opacityAnimator(m_dayTimeMinimizeButton)->animateTo(opacity);
     }
     else
     {
-        dayTimeSizeAnimator->stop();
-        dayTimeItem->setPaintSize(newSize);
+        m_dayTimeItem->setOpacity(opacity);
+        m_dayTimeMinimizeButton->setOpacity(opacity);
     }
 }
 
@@ -310,46 +301,23 @@ void CalendarWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)
 void CalendarWorkbenchPanel::updateControlsGeometry()
 {
     const QRectF geometry = item->geometry();
-    pinButton->setPos(geometry.topRight() + pinOffset);
-    updateDayTimeWidgetGeometry();
-
+    m_pinButton->setPos(geometry.topRight() + m_pinOffset);
+    const QPoint dayTimOffset(kDayTimeWidgetSize.width(), kDayTimeWidgetSize.height());
+    m_dayTimeItem->setPos(geometry.topRight() - dayTimOffset);
+    m_dayTimeMinimizeButton->setPos(m_dayTimeItem->geometry().topRight() + m_dayTimeOffset);
     emit geometryChanged();
-}
-
-void CalendarWorkbenchPanel::updateDayTimeWidgetGeometry()
-{
-    /* Update painting rect the "fair" way. */
-    const QRectF calendarGeometry = item->geometry();
-    QRectF geometry = dayTimeItem->geometry();
-    geometry.moveRight(calendarGeometry.right());
-    geometry.moveBottom(calendarGeometry.top());
-    dayTimeItem->setGeometry(geometry);
 }
 
 void CalendarWorkbenchPanel::at_widget_dateClicked(const QDate &date)
 {
-    const bool sameDate = (dayTimeWidget->date() == date);
-    dayTimeWidget->setDate(date);
+    const bool sameDate = (m_dayTimeWidget->date() == date);
+    m_dayTimeWidget->setDate(date);
 
     if (isOpened())
     {
-        const bool shouldBeOpened = !sameDate || !dayTimeOpened;
+        const bool shouldBeOpened = !sameDate || !m_dayTimeOpened;
         setDayTimeWidgetOpened(shouldBeOpened, true);
     }
-}
-
-void CalendarWorkbenchPanel::at_dayTimeItem_paintGeometryChanged()
-{
-    const QRectF paintGeomerty = dayTimeItem->paintGeometry();
-    dayTimeMinimizeButton->setPos(paintGeomerty.topRight() + dayTimeOffset);
-    dayTimeMinimizeButton->setVisible(paintGeomerty.height());
-
-    if (inDayTimeGeometryUpdate)
-        return;
-
-    QN_SCOPED_VALUE_ROLLBACK(&inDayTimeGeometryUpdate, true);
-
-    emit geometryChanged();
 }
 
 } //namespace NxUi

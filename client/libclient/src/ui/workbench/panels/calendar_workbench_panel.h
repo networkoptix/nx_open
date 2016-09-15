@@ -24,32 +24,9 @@ public:
         QObject* parent = nullptr);
 
     QnMaskedProxyWidget* item;
-    QnCalendarWidget* widget;
-    QnImageButtonWidget* pinButton;
-    QnImageButtonWidget* dayTimeMinimizeButton;
-    VariantAnimator* yAnimator;
-
-    bool inGeometryUpdate;
-    bool inDayTimeGeometryUpdate;
-    QPoint pinOffset;
-
-    bool dayTimeOpened;
-    QnMaskedProxyWidget* dayTimeItem;
-    QnDayTimeWidget* dayTimeWidget;
-    VariantAnimator* dayTimeSizeAnimator;
-
-    QPoint dayTimeOffset;
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
     HoverFocusProcessor* hidingProcessor;
-
-    /** Hover processor that is used to change panel opacity when mouse hovers over it. */
-    HoverFocusProcessor* opacityProcessor;
-
-    /** Animator group for panel's opacity. */
-    AnimatorGroup* opacityAnimatorGroup;
-
-
 public:
     bool isEnabled() const;
     void setEnabled(bool enabled);
@@ -79,17 +56,34 @@ protected:
 
 private:
     void updateControlsGeometry();
-    void updateDayTimeWidgetGeometry();
 
 private:
     void at_widget_dateClicked(const QDate &date);
-    void at_dayTimeItem_paintGeometryChanged();
 
 private:
     bool m_ignoreClickEvent;
     bool m_visible;
 
     QPointF m_origin;
+
+    QnCalendarWidget* m_widget;
+    QnImageButtonWidget* m_pinButton;
+    QnImageButtonWidget* m_dayTimeMinimizeButton;
+    VariantAnimator* m_yAnimator;
+
+    QPoint m_pinOffset;
+
+    bool m_dayTimeOpened;
+    QnMaskedProxyWidget* m_dayTimeItem;
+    QnDayTimeWidget* m_dayTimeWidget;
+
+    QPoint m_dayTimeOffset;
+
+    /** Hover processor that is used to change panel opacity when mouse hovers over it. */
+    HoverFocusProcessor* m_opacityProcessor;
+
+    /** Animator group for panel's opacity. */
+    AnimatorGroup* m_opacityAnimatorGroup;
 };
 
 } //namespace NxUi

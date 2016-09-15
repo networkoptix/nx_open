@@ -1105,7 +1105,7 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
         ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
 
     qreal top = m_controlsWidgetRect.bottom();
-    if (m_calendar->isOpened())
+    if (m_calendar && m_calendar->isOpened())
         top = m_calendar->effectiveGeometry().top();
     else if (m_timeline->isVisible() && m_timeline->isOpened())
         top = m_timeline->effectiveGeometry().top();
@@ -1120,8 +1120,6 @@ void QnWorkbenchUi::updateNotificationsGeometry()
 {
     if (!m_notifications)
         return;
-
-    qDebug() << "updating notifications geometry";
 
     /* Update painting rect the "fair" way. */
     QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(),
@@ -1237,7 +1235,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate)
         return;
 
     /* Small hack. We have a signal that updates visibility if a calendar receive new data */
-    bool calendarEmpty = m_calendar->widget->isEmpty();
+    bool calendarEmpty = navigator()->calendar()->isEmpty();
     //TODO: #GDM refactor to the same logic as timeline
 
     bool calendarEnabled = !calendarEmpty
@@ -1274,16 +1272,14 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     connect(m_calendar, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateNotificationsGeometry);
 
-    connect(m_calendar->widget, &QnCalendarWidget::emptyChanged, this,
+    //TODO: #GDM refactor indirect dependency
+    connect(navigator()->calendar(), &QnCalendarWidget::emptyChanged, this,
         &QnWorkbenchUi::updateCalendarVisibilityAnimated);
 
-
-    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::hoverLeft, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-
-
 }
 
 #pragma endregion Calendar and DayTime widget methods
