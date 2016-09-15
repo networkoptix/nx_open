@@ -121,9 +121,12 @@ angular.module('webadminApp')
 
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
-            $log.log("check system configuration", user);
-
+            $log.log("check system configuration, current user:", user);
+            if(!user){
+                $log.log("Authorization failed, user is not defined.", user);
+            }
             $scope.settings.localLogin = user.name || Config.defaultLogin;
+
 
             if(debugMode) {
                 checkInternet(false);
