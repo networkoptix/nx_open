@@ -45,6 +45,9 @@ static const int kMaxThumbnailsHeight = 196;
 
 static const int kResizerHeight = 16;
 
+static const int kShowWidgetHeight = 50;
+static const int kShowWidgetHiddenHeight = 12;
+
 }
 
 namespace NxUi {
@@ -479,22 +482,19 @@ void TimelineWorkbenchPanel::updateControlsGeometry()
     auto parentWidgetRect = m_parentWidget->rect();
 
     /* Button is painted rotated, so we taking into account its height, not width. */
-    QPointF m_showButtonPos(
+    QPointF showButtonPos(
         (geometry.left() + geometry.right() - m_showButton->geometry().height()) / 2,
         qMin(parentWidgetRect.bottom(), geometry.top()));
-    m_showButton->setPos(m_showButtonPos);
+    m_showButton->setPos(showButtonPos);
 
-    static const int km_showWidgetHeight = 50;
-    static const int km_showWidgetHiddenHeight = 12;
+    const int showWidgetY = isOpened()
+        ? geometry.top() - kShowWidgetHeight
+        : parentWidgetRect.bottom() - kShowWidgetHiddenHeight;
 
-    const int m_showWidgetY = isOpened()
-        ? geometry.top() - km_showWidgetHeight
-        : parentWidgetRect.bottom() - km_showWidgetHiddenHeight;
-
-    QRectF m_showWidgetGeometry(geometry);
-    m_showWidgetGeometry.setTop(m_showWidgetY);
-    m_showWidgetGeometry.setHeight(km_showWidgetHeight);
-    m_showWidget->setGeometry(m_showWidgetGeometry);
+    QRectF showWidgetGeometry(geometry);
+    showWidgetGeometry.setTop(showWidgetY);
+    showWidgetGeometry.setHeight(kShowWidgetHeight);
+    m_showWidget->setGeometry(showWidgetGeometry);
 
     auto zoomButtonsPos = item->timeSlider()->mapToItem(m_parentWidget,
         item->timeSlider()->rect().topLeft());
