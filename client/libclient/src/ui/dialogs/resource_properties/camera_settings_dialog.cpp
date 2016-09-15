@@ -333,8 +333,8 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
         {
             m_settingsWidget->submitToResources();
             for (const QnVirtualCameraResourcePtr &camera : cameras)
-                if (camera->preferedServerId().isNull())
-                    camera->setPreferedServerId(camera->getParentId());
+                if (camera->preferredServerId().isNull())
+                    camera->setPreferredServerId(camera->getParentId());
         };
 
     auto rollback = [this, cameras]()

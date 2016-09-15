@@ -2226,7 +2226,7 @@ void MediaServerProcess::run()
         const auto hwInfo = HardwareInformation::instance();
         server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
         server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-        server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
+        server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
 
         server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
         server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());

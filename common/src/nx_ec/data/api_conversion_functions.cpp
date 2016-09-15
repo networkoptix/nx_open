@@ -255,7 +255,7 @@ void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAtt
     dst->dewarpingParams = QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams);
     dst->minDays = src.minArchiveDays;
     dst->maxDays = src.maxArchiveDays;
-    dst->preferedServerId = src.preferedServerId;
+    dst->preferredServerId = src.preferredServerId;
     dst->failoverPriority = src.failoverPriority;
     dst->backupQualities = src.backupType;
 }
@@ -285,7 +285,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
     dst.minArchiveDays = src->minDays;
     dst.maxArchiveDays = src->maxDays;
-    dst.preferedServerId = src->preferedServerId;
+    dst.preferredServerId = src->preferredServerId;
     dst.failoverPriority = src->failoverPriority;
     dst.backupType = src->backupQualities;
 }

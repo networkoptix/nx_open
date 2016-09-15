@@ -1149,7 +1149,7 @@ APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
                        LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(4001, getClientInfos, ApiClientInfoDataList, \
+APPLY(4001, getClientInfoList, ApiClientInfoDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \

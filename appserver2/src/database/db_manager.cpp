@@ -1731,7 +1731,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             dewarping_params,               \
             min_archive_days,               \
             max_archive_days,               \
-            prefered_server_id,             \
+            preferred_server_id,            \
             license_used,                   \
             failover_priority,              \
             backup_type                     \
@@ -1749,7 +1749,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :dewarpingParams,               \
             :minArchiveDays,                \
             :maxArchiveDays,                \
-            :preferedServerId,              \
+            :preferredServerId,             \
             :licenseUsed,                   \
             :failoverPriority,              \
             :backupType                     \
@@ -1951,9 +1951,9 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_infos VALUES ("
+    query.prepare("INSERT OR REPLACE INTO vms_client_info_list VALUES ("
         ":id, :parentId, :skin, :systemInfo, :cpuArchitecture, :cpuModelName,"
-        ":phisicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer,"
+        ":physicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer,"
         ":fullVersion, :systemRuntime)");
 
     QnSql::bind(tran.params, &query);
@@ -3379,7 +3379,7 @@ ErrorCode QnDbManager::doQueryNoLock(
             dewarping_params as dewarpingParams,         \
             coalesce(min_archive_days, %1) as minArchiveDays,             \
             coalesce(max_archive_days, %2) as maxArchiveDays,             \
-            prefered_server_id as preferedServerId,      \
+            preferred_server_id as preferredServerId,    \
             license_used as licenseUsed,                 \
             failover_priority as failoverPriority,       \
             backup_type as backupType                    \
@@ -3436,7 +3436,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
             cu.dewarping_params as dewarpingParams,            \
             coalesce(cu.min_archive_days, %1) as minArchiveDays,             \
             coalesce(cu.max_archive_days, %2) as maxArchiveDays,             \
-            cu.prefered_server_id as preferedServerId,         \
+            cu.preferred_server_id as preferredServerId,       \
             cu.license_used as licenseUsed,                    \
             cu.failover_priority as failoverPriority,          \
             cu.backup_type as backupType                       \
@@ -3771,10 +3771,10 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
     query.setForwardOnly(true);
     query.prepare(QString(
         "SELECT guid as id, parent_guid as parentId, skin, systemInfo,"
-            "cpuArchitecture, cpuModelName, cpuModelName, phisicalMemory,"
+            "cpuArchitecture, cpuModelName, cpuModelName, physicalMemory,"
             "openGLVersion, openGLVendor, openGLRenderer,"
             "full_version as fullVersion, systemRuntime "
-        "FROM vms_client_infos %1 ORDER BY guid").arg(filterStr));
+        "FROM vms_client_info_list %1 ORDER BY guid").arg(filterStr));
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();

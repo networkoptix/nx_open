@@ -266,7 +266,7 @@ namespace detail
         //getTransactionLog
         ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
-        //getClientInfos
+        //getClientInfoList
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
 
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.

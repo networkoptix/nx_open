@@ -113,8 +113,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         const QnUuid ownGuid = qnCommon->moduleGUID();
         std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid] (const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
         {
-            bool leftOwnServer = leftCam->preferedServerId() == ownGuid;
-            bool rightOwnServer = rightCam->preferedServerId() == ownGuid;
+            bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
+            bool rightOwnServer = rightCam->preferredServerId() == ownGuid;
             if (leftOwnServer != rightOwnServer)
                 return leftOwnServer > rightOwnServer;
 
@@ -190,7 +190,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (existCamRes)
         {
             QnUuid newTypeId = newNetRes->getTypeId();
-            bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId(); 
+            bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId();
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
                 if (isForeign || updateTypeId)

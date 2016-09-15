@@ -443,9 +443,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     *     If the value is less than or equal to zero, it is not used.
     * %param maxArchiveDays Maximum number of days to keep the archive for.
     *     If the value is less than or equal to zero, it is not used.
-    * %param preferedServerId Unique id of a server which is preferred for
+    * %param preferredServerId Unique id of a server which is preferred for
     *     the camera for failover.
-    *     %// TODO: Typo in parameter name: "prefered" -> "preferred".
     * %param failoverPriority Priority for the camera for being transferred
     *     to another server for failover.
     *     %value FP_Never Will never be transferred to another server.
@@ -544,9 +543,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     If the value is less than or equal to zero, it is not used.
      * %param maxArchiveDays Maximum number of days to keep the archive for.
      *     If the value is less than or equal to zero, it is not used.
-     * %param preferedServerId Unique id of a server which is preferred for
+     * %param preferredServerId Unique id of a server which is preferred for
      *     the camera for failover.
-     *     %// TODO: Typo in parameter name: "prefered" -> "preferred".
      * %param failoverPriority Priority for the camera for being transferred
      *     to another server for failover.
      *     %value FP_Never Will never be transferred to another server.
@@ -646,9 +644,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         If the value is less than or equal to zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
      *         If the value is less than or equal to zero, it is not used.
-     *     %param preferedServerId Unique id of a server which is preferred for
+     *     %param preferredServerId Unique id of a server which is preferred for
      *         the camera for failover.
-     *         %// TODO: Typo in parameter name: "prefered" -> "preferred".
      *     %param failoverPriority Priority for the camera for being transferred
      *         to another server for failover.
      *         %value FP_Never Will never be transferred to another server.
@@ -785,9 +782,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         If the value is less than or equal to zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
      *         If the value is less than or equal to zero, it is not used.
-     *     %param preferedServerId Unique id of a server which is preferred for
+     *     %param preferredServerId Unique id of a server which is preferred for
      *         the camera for failover.
-     *         %// TODO: Typo in parameter name: "prefered" -> "preferred".
      *     %param failoverPriority Priority for the camera for being transferred
      *         to another server for failover.
      *         %value FP_Never Will never be transferred to another server.
@@ -1242,7 +1238,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     // ApiClientInfoData
     regUpdate<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
-    regGet<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
+    regGet<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfoList);
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
@@ -1594,12 +1590,13 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         auto clientInfo = loginInfo.clientInfo;
         clientInfo.parentId = qnCommon->moduleGUID();
 
-        ApiClientInfoDataList infos;
-        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infos);
+        ApiClientInfoDataList infoList;
+        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
         if (result != ErrorCode::ok)
             return result;
 
-        if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
+        if (infoList.size() > 0
+            && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
         {
             NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
                 cl_logDEBUG2);
