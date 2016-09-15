@@ -209,7 +209,7 @@ nx::db::DBResult TransactionLog::fetchTransactions(
         fetchTransactionsOfAPeerQuery.prepare(R"sql(
             SELECT tran_data, tran_hash, timestamp, sequence
             FROM transaction_log
-            WHERE system_id=? AND peer_guid=? AND db_guid=? AND sequence>? AND sequence<?
+            WHERE system_id=? AND peer_guid=? AND db_guid=? AND sequence>? AND sequence<=?
             ORDER BY sequence
             )sql");
         fetchTransactionsOfAPeerQuery.addBindValue(QLatin1String(systemId));

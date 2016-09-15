@@ -66,8 +66,10 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
     if (networkError == ec2::ErrorCode::unauthorized)
         return ConnectionResult::Unauthorized;
 
-    if (networkError == ec2::ErrorCode::temporary_unauthorized)
-        return ConnectionResult::TemporaryUnauthorized;
+    if (networkError == ec2::ErrorCode::ldap_temporary_unauthorized)
+        return ConnectionResult::LdapTemporaryUnauthorized;
+    else if (networkError == ec2::ErrorCode::cloud_temporary_unauthorized)
+        return ConnectionResult::CloudTemporaryUnauthorized;
 
     if (networkError != ec2::ErrorCode::ok)
         return ConnectionResult::NetworkError;

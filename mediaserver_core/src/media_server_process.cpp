@@ -1359,15 +1359,20 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
 void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudConnectionManager)
 {
-    PasswordData data;
-    data.password = QnServer::kDefaultAdminPassword;
     while (1)
     {
-        if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), nullptr))
+        auto adminUser = qnResPool->getAdministrator();
+        if (adminUser && !adminUser->isEnabled())
         {
-            qWarning() << "Error while clearing cloud information. Traying again...";
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            continue;
+            PasswordData data;
+            data.password = QnServer::kDefaultAdminPassword;
+            if (!updateUserCredentials(data, QnOptionalBool(true), adminUser, nullptr))
+            {
+                qWarning() << "Error while clearing cloud information. Traying again...";
+                QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+                continue;
+            }
+            qWarning() << "Enable admin user and reset its password to default value due to automatic cloud disconnect and admin user was disabled";
         }
 
         if (!cloudConnectionManager->cleanUpCloudDataInLocalDb())
