@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pt_PT" sourcelanguage="en">
+<TS version="2.1" language="pt_PT" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -198,7 +198,6 @@ Para ver mais Bookmarks</translation>
     <name>QTimeSpanPrivate</name>
     <message numerus="yes">
         <source>%n millisecond(s)</source>
-        <translatorcomment></translatorcomment>
         <translation>
             <numerusform>%n milisegundo</numerusform>
             <numerusform>%n milisegundos</numerusform>
@@ -2028,6 +2027,13 @@ Para ver mais Bookmarks</translation>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation>A carregar...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
@@ -2946,11 +2952,10 @@ Para ver mais Bookmarks</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translatorcomment>There is a warning about not including %n, but the source text does not have it...</translatorcomment>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>e mais %1 utilizador...</numerusform>
-            <numerusform>e mais %1 utilizadores...</numerusform>
+            <numerusform>e mais %n utilizador...</numerusform>
+            <numerusform>e mais %n utilizadores...</numerusform>
         </translation>
     </message>
 </context>
@@ -3003,40 +3008,30 @@ Para ver mais Bookmarks</translation>
         <source>days</source>
         <translation>dias</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation>
-            <numerusform>%nms</numerusform>
-            <numerusform>%nms</numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation>
-            <numerusform>%ns</numerusform>
-            <numerusform>%ns</numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>s</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation>
-            <numerusform>%nm</numerusform>
-            <numerusform>%nm</numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>m</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation>
-            <numerusform>%nh</numerusform>
-            <numerusform>%nh</numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>h</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation>
-            <numerusform>%nd</numerusform>
-            <numerusform>%nd</numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>d</translation>
     </message>
 </context>
 <context>
@@ -5151,7 +5146,7 @@ Se compreende este aviso e pretende prosseguir carregue em &quot;Fusão&quot; pa
     </message>
     <message>
         <source>URL copied to clipboard.</source>
-        <translation type="unfinished">URL copiado para o ClipBoard.</translation>
+        <translation>URL copiado para o ClipBoard.</translation>
     </message>
     <message>
         <source>Information</source>
