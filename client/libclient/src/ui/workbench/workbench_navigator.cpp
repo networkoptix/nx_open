@@ -1366,13 +1366,18 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 
     if (!m_pausedOverride)
     {
-        //TODO: #GDM #refactor logic in 3.0
-        auto usecTimeForWidget = [isSearch](QnMediaResourceWidget *mediaWidget) -> qint64
+        //TODO: #GDM #vkutin #refactor logic in 3.1
+        auto usecTimeForWidget = [isSearch, this](QnMediaResourceWidget *mediaWidget) -> qint64
         {
             if (mediaWidget->display()->camDisplay()->isRealTimeSource())
                 return DATETIME_NOW;
 
-            qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+            qint64 timeUSec;
+            if (m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync))
+                timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
+            else
+                timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+
             if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
 
@@ -1382,6 +1387,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 if (timeUSec != DATETIME_NOW && timeUSec >= 0)
                     timeUSec *= 1000;
             }
+
             return timeUSec;
         };
 
