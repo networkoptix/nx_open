@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <list>
+
 #include <QSharedPointer>
 
 #include "onvif_helper.h"
@@ -325,7 +327,7 @@ private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
     QAuthenticator getDefaultPassword(const QString& manufacturer, const QString& model) const;
-    QSet<QAuthenticator> getPossibleCredentials(const QString& manufacturer, const QString& model) const;
+    std::list<QnCredentials> getPossibleCredentials(const QString& manufacturer, const QString& model) const;
     void calcTimeDrift();
 
     PasswordHelper &m_passwordsData;

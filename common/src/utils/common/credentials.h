@@ -17,6 +17,8 @@ struct QnCredentials{
 
     bool operator==(const QnCredentials& other) const;
 
+    bool operator<(const QnCredentials& other) const;
+
     QString user;
     QString password;
 };
