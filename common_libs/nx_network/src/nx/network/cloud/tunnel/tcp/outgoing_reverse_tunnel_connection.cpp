@@ -6,7 +6,7 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-static const std::chrono::seconds kCloseTunnelWhenInactive(10);
+static const std::chrono::minutes kCloseTunnelWhenInactive(10);
 
 OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
     aio::AbstractAioThread* aioThread,
@@ -52,6 +52,9 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
                         kCloseTunnelWhenInactive,
                         [this]()
                         {
+                            NX_LOGX(lm("Close tunnel by inactivity timer after %1")
+                                .str(kCloseTunnelWhenInactive), cl_logDEBUG1);
+
                             if (const auto handler = std::move(m_closedHandler))
                                 handler(SystemError::timedOut);
                         });

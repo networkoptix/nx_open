@@ -21,6 +21,9 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
 {
     if (!m_handlers.empty())
     {
+        NX_LOGX(lm("Use new socket(%1), %2 sockets left")
+            .strs(socket, m_socketCount.load()), cl_logDEBUG2);
+
         auto handler = std::move(m_handlers.begin()->second);
         m_handlers.erase(m_handlers.begin());
         return handler(SystemError::noError, std::move(socket));
@@ -28,6 +31,9 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
 
     const auto it = m_sockets.insert(m_sockets.end(), std::move(socket));
     ++m_socketCount;
+    NX_LOGX(lm("One socket(%1) added, %2 sockets left")
+        .strs(*it, m_socketCount.load()), cl_logDEBUG2);
+
     (*it)->bindToAioThread(getAioThread());
     monitorSocket(it);
 }
@@ -46,8 +52,10 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
             if (m_sockets.size())
             {
                 auto socket = std::move(m_sockets.front());
-                m_sockets.pop_front();
                 --m_socketCount;
+                m_sockets.pop_front();
+                NX_LOGX(lm("One socket(%1) used, %2 sockets left")
+                    .strs(socket, m_socketCount.load()), cl_logDEBUG2);
 
                 socket->cancelIOSync(aio::etNone);
                 handler(SystemError::noError, std::move(socket));
@@ -97,8 +105,8 @@ void ReverseConnectionHolder::monitorSocket(
             if (code == SystemError::timedOut)
                 return monitorSocket(it);
 
-            NX_LOGX(lm("Unexpected event on socket(%1), size=%2: %3")
-                .args(*it, size, SystemError::toString(code)),
+            NX_LOGX(lm("Unexpected event on socket(%1), size=%2: %3 (%4 sockets left)")
+                .strs(*it, size, SystemError::toString(code), m_socketCount.load() - 1),
                     size ? cl_logERROR : cl_logDEBUG1);
 
             (void)buffer; //< This buffer might be helpful for debug is case smth goes wrong!

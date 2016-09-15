@@ -81,6 +81,23 @@ TEST(HostAddressTest, Base)
     testHostAddress(nullptr, "2001:db8:0:2::1", boost::none, kIpV6b);
 }
 
+TEST(HostAddressTest, IsLocal)
+{
+    ASSERT_TRUE(HostAddress("127.0.0.1").isLocal());
+    ASSERT_TRUE(HostAddress("10.0.2.103").isLocal());
+    ASSERT_TRUE(HostAddress("172.17.0.2").isLocal());
+    ASSERT_TRUE(HostAddress("192.168.1.1").isLocal());
+    ASSERT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772").isLocal());
+    ASSERT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29").isLocal());
+    ASSERT_TRUE(HostAddress("::ffff:172.25.4.8").isLocal());
+
+    ASSERT_FALSE(HostAddress("12.34.56.78").isLocal());
+    ASSERT_FALSE(HostAddress("95.31.136.2").isLocal());
+    ASSERT_FALSE(HostAddress("172.8.0.2").isLocal());
+    ASSERT_FALSE(HostAddress("2001:db8:0:2::1").isLocal());
+    ASSERT_FALSE(HostAddress("::ffff:12.34.56.78").isLocal());
+}
+
 void testSocketAddress(const char* init, const char* host, int port)
 {
     const auto addr = SocketAddress(QString(init));
