@@ -65,6 +65,9 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
     };
 
     m_mode = calculateMode();
+    m_accessibleResources = m_user
+        ? qnResourceAccessManager->accessibleResources(m_user->getId())
+        : QSet<QnUuid>();
 
     emit userChanged(m_user);
 }
@@ -90,7 +93,7 @@ QSet<QnUuid> QnUserSettingsModel::accessibleResources() const
     if (!m_user)
         return QSet<QnUuid>();
 
-    return qnResourceAccessManager->accessibleResources(m_user->getId());
+    return m_accessibleResources;
 }
 
 void QnUserSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
@@ -98,20 +101,7 @@ void QnUserSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
     if (!m_user)
         return;
 
-    QnLayoutResourceList layoutsToShare = qnResPool->getResources(value)
-        .filtered<QnLayoutResource>(
-            [](const QnLayoutResourcePtr& layout)
-            {
-                return !layout->isFile() && !layout->isShared();
-            });
-
-    for (const auto& layout : layoutsToShare)
-    {
-        menu()->trigger(QnActions::ShareLayoutAction,
-            QnActionParameters(layout).withArgument(Qn::UserResourceRole, m_user));
-    }
-
-    qnResourceAccessManager->setAccessibleResources(m_user->getId(), value);
+    m_accessibleResources = value;
 }
 
 void QnUserSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& value)

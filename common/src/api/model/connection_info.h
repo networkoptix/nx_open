@@ -36,6 +36,9 @@ struct QnConnectionInfo
     QString customization;
     QString effectiveUserName;
     QString cloudHost;
+
+    /* Check if https protocol can be used. */
+    QUrl effectiveUrl() const;
 };
 
 #define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)\

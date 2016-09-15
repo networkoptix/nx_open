@@ -28,9 +28,27 @@
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/common/geometry.h>
 #include <ui/customization/customizer.h>
+#include <nx/utils/raii_guard.h>
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
+
+    // We don't have icons for 3x scaling. Thus we have to turn on smooth mode
+    // on painter.
+    const QnRaiiGuardPtr make3xHiDpiWorkaround(QPainter *painter)
+    {
+        if (painter->device()->devicePixelRatio() <= 2)
+            return QnRaiiGuardPtr();
+
+        const bool isSmooth = painter->testRenderHint(QPainter::SmoothPixmapTransform);
+        if (isSmooth)
+            return QnRaiiGuardPtr();
+
+        return QnRaiiGuard::create(
+            [painter]() { painter->setRenderHint(QPainter::SmoothPixmapTransform); },
+            [painter]() { painter->setRenderHint(QPainter::SmoothPixmapTransform, false); });
+
+    }
 } // anonymous namespace
 
 
@@ -56,6 +74,7 @@ QPixmap QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &
     if(iconMode == QIcon::Disabled) {
         QImage image = QImage(pixmap.size(), QImage::Format_ARGB32);
         image.fill(qRgba(0, 0, 0, 0));
+        image.setDevicePixelRatio(pixmap.devicePixelRatio());
 
         QPainter painter(&image);
 #ifdef Q_OS_LINUX
@@ -72,7 +91,10 @@ QPixmap QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &
     }
 }
 
-void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
+void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
+{
+    const auto workaround = make3xHiDpiWorkaround(painter);
+
     switch (control) {
     case CC_TitleBar:
         {
@@ -91,7 +113,10 @@ void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptio
     base_type::drawComplexControl(control, option, painter, widget);
 }
 
-void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    const auto workaround = make3xHiDpiWorkaround(painter);
+
     switch(element) {
     case CE_MenuItem:
         if(drawMenuItemControl(option, painter, widget))
@@ -108,7 +133,10 @@ void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *opti
     base_type::drawControl(element, option, painter, widget);
 }
 
-void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    const auto workaround = make3xHiDpiWorkaround(painter);
+
     switch(element) {
     case PE_IndicatorBranch:
         if(drawBranchPrimitive(option, painter, widget))
@@ -187,7 +215,10 @@ void QnNoptixStyle::unpolish(QGraphicsWidget *widget) {
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    const auto workaround = make3xHiDpiWorkaround(painter);
+
     const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
     if(!itemOption)
         return false;
@@ -210,7 +241,10 @@ bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *pa
     return true;
 }
 
-bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    const auto workaround = make3xHiDpiWorkaround(painter);
+
     const QStyleOptionViewItemV4 *itemOption = qstyleoption_cast<const QStyleOptionViewItemV4 *>(option);
     if(!itemOption)
         return false;
@@ -234,8 +268,11 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     return true;
 }
 
-bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
     Q_UNUSED(widget);
+
+    const auto workaround = make3xHiDpiWorkaround(painter);
 
     if(!option->rect.isValid())
         return false;
@@ -255,6 +292,8 @@ bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const Q
 {
     QN_UNUSED(element);
     QN_UNUSED(painter);
+
+    const auto workaround = make3xHiDpiWorkaround(painter);
 
     if(!widget)
         return false;

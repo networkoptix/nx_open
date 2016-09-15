@@ -94,7 +94,6 @@ QString QnConnectionDiagnosticsHelper::getErrorString(
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     const QnConnectionInfo &connectionInfo,
     ec2::ErrorCode errorCode,
-    const QUrl &url,
     QWidget* parentWidget)
 {
     using namespace Qn;
@@ -138,7 +137,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     }
 
     if (result == ConnectionResult::IncompatibleProtocol)
-        return handleCompatibilityMode(connectionInfo, url, parentWidget);
+        return handleCompatibilityMode(connectionInfo, parentWidget);
 
     NX_ASSERT(false);    //should never get here
     return ConnectionResult::IncompatibleVersion; //just in case
@@ -162,7 +161,6 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     const QnConnectionInfo &connectionInfo,
-    const QUrl &url,
     QWidget* parentWidget)
 {
     using namespace Qn;
@@ -247,7 +245,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         if (button != QDialogButtonBox::Ok)
             return ConnectionResult::IncompatibleVersion;
 
-        switch (applauncher::restartClient(connectionInfo.version, url.toEncoded()))
+        switch (applauncher::restartClient(connectionInfo.version, connectionInfo.ecUrl.toEncoded()))
         {
             case applauncher::api::ResultType::ok:
                 return ConnectionResult::IncompatibleProtocol;

@@ -47,4 +47,5 @@ private:
     Mode m_mode;
     QnUserResourcePtr m_user;
     QSet<QnUuid> m_accessibleLayoutsPreview;
+    QSet<QnUuid> m_accessibleResources;
 };

@@ -1,7 +1,7 @@
 import QtQuick 2.6
 import Qt.labs.controls 1.0
-import Nx 1.0
 import Nx.Dialogs 1.0
+import Nx 1.0
 
 DialogBase
 {
@@ -10,65 +10,35 @@ DialogBase
     property string activeHost: ""
     property alias hostsModel: hostsRepeater.model
 
-    implicitHeight: Math.min(parent.height, contentItem.implicitHeight)
-
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: true
 
-    background: null
-
-    contentItem: Flickable
+    Column
     {
-        id: flickable
+        width: parent.width
 
-        anchors.fill: parent
-
-        implicitWidth: childrenRect.width
-        implicitHeight: childrenRect.height
-
-        contentWidth: width
-        contentHeight: column.height
-
-        topMargin: 16 + getStatusBarHeight()
-        bottomMargin: 16
-        contentY: 0
-
-        Rectangle
+        DialogTitle
         {
-            anchors.fill: column
-            color: ColorTheme.contrast3
+            text: qsTr("Hosts")
         }
 
-        Column
+        Repeater
         {
-            id: column
+            id: hostsRepeater
 
-            width: flickable.width
-
-            DialogTitle
+            DialogListItem
             {
-                text: qsTr("Hosts")
-                bottomPadding: 6
-            }
+                id: control
 
-            Repeater
-            {
-                id: hostsRepeater
+                readonly property string host: model.display
 
-                DialogListItem
+                active: host == activeHost
+                text: host
+
+                onClicked:
                 {
-                    id: control
-
-                    readonly property string host: model.display
-
-                    active: host == activeHost
-                    text: host
-
-                    onClicked:
-                    {
-                        hostSelectionDialog.activeHost = host
-                        hostSelectionDialog.close()
-                    }
+                    hostSelectionDialog.activeHost = host
+                    hostSelectionDialog.close()
                 }
             }
         }

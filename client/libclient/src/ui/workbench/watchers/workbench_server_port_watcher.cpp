@@ -50,8 +50,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
 
                 url.setPort(currentServer->getPort());
                 QnAppServerConnectionFactory::setUrl(url);
-
-                context()->menu()->trigger(QnActions::ReconnectAction);
+                menu()->trigger(QnActions::ReconnectAction);
             });
         });
 }

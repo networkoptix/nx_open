@@ -8,6 +8,8 @@
 #include "utils/media/nalUnits.h"
 #include "network/tcp_connection_priv.h"
 
+#include <motion/motion_detection.h>
+
 #include "stardot_resource.h"
 
 #if 0
@@ -172,8 +174,8 @@ void QnStardotStreamReader::processMotionBinData(const quint8* data, qint64 time
         for (int x = 0; x < 16; ++x)
         {
             if (srcLine & srcMask) {
-                int dstX1 = (x * MD_WIDTH + 8)/16;
-                int dstX2 = ((x+1) * MD_WIDTH + 8)/16;
+                int dstX1 = (x * Qn::kMotionGridWidth + 8)/16;
+                int dstX2 = ((x+1) * Qn::kMotionGridWidth + 8)/16;
                 for (int dstX = dstX1; dstX < dstX2; ++dstX)
                     dst[dstX] |= dstMask;
             }
@@ -188,7 +190,7 @@ QnMetaDataV1Ptr QnStardotStreamReader::getCameraMetadata()
     QnMetaDataV1Ptr rez;
     if (m_lastMetadata) {
         quint32* dst = (quint32*) m_lastMetadata->m_data.data();
-        for (int i = 0; i < MD_WIDTH; ++i)
+        for (int i = 0; i < Qn::kMotionGridWidth; ++i)
             dst[i] = htonl(dst[i]);
         const simd128i* mask = m_stardotRes->getMotionMaskBinData();
         if (mask)

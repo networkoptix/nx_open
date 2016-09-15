@@ -108,7 +108,7 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     ui->enterCloudAccountLabel->setText(tr("Enter %1 Account").arg(QnAppInfo::cloudName()));
     ui->enterCloudAccountLabel->setForegroundRole(QPalette::Light);
 
-    ui->loginInputField->setTitle(tr("E-Mail"));
+    ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));

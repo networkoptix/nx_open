@@ -1,6 +1,8 @@
 
 #include "motion_window.h"
 
+#include <motion/motion_detection.h>
+
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/streaming/config.h>
@@ -73,7 +75,7 @@ QVector<QRect> QnRegion::rects() const
 QnMotionRegion::QnMotionRegion()
 {
     m_dirty = false;
-    addRect(kDefaultSensitivity, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+    addRect(kDefaultSensitivity, QRect(0,0,Qn::kMotionGridWidth, Qn::kMotionGridHeight));
 }
 
 QnMotionRegion::QnMotionRegion( const QnMotionRegion& right )

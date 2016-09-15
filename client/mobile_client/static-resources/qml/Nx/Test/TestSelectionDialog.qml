@@ -8,62 +8,32 @@ DialogBase
 {
     id: testSelectionDialog
 
-    implicitHeight: Math.min(parent.height, contentItem.implicitHeight)
-
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: true
 
-    background: null
-
-    contentItem: Flickable
+    Column
     {
-        id: flickable
+        width: parent.width
 
-        anchors.fill: parent
-
-        implicitWidth: childrenRect.width
-        implicitHeight: childrenRect.height
-
-        contentWidth: width
-        contentHeight: column.height
-
-        topMargin: 16
-        bottomMargin: 16
-        contentY: 0
-
-        Rectangle
+        DialogTitle
         {
-            anchors.fill: column
-            color: ColorTheme.contrast3
+            text: qsTr("Select Test")
         }
 
-        Column
+        Repeater
         {
-            id: column
+            model:
+            [
+                "LiteClientTest"
+            ]
 
-            width: flickable.width
-
-            DialogTitle
+            DialogListItem
             {
-                text: qsTr("Select Test")
-                bottomPadding: 6
-            }
-
-            Repeater
-            {
-                model:
-                [
-                    "LiteClientTest"
-                ]
-
-                DialogListItem
+                text: modelData
+                onClicked:
                 {
-                    text: modelData
-                    onClicked:
-                    {
-                        testSelectionDialog.close()
-                        Workflow.startTest(modelData)
-                    }
+                    testSelectionDialog.close()
+                    Workflow.startTest(modelData)
                 }
             }
         }

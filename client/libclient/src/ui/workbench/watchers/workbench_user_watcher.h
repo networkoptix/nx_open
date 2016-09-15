@@ -46,7 +46,6 @@ public:
 
 signals:
     void userChanged(const QnUserResourcePtr &user);
-    void reconnectRequired();
 
 private:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
@@ -60,6 +59,7 @@ private:
 
     void setCurrentUser(const QnUserResourcePtr &currentUser);
     bool isReconnectRequired(const QnUserResourcePtr &user);
+    void reconnect();
 
     QnUserResourcePtr calculateCurrentUser() const;
 

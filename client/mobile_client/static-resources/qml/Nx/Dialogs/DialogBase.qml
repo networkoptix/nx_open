@@ -6,16 +6,54 @@ Popup
 {
     id: control
 
-    property bool deleteOnClose: false
+    parent: mainWindow.contentItem
 
-    implicitWidth: Math.min(328, parent.width - 32)
-    implicitHeight: Math.min(parent.height - 56 * 2, contentItem.implicitHeight)
-    x: (parent.width - implicitWidth) / 2
-    y: (parent.height - implicitHeight) / 2
+    property bool deleteOnClose: false
+    default property alias data: content.data
+
+    width: Math.min(328, parent.width - 32)
+    height: parent.height
+    x: width > 0 ? (parent.width - width) / 2 : 0
+    y: 0
     padding: 0
     modal: true
 
-    background: Rectangle { color: ColorTheme.contrast3 }
+    background: null
+
+    contentItem: Item
+    {
+        anchors.fill: parent
+        anchors.topMargin: getStatusBarHeight()
+
+        Flickable
+        {
+            id: flickable
+
+            width: parent.width
+            height: Math.min(parent.height, implicitHeight)
+            anchors.centerIn: parent
+
+            implicitWidth: content.implicitWidth
+            implicitHeight: contentHeight
+
+            contentWidth: width
+            contentHeight: content.implicitHeight + 32
+
+            contentY: 0
+
+            Rectangle
+            {
+                id: content
+
+                implicitWidth: childrenRect.width
+                implicitHeight: childrenRect.height
+                width: parent.width
+                y: 16
+
+                color: ColorTheme.contrast3
+            }
+        }
+    }
 
     readonly property int _animationDuration: 200
 
