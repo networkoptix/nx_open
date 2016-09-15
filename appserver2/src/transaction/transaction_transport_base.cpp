@@ -489,7 +489,7 @@ void QnTransactionTransportBase::close()
 void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
 {
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::doOutgoingConnect. remotePeerUrl = %1").
-        arg(remotePeerUrl.toString()), cl_logDEBUG2 );
+        arg(remotePeerUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2 );
 
     setState(ConnectingStage1);
 

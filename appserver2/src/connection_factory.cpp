@@ -1470,7 +1470,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "Ec2DirectConnectionFactory::remoteConnectionFinished. errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(ecUrl.toString()), cl_logDEBUG2);
+        .arg((int)errorCode).arg(ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
     // TODO: #ak async ssl is working now, make async request to old ec here
 
@@ -1518,7 +1518,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString()), cl_logDEBUG2);
+        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         std::make_shared<FixedUrlClientQueryProcessor>(

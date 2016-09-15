@@ -125,7 +125,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline() {
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString()), cl_logDEBUG2);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG2);
     httpClient->doGet(url);
 
     m_runningRequests.insert(reply);
@@ -436,7 +436,7 @@ bool QnCheckForUpdatesPeerTask::tryNextServer() {
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(m_currentUpdateUrl.toString()), cl_logDEBUG2);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(m_currentUpdateUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
     httpClient->doGet(m_currentUpdateUrl);
     m_runningRequests.insert(reply);
     return true;

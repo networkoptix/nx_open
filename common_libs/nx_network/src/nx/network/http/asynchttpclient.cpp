@@ -420,7 +420,7 @@ namespace nx_http
         }
 
         NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
-            arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_lastSysErrorCode = errorCode;
         if (reconnectIfAppropriate())
             return;
@@ -451,7 +451,7 @@ namespace nx_http
         {
             if (reconnectIfAppropriate())
                 return;
-            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
             const auto requestSequenceBak = m_requestSequence;
@@ -486,7 +486,7 @@ namespace nx_http
         m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
         {
-            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
             m_state = sFailed;
             const auto requestSequenceBak = m_requestSequence;
             emit done(sharedThis);
@@ -528,7 +528,7 @@ namespace nx_http
             }
 
             NX_LOGX(lit("Error reading (state %1) http response from %2. %3")
-                .arg(stateBak).arg(m_url.toString()).arg(SystemError::toString(errorCode)),
+                .arg(stateBak).arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)),
                 cl_logDEBUG1);
             m_lastSysErrorCode = errorCode;
             const auto requestSequenceBak = m_requestSequence;
@@ -857,7 +857,7 @@ namespace nx_http
         if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead))
         {
             NX_LOGX(lit("Error parsing http response from %1. %2").
-                arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
+                arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
             m_state = sFailed;
             return -1;
         }
