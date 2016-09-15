@@ -12,6 +12,9 @@ public:
 
     const QModelIndex& hoveredIndex() const;
 
+    bool automaticMouseCursor() const;
+    void setAutomaticMouseCursor(bool value);
+
 signals:
     void itemEnter(const QModelIndex& index);
     void itemLeave(const QModelIndex& index);
@@ -25,7 +28,10 @@ private:
     QRect columnRect(const QModelIndex& index) const;
     QRect rowRect(const QModelIndex& index) const;
 
+    void updateMouseCursor();
+
 private:
     QAbstractItemView* m_itemView;
     QPersistentModelIndex m_hoveredIndex;
+    bool m_automaticMouseCursor;
 };
