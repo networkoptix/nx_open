@@ -15,7 +15,6 @@
                 <include>help/**</include>
                 <include>vox/**</include>
                 <include>av*.dll</include>
-                <include>icu*.dll</include>
                 <include>lib*.dll</include>
                 <include>openal32.dll</include>
                 <include>qjson.dll</include>
@@ -29,7 +28,14 @@
                 <include>${product.name}*.exe</include>
                 <include>vcredist*.exe</include>
             </includes>		
-        </fileSet>			
+        </fileSet>
+		<fileSet>
+			<directory>${project.build.directory}/qt542/${arch}/icu</directory>
+			<outputDirectory>..</outputDirectory>
+			<includes>
+                <include>icu*.dll</include>
+			</includes>		
+		</fileSet>	        
 		<fileSet>
 			<directory>${project.build.directory}/client</directory>
 			<outputDirectory>..</outputDirectory>

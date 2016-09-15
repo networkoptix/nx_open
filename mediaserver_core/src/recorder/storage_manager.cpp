@@ -93,7 +93,7 @@ const QString& sysDrivePath()
 
 const QString getDevicePath(const QString& path)
 {
-    QString command = lit("df ") + path;
+    QString command = lit("df '") + path + lit("'");
     FILE* pipe;
     char buf[BUFSIZ];
 
@@ -1646,6 +1646,12 @@ QSet<QnStorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
     for (const auto& storage: allWritableStorages)
         if (storage->isUsedForWriting())
             result.insert(storage);
+
+    if (!result.empty())
+        m_isWritableStorageAvail = true;
+    else
+        m_isWritableStorageAvail = false;
+
     return result;
 }
 
@@ -1700,10 +1706,6 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
             result.remove(*it);
     }
 
-    if (!result.empty())
-        m_isWritableStorageAvail = true;
-    else
-        m_isWritableStorageAvail = false;
     return result;
 }
 
@@ -2123,7 +2125,8 @@ bool QnStorageManager::renameFileWithDuration(
     for (int i = 1; i < nameParts.size(); ++i)
         newName += lit(".") + nameParts[i];
 
-    return storage->renameFile(oldName, fpath + newName);
+    newName = fpath + newName;
+    return storage->renameFile(oldName, newName);
 }
 
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)

@@ -29,11 +29,12 @@ QnDesktopAudioOnlyDataProvider::QnDesktopAudioOnlyDataProvider(QnResourcePtr ptr
 
 QnDesktopAudioOnlyDataProvider::~QnDesktopAudioOnlyDataProvider()
 {
+    directDisconnectAll();
+
+    stop();
+
     if (m_encoderBuffer)
         av_free(m_encoderBuffer);
-
-    directDisconnectAll();
-    stop();
 }
 
 void QnDesktopAudioOnlyDataProvider::pleaseStop()
@@ -77,12 +78,11 @@ void QnDesktopAudioOnlyDataProvider::startInputs()
     auto primaryIODevice =
         m_audioSourcesInfo.at(0)->ioDevice;
 
-    connect(
+    Qn::directConnect(
         primaryIODevice,
         &QIODevice::readyRead,
         this,
-        &QnDesktopAudioOnlyDataProvider::processData,
-        Qt::DirectConnection);
+        &QnDesktopAudioOnlyDataProvider::processData);
 }
 
 void QnDesktopAudioOnlyDataProvider::run()
