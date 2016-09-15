@@ -10,6 +10,7 @@
 
 #include <transaction/transaction_transport.h>
 #include <utils/common/app_info.h>
+#include <utils/common/id.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 #include "transaction_transport.h"
@@ -192,6 +193,8 @@ TEST_F(Ec2MserverCloudSynchronization2, addingUserLocallyWhileOffline)
         api::SystemSharingEx ownerSharing;
         fetchOwnerSharing(&ownerSharing);
         verifyCloudUserPresenceInLocalDb(ownerSharing);
+
+        waitForCloudAndVmsToSyncUsers();
 
         if (i == 0)
         {

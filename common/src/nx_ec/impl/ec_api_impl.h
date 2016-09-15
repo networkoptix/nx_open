@@ -94,7 +94,7 @@ namespace ec2
         unsupported,
         unauthorized,
         //!Can't check authorization because of LDAP server is offline
-        temporary_unauthorized,
+        ldap_temporary_unauthorized,
         //!Requested operation is currently forbidden (e.g., read-only mode is enabled)
         forbidden,
         //!Response parse error
@@ -106,7 +106,10 @@ namespace ec2
         //!Method is not implemented yet
         notImplemented,
         //!Connection to peer is impossible due to incompatible protocol
-        incompatiblePeer
+        incompatiblePeer,
+        //!Can't check authorization because of cloud is offline
+        cloud_temporary_unauthorized
+
     };
 
     QString toString(ErrorCode errorCode);

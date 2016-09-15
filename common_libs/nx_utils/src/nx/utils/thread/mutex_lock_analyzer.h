@@ -175,8 +175,13 @@ public:
 private:
     struct ThreadContext
     {
+        uintptr_t threadId;
         std::deque<MutexLockKey> currentLockPath;
+
+        ThreadContext(uintptr_t id): threadId(id) {}
     };
+
+    ThreadContext& currentThreadContext();
 
     typedef Digraph<QnMutex*, LockGraphEdgeData> MutexLockDigraph;
 

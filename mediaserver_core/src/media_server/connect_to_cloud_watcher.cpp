@@ -21,6 +21,7 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher():
     m_timer.setInterval(kUpdateIfFailIntervalMs);
 
     connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
+
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
@@ -32,6 +33,11 @@ QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
     m_cdbEndPointFetcher->pleaseStopSync();
 }
 
+void QnConnectToCloudWatcher::restartTimer()
+{
+    m_timer.start();
+}
+
 void QnConnectToCloudWatcher::at_updateConnection()
 {
     m_timer.stop();
@@ -39,7 +45,8 @@ void QnConnectToCloudWatcher::at_updateConnection()
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     bool needCloudConnect =
         localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync) &&
-        !qnGlobalSettings->cloudSystemID().isEmpty();
+        !qnGlobalSettings->cloudSystemID().isEmpty() &&
+		!qnGlobalSettings->cloudAuthKey().isEmpty();
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
@@ -53,8 +60,9 @@ void QnConnectToCloudWatcher::at_updateConnection()
         {
             if (statusCode != nx_http::StatusCode::ok || endpoint->isNull())
             {
-                NX_LOGX(lm("Error fetching cloud_db endpoint. %1").str(statusCode), cl_logDEBUG2);
-                m_timer.start(); //< try once more later
+                NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1").str(statusCode), cl_logWARNING);
+                // try once more later
+                metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                 return;
             }
 

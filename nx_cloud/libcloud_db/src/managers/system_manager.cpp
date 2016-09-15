@@ -1319,17 +1319,40 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     ::ec2::ApiUserData data,
     data::SystemSharing* const systemSharingData)
 {
-    NX_LOGX(lm("Processing vms transaction saveUser. user %1, systemId %2, permissions %3, enabled %4")
+    NX_LOGX(lm("Processing vms transaction saveUser. "
+        "user %1, systemId %2, permissions %3, enabled %4")
         .arg(data.email).arg(systemId)
         .arg(QnLexical::serialized(data.permissions)).arg(data.isEnabled),
         cl_logDEBUG2);
 
-    //preparing SystemSharing structure
+    // Preparing SystemSharing structure.
     systemSharingData->systemID = systemId.toStdString();
     ec2::convert(data, systemSharingData);
 
-    //updating db
-    return updateSharingInDb(dbConnection, *systemSharingData);
+    // Updating db.
+    const nx::db::DBResult result = 
+        updateSharingInDb(dbConnection, *systemSharingData);
+    if (result != nx::db::DBResult::ok)
+        return result;
+
+    // Generating "save full name" transaction.
+    const auto account = m_accountManager.findAccountByUserName(
+        data.email.toStdString());
+    if (!account)
+    {
+        // TODO: #ak Creating new account and sending invite email.
+        return nx::db::DBResult::notFound;
+    }
+
+    ::ec2::ApiResourceParamWithRefData fullNameData;
+    fullNameData.resourceId = data.id;
+    fullNameData.name = Qn::USER_FULL_NAME;
+    fullNameData.value = QString::fromStdString(account->fullName);
+    return m_transactionLog->generateTransactionAndSaveToLog<
+        ::ec2::ApiCommand::setResourceParam>(
+            dbConnection,
+            systemId,
+            std::move(fullNameData));
 }
 
 void SystemManager::onEc2SaveUserDone(

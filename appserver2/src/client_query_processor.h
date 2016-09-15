@@ -179,8 +179,10 @@ namespace ec2
                     QString authResultStr = nx_http::getHeaderValue(httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
                     if (!authResultStr.isEmpty()) {
                         Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
-                        if (authResult == Qn::Auth_ConnectError)
-                            return handler( ErrorCode::temporary_unauthorized, OutputData() );
+                        if (authResult == Qn::Auth_LDAPConnectError)
+                            return handler( ErrorCode::ldap_temporary_unauthorized, OutputData() );
+                        else if (authResult == Qn::Auth_CloudConnectError)
+                            return handler( ErrorCode::cloud_temporary_unauthorized, OutputData() );
                     }
                     return handler( ErrorCode::unauthorized, OutputData() );
                 }

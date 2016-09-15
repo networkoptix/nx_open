@@ -176,6 +176,7 @@ public:
     ::ec2::QnTranState getTransactionState(const nx::String& systemId) const;
     /**
      * Asynchronously reads requested transactions from Db.
+     * @param to State (transaction source id, sequence) to read up to. Boundary is inclusive
      * @param completionHandler is called within unspecified DB connection thread.
      * In case of high load request can be cancelled internaly. 
      * In this case \a api::ResultCode::retryLater will be reported
