@@ -217,6 +217,14 @@ bool NotificationsWorkbenchPanel::isHovered() const
     return m_opacityProcessor->isHovered();
 }
 
+QRectF NotificationsWorkbenchPanel::effectiveGeometry() const
+{
+    QRectF geometry = item->geometry();
+    if (xAnimator->isRunning())
+        geometry.moveLeft(xAnimator->targetValue().toReal());
+    return geometry;
+}
+
 void NotificationsWorkbenchPanel::setShowButtonUsed(bool used)
 {
     m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);

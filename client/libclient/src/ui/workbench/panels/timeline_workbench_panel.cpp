@@ -58,7 +58,6 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     item(new QnNavigationItem(parentWidget)),
     zoomingIn(false),
     zoomingOut(false),
-    yAnimator(new VariantAnimator(this)),
     lastThumbnailsHeight(kDefaultThumbnailsHeight),
 
     m_ignoreClickEvent(false),
@@ -74,7 +73,8 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
-    m_opacityAnimatorGroup(new AnimatorGroup(this))
+    m_opacityAnimatorGroup(new AnimatorGroup(this)),
+    m_yAnimator(new VariantAnimator(this))
 {
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
     m_resizerWidget->setZValue(ResizerItemZOrder);
@@ -216,9 +216,9 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &AbstractWorkbenchPanel::hoverLeft);
 
-    yAnimator->setTimer(animationTimer());
-    yAnimator->setTargetObject(item);
-    yAnimator->setAccessor(new PropertyAccessor("y"));
+    m_yAnimator->setTimer(animationTimer());
+    m_yAnimator->setTargetObject(item);
+    m_yAnimator->setAccessor(new PropertyAccessor("y"));
 
     m_opacityAnimatorGroup->setTimer(animationTimer());
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
@@ -292,19 +292,19 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(QnActions::ToggleTimelineAction)->setChecked(opened);
 
-    yAnimator->stop();
+    m_yAnimator->stop();
     if (opened)
-        yAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::InOutCubic);
     else
-        yAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::OutCubic);
 
-    yAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
+    m_yAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
 
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()
         + (opened ? -item->size().height() : kHidePanelOffset);
     if (animate)
-        yAnimator->animateTo(newY);
+        m_yAnimator->animateTo(newY);
     else
         item->setY(newY);
 
@@ -385,6 +385,14 @@ void TimelineWorkbenchPanel::updateOpacity(bool animate)
 bool TimelineWorkbenchPanel::isHovered() const
 {
     return m_opacityProcessor->isHovered();
+}
+
+QRectF TimelineWorkbenchPanel::effectiveGeometry() const
+{
+    QRectF geometry = item->geometry();
+    if (m_yAnimator->isRunning())
+        geometry.moveTop(m_yAnimator->targetValue().toReal());
+    return geometry;
 }
 
 bool TimelineWorkbenchPanel::isThumbnailsVisible() const

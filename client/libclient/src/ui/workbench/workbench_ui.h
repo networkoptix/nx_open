@@ -139,14 +139,13 @@ public slots:
     void setTimelineVisible(bool visible = true, bool animate = true);
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
-    void setCalendarVisible(bool visible = true, bool animate = true);
 
     void setTreeOpened(bool opened = true, bool animate = true);
     void setTimelineOpened(bool opened = true, bool animate = true);
     void setTitleOpened(bool opened = true, bool animate = true);
     void setNotificationsOpened(bool opened = true, bool animate = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
-    void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+
 
 protected:
     virtual void tick(int deltaMSecs) override;
@@ -159,16 +158,12 @@ protected:
     Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
-    void updateDayTimeWidgetGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
-    QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry);
     void updateActivityInstrumentState();
 
     void setTitleOpacity(qreal opacity, bool animate);
-    void setCalendarOpacity(qreal opacity, bool animate);
 
     bool isHovered() const;
 
@@ -199,17 +194,13 @@ private:
 
 private slots:
     void updateTitleOpacity(bool animate = true);
-    void updateCalendarOpacity(bool animate = true);
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
     void updateTitleOpacityAnimated();
-    void updateCalendarOpacityAnimated();
     void updateCalendarVisibilityAnimated();
     void updateControlsVisibilityAnimated();
-
-    void setCalendarShowButtonUsed(bool used);
 
     void at_freespaceAction_triggered();
     void at_activityStopped();
@@ -220,12 +211,6 @@ private slots:
     void at_controlsWidget_geometryChanged();
 
     void at_titleItem_geometryChanged();
-
-    void at_calendarShowingProcessor_hoverEntered();
-    void at_calendarItem_paintGeometryChanged();
-    void at_dayTimeItem_paintGeometryChanged();
-
-    void at_calendarWidget_dateClicked(const QDate &date);
 
 private:
     /* Global state. */

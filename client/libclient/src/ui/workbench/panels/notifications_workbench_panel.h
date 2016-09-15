@@ -42,6 +42,8 @@ public:
 
     virtual bool isHovered() const override;
 
+    virtual QRectF effectiveGeometry() const override;
+
 private:
     void setShowButtonUsed(bool used);
     void updateControlsGeometry();

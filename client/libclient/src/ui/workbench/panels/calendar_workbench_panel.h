@@ -3,6 +3,7 @@
 #include <ui/workbench/panels/abstract_workbench_panel.h>
 
 class QnMaskedProxyWidget;
+class QnCalendarWidget;
 class QnImageButtonWidget;
 class QnDayTimeWidget;
 class VariantAnimator;
@@ -23,13 +24,13 @@ public:
         QObject* parent = nullptr);
 
     QnMaskedProxyWidget* item;
+    QnCalendarWidget* widget;
     QnImageButtonWidget* pinButton;
     QnImageButtonWidget* dayTimeMinimizeButton;
-    VariantAnimator* sizeAnimator;
+    VariantAnimator* yAnimator;
 
     bool inGeometryUpdate;
     bool inDayTimeGeometryUpdate;
-    bool visible;
     QPoint pinOffset;
 
     bool dayTimeOpened;
@@ -42,9 +43,6 @@ public:
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
     HoverFocusProcessor* hidingProcessor;
 
-    /** Hover processor that is used to show the panel when the mouse hovers over show button. */
-    HoverFocusProcessor* showingProcessor;
-
     /** Hover processor that is used to change panel opacity when mouse hovers over it. */
     HoverFocusProcessor* opacityProcessor;
 
@@ -53,6 +51,12 @@ public:
 
 
 public:
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
+
+    QPointF origin() const;
+    void setOrigin(const QPointF& position);
+
     virtual bool isPinned() const override;
 
     virtual bool isOpened() const override;
@@ -66,8 +70,26 @@ public:
 
     virtual bool isHovered() const override;
 
-private:
+    virtual QRectF effectiveGeometry() const override;
 
+    void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+
+protected:
+    void setProxyUpdatesEnabled(bool updatesEnabled) override;
+
+private:
+    void updateControlsGeometry();
+    void updateDayTimeWidgetGeometry();
+
+private:
+    void at_widget_dateClicked(const QDate &date);
+    void at_dayTimeItem_paintGeometryChanged();
+
+private:
+    bool m_ignoreClickEvent;
+    bool m_visible;
+
+    QPointF m_origin;
 };
 
 } //namespace NxUi

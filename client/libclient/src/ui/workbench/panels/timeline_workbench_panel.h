@@ -28,9 +28,6 @@ public:
     bool zoomingIn;
     bool zoomingOut;
 
-    /** Animator for  position. */
-    VariantAnimator* yAnimator;
-
     qreal lastThumbnailsHeight;
 
 public:
@@ -47,6 +44,8 @@ public:
     virtual void updateOpacity(bool animate) override;
 
     virtual bool isHovered() const override;
+
+    virtual QRectF effectiveGeometry() const override;
 
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
@@ -94,6 +93,9 @@ private:
 
     /** Animator group for panel's opacity. */
     AnimatorGroup* m_opacityAnimatorGroup;
+
+    /** Animator for y position. */
+    VariantAnimator* m_yAnimator;
 };
 
 } //namespace NxUi

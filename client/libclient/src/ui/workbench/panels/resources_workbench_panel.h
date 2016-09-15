@@ -47,6 +47,7 @@ public:
 
     virtual bool isHovered() const override;
 
+    virtual QRectF effectiveGeometry() const override;
 protected:
     void setProxyUpdatesEnabled(bool updatesEnabled) override;
 

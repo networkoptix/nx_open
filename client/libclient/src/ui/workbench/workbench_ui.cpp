@@ -264,8 +264,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setTitleVisible(true, false);
     setTitleUsed(false);
     setNotificationsVisible(true, false);
-    setDayTimeWidgetOpened(false, false);
-    setCalendarVisible(false);
     updateControlsVisibility(false);
 
     setTreeOpened(settings[Qn::WorkbenchPane::Tree].state == Qn::PaneState::Opened, false);
@@ -441,11 +439,6 @@ void QnWorkbenchUi::updateTitleOpacityAnimated()
     updateTitleOpacity(true);
 }
 
-void QnWorkbenchUi::updateCalendarOpacityAnimated()
-{
-    updateCalendarOpacity(true);
-}
-
 void QnWorkbenchUi::updateCalendarVisibilityAnimated()
 {
     updateCalendarVisibility(true);
@@ -503,7 +496,7 @@ void QnWorkbenchUi::updateViewportMargins()
             m_tree ? m_tree->item->size().width() : 0.0,
             m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
             m_titleItem ? m_titleItem->size().height() : 0.0,
-            m_timeline->yAnimator->isRunning() ? m_timeline->yAnimator->targetValue().toReal() : m_timeline->item->pos().y(),
+            m_timeline->effectiveGeometry().top(),
             m_notifications ? m_notifications->xAnimator->isRunning() ? m_notifications->xAnimator->targetValue().toReal() : m_notifications->item->pos().x() : 0.0
         ));
     }
@@ -522,7 +515,7 @@ bool QnWorkbenchUi::isHovered() const
         || (m_tree && m_tree->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notifications && m_notifications->isHovered())
-        || (m_calendar->opacityProcessor      && m_calendar->opacityProcessor->isHovered())
+        || (m_calendar && m_calendar->isHovered())
         ;
 }
 
@@ -851,14 +844,10 @@ void QnWorkbenchUi::updateTreeGeometry()
     {
         sliderPos = QPointF(m_timeline->item->pos().x(), m_controlsWidgetRect.bottom());
     }
-    else if (m_timeline->yAnimator->isRunning())
-    {
-        sliderPos = QPointF(m_timeline->item->pos().x(), m_timeline->yAnimator->targetValue().toReal());
-        defer |= !qFuzzyEquals(sliderPos, m_timeline->item->pos()); /* If animation is running, then geometry sync should be deferred. */
-    }
     else
     {
-        sliderPos = m_timeline->item->pos();
+        sliderPos = m_timeline->effectiveGeometry().topLeft();
+        defer |= !qFuzzyEquals(sliderPos, m_timeline->item->pos()); /* If animation is running, then geometry sync should be deferred. */
     }
 
     /* Calculate title target position. */
@@ -1109,13 +1098,19 @@ void QnWorkbenchUi::setNotificationsVisible(bool visible, bool animate)
         m_notifications->setVisible(visible, animate);
 }
 
-QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
+QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry)
 {
     QPointF pos(
         notificationsGeometry.x(),
         ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
 
-    const qreal maxHeight = (m_timeline->isVisible() ? sliderGeometry.y() : m_controlsWidgetRect.bottom()) - pos.y();
+    qreal top = m_controlsWidgetRect.bottom();
+    if (m_calendar->isOpened())
+        top = m_calendar->effectiveGeometry().top();
+    else if (m_timeline->isVisible() && m_timeline->isOpened())
+        top = m_timeline->effectiveGeometry().top();
+
+    const qreal maxHeight = top - pos.y();
 
     QSizeF size(notificationsGeometry.width(), maxHeight);
     return QRectF(pos, size);
@@ -1126,8 +1121,11 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     if (!m_notifications)
         return;
 
+    qDebug() << "updating notifications geometry";
+
     /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(), m_titleItem->geometry(), m_timeline->item->geometry());
+    QRectF geometry = updatedNotificationsGeometry(m_notifications->item->geometry(),
+        m_titleItem->geometry());
 
     /* Always change position. */
     m_notifications->item->setPos(geometry.topLeft());
@@ -1141,14 +1139,10 @@ void QnWorkbenchUi::updateNotificationsGeometry()
     {
         sliderPos = QPointF(m_timeline->item->pos().x(), m_controlsWidgetRect.bottom());
     }
-    else if (m_timeline->yAnimator->isRunning())
-    {
-        sliderPos = QPointF(m_timeline->item->pos().x(), m_timeline->yAnimator->targetValue().toReal());
-        defer |= !qFuzzyEquals(sliderPos, m_timeline->item->pos()); /* If animation is running, then geometry sync should be deferred. */
-    }
     else
     {
-        sliderPos = m_timeline->item->pos();
+        sliderPos = m_timeline->effectiveGeometry().topLeft();
+        defer |= !qFuzzyEquals(sliderPos, m_timeline->item->pos()); /* If animation is running, then geometry sync should be deferred. */
     }
 
     /* Calculate title target position. */
@@ -1169,8 +1163,7 @@ void QnWorkbenchUi::updateNotificationsGeometry()
 
     /* Calculate target geometry. */
     geometry = updatedNotificationsGeometry(m_notifications->item->geometry(),
-        QRectF(titlePos, m_titleItem->size()),
-        QRectF(sliderPos, m_timeline->item->size()));
+        QRectF(titlePos, m_titleItem->size()));
 
     if (qFuzzyEquals(geometry, m_notifications->item->geometry()))
         return;
@@ -1219,348 +1212,78 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 
 bool QnWorkbenchUi::isCalendarPinned() const
 {
-    return action(QnActions::PinCalendarAction)->isChecked();
+    return m_calendar && m_calendar->isPinned();
 }
 
 bool QnWorkbenchUi::isCalendarOpened() const
 {
-    return action(QnActions::ToggleCalendarAction)->isChecked();
+    return m_calendar && m_calendar->isOpened();
 }
 
 bool QnWorkbenchUi::isCalendarVisible() const
 {
-    return m_calendar->visible;
-}
-
-void QnWorkbenchUi::setCalendarVisible(bool visible, bool animate)
-{
-    ensureAnimationAllowed(animate);
-
-    bool changed = m_calendar->visible != visible;
-
-    m_calendar->visible = visible;
-
-    updateCalendarOpacity(animate);
-    if (changed)
-        updateNotificationsGeometry();
-}
-
-void QnWorkbenchUi::setCalendarOpacity(qreal opacity, bool animate)
-{
-    ensureAnimationAllowed(animate);
-
-    if (animate)
-    {
-        m_calendar->opacityAnimatorGroup->pause();
-        opacityAnimator(m_calendar->item)->setTargetValue(opacity);
-        opacityAnimator(m_calendar->dayTimeItem)->setTargetValue(opacity);
-        opacityAnimator(m_calendar->pinButton)->setTargetValue(opacity);
-        opacityAnimator(m_calendar->dayTimeMinimizeButton)->setTargetValue(opacity);
-        m_calendar->opacityAnimatorGroup->start();
-    }
-    else
-    {
-        m_calendar->opacityAnimatorGroup->stop();
-        m_calendar->item->setOpacity(opacity);
-        m_calendar->dayTimeItem->setOpacity(opacity);
-        m_calendar->pinButton->setOpacity(opacity);
-        m_calendar->dayTimeMinimizeButton->setOpacity(opacity);
-    }
+    return m_calendar && m_calendar->isVisible();
 }
 
 void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
 {
-    if (!opened && isCalendarPinned() && action(QnActions::ToggleCalendarAction)->isChecked())
-        return;
-
-    ensureAnimationAllowed(animate);
-
-    m_calendar->showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
-
-    QSizeF newSize(m_calendar->item->size());
-    if (!opened)
-        newSize.setHeight(0.0);
-
-    if (animate)
-    {
-        m_calendar->sizeAnimator->animateTo(newSize);
-    }
-    else
-    {
-        m_calendar->sizeAnimator->stop();
-        m_calendar->item->setPaintSize(newSize);
-    }
-
-    action(QnActions::ToggleCalendarAction)->setChecked(opened);
-
-    if (!opened)
-        setDayTimeWidgetOpened(opened, animate);
-}
-
-void QnWorkbenchUi::setDayTimeWidgetOpened(bool opened, bool animate)
-{
-    ensureAnimationAllowed(animate);
-
-    m_calendar->dayTimeOpened = opened;
-
-    QSizeF newSize(m_calendar->dayTimeItem->size());
-    if (!opened)
-        newSize.setHeight(0.0);
-
-    if (animate)
-    {
-        m_calendar->dayTimeSizeAnimator->animateTo(newSize);
-    }
-    else
-    {
-        m_calendar->dayTimeSizeAnimator->stop();
-        m_calendar->dayTimeItem->setPaintSize(newSize);
-    }
-}
-
-void QnWorkbenchUi::updateCalendarOpacity(bool animate)
-{
-    const qreal opacity = m_calendar->visible ? NxUi::kOpaque : NxUi::kHidden;
-    setCalendarOpacity(opacity, animate);
+    if (m_calendar)
+        m_calendar->setOpened(opened, animate);
 }
 
 void QnWorkbenchUi::updateCalendarVisibility(bool animate)
 {
-    ensureAnimationAllowed(animate);
+    if (!m_calendar)
+        return;
 
-    bool calendarEmpty = true;
-    if (QnCalendarWidget* c = dynamic_cast<QnCalendarWidget *>(m_calendar->item->widget()))
-        calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
+    /* Small hack. We have a signal that updates visibility if a calendar receive new data */
+    bool calendarEmpty = m_calendar->widget->isEmpty();
+    //TODO: #GDM refactor to the same logic as timeline
 
-    bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & Qn::utc);
-    action(QnActions::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
+    bool calendarEnabled = !calendarEmpty
+        && navigator()->currentWidget()
+        && navigator()->currentWidget()->resource()->flags().testFlag(Qn::utc);
+    m_calendar->setEnabled(calendarEnabled);
 
-    bool calendarVisible = calendarEnabled && m_timeline->isVisible() && isTimelineOpened();
-    setCalendarVisible(calendarVisible && (!m_inactive || isHovered()), animate);
+    bool calendarVisible = calendarEnabled
+        && (!m_inactive || m_timeline->isHovered())
+        && m_timeline->isVisible()
+        && m_timeline->isOpened();
 
     if (!calendarVisible)
-        setCalendarOpened(false);
-}
-
-QRectF QnWorkbenchUi::updatedCalendarGeometry(const QRectF &sliderGeometry)
-{
-    QRectF geometry = m_calendar->item->paintGeometry();
-    geometry.moveRight(m_controlsWidgetRect.right());
-    geometry.moveBottom(sliderGeometry.top());
-    return geometry;
+        m_calendar->setOpened(false, animate);
+    else if (m_calendar->isPinned())
+        m_calendar->setOpened(true, animate);
 }
 
 void QnWorkbenchUi::updateCalendarGeometry()
 {
-    /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedCalendarGeometry(m_timeline->item->geometry());
-    m_calendar->item->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
-
-    /* Always change position. */
-    m_calendar->item->setPos(geometry.topLeft());
-}
-
-QRectF QnWorkbenchUi::updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry)
-{
-    QRectF geometry = m_calendar->dayTimeItem->paintGeometry();
-    geometry.moveRight(sliderGeometry.right());
-    geometry.moveBottom(calendarGeometry.top());
-    return geometry;
-}
-
-void QnWorkbenchUi::updateDayTimeWidgetGeometry()
-{
-    /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedDayTimeWidgetGeometry(m_timeline->item->geometry(), m_calendar->item->geometry());
-    m_calendar->dayTimeItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
-
-    /* Always change position. */
-    m_calendar->dayTimeItem->setPos(geometry.topLeft());
-}
-
-void QnWorkbenchUi::setCalendarShowButtonUsed(bool used)
-{
-    m_timeline->item->calendarButton()->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
-}
-
-void QnWorkbenchUi::at_calendarShowingProcessor_hoverEntered()
-{
-    if (!isCalendarPinned() && !isCalendarOpened())
-    {
-        setCalendarOpened(true);
-
-        /* So that the click that may follow won't hide it. */
-        setCalendarShowButtonUsed(false);
-        QTimer::singleShot(NxUi::kButtonInactivityTimeoutMs, this, [this]() { setCalendarShowButtonUsed(true); });
-    }
-
-    m_calendar->hidingProcessor->forceHoverEnter();
-    m_calendar->opacityProcessor->forceHoverEnter();
-}
-
-void QnWorkbenchUi::at_calendarItem_paintGeometryChanged()
-{
-    const QRectF paintGeometry = m_calendar->item->paintGeometry();
-    m_calendar->pinButton->setPos(paintGeometry.topRight() + m_calendar->pinOffset);
-    m_calendar->pinButton->setVisible(!paintGeometry.isEmpty());
-
-    if (m_calendar->inGeometryUpdate)
-        return;
-
-    QN_SCOPED_VALUE_ROLLBACK(&m_calendar->inGeometryUpdate, true);
-
-    updateCalendarGeometry();
-    updateDayTimeWidgetGeometry();
-    updateNotificationsGeometry();
-}
-
-void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged()
-{
-    const QRectF paintGeomerty = m_calendar->dayTimeItem->paintGeometry();
-    m_calendar->dayTimeMinimizeButton->setPos(paintGeomerty.topRight() + m_calendar->dayTimeOffset);
-    m_calendar->dayTimeMinimizeButton->setVisible(paintGeomerty.height());
-
-    if (m_calendar->inDayTimeGeometryUpdate)
-        return;
-
-    QN_SCOPED_VALUE_ROLLBACK(&m_calendar->inDayTimeGeometryUpdate, true);
-
-    updateDayTimeWidgetGeometry();
-    updateNotificationsGeometry();
-}
-
-void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date)
-{
-    const bool sameDate = (m_calendar->dayTimeWidget->date() == date);
-    m_calendar->dayTimeWidget->setDate(date);
-
-    if (isCalendarOpened())
-    {
-        const bool shouldBeOpened = !sameDate || !m_calendar->dayTimeOpened;
-        setDayTimeWidgetOpened(shouldBeOpened, true);
-    }
+    QRectF geometry = m_calendar->item->geometry();
+    geometry.moveRight(m_controlsWidgetRect.right());
+    geometry.moveBottom(m_timeline->effectiveGeometry().top());
+    m_calendar->setOrigin(geometry.topLeft());
 }
 
 void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
 {
     m_calendar = new NxUi::CalendarWorkbenchPanel(settings, m_controlsWidget, this);
-    m_calendar->inGeometryUpdate = false;
-    m_calendar->visible = false;
-    m_calendar->dayTimeOpened = false;
-    m_calendar->inDayTimeGeometryUpdate = false;
 
-    QnCalendarWidget* calendarWidget = new QnCalendarWidget();
-    setHelpTopic(calendarWidget, Qn::MainWindow_Calendar_Help);
-    navigator()->setCalendar(calendarWidget);
+    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
+        &QnWorkbenchUi::updateNotificationsGeometry);
 
-    m_calendar->dayTimeWidget = new QnDayTimeWidget();
-    setHelpTopic(m_calendar->dayTimeWidget, Qn::MainWindow_DayTimePicker_Help);
-    navigator()->setDayTimeWidget(m_calendar->dayTimeWidget);
+    connect(m_calendar, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateNotificationsGeometry);
 
-    m_calendar->item = new QnMaskedProxyWidget(m_controlsWidget);
-    m_calendar->item->setWidget(calendarWidget);
-    calendarWidget->installEventFilter(m_calendar->item);
-    m_calendar->item->resize(250, 192);
-
-    m_calendar->item->setProperty(Qn::NoHandScrollOver, true);
-
-    const auto pinCalendarAction = action(QnActions::PinCalendarAction);
-    pinCalendarAction->setChecked(settings.state != Qn::PaneState::Unpinned);
-    m_calendar->pinButton = NxUi::newPinButton(m_controlsWidget, context(), pinCalendarAction, true);
-    m_calendar->pinButton->setFocusProxy(m_calendar->item);
-
-    const auto toggleCalendarAction = action(QnActions::ToggleCalendarAction);
-    toggleCalendarAction->setChecked(settings.state == Qn::PaneState::Opened);
-
-    m_calendar->dayTimeItem = new QnMaskedProxyWidget(m_controlsWidget);
-    m_calendar->dayTimeItem->setWidget(m_calendar->dayTimeWidget);
-    m_calendar->dayTimeWidget->installEventFilter(m_calendar->item);
-    m_calendar->dayTimeItem->resize(250, 120);
-    m_calendar->dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
-    m_calendar->dayTimeItem->stackBefore(m_calendar->item);
-
-    m_calendar->dayTimeMinimizeButton = NxUi::newActionButton(m_controlsWidget, context(), action(QnActions::MinimizeDayTimeViewAction), Qn::Empty_Help);
-    m_calendar->dayTimeMinimizeButton->setFocusProxy(m_calendar->dayTimeItem);
-
-    m_calendar->opacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_calendar->opacityProcessor->addTargetItem(m_calendar->item);
-    m_calendar->opacityProcessor->addTargetItem(m_calendar->dayTimeItem);
-    m_calendar->opacityProcessor->addTargetItem(m_calendar->pinButton);
-    m_calendar->opacityProcessor->addTargetItem(m_calendar->dayTimeMinimizeButton);
-
-    m_calendar->hidingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_calendar->hidingProcessor->addTargetItem(m_calendar->item);
-    m_calendar->hidingProcessor->addTargetItem(m_calendar->dayTimeItem);
-    m_calendar->hidingProcessor->addTargetItem(m_calendar->pinButton);
-    m_calendar->hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    m_calendar->hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
-
-    m_calendar->showingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_calendar->showingProcessor->setHoverEnterDelay(NxUi::kOpenPanelTimeoutMs);
-
-    m_calendar->sizeAnimator = new VariantAnimator(this);
-    m_calendar->sizeAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_calendar->sizeAnimator->setTargetObject(m_calendar->item);
-    m_calendar->sizeAnimator->setAccessor(new PropertyAccessor("paintSize"));
-    m_calendar->sizeAnimator->setSpeed(100.0 * 2.0);
-    m_calendar->sizeAnimator->setTimeLimit(500);
-
-    m_calendar->dayTimeSizeAnimator = new VariantAnimator(this);
-    m_calendar->dayTimeSizeAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_calendar->dayTimeSizeAnimator->setTargetObject(m_calendar->dayTimeItem);
-    m_calendar->dayTimeSizeAnimator->setAccessor(new PropertyAccessor("paintSize"));
-    m_calendar->dayTimeSizeAnimator->setSpeed(100.0 * 2.0);
-    m_calendar->dayTimeSizeAnimator->setTimeLimit(500);
-
-    m_calendar->opacityAnimatorGroup = new AnimatorGroup(this);
-    m_calendar->opacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_calendar->opacityAnimatorGroup->addAnimator(opacityAnimator(m_calendar->item));
-    m_calendar->opacityAnimatorGroup->addAnimator(opacityAnimator(m_calendar->dayTimeItem));
-    m_calendar->opacityAnimatorGroup->addAnimator(opacityAnimator(m_calendar->pinButton));
-    m_calendar->opacityAnimatorGroup->addAnimator(opacityAnimator(m_calendar->dayTimeMinimizeButton));
-
-    connect(calendarWidget, &QnCalendarWidget::emptyChanged, this,
+    connect(m_calendar->widget, &QnCalendarWidget::emptyChanged, this,
         &QnWorkbenchUi::updateCalendarVisibilityAnimated);
-    connect(calendarWidget, &QnCalendarWidget::dateClicked, this,
-        &QnWorkbenchUi::at_calendarWidget_dateClicked);
-    connect(m_calendar->dayTimeItem, &QnMaskedProxyWidget::paintRectChanged, this,
-        &QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged);
-    connect(m_calendar->dayTimeItem, &QGraphicsWidget::geometryChanged, this,
-        &QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged);
-    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
-        &QnWorkbenchUi::updateCalendarOpacityAnimated);
-    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::updateCalendarOpacityAnimated);
-    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
-        &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_calendar->hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
-        [this]
-        {
-            setCalendarOpened(false);
-        });
-    connect(m_calendar->showingProcessor, &HoverFocusProcessor::hoverEntered, this,
-        &QnWorkbenchUi::at_calendarShowingProcessor_hoverEntered);
-    connect(m_calendar->item, &QnMaskedProxyWidget::paintRectChanged, this,
-        &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
-    connect(m_calendar->item, &QGraphicsWidget::geometryChanged, this,
-        &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
-    connect(toggleCalendarAction, &QAction::toggled, this,
-        [this](bool checked)
-        {
-            setCalendarOpened(checked);
-        });
-    connect(action(QnActions::MinimizeDayTimeViewAction), &QAction::triggered, this,
-        [this]
-        {
-            setDayTimeWidgetOpened(false, true);
-        });
 
-    static const int kCellsCountOffset = 2;
-    const int size = calendarWidget->headerHeight();
-    m_calendar->pinOffset = QPoint(-kCellsCountOffset * size, 0.0);
-    m_calendar->dayTimeOffset = QPoint(-m_calendar->dayTimeWidget->headerHeight(), 0);
+
+    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
+        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(m_calendar->opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
+        &QnWorkbenchUi::updateControlsVisibilityAnimated);
+
+
 }
 
 #pragma endregion Calendar and DayTime widget methods
@@ -1590,9 +1313,6 @@ void QnWorkbenchUi::setTimelineOpened(bool opened, bool animate)
         opened = true;
 
     m_timeline->setOpened(opened, animate);
-
-    updateCalendarVisibility(animate);
-    m_inFreespace &= !opened;
 }
 
 void QnWorkbenchUi::setTimelineVisible(bool visible, bool animate)
@@ -1605,18 +1325,21 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     m_timeline = new NxUi::TimelineWorkbenchPanel(settings, m_controlsWidget, this);
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::openedChanged, this,
-        [this](bool opened)
+        [this](bool opened, bool animated)
         {
             if (opened && m_timeline->isPinned())
                 m_inFreespace = false;
+            if (!opened)
+                setCalendarOpened(false, animated);
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        [this](bool /*value*/, bool animated)
+        [this](bool value, bool animated)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
-            updateCalendarVisibility(animated);
+            if (!value)
+                setCalendarOpened(false, animated);
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
@@ -1631,26 +1354,18 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateNotificationsGeometry();
             updateViewportMargins();
             updateCalendarGeometry();
-            updateDayTimeWidgetGeometry();
         });
 
     /*
-    Calendar is created before navigation slider (alot of logic relies on that).
-    Therefore we have to bind calendar showing/hiding processors to navigation
-    pane button "CLND" here and not in createCalendarWidget()
-    */
-    m_calendar->hidingProcessor->addTargetItem(m_timeline->item->calendarButton());
+     * Calendar is created before navigation slider (alot of logic relies on that).
+     * Therefore we have to bind calendar showing/hiding processors to navigation
+     * pane button "CLND" here and not in createCalendarWidget()
+     */
+    if (m_calendar)
+        m_calendar->hidingProcessor->addTargetItem(m_timeline->item->calendarButton());
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-
-    if (qnRuntime->isVideoWallMode())
-    {
-        connect(navigator(), &QnWorkbenchNavigator::positionChanged, this,
-            &QnWorkbenchUi::updateCalendarVisibilityAnimated);
-        connect(navigator(), &QnWorkbenchNavigator::speedChanged, this,
-            &QnWorkbenchUi::updateCalendarVisibilityAnimated);
-    }
 
     connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
