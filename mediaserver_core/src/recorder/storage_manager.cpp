@@ -2125,7 +2125,8 @@ bool QnStorageManager::renameFileWithDuration(
     for (int i = 1; i < nameParts.size(); ++i)
         newName += lit(".") + nameParts[i];
 
-    return storage->renameFile(oldName, fpath + newName);
+    newName = fpath + newName;
+    return storage->renameFile(oldName, newName);
 }
 
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
