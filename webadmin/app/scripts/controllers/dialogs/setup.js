@@ -226,6 +226,7 @@ angular.module('webadminApp')
                 'CONFIGURATION_ERROR':'fail',
 
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':'fail',
+                'BOTH_SYSTEM_BOUND_TO_CLOUD':'fail',
                 'DIFFERENT_CLOUD_HOST':'fail'
             };
             return errorClasses[error] || 'fail';
@@ -248,6 +249,7 @@ angular.module('webadminApp')
 
 
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD': L.join.cloudError,
+                'BOTH_SYSTEM_BOUND_TO_CLOUD': L.join.cloudError,
                 'DIFFERENT_CLOUD_HOST':L.join.cloudHostConflict,
 
                 'currentPassword': L.join.incorrectCurrentPassword,
