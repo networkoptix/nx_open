@@ -134,8 +134,8 @@ void QnVideoStreamDisplay::freeScaleContext()
 }
 
 QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QSet<QnAbstractRenderer*> renderList,
-                                                                          int channelNumber, 
-                                                                          int srcWidth, int srcHeight, 
+                                                                          int channelNumber,
+                                                                          int srcWidth, int srcHeight,
                                                                           QnFrameScaler::DownscaleFactor force_factor)
 {
     for (QnAbstractRenderer* render: renderList) {
@@ -152,7 +152,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QSet<Q
             on_screen.setHeight(qMax(on_screen.height(), size.height()));
         }
         /* Check if item size is not calculated yet. */
-        if (on_screen.isEmpty()) {  
+        if (on_screen.isEmpty()) {
             on_screen.setHeight(srcHeight);
             on_screen.setWidth(srcWidth);
         }
@@ -204,14 +204,14 @@ void QnVideoStreamDisplay::reorderPrevFrames()
         return;
     // find latest GOP (or several GOP. Decoder can add 1-3 (or even more) gops at once as 1 reverse block)
     int i = m_reverseQueue.size()-1;
-    for (; i >= 0; --i) 
+    for (; i >= 0; --i)
     {
         if (m_reverseQueue[i]->flags & AV_REVERSE_REORDERED)
             break;
-        if ((m_reverseQueue[i]->flags & AV_REVERSE_BLOCK_START) || i == 0) 
+        if ((m_reverseQueue[i]->flags & AV_REVERSE_BLOCK_START) || i == 0)
         {
             std::reverse(m_reverseQueue.begin() + i, m_reverseQueue.end());
-            for (int j = i; j < m_reverseQueue.size(); ++j) 
+            for (int j = i; j < m_reverseQueue.size(); ++j)
                 m_reverseQueue[j]->flags |= AV_REVERSE_REORDERED;
             return;
         }
@@ -219,7 +219,7 @@ void QnVideoStreamDisplay::reorderPrevFrames()
     i++;
     if (i < m_reverseQueue.size()) {
         std::reverse(m_reverseQueue.begin() + i, m_reverseQueue.end());
-        for (int j = i; j < m_reverseQueue.size(); ++j) 
+        for (int j = i; j < m_reverseQueue.size(); ++j)
             m_reverseQueue[j]->flags |= AV_REVERSE_REORDERED;
     }
 }
@@ -234,7 +234,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
         //int prevIndex = -1;
         int maxStart = 0;
 
-        for (int i = 0; i < m_reverseQueue.size(); ++i) 
+        for (int i = 0; i < m_reverseQueue.size(); ++i)
         {
             if (m_reverseQueue[i]->data[0])
             {
@@ -248,7 +248,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
             }
         }
         int index;
-        if (maxInterval == 1) 
+        if (maxInterval == 1)
         {
             // every 2-nd frame already dropped. Change strategy. Increase min hole interval by 1
             int minHole = INT_MAX;
@@ -326,7 +326,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = channelNum;
 
-    foreach(QnAbstractRenderer* render, m_renderList) 
+    foreach(QnAbstractRenderer* render, m_renderList)
     {
         if (render->isDisplaying(outFrame))
             render->finishPostedFramesRender(channelNum);
@@ -337,7 +337,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     m_mtx.lock();
 
     QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
-    while (dec->decode(emptyData, &tmpFrame)) 
+    while (dec->decode(emptyData, &tmpFrame))
     {
         calcSampleAR(outFrame, dec);
 
@@ -365,7 +365,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
 void QnVideoStreamDisplay::updateRenderList()
 {
     QnMutexLocker lock( &m_renderListMtx );
-    if (m_renderListModified) 
+    if (m_renderListModified)
     {
         foreach(QnAbstractRenderer* renderer, m_newList)
             renderer->inUse();
@@ -414,9 +414,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             m_queueWasFilled = false;
         }
     }
-    else 
+    else
     {
-        if (m_bufferedFrameDisplayer) 
+        if (m_bufferedFrameDisplayer)
         {
             m_bufferedFrameDisplayer->waitForFramesDisplayed();
             //overrideTimestampOfNextFrameToRender(m_bufferedFrameDisplayer->getTimestampOfNextFrameToRender());
@@ -438,7 +438,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         }
         m_queueUsed = false;
     }
-    
+
     if (m_needReinitDecoders) {
         QnMutexLocker lock( &m_mtx );
         foreach(QnAbstractVideoDecoder* decoder, m_decoder)
@@ -475,7 +475,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         m_decoder.insert(data->compressionType, dec);
     }
 
-    if (reverseMode != m_prevReverseMode || m_needResetDecoder) 
+    if (reverseMode != m_prevReverseMode || m_needResetDecoder)
     {
         clearReverseQueue();
         QnMutexLocker lock( &m_mtx );
@@ -502,7 +502,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
          scaleFactor != QnFrameScaler::factor_1);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
-    
+
     foreach(QnAbstractRenderer* render, m_renderList) {
         if (render->isDisplaying(outFrame))
             render->waitForFrameDisplayed(data->channelNumber);
@@ -526,7 +526,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if ((data->flags & AV_REVERSE_BLOCK_START) && m_decodeMode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
         QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
-        while (dec->decode(emptyData, &m_tmpFrame)) 
+        while (dec->decode(emptyData, &m_tmpFrame))
         {
             QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
             if (!downscaleFrame(m_tmpFrame, tmpOutFrame, scaleFactor, pixFmt))
@@ -569,7 +569,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             else
                 return Status_Buffered;
         }
-        if (m_bufferedFrameDisplayer) 
+        if (m_bufferedFrameDisplayer)
         {
             dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full); // do not skip more 1 frame in a row
             return Status_Buffered;
@@ -599,7 +599,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         outFrame->pkt_dts = data->timestamp;
     }
     */
-    
+
 
     if (m_flushedBeforeReverseStart) {
         data->flags |= AV_REVERSE_BLOCK_START;
@@ -650,7 +650,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
     outFrame->flags |= data->flags;
     //outFrame->pts = data->timestamp;
-    if (reverseMode) 
+    if (reverseMode)
     {
         if (outFrame->flags & AV_REVERSE_BLOCK_START)
             reorderPrevFrames();
@@ -707,13 +707,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     if (dec->getWidth() > 0) {
         scaleFactor = determineScaleFactor(m_renderList, channel, dec->getWidth(), dec->getHeight(), force_factor);
     }
-    
+
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
 
     foreach(QnAbstractRenderer* render, m_renderList)
         render->finishPostedFramesRender(channel);
     outFrame->channel = channel;
-    
+
     m_mtx.lock();
 
     if (!dec->decode(QnCompressedVideoDataPtr(), &m_tmpFrame))
@@ -749,7 +749,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
 
     if( outFrame->data[0] || outFrame->picData.data() )
     {
-        if (enableFrameQueue) 
+        if (enableFrameQueue)
         {
             Q_ASSERT(!outFrame->isExternalData());
             if (m_bufferedFrameDisplayer)
@@ -889,18 +889,18 @@ void QnVideoStreamDisplay::setSpeed(float value)
 }
 
 /*
-qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const 
-{ 
+qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
+{
     QnMutexLocker lock( &m_timeMutex );
     if (m_drawer && m_timeChangeEnabled)
         return m_drawer->lastDisplayedTime(m_channelNumber);
     else
-        return m_lastDisplayedTime; 
+        return m_lastDisplayedTime;
 }
 */
 
 void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)
-{ 
+{
     foreach(QnAbstractRenderer* render, m_renderList)
     {
         render->blockTimeValue(m_channelNumber, value);
@@ -911,14 +911,14 @@ void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)
     }
 }
 
-qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const 
+qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
 {
     if (m_renderList.isEmpty())
         return AV_NOPTS_VALUE;
     foreach(QnAbstractRenderer* renderer, m_renderList)
     {
         QnResourceWidgetRenderer* r = dynamic_cast<QnResourceWidgetRenderer*>(renderer);
-        if (r && r->isEnabled(m_channelNumber)) 
+        if (r && r->isEnabled(m_channelNumber))
             return r->getTimestampOfNextFrameToRender(m_channelNumber);
     }
 
@@ -995,7 +995,7 @@ void QnVideoStreamDisplay::clearReverseQueue()
 {
     foreach(QnAbstractRenderer* render, m_renderList)
         render->finishPostedFramesRender(0);
-    
+
     QnMutexLocker lock( &m_mtx );
     m_reverseQueue.clear();
     m_reverseSizeInBytes = 0;
@@ -1032,10 +1032,12 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
 
-    /* Do not take local screenshot if displayed frame has different size. 
-       Checking only height because width can be modified by forced AR. */
+#if 0
+    // Current client version supports all image filters locally.
+    // No need to take screen shot from a server at this case any more.
     if (!anyQuality && m_lastDisplayedFrame->height != m_imageSize.height())
-        return CLVideoDecoderOutputPtr();    //screenshot will be received from the server      
+        return CLVideoDecoderOutputPtr();    //screen shot will be received from the server
+#endif
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     if (!m_decoder.isEmpty())
@@ -1086,7 +1088,7 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
         if( (*outFrame)->format == PIX_FMT_YUV420P )
         {
             // optimization
-            for (int i = 0; i < 3; ++ i) 
+            for (int i = 0; i < 3; ++ i)
             {
                 int h = lastFrame->height >> (i > 0 ? 1 : 0);
                 memcpy( (*outFrame)->data[i], lastFrame->data[i], lastFrame->linesize[i]* h );
