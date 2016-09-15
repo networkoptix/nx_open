@@ -45,12 +45,6 @@ QnTimeSliderColors::QnTimeSliderColors() {
     tickmarkText.push_back(QColor(255, 255, 255, 255));
 }
 
-QnTimeScrollBarColors::QnTimeScrollBarColors() {
-    indicator = QColor(255, 255, 255, 255);
-    border = QColor(255, 255, 255, 64);
-    handle = QColor(255, 255, 255, 48);
-}
-
 QnBackgroundColors::QnBackgroundColors() {
     normal = QColor(0, 0, 255, 51);
     panic = QColor(255, 0, 0, 255);

@@ -31,6 +31,7 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::ConnectionResult::LdapTemporaryUnauthorized:
         case Qn::ConnectionResult::CloudTemporaryUnauthorized:
         case Qn::ConnectionResult::IncompatibleInternal:
+        case Qn::ConnectionResult::IncompatibleCloudHost:
             return Qn::Login_Help;
         case Qn::ConnectionResult::IncompatibleVersion:
         case Qn::ConnectionResult::IncompatibleProtocol:
@@ -72,6 +73,7 @@ QString QnConnectionDiagnosticsHelper::getErrorString(
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
             + strings(ErrorStrings::ContactAdministrator);
     case Qn::ConnectionResult::IncompatibleInternal:
+    case Qn::ConnectionResult::IncompatibleCloudHost:
         return tr("You are trying to connect to incompatible Server.");
     case Qn::ConnectionResult::IncompatibleVersion:
     {

@@ -824,6 +824,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LdapTemporaryUnauthorized,  /*< LDAP server is not accessible. */
         CloudTemporaryUnauthorized, /*< CLOUD server is not accessible. */
         IncompatibleInternal,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleCloudHost,      /*< Server has different cloud host. */
         IncompatibleVersion,        /*< Server version is too low. */
         IncompatibleProtocol        /*< Ec2 protocol versions differs.*/
     };

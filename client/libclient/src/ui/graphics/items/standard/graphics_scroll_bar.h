@@ -13,14 +13,14 @@ class GraphicsScrollBar : public AbstractLinearGraphicsSlider {
 public:
     explicit GraphicsScrollBar(QGraphicsItem *parent = 0);
     explicit GraphicsScrollBar(Qt::Orientation, QGraphicsItem *parent = 0);
-    ~GraphicsScrollBar();
+    virtual ~GraphicsScrollBar();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
 
 protected:
     GraphicsScrollBar(GraphicsScrollBarPrivate &dd, Qt::Orientation orientation, QGraphicsItem *parent);
 
-    virtual bool event(QEvent *event) override;
+    virtual bool sceneEvent(QEvent *event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) override;
