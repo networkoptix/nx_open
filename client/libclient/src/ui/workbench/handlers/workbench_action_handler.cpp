@@ -1095,7 +1095,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered()
         url.setPath(lit("/static/index.html"));
 
         url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-        if (url.host() != server->getApiUrl().host())
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
             return;
 
         QDesktopServices::openUrl(url);
