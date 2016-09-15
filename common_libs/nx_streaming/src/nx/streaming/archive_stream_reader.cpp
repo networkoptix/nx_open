@@ -652,7 +652,7 @@ begin_label:
                 {
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
-                    internalJumpTo(qnSyncTime->currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP);
+                    internalJumpTo(qnSyncTime->currentMSecsSinceEpoch() * 1000 - BACKWARD_SEEK_STEP);
                     m_afterBOFCounter = 0;
                     goto begin_label;
                 }
@@ -699,7 +699,7 @@ begin_label:
                                 seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
                             }
                             else {
-                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch() * 1000;
                                 seekTime = m_topIFrameTime - LIVE_SEEK_OFFSET;
                             }
                         }
@@ -712,12 +712,12 @@ begin_label:
                     {
                         // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
                         // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
-                        qint64 ct = m_currentTime != DATETIME_NOW ? m_currentTime-BACKWARD_SEEK_STEP : m_currentTime;
+                        qint64 ct = m_currentTime != DATETIME_NOW ? m_currentTime - BACKWARD_SEEK_STEP : m_currentTime;
                         seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : ct);
                         if (seekTime != DATETIME_NOW)
                             seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
                         else
-                            seekTime = qnSyncTime->currentMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
+                            seekTime = qnSyncTime->currentMSecsSinceEpoch() * 1000 - BACKWARD_SEEK_STEP;
                     }
 
                     if (m_currentTime != seekTime) {
@@ -743,9 +743,11 @@ begin_label:
                 //return getNextData();
                 goto begin_label;
             }
-        }
+        } // negative speed
+    } // videoData || eof
 
-
+    if (videoData) // in case of video packet
+    {
         if (m_skipFramesToTime)
         {
             if (!m_nextData)
