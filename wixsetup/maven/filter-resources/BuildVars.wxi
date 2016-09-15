@@ -1,5 +1,5 @@
 <Include>
-    <?define cloudHost = "${cloud.host}"?>
+    <?define cloudHost = "${cloudHost}"?>
 
     <?define arch = "${arch}"?>
     <?define vmax = "${vmax}"?>
