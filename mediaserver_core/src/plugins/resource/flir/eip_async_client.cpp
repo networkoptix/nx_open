@@ -1,17 +1,16 @@
 #include "eip_async_client.h"
 #include <utils/common/log.h>
+#include <chrono>
 
-namespace
-{
+namespace {
     const size_t kReceiveBufferSize = 1024*50;
-    const int kSendTimeout = 4000;
-    const int kReceiveTimeout = 4000; 
-}
-
+    const std::chrono::milliseconds kSendTimeout(4000);
+    const std::chrono::milliseconds kReceiveTimeout(4000);
+} //namespace
 
 EIPAsyncClient::EIPAsyncClient(QString hostAddress) :
     m_hostAddress(hostAddress),
-    m_port(kEipPort),
+    m_port(kDefaultEipPort),
     m_terminated(false),
     m_inProcess(false),
     m_hasPendingRequest(false),
@@ -50,8 +49,8 @@ bool EIPAsyncClient::initSocket()
     m_socket.reset(SocketFactory::createStreamSocket());
 
     bool success = m_socket->setNonBlockingMode(true)
-        && m_socket->setSendTimeout(kSendTimeout)
-        && m_socket->setRecvTimeout(kReceiveTimeout);
+        && m_socket->setSendTimeout(kSendTimeout.count())
+        && m_socket->setRecvTimeout(kReceiveTimeout.count());
 
     m_currentState = success ? EIPClientState::NeedSession : EIPClientState::Error;
 
@@ -194,45 +193,41 @@ void EIPAsyncClient::resetBuffers()
 
 void EIPAsyncClient::processState()
 {   
-    if(m_currentState == EIPClientState::NeedSession)
+    switch (m_currentState)
     {
-        resetBuffers();
-        registerSessionAsync();
-    }
-    else if(m_currentState == EIPClientState::ReadyToRequest)
-    {
-        resetBuffers();
-        if(m_hasPendingRequest) 
-            doServiceRequestAsyncInternal(m_pendingRequest);
-    }
-    else if(m_currentState == EIPClientState::DataWasRead)
-    {
-        processPacket(m_recvBuffer);
-        m_inProcess = false;
-        m_currentState = EIPClientState::ReadyToRequest;
+        case EIPClientState::NeedSession:
+            resetBuffers();
+            registerSessionAsync();
+            break;
+        case EIPClientState::ReadyToRequest:
+            resetBuffers();
+            if(m_hasPendingRequest)
+                doServiceRequestAsyncInternal(m_pendingRequest);
+            break;
+        case EIPClientState::DataWasRead:
+            processPacket(m_recvBuffer);
+            m_inProcess = false;
+            m_currentState = EIPClientState::ReadyToRequest;
 
-        m_mutex.unlock();
-        emit done();
-        m_mutex.lock();
-    }
-    else if(m_currentState == EIPClientState::Error)
-    {
-        resetBuffers();
-        m_socket.reset();
-        m_inProcess = false;
+            m_mutex.unlock();
+            emit done();
+            m_mutex.lock();
+            break;
+        case EIPClientState::Error:
+            resetBuffers();
+            m_socket.reset();
+            m_inProcess = false;
 
-        m_mutex.unlock();
-        emit done();
-        m_mutex.lock();
-    }
-    else
-    {
-        qDebug() << "Size/Capacity" << m_recvBuffer.size() << m_recvBuffer.capacity();
-        m_socket->readSomeAsync(
-            &m_recvBuffer,
-            std::bind(
-                &EIPAsyncClient::onSomeBytesReadAsync, this,
-                m_socket, std::placeholders::_1, std::placeholders::_2));
+            m_mutex.unlock();
+            emit done();
+            m_mutex.lock();
+            break;
+        default:
+            m_socket->readSomeAsync(
+                &m_recvBuffer,
+                std::bind(
+                    &EIPAsyncClient::onSomeBytesReadAsync, this,
+                    m_socket, std::placeholders::_1, std::placeholders::_2));
     }
 }
 

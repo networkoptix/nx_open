@@ -7,12 +7,11 @@
 
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
-namespace
-{
-    const int kIOCheckTimeout = 1000;
-    const int kAlarmCheckTimeout = 300;
+namespace {
+    const std::chrono::milliseconds kIOCheckTimeout(1000);
+    const std::chrono::milliseconds kAlarmCheckTimeout(300);
     const QString kAlarmsCountParamName("alarmsCount");
-}
+} //namespace
 
 QnFlirEIPResource::QnFlirEIPResource() :
     m_inputPortMonitored(false),
@@ -42,9 +41,9 @@ CameraDiagnostics::Result QnFlirEIPResource::initInternal()
     m_alarmsEipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
 
     // Just to ensure that the camera is alive
-    auto client = std::make_shared<SimpleEIPClient>(getHostAddress());
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
     if (!client->registerSession())
-        return CameraDiagnostics::CannotEstablishConnectionResult(44818);
+        return CameraDiagnostics::CannotEstablishConnectionResult(kDefaultEipPort);
 
     setCameraCapabilities(
         Qn::PrimaryStreamSoftMotionCapability |
@@ -328,12 +327,8 @@ QString QnFlirEIPResource::parseEIPResponse(const MessageRouterResponse &respons
     return data;
 }
 
-bool QnFlirEIPResource::commitParam(const QnCameraAdvancedParameter &param)
+bool QnFlirEIPResource::commitParam(const QnCameraAdvancedParameter &param, SimpleEIPClient* eipClient)
 {
-    auto client = std::make_shared<SimpleEIPClient>(getHostAddress());
-    if (!client->registerSession())
-        return false;    
-
     const auto commitCmd = param.writeCmd;
     if(commitCmd.isEmpty())
         return false;
@@ -345,11 +340,13 @@ bool QnFlirEIPResource::commitParam(const QnCameraAdvancedParameter &param)
     request.data[0] = commitCmd.size();
     request.data.append(commitCmd.toLatin1());
     request.data[request.data.size()] = 0x01;
-    auto response = client->doServiceRequest(request);
+    auto response = eipClient->doServiceRequest(request);
     return true;
 }
 
-bool  QnFlirEIPResource::handleButtonParam(const QnCameraAdvancedParameter &param)
+bool  QnFlirEIPResource::handleButtonParam(
+    const QnCameraAdvancedParameter &param,
+    SimpleEIPClient* eipClient)
 {
     CIPPath path = parseParamCIPPath(param);
     QByteArray data;
@@ -370,11 +367,7 @@ bool  QnFlirEIPResource::handleButtonParam(const QnCameraAdvancedParameter &para
     request.data = data;
     request.pathSize = (path.attributeId == 0 ? 2 : 3);
 
-    auto client = std::make_shared<SimpleEIPClient>(getHostAddress());
-    if(!client->registerSession())
-        return false;
-
-    auto response = client->doServiceRequest(request);
+    auto response = eipClient->doServiceRequest(request);
     return (response.generalStatus == CIPGeneralStatus::kSuccess);
 }
 
@@ -387,7 +380,7 @@ bool QnFlirEIPResource::getParamPhysical(const QString &id, QString &value)
 
     const auto eipRequest = buildEIPGetRequest(param);
 
-    auto client = std::make_shared<SimpleEIPClient>(getHostAddress());
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
     if (!client->registerSession())
         return false;    
 
@@ -406,16 +399,15 @@ bool QnFlirEIPResource::setParamPhysical(const QString &id, const QString &value
     bool res = false;
     const auto param  =  m_advancedParameters.getParameterById(id);
 
-    if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
-        return handleButtonParam(param);
-
-    const auto eipRequest = buildEIPSetRequest(param, value);
-
-    auto client = std::make_shared<SimpleEIPClient>(getHostAddress());
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
     if (!client->registerSession())
         return false;
 
-    const auto response = client->doServiceRequest(eipRequest);
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
+        return handleButtonParam(param, client.get());
+
+    const auto response = client
+        ->doServiceRequest(buildEIPSetRequest(param, value));
 
     res = (response.generalStatus == CIPGeneralStatus::kSuccess);
 
@@ -423,7 +415,7 @@ bool QnFlirEIPResource::setParamPhysical(const QString &id, const QString &value
         return res;
 
     if(!param.writeCmd.isEmpty())
-        res = commitParam(param);
+        res = commitParam(param, client.get());
 
     return res;
 }
@@ -490,7 +482,7 @@ bool QnFlirEIPResource::startInputPortMonitoringAsync(std::function<void (bool)>
     m_inputPortMonitored = true;
     m_checkInputPortStatusTimerId = TimerManager::instance()->addTimer(
         std::bind(&QnFlirEIPResource::checkInputPortStatus, this, std::placeholders::_1),
-        kIOCheckTimeout );
+        kIOCheckTimeout.count());
 
     startAlarmMonitoringAsync();
 
@@ -512,7 +504,7 @@ bool QnFlirEIPResource::startAlarmMonitoringAsync()
 
     m_checkAlarmStatusTimerId = TimerManager::instance()->addTimer(
         std::bind(&QnFlirEIPResource::checkAlarmStatus, this, std::placeholders::_1),
-        kAlarmCheckTimeout );
+        kAlarmCheckTimeout.count());
 
     return true;
 }
@@ -572,7 +564,7 @@ void QnFlirEIPResource::initializeIO()
             m_outputPorts.push_back(port);
         }
     
-    for (size_t i=0; i < alarmsCount; i++)
+    for (size_t i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 
     setIOPorts(portList);
@@ -663,7 +655,7 @@ void QnFlirEIPResource::checkInputPortStatus(quint64 timerId)
     {
         m_checkInputPortStatusTimerId = TimerManager::instance()->addTimer(
             std::bind(&QnFlirEIPResource::checkInputPortStatus, this, std::placeholders::_1),
-            kIOCheckTimeout );
+            kIOCheckTimeout.count());
     }
 }
 
@@ -693,7 +685,7 @@ void QnFlirEIPResource::checkInputPortStatusDone()
     {
         m_checkInputPortStatusTimerId = TimerManager::instance()->addTimer(
             std::bind(&QnFlirEIPResource::checkInputPortStatus, this, std::placeholders::_1),
-            kIOCheckTimeout );
+            kIOCheckTimeout.count());
     }
     else
     {
@@ -717,7 +709,7 @@ void QnFlirEIPResource::scheduleNextAlarmCheck()
     m_currentAlarmMonitoringState = FlirAlarmMonitoringState::ReadyToCheckAlarm;
     m_checkAlarmStatusTimerId = TimerManager::instance()->addTimer(
         std::bind(&QnFlirEIPResource::checkAlarmStatus, this, std::placeholders::_1),
-        kAlarmCheckTimeout );
+        kAlarmCheckTimeout.count());
 }
 
 void QnFlirEIPResource::checkAlarmStatus(quint64 timerId)

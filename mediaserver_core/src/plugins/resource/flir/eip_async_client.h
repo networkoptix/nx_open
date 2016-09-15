@@ -23,7 +23,6 @@ enum class EIPClientState
 public:
     EIPAsyncClient(QString hostAddress);
     ~EIPAsyncClient();
-    static const unsigned int kEipPort = 44818;
     void setPort(quint16 port);
     bool doServiceRequestAsync(const MessageRouterRequest& request);
     MessageRouterResponse getResponse();
