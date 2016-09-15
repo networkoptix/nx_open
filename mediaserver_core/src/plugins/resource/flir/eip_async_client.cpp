@@ -3,9 +3,11 @@
 #include <chrono>
 
 namespace {
-    const size_t kReceiveBufferSize = 1024*50;
-    const std::chrono::milliseconds kSendTimeout(4000);
-    const std::chrono::milliseconds kReceiveTimeout(4000);
+
+const size_t kReceiveBufferSize = 1024*50;
+const std::chrono::milliseconds kSendTimeout = std::chrono::seconds(4);
+const std::chrono::milliseconds kReceiveTimeout = std::chrono::seconds(4);
+
 } //namespace
 
 EIPAsyncClient::EIPAsyncClient(QString hostAddress) :
@@ -267,8 +269,11 @@ bool EIPAsyncClient::doServiceRequestAsync(const MessageRouterRequest &request)
     if (m_inProcess)
         return false;
 
-    if ((!m_socket || m_currentState == EIPClientState::Error) && !initSocket())
-        return false;
+    if (!m_socket || m_currentState == EIPClientState::Error)
+    {
+        if (!initSocket())
+            return false;
+    }
 
     m_inProcess = true;
     m_pendingRequest = request;

@@ -8,9 +8,11 @@
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
 namespace {
-    const std::chrono::milliseconds kIOCheckTimeout(1000);
-    const std::chrono::milliseconds kAlarmCheckTimeout(300);
-    const QString kAlarmsCountParamName("alarmsCount");
+
+const std::chrono::milliseconds kIOCheckTimeout = std::chrono::seconds(1);
+const std::chrono::milliseconds kAlarmCheckTimeout(300);
+const QString kAlarmsCountParamName("alarmsCount");
+
 } //namespace
 
 QnFlirEIPResource::QnFlirEIPResource() :
