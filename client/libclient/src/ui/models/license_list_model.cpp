@@ -84,7 +84,7 @@ QVariant QnLicenseListModel::data(const QModelIndex& index, int role) const
                 case LicenseStatusColumn:
                 {
                     QString status = getLicenseStatus(license);
-                    return role == Qt::ToolTipRole
+                    return role != Qt::DisplayRole
                         ? status
                         : nx::utils::elideString(status, kMaxStatusLength);
                 }
