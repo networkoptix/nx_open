@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="clear_cache_complete_toast">As 'Caches' foram limpas</string>
+    <string name="no_network_connection_toast">Não encontro qualquer ligação de rede</string>    
+</resources>
