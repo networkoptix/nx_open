@@ -22,8 +22,7 @@ public:
     /*!
         \return Object belongs to this pool
     */
-    QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res) const;
-    QnVideoCameraPtr addVideoCamera(const QnResourcePtr& res);
+    QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res);
     void removeVideoCamera(const QnResourcePtr& res);
     void updateActivity();
 private:
