@@ -1,0 +1,48 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Este nome já existe";
+"Please choose another name." = "Escolha outro nome.";
+"OK" = "OK";
+"Name" = "Nome";
+"Host" = "Anfitrião";
+"IP or hostname" = "IP or nome de anfitrião";
+"Port" = "Porto";
+"Login" = "Login";
+"Password" = "Password";
+"Address: %@" = "Endereço: %@";
+"Error" = "Erro";
+"Connecting..." = "A estabelecer ligação...";
+"Can't connect to the System." = "Não é possível estabelecer uma ligação ao Sistema.";
+"Requesting cameras..." = "A solicitar câmaras...";
+"Communication failure." = "Falha de comunicação.";
+"The System is incompatible with the app" = "O Sistema é incompativel com a App";
+"Show Offline" = "Mostrar Offline";
+"Hide Offline" = "Ocultar Offline";
+"Systems" = "Sistemas";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "A carregar...";
+"No Signal..." = "Sem Sinal...";
+"Invalid Camera Credentials..." = "Credenciais da câmaras inválidas...";
+"Live" = "Em directo";
+"Information" = "Informação";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "Não existe gravações para a data seleccionada. Quer 'saltar' para a data mais próxima?";
+"No" = "Não";
+"Yes" = "Sim";
+"Archive" = "Arquivos";
+"Go" = "Ir";
+"Low" = "Baixo";
+"Medium" = "Médio";
+"High" = "Alto";
+"Best" = "Melhor";
+"Please Upgrade to Continue" = "Actualize para continuar";
+"This app is not compatible with this version of the software. Please download our new app." = "Esta App não é compatível com a versão do software. Descarregue a nova App";
+"Not now" = "Agora não";
+"Download" = "Descarregar";
+"Upgrade Now!" = "Actualizar Agora!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "Está a ligar-se a um Sistema com a versão 2.5 ou superior. Descarregue a nova App para uma melhor experiência.";
