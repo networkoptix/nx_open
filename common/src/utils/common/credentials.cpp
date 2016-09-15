@@ -17,10 +17,10 @@ bool QnCredentials::operator==(const QnCredentials& other) const
 
 bool QnCredentials::operator<(const QnCredentials &other) const
 {
-    if (user < other.user)
-        return true;
+    if (user != other.user)
+        return user < other.user;
 
-    if (user == other.user)
+    if (password != other.password)
         return password < other.password;
 
     return false;
