@@ -185,6 +185,34 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    namespace {
+
+    struct SharedState
+    {
+        QMetaObject::Connection qtConnection;
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
+    };
+
+    } // namespace 
+
+    void AsyncHttpClient::doGet(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        auto sharedState = std::make_shared<SharedState>();
+        sharedState->completionHandler = std::move(completionHandler);
+        auto* qtConnectionPtr = &sharedState->qtConnection;
+        *qtConnectionPtr = QObject::connect(
+            this, &AsyncHttpClient::done,
+            [this, sharedState = std::move(sharedState)](
+                AsyncHttpClientPtr httpClient)
+            {
+                sharedState->completionHandler(httpClient);
+                disconnect(sharedState->qtConnection);
+            });
+        doGet(url);
+    }
+
     void AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,

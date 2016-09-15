@@ -35,7 +35,9 @@ void HttpClient::pleaseStop()
 bool HttpClient::doGet(const QUrl& url)
 {
     using namespace std::placeholders;
-    return doRequest(std::bind(&nx_http::AsyncHttpClient::doGet, _1, url));
+    return doRequest(std::bind(
+        static_cast<void(AsyncHttpClient::*)(const QUrl&)>(
+            &nx_http::AsyncHttpClient::doGet), _1, url));
 }
 
 bool HttpClient::doPost(

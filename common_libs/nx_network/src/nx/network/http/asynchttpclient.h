@@ -129,6 +129,21 @@ namespace nx_http
         To get error description use SystemError::getLastOSErrorCode()
         */
         void doGet(const QUrl& url);
+        /**
+         * This overload is same as:
+         * \code{.cpp}
+         * QObject::connect(
+         *     httpClient.get(), &nx_http::AsyncHttpClient::done,
+         *     [completionHandler](AsyncHttpClientPtr httpClient)
+         *     {
+         *         completionHandler(httpClient);
+         *     });
+         * httpClient->doGet();
+         * \endcode
+         */
+        void doGet(
+            const QUrl& url,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         //!Start POST request to \a url
         /*!

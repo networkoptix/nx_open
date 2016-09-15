@@ -5,19 +5,53 @@
 
 #include "mediaserver_emulator.h"
 
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/utils/string.h>
 #include <nx/utils/thread/barrier_handler.h>
 
+#include <common/common_globals.h>
+#include <network/module_information.h>
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 
 
 namespace nx {
 namespace hpm {
+
+class ApiModuleInformationHandler:
+    public nx_http::AbstractHttpRequestHandler
+{
+public:
+    ApiModuleInformationHandler(nx::String cloudSystemId):
+        m_cloudSystemId(std::move(cloudSystemId))
+    {
+    }
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const connection,
+        stree::ResourceContainer authInfo,
+        nx_http::Request request,
+        nx_http::Response* const response,
+        nx_http::HttpRequestProcessedHandler handler) override
+    {
+        QnModuleInformation moduleInformation;
+        moduleInformation.cloudSystemId = m_cloudSystemId;
+        handler(
+            nx_http::StatusCode::ok,
+            std::make_unique<nx_http::BufferSource>(
+                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                QJson::serialized(moduleInformation)),
+            nx_http::ConnectionEvents());
+    }
+
+private:
+    nx::String m_cloudSystemId;
+};
 
 MediaServerEmulator::MediaServerEmulator(
     const SocketAddress& mediatorEndpoint,
@@ -31,15 +65,25 @@ MediaServerEmulator::MediaServerEmulator(
         false,
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
-    m_serverId(serverName.isEmpty() ? QnUuid::createUuid().toSimpleString().toUtf8() : std::move(serverName)),
+    m_serverId(
+        serverName.isEmpty()
+        ? QnUuid::createUuid().toSimpleString().toUtf8()
+        : std::move(serverName)),
     m_mediatorUdpClient(
         std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
             mediatorEndpoint,
             m_mediatorConnector.get())),
     m_action(ActionToTake::proceedWithConnection),
     m_cloudConnectionMethodMask((int)network::cloud::CloudConnectType::all)
-
 {
+    // Registering /api/moduleInformation handler.
+    m_httpMessageDispatcher.registerRequestProcessor<ApiModuleInformationHandler>(
+        "/api/moduleInformation",
+        [systemId = m_systemData.id]()
+        {
+            return std::make_unique<ApiModuleInformationHandler>(systemId);
+        });
+
     m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
 
     m_mediatorConnector->mockupAddress(std::move(mediatorEndpoint));

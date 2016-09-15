@@ -7,9 +7,11 @@
 
 #include <list>
 
-#include "nx/network/system_socket.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/system_socket.h>
 #include "../abstract_tunnel_connector.h"
 
+#define DO_MSERVER_VERIFICATION
 
 namespace nx {
 namespace network {
@@ -43,7 +45,11 @@ private:
     struct ConnectionContext
     {
         SocketAddress endpoint;
-        std::unique_ptr<TCPSocket> connection;
+        #ifdef DO_MSERVER_VERIFICATION
+            nx_http::AsyncHttpClientPtr httpClient;
+        #else
+            std::unique_ptr<TCPSocket> connection;
+        #endif
     };
 
     const AddressEntry m_targetHostAddress;
@@ -51,9 +57,23 @@ private:
     ConnectCompletionHandler m_completionHandler;
     std::list<ConnectionContext> m_connections;
 
-    void onConnected(
-        SystemError::ErrorCode sysErrorCode,
-        std::list<ConnectionContext>::iterator socketIter);
+    #ifdef DO_MSERVER_VERIFICATION
+        void onHttpRequestDone(
+            nx_http::AsyncHttpClientPtr httpClient,
+            std::list<ConnectionContext>::iterator socketIter);
+    #else
+        void onConnected(
+            SystemError::ErrorCode sysErrorCode,
+            std::list<ConnectionContext>::iterator socketIter);
+    #endif
+
+    void reportErrorOnEndpointVerificationFailure(
+        nx::hpm::api::NatTraversalResultCode resultCode,
+        SystemError::ErrorCode sysErrorCode);
+    bool verifyHostResponse(nx_http::AsyncHttpClientPtr httpClient);
+    void reportSuccessfulVerificationResult(
+        SocketAddress endpoint,
+        std::unique_ptr<AbstractStreamSocket> streamSocket);
 };
 
 } // namespace tcp
