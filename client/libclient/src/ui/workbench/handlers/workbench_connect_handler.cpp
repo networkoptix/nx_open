@@ -408,6 +408,7 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
 //          m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
             break;
         case Qn::ConnectionResult::IncompatibleInternal:
+        case Qn::ConnectionResult::IncompatibleCloudHost:
         case Qn::ConnectionResult::IncompatibleVersion:
         case Qn::ConnectionResult::IncompatibleProtocol:
             m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());

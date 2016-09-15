@@ -30,6 +30,7 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::ConnectionResult::Unauthorized:
         case Qn::ConnectionResult::TemporaryUnauthorized:
         case Qn::ConnectionResult::IncompatibleInternal:
+        case Qn::ConnectionResult::IncompatibleCloudHost:
             return Qn::Login_Help;
         case Qn::ConnectionResult::IncompatibleVersion:
         case Qn::ConnectionResult::IncompatibleProtocol:
@@ -75,7 +76,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
             + strings(ErrorStrings::ContactAdministrator);
     }
-    else if (result == ConnectionResult::IncompatibleInternal)
+    else if (result == ConnectionResult::IncompatibleInternal
+        || result == ConnectionResult::IncompatibleCloudHost)
     {
         detail = tr("You are trying to connect to incompatible Server.");
     }
@@ -156,6 +158,7 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
             break;
         }
         case ConnectionResult::IncompatibleInternal:
+        case ConnectionResult::IncompatibleCloudHost:
         {
             result.details = tr("You are trying to connect to incompatible Server.");
             break;

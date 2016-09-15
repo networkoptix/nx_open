@@ -2008,6 +2008,7 @@ void MediaServerProcess::run()
         switch (connectionResult)
         {
             case Qn::ConnectionResult::IncompatibleInternal:
+            case Qn::ConnectionResult::IncompatibleCloudHost:
             case Qn::ConnectionResult::IncompatibleVersion:
             case Qn::ConnectionResult::IncompatibleProtocol:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);

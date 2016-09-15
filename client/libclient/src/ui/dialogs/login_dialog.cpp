@@ -365,8 +365,11 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
             /* Do not show servers with incompatible customization or cloud host */
             if (!qnRuntime->isDevMode()
-                && compatibilityCode == Qn::ConnectionResult::IncompatibleInternal)
+                && (compatibilityCode == Qn::ConnectionResult::IncompatibleInternal
+                    || compatibilityCode == Qn::ConnectionResult::IncompatibleCloudHost))
+            {
                     continue;
+            }
 
             bool isCompatible = (compatibilityCode == Qn::ConnectionResult::Success);
 

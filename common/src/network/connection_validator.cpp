@@ -96,7 +96,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     using namespace Qn;
 
     if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
-        return ConnectionResult::IncompatibleInternal;
+        return ConnectionResult::IncompatibleCloudHost;
 
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
     bool isMobile = localInfo.peer.isMobileClient();
