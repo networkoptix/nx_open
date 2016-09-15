@@ -63,7 +63,6 @@
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/watchers/current_user_available_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 
 #include <ui/workbench/workbench.h>
@@ -247,7 +246,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchBookmarksWatcher>();
     context->instance<QnTimelineBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
-    context->instance<QnCurrentUserAvailableCamerasWatcher>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);

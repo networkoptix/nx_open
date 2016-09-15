@@ -7,6 +7,8 @@
 #include "dlink_stream_reader.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 
+#include <motion/motion_detection.h>
+
 const QString QnPlDlinkResource::MANUFACTURE(lit("Dlink"));
 
 namespace
@@ -407,19 +409,19 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
         }
     }
 
-    unsigned char maskBit[MD_WIDTH * MD_HEIGHT / 8];
+    unsigned char maskBit[Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8];
     QnMetaDataV1::createMask(getMotionMask(0),  (char*)maskBit);
 
 
-    QImage img(MD_WIDTH, MD_HEIGHT, QImage::Format_Mono);
+    QImage img(Qn::kMotionGridWidth, Qn::kMotionGridHeight, QImage::Format_Mono);
     memset(img.bits(), 0, img.byteCount());
     img.setColor(0, qRgb(0, 0, 0));
     img.setColor(1, qRgb(255, 255, 255));
 
 
-    for (int x = 0; x  < MD_WIDTH; ++x)
+    for (int x = 0; x  < Qn::kMotionGridWidth; ++x)
     {
-        for (int y = 0; y  < MD_HEIGHT; ++y)
+        for (int y = 0; y  < Qn::kMotionGridHeight; ++y)
         {
             if (QnMetaDataV1::isMotionAt(x,y,(char*)maskBit))
                 img.setPixel(x,y,1);

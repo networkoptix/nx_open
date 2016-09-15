@@ -66,8 +66,10 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
     if (networkError == ec2::ErrorCode::unauthorized)
         return ConnectionResult::Unauthorized;
 
-    if (networkError == ec2::ErrorCode::temporary_unauthorized)
-        return ConnectionResult::TemporaryUnauthorized;
+    if (networkError == ec2::ErrorCode::ldap_temporary_unauthorized)
+        return ConnectionResult::LdapTemporaryUnauthorized;
+    else if (networkError == ec2::ErrorCode::cloud_temporary_unauthorized)
+        return ConnectionResult::CloudTemporaryUnauthorized;
 
     if (networkError != ec2::ErrorCode::ok)
         return ConnectionResult::NetworkError;
@@ -96,7 +98,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     using namespace Qn;
 
     if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
-        return ConnectionResult::IncompatibleInternal;
+        return ConnectionResult::IncompatibleCloudHost;
 
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
     bool isMobile = localInfo.peer.isMobileClient();
@@ -110,7 +112,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (version < minSupportedVersion())
         return ConnectionResult::IncompatibleVersion;
 
-    if (protoVersion != QnAppInfo::ec2ProtoVersion())
+    // Mobile client can connect to servers with any protocol version.
+    if (!isMobile && protoVersion != QnAppInfo::ec2ProtoVersion())
         return ConnectionResult::IncompatibleProtocol;
 
     return ConnectionResult::Success;

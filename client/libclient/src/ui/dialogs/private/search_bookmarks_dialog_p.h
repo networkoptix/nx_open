@@ -48,7 +48,7 @@ private:
 
     bool fillActionParameters(QnActionParameters &params, QnTimePeriod &window);
 
-    bool currentUserHasAdminPrivileges();
+    bool currentUserHasAllCameras();
 
     void applyModelChanges();
 

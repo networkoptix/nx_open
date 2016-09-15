@@ -29,6 +29,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -222,19 +223,34 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     //TODO: #GDM #Business show description label if no rules are loaded
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnBusinessRulesDialog::saveAll);
-    connect(ui->addRuleButton,                              &QPushButton::clicked, this, &QnBusinessRulesDialog::at_newRuleButton_clicked);
-    connect(ui->deleteRuleButton,                           &QPushButton::clicked, this, &QnBusinessRulesDialog::at_deleteButton_clicked);
-    connect(ui->advancedButton,                             &QPushButton::clicked, this, &QnBusinessRulesDialog::toggleAdvancedMode);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
+        &QnBusinessRulesDialog::saveAll);
 
-    connect(m_rulesViewModel,                               &QnBusinessRulesActualModel::businessRuleDeleted, this, &QnBusinessRulesDialog::at_message_ruleDeleted);
-    connect(m_rulesViewModel,                               &QnBusinessRulesActualModel::beforeModelChanged, this, &QnBusinessRulesDialog::at_beforeModelChanged);
-    connect(m_rulesViewModel,                               &QnBusinessRulesActualModel::afterModelChanged, this, &QnBusinessRulesDialog::at_afterModelChanged);
+    ui->addRuleButton->setIcon(qnSkin->icon("buttons/plus.png"));
+    connect(ui->addRuleButton, &QPushButton::clicked, this,
+        &QnBusinessRulesDialog::at_newRuleButton_clicked);
 
-    connect(ui->eventLogButton,                             &QPushButton::clicked,  context()->action(QnActions::OpenBusinessLogAction), &QAction::trigger);
+    ui->deleteRuleButton->setIcon(qnSkin->icon("buttons/minus.png"));
+    connect(ui->deleteRuleButton, &QPushButton::clicked, this,
+        &QnBusinessRulesDialog::at_deleteButton_clicked);
 
-    connect(ui->filterLineEdit,                             &QLineEdit::textChanged, this, &QnBusinessRulesDialog::updateFilter);
-    connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
+    connect(ui->advancedButton, &QPushButton::clicked, this,
+        &QnBusinessRulesDialog::toggleAdvancedMode);
+
+    connect(m_rulesViewModel, &QnBusinessRulesActualModel::businessRuleDeleted, this,
+        &QnBusinessRulesDialog::at_message_ruleDeleted);
+    connect(m_rulesViewModel, &QnBusinessRulesActualModel::beforeModelChanged, this,
+        &QnBusinessRulesDialog::at_beforeModelChanged);
+    connect(m_rulesViewModel, &QnBusinessRulesActualModel::afterModelChanged, this,
+        &QnBusinessRulesDialog::at_afterModelChanged);
+
+    connect(ui->eventLogButton, &QPushButton::clicked,
+        context()->action(QnActions::OpenBusinessLogAction), &QAction::trigger);
+
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
+        &QnBusinessRulesDialog::updateFilter);
+    connect(ui->clearFilterButton, &QToolButton::clicked, this,
+        &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
     updateFilter();
     updateControlButtons();

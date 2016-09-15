@@ -144,13 +144,13 @@ quint32 reverseBits(quint32 v)
 
 inline bool isMotionAt(const quint8* data, int x, int y)
 {
-    int shift = x*MD_HEIGHT + y;
+    int shift = x*Qn::kMotionGridHeight + y;
     return data[shift/8] & (128 >> (shift&7));
 }
 
 inline void setMotionAt(quint8* data, int x, int y)
 {
-    int shift = x*MD_HEIGHT + y;
+    int shift = x*Qn::kMotionGridHeight + y;
     data[shift/8] |= (128 >> (shift&7));
 }
 
@@ -224,8 +224,8 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     const simd128i* curLinePtrPrev = (const simd128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)effectiveWidth,16)/16;
-    int linesInStep = (frame->height*65536)/ MD_HEIGHT;
-    int ySteps = MD_HEIGHT;
+    int linesInStep = (frame->height*65536)/ Qn::kMotionGridHeight;
+    int ySteps = Qn::kMotionGridHeight;
 
     int curLineNum = 0;
     for (int y = 0; y < ySteps; ++y)
@@ -257,8 +257,8 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             // get avg value
             int pixels = rowCnt * 8;
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
-            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
-            dstCurLine += MD_HEIGHT*2;
+            dstCurLine[Qn::kMotionGridHeight] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
+            dstCurLine += Qn::kMotionGridHeight*2;
 #endif
         }
         curLineNum = nextLineNum;
@@ -280,8 +280,8 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
-    int linesInStep = (frame->height*65536)/ MD_HEIGHT;
-    int ySteps = MD_HEIGHT;
+    int linesInStep = (frame->height*65536)/ Qn::kMotionGridHeight;
+    int ySteps = Qn::kMotionGridHeight;
 
     int curLineNum = 0;
     for (int y = 0; y < ySteps; ++y)
@@ -308,8 +308,8 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             // get avg value
             int pixels = rowCnt * 8;
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
-            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
-            dstCurLine += MD_HEIGHT*2;
+            dstCurLine[Qn::kMotionGridHeight] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
+            dstCurLine += Qn::kMotionGridHeight*2;
 #endif
         }
         curLineNum = nextLineNum;
@@ -342,8 +342,8 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
     if (frame->width % 16)
         fillRightEdge8(frame);
 
-    int linesInStep = (frame->height*65536)/ MD_HEIGHT;
-    int ySteps = MD_HEIGHT;
+    int linesInStep = (frame->height*65536)/ Qn::kMotionGridHeight;
+    int ySteps = Qn::kMotionGridHeight;
 
     int curLineNum = 0;
     for (int y = 0; y < ySteps; ++y)
@@ -374,7 +374,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
             // get avg value
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
-            dstCurLine += MD_HEIGHT;
+            dstCurLine += Qn::kMotionGridHeight;
 #endif
         }
         curLineNum = nextLineNum;
@@ -392,8 +392,8 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
-    int linesInStep = (frame->height*65536)/ MD_HEIGHT;
-    int ySteps = MD_HEIGHT;
+    int linesInStep = (frame->height*65536)/ Qn::kMotionGridHeight;
+    int ySteps = Qn::kMotionGridHeight;
 
     int curLineNum = 0;
     for (int y = 0; y < ySteps; ++y)
@@ -420,7 +420,7 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             // get avg value
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
-            dstCurLine += MD_HEIGHT;
+            dstCurLine += Qn::kMotionGridHeight;
 #endif
         }
         curLineNum = nextLineNum;
@@ -462,7 +462,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     *dstCurLine = squareSum / (pixels);\
     squareStep = 0;\
     squareSum = 0;\
-    dstCurLine += MD_HEIGHT;\
+    dstCurLine += Qn::kMotionGridHeight;\
 }
 
     NX_ASSERT(frame->linesize[0] % 16 == 0);
@@ -477,8 +477,8 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         fillRightEdge8(frame);
 
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
-    int linesInStep = (frame->height*65536)/ MD_HEIGHT;
-    int ySteps = MD_HEIGHT;
+    int linesInStep = (frame->height*65536)/ Qn::kMotionGridHeight;
+    int ySteps = Qn::kMotionGridHeight;
 
     int squareSum = 0;
     int squareStep = 0;
@@ -539,7 +539,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
     *dstCurLine = squareSum / pixels;\
     squareStep = 0;\
     squareSum = 0;\
-    dstCurLine += MD_HEIGHT;\
+    dstCurLine += Qn::kMotionGridHeight;\
 }
     NX_ASSERT(frame->width % 8 == 0);
     NX_ASSERT(frame->linesize[0] % 16 == 0);
@@ -549,8 +549,8 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
-    int linesInStep = (frame->height*65536)/ MD_HEIGHT;
-    int ySteps = MD_HEIGHT;
+    int linesInStep = (frame->height*65536)/ Qn::kMotionGridHeight;
+    int ySteps = Qn::kMotionGridHeight;
 
     int squareSum = 0;
     int squareStep = 0;
@@ -606,7 +606,7 @@ QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
     m_frames[0]->setUseExternalData(false);
     m_frames[1]->setUseExternalData(false);
 
-    m_scaledMask = 0; // mask scaled to x * MD_HEIGHT. for internal use
+    m_scaledMask = 0; // mask scaled to x * Qn::kMotionGridHeight. for internal use
     m_motionSensScaledMask = 0;
 	m_frameDeltaBuffer = 0;
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
@@ -663,25 +663,25 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
     int prevILineNum;
 
 	//std::vector<quint8> test0,test1;
-	//test0.resize(m_scaledWidth*MD_HEIGHT);
-	//test1.resize(m_scaledWidth*MD_HEIGHT);
+	//test0.resize(m_scaledWidth*Qn::kMotionGridHeight);
+	//test1.resize(m_scaledWidth*Qn::kMotionGridHeight);
 
 #if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
-	lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
+	lineStep = (m_scaledWidth-1) / float(Qn::kMotionGridWidth-1);
     scaledLineNum = 0;
     prevILineNum = -1;
 
-    for (int y = 0; y < MD_WIDTH; ++y)
+    for (int y = 0; y < Qn::kMotionGridWidth; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
         NX_ASSERT(iLineNum < m_scaledWidth);
 
-        simd128i* dst = (simd128i*) (scaledMask/*&test0[0]*/ + MD_HEIGHT*iLineNum);
-        simd128i* src = (simd128i*) (mask + MD_HEIGHT*y);
+        simd128i* dst = (simd128i*) (scaledMask/*&test0[0]*/ + Qn::kMotionGridHeight*iLineNum);
+        simd128i* src = (simd128i*) (mask + Qn::kMotionGridHeight*y);
         if (iLineNum > prevILineNum)
         {
             for (int i = 0; i < iLineNum - prevILineNum; ++i)
-                memcpy(dst - i*MD_HEIGHT/sizeof(simd128i) , src, MD_HEIGHT);
+                memcpy(dst - i*Qn::kMotionGridHeight/sizeof(simd128i) , src, Qn::kMotionGridHeight);
         }
         else
 		{
@@ -693,25 +693,25 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
         scaledLineNum += lineStep;
     }
 #else
-	lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
+	lineStep = (m_scaledWidth-1) / float(Qn::kMotionGridWidth-1);
     scaledLineNum = 0;
     prevILineNum = -1;
 
-    for (int y = 0; y < MD_WIDTH; ++y)
+    for (int y = 0; y < Qn::kMotionGridWidth; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
         NX_ASSERT(iLineNum < m_scaledWidth);
 
-        quint8* dst = scaledMask/*&test1[0]*/ + MD_HEIGHT*iLineNum;
-        quint8* src = mask + MD_HEIGHT*y;
+        quint8* dst = scaledMask/*&test1[0]*/ + Qn::kMotionGridHeight*iLineNum;
+        quint8* src = mask + Qn::kMotionGridHeight*y;
         if (iLineNum > prevILineNum)
 		{
             for (int i = 0; i < iLineNum - prevILineNum; ++i)
-                memcpy(dst - i*MD_HEIGHT , src , MD_HEIGHT);
+                memcpy(dst - i*Qn::kMotionGridHeight , src , Qn::kMotionGridHeight);
         }
         else
 		{
-			for (int i = 0; i < MD_HEIGHT; ++i)
+			for (int i = 0; i < Qn::kMotionGridHeight; ++i)
 				dst[i] = qMin(dst[i], src[i]);
 		}
 
@@ -724,7 +724,7 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 	int it = 0;
 	for (int x = 0; x < m_scaledWidth; ++x)
     {
-		for (int y = 0; y < MD_HEIGHT; ++y)
+		for (int y = 0; y < Qn::kMotionGridHeight; ++y)
 		{
 			if ( test0[it] != test1[it] )
 			{
@@ -756,39 +756,39 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_lastImgHeight = height;
     // calculate scaled image size and allocate memory
 #if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
-    for (m_xStep = 8; m_lastImgWidth/m_xStep > MD_WIDTH; m_xStep += 8);
-    if (m_lastImgWidth/m_xStep <= (MD_WIDTH*3)/4 && m_xStep > 8)
+    for (m_xStep = 8; m_lastImgWidth/m_xStep > Qn::kMotionGridWidth; m_xStep += 8);
+    if (m_lastImgWidth/m_xStep <= (Qn::kMotionGridWidth*3)/4 && m_xStep > 8)
         m_xStep -= 8;
     m_scaledWidth = m_lastImgWidth / m_xStep;
     if (m_lastImgWidth > m_scaledWidth*m_xStep)
         m_scaledWidth++;
 #else
-    m_scaledWidth = MD_WIDTH;
+    m_scaledWidth = Qn::kMotionGridWidth;
 #endif
 
     int swUp = m_scaledWidth+1; // reserve one extra column because of analize_frame function for x8 width can write 1 extra byte
-    m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-    m_linkedNums = (int*) qMallocAligned(MD_HEIGHT * swUp * sizeof(int), 32);
-    m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-	m_frameDeltaBuffer = (uint8_t*) qMallocAligned(MD_HEIGHT * swUp, 32);
+    m_scaledMask = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+    m_linkedNums = (int*) qMallocAligned(Qn::kMotionGridHeight * swUp * sizeof(int), 32);
+    m_motionSensScaledMask = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+	m_frameDeltaBuffer = (uint8_t*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
 
-	m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-	m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-	memset(m_frameBuffer[0], 0, MD_HEIGHT * swUp);
-	memset(m_frameBuffer[1], 0, MD_HEIGHT * swUp);
+	m_frameBuffer[0] = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+	m_frameBuffer[1] = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+	memset(m_frameBuffer[0], 0, Qn::kMotionGridHeight * swUp);
+	memset(m_frameBuffer[1], 0, Qn::kMotionGridHeight * swUp);
 
-	m_filteredFrame = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-    m_resultMotion = new quint32[MD_HEIGHT/4 * swUp];
-    memset(m_resultMotion, 0, MD_HEIGHT * swUp);
+	m_filteredFrame = (quint8*) qMallocAligned(Qn::kMotionGridHeight * swUp, 32);
+    m_resultMotion = new quint32[Qn::kMotionGridHeight/4 * swUp];
+    memset(m_resultMotion, 0, Qn::kMotionGridHeight * swUp);
 
     // scale motion mask to scaled size
-    if (m_scaledWidth != MD_WIDTH) {
+    if (m_scaledWidth != Qn::kMotionGridWidth) {
         scaleMask(m_motionMask, m_scaledMask);
         scaleMask(m_motionSensMask, m_motionSensScaledMask);
     }
     else {
-        memcpy(m_scaledMask, m_motionMask, MD_WIDTH * MD_HEIGHT);
-        memcpy(m_motionSensScaledMask, m_motionSensMask, MD_WIDTH * MD_HEIGHT);
+        memcpy(m_scaledMask, m_motionMask, Qn::kMotionGridWidth * Qn::kMotionGridHeight);
+        memcpy(m_motionSensScaledMask, m_motionSensMask, Qn::kMotionGridWidth * Qn::kMotionGridHeight);
     }
     m_isNewMask = false;
 }
@@ -800,7 +800,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     quint8* dstPtr = m_filteredFrame;
     const quint8* maskPtr = m_scaledMask;
 
-    for (int y = 0; y < MD_HEIGHT; ++y) {
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y) {
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
@@ -813,18 +813,18 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         curPtr++;
         maskPtr++;
         dstPtr++;
-        for (int y = 1; y < MD_HEIGHT-1; ++y)
+        for (int y = 1; y < Qn::kMotionGridHeight-1; ++y)
         {
             if (*curPtr <= *maskPtr)
             {
                 int aroundMotionAmount =(int(curPtr[-1] > maskPtr[-1]) +
                                          int(curPtr[1]  > maskPtr[-1]) +
-                                         int(curPtr[-MD_HEIGHT] >maskPtr[-MD_HEIGHT]) +
-                                         int(curPtr[MD_HEIGHT] >maskPtr[MD_HEIGHT]))*2 +
-                                         int(curPtr[-1-MD_HEIGHT] >maskPtr[-1-MD_HEIGHT]) +
-                                         int(curPtr[-1+MD_HEIGHT] >maskPtr[-1+MD_HEIGHT]) +
-                                         int(curPtr[1-MD_HEIGHT] >maskPtr[1-MD_HEIGHT]) +
-                                         int(curPtr[1+MD_HEIGHT] >maskPtr[1+MD_HEIGHT]);
+                                         int(curPtr[-Qn::kMotionGridHeight] >maskPtr[-Qn::kMotionGridHeight]) +
+                                         int(curPtr[Qn::kMotionGridHeight] >maskPtr[Qn::kMotionGridHeight]))*2 +
+                                         int(curPtr[-1-Qn::kMotionGridHeight] >maskPtr[-1-Qn::kMotionGridHeight]) +
+                                         int(curPtr[-1+Qn::kMotionGridHeight] >maskPtr[-1+Qn::kMotionGridHeight]) +
+                                         int(curPtr[1-Qn::kMotionGridHeight] >maskPtr[1-Qn::kMotionGridHeight]) +
+                                         int(curPtr[1+Qn::kMotionGridHeight] >maskPtr[1+Qn::kMotionGridHeight]);
                 if (aroundMotionAmount >= 6)
                     *dstPtr = *maskPtr;
                 else
@@ -844,7 +844,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         dstPtr++;
     }
 
-    for (int y = 0; y < MD_HEIGHT; ++y) {
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y) {
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
@@ -853,9 +853,9 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
 
     // 2. Determine linked areas
     int currentLinkIndex = 1;
-    memset(m_linkedNums, 0, sizeof(int) * MD_HEIGHT * m_scaledWidth);
+    memset(m_linkedNums, 0, sizeof(int) * Qn::kMotionGridHeight * m_scaledWidth);
     memset(m_linkedSquare, 0, sizeof(m_linkedSquare));
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth/2;++i)
+    for (int i = 0; i < Qn::kMotionGridHeight*m_scaledWidth/2;++i)
         m_linkedMap[i] = i;
 
     int idx = 0;
@@ -864,7 +864,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         *m_linkedNums = currentLinkIndex++;
 
     // 2.2 left col
-    for (int y = 1; y < MD_HEIGHT; ++y, ++idx) {
+    for (int y = 1; y < Qn::kMotionGridHeight; ++y, ++idx) {
         if (m_filteredFrame[idx]) {
             if (m_linkedNums[idx-1])
                 m_linkedNums[idx] = m_linkedNums[idx-1];
@@ -878,33 +878,33 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         // 2.3 top pixel
         if (m_filteredFrame[idx])
         {
-            if (m_linkedNums[idx-MD_HEIGHT])
-                m_linkedNums[idx] = m_linkedNums[idx-MD_HEIGHT];
+            if (m_linkedNums[idx-Qn::kMotionGridHeight])
+                m_linkedNums[idx] = m_linkedNums[idx-Qn::kMotionGridHeight];
             else
                 m_linkedNums[idx] = currentLinkIndex++;
         }
         idx++;
         // 2.4 all other pixels
-        for (int y = 1; y < MD_HEIGHT; ++y, ++idx)
+        for (int y = 1; y < Qn::kMotionGridHeight; ++y, ++idx)
         {
             if (m_filteredFrame[idx])
             {
                 if (m_linkedNums[idx-1]) {
                     m_linkedNums[idx] = m_linkedNums[idx-1];
-                    if (m_linkedNums[idx-MD_HEIGHT] && m_linkedNums[idx-MD_HEIGHT] != m_linkedNums[idx])
+                    if (m_linkedNums[idx-Qn::kMotionGridHeight] && m_linkedNums[idx-Qn::kMotionGridHeight] != m_linkedNums[idx])
                     {
-                        if (m_linkedNums[idx-MD_HEIGHT] < m_linkedNums[idx])
-                            m_linkedMap[m_linkedNums[idx]] = m_linkedNums[idx-MD_HEIGHT];
+                        if (m_linkedNums[idx-Qn::kMotionGridHeight] < m_linkedNums[idx])
+                            m_linkedMap[m_linkedNums[idx]] = m_linkedNums[idx-Qn::kMotionGridHeight];
                         else
-                            m_linkedMap[m_linkedNums[idx-MD_HEIGHT]] = m_linkedNums[idx];
+                            m_linkedMap[m_linkedNums[idx-Qn::kMotionGridHeight]] = m_linkedNums[idx];
                     }
                 }
-                else if (m_linkedNums[idx-MD_HEIGHT]) {
-                    m_linkedNums[idx] = m_linkedNums[idx-MD_HEIGHT];
+                else if (m_linkedNums[idx-Qn::kMotionGridHeight]) {
+                    m_linkedNums[idx] = m_linkedNums[idx-Qn::kMotionGridHeight];
                 }
 #ifndef DISABLE_8_WAY_AREA
-                else if (m_linkedNums[idx-1-MD_HEIGHT]) {
-                    m_linkedNums[idx] = m_linkedNums[idx-1-MD_HEIGHT];
+                else if (m_linkedNums[idx-1-Qn::kMotionGridHeight]) {
+                    m_linkedNums[idx] = m_linkedNums[idx-1-Qn::kMotionGridHeight];
                 }
 #endif
                 else {
@@ -923,11 +923,11 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     }
 
     // 4. merge linked areas
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
+    for (int i = 0; i < Qn::kMotionGridHeight*m_scaledWidth; ++i)
         m_linkedNums[i] = m_linkedMap[m_linkedNums[i]];
 
     // 5. calculate square of each area
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
+    for (int i = 0; i < Qn::kMotionGridHeight*m_scaledWidth; ++i)
     {
         m_linkedSquare[m_linkedNums[i]] += m_filteredFrame[i];
     }
@@ -939,16 +939,16 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         {
             // print square.
             qDebug() << "-determine square size" << m_linkedSquare[i];
-            for (int k = 0; k < MD_HEIGHT*m_scaledWidth; ++k)
+            for (int k = 0; k < Qn::kMotionGridHeight*m_scaledWidth; ++k)
             {
                 if (m_linkedNums[k] == i)
-                    qDebug() << "---- square data at" << k/MD_HEIGHT << 'x' << k%MD_HEIGHT << "=" << m_filteredFrame[k];
+                    qDebug() << "---- square data at" << k/Qn::kMotionGridHeight << 'x' << k%Qn::kMotionGridHeight << "=" << m_filteredFrame[k];
             }
         }
     }
 #endif
     // 6. remove motion if motion square is not enough and write result to bitarray
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
+    for (int i = 0; i < Qn::kMotionGridHeight*m_scaledWidth;)
     {
         quint32 data = 0;
         for (int k = 0; k < 32; ++k, ++i)
@@ -973,7 +973,7 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
 {
 	//saveFrame(data, width, height, stride, QString::fromUtf8("c:/src_orig.bmp"));
 
-    // scale frame to m_scaledWidth* MD_HEIGHT and rotate it to 90 degree
+    // scale frame to m_scaledWidth* Qn::kMotionGridHeight and rotate it to 90 degree
     uint8_t* dst = frameBuffer;
     const uint8_t* src = data;
     int offset = 0;
@@ -1007,13 +1007,13 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
             deltaBuffer[offset] = pixelDelta;
 
             src += xPixels;
-            curDst += MD_HEIGHT;
-            offset += MD_HEIGHT;
+            curDst += Qn::kMotionGridHeight;
+            offset += Qn::kMotionGridHeight;
             curX = nextX;
         }
         src += lines * stride - width;
         dst++;
-        offset = offset - (MD_HEIGHT*MD_WIDTH) + 1;
+        offset = offset - (Qn::kMotionGridHeight*Qn::kMotionGridWidth) + 1;
         curLine = nextLine;
     }
 }
@@ -1064,8 +1064,8 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_frames[idx]->width != m_lastImgWidth || m_frames[idx]->height != m_lastImgHeight || m_isNewMask)
 	{
         reallocateMask(m_frames[idx]->width, m_frames[idx]->height);
-		m_scaleXStep = m_lastImgWidth * 65536 / MD_WIDTH;
-		m_scaleYStep = m_lastImgHeight * 65536 / MD_HEIGHT;
+		m_scaleXStep = m_lastImgWidth * 65536 / Qn::kMotionGridWidth;
+		m_scaleYStep = m_lastImgHeight * 65536 / Qn::kMotionGridHeight;
         m_totalFrames = 0;
 	};
 	/*
@@ -1083,7 +1083,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_frames[0]->width == m_frames[1]->width
         && m_frames[0]->height == m_frames[1]->height
         && m_frames[0]->format == m_frames[1]->format
-        && (m_frames[idx]->width >= MD_WIDTH && m_frames[idx]->height >= MD_HEIGHT))
+        && (m_frames[idx]->width >= Qn::kMotionGridWidth && m_frames[idx]->height >= Qn::kMotionGridHeight))
     {
         // calculate difference between frames
         if (m_xStep == 8)
@@ -1136,7 +1136,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 
 void QnMotionEstimation::postFiltering()
 {
-    for (int y = 0; y < MD_HEIGHT; ++y)
+    for (int y = 0; y < Qn::kMotionGridHeight; ++y)
     {
         for (int x = 0; x < m_scaledWidth; ++x)
         {
@@ -1147,16 +1147,16 @@ void QnMotionEstimation::postFiltering()
                 aroundCnt+=2;
             if (y > 0 && isMotionAt((quint8*)m_resultMotion, x,y-1))
                 aroundCnt+=2;
-            if (y < MD_HEIGHT-1 && isMotionAt((quint8*)m_resultMotion, x,y+1))
+            if (y < Qn::kMotionGridHeight-1 && isMotionAt((quint8*)m_resultMotion, x,y+1))
                 aroundCnt+=2;
 
             if (x > 0 && y > 0 && isMotionAt((quint8*)m_resultMotion, x-1,y-1))
                 aroundCnt++;
-            if (x < m_scaledWidth-1 && y < MD_HEIGHT-1 && isMotionAt((quint8*)m_resultMotion, x+1,y+1))
+            if (x < m_scaledWidth-1 && y < Qn::kMotionGridHeight-1 && isMotionAt((quint8*)m_resultMotion, x+1,y+1))
                 aroundCnt++;
             if (x < m_scaledWidth-1 && y > 0 && isMotionAt((quint8*)m_resultMotion, x+1,y-1))
                 aroundCnt++;
-            if (x > 0 && y < MD_HEIGHT-1 && isMotionAt((quint8*)m_resultMotion, x-1,y+1))
+            if (x > 0 && y < Qn::kMotionGridHeight-1 && isMotionAt((quint8*)m_resultMotion, x-1,y+1))
                 aroundCnt++;
 
             if (aroundCnt >= 6 && !isMotionAt((quint8*)m_resultMotion, x,y))
@@ -1179,24 +1179,24 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 
 #if 0
 	// unit test
-    for (int x = 0; x < MD_WIDTH; ++x)
+    for (int x = 0; x < Qn::kMotionGridWidth; ++x)
     {
-        for (int y = 0; y < MD_HEIGHT; ++y)
+        for (int y = 0; y < Qn::kMotionGridHeight; ++y)
         {
             bool val = false;
             switch (m_totalFrames/8 % 4)
             {
                 case 0:
-                    val = x < MD_WIDTH/2 && y < MD_HEIGHT/2;
+                    val = x < Qn::kMotionGridWidth/2 && y < Qn::kMotionGridHeight/2;
                     break;
                 case 1:
-                    val = x > MD_WIDTH/2 && y < MD_HEIGHT/2;
+                    val = x > Qn::kMotionGridWidth/2 && y < Qn::kMotionGridHeight/2;
                     break;
                 case 2:
-                    val = x < MD_WIDTH/2 && y > MD_HEIGHT/2;
+                    val = x < Qn::kMotionGridWidth/2 && y > Qn::kMotionGridHeight/2;
                     break;
                 case 3:
-                    val = x > MD_WIDTH/2 && y > MD_HEIGHT/2;
+                    val = x > Qn::kMotionGridWidth/2 && y > Qn::kMotionGridHeight/2;
                     break;
             }
             if (val)
@@ -1205,14 +1205,14 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     }
 #else
     // scale result motion (height already valid, scale width ony. Data rotates, so actually duplicate or remove some lines
-    int lineStep = (m_scaledWidth*65536) / MD_WIDTH;
+    int lineStep = (m_scaledWidth*65536) / Qn::kMotionGridWidth;
     int scaledLineNum = 0;
     int prevILineNum = -1;
     quint32* dst = (quint32*) rez->data();
 
     //postFiltering();
 
-    for (int y = 0; y < MD_WIDTH; ++y)
+    for (int y = 0; y < Qn::kMotionGridWidth; ++y)
     {
         int iLineNum = (scaledLineNum+32768) >> 16;
         if (iLineNum > prevILineNum)
@@ -1228,7 +1228,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         scaledLineNum += lineStep;
     }
 #endif
-    memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
+    memset(m_resultMotion, 0, Qn::kMotionGridHeight * m_scaledWidth);
     m_firstFrameTime = m_lastFrameTime;
     m_totalFrames++;
 
@@ -1251,10 +1251,10 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     QnMutexLocker lock( &m_mutex );
     qFreeAligned(m_motionMask);
     qFreeAligned(m_motionSensMask);
-    m_motionMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
-    m_motionSensMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
+    m_motionMask = (quint8*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight, 32);
+    m_motionSensMask = (quint8*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight, 32);
 
-    memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
+    memset(m_motionMask, 255, Qn::kMotionGridWidth * Qn::kMotionGridHeight);
     for (int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
         for(const QRect& rect: region.getRectsBySens(sens))
@@ -1263,8 +1263,8 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
             {
                 for (int x = rect.left(); x <= rect.right(); ++x)
                 {
-                    m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
-                    m_motionSensMask[x * MD_HEIGHT + y] = sens;
+                    m_motionMask[x * Qn::kMotionGridHeight + y] = sensitivityToMask[sens];
+                    m_motionSensMask[x * Qn::kMotionGridHeight + y] = sens;
                 }
 
             }

@@ -575,17 +575,11 @@ int QnServerResourceWidget::helpTopicAt(const QPointF &) const {
     return Qn::MainWindow_MonitoringItem_Help;
 }
 
-Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
-    Q_UNUSED(channel)
-    Q_UNUSED(channelRect)
-
-    drawBackground(paintRect, painter);
-
+Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter* painter, int channel,
+    const QRectF& channelRect, const QRectF& paintRect)
+{
+    base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
     return m_renderStatus;
-}
-
-void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
-    painter->fillRect(rect, palette().color(QPalette::Window));
 }
 
 void QnServerResourceWidget::addOverlays() {

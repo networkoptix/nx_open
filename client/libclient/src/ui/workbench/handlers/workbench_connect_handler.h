@@ -1,5 +1,4 @@
-#ifndef WORKBENCH_CONNECT_HANDLER_H
-#define WORKBENCH_CONNECT_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -7,15 +6,20 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <crash_reporter.h>
 
+#include <client/client_connection_status.h>
+
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
 class QnGraphicsMessageBox;
+class QnReconnectInfoDialog;
+class QnReconnectHelper;
 struct QnConnectionInfo;
 
-class QnWorkbenchConnectHandler : public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchConnectHandler: public Connective<QObject>, public QnWorkbenchContextAware
+{
     Q_OBJECT
-    typedef QObject base_type;
-
+    using base_type = Connective<QObject>;
 public:
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
@@ -37,19 +41,7 @@ public:
             const QnRaiiGuardPtr& completionWatcher);
     };
 
-    /// @brief Connects to server and stores successful connection data
-    /// according to specified settings. If no settings are specified no
-    /// connection data will be stored.
-    ec2::ErrorCode connectToServer(const QUrl &appServerUrl,
-        const ConnectionSettingsPtr &storeSettings,
-        bool silent);
-
-    bool disconnectFromServer(bool force);
-
-    ec2::AbstractECConnectionPtr connection2() const;
-
-    bool connected() const;
-
+private:
     void showLoginDialog();
     void showWelcomeScreen();
 
@@ -57,6 +49,36 @@ public:
 
     /** Clear all local data structures. */
     void clearConnection();
+
+    /// @brief Connects to server and stores successful connection data
+    /// according to specified settings. If no settings are specified no
+    /// connection data will be stored.
+    void connectToServer(
+        const QUrl &url,
+        const ConnectionSettingsPtr &storeSettings);
+
+    bool disconnectFromServer(bool force);
+
+    void handleConnectReply(
+        int handle,
+        ec2::ErrorCode errorCode,
+        ec2::AbstractECConnectionPtr connection,
+        const ConnectionSettingsPtr &storeSettings);
+
+    void processReconnectingReply(
+        Qn::ConnectionResult status,
+        ec2::AbstractECConnectionPtr connection);
+
+    void establishConnection(
+        ec2::AbstractECConnectionPtr connection);
+
+    void storeConnectionRecord(
+        const QnConnectionInfo& info,
+        const ConnectionSettingsPtr& storeSettings);
+
+    void showWarnMessagesOnce();
+
+    void stopReconnecting();
 
 private:
     void at_messageProcessor_connectionOpened();
@@ -66,14 +88,14 @@ private:
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
 
-    void at_beforeExitAction_triggered();
 private:
-    bool m_processingConnectAction;
     int m_connectingHandle;
+    QnClientConnectionStatus m_state;
 
     /** Flag that we should handle new connection. */
-    bool m_readyForConnection;
+    bool m_warnMessagesDisplayed;
     ec2::CrashReporter m_crashReporter;
-};
 
-#endif // WORKBENCH_CONNECT_HANDLER_H
+    QPointer<QnReconnectInfoDialog> m_reconnectDialog;
+    QScopedPointer<QnReconnectHelper> m_reconnectHelper;
+};

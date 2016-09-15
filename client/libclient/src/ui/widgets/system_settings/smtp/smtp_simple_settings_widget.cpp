@@ -47,11 +47,11 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
 {
     ui->setupUi(this);
 
-    ui->emailInputField->setTitle(tr("E-Mail"));
+    ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator([](const QString& text)
     {
         if (text.trimmed().isEmpty() || !QnEmailAddress::isValid(text))
-            return Qn::ValidationResult(tr("E-Mail is not valid."));
+            return Qn::ValidationResult(tr("Email is not valid."));
 
         QnEmailAddress email(text);
         if (email.smtpServer().isNull())

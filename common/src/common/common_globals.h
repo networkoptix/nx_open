@@ -623,7 +623,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_WrongPassword, // invalid password
         Auth_Forbidden,     // no auth mehod found or custom auth scheme without login/password is failed
         Auth_PasswordExpired, // Password is expired
-        Auth_ConnectError   // can't connect to the external system to authenticate
+        Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
+        Auth_CloudConnectError   // can't connect to the Cloud to authenticate
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
 
@@ -820,8 +821,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Success,                    /*< Connection available. */
         NetworkError,               /*< Connection could not be established. */
         Unauthorized,               /*< Invalid login/password. */
-        TemporaryUnauthorized,      /*< LDAP server is not accessible. */
+        LdapTemporaryUnauthorized,  /*< LDAP server is not accessible. */
+        CloudTemporaryUnauthorized, /*< CLOUD server is not accessible. */
         IncompatibleInternal,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleCloudHost,      /*< Server has different cloud host. */
         IncompatibleVersion,        /*< Server version is too low. */
         IncompatibleProtocol        /*< Ec2 protocol versions differs.*/
     };
@@ -842,9 +845,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 
 // TODO: #Elric #enum
-
-/* Motion Detection constants */
-enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole)(Qn::ConnectionResult),

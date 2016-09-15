@@ -26,20 +26,11 @@ QnTimeScrollBar::QnTimeScrollBar(QGraphicsItem *parent):
     m_indicatorPosition(0),
     m_indicatorVisible(true)
 {
+    setAcceptHoverEvents(true);
 }
 
 QnTimeScrollBar::~QnTimeScrollBar()
 {
-}
-
-const QnTimeScrollBarColors &QnTimeScrollBar::colors() const
-{
-    return m_colors;
-}
-
-void QnTimeScrollBar::setColors(const QnTimeScrollBarColors &colors)
-{
-    m_colors = colors;
 }
 
 qint64 QnTimeScrollBar::indicatorPosition() const
@@ -52,74 +43,53 @@ void QnTimeScrollBar::setIndicatorPosition(qint64 indicatorPosition)
     m_indicatorPosition = indicatorPosition;
 }
 
-void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* _opt, QWidget *widget)
+bool QnTimeScrollBar::indicatorVisible() const
 {
-    Q_UNUSED(_opt);
-
-    Q_D(QnTimeScrollBar);
-    sendPendingMouseMoves(widget);
-
-    QStyleOptionSlider opt;
-    initStyleOption(&opt);
-
-    QnScopedPainterPenRollback penRollback(painter);
-    QnScopedPainterBrushRollback brushRollback(painter);
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-
-    /* Draw scrollbar background. */
-    painter->fillRect(rect(), palette().color(QPalette::Window));
-
-    /* Draw scrollbar handle. */
-    QRect handleRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, NULL);
-    handleRect.adjust(0, 1, 0, -1);
-
-    QColor handleColor = m_colors.handle;
-    if (auto nxStyle = QnNxStyle::instance())
-    {
-        QnPaletteColor mainColor = nxStyle->findColor(m_colors.handle);
-        if (d->pressedControl)
-            handleColor = mainColor.lighter(1);
-        else if (opt.state & QStyle::State_MouseOver)
-            handleColor = mainColor.lighter(2);
-        else
-            handleColor = mainColor;
-    }
-
-    painter->fillRect(handleRect, handleColor);
-
-    /* Draw indicator. */
-    if (m_indicatorVisible && m_indicatorPosition >= minimum() && indicatorPosition() <= maximum() + pageStep())
-    {
-        /* Calculate handle- and groove-relative indicator positions. */
-        qint64 handleValue = qBound(0ll, m_indicatorPosition - sliderPosition(), pageStep());
-        qint64 grooveValue = m_indicatorPosition - handleValue;
-
-        /* Calculate handle- and groove-relative indicator offsets. */
-        qreal grooveOffset = positionFromValue(grooveValue).x();
-        qreal handleOffset = GraphicsStyle::sliderPositionFromValue(0, pageStep(), handleValue, handleRect.width(), opt.upsideDown, true);
-
-        /* Paint it. */
-        qreal x = handleOffset + grooveOffset;
-        painter->setPen(QPen(m_colors.indicator, 2.0));
-        painter->drawLine(QPointF(x, opt.rect.top() + 1.0), QPointF(x, opt.rect.bottom())); /* + 1.0 is to deal with AA spilling the line outside the item's boundaries. */
-    }
+    return m_indicatorVisible;
 }
 
-void QnTimeScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent *)
+void QnTimeScrollBar::setIndicatorVisible(bool value)
 {
+    m_indicatorVisible = value;
+}
+
+void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    /* Draw scrollbar groove and handle. */
+    base_type::paint(painter, option, widget);
+
+    /* Draw indicator. */
+    if (!m_indicatorVisible)
+        return;
+
+    auto relativePos = m_indicatorPosition - minimum();
+    auto range = maximum() - minimum() + pageStep();
+
+    if (relativePos < 0 || relativePos >= range)
+        return;
+
+    auto grooveFraction = static_cast<qreal>(relativePos) / range;
+    int x = option->rect.left() + static_cast<int>(option->rect.width() * grooveFraction + 0.5);
+
+    /* Paint it. */
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette().text(), 2.0));
+    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
+    painter->drawLine(QPointF(x, option->rect.top() + 1.0), QPointF(x, option->rect.bottom() - 1.0));
+}
+
+void QnTimeScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    Q_UNUSED(event);
     /* No default context menu. */
 }
 
-void QnTimeScrollBar::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    base_type::mousePressEvent(event);
-}
-
-void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     Q_D(QnTimeScrollBar);
 
     // copy-paste from the base class, but it's needed to prevent double-setting of slider value
+
+    //TODO: #vkutin #common Figure out WTF is this copypaste
 
     AbstractLinearGraphicsSlider::mouseMoveEvent(event);
 
@@ -158,19 +128,4 @@ void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
         base_type::mouseMoveEvent(event);
     }
-}
-
-void QnTimeScrollBar::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    base_type::mouseReleaseEvent(event);
-}
-
-bool QnTimeScrollBar::indicatorVisible() const
-{
-    return m_indicatorVisible;
-}
-
-void QnTimeScrollBar::setIndicatorVisible(bool value)
-{
-    m_indicatorVisible = value;
 }

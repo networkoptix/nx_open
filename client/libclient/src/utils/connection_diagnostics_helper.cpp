@@ -28,8 +28,10 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
             return Qn::Empty_Help;
         case Qn::ConnectionResult::NetworkError:
         case Qn::ConnectionResult::Unauthorized:
-        case Qn::ConnectionResult::TemporaryUnauthorized:
+        case Qn::ConnectionResult::LdapTemporaryUnauthorized:
+        case Qn::ConnectionResult::CloudTemporaryUnauthorized:
         case Qn::ConnectionResult::IncompatibleInternal:
+        case Qn::ConnectionResult::IncompatibleCloudHost:
             return Qn::Login_Help;
         case Qn::ConnectionResult::IncompatibleVersion:
         case Qn::ConnectionResult::IncompatibleProtocol:
@@ -46,10 +48,54 @@ QnConnectionDiagnosticsHelper::QnConnectionDiagnosticsHelper(QObject* parent):
 {
 }
 
+QString QnConnectionDiagnosticsHelper::getErrorString(
+    Qn::ConnectionResult result,
+    const QnConnectionInfo& connectionInfo)
+{
+    QString versionDetails =
+        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
+        + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
+
+    switch (result)
+    {
+    case Qn::ConnectionResult::Success:
+        return QString();
+    case Qn::ConnectionResult::Unauthorized:
+        return tr("The username or password you have entered is incorrect. Please try again.");
+    case Qn::ConnectionResult::LdapTemporaryUnauthorized:
+        return tr("LDAP Server connection timed out.") + L'\n'
+            + strings(ErrorStrings::ContactAdministrator);
+    case Qn::ConnectionResult::CloudTemporaryUnauthorized:
+        return tr("Connection to the %1 is not ready yet. Check media server internet connection or try again later.").
+            arg(QnAppInfo::cloudName()) + L'\n' + strings(ErrorStrings::ContactAdministrator);
+    case Qn::ConnectionResult::NetworkError:
+        return tr("Connection to the Server could not be established.") + L'\n'
+            + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
+            + strings(ErrorStrings::ContactAdministrator);
+    case Qn::ConnectionResult::IncompatibleInternal:
+    case Qn::ConnectionResult::IncompatibleCloudHost:
+        return tr("You are trying to connect to incompatible Server.");
+    case Qn::ConnectionResult::IncompatibleVersion:
+    {
+        return tr("Server has a different version:") + L'\n'
+            + versionDetails
+            + tr("Compatibility mode for versions lower than %1 is not supported.")
+            .arg(QnConnectionValidator::minSupportedVersion().toString());
+    }
+    case Qn::ConnectionResult::IncompatibleProtocol:
+        return tr("Server has a different version:") + L'\n'
+            + versionDetails
+            + tr("You will be asked to restart the client in compatibility mode.");
+        break;
+    default:
+        return QString();
+    }
+
+}
+
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     const QnConnectionInfo &connectionInfo,
     ec2::ErrorCode errorCode,
-    const QUrl &url,
     QWidget* parentWidget)
 {
     using namespace Qn;
@@ -60,26 +106,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
 
     int helpTopicId = helpTopic(result);
 
-    QString detail;
-    if (result == ConnectionResult::Unauthorized)
-    {
-        detail = tr("The username or password you have entered is incorrect. Please try again.");
-    }
-    else if (result == ConnectionResult::TemporaryUnauthorized)
-    {
-        detail = tr("LDAP Server connection timed out.") + L'\n'
-            + strings(ErrorStrings::ContactAdministrator);
-    }
-    else if (result == ConnectionResult::NetworkError)
-    {
-        detail = tr("Connection to the Server could not be established.") + L'\n'
-            + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
-            + strings(ErrorStrings::ContactAdministrator);
-    }
-    else if (result == ConnectionResult::IncompatibleInternal)
-    {
-        detail = tr("You are trying to connect to incompatible Server.");
-    }
+    QString detail = getErrorString(result, connectionInfo);
 
     if (!detail.isEmpty())
     {
@@ -112,7 +139,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     }
 
     if (result == ConnectionResult::IncompatibleProtocol)
-        return handleCompatibilityMode(connectionInfo, url, parentWidget);
+        return handleCompatibilityMode(connectionInfo, parentWidget);
 
     NX_ASSERT(false);    //should never get here
     return ConnectionResult::IncompatibleVersion; //just in case
@@ -130,61 +157,12 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
     result.result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
     result.helpTopicId = helpTopic(result.result);
 
-    QString versionDetails =
-        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
-        + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
-
-    switch (result.result)
-    {
-        case ConnectionResult::Success:
-            break;
-        case ConnectionResult::Unauthorized:
-        {
-            result.details = tr("The username or password you have entered is incorrect. Please try again.");
-            break;
-        }
-        case ConnectionResult::TemporaryUnauthorized:
-        {
-            result.details = tr("LDAP Server connection timed out.") + L'\n'
-                + strings(ErrorStrings::ContactAdministrator);
-            break;
-        }
-        case ConnectionResult::NetworkError:
-        {
-            result.details = tr("Connection to the Server could not be established.") + L'\n'
-                + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
-                + strings(ErrorStrings::ContactAdministrator);
-            break;
-        }
-        case ConnectionResult::IncompatibleInternal:
-        {
-            result.details = tr("You are trying to connect to incompatible Server.");
-            break;
-        }
-        case ConnectionResult::IncompatibleVersion:
-        {
-            result.details = tr("Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("Compatibility mode for versions lower than %1 is not supported.")
-                .arg(QnConnectionValidator::minSupportedVersion().toString());
-            break;
-        }
-        case ConnectionResult::IncompatibleProtocol:
-        {
-            result.details = tr("Server has a different version:") + L'\n'
-                + versionDetails
-                + tr("You will be asked to restart the client in compatibility mode.");
-            break;
-        }
-        default:
-            break;
-    }
+    result.details = getErrorString(result.result, connectionInfo);
     return result;
 }
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     const QnConnectionInfo &connectionInfo,
-    const QUrl &url,
     QWidget* parentWidget)
 {
     using namespace Qn;
@@ -269,7 +247,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         if (button != QDialogButtonBox::Ok)
             return ConnectionResult::IncompatibleVersion;
 
-        switch (applauncher::restartClient(connectionInfo.version, url.toEncoded()))
+        switch (applauncher::restartClient(connectionInfo.version, connectionInfo.ecUrl.toEncoded()))
         {
             case applauncher::api::ResultType::ok:
                 return ConnectionResult::IncompatibleProtocol;

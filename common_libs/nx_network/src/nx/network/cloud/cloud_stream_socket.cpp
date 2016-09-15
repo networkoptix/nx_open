@@ -430,6 +430,12 @@ bool CloudStreamSocket::startAsyncConnect(
                     auto operationLock = sharedOperationGuard->lock();
                     if (!operationLock)
                         return; //operation has been cancelled
+
+                    if (errorCode == SystemError::noError)
+                    {
+                        NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
+                    }
+
                     dispatch(
                         [this, errorCode, 
                             cloudConnection = std::move(cloudConnection)]() mutable

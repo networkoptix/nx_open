@@ -16,6 +16,7 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
             if (server && resource->getId() == qnCommon->moduleGUID())
             {
                 connect(server.data(), &QnMediaServerResource::serverFlagsChanged, this, &QnMasterServerStatusWatcher::at_updateMasterFlag);
+                at_updateMasterFlag();
             }
         });
 

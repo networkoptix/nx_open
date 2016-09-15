@@ -4,6 +4,8 @@
 #include <nx/utils/raii_guard.h>
 #include <utils/common/connective.h>
 
+#include <ui/widgets/common/emulated_frame_widget.h>
+
 namespace {
 
 typedef QMultiMap<int, QScreen*> SortedScreens;
@@ -49,7 +51,7 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
         ? (it == xSorted.begin() ? xSorted.end() : it - 1)
         : (it == (xSorted.end() - 1) ? xSorted.end() : it + 1));
 
-    if (it == xSorted.end())
+    if (itRealScreen == xSorted.end())
         return QPoint();
 
     // We've found prev screen
@@ -58,7 +60,13 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
     const auto offset = (backwardSearch ? QPoint(targetGeometry.width(), 0) : QPoint());
     const auto factor = appropriate->devicePixelRatio();
     const auto targetTopLeft = targetGeometry.topLeft();
-    return targetTopLeft + offset + pixelPointOnScreen / factor;
+
+    const auto result = targetTopLeft + offset + pixelPointOnScreen / factor;;
+    if (appropriate->geometry().contains(result))
+        return result;
+
+    // Looking for next screen
+    return screenRelatedToGlobal(result, appropriate);
 }
 
 QScreen* getScreen(const QPoint& scaled)
@@ -205,18 +213,44 @@ QPoint getPoint(QWidget* widget, const QPoint& offset, QWindow* parentWindow = n
     return screenRelatedToGlobal(globalPos, parentWindow->screen());
 }
 
-class CE : public QContextMenuEvent
+class TopLevelWidgetsPositionCorrector : public QObject
 {
 public:
-    CE(QContextMenuEvent::Reason reason, const QPoint& pos, const QPoint& globalPos)
-        :QContextMenuEvent(QContextMenuEvent::Mouse,   //< Always set mouse to prevent coordinates transforming
-            pos, globalPos)
-    {}
+    bool eventFilter(QObject*watched, QEvent* event)
+    {
+        if (event->type() != QEvent::Show)
+            return QObject::eventFilter(watched, event);
+
+        QWidget* properWidget = dynamic_cast<QnEmulatedFrameWidget*>(watched);  // Main window
+        if (!properWidget)
+            properWidget = dynamic_cast<QDialog*>(watched); // Any dialog
+        if (!properWidget)
+            return QObject::eventFilter(watched, event);
+
+        const auto parentWindow = getParentWindow(properWidget);
+        const auto geometry = properWidget->geometry();
+        qDebug() << "1" << parentWindow->screen();
+        const auto fixedPos = screenRelatedToGlobal(
+            parentWindow->geometry().topLeft(), parentWindow->screen());
+        parentWindow->setScreen(getScreen(fixedPos));
+        qDebug() << "2" << parentWindow->screen();
+        parentWindow->setPosition(fixedPos);
+        return QObject::eventFilter(watched, event);
+    }
 };
 
 class ContextMenuEventCorrector : public QObject
 {
-private:
+    class ProxyContextMenuEvent : public QContextMenuEvent
+    {
+    public:
+        ProxyContextMenuEvent(const QPoint& pos, const QPoint& globalPos)
+            :QContextMenuEvent(QContextMenuEvent::Mouse,   //< Always set mouse to prevent coordinates transforming
+                pos, globalPos)
+        {}
+    };
+
+public:
     bool eventFilter(QObject*watched, QEvent* event)
     {
         if (event->type() != QEvent::ContextMenu)
@@ -225,10 +259,10 @@ private:
         const auto contextMenuEvent = static_cast<QContextMenuEvent*>(event);
         const auto widget = dynamic_cast<QWidget*>(watched);
         const auto parentWindow = getParentWindow(widget);
-        if (!dynamic_cast<CE*>(event) && parentWindow)
+        if (!dynamic_cast<ProxyContextMenuEvent*>(event) && parentWindow)
         {
             const auto targetPos = getPoint(widget, contextMenuEvent->pos(), parentWindow);
-            auto fixedEvent = CE(contextMenuEvent->reason(), contextMenuEvent->pos(), targetPos);
+            auto fixedEvent = ProxyContextMenuEvent(contextMenuEvent->pos(), targetPos);
             if (!qApp->sendEvent(watched, &fixedEvent) || !fixedEvent.isAccepted())
                 return QObject::eventFilter(watched, event);
 
@@ -265,6 +299,7 @@ void QnHiDpiWorkarounds::init()
 {
 #if defined(Q_OS_WIN)
     qApp->installEventFilter(new ContextMenuEventCorrector());
+    qApp->installEventFilter(new TopLevelWidgetsPositionCorrector());
 #endif
 }
 

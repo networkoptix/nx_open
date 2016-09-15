@@ -15,7 +15,6 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
@@ -24,43 +23,7 @@ class QnNotificationWidget;
 class QnParticleItem;
 class QnToolTipWidget;
 class QnCameraThumbnailManager;
-
-/**
- * An image button widget that displays thumbnail behind the button.
- */
-class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
-    Q_OBJECT
-    typedef QnImageButtonWidget base_type;
-
-public:
-    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
-
-public slots:
-    void setNotificationCount(int count);
-    void setColor(const QColor &color);
-
-protected:
-    virtual void tick(int deltaMSecs) override;
-
-private slots:
-    void showBalloon();
-    void hideBalloon();
-
-    void updateParticleGeometry();
-    void updateParticleVisibility();
-    void updateToolTip();
-    void updateBalloonTailPos();
-    void updateBalloonGeometry();
-
-    void at_particle_visibleChanged();
-
-private:
-    QnToolTipWidget *m_balloon;
-    QnParticleItem *m_particle;
-    qint64 m_time;
-    int m_count;
-};
-
+class QnBlinkingImageButtonWidget;
 
 class QnNotificationsCollectionWidget: public Connective<GraphicsWidget>, public QnWorkbenchContextAware {
     Q_OBJECT

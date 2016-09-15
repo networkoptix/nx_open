@@ -23,7 +23,7 @@
 namespace {
 
 #ifdef _DEBUG
-#define QN_RECONNECT_HELPER_LOG
+//#define QN_RECONNECT_HELPER_LOG
 #endif
 
     void printLog(const QByteArray &message, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr())

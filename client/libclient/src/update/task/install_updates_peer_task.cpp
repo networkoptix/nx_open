@@ -163,9 +163,10 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     else if (!m_stoppingPeers.contains(peerId))
         m_restartingPeers.remove(peerId);
 
-    QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    NX_ASSERT(server);
 
-    if (server->getVersion() == m_version) {
+    if (server && server->getVersion() == m_version) {
         m_pendingPeers.remove(peerId);
         m_stoppingPeers.remove(peerId);
         m_restartingPeers.remove(peerId);

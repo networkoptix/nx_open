@@ -2108,14 +2108,13 @@ QRect QnNxStyle::subControlRect(
         SubControl subControl,
         const QWidget *widget) const
 {
-    QRect rect = base_type::subControlRect(control, option, subControl, widget);
-
     switch (control)
     {
         case CC_Slider:
         {
             if (auto slider = qstyleoption_cast<const QStyleOptionSlider*>(option))
             {
+                QRect rect = base_type::subControlRect(CC_Slider, option, subControl, widget);
                 int tickSize = proxy()->pixelMetric(PM_SliderTickmarkOffset, option, widget);
 
                 switch (subControl)
@@ -2177,6 +2176,8 @@ QRect QnNxStyle::subControlRect(
                     default:
                         break;
                 }
+
+                return rect;
             }
             break;
         }
@@ -2185,6 +2186,7 @@ QRect QnNxStyle::subControlRect(
         {
             if (auto comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option))
             {
+                QRect rect;
                 switch (subControl)
                 {
                     case SC_ComboBoxArrow:
@@ -2207,8 +2209,11 @@ QRect QnNxStyle::subControlRect(
                     }
 
                     default:
+                        rect = base_type::subControlRect(CC_ComboBox, option, subControl, widget);
                         break;
                 }
+
+                return rect;
             }
             break;
         }
@@ -2364,12 +2369,7 @@ QRect QnNxStyle::subControlRect(
         {
             if (auto scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
             {
-                /* For some reason QCommonStyle returns scrollbar subcontrol rects in local coordinates.
-                 * Fix that: */
-                rect.moveTopLeft(option->rect.topLeft() + rect.topLeft());
-
-                const int w = pixelMetric(PM_ScrollBarExtent, option, widget);
-
+                QRect rect = scrollBar->rect;
                 switch (subControl)
                 {
                     case SC_ScrollBarAddLine:
@@ -2387,34 +2387,68 @@ QRect QnNxStyle::subControlRect(
                         break;
 
                     case SC_ScrollBarGroove:
-                        rect = scrollBar->rect;
                         break;
 
                     case SC_ScrollBarSlider:
-                        if (scrollBar->orientation == Qt::Vertical)
-                            rect.adjust(0, -w, 0, w);
-                        else
-                            rect.adjust(-w, 0, w, 0);
-                        break;
-
                     case SC_ScrollBarAddPage:
-                        if (scrollBar->orientation == Qt::Vertical)
-                            rect.adjust(0, w, 0, 0);
-                        else
-                            rect.adjust(w, 0, 0, 0);
-                        break;
-
                     case SC_ScrollBarSubPage:
-                        if (scrollBar->orientation == Qt::Vertical)
-                            rect.adjust(0, 0, 0, -w);
-                        else
-                            rect.adjust(0, 0, -w, 0);
-                        break;
+                    {
+                        qreal range = scrollBar->maximum - scrollBar->minimum;
+                        int maxLength = scrollBar->orientation == Qt::Vertical
+                            ? rect.height()
+                            : rect.width();
 
-                    default:
+                        int minLength = proxy()->pixelMetric(PM_ScrollBarSliderMin, scrollBar, widget);
+
+                        int sliderLength = static_cast<int>(
+                            (static_cast<qreal>(maxLength) * scrollBar->pageStep)
+                            / (range + scrollBar->pageStep) + 0.5);
+
+                        sliderLength = qBound(minLength, sliderLength, maxLength);
+
+                        int pos = sliderPositionFromValue(
+                            scrollBar->minimum,
+                            scrollBar->maximum,
+                            scrollBar->sliderPosition,
+                            maxLength - sliderLength,
+                            scrollBar->upsideDown);
+
+                        switch (subControl)
+                        {
+                            case SC_ScrollBarSlider:
+                                if (scrollBar->orientation == Qt::Vertical)
+                                    rect = QRect(rect.left(), rect.top() + pos, rect.width(), sliderLength);
+                                else
+                                    rect = QRect(rect.left() + pos, rect.top(), sliderLength, rect.height());
+                                break;
+
+                            case SC_ScrollBarAddPage:
+                                if (scrollBar->orientation == Qt::Vertical)
+                                    rect = QRect(QPoint(rect.left(), rect.top() + pos + sliderLength), rect.bottomRight());
+                                else
+                                    rect = QRect(QPoint(rect.left() + pos + sliderLength, rect.top()), rect.bottomRight());
+                                break;
+
+                            case SC_ScrollBarSubPage:
+                                if (scrollBar->orientation == Qt::Vertical)
+                                    rect = QRect(rect.left(), rect.top(), rect.width(), pos);
+                                else
+                                    rect = QRect(rect.left(), rect.top(), pos, rect.height());
+                                break;
+                        }
+
                         break;
+                    }
+
+                    case SC_ScrollBarFirst:
+                    case SC_ScrollBarLast:
+                    default:
+                        return QRect();
                 }
+
+                return visualRect(scrollBar->direction, scrollBar->rect, rect);
             }
+
             break;
         }
 
@@ -2422,7 +2456,7 @@ QRect QnNxStyle::subControlRect(
             break;
     }
 
-    return rect;
+    return base_type::subControlRect(control, option, subControl, widget);
 }
 
 QRect QnNxStyle::subElementRect(

@@ -221,7 +221,7 @@ void QnLoginDialog::accept()
         m_requestHandle = -1;
         updateUsability();
 
-        auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, this);
         switch (status)
         {
             case Qn::ConnectionResult::Success:
@@ -365,8 +365,11 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
             /* Do not show servers with incompatible customization or cloud host */
             if (!qnRuntime->isDevMode()
-                && compatibilityCode == Qn::ConnectionResult::IncompatibleInternal)
+                && (compatibilityCode == Qn::ConnectionResult::IncompatibleInternal
+                    || compatibilityCode == Qn::ConnectionResult::IncompatibleCloudHost))
+            {
                     continue;
+            }
 
             bool isCompatible = (compatibilityCode == Qn::ConnectionResult::Success);
 

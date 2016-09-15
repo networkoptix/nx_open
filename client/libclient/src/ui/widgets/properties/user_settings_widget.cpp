@@ -354,13 +354,13 @@ void QnUserSettingsWidget::setupInputFields()
 
     ui->nameInputField->setTitle(tr("Name"));
 
-    ui->emailInputField->setTitle(tr("E-Mail"));
+    ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
-    ui->cloudEmailInputField->setTitle(tr("E-Mail"));
+    ui->cloudEmailInputField->setTitle(tr("Email"));
     ui->cloudEmailInputField->setValidator([this](const QString& text)
     {
-        Qn::ValidationResult result = Qn::defaultNonEmptyValidator(tr("E-Mail cannot be empty."))(text);
+        Qn::ValidationResult result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
         if (result.state != QValidator::Acceptable)
             return result;
 

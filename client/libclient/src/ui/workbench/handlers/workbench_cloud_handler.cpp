@@ -76,19 +76,6 @@ void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
     /* Updating login if were logged under temporary credentials. */
     qnCloudStatusWatcher->setCloudCredentials(QnCredentials(
         qnCloudStatusWatcher->effectiveUserName(), QString()));
-
-    /* Check if we need to logout if logged in under this user. */
-    const auto state = qnDesktopClientMessageProcessor->connectionState();
-    if (state == QnConnectionState::Disconnected)
-        return;
-
-    QString currentLogin = QnAppServerConnectionFactory::url().userName();
-    if (currentLogin.isEmpty())
-        return;
-
-    if (qnCloudStatusWatcher->effectiveUserName() == currentLogin)
-        menu()->trigger(QnActions::DisconnectAction,
-            QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
 void QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered()

@@ -1,24 +1,23 @@
-#ifndef QN_RECONNECT_INFO_DIALOG_H
-#define QN_RECONNECT_INFO_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 
-#include <ui/dialogs/common/dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 #include <core/resource/resource_fwd.h>
 
 namespace Ui {
-    class ReconnectInfoDialog;
+class ReconnectInfoDialog;
 }
 
-class QnReconnectInfoDialog: public QnDialog {
+class QnReconnectInfoDialog: public QnButtonBoxDialog
+{
     Q_OBJECT
 
-    typedef QnDialog base_type;
+    using base_type = QnButtonBoxDialog;
 public:
-    explicit QnReconnectInfoDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    explicit QnReconnectInfoDialog(QWidget *parent = NULL,
+        Qt::WindowFlags windowFlags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     virtual ~QnReconnectInfoDialog();
-
-    bool wasCanceled() const;
 
     QnMediaServerResourceList servers() const;
     void setServers(const QnMediaServerResourceList &servers);
@@ -30,13 +29,11 @@ public:
 
 signals:
     void currentServerChanged(const QnMediaServerResourcePtr &server);
+
 private:
     Q_DISABLE_COPY(QnReconnectInfoDialog);
 
     QScopedPointer<Ui::ReconnectInfoDialog> ui;
     QnMediaServerResourceList m_servers;
     QnMediaServerResourcePtr m_currentServer;
-    bool m_cancelled;
 };
-
-#endif //QN_RECONNECT_INFO_DIALOG_H

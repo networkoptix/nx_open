@@ -6,6 +6,8 @@
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
+#include <motion/motion_detection.h>
+
 #include <recording/time_period_list.h>
 
 #include <nx/fusion/serialization/json.h>
@@ -52,7 +54,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
 
     QVector<char*> masks;
     for (int i = 0; i < motionRegions.size(); ++i) {
-        masks << (char*) qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, CL_MEDIA_ALIGNMENT);
+        masks << (char*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8, CL_MEDIA_ALIGNMENT);
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
 

@@ -130,6 +130,8 @@ public:
 
     virtual ~QnTimeSlider();
 
+    void invalidateWindow();
+
     int lineCount() const;
     void setLineCount(int lineCount);
 
@@ -208,6 +210,9 @@ public:
 
     const QnTimeSliderColors& colors() const;
     void setColors(const QnTimeSliderColors& colors);
+
+    bool isTooltipVisible() const;
+    void setTooltipVisible(bool visible);
 
     void setLastMinuteIndicatorVisible(int line, bool visible);
     bool isLastMinuteIndicatorVisible(int line) const;
@@ -365,7 +370,7 @@ private:
     int findTopLevelStepIndex() const;
 
     void updatePixmapCache();
-    void updateToolTipVisibility();
+    void updateToolTipVisibilityInternal(bool animated);
     void updateToolTipText();
     void updateSteps();
     void updateTickmarkTextSteps();
@@ -395,10 +400,10 @@ private:
 
     void setThumbnailSelecting(qint64 time, bool selecting);
 
-    void setAnimationStart(qint64 start);
-    void setAnimationEnd(qint64 end);
-    qint64 animationStart();
-    qint64 animationEnd();
+    void setTargetStart(qint64 start);
+    void setTargetEnd(qint64 end);
+    qint64 targetStart();
+    qint64 targetEnd();
 
     void generateProgressPatterns();
 
@@ -427,9 +432,9 @@ private:
     QnBoundedLinearFunction m_boundMapper;
 
     qint64 m_zoomAnchor;
-    bool m_animating;
+    bool m_animatingSliderWindow;
     bool m_kineticsHurried;
-    qint64 m_animationStart, m_animationEnd;
+    qint64 m_targetStart, m_targetEnd;
     Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;
@@ -457,6 +462,7 @@ private:
     QRectF m_thumbnailsPaintRect;
     qint64 m_lastHoverThumbnail;
     bool m_thumbnailsVisible;
+    bool m_tooltipVisible;
 
     qreal m_rulerHeight;
 

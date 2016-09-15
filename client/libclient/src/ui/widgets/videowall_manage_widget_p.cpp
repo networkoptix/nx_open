@@ -299,7 +299,7 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, con
         return;
     base_type::paint(painter, process);
     if (!process.isRunning())
-        paintPixmap(painter, bodyRect(), qnSkin->pixmap("item/add.png"));
+        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png"));
 }
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const {
@@ -354,7 +354,7 @@ QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(int idx, const QRect &r
             QRect partRect(rect.x() + width * j, rect.y() + height * k, width, height);
             ModelScreenPart part(idx, j, k, partRect, q);
             parts << part;
-        } 
+        }
     }
 }
 
@@ -427,7 +427,7 @@ void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value) {
 
 void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
     base_type::paintProposed(painter, proposedGeometry);
-    
+
     Q_Q(const QnVideowallManageWidget);
     QnScopedPainterPenRollback pen(painter, Qt::NoPen);
     QnScopedPainterBrushRollback brush(painter, q->colors().error);
@@ -581,7 +581,7 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
         videowall->items()->addOrUpdateItem(item);
     }
 
-    /* Delete other items. */ 
+    /* Delete other items. */
     foreach (const QnUuid &toDelete, existingIds)
         videowall->items()->removeItem(toDelete);
 
@@ -728,9 +728,9 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
     });
 
     for (auto item = m_items.begin(); item != m_items.end(); ++item) {
-        if (!item->editable || !item->deleteButtonRect().contains(pos)) 
+        if (!item->editable || !item->deleteButtonRect().contains(pos))
             continue;;
-        
+
         if (item->itemType == ItemType::Existing) {
             if (QnMessageBox::question(
                 q_ptr,
@@ -739,7 +739,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
                 QDialogButtonBox::Ok | QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
                 return;
         }
-        
+
         setFree(item->snaps, true);
         m_items.removeAt(std::distance(m_items.begin(), item));
         emit itemsChanged();
@@ -756,11 +756,11 @@ void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
         abort = true;   //no more than one such item must exist
 
         m_process.value = transformationsAnchor(item.bodyRect(), pos);
-        if (m_process == ItemTransformation::None) 
+        if (m_process == ItemTransformation::None)
             return;
 
         calculateProposedGeometryFunction func = [this](const BaseModelItem &item, bool *valid, bool *multiScreen) {
-            if (m_process == ItemTransformation::Move) 
+            if (m_process == ItemTransformation::Move)
                 return calculateProposedMoveGeometry(item, valid, multiScreen);
             return calculateProposedResizeGeometry(item, valid, multiScreen);
         };
@@ -797,7 +797,7 @@ void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos) {
             return;
 
         calculateProposedGeometryFunction func = [this](const BaseModelItem &item, bool *valid, bool *multiScreen) {
-            if (m_process == ItemTransformation::Move) 
+            if (m_process == ItemTransformation::Move)
                 return calculateProposedMoveGeometry(item, valid, multiScreen);
             return calculateProposedResizeGeometry(item, valid, multiScreen);
         };
@@ -1041,7 +1041,7 @@ void QnVideowallManageWidgetPrivate::processItemEnd(BaseModelItem &item, calcula
             foreach(const ModelScreen &screen, m_screens) {
                 if (!screen.geometry.intersects(newGeometry))
                     continue;
-                if (screen.geometry == newGeometry) 
+                if (screen.geometry == newGeometry)
                     item.snaps = screen.snaps;
                 else
                     item.snaps = snapsFromGeometry(screen.parts, newGeometry);

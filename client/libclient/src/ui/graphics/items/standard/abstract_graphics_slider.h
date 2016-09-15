@@ -23,47 +23,48 @@ class AbstractGraphicsSlider : public GraphicsWidget
     typedef GraphicsWidget base_type;
 
 public:
-    explicit AbstractGraphicsSlider(QGraphicsItem *parent = 0);
+    explicit AbstractGraphicsSlider(QGraphicsItem* parent = nullptr);
     virtual ~AbstractGraphicsSlider();
 
     Qt::Orientation orientation() const;
     void setOrientation(Qt::Orientation);
 
     qint64 minimum() const;
-    void setMinimum(qint64);
+    void setMinimum(qint64 min);
 
     qint64 maximum() const;
-    void setMaximum(qint64);
+    void setMaximum(qint64 max);
 
     void setRange(qint64 min, qint64 max);
 
     qint64 singleStep() const;
-    void setSingleStep(qint64);
+    void setSingleStep(qint64 singleStep);
 
     qint64 pageStep() const;
-    void setPageStep(qint64);
+    void setPageStep(qint64 pageStep);
 
     bool hasTracking() const;
     void setTracking(bool enable);
 
     bool isSliderDown() const;
-    void setSliderDown(bool);
+    void setSliderDown(bool down);
 
     qint64 sliderPosition() const;
-    void setSliderPosition(qint64);
+    void setSliderPosition(qint64 position);
 
     qint64 value() const;
 
     bool invertedAppearance() const;
-    void setInvertedAppearance(bool);
+    void setInvertedAppearance(bool invert);
 
     bool invertedControls() const;
-    void setInvertedControls(bool);
+    void setInvertedControls(bool invert);
 
     bool isWheelingAccelerated() const;
-    void setWheelingAccelerated(bool);
+    void setWheelingAccelerated(bool enable);
 
-    enum SliderAction {
+    enum SliderAction
+    {
         SliderNoAction,
         SliderSingleStepAdd,
         SliderSingleStepSub,
@@ -77,10 +78,10 @@ public:
     void triggerAction(SliderAction action);
 
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const = 0;
-    virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const = 0;
+    virtual qint64 valueFromPosition(const QPointF& position, bool bound = true) const = 0;
 
 public Q_SLOTS:
-    void setValue(qint64);
+    void setValue(qint64 value);
 
 Q_SIGNALS:
     void valueChanged(qint64 value);
@@ -100,7 +101,7 @@ protected:
     void setRepeatAction(SliderAction action, int thresholdTime = 500, int repeatTime = 50);
 
     void sendPendingMouseMoves(bool checkPosition = true);
-    void sendPendingMouseMoves(QWidget *widget, bool checkPosition = true);
+    void sendPendingMouseMoves(QWidget* widget, bool checkPosition = true);
 
     enum SliderChange {
         SliderRangeChange,
@@ -111,21 +112,21 @@ protected:
     };
     virtual void sliderChange(SliderChange change);
 
-    virtual void initStyleOption(QStyleOption *option) const override;
+    virtual void initStyleOption(QStyleOption* option) const override;
 
-    virtual bool event(QEvent *event) override;
-    virtual void changeEvent(QEvent *event) override;
-    virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual void timerEvent(QTimerEvent *event) override;
+    virtual bool event(QEvent* event) override;
+    virtual void changeEvent(QEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
+    virtual void timerEvent(QTimerEvent* event) override;
 #ifndef QT_NO_WHEELEVENT
-    virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+    virtual void wheelEvent(QGraphicsSceneWheelEvent* event) override;
 #endif
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 protected:
-    AbstractGraphicsSlider(AbstractGraphicsSliderPrivate &dd, QGraphicsItem *parent);
+    AbstractGraphicsSlider(AbstractGraphicsSliderPrivate& dd, QGraphicsItem* parent);
 
 private:
     Q_DISABLE_COPY(AbstractGraphicsSlider)

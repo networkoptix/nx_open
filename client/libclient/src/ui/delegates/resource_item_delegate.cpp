@@ -463,8 +463,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     else if (nodeType == Qn::RecorderNode)
     {
         auto firstChild = index.model()->index(0, 0, index);
-        NX_ASSERT(firstChild.isValid());
-        if (!firstChild.isValid())
+        if (!firstChild.isValid()) /* This can happen in rows deleting */
             return;
         QnResourcePtr resource = firstChild.data(Qn::ResourceRole).value<QnResourcePtr>();
         extInfo = QnResourceDisplayInfo(resource).extraInfo();

@@ -12,12 +12,15 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include "utils/math/math.h"
+#include <utils/math/math.h>
+#include <nx/utils/string.h>
 
 namespace {
 
 /** How many ms before expiration should we show warning. Default value is 15 days. */
 const qint64 kExpirationWarningTimeMs = 15ll * 1000ll * 60ll * 60ll * 24ll;
+
+const int kMaxStatusLength = 20;
 
 }
 
@@ -79,7 +82,12 @@ QVariant QnLicenseListModel::data(const QModelIndex& index, int role) const
                         : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate);
 
                 case LicenseStatusColumn:
-                    return getLicenseStatus(license);
+                {
+                    QString status = getLicenseStatus(license);
+                    return role != Qt::DisplayRole
+                        ? status
+                        : nx::utils::elideString(status, kMaxStatusLength);
+                }
 
                 case ServerColumn:
                     return server

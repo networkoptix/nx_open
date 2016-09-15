@@ -147,19 +147,18 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_separators->setFrameColor(palette().color(QPalette::Midlight));
     m_separators->setFrameWidth(1.0);
 
-    auto updateTimelineMode =
-        [this, timelinePlaceholder]()
+    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged, this,
+        [this, timelinePlaceholder](bool isRelevant)
         {
-            bool isTimeline = isTimelineRelevant();
-            m_timeSlider->setVisible(isTimeline);
-            m_timeScrollBar->setVisible(isTimeline);
-            timelinePlaceholder->setVisible(!isTimeline);
-            m_separators->setFrameColor(palette().color(isTimeline ? QPalette::Shadow : QPalette::Midlight));
-            m_separators->setFrameWidth(isTimeline ? 2.0 : 1.0);
-        };
-
-    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,      this, updateTimelineMode);
-    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,   this, updateTimelineMode);
+            bool reset = m_timeSlider->isVisible() != isRelevant;
+            m_timeSlider->setVisible(isRelevant);
+            m_timeScrollBar->setVisible(isRelevant);
+            timelinePlaceholder->setVisible(!isRelevant);
+            m_separators->setFrameColor(palette().color(isRelevant ? QPalette::Shadow : QPalette::Midlight));
+            m_separators->setFrameWidth(isRelevant ? 2.0 : 1.0);
+            if (reset)
+                m_timeSlider->invalidateWindow();
+        });
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);

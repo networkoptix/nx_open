@@ -462,6 +462,7 @@ void QnAccessibleResourcesWidget::refreshModel()
     m_resourcesModel->setResources(QnResourceList());
     for (const QnResourcePtr& resource : qnResPool->getResources())
         handleResourceAdded(resource);
+    indirectAccessChanged();
 }
 
 void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* event)

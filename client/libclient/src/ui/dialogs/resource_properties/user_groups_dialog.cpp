@@ -42,16 +42,6 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnUserGroupsDialog::accessibleLayoutsChanged);
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
-        [this](const QSet<QnUuid>& resourceIds)
-        {
-            if (resourceIds.contains(m_model->selectedGroup()))
-            {
-                m_camerasPage->indirectAccessChanged();
-                m_layoutsPage->indirectAccessChanged();
-            }
-        });
-
     for (auto page : allPages())
     {
         /* Changes are locally stored in model. */

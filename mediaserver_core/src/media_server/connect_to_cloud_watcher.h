@@ -19,6 +19,7 @@ public:
     virtual ~QnConnectToCloudWatcher();
 private slots:
     void at_updateConnection();
+    void restartTimer();
 private:
     QUrl m_cloudUrl;
     QTimer m_timer;
