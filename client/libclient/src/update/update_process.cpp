@@ -11,7 +11,6 @@
 #include <core/resource/media_server_resource.h>
 
 #include <update/task/check_update_peer_task.h>
-#include <update/task/validate_update_peer_task.h>
 #include <update/task/download_updates_peer_task.h>
 #include <update/task/rest_update_peer_task.h>
 #include <update/task/check_free_space_peer_task.h>
@@ -273,7 +272,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
 
     clearUpdatesCache(m_target.version);
 
-    validateUpdate();
+    downloadUpdates();
 }
 
 void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode) {
@@ -331,19 +330,6 @@ void QnUpdateProcess::checkFreeSpace()
         checkFreeSpacePeerTask, &QObject::deleteLater);
     m_currentTask = checkFreeSpacePeerTask;
     checkFreeSpacePeerTask->start(m_targetPeerIds + m_incompatiblePeerIds);
-}
-
-void QnUpdateProcess::validateUpdate()
-{
-    setStage(QnFullUpdateStage::Validate);
-
-    auto validateTask = new QnValidateUpdatePeerTask();
-    connect(validateTask, &QnNetworkPeerTask::finished,
-        this, &QnUpdateProcess::at_validateTask_finished);
-    connect(validateTask, &QnNetworkPeerTask::finished,
-        validateTask, &QObject::deleteLater);
-    m_currentTask = validateTask;
-    validateTask->start(m_targetPeerIds + m_incompatiblePeerIds);
 }
 
 void QnUpdateProcess::installClientUpdate() {
@@ -442,24 +428,6 @@ void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
     }
 
     installUpdatesToServers();
-}
-
-void QnUpdateProcess::at_validateTask_finished(int errorCode, const QSet<QnUuid>& failedPeers)
-{
-    if (errorCode != 0)
-    {
-        setAllPeersStage(QnPeerUpdateStage::Init);
-
-        auto resultCode = QnUpdateResult::ValidationFailed;
-        if (errorCode == QnValidateUpdatePeerTask::CloudHostConflict)
-            resultCode = QnUpdateResult::ValidationFailed_CloudHostConflict;
-
-        m_failedPeerIds = failedPeers;
-        finishUpdate(resultCode);
-        return;
-    }
-
-    downloadUpdates();
 }
 
 void QnUpdateProcess::at_checkFreeSpaceTask_finished(
