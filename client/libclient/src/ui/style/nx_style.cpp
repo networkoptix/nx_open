@@ -2975,7 +2975,7 @@ int QnNxStyle::pixelMetric(
         case PM_ScrollBarExtent:
             return dp(8);
         case PM_ScrollBarSliderMin:
-            return dp(8);
+            return dp(24);
 
         case PM_SplitterWidth:
             return dp(5);
