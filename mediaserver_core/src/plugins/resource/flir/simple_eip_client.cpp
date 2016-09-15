@@ -213,7 +213,9 @@ bool SimpleEIPClient::tryGetResponse(const MessageRouterRequest &request, QByteA
     auto header = EIPPacket::parseHeader(QByteArray(m_recvBuffer, EIPEncapsulationHeader::SIZE));
     data = QByteArray(m_recvBuffer, EIPEncapsulationHeader::SIZE + header.dataLength);
 
-    *outStatus = header.status;
+    if (outStatus)
+        *outStatus = header.status;
+
     return true;
     
 }
@@ -251,7 +253,7 @@ MessageRouterResponse SimpleEIPClient::doServiceRequest(const MessageRouterReque
     if(status == EIPStatus::kEipStatusInvalidSessionHandle)
     {
         registerSessionUnsafe();
-        tryGetResponse(request, response);
+        tryGetResponse(request, response, &status);
     }
 
     return getServiceResponseData(response);
