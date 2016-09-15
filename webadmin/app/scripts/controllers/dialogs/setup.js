@@ -121,9 +121,12 @@ angular.module('webadminApp')
 
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
-            $log.log("check system configuration", user);
-
+            $log.log("check system configuration, current user:", user);
+            if(!user){
+                $log.log("Authorization failed, user is not defined.", user);
+            }
             $scope.settings.localLogin = user.name || Config.defaultLogin;
+
 
             if(debugMode) {
                 checkInternet(false);
@@ -223,6 +226,7 @@ angular.module('webadminApp')
                 'CONFIGURATION_ERROR':'fail',
 
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':'fail',
+                'BOTH_SYSTEM_BOUND_TO_CLOUD':'fail',
                 'DIFFERENT_CLOUD_HOST':'fail'
             };
             return errorClasses[error] || 'fail';
@@ -245,6 +249,7 @@ angular.module('webadminApp')
 
 
                 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD': L.join.cloudError,
+                'BOTH_SYSTEM_BOUND_TO_CLOUD': L.join.cloudError,
                 'DIFFERENT_CLOUD_HOST':L.join.cloudHostConflict,
 
                 'currentPassword': L.join.incorrectCurrentPassword,
