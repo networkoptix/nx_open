@@ -52,7 +52,7 @@ void DirectEndpointConnector::connect(
 
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
 
-    // TODO: Performing /api/moduleInformation HTTP requests since 
+    // Performing /api/moduleInformation HTTP requests since 
     //  currently only mediaserver can be on remote side
 
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
