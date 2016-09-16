@@ -157,6 +157,9 @@ angular.module('webadminApp')
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
                         }).then(function(data){
+                            if(data.data.error != "0"){
+                                return $q.reject(data.data);
+                            }
                             $localStorage.login = login;
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
