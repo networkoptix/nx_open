@@ -341,11 +341,12 @@ public:
                 partialScanProcessed = true;
                 QMap<DeviceFileCatalogPtr, qint64> catalogToScan; // key - catalog, value - start scan time;
                 {
+                    int storageIndex = qnStorageDbPool->getStorageIndex(scanData.storage);
                     QnMutexLocker lock(&m_owner->m_mutexCatalog);
                     for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
-                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime(storageIndex));
                     for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::HiQualityCatalog])
-                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime(storageIndex));
                 }
                 int totalStorageStep = catalogToScan.size();
                 int currentStorageStep = 0;

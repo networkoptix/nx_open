@@ -133,6 +133,7 @@ public:
     void addRecord(const Chunk& chunk);
     Chunk updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration);
     qint64 lastChunkStartTime() const;
+    qint64 lastChunkStartTime(int storageIndex) const;
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
 
     Chunk deleteFirstRecord(); 
