@@ -25,7 +25,9 @@ const QnVirtualCameraResourceList& QnSelectDevicesButton::selectedDevices() cons
 void QnSelectDevicesButton::setSelectedDevices(const QnVirtualCameraResourceList& list)
 {
     m_selectedDevices = list;
-    updateData();
+
+    if (m_mode == Selected)
+        updateData();
 }
 
 QnSelectDevicesButton::SingleDeviceParameters QnSelectDevicesButton::singleDeviceParameters() const
