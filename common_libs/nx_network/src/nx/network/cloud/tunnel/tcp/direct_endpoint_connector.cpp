@@ -58,27 +58,12 @@ void DirectEndpointConnector::connect(
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
     for (const SocketAddress& endpoint: response.forwardedTcpEndpointList)
     {
-        #ifdef DO_MSERVER_VERIFICATION
-            auto httpClient = nx_http::AsyncHttpClient::create();
-            httpClient->bindToAioThread(getAioThread());
-            httpClient->setSendTimeoutMs(timeout.count());
-            httpClient->setResponseReadTimeoutMs(timeout.count());
-            httpClient->setMessageBodyReadTimeoutMs(timeout.count());
-            m_connections.push_back(ConnectionContext{endpoint, std::move(httpClient)});
-        #else
-            auto tcpSocket = std::make_unique<TCPSocket>(false, AF_INET);
-            tcpSocket->bindToAioThread(getAioThread());
-            if (!tcpSocket->setNonBlockingMode(true) ||
-                !tcpSocket->setSendTimeout(timeout.count()))
-            {
-                sysErrorCode = SystemError::getLastOSErrorCode();
-                NX_LOGX(lm("cross-nat %1. Failed to initialize socket for connection to %2: %3")
-                    .arg(m_connectSessionId).arg(endpoint.toString())
-                    .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
-                continue;
-            }
-            m_connections.push_back(ConnectionContext{endpoint, std::move(tcpSocket)});
-        #endif
+        auto httpClient = nx_http::AsyncHttpClient::create();
+        httpClient->bindToAioThread(getAioThread());
+        httpClient->setSendTimeoutMs(timeout.count());
+        httpClient->setResponseReadTimeoutMs(timeout.count());
+        httpClient->setMessageBodyReadTimeoutMs(timeout.count());
+        m_connections.push_back(ConnectionContext{endpoint, std::move(httpClient)});
     }
 
     post(
@@ -97,15 +82,9 @@ void DirectEndpointConnector::connect(
             m_completionHandler = std::move(handler);
             for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
             {
-                #ifdef DO_MSERVER_VERIFICATION
-                    it->httpClient->doGet(
-                        QUrl(lit("http://%1/api/moduleInformation").arg(it->endpoint.toString())),
-                        std::bind(&DirectEndpointConnector::onHttpRequestDone, this, _1, it));
-                #else
-                    it->connection->connectAsync(
-                        it->endpoint,
-                        std::bind(&DirectEndpointConnector::onConnected, this, _1, it));
-                #endif
+                it->httpClient->doGet(
+                    QUrl(lit("http://%1/api/moduleInformation").arg(it->endpoint.toString())),
+                    std::bind(&DirectEndpointConnector::onHttpRequestDone, this, _1, it));
             }
     });
 }
@@ -114,8 +93,6 @@ const AddressEntry& DirectEndpointConnector::targetPeerAddress() const
 {
     return m_targetHostAddress;
 }
-
-#ifdef DO_MSERVER_VERIFICATION
 
 void DirectEndpointConnector::onHttpRequestDone(
     nx_http::AsyncHttpClientPtr httpClient,
@@ -161,50 +138,6 @@ void DirectEndpointConnector::onHttpRequestDone(
         std::move(connectionContext.endpoint),
         httpClient->takeSocket());
 }
-
-#else
-
-void DirectEndpointConnector::onConnected(
-    SystemError::ErrorCode sysErrorCode,
-    std::list<ConnectionContext>::iterator socketIter)
-{
-    auto connectionContext = std::move(*socketIter);
-    m_connections.erase(socketIter);
-
-    if (sysErrorCode != SystemError::noError)
-    {
-        NX_LOGX(lm("cross-nat %1. Tcp connect to %2 has failed: %3")
-            .arg(m_connectSessionId).arg(connectionContext.endpoint.toString())
-            .arg(SystemError::toString(sysErrorCode)),
-            cl_logDEBUG2);
-        if (!m_connections.empty())
-            return; //waiting for completion of other connections
-        auto handler = std::move(m_completionHandler);
-        m_completionHandler = nullptr;
-        return handler(
-            nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
-            sysErrorCode,
-            nullptr);
-    }
-
-    m_connections.clear();
-
-    auto tunnel =
-        std::make_unique<DirectTcpEndpointTunnel>(
-            getAioThread(),
-            m_connectSessionId,
-            std::move(connectionContext.endpoint),
-            std::move(connectionContext.connection));
-
-    auto handler = std::move(m_completionHandler);
-    m_completionHandler = nullptr;
-    handler(
-        nx::hpm::api::NatTraversalResultCode::ok,
-        SystemError::noError,
-        std::move(tunnel));
-}
-
-#endif
 
 void DirectEndpointConnector::reportErrorOnEndpointVerificationFailure(
     nx::hpm::api::NatTraversalResultCode resultCode,

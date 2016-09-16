@@ -11,8 +11,6 @@
 #include <nx/network/system_socket.h>
 #include "../abstract_tunnel_connector.h"
 
-#define DO_MSERVER_VERIFICATION
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -45,11 +43,7 @@ private:
     struct ConnectionContext
     {
         SocketAddress endpoint;
-        #ifdef DO_MSERVER_VERIFICATION
-            nx_http::AsyncHttpClientPtr httpClient;
-        #else
-            std::unique_ptr<TCPSocket> connection;
-        #endif
+        nx_http::AsyncHttpClientPtr httpClient;
     };
 
     const AddressEntry m_targetHostAddress;
@@ -57,15 +51,9 @@ private:
     ConnectCompletionHandler m_completionHandler;
     std::list<ConnectionContext> m_connections;
 
-    #ifdef DO_MSERVER_VERIFICATION
-        void onHttpRequestDone(
-            nx_http::AsyncHttpClientPtr httpClient,
-            std::list<ConnectionContext>::iterator socketIter);
-    #else
-        void onConnected(
-            SystemError::ErrorCode sysErrorCode,
-            std::list<ConnectionContext>::iterator socketIter);
-    #endif
+    void onHttpRequestDone(
+        nx_http::AsyncHttpClientPtr httpClient,
+        std::list<ConnectionContext>::iterator socketIter);
 
     void reportErrorOnEndpointVerificationFailure(
         nx::hpm::api::NatTraversalResultCode resultCode,
