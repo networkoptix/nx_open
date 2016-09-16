@@ -268,7 +268,7 @@ private slots:
     void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
     void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     void emitRemotePeerUnauthorized(const QnUuid& id);
-    void onEc2ConnectionSettingsChanged();
+    void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
     /** Info about us. */

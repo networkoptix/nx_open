@@ -45,6 +45,7 @@ private slots:
 private:
     int installCompatibilityVersion();
     int installUpdate();
+    void setMessage(const QString& message);
 
 private:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;

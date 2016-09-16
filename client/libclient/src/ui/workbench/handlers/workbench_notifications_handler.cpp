@@ -18,6 +18,7 @@
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/resource_property_adaptors.h>
 #include <utils/app_server_notification_cache.h>
@@ -33,6 +34,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
+
+    auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
 
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,
         this, &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
@@ -153,6 +156,19 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(businessAction), true);
 }
 
+bool QnWorkbenchNotificationsHandler::tryClose(bool force)
+{
+    clear();
+    return true;
+}
+
+void QnWorkbenchNotificationsHandler::forcedUpdate()
+{
+    checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+}
+
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message)
 {
     switch (message)
@@ -238,9 +254,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
 {
     m_adaptor->setResource(context()->user());
 
-    checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
-    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
-    checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+    forcedUpdate();
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message)

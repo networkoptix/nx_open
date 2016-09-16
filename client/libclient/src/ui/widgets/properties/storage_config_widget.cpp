@@ -251,28 +251,12 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_StoragesBackup_Help);
 
     auto hoverTracker = new QnItemViewHoverTracker(ui->storageView);
+    hoverTracker->setAutomaticMouseCursor(true);
+
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
     ui->storageView->setItemDelegateForColumn(QnStorageListModel::CheckBoxColumn,
         new QnSwitchItemDelegate(this));
-
-    /* Cursor changes with hover: */
-    connect(hoverTracker, &QnItemViewHoverTracker::itemEnter, this,
-        [this](const QModelIndex& index)
-        {
-            bool ok;
-            auto shape = static_cast<Qt::CursorShape>(index.data(Qn::ItemMouseCursorRole).toInt(&ok));
-            if (ok)
-                ui->storageView->setCursor(shape);
-            else
-                ui->storageView->unsetCursor();
-        });
-
-    connect(hoverTracker, &QnItemViewHoverTracker::itemLeave, this,
-        [this]()
-        {
-            ui->storageView->unsetCursor();
-        });
 
     StoragesSortModel* sortModel = new StoragesSortModel(this);
     sortModel->setSourceModel(m_model.data());

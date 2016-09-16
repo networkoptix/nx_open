@@ -61,8 +61,10 @@ namespace style
         static const char* kSuppressHoverPropery;   /**< Name of a property to suppress hovering of itemview items (bool). */
         static const char* kSideIndentation;        /**< Name of a property to hold overridden leftmost and rightmost itemview item margins (QnIndentation). */
         static const char* kCheckBoxAsButton;       /**< Name of a property to change checkbox appearance to switch button (bool). */
-        static const char* kButtonMarginProperty;   /**< Name of a property to hold a custom push button margin (int). Buttons with this property are left-aligned. */
         static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
+
+        //TODO: #vkutin Refactor this property to something else in the future
+        static const char* kButtonMarginProperty;   /**< Name of a property to hold a custom push button margin (int). Buttons with this property are left-aligned. */
     };
 
     /** Flags of additional slider features */

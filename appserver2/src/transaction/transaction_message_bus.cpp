@@ -1826,25 +1826,31 @@ void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
         emit remotePeerUnauthorized(id);
 }
 
-void QnTransactionMessageBus::onEc2ConnectionSettingsChanged()
+void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
 {
     //we need break connection only if following settings have been changed:
     //  connectionKeepAliveTimeout
     //  keepAliveProbeCount
-    const auto connectionKeepAliveTimeout =
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout();
-    const auto keepAliveProbeCount =
-        QnGlobalSettings::instance()->keepAliveProbeCount();
-
-    QnMutexLocker lock(&m_mutex);
-
-    for (QnTransactionTransport* transport : m_connections)
+    if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
     {
-        if (transport->connectionKeepAliveTimeout() != connectionKeepAliveTimeout ||
-            transport->keepAliveProbeCount() != keepAliveProbeCount)
+        const auto timeout = qnGlobalSettings->connectionKeepAliveTimeout();
+        QnMutexLocker lock(&m_mutex);
+        //resetting connection
+        for (auto* transport : m_connections)
         {
-            //resetting connection
-            transport->setState(ec2::QnTransactionTransport::Error);
+            if (transport->connectionKeepAliveTimeout() != timeout)
+                transport->setState(ec2::QnTransactionTransport::Error);
+        }
+    }
+    else if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    {
+        const auto probeCount = qnGlobalSettings->keepAliveProbeCount();
+        QnMutexLocker lock(&m_mutex);
+        //resetting connection
+        for (auto* transport : m_connections)
+        {
+            if (transport->keepAliveProbeCount() != probeCount)
+                transport->setState(ec2::QnTransactionTransport::Error);
         }
     }
 }
