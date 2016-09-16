@@ -25,7 +25,9 @@ namespace {
         storage->setFreeSpace(spaceInfo.freeSpace);
         storage->setTotalSpace(spaceInfo.totalSpace);
         storage->setWritable(spaceInfo.isWritable);
+        storage->setSpaceLimit(spaceInfo.reservedSpace);
         storage->setStatus(spaceInfo.isOnline ? Qn::Online : Qn::Offline);
+
     }
 }
 
