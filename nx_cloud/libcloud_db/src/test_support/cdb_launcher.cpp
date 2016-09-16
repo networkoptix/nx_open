@@ -453,6 +453,24 @@ api::ResultCode CdbLauncher::getSystem(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    api::SystemDataEx* const system)
+{
+    std::vector<api::SystemDataEx> systems;
+    const auto res = getSystem(email, password, systemID, &systems);
+    if (res != api::ResultCode::ok)
+        return res;
+
+    if (systems.size() != 1)
+        return api::ResultCode::unknownError;
+
+    *system = systems[0];
+    return api::ResultCode::ok;
+}
+
 api::ResultCode CdbLauncher::shareSystem(
     const std::string& email,
     const std::string& password,

@@ -15,9 +15,10 @@ namespace cdb {
 namespace api {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemStatus,
-    (ssInvalid, "invalid")
-    (ssNotActivated, "notActivated")
-    (ssActivated, "activated"));
+    (SystemStatus::ssInvalid, "invalid")
+    (SystemStatus::ssNotActivated, "notActivated")
+    (SystemStatus::ssActivated, "activated")
+    (SystemStatus::ssDeleted, "deleted"));
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemHealth,
     (SystemHealth::offline, "offline")
