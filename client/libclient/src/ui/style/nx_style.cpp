@@ -2402,7 +2402,7 @@ QRect QnNxStyle::subControlRect(
 
                         int sliderLength = static_cast<int>(
                             (static_cast<qreal>(maxLength) * scrollBar->pageStep)
-                            / (range + scrollBar->pageStep) + 0.5);
+                                / (range + scrollBar->pageStep) + 0.5);
 
                         sliderLength = qBound(minLength, sliderLength, maxLength);
 
