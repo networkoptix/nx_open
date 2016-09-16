@@ -27,6 +27,12 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+namespace {
+
+const int kSeparatorItemHeight = 16;
+
+} // namespace
+
 
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
@@ -137,22 +143,26 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     switch (itemState(index))
     {
-    case ItemState::Selected:
-        iconMode = QIcon::Selected;
-        mainColor = m_colors.mainTextSelected;
-        extraColor = m_colors.extraTextSelected;
-        break;
+        case ItemState::Normal:
+            iconMode = QIcon::Normal;
+            mainColor = m_colors.mainText;
+            extraColor = m_colors.extraText;
+            break;
 
-    case ItemState::Accented:
-        iconMode = QIcon::Active;
-        mainColor = m_colors.mainTextAccented;
-        extraColor = m_colors.extraTextAccented;
-        break;
+        case ItemState::Selected:
+            iconMode = QIcon::Selected;
+            mainColor = m_colors.mainTextSelected;
+            extraColor = m_colors.extraTextSelected;
+            break;
 
-    default:
-        iconMode = QIcon::Normal;
-        mainColor = m_colors.mainText;
-        extraColor = m_colors.extraText;
+        case ItemState::Accented:
+            iconMode = QIcon::Active;
+            mainColor = m_colors.mainTextAccented;
+            extraColor = m_colors.extraTextAccented;
+            break;
+
+        default:
+            NX_ASSERT(false); // Should never get here
     }
 
     if (index.column() == Qn::CustomColumn)
@@ -218,7 +228,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         }
     }
 
-    QRect extraIconRect = iconRect.adjusted(-4, 0, -4, 0);
+    QRect extraIconRect(iconRect);
     auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
@@ -251,7 +261,7 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
 
     /* If item is separator, return separator size: */
     if (option.features == QStyleOptionViewItem::None)
-        return style::Metrics::kSeparatorSize + QSize(0, m_rowSpacing);
+        return QSize(0, kSeparatorItemHeight + m_rowSpacing);
 
     // TODO #vkutin Keep this while checkboxed items are painted by default implementation:
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
@@ -350,20 +360,23 @@ QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptio
     QPalette editorPalette = editor->palette();
     switch (itemState(index))
     {
-    case ItemState::Normal:
-        editorPalette.setColor(QPalette::Text, m_colors.mainText);
-        editorPalette.setColor(QPalette::HighlightedText, m_colors.mainText);
-        break;
+        case ItemState::Normal:
+            editorPalette.setColor(QPalette::Text, m_colors.mainText);
+            editorPalette.setColor(QPalette::HighlightedText, m_colors.mainText);
+            break;
 
-    case ItemState::Selected:
-        editorPalette.setColor(QPalette::Text, m_colors.mainTextSelected);
-        editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextSelected);
-        break;
+        case ItemState::Selected:
+            editorPalette.setColor(QPalette::Text, m_colors.mainTextSelected);
+            editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextSelected);
+            break;
 
-    case ItemState::Accented:
-        editorPalette.setColor(QPalette::Text, m_colors.mainTextAccented);
-        editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextAccented);
-        break;
+        case ItemState::Accented:
+            editorPalette.setColor(QPalette::Text, m_colors.mainTextAccented);
+            editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextAccented);
+            break;
+
+        default:
+            NX_ASSERT(false); // Should never get here
     }
 
     editor->setPalette(editorPalette);
