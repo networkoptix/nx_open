@@ -13,16 +13,17 @@
 
 namespace {
 
-int popoutTimeoutMs = 300;
-int moveUpTimeoutMs = 500;
-int displayTimeoutMs = 12500;
-int hideTimeoutMs = 300;
-int collapseTimeoutMs = 250;
-int hoverLeaveTimeoutMSec = 250;
+static const int kPopoutTimeoutMs = 100;
+static const int kMoveUpTimeoutMs = 50;
+static const int kDisplayTimeoutMs = 12500;
+static const int kHideTimeoutMs = 50;
+static const int kCollapseTimeoutMs = 250;
+static const int kHoverLeaveTimeoutMs = 250;
 
-qreal widgetWidth = 250;
-qreal collapserHeight = 30;
+static const qreal kWidgetWidth = 250;
+static const qreal kCollapserHeight = 30;
 
+static const int kDisplayAnimationOffsetX = 20;
 
 }
 
@@ -39,15 +40,15 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     setFlag(QGraphicsItem::ItemHasNoContents);
 
     m_hoverProcessor->addTargetItem(this);
-    m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
+    m_hoverProcessor->setHoverLeaveDelay(kHoverLeaveTimeoutMs);
 
     m_collapser.item = new QnNotificationWidget(this);
     m_collapser.item->setNotificationLevel(m_itemNotificationLevel);
-    m_collapser.item->setMinimumSize(QSizeF(widgetWidth, collapserHeight));
-    m_collapser.item->setMaximumSize(QSizeF(widgetWidth, collapserHeight));
+    m_collapser.item->setMinimumSize(QSizeF(kWidgetWidth, kCollapserHeight));
+    m_collapser.item->setMaximumSize(QSizeF(kWidgetWidth, kCollapserHeight));
     m_collapser.item->setOpacity(0.0);
     m_collapser.item->setVisible(true);
-    m_collapser.setAnimation(0, 0, moveUpTimeoutMs * 0.5);
+    m_collapser.setAnimation(0, 0, kMoveUpTimeoutMs * 0.5);
 
     connect(this, SIGNAL(geometryChanged()), this, SLOT(at_geometry_changed()));
 }
@@ -72,10 +73,10 @@ QSizeF QnNotificationListWidget::sizeHint(Qt::SizeHint which, const QSizeF &cons
 
     if (which == Qt::MinimumSize || m_itemDataByItem.isEmpty())
     {
-        return QSizeF(widgetWidth, collapserHeight);
+        return QSizeF(kWidgetWidth, kCollapserHeight);
     }
 
-    QSizeF result(widgetWidth, 0);
+    QSizeF result(kWidgetWidth, 0);
     // preferred height is height of the most bottom item + height of all hidden items
     foreach(QnNotificationWidget *item, m_items | boost::adaptors::reversed)
     {
@@ -143,7 +144,7 @@ void QnNotificationListWidget::tick(int deltaMSecs)
                     item->setY(bottomY);
                     item->setOpacity(1.0);
                     item->setTransform(transform());
-                    data->setAnimation(item->geometry().width(), 0.0, popoutTimeoutMs / m_speedUp);
+                    data->setAnimation(kDisplayAnimationOffsetX, 0.0, kPopoutTimeoutMs / m_speedUp);
                     item->setX(data->animation.value);
                     item->setVisible(true);
                     m_collapsedItemCountChanged = true;
@@ -163,7 +164,7 @@ void QnNotificationListWidget::tick(int deltaMSecs)
                 if (data->animationFinished())
                 {
                     data->state = ItemData::Displayed;
-                    data->setAnimation(0.0, 1.0, displayTimeoutMs / m_speedUp);
+                    data->setAnimation(0.0, 1.0, kDisplayTimeoutMs / m_speedUp);
                 }
                 canShowNew = false;
                 break;
@@ -217,7 +218,7 @@ void QnNotificationListWidget::tick(int deltaMSecs)
 
         qreal targetY = (previous == NULL ? 0 : previous->item->geometry().bottom());
         qreal currentY = item->y();
-        qreal stepY = qMax(currentY, item->geometry().height()) * (qreal)deltaMSecs / (moveUpTimeoutMs / m_speedUp);
+        qreal stepY = qMax(currentY, item->geometry().height()) * (qreal)deltaMSecs / (kMoveUpTimeoutMs / m_speedUp);
         if (currentY > targetY)
         {
             item->setY(qMax(currentY - stepY, targetY));
@@ -230,7 +231,7 @@ void QnNotificationListWidget::tick(int deltaMSecs)
         m_collapser.animation.target = (previous == NULL ? 0 : previous->item->geometry().bottom());
         m_collapser.animationTick(deltaMSecs);
         m_collapser.item->setY(m_collapser.animation.value);
-        qreal opacityStep = (qreal)deltaMSecs / (qreal)hideTimeoutMs;
+        qreal opacityStep = (qreal)deltaMSecs / (qreal)kHideTimeoutMs;
         if (collapsedItemsCount == 0)
             m_collapser.item->setOpacity(qMax(0.0, m_collapser.item->opacity() - opacityStep));
         else
@@ -290,7 +291,7 @@ void QnNotificationListWidget::updateGeometry()
 void QnNotificationListWidget::updateVisibleSize()
 {
 
-    QSizeF size(widgetWidth, 0);
+    QSizeF size(kWidgetWidth, 0);
     if (!qFuzzyIsNull(m_collapser.item->opacity()))
     {
         size.setHeight(m_collapser.item->geometry().bottom());
@@ -318,8 +319,8 @@ void QnNotificationListWidget::updateVisibleSize()
 void QnNotificationListWidget::addItem(QnNotificationWidget *item, bool locked)
 {
     item->setVisible(false);
-    item->setMinimumWidth(widgetWidth);
-    item->setMaximumWidth(widgetWidth);
+    item->setMinimumWidth(kWidgetWidth);
+    item->setMaximumWidth(kWidgetWidth);
     item->setTooltipEnclosingRect(m_tooltipsEnclosingRect);
     connect(item, SIGNAL(closeTriggered()), this, SLOT(at_item_closeTriggered()));
     connect(item, SIGNAL(geometryChanged()), this, SLOT(at_item_geometryChanged()));
@@ -436,7 +437,7 @@ void QnNotificationListWidget::at_geometry_changed()
         if (item->geometry().bottom() > geometry().height())
         {
             data->state = ItemData::Collapsing;
-            data->setAnimation(0.0, 90.0, collapseTimeoutMs / m_speedUp);
+            data->setAnimation(0.0, 90.0, kCollapseTimeoutMs / m_speedUp);
         }
         else
             break;
@@ -450,7 +451,7 @@ void QnNotificationListWidget::ItemData::hide(qreal speedUp)
         return;
 
     state = Hiding;
-    setAnimation(1.0, 0.0, hideTimeoutMs / speedUp);
+    setAnimation(1.0, 0.0, kHideTimeoutMs / speedUp);
 }
 
 void QnNotificationListWidget::ItemData::setAnimation(qreal from, qreal to, qreal time)
