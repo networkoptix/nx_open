@@ -105,9 +105,11 @@ public:
     QString statisticsReportServerApi() const;
     void setStatisticsReportServerApi(const QString &value);
 
+    static const QString kConnectionKeepAliveTimeoutKey;
     std::chrono::seconds connectionKeepAliveTimeout() const;
     void setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout);
 
+    static const QString kKeepAliveProbeCountKey;
     int keepAliveProbeCount() const;
     void setKeepAliveProbeCount(int newProbeCount);
 
@@ -175,7 +177,7 @@ signals:
     void statisticsAllowedChanged();
     void updateNotificationsChanged();
     void upnpPortMappingEnabledChanged();
-    void ec2ConnectionSettingsChanged();
+    void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
     void newSystemChanged();
 

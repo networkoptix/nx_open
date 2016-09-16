@@ -182,11 +182,8 @@ QnEventLogModel::QnEventLogModel(QObject *parent)
     , QnWorkbenchContextAware(parent)
     , m_columns()
     , m_linkBrush(QPalette().link())
-    , m_linkFont()
     , m_index(new DataIndex(this))
 {
-    m_linkFont.setUnderline(true);
-
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnEventLogModel::at_resource_removed);
 }
 
@@ -252,13 +249,6 @@ bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action)
         }
     }
     return false;
-}
-
-QVariant QnEventLogModel::fontData(const Column& column, const QnBusinessActionData &action) const {
-    if (column == DescriptionColumn && hasVideoLink(action))
-        return m_linkFont;
-
-    return QVariant();
 }
 
 QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessActionData &action) const {
@@ -540,83 +530,91 @@ QVariant QnEventLogModel::headerData(int section, Qt::Orientation orientation, i
     return base_type::headerData(section, orientation, role);
 }
 
-QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
+QVariant QnEventLogModel::data(const QModelIndex& index, int role) const
+{
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
     if (index.column() < 0 || index.column() >= m_columns.size()) // TODO: #Elric this is probably not needed, hasIndex checks it?
         return QVariant();
 
-    const Column &column = m_columns[index.column()];
+    Column column = m_columns[index.column()];
 
     if (index.row() < 0 || index.row() >= m_index->size())
         return QVariant();
 
-    const QnBusinessActionData &action = m_index->at(index.row());
+    const QnBusinessActionData& action = m_index->at(index.row());
 
-    switch(role) {
-    case Qt::ToolTipRole:
+    switch (role)
     {
-        if (index.column() == ActionCameraColumn &&  action.actionType == QnBusiness::ShowOnAlarmLayoutAction)
+        case Qt::ToolTipRole:
         {
-            enum { kMaxShownUsersCount = 20 };
-
-            const auto users = action.actionParams.additionalResources;
-
-            QStringList userNames;
-            if (users.empty())
+            if (column == ActionCameraColumn &&  action.actionType == QnBusiness::ShowOnAlarmLayoutAction)
             {
-                const auto userResources = qnResPool->getResources<QnUserResource>();
-                for (const auto &resource: userResources)
-                    userNames.append(resource->getName());
+                enum { kMaxShownUsersCount = 20 };
+
+                const auto& users = action.actionParams.additionalResources;
+
+                QStringList userNames;
+                if (users.empty())
+                {
+                    const auto userResources = qnResPool->getResources<QnUserResource>();
+                    for (const auto& resource : userResources)
+                        userNames.append(resource->getName());
+                }
+                else
+                {
+                    for (const auto& userId : users)
+                        userNames.append(getUserNameById(userId));
+                }
+
+                if (userNames.size() > kMaxShownUsersCount)
+                {
+                    const auto diffCount = (kMaxShownUsersCount - userNames.size());
+
+                    userNames = userNames.mid(0, kMaxShownUsersCount);
+                    userNames.append(tr("and %1 user(s) more...", nullptr, diffCount));
+                }
+
+                return userNames.join(kDelimiter);
             }
+            else if (column != DescriptionColumn)
+            {
+                return QVariant();
+            }
+
+            // else go to Qt::DisplayRole
+        }
+        case Qt::DisplayRole:
+            return QVariant(textData(column, action));
+
+        case Qt::DecorationRole:
+            return iconData(column, action);
+
+        case Qt::ForegroundRole:
+            return foregroundData(column, action);
+
+        case Qn::ItemMouseCursorRole:
+            return mouseCursorData(column, action);
+
+        case Qn::ResourceRole:
+            return QVariant::fromValue<QnResourcePtr>(getResource(column, action));
+
+        case Qn::DisplayHtmlRole:
+        {
+            QString text = textData(column, action);
+            QString url = motionUrl(column, action);
+            if (url.isEmpty())
+                return text;
             else
-            {
-                for (const auto &userId: users)
-                    userNames.append(getUserNameById(userId));
-            }
-
-            if (userNames.size() > kMaxShownUsersCount)
-            {
-                const auto diffCount = (kMaxShownUsersCount - userNames.size());
-
-                userNames = userNames.mid(0, kMaxShownUsersCount);
-                userNames.append(tr("and %1 user(s) more...", nullptr, diffCount));
-            }
-
-            return userNames.join(kDelimiter);
-        }
-        else if (index.column() != DescriptionColumn)
-        {
-            return QVariant();
+                return lit("<a href=\"%1\">%2</a>").arg(url, text);
         }
 
-        // else go to Qt::DisplayRole
-    }
-    case Qt::DisplayRole:
-        return QVariant(textData(column, action));
-    case Qt::DecorationRole:
-        return iconData(column, action);
-    case Qt::FontRole:
-        return fontData(column, action);
-    case Qt::ForegroundRole:
-        return foregroundData(column, action);
-    case Qn::ItemMouseCursorRole:
-        return mouseCursorData(column, action);
-    case Qn::ResourceRole:
-        return QVariant::fromValue<QnResourcePtr>(getResource(column, action));
-    case Qn::DisplayHtmlRole: {
-        QString text = textData(column, action);
-        QString url = motionUrl(column, action);
-        if (url.isEmpty())
-            return text;
-        else
-            return lit("<a href=\"%1\">%2</a>").arg(url, text);
-    }
-    case Qn::HelpTopicIdRole:
-        return helpTopicIdData(column, action);
-    default:
-        break;
+        case Qn::HelpTopicIdRole:
+            return helpTopicIdData(column, action);
+
+        default:
+            break;
     }
 
     return QVariant();

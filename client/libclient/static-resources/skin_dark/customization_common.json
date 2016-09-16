@@ -406,8 +406,8 @@
         "palette": {
             "default": {
                 "dark": "dark4",
-	        "midlight": "dark12",
-		"text": "light4"
+                "midlight": "dark12",
+                "text": "light4"
             }
         }
     },

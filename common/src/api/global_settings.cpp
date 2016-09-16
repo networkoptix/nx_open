@@ -74,9 +74,7 @@ namespace
     const QString ldapSearchBase(lit("ldapSearchBase"));
     const QString ldapSearchFilter(lit("ldapSearchFilter"));
 
-    const QString kEc2ConnectionKeepAliveTimeout(lit("ec2ConnectionKeepAliveTimeoutSec"));
     const int kEc2ConnectionKeepAliveTimeoutDefault = 5;
-    const QString kEc2KeepAliveProbeCount(lit("ec2KeepAliveProbeCount"));
     const int kEc2KeepAliveProbeCountDefault = 3;
     const QString kEc2AliveUpdateInterval(lit("ec2AliveUpdateIntervalSec"));
     const int kEc2AliveUpdateIntervalDefault = 60;
@@ -96,6 +94,13 @@ namespace
     const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
     const int kTakeCameraOwnershipWithoutLockDefault = false;
 }
+
+const QString QnGlobalSettings::kNameCloudAccountName(lit("cloudAccountName"));
+const QString QnGlobalSettings::kNameCloudSystemID(lit("cloudSystemID"));
+const QString QnGlobalSettings::kNameCloudAuthKey(lit("cloudAuthKey"));
+const QString QnGlobalSettings::kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
+const QString QnGlobalSettings::kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
+const QString QnGlobalSettings::kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
     base_type(parent)
@@ -223,12 +228,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
 {
     AdaptorList ec2Adaptors;
     m_ec2ConnectionKeepAliveTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        kEc2ConnectionKeepAliveTimeout,
+        kConnectionKeepAliveTimeoutKey,
         kEc2ConnectionKeepAliveTimeoutDefault,
         this);
     ec2Adaptors << m_ec2ConnectionKeepAliveTimeoutAdaptor;
     m_ec2KeepAliveProbeCountAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        kEc2KeepAliveProbeCount,
+        kKeepAliveProbeCountKey,
         kEc2KeepAliveProbeCountDefault,
         this);
     ec2Adaptors << m_ec2KeepAliveProbeCountAdaptor;
@@ -259,10 +264,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
     ec2Adaptors << m_takeCameraOwnershipWithoutLock;
 
     for (auto adaptor : ec2Adaptors)
-        connect(
-            adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
-            this, &QnGlobalSettings::ec2ConnectionSettingsChanged,
-            Qt::QueuedConnection);
+    {
+        connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,
+            [this, key = adaptor->key()]
+            {
+                emit ec2ConnectionSettingsChanged(key);
+            }, Qt::QueuedConnection);
+    }
 
     return ec2Adaptors;
 }
@@ -640,8 +648,6 @@ void QnGlobalSettings::setStatisticsReportUpdateDelay(const QString& value)
     m_statisticsReportUpdateDelayAdaptor->setValue(value);
 }
 
-const QString QnGlobalSettings::kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
-
 bool QnGlobalSettings::isUpnpPortMappingEnabled() const
 {
     return m_upnpPortMappingEnabledAdaptor->value();
@@ -737,8 +743,6 @@ bool QnGlobalSettings::isTimeSynchronizationEnabled() const
     return m_timeSynchronizationEnabledAdaptor->value();
 }
 
-const QString QnGlobalSettings::kNameCloudAccountName(lit("cloudAccountName"));
-
 QString QnGlobalSettings::cloudAccountName() const
 {
     return m_cloudAccountNameAdaptor->value();
@@ -749,8 +753,6 @@ void QnGlobalSettings::setCloudAccountName(const QString& value)
     m_cloudAccountNameAdaptor->setValue(value);
 }
 
-const QString QnGlobalSettings::kNameCloudSystemID(lit("cloudSystemID"));
-
 QString QnGlobalSettings::cloudSystemID() const
 {
     return m_cloudSystemIDAdaptor->value();
@@ -760,8 +762,6 @@ void QnGlobalSettings::setCloudSystemID(const QString& value)
 {
     m_cloudSystemIDAdaptor->setValue(value);
 }
-
-const QString QnGlobalSettings::kNameCloudAuthKey(lit("cloudAuthKey"));
 
 QString QnGlobalSettings::cloudAuthKey() const
 {

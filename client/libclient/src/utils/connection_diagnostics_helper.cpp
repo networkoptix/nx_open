@@ -48,7 +48,7 @@ QnConnectionDiagnosticsHelper::QnConnectionDiagnosticsHelper(QObject* parent):
 {
 }
 
-QString QnConnectionDiagnosticsHelper::getErrorString(
+QString QnConnectionDiagnosticsHelper::getErrorDescription(
     Qn::ConnectionResult result,
     const QnConnectionInfo& connectionInfo)
 {
@@ -64,14 +64,14 @@ QString QnConnectionDiagnosticsHelper::getErrorString(
         return tr("The username or password you have entered is incorrect. Please try again.");
     case Qn::ConnectionResult::LdapTemporaryUnauthorized:
         return tr("LDAP Server connection timed out.") + L'\n'
-            + strings(ErrorStrings::ContactAdministrator);
+            + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::ConnectionResult::CloudTemporaryUnauthorized:
         return tr("Connection to the %1 is not ready yet. Check media server internet connection or try again later.").
-            arg(QnAppInfo::cloudName()) + L'\n' + strings(ErrorStrings::ContactAdministrator);
+            arg(QnAppInfo::cloudName()) + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::ConnectionResult::NetworkError:
         return tr("Connection to the Server could not be established.") + L'\n'
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
-            + strings(ErrorStrings::ContactAdministrator);
+            + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::ConnectionResult::IncompatibleInternal:
     case Qn::ConnectionResult::IncompatibleCloudHost:
         return tr("You are trying to connect to incompatible Server.");
@@ -94,58 +94,36 @@ QString QnConnectionDiagnosticsHelper::getErrorString(
 }
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
-    const QnConnectionInfo &connectionInfo,
+    const QnConnectionInfo& connectionInfo,
     ec2::ErrorCode errorCode,
     QWidget* parentWidget)
 {
-    using namespace Qn;
+    using Qn::ConnectionResult;
 
-    ConnectionResult result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
+    const auto result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
     if (result == ConnectionResult::Success)
         return result;
 
-    int helpTopicId = helpTopic(result);
+    const auto helpTopicId = helpTopic(result);
+    const QString description = getErrorDescription(result, connectionInfo);
 
-    QString detail = getErrorString(result, connectionInfo);
-
-    if (!detail.isEmpty())
+    if (result == ConnectionResult::IncompatibleProtocol
+        || result == ConnectionResult::IncompatibleCloudHost)
     {
-        QnMessageBox::warning(
-            parentWidget,
-            helpTopicId,
-            strings(ErrorStrings::UnableConnect),
-            detail
-        );
-        return result;
-    }
-
-    const auto versionDetails =
-        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
-        + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
-
-    if (result == ConnectionResult::IncompatibleVersion)
-    {
-        QnMessageBox::warning(
-            parentWidget,
-            helpTopicId,
-            strings(ErrorStrings::UnableConnect),
-            tr("You are about to connect to Server which has a different version:") + L'\n'
-            + versionDetails
-            + tr("Compatibility mode for versions lower than %1 is not supported.")
-            .arg(QnConnectionValidator::minSupportedVersion().toString()),
-            QDialogButtonBox::Ok
-        );
-        return result;
-    }
-
-    if (result == ConnectionResult::IncompatibleProtocol)
         return handleCompatibilityMode(connectionInfo, parentWidget);
+    }
 
-    NX_ASSERT(false);    //should never get here
-    return ConnectionResult::IncompatibleVersion; //just in case
+    QnMessageBox::warning(
+        parentWidget,
+        helpTopicId,
+        getErrorString(ErrorStrings::UnableConnect),
+        description);
+
+    return result;
 }
 
-QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelper::validateConnectionTest(
+QnConnectionDiagnosticsHelper::TestConnectionResult
+QnConnectionDiagnosticsHelper::validateConnectionTest(
     const QnConnectionInfo& connectionInfo,
     ec2::ErrorCode errorCode)
 {
@@ -157,7 +135,7 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
     result.result = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
     result.helpTopicId = helpTopic(result.result);
 
-    result.details = getErrorString(result.result, connectionInfo);
+    result.details = getErrorDescription(result.result, connectionInfo);
     return result;
 }
 
@@ -187,7 +165,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             QnMessageBox::warning(
                 parentWidget,
                 helpTopicId,
-                strings(ErrorStrings::UnableConnect),
+                getErrorString(ErrorStrings::UnableConnect),
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("An error has occurred while trying to restart in compatibility mode."),
@@ -206,7 +184,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             int selectedButton = QnMessageBox::warning(
                 parentWidget,
                 helpTopicId,
-                strings(ErrorStrings::UnableConnect),
+                getErrorString(ErrorStrings::UnableConnect),
                 tr("You are about to connect to Server which has a different version:") + L'\n'
                 + tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
                 + tr(" - Server version: %1.").arg(versionString) + L'\n'
@@ -236,7 +214,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         int button = QnMessageBox::warning(
             parentWidget,
             helpTopicId,
-            strings(ErrorStrings::UnableConnect),
+            getErrorString(ErrorStrings::UnableConnect),
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
             + tr("Would you like to restart the Client in compatibility mode?"),
@@ -292,7 +270,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     return ConnectionResult::IncompatibleVersion;
 }
 
-QString QnConnectionDiagnosticsHelper::strings(ErrorStrings id)
+QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
 {
     switch (id)
     {
