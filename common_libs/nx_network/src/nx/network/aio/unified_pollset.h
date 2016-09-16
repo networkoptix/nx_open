@@ -103,6 +103,7 @@ public:
         \note If multiple event occured on same socket each event will be present as a single element
     */
     int poll(int millisToWait = INFINITE_TIMEOUT);
+    int poll(std::chrono::milliseconds timeout) { return poll(timeout.count()); }
 
     //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
     const_iterator begin() const;

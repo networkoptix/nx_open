@@ -36,8 +36,10 @@
 #include <utils/common/app_info.h>
 
 class QnTcpListener;
-static const int IO_TIMEOUT = 1000 * 1000;
-static const int MAX_PROXY_TTL = 8;
+
+static const int kMaxProxyTtl = 8;
+static const std::chrono::milliseconds kIoTimeout = std::chrono::minutes(16);
+static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(100);
 
 /** Returns false if socket would block in blocking mode */
 static bool readSocketNonBlock(
@@ -188,8 +190,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
         return route.id.toString();
     }
 
-    d->dstSocket->setRecvTimeout(IO_TIMEOUT);
-    d->dstSocket->setSendTimeout(IO_TIMEOUT);
+    d->dstSocket->setRecvTimeout(kIoTimeout);
+    d->dstSocket->setSendTimeout(kIoTimeout);
 
     return QString();
 }
@@ -379,7 +381,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             bool ok;
             int ttl = ttlString.toInt(&ok);
             if (!ok)
-                ttl = MAX_PROXY_TTL;
+                ttl = kMaxProxyTtl;
             --ttl;
 
             if (ttl <= 0)
@@ -457,23 +459,12 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
     return true;
 }
 
-void QnProxyConnectionProcessor::pleaseStop()
-{
-    Q_D(QnProxyConnectionProcessor);
-
-    QnTCPConnectionProcessor::pleaseStop();
-    if (d->socket)
-        d->socket->close();
-    if (d->dstSocket)
-        d->dstSocket->close();
-}
-
 void QnProxyConnectionProcessor::run()
 {
     Q_D(QnProxyConnectionProcessor);
 
-    d->socket->setRecvTimeout(IO_TIMEOUT);
-    d->socket->setSendTimeout(IO_TIMEOUT);
+    d->socket->setRecvTimeout(kIoTimeout);
+    d->socket->setSendTimeout(kIoTimeout);
 
     if (d->clientRequest.isEmpty()) {
         d->socket->close();
@@ -511,12 +502,20 @@ void QnProxyConnectionProcessor::doRawProxy()
     pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
     while (!m_needStop)
     {
-        int rez = pollSet.poll(IO_TIMEOUT);
-        if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
-            continue;
+        int rez = 0;
+        auto pollLimitTime = std::chrono::steady_clock::now() + kPollTimeout;
+        while (rez == 0)
+        {
+            if (pollLimitTime <= std::chrono::steady_clock::now())
+                return; // IO timeout
 
-        if (rez < 1)
-            return; // error or timeout
+            rez = pollSet.poll(kPollTimeout);
+            if (rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted)
+                rez = 0; // the same as timeout
+
+            if (m_needStop || rez < 0)
+                return; // stop or error
+        }
 
         for (auto it = pollSet.begin(); it != pollSet.end(); ++it)
         {
@@ -553,15 +552,22 @@ void QnProxyConnectionProcessor::doSmartProxy()
     nx::network::aio::UnifiedPollSet pollSet;
     pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
     pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
-
     while (!m_needStop)
     {
-        int rez = pollSet.poll(IO_TIMEOUT);
-        if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
-            continue;
+        int rez = 0;
+        auto pollLimitTime = std::chrono::steady_clock::now() + kPollTimeout;
+        while (rez == 0)
+        {
+            if (pollLimitTime <= std::chrono::steady_clock::now())
+                return; // IO timeout
 
-        if (rez < 1)
-            return; // error or timeout
+            rez = pollSet.poll(kPollTimeout);
+            if (rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted)
+                rez = 0; // the same as timeout
+
+            if (m_needStop || rez < 0)
+                return; // stop or error
+        }
 
         for (auto it = pollSet.begin(); it != pollSet.end(); ++it)
         {
