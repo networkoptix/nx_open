@@ -35,25 +35,17 @@ WidgetAnimator::~WidgetAnimator() {
     stop();
 }
 
-void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasingCurve &curve) {
-    if(widget() == NULL) {
-        qnWarning("Cannot move a NULL widget.");
+void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
+    NX_ASSERT(widget());
+    if (!widget())
         return;
-    }
 
     pause();
 
     m_geometryAnimator->setTargetValue(geometry);
-    m_geometryAnimator->setEasingCurve(curve);
-
     m_rotationAnimator->setTargetValue(rotation);
-    m_rotationAnimator->setEasingCurve(curve);
 
     start();
-}
-
-void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
-    moveTo(geometry, rotation, QEasingCurve::Linear);
 }
 
 QGraphicsWidget *WidgetAnimator::widget() const {
@@ -90,5 +82,15 @@ void WidgetAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
 
 void WidgetAnimator::setRotationSpeed(qreal degrees) {
     m_rotationAnimator->setSpeed(degrees);
+}
+
+const QEasingCurve & WidgetAnimator::easingCurve() const
+{
+    return m_geometryAnimator->easingCurve();
+}
+
+void WidgetAnimator::setEasingCurve(const QEasingCurve &easingCurve)
+{
+    m_geometryAnimator->setEasingCurve(easingCurve);
 }
 

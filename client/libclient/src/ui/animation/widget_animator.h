@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QMetaType>
+#include <QtCore/QEasingCurve>
+
 #include <ui/common/geometry.h>
 #include "animator_group.h"
 
@@ -31,14 +33,11 @@ public:
     virtual ~WidgetAnimator();
 
     /**
-     * Starts animated move of a widget to the given position.
-     * 
-     * \param geometry                  Rectangle to move widget to, in scene coordinates.
-     * \param rotation                  Rotation value for the widget.
-     * \param curve                     Easing curve to use.
-     */
-    void moveTo(const QRectF &geometry, qreal rotation, const QEasingCurve &curve);
-
+    * Starts animated move of a widget to the given position.
+    * 
+    * \param geometry                  Rectangle to move widget to, in scene coordinates.
+    * \param rotation                  Rotation value for the widget.
+    */
     void moveTo(const QRectF &geometry, qreal rotation);
 
     /**
@@ -78,6 +77,16 @@ public:
      * \param multiplier                Widget rotation speed, in degrees per second.
      */
     void setRotationSpeed(qreal degrees);
+
+    /**
+    * \returns                         Easing curve used by this animator.
+    */
+    const QEasingCurve &easingCurve() const;
+
+    /**
+    * \param easingCurve               New easing curve to use.
+    */
+    void setEasingCurve(const QEasingCurve &easingCurve);
 
 private:
     /** Widget geometry animation. */
