@@ -185,32 +185,14 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
-    namespace {
-
-    struct SharedState
-    {
-        QMetaObject::Connection qtConnection;
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
-    };
-
-    } // namespace 
-
     void AsyncHttpClient::doGet(
         const QUrl& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
     {
-        auto sharedState = std::make_shared<SharedState>();
-        sharedState->completionHandler = std::move(completionHandler);
-        auto* qtConnectionPtr = &sharedState->qtConnection;
-        *qtConnectionPtr = QObject::connect(
-            this, &AsyncHttpClient::done,
-            [this, sharedState = std::move(sharedState)](
-                AsyncHttpClientPtr httpClient)
-            {
-                sharedState->completionHandler(httpClient);
-                disconnect(sharedState->qtConnection);
-            });
-        doGet(url);
+        doHttpOperation<const QUrl&>(
+            std::move(completionHandler),
+            static_cast<void(AsyncHttpClient::*)(const QUrl&)>(&AsyncHttpClient::doGet),
+            url);
     }
 
     void AsyncHttpClient::doPost(
@@ -233,6 +215,28 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    void AsyncHttpClient::doPost(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody,
+        bool includeContentLength,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(
+            const QUrl& /*url*/,
+            const nx_http::StringType& /*contentType*/,
+            nx_http::StringType /*messageBody*/,
+            bool /*includeContentLength*/);
+
+        doHttpOperation<const QUrl&, const nx_http::StringType&, nx_http::StringType, bool>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doPost),
+            url,
+            contentType,
+            std::move(messageBody),
+            includeContentLength);
+    }
+
     void AsyncHttpClient::doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
@@ -250,6 +254,25 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    void AsyncHttpClient::doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(
+            const QUrl& /*url*/,
+            const nx_http::StringType& /*contentType*/,
+            nx_http::StringType /*messageBody*/);
+
+        doHttpOperation<const QUrl&, const nx_http::StringType&, nx_http::StringType>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doPut),
+            url,
+            contentType,
+            std::move(messageBody));
+    }
+
     void AsyncHttpClient::doOptions(const QUrl& url)
     {
         NX_ASSERT(url.isValid());
@@ -259,6 +282,18 @@ namespace nx_http
         m_url.setPath(QLatin1String("*"));
         composeRequest(nx_http::Method::OPTIONS);
         initiateHttpMessageDelivery(url);
+    }
+
+    void AsyncHttpClient::doOptions(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(const QUrl& /*url*/);
+
+        doHttpOperation<const QUrl&>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doOptions),
+            url);
     }
 
     const nx_http::Request& AsyncHttpClient::request() const
@@ -1114,6 +1149,36 @@ namespace nx_http
         nx_http::insertOrReplaceHeader(
             &request->headers,
             HttpHeader(Qn::REALM_HEADER_NAME, realmIter->second));
+    }
+
+    namespace {
+
+    struct SharedState
+    {
+        QMetaObject::Connection qtConnection;
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
+    };
+
+    } // namespace 
+
+    template<typename ... Args>
+    void AsyncHttpClient::doHttpOperation(
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler,
+        void(AsyncHttpClient::*func)(Args...),
+        Args... args)
+    {
+        auto sharedState = std::make_shared<SharedState>();
+        sharedState->completionHandler = std::move(completionHandler);
+        auto* qtConnectionPtr = &sharedState->qtConnection;
+        *qtConnectionPtr = QObject::connect(
+            this, &AsyncHttpClient::done,
+            [this, sharedState = std::move(sharedState)](
+                AsyncHttpClientPtr httpClient)
+            {
+                sharedState->completionHandler(httpClient);
+                disconnect(sharedState->qtConnection);
+            });
+        (this->*func)(args...);
     }
 
     const char* AsyncHttpClient::toString(State state)

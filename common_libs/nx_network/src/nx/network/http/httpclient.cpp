@@ -47,8 +47,14 @@ bool HttpClient::doPost(
 {
     using namespace std::placeholders;
 
+    typedef void(AsyncHttpClient::*FuncType)(
+        const QUrl& /*url*/,
+        const nx_http::StringType& /*contentType*/,
+        nx_http::StringType /*messageBody*/,
+        bool /*includeContentLength*/);
+
     return doRequest(std::bind(
-        &nx_http::AsyncHttpClient::doPost,
+        static_cast<FuncType>(&nx_http::AsyncHttpClient::doPost),
         _1,
         url,
         contentType,
