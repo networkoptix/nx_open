@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>กล้องนี้ยังไม่มีการตั้งค่าขั้นสูง</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -882,11 +887,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTP เนื้อหา</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>HTTP url</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>เข้าสู่ระบบเพื่อรับรองความถูกต้อง (ถ้ามี)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>เข้าสู่ระบบ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>รหัสผ่านในการตรวจสอบ (ถ้ามี)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>รหัสผ่าน</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>ตำแหน่ง &amp;PTZ:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>ส่งออกทบทวนอย่างรวดเร็ว</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>ความยาววิดีโอเริ่มต้น</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>ส่งออกความยาววิดีโอ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>ความเร็วในการทบทวนอย่างรวดเร็ว</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>กรอบช่วงเวลา</translation>
     </message>
 </context>
 <context>
@@ -1604,6 +1670,11 @@
         <location/>
         <source>Test...</source>
         <translation>ทดสอบ...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>จอแสดงผลให้กับผู้ใช้</translation>
     </message>
 </context>
 <context>
@@ -2381,6 +2452,11 @@
         <location/>
         <source>Test...</source>
         <translation>ทดสอบ...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>พูดคุยกับผู้ใช้</translation>
     </message>
 </context>
 <context>

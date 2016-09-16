@@ -420,6 +420,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation>Запись на модуле ввода/вывода отклочена:</translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation>Выполнить HTTP запрос</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

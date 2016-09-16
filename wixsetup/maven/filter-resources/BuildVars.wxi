@@ -59,6 +59,7 @@
     <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
     <?define NxtoolSourceDir="${root.dir}/nxtool/${arch}/bin/${build.configuration}"?>    
     <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
+    <?define IcuDir="${environment.dir}/qt542/${arch}/icu"?>    
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 </Include>

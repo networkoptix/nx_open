@@ -532,14 +532,6 @@ to view more bookmarks</source>
         <translation>Уменьшить в окно</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>Показать сообщение</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>Показать сообщение о несоответствии версий</translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translation>Обучающие видео и ЧаВо...</translation>
     </message>
@@ -774,10 +766,6 @@ to view more bookmarks</source>
     <message>
         <source>Go To Saved Position</source>
         <translation>Переместиться на сохраненную позицию</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>Показывать предупреждение о Beta версии</translation>
     </message>
     <message>
         <source>Calibrate Fisheye</source>
@@ -1230,6 +1218,10 @@ to view more bookmarks</source>
     <message>
         <source>Add Bookmark...</source>
         <translation>Добавить закладку...</translation>
+    </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation>Экспорт с быстрой прокруткой...</translation>
     </message>
 </context>
 <context>
@@ -1711,14 +1703,6 @@ to view more bookmarks</source>
         <translation>Для всех</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>Выберите звук</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>Введите текст</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;Любое устройство&gt;</translation>
     </message>
@@ -2051,6 +2035,28 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation>Изменения применяются...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Загрузка...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation>Выбор устройства</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation>
+            <numerusform>%1 не поддерживает двусторонний звук</numerusform>
+            <numerusform>%1 не поддерживают двусторонний звук</numerusform>
+            <numerusform>%1 не поддерживают двусторонний звук</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2626,7 +2632,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unable to connect to the server</source>
-        <translation>Нет соединения с сервером.</translation>
+        <translation>Нет соединения с сервером</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
@@ -2739,7 +2745,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Failed to dump server database to %1.</source>
-        <translation>Не удалось сохранить копию базы данных сервера в %1</translation>
+        <translation>Не удалось сохранить копию базы данных сервера в %1.</translation>
     </message>
     <message>
         <source>Are you sure you would like to restore the database? All existing data will be lost.</source>
@@ -2748,6 +2754,25 @@ to view more bookmarks</source>
     <message>
         <source>You need to connect to a server prior to backup start.</source>
         <translation>Перед началом резервного копирования необходимо соединиться с сервером.</translation>
+    </message>
+</context>
+<context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>Невозможно обнаружить звуковой кодек &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation>Невозможно инициализировать звуковой кодек.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation>Первичное звуковое устройство не выбрано.</translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation>Формат устройства ввода %1 не поддерживается.</translation>
     </message>
 </context>
 <context>
@@ -2941,14 +2966,18 @@ to view more bookmarks</source>
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation>
-            <numerusform>%1 из (%n раза)</numerusform>
             <numerusform>%1 из (%n раз)</numerusform>
+            <numerusform>%1 из (%n раза)</numerusform>
             <numerusform>%1 из (%n раз)</numerusform>
         </translation>
     </message>
-    <message>
-        <source>and %1 user(s) more...</source>
-        <translation>и %1 пользовалел(и)</translation>
+    <message numerus="yes">
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>и ещё %n пользователь...</numerusform>
+            <numerusform>и ещё %n пользователя...</numerusform>
+            <numerusform>и ещё %n пользователей...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2979,6 +3008,50 @@ to view more bookmarks</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>Настройки расписания несовместимы с некоторыми устройствами.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation>с</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation>м</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation>ч</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>д</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>мс</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>с</translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>м</translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>ч</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>д</translation>
     </message>
 </context>
 <context>
@@ -3373,10 +3446,6 @@ to view more bookmarks</source>
         <translation>Невозможно выполнить проверку.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Ни один из серверов не подключен к сети Интернет.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>Время ожидания истекло</translation>
     </message>
@@ -3425,10 +3494,6 @@ to view more bookmarks</source>
     <message>
         <source>No new users found.</source>
         <translation>Новые пользователи не найдены.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Ни один из серверов не подключен к сети Интернет.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3778,10 +3843,6 @@ to view more bookmarks</source>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>Вы уверены, что хотите удалить данное подключение: %1?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>Неверные параметры</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -4314,6 +4375,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>Невозможно сохранить настройки. Свяжитесь с вашим администратором.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation>Настройки звука</translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4717,6 +4782,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Archived duration in calendar days since the first recording</source>
         <translation>Длительность архива в календарных днях с момента начала записи</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>Битрейт</translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4866,10 +4935,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>Экспорт закладки...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Поиск закладок по имени, тегу или описанию</translation>
     </message>
@@ -4920,6 +4985,10 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform>&lt;%n модуля ввода-вывода&gt;</numerusform>
             <numerusform>&lt;%n модулей ввода-вывода&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation>Экспорт закладки...</translation>
     </message>
 </context>
 <context>
@@ -5499,12 +5568,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Успешно</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>Невозможно выполнить тест. Ни один из серверов не подключен к сети Интернет.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>Невозможно выполнить тест. Указаны неверные параметры.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>Невозможно выполнить проверку.</translation>
     </message>
 </context>
 <context>
@@ -5543,10 +5612,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Activate analog license to remove this message</source>
         <translation>Активируйте аналогувую лицензию, чтобы убрать это сообщение</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>Нет видео потока</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -6124,6 +6189,25 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Select file...</source>
         <translation>Выбрать файл...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation>Устройство ввода не выбрано.</translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation>Поток недоступен, пожалуйста, повторите попытку позже.</translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation>Сетевая ошибка.</translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation>Нажмите и говорите</translation>
     </message>
 </context>
 <context>
@@ -6749,6 +6833,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>Добавление устройств уже выполняется. Вы уверены что хотите его отменить?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation>%1 определил, что Вы используете дисплей с высоким разрешением. Некоторые элементы интерфейса %1 могут отображаться некорректно.</translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation>Это известная проблема и она будет исправлена в версии 3.0.</translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation>А пока проблема может быть решена изменением разрешения монитора.</translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation>Предупреждение: поддержка экранов с высоким разрешением</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -7041,6 +7141,10 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>Вы собираетесь запустить экспорт архива с нескольких камер общей длиной более 30 минут.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation>Выбранный интервал слишком короток, чтобы произвести экспорт с быстрой прокруткой.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7235,10 +7339,6 @@ If you understand this and would like to proceed please click Merge to continue.
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
-    </message>
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Пожалуйста дождитесь включения камеры.</translation>

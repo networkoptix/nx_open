@@ -145,6 +145,7 @@ private slots:
     void at_workbenchLayoutItem_dataChanged(int role);
 
     void at_navigator_positionChanged();
+    void at_navigator_playingChanged();
     void at_navigator_speedChanged();
 
     void at_workbenchStreamSynchronizer_runningChanged();

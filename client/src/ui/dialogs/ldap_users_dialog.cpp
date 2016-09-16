@@ -95,9 +95,9 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     if (status != 0 || !errorString.isEmpty()) {
         QString result;
         result = tr("Error while loading users.");
-#if _DEBUG
-        result += lit(" (%1)").arg(errorString);
-#endif
+        if (!errorString.isEmpty())
+            result += lit(" (%1)").arg(errorString);
+
         stopTesting(result);
         return;
     }

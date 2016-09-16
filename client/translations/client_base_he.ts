@@ -548,18 +548,6 @@ to view more bookmarks</source>
         <translation>שחזר</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>הצג הודעה</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>הצג הודעת אי-התאמת גירסה</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>הצג הודעת אזהרת גירסת ביתא</translation>
-    </message>
-    <message>
         <source>Ask About Statistics Reporting</source>
         <translation>שאל אודות דיווחי סטטיסטיקה</translation>
     </message>
@@ -1225,6 +1213,10 @@ to view more bookmarks</source>
         <source>Add Bookmark...</source>
         <translation>הוסף סימניה...</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation>יצוא סקירה מהירה...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1655,14 +1647,6 @@ to view more bookmarks</source>
         <translation>כל המשתמשים</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>בחר סאונד</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>הכנס טקסט</translation>
-    </message>
-    <message>
         <source>Instant</source>
         <translation>מיידי</translation>
     </message>
@@ -1728,9 +1712,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>מקור ו %n מצלמות נוספות</numerusform>
-            <numerusform></numerusform>
+            <numerusform>מקורות ו %n מצלמות נוספות</numerusform>
         </translation>
     </message>
     <message>
@@ -2031,6 +2015,27 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation>מחיל שינויים...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">טוען...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation>בחר התקן</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation>
+            <numerusform>%1 אינו תומך באודיו דו כיווני</numerusform>
+            <numerusform>%1 אינם תומכים באודיו דו כיווני</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2721,6 +2726,25 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>מקודד האודיו &apos;%1&apos; לא נמצא.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation>התקן האודיו הראשי לא נבחר.</translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation>פורמט הדגימה של ההתקן %1 אינו נתמך.</translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2913,9 +2937,12 @@ to view more bookmarks</source>
             <numerusform>%1 (%n פעמים)</numerusform>
         </translation>
     </message>
-    <message>
-        <source>and %1 user(s) more...</source>
-        <translation>ו %1 משתמשים נוספים...</translation>
+    <message numerus="yes">
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>ומשתמש נוסף אחד...</numerusform>
+            <numerusform>ו %n משתמשים נוספים...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2946,6 +2973,50 @@ to view more bookmarks</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>הגדרות לוח זמנים אינן מתאימות לחלק מההתקנים.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation>שנ&apos;</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation>דקות</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation>שעות</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>ימים</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>ש</translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>ד</translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>שע</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>ימ</translation>
     </message>
 </context>
 <context>
@@ -3339,10 +3410,6 @@ to view more bookmarks</source>
         <translation>לא ניתן לבצע את הבדיקה.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>אף אחד מהשרתים שלך אינו מחובר לאינטרנט.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>הזמן הקצוב עבר</translation>
     </message>
@@ -3391,10 +3458,6 @@ to view more bookmarks</source>
     <message>
         <source>No new users found.</source>
         <translation>לא נמצאו משתמשים חדשים.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>אף אחד מהשרתים שלך אינו מחובר לאינטרנט.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3717,10 +3780,6 @@ to view more bookmarks</source>
     <message>
         <source>&lt;none&gt;</source>
         <translation>&lt;ללא&gt;</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>פרמטרים שגויים</translation>
     </message>
     <message>
         <source>The information you have entered is not valid.</source>
@@ -4273,6 +4332,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
         <translation>שינויים מסויימים יחולו רק לאחר אתחול התוכנה. האם ברצונך לאתחל את התוכנה כעת?</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation>הגדרות אודיו</translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4665,6 +4728,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Archived duration in calendar days since the first recording</source>
         <translation>משך ארכיון בימים מאז ההקלטה הראשונה</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>קצת תקשורת</translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4814,10 +4881,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>ייצוא סימנייה...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>חפש סימנייה לפי שם, תגית או תיאור</translation>
     </message>
@@ -4847,24 +4910,28 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>&lt;התקן&gt;</numerusform>
             <numerusform>&lt;%n התקנים&gt;</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>&lt;מצלמה&gt;</numerusform>
             <numerusform>&lt;%n מצלמות&gt;</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n מודולי קלט/פלט&gt;</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;התקן קלט/פלט&gt;</numerusform>
+            <numerusform>&lt;%n התקני קלט/פלט&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation>ייצוא סימנייה...</translation>
     </message>
 </context>
 <context>
@@ -5438,12 +5505,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>הצלחה</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>לא ניתן לבצע בדיקה. אף שרת אינו מחובר לרשת האינטרנט.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>הנתונים שסופקו אינם תקינים. לא ניתן לבצע בדיקה.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>לא ניתן לבצע את הבדיקה.</translation>
     </message>
 </context>
 <context>
@@ -5486,10 +5553,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Loading...</source>
         <translation>טוען...</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>לא נמצא זרם וידאו</translation>
     </message>
     <message>
         <source>Module is disabled</source>
@@ -5627,16 +5690,16 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>מצלמה אחת</numerusform>
             <numerusform>%n מצלמות</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>התקן אחד</numerusform>
             <numerusform>%n התקנים</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6061,6 +6124,25 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Select file...</source>
         <translation>בחר קובץ...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation>התקן קלט לא נבחר.</translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation>הזרמת וידאו אינה מוכנה עדיין, נסה שוב מאוחר יותר.</translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation>שגיאת רשת.</translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation>לחץ לדיבור.</translation>
     </message>
 </context>
 <context>
@@ -6663,6 +6745,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>הוספת ההתקן כבר מתבצעת.האם אתה בטוח שאתה רוצה לבטל את התהליך הנוכחי?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation>%1 גילה שיש ברשותך מסך ברזולוציה גבוהה ויתכן שבעקבות כך %1 לא יוצג באופן תקין.</translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation>אנו מודעים לבעיה זו והיא תתוקן בגירסה 3.0.</translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation>בנתיים יש לשנות את רזולוציית המסך לקבלת תוצאות טובות יותר.</translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation>אזהרת תמיכה במסכי HiDpi</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6700,9 +6798,9 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>האם למחוק את הסימניה?</numerusform>
             <numerusform>האם למחוק את %n הסימניות?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -6953,6 +7051,10 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>אתה עומד לייצא מספר קטעי וידאו שאורכם הכולל ארוך מ 30 דקות.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation>טווח הזמן שנבחר קצר מידי ולא ניתן לייצאו בסקירה מהירה.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7150,10 +7252,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>אנא המתן עד שהמצלמה תחזור להיות מקוונת.</translation>
-    </message>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
         <source>Unable to set position on camera.</source>

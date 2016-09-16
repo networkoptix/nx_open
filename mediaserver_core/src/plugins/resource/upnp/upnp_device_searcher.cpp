@@ -308,46 +308,56 @@ bool UPNPDeviceSearcher::isInterfaceListChanged() const
     auto ifaces = getAllIPv4Interfaces().toSet();
     bool changed = false;
 
-    if( changed = ifaces != m_interfacesCache)
+    if( changed = ifaces != m_interfacesCache )
         m_interfacesCache = ifaces;
 
     return changed;
 }
 
-void UPNPDeviceSearcher::updateReceiveSocket()
+std::unique_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::updateReceiveSocket()
 {
     using namespace std::placeholders;
 
     m_receiveBuffer.reserve(READ_BUF_CAPACITY);
 
+    std::unique_ptr<AbstractDatagramSocket> oldSock;
     if(m_receiveSocket)
-        m_receiveSocket->cancelAsyncIO(aio::etNone);
+        oldSock  = std::move(m_receiveSocket);
 
-    auto udpSock = make_shared<UDPSocket>();
-    udpSock->setReuseAddrFlag(true);
-    udpSock->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
-    udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
+    m_receiveSocket.reset(new UDPSocket(AF_INET));
+
+    m_receiveSocket->setNonBlockingMode(true);
+    m_receiveSocket->setReuseAddrFlag(true);
+    m_receiveSocket->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
+    m_receiveSocket->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
+
     for(const auto iface: getAllIPv4Interfaces())
-        udpSock->joinGroup( groupAddress.toString(), iface.address.toString() );
-    udpSock->readSomeAsync(
+        m_receiveSocket->joinGroup( groupAddress.toString(), iface.address.toString() );
+
+    m_receiveSocket->readSomeAsync(
         &m_receiveBuffer,
         std::bind(
             &UPNPDeviceSearcher::onSomeBytesRead,
             this,
-            udpSock.get(), _1, &m_receiveBuffer, _2 ) );
+            m_receiveSocket.get(), _1, &m_receiveBuffer, _2 ) );
 
-    m_receiveSocket = udpSock;
+    return oldSock;
 }
 
 std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
     using namespace std::placeholders;
 
+    std::unique_ptr<AbstractDatagramSocket> oldSock;
+
     {
         QnMutexLocker lk(&m_mutex);
         if(isInterfaceListChanged())
-            updateReceiveSocket();
+            oldSock = updateReceiveSocket();
     }
+
+    if (oldSock)
+        oldSock->terminateAsyncIO(true);
 
     const QString& localAddress = iface.address.toString();
 
@@ -360,11 +370,13 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
         return p.first->second.sock;
 
     //creating new socket
-    std::shared_ptr<UDPSocket> sock( new UDPSocket() );
+    std::shared_ptr<UDPSocket> sock( new UDPSocket(AF_INET) );
 
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
-    if( !sock->setReuseAddrFlag( true ) ||
+
+    if( !sock->setNonBlockingMode(true) ||
+        !sock->setReuseAddrFlag( true ) ||
         !sock->bind( SocketAddress( localAddress ) ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||

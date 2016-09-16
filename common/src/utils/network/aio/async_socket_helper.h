@@ -50,7 +50,7 @@ public:
 
         aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
     }
-    
+
     //!This call stops async I/O on socket and it can never be resumed!
     void terminateAsyncIO()
     {
@@ -71,7 +71,8 @@ class AsyncSocketImplHelper
 public:
     AsyncSocketImplHelper(
         SocketType* _socket,
-        AbstractCommunicatingSocket* _abstractSocketPtr )
+        AbstractCommunicatingSocket* _abstractSocketPtr,
+        int _ipVersion)
     :
         BaseAsyncSocketImplHelper<SocketType>( _socket ),
         m_abstractSocketPtr( _abstractSocketPtr ),
@@ -85,7 +86,8 @@ public:
         m_recvHandlerTerminatedFlag( nullptr ),
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
-        m_asyncSendIssued( false )
+        m_asyncSendIssued( false ),
+        m_ipVersion( _ipVersion )
     {
         assert( this->m_socket );
         assert( m_abstractSocketPtr );
@@ -94,7 +96,7 @@ public:
     virtual ~AsyncSocketImplHelper()
     {
         //synchronization may be required here in case if recv handler and send/connect handler called simultaneously in different aio threads,
-        //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing 
+        //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing
         //async I/O and wait for completion. That is, wait for eventTriggered to return.
         //So, socket can only be removed from handler called in aio thread. So, eventTriggered is down the stack if m_*TerminatedFlag is not nullptr
 
@@ -155,7 +157,7 @@ public:
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
         {
-            //socket has been terminated, no async call possible. 
+            //socket has been terminated, no async call possible.
             //Returning true to trick calling party: let it think everything OK and
             //finish its completion handler correctly.
             //TODO #ak is it really ok to trick someone?
@@ -167,7 +169,7 @@ public:
         //TODO #ak if address is already resolved (or is an ip address) better make synchronous non-blocking call
         //NOTE: socket cannot be read from/written to if not connected yet. TODO #ak check that with assert
 
-        if( HostAddressResolver::instance()->isAddressResolved(addr.address) )
+        if( HostAddressResolver::isAddressResolved(addr.address) )
             return startAsyncConnect( addr );
 
         //resolving address, if required
@@ -181,6 +183,7 @@ public:
                 else if( !startAsyncConnect( SocketAddress(resolvedAddress, addr.port) ) )
                     this->post( std::bind( m_connectHandler, SystemError::getLastOSErrorCode() ) );
             },
+            m_ipVersion,
             this );
     }
 
@@ -191,7 +194,7 @@ public:
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
-        //this assert is not critical but is a signal of possible 
+        //this assert is not critical but is a signal of possible
             //ineffective memory usage in calling code
         Q_ASSERT( buf->capacity() > buf->size() );
 
@@ -318,6 +321,7 @@ private:
 
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     std::atomic<bool> m_asyncSendIssued;
+    const int m_ipVersion;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {

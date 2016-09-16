@@ -3,13 +3,15 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <list>
+
 #include <QHash>
 #include <QtCore/QString>
 #include <QtCore/QSet>
 #include <QtCore/QPair>
 
 //first - login, second - password
-typedef QSet<QPair<const char*, const char*> > PasswordList;
+typedef std::list<std::pair<const char*, const char*> > PasswordList;
 
 struct SOAP_ENV__Fault;
 
@@ -31,7 +33,7 @@ public:
     static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);
     static bool isConflictError(const SOAP_ENV__Fault* faultInfo);
 
-    const PasswordList& getPasswordsByManufacturer(const QString& mdnsPacketData) const;
+    const PasswordList getPasswordsByManufacturer(const QString& mdnsPacketData) const;
 
 private:
 

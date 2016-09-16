@@ -39,7 +39,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 {
     if (m_receiveSocket == 0)
     {
-        UDPSocket* udpSock = new UDPSocket();
+        UDPSocket* udpSock = new UDPSocket(AF_INET);
         udpSock->setReuseAddrFlag(true);
         udpSock->setRecvBufferSize(RECV_BUFFER_SIZE);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );

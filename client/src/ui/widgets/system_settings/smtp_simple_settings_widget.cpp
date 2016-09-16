@@ -68,7 +68,7 @@ QnSmtpSimpleSettingsWidget::~QnSmtpSimpleSettingsWidget()
 
 QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const {
     QnSimpleSmtpSettings result;
-    result.email = ui->emailLineEdit->text(); 
+    result.email = ui->emailLineEdit->text();
     result.password = ui->passwordLineEdit->text();
     result.signature = ui->signatureLineEdit->text();
     result.supportEmail = ui->supportLinkLineEdit->text();
@@ -103,7 +103,7 @@ void QnSmtpSimpleSettingsWidget::validateEmail() {
     const QString targetEmail = ui->emailLineEdit->text();
 
     if (!targetEmail.isEmpty()) {
-        QnEmailAddress email(targetEmail); 
+        QnEmailAddress email(targetEmail);
         if (!email.isValid())
             errorText = tr("E-Mail is not valid");
         else if (email.smtpServer().isNull())

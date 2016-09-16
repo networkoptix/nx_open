@@ -19,12 +19,12 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/us/app/qulu/id888320566?mt=8",
+            url: "https://itunes.apple.com/us/app/qulu/id1090487857?mt=8",
             button: "iOS Client",
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.vista.qulu&hl=en",
+            url: "https://play.google.com/store/apps/details?id=com.vista.qulumobile&hl=en",
             class:'googleplay',
             button: "Android Client"
         }

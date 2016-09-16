@@ -414,6 +414,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -579,7 +583,7 @@
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">카메라 재시작후 카메라 웹페이지를 통해 장치를 초기화 해주세요.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
@@ -591,11 +595,11 @@
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">먼저, 카메라설정에서 녹화설정을 셋팅하고 fps를 줄여보세요.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">문제가 해결되지 않았습니다. 카메라 웹페이지를 통해 초기화 하세요.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -611,7 +615,7 @@
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">미디어 에러 경고, 상세 내용은 장치 문제 창을 열어서 확인하세요.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
@@ -953,11 +957,11 @@
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IO장치</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IO장치</translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -965,7 +969,7 @@
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IO장치</translation>
     </message>
 </context>
 <context>

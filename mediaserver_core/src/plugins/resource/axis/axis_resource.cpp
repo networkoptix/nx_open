@@ -11,7 +11,8 @@
 #include <utils/common/synctime.h>
 #include <utils/common/log.h>
 
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "axis_stream_reader.h"
 #include "axis_ptz_controller.h"
@@ -32,6 +33,7 @@ namespace{
     const quint16 DEFAULT_AXIS_API_PORT = 80;
     const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
     const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+    const QString AXIS_FIRMWARE_VERSION_PARAM_NAME("Properties.Firmware.Version");
 
     QnAudioFormat toAudioFormat(const QString& codecName)
     {
@@ -270,12 +272,6 @@ bool QnPlAxisResource::isInputPortMonitored() const
     return m_ioHttpMonitor[0].httpClient.get() != nullptr;
 }
 
-bool QnPlAxisResource::isInitialized() const
-{
-    QnMutexLocker lock( &m_mutex );
-    return isIOModule() ? base_type::isInitialized() : !m_resolutionList.isEmpty();
-}
-
 void QnPlAxisResource::clear()
 {
     m_resolutionList.clear();
@@ -409,13 +405,11 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
-        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
-        if (status == CL_HTTP_SUCCESS) {
-            QByteArray firmware;
-            http.readAll(firmware);
-            firmware = firmware.mid(firmware.indexOf('=')+1);
-            setFirmware(QString::fromUtf8(firmware));
-        }
+
+        QString firmware;
+        auto status = readAxisParameter(&http, AXIS_FIRMWARE_VERSION_PARAM_NAME, &firmware);
+        if (status == CL_HTTP_SUCCESS)
+            setFirmware(firmware);
     }
 
     if (hasVideo(0))
@@ -423,7 +417,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         // enable send motion into H.264 stream
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"));
-        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=").append(isAudioEnabled() ? "yes" : "no"));
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=yes"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
@@ -515,6 +509,10 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
                 }
             }
         }
+
+        if (!isIOModule() && m_resolutionList.isEmpty())
+            return CameraDiagnostics::CameraInvalidParams("Failed to read resolution list");
+
     }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
             //m_initMutex is locked up the stack
     if (hasVideo(0))
@@ -1331,10 +1329,8 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     return true;
 }
 
-void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
+void QnPlAxisResource::asyncUpdateIOSettings()
 {
-    QN_UNUSED(key);
-
     const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
     QnIOPortDataList prevValue;
     {
@@ -1360,7 +1356,16 @@ void QnPlAxisResource::asyncUpdateIOSettings(const QString & key)
 void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QString & key)
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
-        QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
+    {
+        QnUuid id = res->getId();
+        QnConcurrent::run(
+            QThreadPool::globalInstance(),
+            [id]()
+            {
+                if (auto res = qnResPool->getResourceById<QnPlAxisResource>(id))
+                    res->asyncUpdateIOSettings();
+            });
+    }
 }
 
 QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()

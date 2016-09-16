@@ -191,8 +191,12 @@ int launchFile(const wstring& executePath)
     if (!srcFile.is_open())
         return -1;
 
-    srcFile.seekg(-sizeof(int64_t)*2, std::ios::end); // skip magic, and nov pos
-    int64_t magic, novPos, indexTablePos;
+    // see seekg(-value, std::ios::end) is broken in MSVC2012 for x86 mode. Workaround it
+    srcFile.seekg(0, std::ios::end);
+    int64_t pos = (int64_t) srcFile.tellg() - sizeof(int64_t) * 2; // skip magic, and nov pos
+    srcFile.seekg(pos);
+
+    int64_t magic = 0, novPos = 0, indexTablePos = 0;
 
     srcFile.read((char*) &novPos, sizeof(int64_t));
     srcFile.read((char*) &magic, sizeof(int64_t));

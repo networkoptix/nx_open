@@ -349,13 +349,13 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
             if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
             {
                 if (camTimeChanged) {
-                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logDEBUG1);
                 }
                 else if (localTimeChanged) {
-                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logDEBUG1);
                 }
                 else {
-                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logDEBUG1);
                 }
                 m_lastWarnTime = currentUsecTime;
             }

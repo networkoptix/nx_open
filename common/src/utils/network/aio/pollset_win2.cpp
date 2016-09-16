@@ -120,7 +120,7 @@ namespace aio
             writefdsOriginal->fd_count = 0;
             exceptfdsOriginal->fd_count = 0;
 
-            dummySocket.reset( new UDPSocket() );
+            dummySocket.reset( new UDPSocket(AF_INET) );
         }
 
         ~PollSetImpl()

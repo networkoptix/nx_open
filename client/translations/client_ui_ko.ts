@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>이 카메라는 상세 설정이 없습니다.</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -882,11 +887,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTP content</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>HTTP url</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>사용자 로그인(옵션)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>로그인</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>인증을위한 비밀번호(옵션)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>비밀번호</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>&amp;PTZ 프리셋</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>빠른검토 내보내기</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>초기 영상길이</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>추출된 영상 길이</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>빠른 검토 속도</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>프레임 간격</translation>
     </message>
 </context>
 <context>
@@ -1604,6 +1670,11 @@
         <location/>
         <source>Test...</source>
         <translation>테스트...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>사용자 지정</translation>
     </message>
 </context>
 <context>
@@ -2381,6 +2452,11 @@
         <location/>
         <source>Test...</source>
         <translation>테스트...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>사용자에게 말하기</translation>
     </message>
 </context>
 <context>

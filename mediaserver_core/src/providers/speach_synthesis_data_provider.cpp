@@ -30,25 +30,19 @@ QnMediaContextPtr QnSpeachSynthesisDataProvider::initializeAudioContext()
     auto synthesizer = TextToWaveServer::instance();
     auto format = synthesizer->getAudioFormat();
     auto codecId = synthesizer->getCodecId();
-    auto codec = avcodec_find_decoder(codecId);
 
-    if (!codec)
-        return QnMediaContextPtr();
-
-    auto ctx = avcodec_alloc_context3(codec);
+    auto mediaCtx = QnMediaContextPtr(new QnMediaContext(codecId));
+    auto ctx = mediaCtx->ctx();
 
     if (!ctx)
         return QnMediaContextPtr();
 
-    ctx->codec = codec;
-    ctx->codec_id = codecId;
-    ctx->codec_type = AVMEDIA_TYPE_AUDIO;
     ctx->sample_fmt = CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(format);
     ctx->sample_rate = format.sampleRate();
     ctx->frame_size = kDefaultDataChunkSize / 2;
     ctx->channels = format.channelCount();
 
-    return QnMediaContextPtr(new QnMediaContext(ctx));
+    return mediaCtx;
 }
 
 QnAbstractMediaDataPtr QnSpeachSynthesisDataProvider::getNextData()

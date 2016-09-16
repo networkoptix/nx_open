@@ -12,13 +12,15 @@
 namespace ite
 {
     ///
-    class MediaEncoder : public nxcip::CameraMediaEncoder3, public ObjectCounter<MediaEncoder>
+    class MediaEncoder : public DefaultRefCounter<nxcip::CameraMediaEncoder3>
     {
-        DEF_REF_COUNTER
-
     public:
         MediaEncoder( CameraManager* cameraManager, int encoderNumber );
         virtual ~MediaEncoder();
+
+        // nxcip::PluginInterface
+
+        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::CameraMediaEncoder
 

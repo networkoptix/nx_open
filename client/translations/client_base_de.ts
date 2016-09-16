@@ -537,18 +537,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation></translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>Nachricht anzeigen</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>Versionsdiskrepanz Warnung anzeigen</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>Beta-Versions Warnung anzeigen</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>Im Browser öffnen...</translation>
     </message>
@@ -1224,6 +1212,10 @@ um mehr Lesezeichen zu sehen</translation>
         <source>Add Bookmark...</source>
         <translation>Lesezeichen hinzufügen...</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation>Rapid Review exportieren...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1694,14 +1686,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Alle Benutzer</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>Ton auswählen</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>Text eingeben</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;Jedes Gerät&gt;</translation>
     </message>
@@ -1727,8 +1711,8 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
-            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+        <translation>
+            <numerusform>Quell-Kamera und %n weitere Kamera</numerusform>
             <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
         </translation>
     </message>
@@ -2031,6 +2015,27 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Applying changes...</source>
         <translation>Änderungen werden übernommen...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Lade...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation>Gerät auswählen</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation>
+            <numerusform>%1 unterstützt kein Zweiwege-Audio</numerusform>
+            <numerusform>%1 unterstützen kein Zweiwege-Audio</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2600,7 +2605,7 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Ladeprozess nicht gefunden</translation>
+        <translation>Ladeprozess nicht gefunden.</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
@@ -2615,7 +2620,7 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation>Zeitüberschreitung der Anforderung.</translation>
+        <translation>Zeitüberschreitung der Anforderung</translation>
     </message>
     <message>
         <source>Test Failed</source>
@@ -2718,6 +2723,25 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>You need to connect to a server prior to backup start.</source>
         <translation>Sie müssen sich vorher mit einem Server verbinden, um die Sicherung zu starten.</translation>
+    </message>
+</context>
+<context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>Audio-Encoder &apos;%1&apos; konnte nicht gefunden werden.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation>Audio-Encoder konnte nicht initialisiert werden.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation>Primäres Audiogerät wurde nicht ausgewählt.</translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation>Sample-Format des Eingabegeräts %1 wird nicht unterstützt.</translation>
     </message>
 </context>
 <context>
@@ -2913,9 +2937,12 @@ um mehr Lesezeichen zu sehen</translation>
             <numerusform>%1 (%n mal)</numerusform>
         </translation>
     </message>
-    <message>
-        <source>and %1 user(s) more...</source>
-        <translation>und %1 Benutzer mehr...</translation>
+    <message numerus="yes">
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>und %n Benutzer mehr...</numerusform>
+            <numerusform>und %n Benutzer mehr...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2946,6 +2973,50 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>Zeitplan-Einstellungen sind nicht kompatibel mit einigen Geräten.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation>Sek</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation>Min</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation>Std</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>Tage</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>s</translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>m</translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>h</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>d</translation>
     </message>
 </context>
 <context>
@@ -3341,10 +3412,6 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
         <translation>Test konnte nicht ausgeführt werden.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>Zeitüberschreitung</translation>
     </message>
@@ -3393,10 +3460,6 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     <message>
         <source>No new users found.</source>
         <translation>Keine neuen Benutzer gefunden.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3740,10 +3803,6 @@ Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartet
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>Wollen Sie die Verbindung %1 wirklich löschen?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>Ungültige Parameter</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -4274,6 +4333,10 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>Systemkonfiguration kann nicht gespeichert werden. Bitte kontaktieren Sie den Systemadministrator.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation>Audio Einstellungen</translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4666,6 +4729,10 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>Archived duration in calendar days since the first recording</source>
         <translation>Archivierte Dauer in Kalendertagen seit der ersten Aufzeichnung</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>Bitrate</translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4815,10 +4882,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>Exportiere Lesezeichen...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Suche Lesezeichen nach Namen, Tag oder Beschreibung</translation>
     </message>
@@ -4848,24 +4911,28 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+        <translation>
+            <numerusform>&lt;%n Gerät&gt;</numerusform>
             <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+        <translation>
+            <numerusform>&lt;%n Kamera&gt;</numerusform>
             <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+        <translation>
+            <numerusform>&lt;%n I/O Modul&gt;</numerusform>
             <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation>Exportiere Lesezeichen...</translation>
     </message>
 </context>
 <context>
@@ -5439,13 +5506,13 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Aktion erfolgreich</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>Konnte den Test nicht ausführen. Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>
 Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgeführt werden.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>Test konnte nicht ausgeführt werden.</translation>
     </message>
 </context>
 <context>
@@ -5484,10 +5551,6 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     <message>
         <source>Loading...</source>
         <translation>Lade...</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>Kein Videostream</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -5629,15 +5692,15 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform>%n Kamera(s)</numerusform>
+        <translation>
+            <numerusform>%n Kamera</numerusform>
             <numerusform>%n Kamera(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform>%n Gerät(e)</numerusform>
+        <translation>
+            <numerusform>%n Gerät</numerusform>
             <numerusform>%n Gerät(e)</numerusform>
         </translation>
     </message>
@@ -6063,6 +6126,25 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     <message>
         <source>Select file...</source>
         <translation>Datei wählen...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation>Eingabegerät wurde nicht ausgewählt.</translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation>Streaming ist momentan nicht möglich, versuchen Sie es später erneut.</translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation>Netzwerkfehler.</translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation>Halten, um zu Sprechen</translation>
     </message>
 </context>
 <context>
@@ -6666,6 +6748,22 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>Das Hinzufügen des Geräts ist bereits im Gange. Sind Sie sicher, dass Sie den aktuellen Vorgang abbrechen möchten?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation>%1 hat festgestellt, dass Sie eine hohe Auflösung nutzen und deswegen %1 möglicherweise nicht korrekt angezeigt wird.</translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation>Wir sind uns dieses Problems bewusst und ein Update wird mit v3.0 erscheinen.</translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation>In der Zwischenzeit passen Sie bitte Ihre Bildschirmauflösung für eine bessere Erfahrung an.</translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation>Support-Warnung HiDpi</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6703,8 +6801,8 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
-            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+        <translation>
+            <numerusform>Sind Sie sicher, dass Sie das %n Lesezeichen löschen wollen?</numerusform>
             <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
         </translation>
     </message>
@@ -6956,6 +7054,10 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>Sie sind dabei mehrere Videos zu exportieren, welche eine Gesamtlänge von größer als 30 Minuten haben.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation>Die ausgewählte Periode ist zu kurz und kann nicht als Rapid Review exportiert werden.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7145,10 +7247,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
-    </message>
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Bitte warten Sie bis die Kamera online ist.</translation>

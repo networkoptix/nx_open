@@ -1454,6 +1454,7 @@ namespace ec2
 
     void QnTransactionMessageBus::gotConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
+        ConnectionLockGuard connectionLockGuard,
         QSharedPointer<AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const ApiPeerData& remotePeer,
@@ -1473,6 +1474,7 @@ namespace ec2
 
         QnTransactionTransport* transport = new QnTransactionTransport(
             connectionGuid,
+            std::move(connectionLockGuard),
             localPeer(),
             remotePeer,
             std::move(socket),

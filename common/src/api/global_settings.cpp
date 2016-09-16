@@ -74,7 +74,7 @@ namespace {
     const int kProxyConnectTimeoutDefault = 5;
 
     const QString kMaxRecorderQueueSizeBytesName(lit("maxRecordQueueSizeBytes"));
-    const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 42;
+    const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 24;
     const QString kMaxRecorderQueueSizePacketsName(lit("maxRecordQueueSizeElements"));
     const int kMaxRecorderQueueSizePacketsDefault = 1000;
 

@@ -508,14 +508,6 @@ to view more bookmarks</source>
         <translation>Phục hồi dựa trên Windows</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>hiển thị tin nhắn</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>Hiển thị phiên bản không phù hợp nhắn</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>Trong mở trình duyệt…</translation>
     </message>
@@ -702,10 +694,6 @@ to view more bookmarks</source>
     <message>
         <source>Activate PTZ Tour</source>
         <translation>Bắt đầu lên PTZ Cruise</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>Thông điệp cảnh báo được hiển thị Beta</translation>
     </message>
     <message>
         <source>Manage...</source>
@@ -1215,6 +1203,10 @@ to view more bookmarks</source>
         <source>Add Bookmark...</source>
         <translation>thêm Bookmark ...</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation>Xuất khẩu nhanh chóng xem xét lại ...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1675,14 +1667,6 @@ to view more bookmarks</source>
         <translation>Tất cả người dùng</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>Chọn một giọng nói</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>nhập văn bản</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;Bất kỳ thiết bị&gt;</translation>
     </message>
@@ -1708,7 +1692,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Nguồn và %n máy ảnh hơn</numerusform>
         </translation>
     </message>
@@ -2007,6 +1991,26 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation>Áp dụng những thay đổi ...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Đang tải...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation>Chọn thiết bị</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation>
+            <numerusform>%1 không hỗ trợ âm thanh hai chiều %n</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2687,6 +2691,25 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>Không thể tìm thấy các coder audio &apos;%1&apos;。</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation>thiết bị âm thanh chính không được chọn.</translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation>định dạng mẫu của %1 thiết bị đầu vào không được hỗ trợ.</translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2876,9 +2899,11 @@ to view more bookmarks</source>
             <numerusform>%1 (%n thời gian)</numerusform>
         </translation>
     </message>
-    <message>
-        <source>and %1 user(s) more...</source>
-        <translation>and %1 user(s) more...</translation>
+    <message numerus="yes">
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>và %n người sử dụng nhiều hơn %n...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2909,6 +2934,50 @@ to view more bookmarks</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>Thiết lập lịch trình không tương thích với một số thiết bị.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation>giây</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation>phút</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation>giờ</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>ngày</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation type="unfinished">micro giây</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation type="unfinished">giây</translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation type="unfinished">phút</translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation type="unfinished">giờ</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation type="unfinished">ngày</translation>
     </message>
 </context>
 <context>
@@ -3301,10 +3370,6 @@ to view more bookmarks</source>
         <translation>Không thể thực hiện một thử nghiệm.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>giờ nghĩ giảo lao</translation>
     </message>
@@ -3353,10 +3418,6 @@ to view more bookmarks</source>
     <message>
         <source>No new users found.</source>
         <translation>Không có người dùng mới được tìm thấy.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3692,10 +3753,6 @@ to view more bookmarks</source>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>Bạn có chắc chắn muốn xóa kết nối này: %1?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>Lập luận không hợp lệ</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -4225,6 +4282,10 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>Cài đặt không thể lưu. Hãy liên hệ với quản trị hệ thống của bạn.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation>Cài đặt âm thanh</translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4606,6 +4667,10 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>Archived duration in calendar days since the first recording</source>
         <translation>Thời gian lưu trữ trong những ngày lịch kể từ khi ghi hình đầu tiên</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>bitrate</translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4755,10 +4820,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>Xuất dấu trang ...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Tìm kiếm dấu theo tên, từ khóa hoặc mô tả</translation>
     </message>
@@ -4788,21 +4849,25 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n thiết bị&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n camera(s)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n I/O module(s)&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation>Xuất dấu trang ...</translation>
     </message>
 </context>
 <context>
@@ -5370,12 +5435,12 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>sự thành công</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>Không thể thực hiện một thử nghiệm. Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>Các thông số được cung cấp không hợp lệ. Không thể thực hiện một thử nghiệm.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>Không thể thực hiện một thử nghiệm.</translation>
     </message>
 </context>
 <context>
@@ -5414,10 +5479,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>Activate analog license to remove this message</source>
         <translation>Xin vui lòng mua các loại suy ủy quyền</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>Không có dòng video</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -5559,13 +5620,13 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Máy ảnh</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Thiết bị</numerusform>
         </translation>
     </message>
@@ -5991,6 +6052,25 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>Select file...</source>
         <translation>Chọn File...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation>Thiết bị đầu vào không được chọn.</translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation>streaming là chưa sẵn sàng, xin vui lòng thử lại sau.</translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation>Lỗi mạng.</translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation>Giữ để nói</translation>
     </message>
 </context>
 <context>
@@ -6570,6 +6650,22 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>Device Ngoài ra là đã được tiến hành. Bạn có chắc chắn muốn hủy bỏ quá trình hiện tại?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation>%1 đã phát hiện ra rằng bạn có một màn hình độ phân giải cao và kết quả là %1 có thể không được hiển thị tốt.</translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation>Chúng tôi nhận thức được vấn đề này và một sửa chữa sẽ đến trong v3.0.</translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation>Trong khi đó hãy điều chỉnh độ phân giải của màn hình của bạn nếu cần thiết cho một trải nghiệm tốt hơn.</translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation>HiDpi màn hình Hỗ trợ cảnh báo</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6607,7 +6703,7 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Bạn có chắc chắn muốn xóa những %n dấu không?</numerusform>
         </translation>
     </message>
@@ -6858,6 +6954,10 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>Bạn muốn xuất khẩu một số đoạn video với tổng chiều dài quá 30 phút.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation>thời gian lựa chọn là quá ngắn và không thể được xuất khẩu như xem xét nhanh chóng.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7011,12 +7111,12 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>Giờ: phút: giây</translation>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>Min: sec</translation>
+        <translation>mm:ss</translation>
     </message>
     <message>
         <source>yyyy MMM dd</source>
@@ -7043,10 +7143,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
-    </message>
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Xin vui lòng chờ máy ảnh để đi trực tuyến.</translation>

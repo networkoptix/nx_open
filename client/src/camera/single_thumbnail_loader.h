@@ -27,6 +27,9 @@ public:
 
     virtual QImage image() const override;
 
+    QnThumbnailRequestData requestData() const;
+    void setRequestData(const QnThumbnailRequestData& data);
+
 signals:
     /** Internal signal to implement thread-safety. */
     void imageLoaded(const QByteArray &data);

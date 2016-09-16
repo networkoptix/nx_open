@@ -61,6 +61,7 @@ public:
     int screenWidth() const;
     int screenHeight() const;
     void pleaseStop();
+    Qn::CaptureMode getMode() const { return m_mode; }
 private:
     HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int dataStride, int width, int height, AVFrame* pFrame);
@@ -85,8 +86,6 @@ private:
     unsigned m_frameNum;
     int m_currentIndex;
 
-    static QnMutex m_instanceMutex;
-    static int m_aeroInstanceCounter;
     Qn::CaptureMode m_mode;
     int m_poolSize;
     bool m_captureCursor;

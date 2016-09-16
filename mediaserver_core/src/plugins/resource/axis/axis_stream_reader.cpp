@@ -105,8 +105,8 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         }
 
 
-        // ================ profile setup ======================== 
-    
+        // ================ profile setup ========================
+
         // -------------- check if profile already exists
 
         std::set<QByteArray> profilesToRemove;
@@ -123,7 +123,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
                     getResource()->setStatus(Qn::Unauthorized);
                     return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
                 }
-                else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
+                else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned)
                 {
                     NX_LOG( lit("Axis camera must be have old firmware!!!!  ip = %1").arg(res->getHostAddress()) , cl_logERROR);
                     m_oldFirmwareWarned = true;
@@ -139,16 +139,29 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
                 msleep(rand() % 50);
                 continue; // sometime axis returns empty profiles list
             }
-        
+
             QList<QByteArray> lines = body.split('\n');
+            bool profileFound = false;
             for (int i = 0; i < lines.size(); ++i)
             {
                 if (lines[i].endsWith(QByteArray("Name=") +profileName))
                 {
-                    action = "update"; // profile already exists, so update instead of add
                     QList<QByteArray> params = lines[i].split('.');
                     if (params.size() >= 2)
-                        profileNumber = params[params.size()-2];
+                    {
+                        QByteArray token = params[params.size()-2];
+                        if (!profileFound)
+                        {
+                            action = "update"; // profile already exists, so update instead of add
+                            profileNumber = token;
+                        }
+                        else
+                        {
+                            profilesToRemove.insert( token );
+                        }
+                        profileFound = true;
+                    }
+
                 }
                 else if( lines[i].endsWith(QByteArray("Name=") + oldProfileName) )
                 {
@@ -180,7 +193,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
                 ? PRIMARY_ENCODER_INDEX
                 : SECONDARY_ENCODER_INDEX );
 
-        if (resolution.size.isEmpty()) 
+        if (resolution.size.isEmpty())
             qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
         Qn::StreamQuality quality = params.quality;
 
@@ -242,7 +255,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     }
 
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(request).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
-    
+
 
     // ============== requesting a video ==========================
     m_rtpStreamParser.setRequest(request);
@@ -272,7 +285,7 @@ void QnAxisStreamReader::fillMotionInfo(const QRect& rect)
 {
     if (m_lastMetadata == 0) {
         m_lastMetadata = QnMetaDataV1Ptr(new QnMetaDataV1());
-        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec 
+        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec
     }
     for (int x = rect.left(); x <= rect.right(); ++x)
     {
@@ -379,20 +392,20 @@ void QnAxisStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
-    if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid) 
+    if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
         m_axisRes->readMotionInfo();
 
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData()) 
+    if (needMetaData())
         return getMetaData();
 
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 10; ++i)
     {
         rez = m_rtpStreamParser.getNextData();
-        if (rez) 
+        if (rez)
         {
             if (rez->dataType == QnAbstractMediaData::VIDEO) {
                 parseMotionInfo(static_cast<QnCompressedVideoData*>(rez.get()));
@@ -408,7 +421,7 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
             break;
         }
     }
-    
+
     return rez;
 }
 

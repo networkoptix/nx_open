@@ -46,6 +46,7 @@
 
 #include <utils/common/model_functions.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+#include <core/resource/resource_data_structures.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -108,21 +109,6 @@ StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
-
-struct StrictBitrateInfo {
-    const char* model;
-    int minBitrate;
-    int maxBitrate;
-};
-
-// TODO: #Elric #VASILENKO move out to JSON
-// Strict bitrate range for specified cameras
-StrictBitrateInfo strictBitrateList[] =
-{
-    { "DCS-7010L", 4096, 1024*16 },
-    { "DCS-6010L", 0, 1024*2 }
-};
-
 
 //width > height is prefered
 static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -698,19 +684,56 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
-    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps));
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps), role);
 }
 
-int QnPlOnvifResource::strictBitrate(int bitrate) const
+int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
 {
-    for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(strictBitrateList[0]); ++i)
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
+    QString availableBitratesParamName;
+    QString bitrateBoundsParamName;
+    
+    quint64 bestBitrate = bitrate;
+
+    if (role == Qn::CR_LiveVideo)
     {
-        if (getModel() == QLatin1String(strictBitrateList[i].model))
-            return qMin(strictBitrateList[i].maxBitrate, qMax(strictBitrateList[i].minBitrate, bitrate));
+        bitrateBoundsParamName = Qn::HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME;
+        availableBitratesParamName = Qn::HIGH_STREAM_AVAILABLE_BITRATES_PARAM_NAME;
+    }   
+    else if (role == Qn::CR_SecondaryLiveVideo) 
+    {
+        bitrateBoundsParamName = Qn::LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME;
+        availableBitratesParamName = Qn::LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME;
     }
-    return bitrate;
+
+    if (!bitrateBoundsParamName.isEmpty())
+    {
+        auto bounds = resData.value<QnBounds>(bitrateBoundsParamName, QnBounds());
+        if (!bounds.isNull())
+            bestBitrate = qMin(bounds.max, qMax(bounds.min, bestBitrate));
+    }
+
+    if (availableBitratesParamName.isEmpty())
+        return bestBitrate;
+
+    auto availableBitrates = resData.value<QnBitrateList>(availableBitratesParamName, QnBitrateList());
+
+    quint64 bestDiff = std::numeric_limits<quint64>::max();
+    for (const auto& bitrateOption: availableBitrates)
+    {
+        auto diff = qMax<quint64>(bitrateOption, bitrate) - qMin<quint64>(bitrateOption, bitrate);
+
+        if (diff < bestDiff)
+        {
+            bestDiff = diff;
+            bestBitrate = bitrateOption;
+        }
+    }
+
+    return bestBitrate;
 }
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
@@ -2729,10 +2752,13 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
-#ifdef _DEBUG
+
     if (!result)
-        qWarning() << "Error while parsing xml" << paramsTemplateFileName;
-#endif
+    {
+        NX_LOG(lit("Error while parsing xml (onvif) %1").arg(paramsTemplateFileName), cl_logWARNING);
+    }
+    
+
     return result;
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="hu" sourcelanguage="en">
+<TS version="2.1" language="hu" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -321,14 +321,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>FPS elrejtése</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Eszköz bedobása</translation>
     </message>
@@ -349,24 +341,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Következő elrendezés</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Előző elrendezés</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Mind kijelölése</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -383,10 +363,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>Freespace módra váltás</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -429,16 +405,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Főmenü</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+szóköz</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Csatlakozás szerverhez...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -451,10 +419,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Pánikrögzítés leállítása</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -477,20 +441,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Új lap</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Ablak</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Új ablak</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -521,10 +477,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Fájl(ok)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Elrendezés(ek)...</translation>
     </message>
@@ -537,20 +489,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Jelenlegi elrendezés mentése</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Jelenlegi elrendezés mentése mint...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -563,14 +503,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Stop Screen Recording</source>
         <translation>Képernyőfelvétel leállítása</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -597,40 +529,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Visszaállítás tálcaméretre</translation>
     </message>
     <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
-        <source>Show Message</source>
-        <translation>Üzenet megjelenítése</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>Hibás üzenet verziójának megjelenítése</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>Figyelmeztető üzenet Béta verziójának megjelenítése</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>Megnyitás böngészőben...</translation>
     </message>
     <message>
         <source>System Administration...</source>
         <translation>Rendszer adminisztráció...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <source>Open Web Client...</source>
@@ -645,18 +549,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Helyi beállítások...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
         <source>Merge Systems...</source>
         <translation>Rendszerek összevonása...</translation>
     </message>
@@ -669,16 +561,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Névjegy...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Kilépés</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Server...</source>
@@ -721,14 +605,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Tartalmazó mappa megnyitása</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>Azonosítás</translation>
     </message>
@@ -751,10 +627,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Delete</source>
         <translation>Törlés</translation>
-    </message>
-    <message>
-        <source>Del</source>
-        <translation>Del</translation>
     </message>
     <message>
         <source>Update Layout</source>
@@ -781,24 +653,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Elem maximalizálása</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Enter</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Return</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Elem visszaállítása</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Info megjelenítése</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -853,10 +713,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Mozgás megjelenítése</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Mozgás elrejtése/Okoskeresés</translation>
     </message>
@@ -877,24 +733,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Vízjel ellenőrzése</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Fénykép készítése</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Kép javítása...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -927,10 +771,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Rename</source>
         <translation>Átnevezés</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1009,16 +849,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Túra leállítása</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Bezár</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1029,16 +861,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Adja meg a jelölés kezdetét</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Adja meg a jelölés végét</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1069,50 +893,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Keresés előnézet...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Növekvő hibaszűrésszámláló</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Csökkenő hibaszűrésszámláló</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Eszközpark megjelenítése</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>PTZ kalibrálás</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>PTZ pozíció megadása</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Hibaszűrés vezérlőpanel</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Szóköz</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Play</translation>
     </message>
@@ -1121,72 +901,36 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Pause</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+bal</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Előző kocka</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+jobb</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Következő kocka</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>Elejéhez</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>Végéhez</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+fel</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Hangerő le</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+le</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Hangerő fel</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Némitás váltása</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Élőmódba ugrás</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1251,10 +995,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Unpin Notifications</source>
         <translation>Figylemeztetések feloldása</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1381,10 +1121,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Kamerák biztonsági mentése...</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
-    </message>
-    <message>
         <source>Show Bookmarks</source>
         <translation>Könyvjelzők megjelenítése</translation>
     </message>
@@ -1467,6 +1203,10 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Add Bookmark...</source>
         <translation>Könyvjelző hozzáadása...</translation>
+    </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation>Gyors áttekintés exportálása...</translation>
     </message>
 </context>
 <context>
@@ -1928,14 +1668,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Minden felhasználó</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>Válasszon hangmintát</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>Adja meg a szöveget</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;Minden eszköz&gt;</translation>
     </message>
@@ -1959,9 +1691,11 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Source camera</source>
         <translation>Forrás kamera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Forrás és még %n kamera</translation>
+        <translation>
+            <numerusform>Forrás és még %n kamera</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -2242,7 +1976,7 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation></translation>
+        <translation>Hostok keresése... (%1)</translation>
     </message>
     <message>
         <source>Finishing searching...</source>
@@ -2258,6 +1992,26 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Applying changes...</source>
         <translation>Változások érvényesítése...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Beolvasás...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation>Válasszon eszközt</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation>
+            <numerusform>%1 nem támodat kétirányú audiót</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2938,6 +2692,25 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>Nem található audió enkóder&apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation>Audió encoder inicializálása sikertelen.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation>Nincs elsődleges auidóeszköz kiválasztva.</translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation>A %1 bemeneti eszköz minta formátuma nem támogatott.</translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -3127,9 +2900,11 @@ több könyvjelző megjelenítéséhez</translation>
             <numerusform>%1 (%n alkalom)</numerusform>
         </translation>
     </message>
-    <message>
-        <source>and %1 user(s) more...</source>
-        <translation>és még %1 felhasználó...</translation>
+    <message numerus="yes">
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>és még %n felhasználó...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3160,6 +2935,50 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>Ütemzés beállítások nem kompatibilisek néhány eszközzel.</translation>
+    </message>
+</context>
+<context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation>mp</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation>perc</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation>óra</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>nap</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>mp</translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>p</translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>ó</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>n</translation>
     </message>
 </context>
 <context>
@@ -3552,10 +3371,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Nem lehet a tesztet végrehajtani.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Egyik szerver sem kapcsolódik az Internetre.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>Időtúllépés</translation>
     </message>
@@ -3604,10 +3419,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>No new users found.</source>
         <translation>Nem található új felhasználó.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>Egyik szerver sem kapcsolódik az Internetre.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3943,10 +3754,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>Biztosan törli ezt a kapcsolatot: %1?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>Érvénytelen paraméterek</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -4477,6 +4284,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
         <translation>Néhány változás csak az alkalmazás újrainditását követően lép életbe. Szeretné újraindítani az alkalmazást?</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation>Audióbeállítás</translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4858,6 +4669,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Archived duration in calendar days since the first recording</source>
         <translation>Archivált események naptári napokban az első rögzítés időpontjától</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>Bitráta</translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -5007,10 +4822,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>Könyvjelzők exportálása...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>Könyvjelzők keresése név, címke, vagy leírás alapján</translation>
     </message>
@@ -5038,17 +4849,27 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Minden saját I/O modul&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n eszköz&gt;</translation>
+        <translation>
+            <numerusform>&lt;%n eszköz&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n kamera&gt;</translation>
+        <translation>
+            <numerusform>&lt;%n kamera&gt;</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation>
+            <numerusform>&lt;%n I/O modul&gt;</numerusform>
+        </translation>
     </message>
     <message>
-        <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O modul&gt;</translation>
+        <source>Export Bookmark...</source>
+        <translation>Könyvjelzők exportálása...</translation>
     </message>
 </context>
 <context>
@@ -5616,12 +5437,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Sikeres</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>A teszt nem hajtható végre. Egyik szerver sem kapcsolódik az Internetre.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>A megadott paraméterek érvénytelenek. A teszt nem hajtható végre.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>Nem lehet a tesztet végrehajtani.</translation>
     </message>
 </context>
 <context>
@@ -5660,10 +5481,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Loading...</source>
         <translation>Beolvasás...</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>Nincs video adafolyam</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -5803,13 +5620,17 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Megjegyzés: Csak az újabb adatok biztonsági mentése lesz lehetséges. A meglévő fájlokat figyelmen kívül fogja hagyni.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n kamera</translation>
+        <translation>
+            <numerusform>%n kamera</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n eszköz</translation>
+        <translation>
+            <numerusform>%n eszköz</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6236,6 +6057,25 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
 </context>
 <context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation>Nincs bemenneti eszköz kiválasztva.</translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation>Streamelés nem lehetséges, próbálja meg később.</translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation>Hálózati hiba.</translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation>Tartsa lenyomva a beszédhez</translation>
+    </message>
+</context>
+<context>
     <name>QnUpdateStatusItemDelegate</name>
     <message>
         <source>%1%</source>
@@ -6497,7 +6337,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
         <translation>
-            <numerusform>Pc%1 - Képernyő %2</numerusform>
+            <numerusform>Pc %1.-.Képernyő %2</numerusform>
         </translation>
     </message>
 </context>
@@ -6812,6 +6652,22 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>Az eszköz hozzáadása folyamatban. Szeretné megszakítani a folyamatot?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation>%1 nagyfelbontású képernyőt érzékelt, ezért %1 lehet, hogy nem megfelelően jelenik meg.</translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation>Ismert hiba.Javítása a 3.0-verzióban várható.</translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation>Ha teheti állítson képernyője felbontásán a jobb felhasználói élmény eléréséhez.</translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation>HiDpi képernyő támogatás jelzése</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6847,9 +6703,11 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Press %1 to search bookmarks</source>
         <translation>Nyomja meg a %1(e)t a könyvjelzők kereséséhez</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Biztosan törli ezt a %n könyvjelzőt?</translation>
+        <translation>
+            <numerusform>Biztosan törli ezt a %n könyvjelzőt?</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7098,6 +6956,10 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>Az exportálásra kijelölt videók hosszabbak mint 30 perc.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation>A kiválasztott időtartam túl rövid. Nem exportálható gyors áttekintésként.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7287,10 +7149,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Kérem várjon míg a kamera elérhetővé válik.</translation>
-    </message>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation></translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>

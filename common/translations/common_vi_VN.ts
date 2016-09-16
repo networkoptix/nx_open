@@ -414,6 +414,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation>Ghi trên I / O module là người khuyết tật:</translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation>gởi HTTP yêu cầu</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

@@ -47,16 +47,6 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        /*
-        QnAbstractStorageResourceList storages = resource->getStorages();
-        for (int i = 0; i < storages.size(); ++i)
-        {
-            if (storages[i]->getId().isNull())
-                storages[i]->setId(QnUuid::createUuid());
-        }
-        resource->setStorages(storages);
-        */
-
         //performing request
         auto tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
 

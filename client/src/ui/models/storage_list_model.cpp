@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <utils/common/collection.h>
+#include <utils/network/socket_common.h>
 
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
@@ -149,13 +150,11 @@ int QnStorageListModel::columnCount(const QModelIndex &parent) const {
 
 QString urlPath(const QString& url)
 {
-    if (url.indexOf(lit("://")) > 0) {
-        QUrl u(url);
-        return u.host() + (u.port() != -1 ? lit(":").arg(u.port()) : lit(""))  + u.path();
-    }
-    else {
+    if (url.indexOf(lit("://")) <= 0)
         return url;
-    }
+
+    const QUrl u(url);
+    return SocketAddress(u.host(), u.port(0)).toString() + u.path();
 }
 
 QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedText) const
@@ -218,8 +217,10 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
         if (m_readOnly)
             return QString();
 
-        if (!storageData.isWritable)
+        if (!storageData.isOnline)
             return tr("Inaccessible");
+        else if (!storageData.isWritable)
+            return lit("");
 
         if (!canMoveStorage(storageData))
             return QString();
@@ -439,7 +440,7 @@ bool QnStorageListModel::canRemoveStorage( const QnStorageModelInfo &data ) cons
     if (isStoragePoolInRebuild(data))
         return false;
 
-    return data.isExternal || !data.isWritable;
+    return data.isExternal || !data.isOnline;
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo &data) const

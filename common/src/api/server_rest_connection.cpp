@@ -18,10 +18,16 @@
 #include <http/custom_headers.h>
 #include <utils/network/http/httptypes.h>
 #include <utils/common/delayed.h>
+#include <utils/common/log.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
     static const size_t TcpConnectTimeoutMs   = 5 * 1000;
+
+    void trace(int handle, const QString& message)
+    {
+        NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
+    }
 }
 
 // --------------------------- public methods -------------------------------------------
@@ -119,7 +125,9 @@ template <typename ResultType>
 Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
     Request request = prepareRequest(HttpMethod::Get, prepareUrl(path, params));
-    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 template <typename ResultType>
@@ -131,16 +139,28 @@ Handle ServerConnection::executePost(const QString& path,
                                            QThread* targetThread)
 {
     Request request = prepareRequest(HttpMethod::Post, prepareUrl(path, params), contentType, messageBody);
-    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 template <typename ResultType>
 void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool success, const Handle& id, const ResultType& result)
 {
     if (targetThread)
-        executeDelayed([callback, success, id, result] { callback(success, id, result); }, 0, targetThread);
+    {
+        executeDelayed(
+        [callback, success, id, result]
+        {
+            trace(id, lit("Reply"));
+            callback(success, id, result);
+        }, 0, targetThread);
+    }
     else
+    {
+        trace(id, lit("Reply"));
         callback(success, id, result);
+    }
 }
 
 template <typename ResultType>
@@ -215,9 +235,13 @@ void ServerConnection::cancelRequest(const Handle& requestId)
         httpClient->terminate();
 }
 
-ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType, const nx_http::StringType& messageBody)
+ServerConnection::Request ServerConnection::prepareRequest(
+    HttpMethod method,
+    const QUrl& url,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody)
 {
-    QnMediaServerResourcePtr server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
+    const auto server = qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return Request();
 
@@ -229,12 +253,27 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
     request.contentType = contentType;
     request.messageBody = messageBody;
 
+    auto user = QnAppServerConnectionFactory::url().userName().toLower();
+    auto password = QnAppServerConnectionFactory::url().password();
+
+    if (user.isEmpty() || password.isEmpty())
+    {
+        if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+        {
+            // if auth is not known, use admin hash
+            user = admin->getName().toLower();
+            password = QString::fromUtf8(admin->getDigest());
+            request.authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
+        }
+    }
+
     auto videoWallGuid = QnAppServerConnectionFactory::videowallGuid();
     if (!videoWallGuid.isNull())
         request.headers.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videoWallGuid.toByteArray());
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
-    request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, QnAppServerConnectionFactory::url().userName().toUtf8());
+    request.headers.emplace(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, user.toUtf8());
     request.headers.emplace("User-Agent", nx_http::userAgentString());
 
     QnRoute route = QnRouter::instance()->routeTo(server->getId());
@@ -257,19 +296,9 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
         request.url.setPort(route.addr.port);
     }
 
-    QString user = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
-    if (user.isEmpty() || password.isEmpty()) {
-        if (QnUserResourcePtr admin = qnResPool->getAdministrator())
-        {
-            // if auth is not known, use admin hash
-            user = admin->getName();
-            password = QString::fromUtf8(admin->getDigest());
-            request.authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
-        }
-    }
     request.url.setUserName(user);
     request.url.setPassword(password);
+
     return request;
 }
 

@@ -147,6 +147,7 @@
 /* Begin PBXFileReference section */
 		1381EE06ED874D8C96CB5F42 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36BA322F332FB8CD10706884 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "../Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		84CD7C861D8B03E700768876 /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		B680D01F4BB8DCA3CBAED3BB /* Base */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B680D046C74817A26B4B7E55 /* Camera.pb.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Camera.pb.m; sourceTree = "<group>"; };
 		B680D05B5DB348BD15913865 /* icon_114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_114x114.png; sourceTree = "<group>"; };
@@ -294,7 +295,7 @@
 		C718315C1AF16A500084AD5A /* HDWMultipartStreamParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HDWMultipartStreamParser.h; path = HDWitness/HDWMultipartStreamParser.h; sourceTree = "<group>"; };
 		C718315D1AF16A500084AD5A /* HDWMultipartStreamParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HDWMultipartStreamParser.m; path = HDWitness/HDWMultipartStreamParser.m; sourceTree = "<group>"; };
 		C718315F1AF1843B0084AD5A /* HDWStreamParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDWStreamParser.h; sourceTree = "<group>"; };
-		C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DWSpectrum.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C71D5AF016ADBB9600C764B5 /* NxWitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NxWitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C71D5AF416ADBB9600C764B5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		C71D5AF616ADBB9600C764B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C71D5AF816ADBB9600C764B5 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -646,7 +647,7 @@
 		C71D5AF116ADBB9600C764B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */,
+				C71D5AF016ADBB9600C764B5 /* NxWitness.app */,
 				C71D5B1D16ADBB9600C764B5 /* HDWitnessTests.xctest */,
 			);
 			name = Products;
@@ -712,7 +713,7 @@
 			);
 			name = HDWitness;
 			productName = HDWitness;
-			productReference = C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */;
+			productReference = C71D5AF016ADBB9600C764B5 /* NxWitness.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C71D5B1C16ADBB9600C764B5 /* HDWitnessTests */ = {
@@ -775,6 +776,7 @@
 				hu,
 				he,
 				"tr-TR",
+				"pt-PT",
 			);
 			mainGroup = C71D5AE516ADBB9600C764B5;
 			productRefGroup = C71D5AF116ADBB9600C764B5 /* Products */;
@@ -990,6 +992,7 @@
 				C76FA6A91B9A55FE0094E6E0 /* hu */,
 				C764ABD21BCEE7CA00254334 /* he */,
 				C7AE94241C8A1D0300F32CBF /* tr-TR */,
+				84CD7C861D8B03E700768876 /* pt-PT */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

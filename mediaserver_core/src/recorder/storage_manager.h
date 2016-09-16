@@ -2,6 +2,7 @@
 #define __STORAGE_MANAGER_H__
 
 #include <random>
+#include <functional>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QString>
@@ -98,15 +99,25 @@ public:
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(
-        QnAbstractMediaStreamDataProvider                   *provider,
-        std::function<bool(const QnStorageResourcePtr &)>   pred =
+        QnAbstractMediaStreamDataProvider *provider,
+        std::function<bool(const QnStorageResourcePtr &)> pred =
             [](const QnStorageResourcePtr &storage) {
                 return !storage->hasFlags(Qn::storage_fastscan) ||
                         storage->getFreeSpace() > storage->getSpaceLimit();
-            }
-    );
+            });
 
     QnStorageResourceList getStorages() const;
+
+    /*
+     * Return writable storages with checkBox 'usedForWriting'
+     */
+    QSet<QnStorageResourcePtr> getUsedWritableStorages() const;
+
+    /*
+     * Return all storages which can be used for writing
+     */
+    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
@@ -172,7 +183,6 @@ private:
 
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
-    QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, std::function<void(int current, int total)> progressCallback = nullptr);
@@ -254,6 +264,7 @@ private:
 
     std::random_device m_rd;
     std::mt19937 m_gen;
+    bool m_isRenameDisabled;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

@@ -207,6 +207,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged() {
 
     checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
     checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
@@ -342,8 +343,8 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
     m_popupSystemHealthFilter = filter;
 }
 
-void QnWorkbenchNotificationsHandler::at_emailSettingsChanged() {
+void QnWorkbenchNotificationsHandler::at_emailSettingsChanged()
+{
     QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
-    bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
-    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && isInvalid);
+    setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && !settings.isValid());
 }

@@ -418,6 +418,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation>I/O模块录像已无效:</translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation>进行HTTP请求</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

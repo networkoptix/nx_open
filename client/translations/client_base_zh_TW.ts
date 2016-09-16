@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_TW" sourcelanguage="en_US">
+<TS version="2.1" language="zh_TW" sourcelanguage="en_US">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -507,14 +507,6 @@ to view more bookmarks</source>
         <translation>恢復視窗化</translation>
     </message>
     <message>
-        <source>Show Message</source>
-        <translation>顯示訊息</translation>
-    </message>
-    <message>
-        <source>Show Version Mismatch Message</source>
-        <translation>顯示版本不匹配訊息</translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>在瀏覽器開啟…</translation>
     </message>
@@ -705,10 +697,6 @@ to view more bookmarks</source>
     <message>
         <source>Activate PTZ Tour</source>
         <translation>啟動 PTZ 巡航</translation>
-    </message>
-    <message>
-        <source>Show Beta Version Warning Message</source>
-        <translation>顯示測試版警告訊息</translation>
     </message>
     <message>
         <source>Manage...</source>
@@ -1214,6 +1202,10 @@ to view more bookmarks</source>
         <source>Add Bookmark...</source>
         <translation>新增書籤...</translation>
     </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation>匯出縮時預覽...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -1674,14 +1666,6 @@ to view more bookmarks</source>
         <translation>全部使用者</translation>
     </message>
     <message>
-        <source>Select Sound</source>
-        <translation>選擇聲音</translation>
-    </message>
-    <message>
-        <source>Enter Text</source>
-        <translation>輸入文字</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;任何裝置&gt;</translation>
     </message>
@@ -2006,6 +1990,26 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation>套用變更...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">載入...</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+        <source>Select device</source>
+        <translation>選擇裝置</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 doesn&apos;t support two-way audio</source>
+        <translation>
+            <numerusform>%1 不支援雙向語音%n</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2686,6 +2690,25 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnDesktopAudioOnlyDataProvider</name>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation>找不到聲音編碼器 &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation>無法初始化聲音編碼器.</translation>
+    </message>
+    <message>
+        <source>Primary audio device isn&apos;t selected.</source>
+        <translation>未選擇主要聲音裝置.</translation>
+    </message>
+    <message>
+        <source>Sample format of input device %1 is not supported.</source>
+        <translation>輸入裝置的格式 %1 未支援.</translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2875,9 +2898,11 @@ to view more bookmarks</source>
             <numerusform>%1 (%n 次)</numerusform>
         </translation>
     </message>
-    <message>
-        <source>and %1 user(s) more...</source>
-        <translation>多 %1 個使用者...</translation>
+    <message numerus="yes">
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>多 %n個使用者...</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2911,6 +2936,50 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnExportTimelapseDialog</name>
+    <message>
+        <source>sec</source>
+        <translation>秒</translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation>分</translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation>時</translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>日</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>毫秒</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>秒</translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>分</translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>時</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>日</translation>
+    </message>
+</context>
+<context>
     <name>QnFailoverPriorityDialog</name>
     <message>
         <source>Failover Priority</source>
@@ -2919,7 +2988,7 @@ to view more bookmarks</source>
     <message>
         <source>Never</source>
         <comment>Failover priority</comment>
-        <translation>永久</translation>
+        <translation>不做</translation>
     </message>
     <message>
         <source>Low</source>
@@ -3300,10 +3369,6 @@ to view more bookmarks</source>
         <translation>無法執行測試.</translation>
     </message>
     <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>無任何伺服器連接至網際網路.</translation>
-    </message>
-    <message>
         <source>Timed Out</source>
         <translation>逾時</translation>
     </message>
@@ -3352,10 +3417,6 @@ to view more bookmarks</source>
     <message>
         <source>No new users found.</source>
         <translation>找不到新的使用者.</translation>
-    </message>
-    <message>
-        <source>None of your servers are connected to the Internet.</source>
-        <translation>無任何伺服器連接至網際網路.</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3691,10 +3752,6 @@ to view more bookmarks</source>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
         <translation>是否確定刪除此連線: %1?</translation>
-    </message>
-    <message>
-        <source>Invalid Paramaters</source>
-        <translation>無效參數</translation>
     </message>
     <message>
         <source>Connection already exists.</source>
@@ -4224,6 +4281,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation>設定參數無法儲存. 請連繫您的管理員.</translation>
     </message>
+    <message>
+        <source>Audio Settings</source>
+        <translation>聲音設定</translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4605,6 +4666,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Archived duration in calendar days since the first recording</source>
         <translation>從首次錄影開始之錄影長度</translation>
     </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>傳輸速率</translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4754,10 +4819,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
-        <source>Export bookmark...</source>
-        <translation>匯出書籤...</translation>
-    </message>
-    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation>以名稱, 標籤或敘述搜尋書籤</translation>
     </message>
@@ -4802,6 +4863,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>
             <numerusform>&lt;%n 個 I/O 模組&gt;</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export Bookmark...</source>
+        <translation>匯出書籤...</translation>
     </message>
 </context>
 <context>
@@ -5369,12 +5434,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>成功</translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation>無法執行測試. 無任何伺服器連接至網際網路.</translation>
-    </message>
-    <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation>所提供的參數無效. 無法執行測試.</translation>
+    </message>
+    <message>
+        <source>Could not perform a test.</source>
+        <translation>無法執行測試.</translation>
     </message>
 </context>
 <context>
@@ -5413,10 +5478,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Activate analog license to remove this message</source>
         <translation>請購買類比授權</translation>
-    </message>
-    <message>
-        <source>No video stream</source>
-        <translation>無影像串流</translation>
     </message>
     <message>
         <source>Diagnostics...</source>
@@ -5990,6 +6051,25 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Select file...</source>
         <translation>選擇檔案...</translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoWayAudioWidgetPrivate</name>
+    <message>
+        <source>Input device is not selected.</source>
+        <translation>輸入裝置未選取.</translation>
+    </message>
+    <message>
+        <source>Streaming is not ready yet, please try again later.</source>
+        <translation>串流仍未正常運作, 請稍候再試.</translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation>網路問題.</translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
+        <translation>按住以發話</translation>
     </message>
 </context>
 <context>
@@ -6569,6 +6649,22 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation>新增裝置已在進行中. 是否確定要取消此程序?</translation>
     </message>
+    <message>
+        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
+        <translation>%1 被偵測到有高解析輸出但 %1 可能未正常顯示.</translation>
+    </message>
+    <message>
+        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
+        <translation>我們已知此問題, 並會在v3.0修復.</translation>
+    </message>
+    <message>
+        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
+        <translation>現在請調整您的螢幕解析度以獲得更佳的瀏覽.</translation>
+    </message>
+    <message>
+        <source>HiDpi Screens Support Warning</source>
+        <translation>HiDpi螢幕支援警告</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6857,6 +6953,10 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation>您將匯出多個影像, 總長度超過 30 分鐘.</translation>
     </message>
+    <message>
+        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
+        <translation>選取的區段太短因此無法匯出縮時預覽.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7042,10 +7142,6 @@ If you understand this and would like to proceed please click Merge to continue.
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
-    <message>
-        <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_CALIBRATION_%1.jpg</translation>
-    </message>
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>請靜待攝影機上線.</translation>

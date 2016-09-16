@@ -160,6 +160,10 @@ public:
          */
         BetaVersionMessageAction,
 
+        /**
+         * Displays HiDpi screens support warning dialog.
+         */
+        HiDpiSupportMessageAction,
 
         /**
          * Displays dialog asking about statistics reporting.

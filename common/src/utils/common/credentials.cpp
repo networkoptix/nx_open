@@ -10,5 +10,18 @@ QAuthenticator QnCredentials::toAuthenticator() const
     return auth;
 }
 
+bool QnCredentials::operator==(const QnCredentials& other) const
+{
+    return user == other.user && password == other.password;
+}
+
+bool QnCredentials::operator<(const QnCredentials &other) const
+{
+    if (user != other.user)
+        return user < other.user;
+
+    return password < other.password;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCredentials, (json)(ubjson)(xml)(csv_record), QnCredentials_Fields)
 

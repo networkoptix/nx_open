@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>Esta cámara no tiene ninguna configuración avanzada</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -882,11 +887,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>Contenido HTTP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>URL de HTTP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>Inicio de sesión para autenticar (opcional)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Iniciar Sesión</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>Contraseña para autenticar (opcional)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Contraseña</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>Programación &amp;PTZ:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>Exportar una rápida revisión</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>Duración del Video inicial</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>Duración del Video exportado</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>Velocidad rápida de revisión</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>Intervalo de fotogramas</translation>
     </message>
 </context>
 <context>
@@ -1604,6 +1670,11 @@
         <location/>
         <source>Test...</source>
         <translation>Prueba...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>Jugar al usuario</translation>
     </message>
 </context>
 <context>
@@ -2381,6 +2452,11 @@
         <location/>
         <source>Test...</source>
         <translation>Prueba...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>Hable al usuario</translation>
     </message>
 </context>
 <context>

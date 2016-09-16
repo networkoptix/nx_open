@@ -233,8 +233,8 @@
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
-            <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />

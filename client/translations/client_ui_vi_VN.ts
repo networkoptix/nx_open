@@ -509,6 +509,11 @@
         <source>This camera has no advanced settings</source>
         <translation>máy ảnh này không có cài đặt nâng cao</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -889,11 +894,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTP Nội dung</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>HTTP url</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>Đăng nhập vào xác thực (tùy chọn)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Đăng nhập</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>Mật khẩu để xác thực (tùy chọn)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Mật khẩu</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>&amp;PTZ cài sẵn:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>Xuất nhanh Xem lại</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>Thời lượng video ban đầu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>Thời lượng video xuất khẩu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>tốc độ Xem nhanh</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>khoảng thời gian khung hình</translation>
     </message>
 </context>
 <context>
@@ -1611,6 +1677,11 @@
         <location/>
         <source>Test...</source>
         <translation>thử…</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>chơi để người sử dụng</translation>
     </message>
 </context>
 <context>
@@ -2388,6 +2459,11 @@
         <location/>
         <source>Test...</source>
         <translation>thử...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>Nói chuyện với người sử dụng</translation>
     </message>
 </context>
 <context>

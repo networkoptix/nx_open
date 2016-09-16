@@ -11,8 +11,15 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include <plugins/resource/mdns/mdns_packet.h>
+#include <utils/common/credentials.h>
 
 extern QString getValueFromString(const QString& line);
+
+namespace
+{
+    const QString kTestCredentialsUrl = lit("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName");
+    const int kDefaultAxisTimeout = 4000;
+}
 
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
 {
@@ -123,7 +130,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QUrl finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
-    resource->setUrl(finalUrl.toString());
+    resource->setUrl(finalUrl.toString());    
     resource->setDefaultAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
@@ -235,12 +242,14 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     QnMdnsPacket packet;
     if (packet.fromDatagram(responseData))
     {
-        for (const auto& answer: packet.answerRRs)
+        auto rrsToInspect = packet.answerRRs + packet.additionalRRs;
+
+        for (const auto& record: rrsToInspect)
         {
-            if (answer.recordType == QnMdnsPacket::kSrvRecordType)
+            if (record.recordType == QnMdnsPacket::kSrvRecordType)
             {
                 QnMdnsSrvData srv;
-                srv.decode(answer.data);
+                srv.decode(record.data);
                 port = srv.port;
             }
         }
@@ -253,14 +262,52 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     resource->setUrl(url.toString());
 
-    local_results.push_back(resource);
+    auto auth = determineResourceCredentials(resource);
+    resource->setDefaultAuth(auth);
 
+    local_results.push_back(resource);
 
     addMultichannelResources(local_results);
     
     return local_results;
 }
-template <class T>
+
+bool QnPlAxisResourceSearcher::testCredentials(
+    const QUrl& url,
+    const QAuthenticator& auth) const
+{
+    auto host = url.host();
+    auto port = url.port(nx_http::DEFAULT_HTTP_PORT);
+
+    CLHttpStatus status;
+    auto response = downloadFile(status, kTestCredentialsUrl, host, port, kDefaultAxisTimeout, auth);
+    
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
+    return true;
+}
+
+QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(const QnSecurityCamResourcePtr& resource) const
+{
+    if (!resource)
+        return QAuthenticator();
+
+    auto resData = qnCommon->dataPool()->data(resource->getVendor(), resource->getModel());
+    auto possibleCredentials = resData.value<QList<QnCredentials>>(
+        Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    for (const auto& creds: possibleCredentials)
+    {
+        auto auth = creds.toAuthenticator();
+        if (testCredentials(resource->getUrl(), auth))
+            return auth;
+    }
+
+    return QAuthenticator();
+}
+
+template <typename T>
 void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 {
     QnPlAxisResourcePtr firstResource = result.first().template dynamicCast<QnPlAxisResource>();

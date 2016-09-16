@@ -14,7 +14,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C71D5AEF16ADBB9600C764B5"
-               BuildableName = "DWSpectrum.app"
+               BuildableName = "NxWitness.app"
                BlueprintName = "HDWitness"
                ReferencedContainer = "container:HDWitness.xcodeproj">
             </BuildableReference>
@@ -56,7 +56,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C71D5AEF16ADBB9600C764B5"
-            BuildableName = "DWSpectrum.app"
+            BuildableName = "NxWitness.app"
             BlueprintName = "HDWitness"
             ReferencedContainer = "container:HDWitness.xcodeproj">
          </BuildableReference>
@@ -79,7 +79,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C71D5AEF16ADBB9600C764B5"
-            BuildableName = "DWSpectrum.app"
+            BuildableName = "NxWitness.app"
             BlueprintName = "HDWitness"
             ReferencedContainer = "container:HDWitness.xcodeproj">
          </BuildableReference>
@@ -98,7 +98,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C71D5AEF16ADBB9600C764B5"
-            BuildableName = "DWSpectrum.app"
+            BuildableName = "NxWitness.app"
             BlueprintName = "HDWitness"
             ReferencedContainer = "container:HDWitness.xcodeproj">
          </BuildableReference>

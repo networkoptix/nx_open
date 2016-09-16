@@ -51,7 +51,8 @@ namespace {
                 existResList = existResList.filtered(
                     [](const QnNetworkResourcePtr& res) 
                     { 
-                        return qnResPool->getResourceById(res->getParentId());
+                        bool hasParent = qnResPool->getResourceById(res->getParentId());
+                        return hasParent && res->getStatus() != Qn::Offline;
                     });
 
                 for(const QnNetworkResourcePtr& existRes: existResList) 

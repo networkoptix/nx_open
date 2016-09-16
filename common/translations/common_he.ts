@@ -417,6 +417,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation>הקלטה על מודולי קלט/פלט אינה מאופשרת:</translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation>בצע בקשת HTTP</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>Cette caméra n&apos;a pas de paramètres avancés</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -883,11 +888,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>Contenu HTTP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>URL HTTP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>Identifiant d&apos;authentification (facultatif)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Identifiant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>MDP d&apos;authentification (facultatif)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>&amp;Preset PTZ:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>Exporter Analyse Rapide</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>Durée de la vidéo Initial</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>Durée de la vidéo exportée</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>Vitesse Analyse Rapide</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>Intervalle d&apos;image</translation>
     </message>
 </context>
 <context>
@@ -1605,6 +1671,11 @@
         <location/>
         <source>Test...</source>
         <translation>Test...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>Jouer à l&apos;utilisateur</translation>
     </message>
 </context>
 <context>
@@ -2384,6 +2455,11 @@
         <location/>
         <source>Test...</source>
         <translation>Test...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>Parler à l&apos;utilisateur</translation>
     </message>
 </context>
 <context>

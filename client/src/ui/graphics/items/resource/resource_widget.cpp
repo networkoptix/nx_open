@@ -853,7 +853,7 @@ void QnResourceWidget::updateHud(bool animate) {
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
         infoButton->setChecked(detailsVisible);
 
-    bool showOnlyCameraName         = overlaysCanBeVisible && detailsVisible && !m_mouseInWidget;
+    bool showOnlyCameraName         = overlaysCanBeVisible && detailsVisible && (!m_mouseInWidget || qnRuntime->isVideoWallMode());
     bool showCameraNameWithButtons  = overlaysCanBeVisible && m_mouseInWidget;
     bool showPosition               = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
     bool showDetailedInfo           = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());

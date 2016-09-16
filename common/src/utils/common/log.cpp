@@ -1,20 +1,20 @@
 #include "log.h"
 #include <iomanip>
 #include <sstream>
-#include <QtCore/QTextStream>
+#include <iostream>
+#include <fstream>
+
 #include <QtCore/QThread>
 #include <QtCore/QDateTime>
-#include <QtCore/QLocale>
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-#   include <sys/types.h>
-#   include <linux/unistd.h>
-static pid_t gettid(void) { return syscall(__NR_gettid); }
+	#include <sys/types.h>
+	#include <linux/unistd.h>
+	static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
-const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
     const QString str = value.toUpper().trimmed();
@@ -52,13 +52,8 @@ public:
         m_curNum = 0;
 
         m_logLevel = logLevel;
-
-        m_file.setFileName(currFileName());
-
-        bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
-        if (rez && m_file.size() == 0)
-            m_file.write(UTF8_BOM);
-        return rez;
+        openFileImpl();
+        return !m_file.fail();
     }
 
     void setLogLevel(QnLogLevel logLevel) 
@@ -88,33 +83,32 @@ public:
             QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #endif
             << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << "\r\n";
-        ostr.flush();
 
-        const std::string& str = ostr.str();
         {
             QnMutexLocker mutx( &m_mutex );
-            if (!m_file.isOpen()) {
+            if (m_file.fail())
+            {
+                switch (logLevel)
+                {
+                    case cl_logERROR:
+                    case cl_logWARNING:
+                        std::cerr << ostr.str();
+                        std::cerr.flush();
+                        break;
 
-                switch (logLevel) {
-                case cl_logERROR:
-                case cl_logWARNING:
-                {
-                    QTextStream out(stderr);
-                    out << str.c_str();
-                    break;
+                    default:
+                        std::cout << ostr.str();
+                        std::cout.flush();
+                        break;
                 }
-                default:
-                {
-                    QTextStream out(stdout);
-                    out << str.c_str();
-                }
-                }
-                return;
             }
-            m_file.write(str.c_str());
-            m_file.flush();
-            if (m_file.size() >= m_maxFileSize)
-                openNextFile();
+            else
+            {
+                m_file << ostr.str();
+                m_file.flush();
+                if (m_file.tellp() >= m_maxFileSize)
+                    openNextFile();
+            }
         }
     }
 
@@ -127,7 +121,7 @@ public:
 private:
     void openNextFile()
     {
-        m_file.close(); // close current file
+        m_file.close();
 
         int max_existing_num = m_maxBackupFiles;
         while (max_existing_num)
@@ -137,7 +131,7 @@ private:
             --max_existing_num;
         }
 
-        if (max_existing_num<m_maxBackupFiles) // if we do not need to delete backupfiles
+        if (max_existing_num < m_maxBackupFiles) // if we do not need to delete backupfiles
         {
             QFile::rename(currFileName(), backupFileName(max_existing_num+1));
         }
@@ -151,9 +145,23 @@ private:
             QFile::rename(currFileName(), backupFileName(m_maxBackupFiles)); // move current to the most latest backup
         }
 
-        m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-        if (m_file.size() == 0)
-            m_file.write(UTF8_BOM);
+        openFileImpl();
+    }
+
+    void openFileImpl()
+    {
+        #ifdef Q_OS_WIN
+            m_file.open(currFileName().toStdWString(), std::ios_base::app | std::ios_base::out);
+        #else
+            m_file.open(currFileName().toStdString(), std::ios_base::app | std::ios_base::out);
+        #endif
+
+        if (m_file.fail())
+            return;
+
+        // Ensure 1st char is UTF8 BOM
+        if (m_file.tellp() == std::fstream::pos_type(0))
+            m_file.write("\xEF\xBB\xBF", 3);
     }
 
     QString currFileName() const
@@ -184,9 +192,7 @@ private:
     quint8 m_curNum;
     QString m_baseName;
     QnLogLevel m_logLevel;
-
-    QFile m_file;
-
+    std::fstream m_file;
     mutable QnMutex m_mutex;
 };
 

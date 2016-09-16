@@ -7,6 +7,12 @@
 #include <ui/style/globals.h>
 #include "ui/models/ioports_view_model.h"
 
+namespace {
+
+static const int kColumnSizeExtendPx = 20;
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnIOPortItemDelegate ---------------------------------------//
@@ -21,7 +27,7 @@ QnIOPortItemDelegate::~QnIOPortItemDelegate() {
 
 }
 
-void QnIOPortItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  
+void QnIOPortItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const
 {
     base_type::initStyleOption(option, index);
     if (index.data(Qn::DisabledRole).toBool()) {
@@ -32,13 +38,13 @@ void QnIOPortItemDelegate::initStyleOption(QStyleOptionViewItem *option, const Q
     }
 }
 
-QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex &index) const  
+QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex &index) const
 {
     Q_UNUSED(option)
     Q_UNUSED(parent)
 
-        QnIOPortData ioPort = index.data(Qn::IOPortDataRole).value<QnIOPortData>();
-    switch (index.column()) 
+    QnIOPortData ioPort = index.data(Qn::IOPortDataRole).value<QnIOPortData>();
+    switch (index.column())
     {
         case QnIOPortsViewModel::TypeColumn:
         {
@@ -112,9 +118,9 @@ void QnIOPortItemDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
     base_type::setEditorData(editor, index);
 }
 
-void QnIOPortItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const 
+void QnIOPortItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    switch (index.column()) 
+    switch (index.column())
     {
         case QnIOPortsViewModel::TypeColumn:
         case QnIOPortsViewModel::DefaultStateColumn:
@@ -137,6 +143,21 @@ void QnIOPortItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mod
             break;
     }
     base_type::setModelData(editor, model, index);
+}
+
+QSize QnIOPortItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QSize result = base_type::sizeHint(option, index);
+    result.setWidth(result.width() + kColumnSizeExtendPx);
+
+    if (index.isValid() && index.model() && index.model()->flags(index).testFlag(Qt::ItemIsEditable))
+    {
+        QScopedPointer<QWidget> editor(createEditor(nullptr, option, index));
+        QSize editorHint = editor->sizeHint();
+        result.setWidth(std::max(result.width(), editorHint.width()));
+    }
+
+    return result;
 }
 
 bool QnIOPortItemDelegate::eventFilter(QObject *object, QEvent *event) {

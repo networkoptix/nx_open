@@ -50,7 +50,8 @@ private:
     enum class Page {
         Empty,
         Manual,
-        Web
+        Web,
+        Unavailable
     };
     void setPage(Page page);
 

@@ -8,162 +8,311 @@
 #include "host_address_resolver.h"
 #include "aio/aioservice.h"
 
-
-const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
-const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );
-
-HostAddress::HostAddress()
-:
-    m_addressResolved(true)
-{
-    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
-}
+const HostAddress HostAddress::localhost( "127.0.0.1" );
+const HostAddress HostAddress::anyHost( "0.0.0.0" );
 
 HostAddress::HostAddress( const HostAddress& rhs )
 :
-    m_addrStr( rhs.m_addrStr ),
-    m_sinAddr( rhs.m_sinAddr ),
-    m_addressResolved( rhs.m_addressResolved )
+    m_string( rhs.m_string ),
+    m_ipV4( rhs.m_ipV4 ),
+    m_ipV6( rhs.m_ipV6 )
 {
 }
 
 HostAddress::HostAddress( HostAddress&& rhs )
 :
-    m_addrStr( std::move(rhs.m_addrStr) ),
-    m_sinAddr( rhs.m_sinAddr ),
-    m_addressResolved( rhs.m_addressResolved )
-{
-    memset( &rhs.m_sinAddr, 0, sizeof(rhs.m_sinAddr) );
-    rhs.m_addressResolved = false;
-}
-
-HostAddress::HostAddress( const struct in_addr& sinAddr )
-:
-    m_sinAddr(sinAddr),
-    m_addressResolved(true)
+    m_string( std::move(rhs.m_string) ),
+    m_ipV4( rhs.m_ipV4 ),
+    m_ipV6( rhs.m_ipV6 )
 {
 }
 
-HostAddress::HostAddress( uint32_t _ipv4 )
+HostAddress::HostAddress( const in_addr& addr )
 :
-    m_addressResolved(true)
+    m_ipV4( addr )
 {
-    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
-    m_sinAddr.s_addr = htonl( _ipv4 );
+}
+
+HostAddress::HostAddress( const in6_addr& addr )
+:
+    m_ipV6( addr )
+{
 }
 
 HostAddress::HostAddress( const QString& addrStr )
 :
-    m_addrStr( addrStr ),
-    m_addressResolved(false)
+    m_string( addrStr )
 {
-    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
-    //if addrStr is an ip address
-
-    if( addrStr == lit("255.255.255.255") )
-    {
-        m_sinAddr.s_addr = 0xffffffffU;
-        m_addressResolved = true;
-        return;
-    }
-
-    m_sinAddr.s_addr = inet_addr( addrStr.toLatin1().constData() );
-    if( m_sinAddr.s_addr != INADDR_NONE )
-        m_addressResolved = true;   //addrStr contains valid ip address
 }
 
 HostAddress::HostAddress( const char* addrStr )
 :
-    m_addrStr( QLatin1String(addrStr) ),
-    m_addressResolved(false)
+    m_string( QLatin1String(addrStr) )
 {
-    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
-    //if addrStr is an ip address
-
-    if( strcmp( addrStr, "255.255.255.255" ) == 0 )
-    {
-        m_sinAddr.s_addr = 0xffffffffU;
-        m_addressResolved = true;
-        return;
-    }
-
-    m_sinAddr.s_addr = inet_addr( addrStr );
-    if( m_sinAddr.s_addr != INADDR_NONE )
-        m_addressResolved = true;   //addrStr contains valid ip address
-}
-
-uint32_t HostAddress::ipv4() const
-{
-    return ntohl(inAddr().s_addr);
-}
-
-QString HostAddress::toString() const
-{
-    if( !m_addrStr )
-    {
-        Q_ASSERT( m_addressResolved );
-        m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
-    }
-    return m_addrStr.get();
 }
 
 HostAddress& HostAddress::operator=( const HostAddress& rhs )
 {
-    m_addrStr = rhs.m_addrStr;
-    m_sinAddr = rhs.m_sinAddr;
-    m_addressResolved = rhs.m_addressResolved;
-
+    m_string = rhs.m_string;
+    m_ipV4 = rhs.m_ipV4;
+    m_ipV6 = rhs.m_ipV6;
     return *this;
 }
 
 HostAddress& HostAddress::operator=( HostAddress&& rhs )
 {
-    m_addrStr = std::move(rhs.m_addrStr);
-    m_sinAddr = rhs.m_sinAddr;
-    m_addressResolved = rhs.m_addressResolved;
-
-    memset( &rhs.m_sinAddr, 0, sizeof(rhs.m_sinAddr) );
-    rhs.m_addressResolved = false;
-
+    m_string = std::move(rhs.m_string);
+    m_ipV4 = rhs.m_ipV4;
+    m_ipV6 = rhs.m_ipV6;
     return *this;
 }
 
 bool HostAddress::operator==( const HostAddress& rhs ) const
 {
-    if( m_addressResolved != rhs.m_addressResolved )
+    if (isResolved() != rhs.isResolved())
         return false;
 
-    return m_addressResolved
-        ? memcmp( &m_sinAddr, &rhs.m_sinAddr, sizeof(m_sinAddr) ) == 0
-        : m_addrStr == rhs.m_addrStr;
+    if (!isResolved())
+        return toString() == rhs.toString();
+
+    if (ipV4() && rhs.ipV4())
+        return memcmp(m_ipV4.get_ptr(), rhs.m_ipV4.get_ptr(), sizeof(*m_ipV4)) == 0;
+
+    if (ipV6() && rhs.ipV6())
+        return memcmp(m_ipV6.get_ptr(), rhs.m_ipV6.get_ptr(), sizeof(*m_ipV6)) == 0;
+
+    return false;
 }
 
-bool HostAddress::operator<( const HostAddress& right ) const
+bool HostAddress::operator<( const HostAddress& rhs ) const
 {
-    if( m_addressResolved < right.m_addressResolved )
-        return true;
-    if( m_addressResolved > right.m_addressResolved )
-        return false;
-
-    return m_addressResolved
-        ? m_sinAddr.s_addr < right.m_sinAddr.s_addr
-        : m_addrStr < right.m_addrStr;
+    return toString() < rhs.toString();
 }
 
-struct in_addr HostAddress::inAddr(bool* ok) const
+static const QString kIpVersionConvertPart = QLatin1String("::ffff:");
+
+const QString& HostAddress::toString() const
 {
-    if( !m_addressResolved )
+    if (m_string)
+        return *m_string;
+
+    if (m_ipV4)
     {
-        Q_ASSERT( m_addrStr );
-        //resolving address
-        //TODO #ak remove const_cast
-        HostAddressResolver::instance()->resolveAddressSync( m_addrStr.get(), const_cast<HostAddress*>(this) );
+        m_string = ipToString(*m_ipV4);
+        Q_ASSERT(m_string);
+        return *m_string;
     }
-    if( ok )
-        *ok = m_addressResolved;
-    return m_sinAddr;
+
+    Q_ASSERT(m_ipV6);
+    auto string = ipToString(*m_ipV6);
+    Q_ASSERT(string);
+
+    // TODO: Remove this hack when IPv6 is properly supported!
+    //  Try to map it on IPv4 as v4 format is preferable
+    if (*string == QLatin1String("::"))
+    {
+        *string = QLatin1String("0.0.0.0");
+    }
+    else if (*string == QLatin1String("::1"))
+    {
+        *string = QLatin1String("127.0.0.1");
+    }
+    else if (string->startsWith(kIpVersionConvertPart))
+    {
+        const auto part = string->mid(kIpVersionConvertPart.length());
+        m_ipV4 = ipV4from(part);
+        if (m_ipV4)
+        {
+            m_string = part;
+            return *m_string;
+        }
+    }
+
+    m_string = string;
+    return *m_string;
 }
 
+const boost::optional<in_addr>& HostAddress::ipV4() const
+{
+    if (m_ipV4)
+        return m_ipV4;
+
+    if (m_string)
+    {
+        m_ipV4 = ipV4from(*m_string);
+        if (m_ipV4)
+            return m_ipV4;
+    }
+    else
+    {
+        Q_ASSERT(m_ipV6);
+        toString(); // Converts from IPv6
+    }
+
+    Q_ASSERT(m_string);
+    m_ipV4 = ipV4from(*m_string);
+    if (!m_ipV4)
+    {
+        // Try to map it on IPv4 if HostAddress was created by IPv4 string
+        if (*m_string == QLatin1String("::"))
+            m_ipV4 = ipV4from(QLatin1String("0.0.0.0"));
+
+        else if (*m_string == QLatin1String("::1"))
+            m_ipV4 = ipV4from(QLatin1String("127.0.0.1"));
+
+        else if (m_string->startsWith(kIpVersionConvertPart))
+            m_ipV4 = ipV4from(m_string->mid(kIpVersionConvertPart.length()));
+    }
+
+    return m_ipV4;
+}
+
+const boost::optional<in6_addr>& HostAddress::ipV6() const
+{
+    if (m_ipV6)
+        return m_ipV6;
+
+    boost::optional<QString>* string = &m_string;
+    boost::optional<QString> tmpString;
+
+    if (m_string)
+    {
+        m_ipV6 = ipV6from(*m_string);
+        if (m_ipV6)
+            return m_ipV6;
+
+        if (m_ipV4)
+        {
+            // it look's like m_string is DNS, so save ip for conversion
+            tmpString = ipToString(*m_ipV4);
+            string = &tmpString;
+        }
+    }
+    else
+    {
+        Q_ASSERT(m_ipV4);
+        m_string = ipToString(*m_ipV4);
+    }
+
+    Q_ASSERT((bool) *string);
+
+    // TODO: Remove this hack when IPv6 is properly supported!
+    //  Try to map it from IPv4 as v4 format is preferable
+    if (string->get() == QLatin1String("0.0.0.0"))
+        m_ipV6 = ipV6from(QLatin1String("::"));
+    else if (string->get() == QLatin1String("127.0.0.1"))
+        m_ipV6 = ipV6from(QLatin1String("::1"));
+    else
+        m_ipV6 = ipV6from(kIpVersionConvertPart + string->get());
+
+    return m_ipV6;
+}
+
+bool HostAddress::isLocal() const
+{
+    const auto string = toString();
+
+    // TODO: add some more IPv4
+    return string == QLatin1String("127.0.0.1") // localhost
+        || string.startsWith(QLatin1String("10.")) // IPv4 private
+        || string.startsWith(QLatin1String("192.168")) // IPv4 private
+        || string.startsWith(QLatin1String("fd00::")) // IPv6 private
+        || string.startsWith(QLatin1String("fe80::")); // IPv6 link-local
+}
+
+bool HostAddress::isResolved() const
+{
+    return ipV4() || ipV6();
+}
+
+boost::optional<QString> HostAddress::ipToString(const in_addr& addr)
+{
+    char buffer[1024];
+    if (inet_ntop(AF_INET, (void*)&addr, buffer, sizeof(buffer)))
+        return QString(QLatin1String(buffer));
+
+    return boost::none;
+
+    return QString(QLatin1String(inet_ntoa(addr)));
+}
+
+boost::optional<QString> HostAddress::ipToString(const in6_addr& addr)
+{
+    char buffer[1024];
+    if (inet_ntop(AF_INET6, (void*)&addr, buffer, sizeof(buffer)))
+        return QString(QLatin1String(buffer));
+
+    return boost::none;
+}
+
+boost::optional<in_addr> HostAddress::ipV4from(const QString& ip)
+{
+    in_addr v4;
+    if (inet_pton(AF_INET, ip.toLatin1().data(), &v4))
+        return v4;
+
+    return boost::none;
+}
+
+boost::optional<in6_addr> HostAddress::ipV6from(const QString& ip)
+{
+    in6_addr v6;
+    if (inet_pton(AF_INET6, ip.toLatin1().data(), &v6))
+        return v6;
+
+    return boost::none;
+}
+
+SocketAddress::SocketAddress(const HostAddress& _address, unsigned short _port):
+    address(_address),
+    port(_port)
+{
+}
+
+SocketAddress::SocketAddress(const QString& str):
+    port(0)
+{
+    // NOTE: support all formats
+    //  IPv4  <host> or <host>:<port> e.g. 127.0.0.1, 127.0.0.1:80
+    //  IPv6  [<host>] or [<host>]:<port> e.g. [::1] [::1]:80
+    int sepPos = str.lastIndexOf(QLatin1Char(':'));
+    if (sepPos == -1 || str.indexOf(QLatin1Char(']'), sepPos) != -1)
+    {
+        address = HostAddress(trimIpV6(str));
+    }
+    else
+    {
+        address = HostAddress(trimIpV6(str.mid(0, sepPos)));
+        port = str.mid(sepPos + 1).toInt();
+    }
+}
+
+QString SocketAddress::toString() const
+{
+    auto host = address.toString();
+    if (host.contains(QLatin1Char(':')))
+        host = QString(QLatin1String("[%1]")).arg(host);
+
+    return host + (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
+}
+
+bool SocketAddress::operator==(const SocketAddress& rhs) const
+{
+    return address == rhs.address && port == rhs.port;
+}
+
+bool SocketAddress::isNull() const
+{
+    return address == HostAddress() && port == 0;
+}
+
+QString SocketAddress::trimIpV6(const QString& ip)
+{
+    if (ip.startsWith(QLatin1Char('[')) && ip.endsWith(QLatin1Char(']')))
+        return ip.mid(1, ip.length() - 2);
+
+    return ip;
+}
 
 class SocketGlobalRuntimeInternal
 {

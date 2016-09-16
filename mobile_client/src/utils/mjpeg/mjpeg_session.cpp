@@ -2,6 +2,7 @@
 
 #include <QtCore/QUrl>
 #include <QtCore/QQueue>
+#include <QtCore/QPointer>
 #include <QtGui/QImage>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -541,18 +542,34 @@ void QnMjpegSession::setFinalTimestampMs(qint64 finalTimestampMs) {
     emit finalTimestampChanged();
 }
 
-void QnMjpegSession::start() {
+void QnMjpegSession::start()
+{
     Q_D(QnMjpegSession);
 
-    executeDelayed([d]() { d->connect(); }, 0, thread());
+    executeDelayed(
+        [guard = QPointer<QnMjpegSessionPrivate>(d)]()
+        {
+            if (guard)
+                guard->connect();
+        },
+        0,
+        thread());
 }
 
-void QnMjpegSession::stop() {
+void QnMjpegSession::stop()
+{
     Q_D(QnMjpegSession);
 
     d->setState(Disconnecting);
     d->lastFrameReleased.wakeAll();
 
-    executeDelayed([d]() { d->disconnect(); }, 0, thread());
+    executeDelayed(
+        [guard = QPointer<QnMjpegSessionPrivate>(d)]()
+        {
+            if (guard)
+                guard->disconnect();
+        },
+        0,
+        thread());
 }
 

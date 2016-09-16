@@ -3,9 +3,12 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <list>
+
 #include <QSharedPointer>
 
 #include "onvif_helper.h"
+#include <utils/common/credentials.h>
 
 struct soap;
 class DeviceBindingProxy;
@@ -324,6 +327,7 @@ private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
     QAuthenticator getDefaultPassword(const QString& manufacturer, const QString& model) const;
+    std::list<QnCredentials> getPossibleCredentials(const QString& manufacturer, const QString& model) const;
     void calcTimeDrift();
 
     PasswordHelper &m_passwordsData;

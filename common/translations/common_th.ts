@@ -414,6 +414,10 @@
         <source>Recording on I/O modules is disabled:</source>
         <translation>การบันทึกลงบนโมดูล I/O ปิดการใช้งาน:</translation>
     </message>
+    <message>
+        <source>Do HTTP request</source>
+        <translation>ส่ง HTTP</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<TS version="2.0" language="de" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -892,11 +892,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTP Inhalt</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>HTTP URL</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>Einloggen zum Authentifizieren (optional)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Login</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>Passwort zum Authentifizieren (optional)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Passwort</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>&amp;PTZ Preset:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>Rapid Review exportieren</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>Ursprüngliche Videolänge</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>Exportierte Videolänge</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>Rapid Review Geschwindigkeit</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>Frame Intervall</translation>
     </message>
 </context>
 <context>
@@ -1616,6 +1677,11 @@
         <location/>
         <source>Test...</source>
         <translation>Test...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>Soundausgabe</translation>
     </message>
 </context>
 <context>
@@ -2393,6 +2459,11 @@
         <location/>
         <source>Test...</source>
         <translation>Test...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>Sprachausgabe</translation>
     </message>
 </context>
 <context>

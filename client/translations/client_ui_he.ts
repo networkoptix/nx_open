@@ -505,6 +505,11 @@
         <source>This camera has no advanced settings</source>
         <translation>למצלמה זו אין הגדרות מתקדמות</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -883,11 +888,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>תוכן HTTP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>כתובת HTTP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>היכנס לארכיטקטורה (אופציונאלי)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>כניסה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>סיסמא לאימות (אופציונאלי)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>סיסמא</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>פריסט &amp;PTZ:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>ייצוא סקירה מהירה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>משך וידאו מקורי</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>משך וידאו לאחר ייצוא</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>מהירות סקירה מהירה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>מרווח תמונות</translation>
     </message>
 </context>
 <context>
@@ -1605,6 +1671,11 @@
         <location/>
         <source>Test...</source>
         <translation>בדוק...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>נגן למתשתמש</translation>
     </message>
 </context>
 <context>
@@ -2382,6 +2453,11 @@
         <location/>
         <source>Test...</source>
         <translation>בדיקה...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>דבר אל המשתמש</translation>
     </message>
 </context>
 <context>

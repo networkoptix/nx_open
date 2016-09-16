@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>このカメラにはアドバンス設定がありません</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -882,11 +887,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTPコンテンツ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>HTTP url</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>ログイン認証</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>ログイン</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>パスワード認証</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>パスワード</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>&amp;PTZ プリセット:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>ラピッドレビューのエクスポート</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>イニシャルビデオ長</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>エクスポートビデオ長</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>ラピッドレビュースピード</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>フレームインターバル</translation>
     </message>
 </context>
 <context>
@@ -1604,6 +1670,11 @@
         <location/>
         <source>Test...</source>
         <translation>テスト...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>ユーザー</translation>
     </message>
 </context>
 <context>
@@ -2381,6 +2452,11 @@
         <location/>
         <source>Test...</source>
         <translation>テスト...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>スピーク</translation>
     </message>
 </context>
 <context>

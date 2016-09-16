@@ -840,17 +840,22 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::MessageBoxAction).
         flags(Qn::NoTarget).
-        text(tr("Show Message"));
+        text(lit("Show Message"));
 
     factory(QnActions::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Show Version Mismatch Message"));
+        text(lit("Show Version Mismatch Message"));
 
     factory(QnActions::BetaVersionMessageAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Show Beta Version Warning Message"));
+        text(lit("Show Beta Version Warning Message"));
+
+    factory(QnActions::HiDpiSupportMessageAction).
+        flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(lit("Show HiDpi Support Warning Message"));
 
     factory(QnActions::AllowStatisticsReportMessageAction).
         flags(Qn::NoTarget).

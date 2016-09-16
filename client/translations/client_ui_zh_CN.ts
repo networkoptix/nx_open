@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>摄像机不能进行高级设置</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -882,11 +887,72 @@
     </message>
 </context>
 <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTP内容</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation>HTTP路径</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>请进行登录验证(可选)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>登录</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>请进行密码验证(可选)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>密码</translation>
+    </message>
+</context>
+<context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
         <translation>&amp;PTZ预置位:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>导出快速回放</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>起始视频长度</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>导出视频长度</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>快速回放速度</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>帧间隔</translation>
     </message>
 </context>
 <context>
@@ -1605,6 +1671,11 @@
         <location/>
         <source>Test...</source>
         <translation>测试...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>用户播放</translation>
     </message>
 </context>
 <context>
@@ -2382,6 +2453,11 @@
         <location/>
         <source>Test...</source>
         <translation>测试...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>用户广播</translation>
     </message>
 </context>
 <context>
