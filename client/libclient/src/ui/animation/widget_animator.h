@@ -1,5 +1,4 @@
-#ifndef QN_WIDGET_ANIMATOR_H
-#define QN_WIDGET_ANIMATOR_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QMetaType>
@@ -14,18 +13,20 @@ class QEasingCurve;
 class VariantAnimator;
 class RectAnimator;
 
-class WidgetAnimator: public AnimatorGroup {
-    Q_OBJECT;
+class WidgetAnimator: public AnimatorGroup
+{
+    Q_OBJECT
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param widget                    Widget that this animator will be assigned to.
      * \param geometryPropertyName      Property name for changing widget's geometry.
      * \param rotationPropertyName      Property name for changing widget's rotation.
      * \param parent                    Parent object.
      */
-    WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent = NULL);
+    WidgetAnimator(QGraphicsWidget* widget, const QByteArray& geometryPropertyName, 
+        const QByteArray& rotationPropertyName, QObject* parent = nullptr);
 
     /**
      * Virtual destructor.
@@ -34,16 +35,16 @@ public:
 
     /**
     * Starts animated move of a widget to the given position.
-    * 
+    *
     * \param geometry                  Rectangle to move widget to, in scene coordinates.
     * \param rotation                  Rotation value for the widget.
     */
-    void moveTo(const QRectF &geometry, qreal rotation);
+    void moveTo(const QRectF& geometry, qreal rotation);
 
     /**
      * \returns                         Widget that this animator is assigned to.
      */
-    QGraphicsWidget *widget() const;
+    QGraphicsWidget* widget() const;
 
     /**
      * \returns                         Widget scaling speed, scale factor per second.
@@ -51,7 +52,7 @@ public:
     qreal scalingSpeed() const;
 
     /**
-     * \returns                         Relative part of the widget's movement speed, 
+     * \returns                         Relative part of the widget's movement speed,
      *                                  in widgets per second.
      */
     qreal relativeMovementSpeed() const;
@@ -81,21 +82,19 @@ public:
     /**
     * \returns                         Easing curve used by this animator.
     */
-    const QEasingCurve &easingCurve() const;
+    const QEasingCurve& easingCurve() const;
 
     /**
     * \param easingCurve               New easing curve to use.
     */
-    void setEasingCurve(const QEasingCurve &easingCurve);
+    void setEasingCurve(const QEasingCurve& easingCurve);
 
 private:
     /** Widget geometry animation. */
-    RectAnimator *m_geometryAnimator;
+    RectAnimator* m_geometryAnimator;
 
     /** Widget rotation animation. */
-    VariantAnimator *m_rotationAnimator;
+    VariantAnimator* m_rotationAnimator;
 };
 
-Q_DECLARE_METATYPE(WidgetAnimator *);
-
-#endif // QN_WIDGET_ANIMATOR_H
+Q_DECLARE_METATYPE(WidgetAnimator*);
