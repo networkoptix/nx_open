@@ -412,7 +412,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
         if (!variant.file.isEmpty())
         {
             m_clientUpdateFile.reset(
-                new QnUpdateFileInformation(m_target.version, urlPrefix + variant.file));
+                new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + variant.file)));
             m_clientUpdateFile->baseFileName = variant.file;
             m_clientUpdateFile->fileSize = variant.size;
             m_clientUpdateFile->md5 = variant.md5;
