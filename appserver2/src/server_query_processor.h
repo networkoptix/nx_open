@@ -474,7 +474,7 @@ private:
         int /*dummy*/ = 0)
     {
         ErrorCode errorCode = processMultiUpdateSync(
-            ApiCommand::removeBusinessRule,
+            ApiCommand::removeEventRule,
             tran.transactionType,
             dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsToSend);
@@ -482,7 +482,7 @@ private:
             return errorCode;
 
         return processMultiUpdateSync(
-            ApiCommand::saveBusinessRule,
+            ApiCommand::saveEventRule,
             tran.transactionType,
             tran.params.defaultRules,
             transactionsToSend);
@@ -555,7 +555,7 @@ private:
                         updatedTran.command = ApiCommand::removeWebPage;
                         break;
                     case ApiObject_BusinessRule:
-                        updatedTran.command = ApiCommand::removeBusinessRule;
+                        updatedTran.command = ApiCommand::removeEventRule;
                         break;
                     default:
                         return processUpdateSync(tran, transactionsToSend, 0);
