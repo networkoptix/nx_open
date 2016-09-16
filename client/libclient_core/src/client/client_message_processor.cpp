@@ -36,6 +36,8 @@ QnClientMessageProcessor::QnClientMessageProcessor()
     m_holdConnection(false),
     m_waitingForPeerReconnect(false)
 {
+//TODO: #GDM VMS-3835 logic is not working in 3.0
+#if 0
     /*
      * On changing ec2 settings qnTransactionMessageBus reconnects all peers, therefore
      * disconnecting us from server. After that 'Reconnect' dialog appears and reconnects us.
@@ -44,18 +46,20 @@ QnClientMessageProcessor::QnClientMessageProcessor()
      * This workaround depends on fact that qnTransactionMessageBus works in own thread and
      * connects to ec2ConnectionSettingsChanged via queued connection.
      */
-    connect(qnGlobalSettings, &QnGlobalSettings::ec2ConnectionSettingsChanged, this, [this]()
-    {
-        //TODO: #gdm #3.0 improve dependency logic
-        if (!m_connected)
-            return;
+    connect(qnGlobalSettings, &QnGlobalSettings::ec2ConnectionSettingsChanged, this, 
+        [this](const QString& key)
+        {
+            //TODO: #gdm #3.0 improve dependency logic
+            if (!m_connected)
+                return;
 
-        if (m_waitingForPeerReconnect)
-            return;
+            qDebug() << "ec2ConnectionSettingsChanged" << key;
+            if (m_waitingForPeerReconnect)
+                return;
 
-        m_waitingForPeerReconnect = true;
-    });
-
+           // m_waitingForPeerReconnect = true;
+        });
+#endif
 
 }
 
