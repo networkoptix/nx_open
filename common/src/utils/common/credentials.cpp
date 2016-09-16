@@ -17,13 +17,10 @@ bool QnCredentials::operator==(const QnCredentials& other) const
 
 bool QnCredentials::operator<(const QnCredentials &other) const
 {
-    if (user < other.user)
-        return true;
+    if (user != other.user)
+        return user < other.user;
 
-    if (user == other.user)
-        return password < other.password;
-
-    return false;
+    return password < other.password;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCredentials, (json)(ubjson)(xml)(csv_record), QnCredentials_Fields)

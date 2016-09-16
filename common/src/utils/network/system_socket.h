@@ -367,7 +367,7 @@ public:
     template<class Param1Type, class Param2Type, class Param3Type, class Param4Type>
     SocketImplementationDelegate( const Param1Type& param1, const Param2Type& param2, const Param3Type& param3, const Param4Type& param4 )
     :
-        base_type( this, param1, param2, param3 )
+        base_type( this, param1, param2, param3, param4 )
     {
     }
 
