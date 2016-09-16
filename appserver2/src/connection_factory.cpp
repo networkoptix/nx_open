@@ -149,8 +149,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     /**%apidoc GET /ec2/getResourceTypes
      * Read all resource types. Resource type contain object type such as
-     * 'Server', 'Camera' e.t.c. Also, resource types contain additional information
-     * for cameras such as maximum fps, resolution, e.t.c
+     * "Server", "Camera", etc. Also, resource types contain additional information
+     * for cameras such as maximum fps, resolution, etc.
      * %param[default] format
      * %return Return object in requested format
      * %// AbstractResourceManager::getResourceTypes
@@ -385,7 +385,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     * %param motionMask List of motion detection areas and their
     *     sensitivity. The format is proprietary and is likely to change in
     *     future API versions. Currently, this string defines several rectangles separated with
-    *     ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+    *     ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
     *     left top corner), width, height.
     * %param scheduleTasks List of scheduleTask objects which define the camera recording
     *     schedule.
@@ -485,7 +485,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param motionMask List of motion detection areas and their
      *     sensitivity. The format is proprietary and is likely to change in
      *     future API versions. Currently, this string defines several rectangles separated with
-     *     ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+     *     ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
      *     left top corner), width, height.
      * %param scheduleTasks List of scheduleTask objects which define the camera recording
      *     schedule.
@@ -586,7 +586,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
-     *         with ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x
+     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x
      *         and y (for left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
@@ -682,7 +682,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return List of objects with camera information formatted in the requested format.
      *     %// From struct ApiResourceData:
      *     %param id Camera unique Id.
-     *     %param parentId Unique Id of a camera's server.
+     *     %param parentId Unique Id of a camera server.
      *     %param name Camera name.
      *     %param url Camera IP address, or a complete HTTP URL if the camera was added manually.
      *         Also, for multichannel encoders a complete URL is used.
@@ -724,7 +724,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
-     *         with ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x
+     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x
      *         and y (for left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
@@ -839,24 +839,24 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     // AbstractLicenseManager::removeLicense
     regUpdate<ApiLicenseData>(p, ApiCommand::removeLicense);
 
-    /**%apidoc GET /ec2/getBusinessRules
-     * Return business rules
+    /**%apidoc GET /ec2/getEventRules
+     * Return all event rules.
      * %param[default] format
      * %return Return object in requested format
      * %// AbstractBusinessEventManager::getBusinessRules
      */
-    regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
+    regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     // AbstractBusinessEventManager::save
-    regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);
+    regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveEventRule);
     // AbstractBusinessEventManager::deleteRule
-    regUpdate<ApiIdData>(p, ApiCommand::removeBusinessRule);
+    regUpdate<ApiIdData>(p, ApiCommand::removeEventRule);
 
-    regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetBusinessRules);
-    regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastBusinessAction);
-    regUpdate<ApiBusinessActionData>(p, ApiCommand::execBusinessAction);
+    regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetEventRules);
+    regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastAction);
+    regUpdate<ApiBusinessActionData>(p, ApiCommand::execAction);
 
     /**%apidoc GET /ec2/getUsers
      * Return users registered in the system. User's password contain MD5
@@ -921,7 +921,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value GlobalExportPermission Can export archives of available cameras.
      *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
      *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
-     *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O
+     *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      * %param email User's email.
@@ -973,7 +973,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value GlobalExportPermission Can export archives of available cameras.
      *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
      *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
-     *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O
+     *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      * %// AbstractUserManager::saveGroup

@@ -40,7 +40,7 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
         std::nullptr_t,
         ApiBusinessRuleDataList,
-        decltype(queryDoneHandler)> ( ApiCommand::getBusinessRules, nullptr, queryDoneHandler);
+        decltype(queryDoneHandler)> ( ApiCommand::getEventRules, nullptr, queryDoneHandler);
     return reqID;
 }
 
@@ -56,7 +56,7 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
 
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::saveBusinessRule, params,
+        ApiCommand::saveEventRule, params,
         std::bind( &impl::SaveBusinessRuleHandler::done, handler, reqID, _1, rule ) );
 
     return reqID;
@@ -68,7 +68,7 @@ int QnBusinessEventManager<T>::deleteRule( QnUuid ruleId, impl::SimpleHandlerPtr
     const int reqID = generateRequestID();
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::removeBusinessRule, ApiIdData(ruleId),
+        ApiCommand::removeEventRule, ApiIdData(ruleId),
         std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
     return reqID;
 }
@@ -77,7 +77,7 @@ template<class T>
 int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    auto tran = prepareTransaction( ApiCommand::broadcastBusinessAction, businessAction );
+    auto tran = prepareTransaction( ApiCommand::broadcastAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran);
     QnConcurrent::run(
         Ec2ThreadPool::instance(),
@@ -89,7 +89,7 @@ template<class T>
 int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& dstPeer, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    auto tran = prepareTransaction( ApiCommand::execBusinessAction, businessAction );
+    auto tran = prepareTransaction( ApiCommand::execAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran, dstPeer);
     QnConcurrent::run(
         Ec2ThreadPool::instance(),
@@ -106,7 +106,7 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
 
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::resetBusinessRules, params,
+        ApiCommand::resetEventRules, params,
         std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
 
     return reqID;

@@ -476,7 +476,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 return false;
         }
         if (m_needResyncbRules) {
-            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule, businessRuleObjectUpdater))
+            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
                 return false;
         }
         if (m_needResyncUsers) {
@@ -728,7 +728,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
         return false;
-    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule, businessRuleObjectUpdater))
+    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
         return false;
     if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
@@ -1177,7 +1177,7 @@ bool QnDbManager::fixBusinessRules()
             qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
             return false;
         }
-        if (abstractTran.command == ApiCommand::resetBusinessRules || abstractTran.command == ApiCommand::saveBusinessRule)
+        if (abstractTran.command == ApiCommand::resetEventRules || abstractTran.command == ApiCommand::saveEventRule)
         {
             delQuery.addBindValue(QnSql::serialized_field(tranGuid));
             if (!delQuery.exec()) {
@@ -2981,7 +2981,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
         return removeMediaServerUserAttributes(tran.params.id);
     case ApiCommand::removeLayout:
         return removeLayout(tran.params.id);
-    case ApiCommand::removeBusinessRule:
+    case ApiCommand::removeEventRule:
         return removeBusinessRule(tran.params.id);
     case ApiCommand::removeUser:
         return removeUser(tran.params.id);
@@ -3902,7 +3902,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataL
     return ErrorCode::ok;
 }
 
-//getBusinessRules
+//getEventRules
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
 {
     QSqlQuery query(m_sdb);
