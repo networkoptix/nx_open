@@ -118,12 +118,21 @@ public:
     MediaStatus mediaStatus() const;
 
     QUrl source() const;
+    /**
+     * Set media source to play.
+     * Supported types of media sources (url scheme part):
+     * 'file' - local file
+     * any other scheme interpreted as a link to a resource in resourcePool. Url path is resource Id.
+     */
     void setSource(const QUrl &source);
 
     QAbstractVideoSurface *videoSurface() const;
     void setVideoSurface(QAbstractVideoSurface *videoSurface);
 
     qint64 position() const;
+    /**
+     * Position to play in UTC milliseconds
+     */
     void setPosition(qint64 value);
 
     int maxTextureSize() const;
@@ -132,6 +141,10 @@ public:
     bool reconnectOnPlay() const;
     void setReconnectOnPlay(bool reconnectOnPlay);
 
+    /**
+     * Returns true if current playback position is 'now' time (live video from a camera).
+     * For non-camera sources like local files it is already false.
+     */
     bool liveMode() const;
     double aspectRatio() const;
 
