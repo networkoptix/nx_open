@@ -73,6 +73,8 @@ protected:
         const SocketAddress& localAddress);
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket);
 
+    SystemError::ErrorCode m_lastError;
+
 private:
     void removeDisconnectedConnections();
     void removeAllConnections();

@@ -522,11 +522,11 @@ void socketSimpleAsync(
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-    void socketMultiConnect(
-        const ServerSocketMaker& serverMaker,
-        const ClientSocketMaker& clientMaker,
-        SocketAddress endpoint = kAnyPrivateAddress,
-        int clientCount = kClientCount)
+void socketMultiConnect(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    SocketAddress endpoint = kAnyPrivateAddress,
+    int clientCount = kClientCount)
 {
     static const std::chrono::milliseconds timeout(1500);
 
@@ -595,6 +595,27 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
     server->pleaseStopSync();
     for (auto& socket : connectedSockets)
         socket->pleaseStopSync();
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketErrorHandling(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker)
+{
+    auto client = clientMaker();
+    auto server = serverMaker();
+
+    SystemError::setLastErrorCode(SystemError::noError);
+    ASSERT_TRUE(client->bind(SocketAddress::anyAddress));
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
+
+    SystemError::setLastErrorCode(SystemError::noError);
+    ASSERT_FALSE(server->bind(client->getLocalAddress()));
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::addrInUse);
+
+    SystemError::setLastErrorCode(SystemError::noError);
+    ASSERT_FALSE(server->listen(10));
+    ASSERT_NE(SystemError::getLastOSErrorCode(), SystemError::noError);
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>

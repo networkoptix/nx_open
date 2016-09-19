@@ -80,7 +80,8 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
 QnTcpListener::QnTcpListener(
     const QHostAddress& address, int port, int maxConnections, bool useSSL)
     :
-    d_ptr(new QnTcpListenerPrivate())
+    d_ptr(new QnTcpListenerPrivate()),
+    m_lastError(SystemError::noError)
 {
     Q_D(QnTcpListener);
     d->serverAddress = address;
@@ -111,17 +112,15 @@ bool QnTcpListener::bindToLocalAddress()
     if (!d->serverSocket
         || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
-        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG(lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)")
-            .arg(d->serverAddress.toString()).arg(d->localPort)
-            .arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING);
-        qCritical() << "Can't start TCP listener at address"
-            << d->serverAddress << ":" << d->localPort << ". "
-            << "Reason: " << SystemError::toString(prevErrorCode) << "(" << prevErrorCode << ")";
+        const auto errorMessage = lm("Can't bind and listen on %1, %2")
+            .strs(localAddress, SystemError::toString(m_lastError));
+
+        NX_LOGX(errorMessage, cl_logWARNING);
+        qCritical() << errorMessage;
         return false;
     }
 
-    NX_LOG(lit("Server started at %1").arg(localAddress.toString()), cl_logINFO);
+    NX_LOGX(lm("Server started at %1").str(localAddress), cl_logINFO);
     return true;
 }
 
@@ -139,6 +138,7 @@ AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
         !serverSocket->bind(localAddress) ||
         !serverSocket->listen())
     {
+        m_lastError = SystemError::getLastOSErrorCode();
         return nullptr;
     }
 
