@@ -15,6 +15,10 @@ if [ $? -gt 0 ]; then
    echo "+++++++++++++++++++++++++ NPM errorlevel:" $? "+++++++++++++++++++++++++"
    exit $?
 fi
+~/.rvm/bin/rvm install 2.3.0
+source ~/.rvm/scripts/rvm
+rvm use 2.3.0 --default
+gem install compass
 #sleep 2
 echo "+++++++++++++++++++++++++ Running BOWER... +++++++++++++++++++++++++"
 bower install
