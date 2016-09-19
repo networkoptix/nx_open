@@ -28,7 +28,7 @@ template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::changeSystemName(
         const QString &systemName,
         qint64 sysIdTime,
-        qint64 tranLogTime,
+        Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();

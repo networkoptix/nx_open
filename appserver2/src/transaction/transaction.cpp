@@ -35,9 +35,9 @@ namespace ec2
 
     QString QnAbstractTransaction::toString() const
     {
-        return lit("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
+        return lm("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
             .arg(ApiCommand::toString(command))
-            .arg(persistentInfo.timestamp)
+            .str(persistentInfo.timestamp)
             .arg(peerID.toString())
             .arg(persistentInfo.dbID.toString())
             .arg(persistentInfo.sequence);
