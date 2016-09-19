@@ -174,7 +174,7 @@ void QnGraphicsMessageBox::at_animationIn_finished() {
     VariantAnimator *animator = opacityAnimator(this);
     animator->setTimeLimit(m_timeout);
     animator->setDurationOverride(m_timeout);
-    animator->setEasingCurve(QEasingCurve::InCubic);
+    animator->setEasingCurve(QEasingCurve::InQuad);
     animator->animateTo(0.6);
     disconnect(animator, 0, this, 0);
     connect(animator, &VariantAnimator::animationTick, this, &QnGraphicsMessageBox::tick);

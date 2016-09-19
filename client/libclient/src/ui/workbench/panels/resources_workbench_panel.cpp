@@ -168,9 +168,9 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 
     xAnimator->stop();
     if (opened)
-        xAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::InOutQuad);
     else
-        xAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::OutQuad);
 
     qreal width = item->size().width();
     xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
