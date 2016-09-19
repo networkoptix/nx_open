@@ -155,16 +155,17 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
     int videoChannel = videoFrame->channelNumber;
-    if (videoFrame->dataProvider)
+    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*> (videoFrame->dataProvider);
+    if (archiveReader)
     {
-        auto videoLayout = videoFrame->dataProvider->getVideoLayout();
+        auto videoLayout = archiveReader->getDPVideoLayout();
         if (videoLayout)
             m_awaitingFramesMask.setChannelCount(videoLayout->channelCount());
     }
 
     {
         QnMutexLocker lock(&m_decoderMutex);
-        while (m_videoDecoders.size() < videoChannel)
+        while (m_videoDecoders.size() <= videoChannel)
         {
             auto videoDecoder = new SeamlessVideoDecoder();
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
@@ -237,7 +238,9 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
     lock.unlock();
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
-    if (metadata.videoChannel != m_hurryUpToFrame.videoChannel ||
+
+    if ((metadata.videoChannel != m_hurryUpToFrame.videoChannel &&
+        m_awaitingFramesMask.hasChannel(m_hurryUpToFrame.videoChannel)) ||
         metadata.frameNum < m_hurryUpToFrame.frameNumber)
     {
         metadata.noDelay = true;

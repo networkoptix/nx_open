@@ -126,8 +126,8 @@ public:
      */
     void setSource(const QUrl &source);
 
-    QAbstractVideoSurface *videoSurface() const;
-    void setVideoSurface(QAbstractVideoSurface *videoSurface);
+    QAbstractVideoSurface *videoSurface(int channel = 0) const;
+    void setVideoSurface(QAbstractVideoSurface *videoSurface, int channel = 0);
 
     qint64 position() const;
     /**

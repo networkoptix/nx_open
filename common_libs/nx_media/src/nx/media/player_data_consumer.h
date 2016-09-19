@@ -135,6 +135,7 @@ private:
         void setMask() { m_mask = (1 << m_channels) - 1; }
         void resetMask() { m_mask = 0; }
         void removeChannel(int channelNumber) { m_mask &= ~(1 << channelNumber); }
+        bool hasChannel(int channelNumber) const { return m_mask & (1 << channelNumber);  }
         bool isEmpty() const { return m_mask == 0; }
     };
 
