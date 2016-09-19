@@ -29,10 +29,10 @@ qint64 getEndOfTheDayMs(qint64 timeMs)
 
 QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::DateRangeWidget()),
     m_startTimeMs(0),
-    m_endTimeMs(0),
-    QnWorkbenchContextAware(parent)
+    m_endTimeMs(0)
 {
     ui->setupUi(this);
 
