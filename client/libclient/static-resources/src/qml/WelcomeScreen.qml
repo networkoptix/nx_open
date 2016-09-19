@@ -141,17 +141,6 @@ Rectangle
                     deactivateFunc: function(item) { item.toggle(); };
                 }
 
-
-                Connections
-                {
-                    target: context;
-                    onIsVisibleChanged:
-                    {
-                        if (!context.isVisible)
-                            grid.watcher.resetCurrentItem();
-                    }
-                }
-
                 model: QnQmlSortFilterProxyModel
                 {
                     model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
@@ -313,5 +302,15 @@ Rectangle
         text: context.softwareVersion;
         standardColor: Style.darkerColor(Style.colors.windowText, 1);
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
+    }
+
+    Connections
+    {
+        target: context;
+        onIsVisibleChanged:
+        {
+            grid.watcher.resetCurrentItem();
+            pageSwitcher.setPage(0);
+        }
     }
 }
