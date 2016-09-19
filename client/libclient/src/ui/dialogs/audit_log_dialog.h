@@ -21,11 +21,11 @@ namespace Ui
     class AuditLogDialog;
 }
 
-class QnAuditLogDialog: public QnSessionAwareButtonBoxDialog
+class QnAuditLogDialog: public QnSessionAwareDialog
 {
     Q_OBJECT
 
-    typedef QnSessionAwareButtonBoxDialog base_type;
+    typedef QnSessionAwareDialog base_type;
 
 public:
     explicit QnAuditLogDialog(QWidget* parent);
@@ -33,7 +33,6 @@ public:
 
     void disableUpdateData();
     void enableUpdateData();
-    void setDateRange(const QDate& from, const QDate& to);
 
 protected:
     virtual void setVisible(bool value) override;

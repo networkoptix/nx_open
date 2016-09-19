@@ -17,12 +17,14 @@ public:
     inline QLineEdit *lineEdit() const { return m_lineEdit; }
 
     QSize sizeHint() const;
+    QString text() const;
 
     QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
 
     int textChangedSignalFilterMs() const;
     void setTextChangedSignalFilterMs(int filterMs);
 
+    void clear();
 signals:
     void textChanged(const QString &text);
     void escKeyPressed();

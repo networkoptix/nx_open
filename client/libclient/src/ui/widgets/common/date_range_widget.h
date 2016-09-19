@@ -24,11 +24,16 @@ public:
     qint64 endTimeMs() const;
     void setRange(qint64 startTimeMs, qint64 endTimeMs);
 
+    /** Change values to default dates: since 1/1/2000 to today's date. */
+    void reset();
+
 signals:
     void rangeChanged(qint64 startTimeMs, qint64 endTimeMs);
 
 private:
     void updateRange();
+    void updateAllowedRange();
+
     QDateTime actualDateTime(const QDate &userDate) const;
     QDate displayDate(qint64 timestampMs) const;
 

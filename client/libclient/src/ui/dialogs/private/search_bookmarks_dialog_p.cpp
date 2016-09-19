@@ -20,6 +20,7 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -51,6 +52,9 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , m_updatingNow(false)
 {
     m_ui->setupUi(m_owner);
+    m_ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
+    m_ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+
     m_ui->gridBookmarks->setModel(m_model);
 
     QnBookmarkSortOrder sortOrder = QnSearchBookmarksModel::defaultSortOrder();
@@ -133,12 +137,8 @@ void QnSearchBookmarksDialogPrivate::reset()
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
         resetToAllAvailableCameras();
-        m_ui->filterLineEdit->lineEdit()->setText(QString());
-        m_model->setFilterText(QString());
-
-        /* Start/end values are rounded in the widget to 1-day granularity. */
-        m_ui->dateRangeWidget->setRange(0, QDateTime::currentMSecsSinceEpoch());
-        m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
+        m_ui->filterLineEdit->clear();
+        m_ui->dateRangeWidget->reset();
     }
 
     applyModelChanges();

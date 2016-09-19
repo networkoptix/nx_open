@@ -96,6 +96,11 @@ QSize QnSearchLineEdit::sizeHint() const
     return size;
 }
 
+QString QnSearchLineEdit::text() const
+{
+    return m_lineEdit->text();
+}
+
 void QnSearchLineEdit::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
@@ -179,6 +184,11 @@ int QnSearchLineEdit::textChangedSignalFilterMs() const
 void QnSearchLineEdit::setTextChangedSignalFilterMs(int filterMs)
 {
     m_textChangedSignalFilterMs = filterMs;
+}
+
+void QnSearchLineEdit::clear()
+{
+    m_lineEdit->clear();
 }
 
 void QnSearchLineEdit::inputMethodEvent(QInputMethodEvent *e)
