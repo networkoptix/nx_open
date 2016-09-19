@@ -104,11 +104,7 @@ QString QnSearchLineEdit::text() const
 void QnSearchLineEdit::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-
-    QStyleOptionFrameV2 panel;
-    initStyleOption(&panel);
-    const auto rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
-    m_lineEdit->setGeometry(rect);
+    m_lineEdit->setGeometry(rect());
 }
 
 void QnSearchLineEdit::focusInEvent(QFocusEvent *event)
@@ -160,15 +156,6 @@ bool QnSearchLineEdit::event(QEvent *event)
     }
 
     return QWidget::event(event);
-}
-
-void QnSearchLineEdit::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event)
-    QPainter p(this);
-    QStyleOptionFrameV2 panel;
-    initStyleOption(&panel);
-    style()->drawPrimitive(QStyle::PE_PanelLineEdit, &panel, &p, this);
 }
 
 QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const

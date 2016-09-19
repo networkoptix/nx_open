@@ -36,7 +36,6 @@ protected:
     void focusInEvent(QFocusEvent *event) override;
     void focusOutEvent(QFocusEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
     void inputMethodEvent(QInputMethodEvent *e) override;
     bool event(QEvent *event) override;
     void changeEvent(QEvent *event);
