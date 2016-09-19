@@ -2878,16 +2878,22 @@ QSize QnNxStyle::sizeFromContents(
 }
 
 int QnNxStyle::pixelMetric(
-        PixelMetric metric,
-        const QStyleOption *option,
-        const QWidget *widget) const
+    PixelMetric metric,
+    const QStyleOption* option,
+    const QWidget* widget) const
 {
     switch (metric)
     {
         case PM_ButtonMargin:
         {
             int margin = widget ? widget->property(Properties::kButtonMarginProperty).toInt() : 0;
-            return margin ? margin : dp(16);
+            if (margin)
+                return margin;
+
+            if (isCheckableButton(option))
+                return Metrics::kStandardPadding;
+
+            return dp(16);
         }
 
         case PM_ButtonShiftVertical:
