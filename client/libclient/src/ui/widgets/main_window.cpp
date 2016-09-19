@@ -678,7 +678,7 @@ bool QnMainWindow::event(QEvent *event) {
 
     if ((event->type() == QEvent::WindowActivate) && isWelcomeScreenVisible())
     {
-        // Welcome screen looses focus after window deactivate. We restore it here.
+        // Welcome screen looses focus after window deactivation. We restore it here.
         const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
         welcomeScreen->forceActiveFocus();
     }
