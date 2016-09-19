@@ -35,7 +35,7 @@ static const int kDefaultThumbnailsHeight = 48;
 static const int kVideoWallTimelineAutoHideTimeoutMs = 10000;
 
 static const int kShowAnimationDurationMs = 240;
-static const int kHideAnimationDurationMs = 160;
+static const int kHideAnimationDurationMs = 240;
 
 static const int kShowTimelineTimeoutMs = 100;
 static const int kCloseTimelineTimeoutMs = 250;

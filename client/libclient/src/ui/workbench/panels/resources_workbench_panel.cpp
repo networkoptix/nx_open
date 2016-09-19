@@ -23,7 +23,7 @@
 namespace {
 
 static const int kShowAnimationDurationMs = 300;
-static const int kHideAnimationDurationMs = 200;
+static const int kHideAnimationDurationMs = 300;
 
 }
 
