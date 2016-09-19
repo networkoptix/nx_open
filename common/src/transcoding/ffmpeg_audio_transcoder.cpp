@@ -57,7 +57,7 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     QnAudioTranscoder(codecId),
     m_audioEncodingBuffer(0),
     m_encoderCtx(0),
-    m_decoderContext(0),
+    m_decoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_unresampledData(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE),
     m_resampledData(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE),
@@ -65,6 +65,7 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     m_downmixAudio(false),
     m_frameNum(0),
     m_resampleCtx(0),
+    m_sampleBuffers(nullptr),
     m_dstSampleRate(0),
     m_outFrame(av_frame_alloc()),
     m_inputFrame(av_frame_alloc())
@@ -80,7 +81,7 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
         audio_resample_close(m_resampleCtx);
 
     QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
-    QnFfmpegHelper::deleteAvCodecContext(m_decoderContext);
+    QnFfmpegHelper::deleteAvCodecContext(m_decoderCtx);
     av_frame_free(&m_outFrame);
     av_frame_free(&m_inputFrame);
 }
@@ -141,9 +142,9 @@ bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
     }
 
     avCodec = avcodec_find_decoder(context->getCodecId());
-    m_decoderContext = avcodec_alloc_context3(0);
-    QnFfmpegHelper::mediaContextToAvCodecContext(m_decoderContext, context);
-    if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
+    m_decoderCtx = avcodec_alloc_context3(0);
+    QnFfmpegHelper::mediaContextToAvCodecContext(m_decoderCtx, context);
+    if (avcodec_open2(m_decoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = tr("Could not initialize audio decoder.");
         return false;
@@ -191,26 +192,26 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         // TODO: #vasilenko avoid using deprecated methods
 
         bool needResample=
-            m_encoderCtx->channels != m_decoderContext->channels ||
-            m_encoderCtx->sample_rate != m_decoderContext->sample_rate ||
-            m_encoderCtx->sample_fmt != m_decoderContext->sample_fmt;
+            m_encoderCtx->channels != m_decoderCtx->channels ||
+            m_encoderCtx->sample_rate != m_decoderCtx->sample_rate ||
+            m_encoderCtx->sample_fmt != m_decoderCtx->sample_fmt;
 
         QnByteArray& bufferToDecode = needResample ? m_unresampledData : m_resampledData;
         quint8* decodedDataEndPtr = (quint8*) bufferToDecode.data() + bufferToDecode.size();
 
         // todo: ffmpeg-test
         int got_frame = 0;
-        int decodeResult = avcodec_decode_audio4(m_decoderContext, m_outFrame, &got_frame, &avpkt);
-        int decodedAudioSize = m_outFrame->nb_samples * QnFfmpegHelper::audioSampleSize(m_decoderContext);
+        int decodeResult = avcodec_decode_audio4(m_decoderCtx, m_outFrame, &got_frame, &avpkt);
+        int decodedAudioSize = m_outFrame->nb_samples * QnFfmpegHelper::audioSampleSize(m_decoderCtx);
         if (got_frame)
         {
             if (!m_audioHelper)
-                m_audioHelper.reset(new QnFfmpegAudioHelper(m_decoderContext));
+                m_audioHelper.reset(new QnFfmpegAudioHelper(m_decoderCtx));
             m_audioHelper->copyAudioSamples(decodedDataEndPtr, m_outFrame);
         }
 
         if (m_encoderCtx->frame_size == 0)
-            m_encoderCtx->frame_size = m_decoderContext->frame_size;
+            m_encoderCtx->frame_size = m_decoderCtx->frame_size;
 
         if (decodeResult < 0)
             return -3;
@@ -218,7 +219,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         if (decodedAudioSize > 0)
         {
             if (m_downmixAudio)
-                decodedAudioSize = QnAudioProcessor::downmix(decodedDataEndPtr, decodedAudioSize, m_decoderContext);
+                decodedAudioSize = QnAudioProcessor::downmix(decodedDataEndPtr, decodedAudioSize, m_decoderCtx);
             bufferToDecode.resize(bufferToDecode.size() + decodedAudioSize);
 
             if (needResample)
@@ -227,15 +228,15 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
                 {
                     m_resampleCtx = av_audio_resample_init(
                         m_encoderCtx->channels,
-                        m_decoderContext->channels,
+                        m_decoderCtx->channels,
                         m_encoderCtx->sample_rate,
-                        m_decoderContext->sample_rate,
+                        m_decoderCtx->sample_rate,
                         m_encoderCtx->sample_fmt,
-                        av_get_packed_sample_fmt(m_decoderContext->sample_fmt),
+                        av_get_packed_sample_fmt(m_decoderCtx->sample_fmt),
                         16, 10, 0, 0.8);
                 }
 
-                int inSamples = bufferToDecode.size() / QnFfmpegHelper::audioSampleSize(m_decoderContext);
+                int inSamples = bufferToDecode.size() / QnFfmpegHelper::audioSampleSize(m_decoderCtx);
                 int outSamlpes = audio_resample(
                     m_resampleCtx,
                     (short*) (m_resampledData.data() + m_resampledData.size()),
@@ -297,6 +298,61 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     return 0;
 }
 
+int QnFfmpegAudioTranscoder::transcodePacket2(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
+{
+    int gotResult = 0;
+    int bytesConsumed = 0;
+    int encodingResult = 0;
+
+    AVFrame decodedFrame;
+    AVPacket packetToDecode;
+
+
+    av_init_packet(&packetToDecode);
+    packetToDecode.data = const_cast<quint8*>((const quint8*)media->data());
+    packetToDecode.size = static_cast<int>(media->dataSize());
+
+    bytesConsumed = avcodec_decode_audio4(
+        m_decoderCtx,
+        &decodedFrame,
+        &gotResult,
+        &packet);
+
+    if (bytesConsumed < 0)
+        return bytesConsumed;
+
+    if (!gotResult)
+        return 0;
+
+    //init resample context, alloc resampledFrame buffers
+
+    initResampleCtx(m_decoderCtx, m_encoderCtx);
+
+    allocSampleBuffers(m_decoderCtx, m_encoderCtx, m_resampleCtx);
+
+    auto outSamplesPerChannel = swr_convert(
+        m_resampleCtx,
+        m_sampleBuffers,
+        m_encoderCtx->frame_size,
+        decodedFrame.data,
+        decodedFrame.linesize);
+
+    AVFrame resampledFrame;
+    AVPacket packetEncodeTo;
+    av_packet_init(&packetEncodeTo);
+
+    encodingResult = avcodec_encode_audio2(
+        m_encoderCtx,
+        &packetEncodeTo,
+        &resampledFrame,
+        &gotResult);
+
+    if (gotResult)
+        *result = createMediaDataFromAVPacket(packetEncodeTo);
+
+    return 0;
+}
+
 AVCodecContext* QnFfmpegAudioTranscoder::getCodecContext()
 {
     return m_encoderCtx;
@@ -305,6 +361,72 @@ AVCodecContext* QnFfmpegAudioTranscoder::getCodecContext()
 void QnFfmpegAudioTranscoder::setSampleRate(int value)
 {
     m_dstSampleRate = value;
+}
+
+void QnFfmpegAudioTranscoder::initResampleCtx(const AVCodecContext *inCtx, const AVCodecContext *outCtx)
+{
+    if (m_resampleCtx)
+        return;
+
+    m_resampleCtx = swr_alloc();
+
+    av_opt_set_channel_layout(
+        m_resampleCtx,
+        "in_channel_layout",
+        inCtx->channel_layout,
+        0);
+
+    av_opt_set_channel_layout(
+        m_resampleCtx,
+        "out_channel_layout",
+        outCtx->channel_layout,
+        0);
+
+    av_opt_set_int(m_resampleCtx, "in_sample_rate", inCtx->sample_rate, 0);
+    av_opt_set_int(m_resampleCtx, "out_sample_rate", outCtx->sample_rate, 0);
+    av_opt_set_sample_fmt(m_resampleCtx, "in_sample_fmt", inCtx->sample_fmt, 0);
+    av_opt_set_sample_fmt(m_resampleCtx, "out_sample_fmt", outCtx->sample_fmt, 0);
+}
+
+void QnFfmpegAudioTranscoder::allocSampleBuffers(
+    const AVCodecContext *inCtx,
+    const AVCodecContext *outCtx,
+    const SwrContext* resampleCtx)
+{
+    if (m_sampleBuffers)
+        return;
+
+    //determine size of sample buffers
+    auto outSampleCount = av_rescale_rnd(
+        swr_get_delay(resampleCtx, inCtx->sample_rate) + inCtx->frame_size,
+        outCtx->sample_rate,
+        inCtx->sample_rate,
+        AV_ROUND_UP);
+
+    int linesize = 0;
+    const int kDefaultAlign = 0;
+
+    av_samples_alloc_array_and_samples(
+        m_sampleBuffers,
+        &linesize,
+        m_encoderCtx->channels,
+        m_encoderCtx->frame_size,
+        m_encoderCtx->sample_fmt,
+        kDefaultAlign);
+
+}
+
+QnAbstractMediaDataPtr QnFfmpegAudioTranscoder::createMediaDataFromAVPacket(const AVPacket &packet)
+{
+    auto resultAudioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded, m_context);
+    resultAudioData->compressionType = m_codecId;
+
+    AVRational r = {1, 1000000};
+    qint64 audioPts = m_frameNum++ * m_encoderCtx->frame_size;
+    resultAudioData->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r) + m_firstEncodedPts;
+
+    resultAudioData->m_data.write((const char*) packet.data, packet.size);
+    return  QnCompressedAudioDataPtr(resultAudioData);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

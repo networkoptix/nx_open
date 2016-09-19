@@ -9,6 +9,9 @@
 #include "utils/common/byte_array.h"
 #include <utils/media/ffmpeg_helper.h>
 
+#include <libswresample/swresample.h>
+#include <stdint.h>
+
 class QnFfmpegAudioTranscoder: public QnAudioTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegAudioTranscoder)
@@ -23,10 +26,22 @@ public:
     AVCodecContext* getCodecContext();
     virtual bool existMoreData() const override;
     void setSampleRate(int value);
+
+private:
+    void initResampleCtx(const AVCodecContext* inCtx, const AVCodecContext* outCtx);
+    void allocSampleBuffers(
+        const AVCodecContext* inCtx,
+        const AVCodecContext* outCtx,
+        const SwrContext* resampleCtx);
+
+
+
+    QnAbstractMediaDataPtr createMediaDataFromAVPacket(const AVPacket& packet);
+
 private:
     quint8* m_audioEncodingBuffer;
     AVCodecContext* m_encoderCtx;
-    AVCodecContext* m_decoderContext;
+    AVCodecContext* m_decoderCtx;
     qint64 m_firstEncodedPts;
 
     QnByteArray m_unresampledData;
@@ -37,7 +52,10 @@ private:
 
     bool m_downmixAudio;
     int m_frameNum;
-    ReSampleContext* m_resampleCtx;
+    //ReSampleContext* m_resampleCtx;
+    SwrContext* m_resampleCtx;
+    uint8_t** m_sampleBuffers;
+
     int m_dstSampleRate;
     AVFrame* m_outFrame;
     std::unique_ptr<QnFfmpegAudioHelper> m_audioHelper;
