@@ -265,11 +265,14 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                     break;
                 }
                 case QnConnectionState::Connecting:
+                    // Does nothing. If welcome screen is shown it manages connecting state.
+                    // If it is reconnecting state - we just see our scene.
+                    break;
                 case QnConnectionState::Connected:
+                    // If connection is successful we show global preloader while loading resources
                     welcomeScreen->setGlobalPreloaderVisible(true);
                     break;
                 case QnConnectionState::Ready:
-                    welcomeScreen->setGlobalPreloaderVisible(false);
                     resourceModeAction->setChecked(true); //< Hides welcome screen
                     break;
                 default:
