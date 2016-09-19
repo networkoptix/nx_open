@@ -1,10 +1,13 @@
 -----------------------------------------------2.6.0.xxxx-----------------------------------------
 NEW FEATURES
-* 2-way audio integrated for Axis cameras and I/O devices with firmware version 5.x
-* 2-way audio as an action (for actions "Speak", "Play sound" and "Repeat Sound" Axis camera or I/O device can be selected as a target)
+* 2-way audio integrated for Axis cameras and I/O device (requires firmware 5.x)
+* Audio-as-an-Action now available for Axis devices (requires firmware 5.x)
 * HTTP Request-as an-Action
 * Rapid Review (export and review 1 day of video in 1 minute)
-* [NOT IN BETA]IPv6 support
+* IPv6 support (required for publishing iOS apps)
+
+SUPPORTED OS
+* Windows XP is no longer supported
 
 NEW DEVICE SUPPORT
 * FLIR AX8 and FC-series cameras integrated via ONVIF
@@ -15,63 +18,70 @@ NEW DEVICE SUPPORT
 * ACTi PTZ Dome I98
 * New Arecont Vision(G5) and new Axis cameras support
 * Arecont Vision AV2195 and AV2196
-* AHD DVR integrated
-* [NOT IN BETA]DWC-PF5M1TIR camera
+* AHD DVR
+* DWC-PF5M1TIR camera
 
 IMPROVEMENTS
-* ACTi Cameras Advanced Integration
+* ACTi Cameras advanced Integration
+* Encoders ACTi V32, Axis M7014, M7016, Q7404 now accept "Analog Encoder" licenses
 * Sony SNC-EP550 audio is now supported
 * Improved PTZ for Uniview and Vivotek cameras
-* Added playback speed controls for VMAX
+* Added advanced PTS options for cameras NFX-22053H3, VK2-HD20-SM, VK2-HD30IR-PM
 * DW CPRO-manufactured cameras now use H264-High profile
 * DW Panzilla optimizations
-* [NOT IN BETA]Added IR controls for Hikvision DS-2CD2032-I to the "Advanced" tab of camera settings in Client
-* Improved default password autofill during auto-discovery for DW cameras
+* Added IR controls for Hikvision DS-2CD2032-I to the "Advanced" tab of camera settings in Desktop Client
+* Improved default password auto-fill during auto-discovery for DW cameras
 * RTSP workflow improvement reduces glitches for cameras that experience short-time RTSP-stream frequent stops
-* Software Motion Detection stream resolution threshold increased to 1024x768. Works also for single-stream cameras with resolution of that value and below
+* Software Motion Detection stream resolution threshold increased to 1024x768. Works also for single-stream cameras
 * Storage Database management optimizations
-* Write to storage function optimisations for high-bitrate cameras. Drastically decreases "HDD Slow" errors.
-* [NOT IN BETA]SMTP servers without authentication are supported now for sending emails
-* Added more useful warnings to LDAP "Test" results
+* Write to storage function optimisations. Drastically decreases "HDD Slow" errors
+* To prevent OS malfunction, system disk drive is disabled for recording if there's more than one storage drive on Server and system disk drive is 5 times less than summary capacity of other storage drives
+* Added screenshot and video links to "Input on camera" email for recorded cameras
+* Sending email via SMTP servers w/out authentication now allowed
+* Modified warnings to LDAP "Test" results to be clearer
+* Added a possibility to use PTZ functions directly on Video Wall
 * Incremental expansion of Server API documentation
 * General server stability improvements based on anonymous usage and crash statistics
 
 BUG FIXES
+* Server may not delete some particular video files during archive rewriting. Fixed. Rebuild of archive index is needed after update to 2.6.0.
 * Inputs were not properly recognised from camera VK2-1080XVRDPTZf. Fixed.
-* [NOT IN BETA]There was no video in Client from camera Sony SNC-VM772R. Fixed.
-* Acti V32 didn't accept Analog Encoder licenses. Fixed.
+* There was no video in Client from camera Sony SNC-VM772R. Fixed.
 * Motion detection stopped working at DW-MV421 Onvif camera. Fixed.
-* [NOT IN BETA]Canon VB-S30D lost PTZ capabilities after some time after the initialization. Fixed.
-* Server pasted default http port :80 for Axis cameras instead of parsing mutlicast reply. Fixed.
-* Desktop Client crashed while viewing archive recordings from some cameras with g726 coded audio. Noticed at Axis fw 6.x. Fixed.
-* [NOT IN BETA]Couldn't add camera manually if there was other offline device with the same IP in the Resources Tree. Fixed.
-* Sometimes camera went to unauthorized state after moving between servers. Fixed.
+* Canon VB-S30D lost PTZ capabilities after some time after the initialization. Fixed.
+* Server used default HTTP port :80 for Axis cameras instead of parsing multicast reply. Fixed.
+* Desktop Client crashed while viewing archive recordings from some cameras with g726 coded audio. Noticed w/ Axis firmware 6.x. Fixed.
+* Couldn't add camera manually if there was other offline device with the same IP in the Resources Tree. Fixed.
+* Sometimes cameras displayed unauthorized state after moving between servers. Fixed.
 * Video noise appeared on specific frames of DW-CP16. Fixed.
-* Server crashed if advanced settings for DWC-PF5MTIR had been changed. Fixed.
+* Server crash when advanced settings modified for DWC-PF5MTIR. Fixed.
 * Sometimes Server locked after effort to restart it. Fixed.
 * Windows Error Report about Server crash might appear right after update because of improper Server restart. Fixed.
 * Server froze after "maximum archive days" option value had been decreased for any camera. Fixed.
 * Server memory leak on email notifications. Fixed.
-* If storage drive was mounted via Client first, then removed and mounted via fstab as local, it might become inaccessible. Fixed.
+* Server crashed on attempt to export video of big size via API GET /hls/<physicalId>.<format>
+* If storage drive was mounted via Desktop Client first, then removed and mounted via fstab as local, it might become inaccessible. Fixed.
 * Sending emails would not work if SMTP server did not support support PLAIN. Fixed.
-* Locally based SMTP Server could not be used as Email Server for email notifications. Fixed.
+* Local (not Internet connected) SMTP Server could not be used as Email Server for email notifications. Fixed.
 * Email notifications for "Device Disconnected", "Network Issues" and "Generic Events" stopped functioning after the v2.5 update. Fixed.
 * Server could not connect to LDAP without an active Internet connection. Fixed.
-* If Client wasn't able to connect to Server directly, web page in camera Advanced Settings dialog couldn't be displayed. Fixed.
-* [NOT IN BETA]Archive playback may hang sometimes if video item was switched to fullscreen mode. Fixed.
-* Some local video couldn't be played in Client after the v2.5 update. Fixed.
+* If Desktop Client wasn't able to connect to Server directly, web page in camera Advanced Settings dialog couldn't be displayed. Fixed.
+* Part of archive may not be played in Client if archive was located on several Servers of the System at the same time. Fixed.
+* Some local video couldn't be played in Desktop Client after the v2.5 update. Fixed.
 * Motion alarm layout notifications (green frames) were improperly displayed. Fixed.
 * Client might crash when zoom window was dragged between items. Fixed.
-* Exporting to executable at NxWitness Chinese language Client failed with message about absent FFMPEG. Fixed.
-* Chinese input didn't work in Client on Ubuntu. Fixed.
-* Mobile Client didn't allow connection in login or password contained the specific symbols like '@', '#' etc. Fixed.
-* System names in "Saved Connections" in Mobile Client could change after connect to Server in case of specific network configuration. Fixed.
-* [NOT IN BETA]iOS Client may not to switch its orientation to portrait/landscape mode after switching between the applications. Fixed.
-* [NOT IN BETA]Sometimes Mobile Client refused to display video in 1080p. Fixed. 
+* Exporting to executable in Chinese language Desktop Client failed with message about absent FFMPEG. Fixed.
+* File exported as exe from 32 bit system couldn't be opened by double-clicking. Fixed.
+* Chinese input didn't work in Desktop Client on Ubuntu. Fixed.
+* Video Wall didn't start on Windows startup. Fixed.
+* Mobile App didn't allow connection in login or password contained the specific symbols like '@', '#' etc. Fixed.
+* Thumbnails were not loaded in Mobile Client for users with capital letters in login. Fixed.
+* System names in "Saved Connections" in Mobile App could change after connect to Server in case of specific network configuration. Fixed.
+* iOS App may not to switch its orientation to portrait/landscape mode after switching between the applications. Fixed.
 
 KNOWN ISSUES
-* There's sound at the live view but no sound in the archived recordings. Noticed at some Axis cameras fw 6.x. Planned to fix in 3.0
-* Spontaneous server crashes due to a lot of network issues at some cameras. Noticed at systems with Hikvision models installed: DS-2CD2112F-I, DS-2CD2312-I, DS-2CD2332-I, DS-2CD6412FWD-20, DS-2CD2632F-I, DS-2CD2732F-I, DS-2CD2532F-I. Planned to fix in 3.0
+* Sound issues with Axis devices running firmware v6.x (live video has audio, but archive does not). Planned to fix in 3.0
+* Rare server crashes caused by unstable RTSP streams from certain Hikvision devices. The issue has been identified in systems with the following Hikvision models: DS-2CD2112F-I, DS-2CD2312-I, DS-2CD2332-I, DS-2CD6412FWD-20, DS-2CD2632F-I, DS-2CD2732CD2312-I, DS-2CD2332-I, DS-2CD6412FWD-20, DS-2CD2632F-I, DS-2CD2732. Planned to fix in 3.0
 
 
 -----------------------------------------------2.5.0.xxxx-----------------------------------------
