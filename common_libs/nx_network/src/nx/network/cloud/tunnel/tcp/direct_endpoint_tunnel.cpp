@@ -87,9 +87,15 @@ void DirectTcpEndpointTunnel::startConnection(
     {
         auto tcpConnection = std::move(m_tcpConnection);
         m_tcpConnection = nullptr;
+        SystemError::ErrorCode sysErrorCodeToReport = SystemError::noError;
+        if (!connectionContextIter->socketAttributes.applyTo(tcpConnection.get()))
+        {
+            sysErrorCodeToReport = SystemError::getLastOSErrorCode();
+            tcpConnection.reset();
+        }
         reportConnectResult(
             connectionContextIter,
-            SystemError::noError,
+            sysErrorCodeToReport,
             std::move(tcpConnection),
             true);
         return;
