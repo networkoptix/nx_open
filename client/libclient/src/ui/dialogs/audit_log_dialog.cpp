@@ -111,14 +111,14 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     setupSessionsGrid();
     setupCamerasGrid();
     setupDetailsGrid();
+    reset();
 
     at_updateCheckboxes();
 
     connect(m_sessionModel, &QnAuditLogModel::colorsChanged,    this, &QnAuditLogDialog::at_updateCheckboxes);
     connect(ui->selectAllCheckBox, &QCheckBox::stateChanged,    this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
 
-    auto now = QDateTime::currentMSecsSinceEpoch();
-    ui->dateRangeWidget->setRange(now, now);
+
     connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
@@ -131,6 +131,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     connect(m_exportAction,     &QAction::triggered,            this, &QnAuditLogDialog::at_exportAction_triggered);
 
     connect(ui->refreshButton,  &QAbstractButton::clicked,      this, &QnAuditLogDialog::updateData);
+    connect(ui->clearFilterButton, &QPushButton::clicked, this,
+        &QnAuditLogDialog::reset);
 
     enum { kUpdateFilterDelayMs = 200 };
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
@@ -724,6 +726,15 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
 
     if (isMaximized())
         showNormal();
+}
+
+void QnAuditLogDialog::reset()
+{
+    disableUpdateData();
+    ui->filterLineEdit->clear();
+    auto now = QDateTime::currentMSecsSinceEpoch();
+    ui->dateRangeWidget->setRange(now, now);
+    enableUpdateData();
 }
 
 void QnAuditLogDialog::updateData()

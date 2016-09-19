@@ -90,6 +90,16 @@ void QnDateRangeWidget::setRange(qint64 startTimeMs, qint64 endTimeMs)
     emit rangeChanged(start, end);
 }
 
+QDate QnDateRangeWidget::startDate() const
+{
+    return ui->dateEditFrom->date();
+}
+
+QDate QnDateRangeWidget::endDate() const
+{
+    return ui->dateEditTo->date();
+}
+
 void QnDateRangeWidget::reset()
 {
     setRange(kDefaultStartDate.toMSecsSinceEpoch(), QDateTime::currentMSecsSinceEpoch());

@@ -38,6 +38,7 @@ protected:
     virtual void setVisible(bool value) override;
 
 private slots:
+    void reset();
     void updateData();
     void at_gotdata(int httpStatus, const QnAuditRecordList& data, int requestNum);
     void at_customContextMenuRequested(const QPoint& screenPos);

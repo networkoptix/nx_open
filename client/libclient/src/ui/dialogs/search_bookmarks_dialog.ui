@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1170</width>
-    <height>719</height>
+    <width>1200</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,9 +33,6 @@
         </property>
         <property name="text">
          <string>&lt; Any camera &gt;</string>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
         </property>
        </widget>
       </item>

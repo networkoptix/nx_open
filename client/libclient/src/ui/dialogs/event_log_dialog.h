@@ -19,11 +19,11 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public QnSessionAwareButtonBoxDialog
+class QnEventLogDialog: public QnSessionAwareDialog
 {
     Q_OBJECT
 
-    typedef QnSessionAwareButtonBoxDialog base_type;
+    typedef QnSessionAwareDialog base_type;
 
 public:
     explicit QnEventLogDialog(QWidget *parent);
@@ -31,7 +31,7 @@ public:
 
     void disableUpdateData();
     void enableUpdateData();
-    void setDateRange(const QDate& from, const QDate& to);
+    void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
     void setCameraList(const QnVirtualCameraResourceList &cameras);
     void setActionType(QnBusiness::ActionType value);
     void setEventType(QnBusiness::EventType value);
@@ -41,13 +41,13 @@ protected:
     virtual void retranslateUi() override;
 
 private slots:
+    void reset();
     void updateData();
     void at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum);
     void at_eventsGrid_clicked(const QModelIndex & index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
     void at_cameraButton_clicked();
     void at_filterAction_triggered();
-    void at_resetFilterAction_triggered();
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
@@ -55,7 +55,6 @@ private slots:
 private:
     QStandardItem* createEventTree(QStandardItem* rootItem, QnBusiness::EventType value);
 
-    void updateHeaderWidth();
     bool isFilterExist() const;
     void requestFinished();
     void updateActionList(bool instantOnly);

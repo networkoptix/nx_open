@@ -24,6 +24,9 @@ public:
     qint64 endTimeMs() const;
     void setRange(qint64 startTimeMs, qint64 endTimeMs);
 
+    QDate startDate() const;
+    QDate endDate() const;
+
     /** Change values to default dates: since 1/1/2000 to today's date. */
     void reset();
 

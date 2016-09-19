@@ -1237,8 +1237,8 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
         businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
-        QDate date = QDateTime::currentDateTime().date();
-        businessEventsLogDialog()->setDateRange(date, date);
+        auto now = QDateTime::currentMSecsSinceEpoch();
+        businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(cameras);
         businessEventsLogDialog()->enableUpdateData();
     }
