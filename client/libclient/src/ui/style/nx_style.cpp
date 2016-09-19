@@ -3122,6 +3122,16 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QGroupBox*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
+
+        /*
+        * Fix for Qt 5.6 bug: QDateTimeEdit doesn't calculate hovered subcontrol rect
+        *  which causes calendar dropdown button to not redraw properly
+        */
+        #if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
+        #error Check if this workaround is required in current Qt version
+        #endif
+        if (qobject_cast<QDateTimeEdit*>(widget))
+            widget->installEventFilter(this);
     }
 
     if (qobject_cast<QPushButton*>(widget) ||
@@ -3459,6 +3469,23 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+            default:
+                break;
+        }
+    }
+    /* Fix for Qt 5.6 bug: QDateTimeEdit doesn't calculate hovered subcontrol rect
+     * which causes calendar dropdown button to not redraw properly. We simply update
+     * entire control on each hover event, it's not optimal but will suffice for now: */
+    else if (auto dateTime = qobject_cast<QDateTimeEdit*>(object))
+    {
+        switch (event->type())
+        {
+            case QEvent::HoverEnter:
+            case QEvent::HoverMove:
+            case QEvent::HoverLeave:
+                dateTime->update();
+                break;
+
             default:
                 break;
         }
