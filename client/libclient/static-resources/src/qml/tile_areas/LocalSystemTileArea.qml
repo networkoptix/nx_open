@@ -116,7 +116,6 @@ Item
 
             onCurrentItemIndexChanged:
             {
-                expandedArea.passwordTextField.text = ""; // Force clear password field on user change
                 control.impl.updatePasswordData(currentItemIndex);
             }
 
@@ -146,12 +145,18 @@ Item
 
     property QtObject impl: QtObject
     {
-        readonly property bool hasRecentConnections: userChooseItem.value.length;
+        readonly property bool hasRecentConnections: (recentUserConnectionsModel && recentUserConnectionsModel.hasConnections);
 
         function updatePasswordData(currentItemIndex)
         {
             if (currentItemIndex !== userChooseItem.currentItemIndex)
                 return; // Do not update if it is not current item
+
+            if (currentItemIndex == -1) //< In case of non-existent user
+            {
+                expandedArea.savePasswordCheckbox.checked = false;  // Reset "Store password" checkbox
+                return;
+            }
 
             var hasStoredPasswordValue = (control.recentUserConnectionsModel
                 && control.recentUserConnectionsModel.getData("hasStoredPassword", currentItemIndex));
@@ -165,6 +170,20 @@ Item
         }
     }
 
+    onIsExpandedTileChanged:
+    {
+        if (isExpandedTile)
+            return;
 
+        if (userChooseItem.currentItemIndex == -1)
+        {
+            // Clears password if it is new user.
+            // Is "save password" is checked then connection will be stored anyway
+            expandedArea.passwordTextField.text = "";
+            expandedArea.savePasswordCheckbox.checked = false;
+        }
+
+        impl.updatePasswordData(userChooseItem.currentItemIndex);
+    }
     Component.onCompleted: { impl.updatePasswordData(0); }
 }
