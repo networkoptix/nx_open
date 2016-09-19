@@ -433,6 +433,7 @@ void CSndUList::remove_(const CUDT* u)
             break;
       }
 
+      m_pHeap[m_iLastEntry + 1] = 0;
       n->m_iHeapLoc = -1;
    }
 

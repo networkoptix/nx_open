@@ -78,14 +78,16 @@ void syncSocketServerMainFunc(
             nx::utils::promise<
                 std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
             > acceptedPromise;
+            ASSERT_TRUE(server->setNonBlockingMode(true));
             server->acceptAsync(
                 [&server, &acceptedPromise](
                     SystemError::ErrorCode errorCode,
                     AbstractStreamSocket* socket)
                 {
                     server->post(
-                        [&acceptedPromise, errorCode, socket]()
+                        [&server, &acceptedPromise, errorCode, socket]()
                         {
+                            ASSERT_TRUE(server->setNonBlockingMode(false));
                             acceptedPromise.set_value(
                                 std::make_pair(
                                     errorCode,
