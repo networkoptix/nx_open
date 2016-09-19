@@ -17,8 +17,10 @@ class QnTcpListenerPrivate
 public:
     nx::network::SocketGlobals::InitGuard socketGlobalsInitGuard;
     AbstractStreamServerSocket* serverSocket;
+    SocketAddress localEndpoint;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
+    mutable QnMutex mutex;
     QnMutex connectionMtx;
     std::atomic<int> newPort;
     QHostAddress serverAddress;
@@ -119,6 +121,11 @@ bool QnTcpListener::bindToLocalAddress()
             << d->serverAddress << ":" << d->localPort << ". "
             << "Reason: " << SystemError::toString(prevErrorCode) << "(" << prevErrorCode << ")";
         return false;
+    }
+
+    {
+        QnMutexLocker lk(&d->mutex);
+        d->localEndpoint = d->serverSocket->getLocalAddress();
     }
 
     NX_LOG(lit("Server started at %1").arg(localAddress.toString()), cl_logINFO);
@@ -362,6 +369,13 @@ int QnTcpListener::getPort() const
 {
     Q_D(const QnTcpListener);
     return d->localPort;
+}
+
+SocketAddress QnTcpListener::getLocalEndpoint() const
+{
+    Q_D(const QnTcpListener);
+    QnMutexLocker lk(&d->mutex);
+    return d->localEndpoint;
 }
 
 void QnTcpListener::setDefaultPage(const QByteArray& path)

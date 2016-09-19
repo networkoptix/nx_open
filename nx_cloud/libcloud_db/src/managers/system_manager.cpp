@@ -606,8 +606,16 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     const data::SystemRegistrationDataWithAccount& newSystem,
     InsertNewSystemToDbResult* const result)
 {
-    nx::db::DBResult dbResult = 
-        insertNewSystemDataToDb(connection, newSystem, result);
+    nx::db::DBResult dbResult = nx::db::DBResult::ok;
+
+    dbResult = insertNewSystemDataToDb(connection, newSystem, result);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    dbResult = m_transactionLog->updateTimestampHiForSystem(
+        connection,
+        result->systemData.id.c_str(),
+        result->systemData.systemSequence);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
@@ -615,11 +623,6 @@ nx::db::DBResult SystemManager::insertSystemToDB(
         connection, result->systemData.id, newSystem, &result->ownerSharing);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
-
-    //dbResult = generatePersistentSystemSequence(
-    //    connection, result->systemData.id, &result->systemData.systemSequence);
-    //if (dbResult != nx::db::DBResult::ok)
-    //    return dbResult;
 
     return nx::db::DBResult::ok;
 }
@@ -719,30 +722,6 @@ nx::db::DBResult SystemManager::insertOwnerSharingToDb(
 
     return nx::db::DBResult::ok;
 }
-
-//nx::db::DBResult SystemManager::generatePersistentSystemSequence(
-//    QSqlDatabase* const connection,
-//    const std::string& systemId,
-//    std::uint64_t* const systemSequence)
-//{
-//    QSqlQuery generateNewSequenceQuery(*connection);
-//    generateNewSequenceQuery.prepare(
-//        R"sql(
-//        TODO
-//        )sql");
-//    if (!generateNewSequenceQuery.exec() ||
-//        !generateNewSequenceQuery.next())
-//    {
-//        NX_LOG(lm("Could not generate sequence for new system %1. %2")
-//            .arg(systemId).arg(generateNewSequenceQuery.lastError().text()),
-//            cl_logDEBUG1);
-//        return db::DBResult::ioError;
-//    }
-//
-//    *systemSequence = generateNewSequenceQuery.value(0).toULongLong();
-//
-//    return db::DBResult::ok;
-//}
 
 void SystemManager::systemAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,

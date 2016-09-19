@@ -73,6 +73,14 @@ public:
         nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(QSqlDatabase*, nx::db::DBResult)> onDbUpdateCompleted);
 
+    /**
+     * \note This call should be made only once when generating first transaction.
+     */
+    nx::db::DBResult updateTimestampHiForSystem(
+        QSqlDatabase* connection,
+        const nx::String& systemId,
+        std::uint64_t newValue);
+
     /** 
      * If transaction is not needed (it can be late or something), 
      *      \a db::DBResult::cancelled is returned.
@@ -193,7 +201,7 @@ private:
     struct UpdateHistoryData
     {
         ::ec2::QnTranStateKey updatedBy;
-        qint64 timestamp;
+        ::ec2::Timestamp timestamp;
 
         //UpdateHistoryData():
         //    timestamp(0)
@@ -217,8 +225,9 @@ private:
         /** map<peer, transport sequence> */
         std::map<::ec2::QnTranStateKey, int> lastTransportSeq;
         ::ec2::QnTranState transactionState;
+        std::uint64_t timestampSequence;
 
-        //VmsTransactionLogData(): persistentSequence(0) {}
+        VmsTransactionLogData(): timestampSequence(0) {}
     };
 
     struct DbTransactionContext
@@ -288,7 +297,7 @@ private:
     int generateNewTransactionSequence(
         QSqlDatabase* connection,
         const nx::String& systemId);
-    qint64 generateNewTransactionTimestamp(
+    ::ec2::Timestamp generateNewTransactionTimestamp(
         QSqlDatabase* connection,
         const nx::String& systemId);
     void onDbTransactionCompleted(

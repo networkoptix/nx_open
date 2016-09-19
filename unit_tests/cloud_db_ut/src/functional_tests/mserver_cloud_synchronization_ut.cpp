@@ -392,5 +392,52 @@ TEST_F(Ec2MserverCloudSynchronization2, reBindingSystemToCloud)
     }
 }
 
+TEST_F(Ec2MserverCloudSynchronization2, newTransactionTimestamp)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    api::AccountData testAccount;
+    std::string testAccountPassword;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->addActivatedAccount(&testAccount, &testAccountPassword));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+        waitForCloudAndVmsToSyncUsers();
+
+        ::ec2::ApiTransactionDataList transactionList;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            fetchCloudTransactionLogFromMediaserver(&transactionList));
+    
+        for (const auto& transaction: transactionList)
+        {
+            ASSERT_EQ(
+                registeredSystemData().systemSequence,
+                transaction.tran.persistentInfo.timestamp.sequence);
+        }
+
+        if (i == 0)
+        {
+            appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+
+            cdb()->restart();
+
+            api::SystemSharing sharing;
+            sharing.accountEmail = testAccount.email;
+            sharing.systemID = registeredSystemData().id;
+            sharing.accessRole = api::SystemAccessRole::cloudAdmin;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
+        }
+    }
+}
+
 } // namespace cdb
 } // namespace nx

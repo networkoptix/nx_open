@@ -230,10 +230,6 @@ private:
         const std::string& systemId,
         const data::SystemRegistrationDataWithAccount& newSystem,
         nx::cdb::data::SystemSharing* const ownerSharing);
-    //nx::db::DBResult generatePersistentSystemSequence(
-    //    QSqlDatabase* const connection,
-    //    const std::string& systemId,
-    //    std::uint64_t* const systemSequence);
     void systemAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         QSqlDatabase* /*dbConnection*/,

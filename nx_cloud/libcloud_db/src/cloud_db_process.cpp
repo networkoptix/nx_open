@@ -615,6 +615,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kChangeTransactionLogTimestampTypeToBigInt);
     dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
     dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
+    dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
     return dbStructureUpdater.updateStructSync();
 }
 

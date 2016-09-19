@@ -520,7 +520,7 @@ INSERT INTO cloud_db_transaction_sequence(max_sequence) VALUES(1000);
 
 /**
  * #CLOUD-545. Adding persistent system sequence for transaction timestamp
- * MySQL: "BIGINT PRIMARY KEY AUTO_INCREMENT"
+ * TODO: ak: MySQL: "BIGINT PRIMARY KEY AUTO_INCREMENT"
  */
 static const char kAddSystemSequence[] =
 R"sql(
@@ -590,6 +590,22 @@ CREATE UNIQUE INDEX idx_transaction_log_hash
     ON transaction_log(system_id, tran_hash);
 CREATE INDEX idx_transaction_log_time
     ON transaction_log(system_id, timestamp);
+
+)sql";
+
+/**
+ * #CLOUD-546. Making transaction timestamp 128-bit.
+ */
+static const char kMakeTransactionTimestamp128Bit[] =
+R"sql(
+
+ALTER TABLE transaction_log ADD COLUMN timestamp_hi BIGINT NOT NULL DEFAULT 0;
+
+CREATE TABLE transaction_source_settings (
+    system_id       VARCHAR(64) NOT NULL,
+    timestamp_hi    BIGINT NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
 
 )sql";
 
