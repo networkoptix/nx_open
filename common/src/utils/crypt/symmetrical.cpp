@@ -1,5 +1,7 @@
 #include <array>
 #include "symmetrical.h"
+#include <nx/utils/log/assert.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace utils {
@@ -34,10 +36,31 @@ void AES128_CBC_encrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length, const uint8_t* key, const uint8_t* iv);
 
 #endif // #if defined(CBC) && CBC
+
+QnMutex stateMutex;
+const size_t kKeySize = 16;
+
+using KeyType = std::array<uint8_t, kKeySize>;
+
+KeyType keyFromByteArray(const QByteArray& data)
+{
+    KeyType result;
+    for (int i = 0; i < result.size(); ++i)
+    {
+        if (i < data.size())
+            result[(size_t)i] = (uint8_t)data[i];
+        else if (i == data.size())
+            result[i] = (uint8_t)(0x1);
+        else
+            result[i] = result[i-1] + 1;
+    }
+    return result;
+}
 }
 
-QByteArray encodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>& key)
+QByteArray encodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
 {
+    QnMutexLocker lock(&detail::stateMutex);
     const QByteArray* pdata = &data;
     QByteArray dataCopy;
     int padSize = 16 - data.size() % 16;
@@ -48,7 +71,7 @@ QByteArray encodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>
         pdata = &dataCopy;
     }
     QByteArray result;
-    result.reserve(pdata->size());
+    result.resize(pdata->size());
     detail::AES128_CBC_encrypt_buffer(
         (uint8_t*)result.data(),
         (uint8_t*)pdata->data(),
@@ -58,10 +81,30 @@ QByteArray encodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>
     return result;
 }
 
-QByteArray decodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>& key)
+QByteArray decodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
 {
+    QnMutexLocker lock(&detail::stateMutex);
     if (data.size() % 16 != 0)
         return QByteArray();
+    QByteArray result;
+    result.resize(data.size());
+    detail::AES128_CBC_decrypt_buffer(
+        (uint8_t*)result.data(),
+        (uint8_t*)data.data(),
+        data.size(),
+        key.data(),
+        detail::iv);
+    return result.left(result.indexOf((char)0));
+}
+
+QByteArray encodeAES128CBC(const QByteArray& data, const QByteArray& key)
+{
+    return encodeAES128CBC(data, detail::keyFromByteArray(key));
+}
+
+QByteArray decodeAES128CBC(const QByteArray& data, const QByteArray& key)
+{
+    return decodeAES128CBC(data, detail::keyFromByteArray(key));
 }
 
 namespace detail {
@@ -97,10 +140,6 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 */
 
 
-
-/*****************************************************************************/
-/* Defines:                                                                  */
-/*****************************************************************************/
 // The number of columns comprising a state in AES. This is a constant in AES. Value=4
 #define Nb 4
 // The number of 32 bit words in a key.
@@ -110,9 +149,6 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 // The number of rounds in AES Cipher.
 #define Nr 10
 
-// jcallan@github points out that declaring Multiply as a function 
-// reduces code size considerably with the Keil ARM compiler.
-// See this link for more information: https://github.com/kokke/tiny-AES128-C/pull/3
 #ifndef MULTIPLY_AS_A_FUNCTION
   #define MULTIPLY_AS_A_FUNCTION 0
 #endif
