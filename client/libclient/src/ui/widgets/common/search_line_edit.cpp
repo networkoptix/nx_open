@@ -17,6 +17,8 @@
 #include <QtWidgets/QStyleOptionFrameV2>
 
 #include <ui/common/palette.h>
+#include <ui/style/skin.h>
+
 #include <utils/common/delayed.h>
 
 QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
@@ -43,6 +45,8 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     clearPalette.setBrush(QPalette::Base, QBrush(Qt::transparent));
     m_lineEdit->setPalette(clearPalette);
     m_lineEdit->setPlaceholderText(tr("Search"));
+    m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 
     connect(m_lineEdit, &QLineEdit::textChanged, this

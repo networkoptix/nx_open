@@ -380,8 +380,8 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 
     bool wasLoggedIn = !context()->user().isNull();
 
-    QScopedPointer<QnCustomFileDialog> dialog(
-        new QnSessionAwareDialog<QnCustomFileDialog> (
+    QScopedPointer<QnSessionAwareFileDialog> dialog(
+        new QnSessionAwareFileDialog (
         mainWindow(),
         tr("Save Screenshot As..."),
         suggestion,
@@ -524,7 +524,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
     if (!m_screenshotProgressDialog) {
-        m_screenshotProgressDialog = new QnSessionAwareDialog<QnProgressDialog>(mainWindow());
+        m_screenshotProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindow());
         m_screenshotProgressDialog->setWindowTitle(tr("Saving Screenshot..."));
         m_screenshotProgressDialog->setInfiniteProgress();
         // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality

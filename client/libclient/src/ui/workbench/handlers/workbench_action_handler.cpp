@@ -1471,7 +1471,7 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
 
     QScopedPointer<QnMediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnSessionAwareDialog<QnMediaFileSettingsDialog>(mainWindow()));
+        dialog.reset(new QnSessionAware<QnMediaFileSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
 

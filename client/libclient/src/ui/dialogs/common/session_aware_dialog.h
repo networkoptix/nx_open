@@ -8,6 +8,7 @@
 #include <utils/common/forward.h>
 
 #include <ui/dialogs/common/button_box_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
 
 #include <ui/workbench/workbench_state_manager.h>
@@ -16,11 +17,11 @@
 #define ID(x) x
 
 template<class Base>
-class QnSessionAwareDialog: public Base, public QnSessionAwareDelegate
+class QnSessionAware: public Base, public QnSessionAwareDelegate
 {
     typedef Base base_type;
 public:
-    QN_FORWARD_CONSTRUCTOR(QnSessionAwareDialog, Base, ID(COMMA QnSessionAwareDelegate(this->parent()) {}))
+    QN_FORWARD_CONSTRUCTOR(QnSessionAware, Base, ID(COMMA QnSessionAwareDelegate(this->parent()) {}))
 
     virtual bool tryClose(bool force) override
     {
@@ -44,7 +45,9 @@ protected:
 #undef ID
 #undef COMMA
 
-using QnSessionAwareMessageBox = QnSessionAwareDialog<QnMessageBox>;
+using QnSessionAwareMessageBox = QnSessionAware<QnMessageBox>;
+using QnSessionAwareDialog = QnSessionAware<QnDialog>;
+using QnSessionAwareFileDialog = QnSessionAware<QnCustomFileDialog>;
 
 /**
  * Button box dialog that will be closed if we are disconnected from server.

@@ -114,7 +114,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
         return;
     }
 
-    m_mergeDialog = new QnSessionAwareDialog<QnMergeSystemsDialog>(mainWindow());
+    m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindow());
     m_mergeDialog->exec();
     delete m_mergeDialog;
 }
