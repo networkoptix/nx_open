@@ -187,7 +187,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             m_targetVersion = QnSoftwareVersion();
             m_localFileName = QString();
 
-            ui->versionTitleLabel->setText(tr("Latest Available Update"));
+            ui->selectUpdateTypeButton->setText(tr("Latest Available Update"));
             ui->targetVersionLabel->setText(m_latestVersion.isNull()
                 ? kNoVersionNumberText
                 : m_latestVersion.toString());
@@ -210,7 +210,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             m_localFileName = QString();
 
             ui->targetVersionLabel->setText(m_targetVersion.toString());
-            ui->versionTitleLabel->setText(tr("Selected Version"));
+            ui->selectUpdateTypeButton->setText(tr("Selected Version"));
 
             ui->downloadButton->setText(tr("Download Update File"));
             ui->downloadButton->hide();
@@ -231,27 +231,13 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             ui->targetVersionLabel->setText(kNoVersionNumberText);
-            ui->versionTitleLabel->setText(tr("Selected Update File"));
+            ui->selectUpdateTypeButton->setText(tr("Selected Update File"));
             ui->downloadButton->hide();
 
             checkForUpdates(false);
         });
 
-    ui->selectUpdateTypeButton->setIcon(qnSkin->icon("buttons/expand.png"));
-    QIcon collapseIcon(qnSkin->icon("buttons/collapse.png"));
-
-    connect(ui->selectUpdateTypeButton, &QPushButton::clicked, this,
-        [this, collapseIcon, selectUpdateTypeMenu]()
-        {
-            QnScopedTypedPropertyRollback<QIcon, QPushButton> iconRollback(
-                ui->selectUpdateTypeButton,
-                &QPushButton::setIcon,
-                &QPushButton::icon,
-                collapseIcon);
-
-            selectUpdateTypeMenu->exec(ui->selectUpdateTypeButton->mapToGlobal(
-                ui->selectUpdateTypeButton->rect().bottomLeft() + QPoint(0, 1)));
-        });
+    ui->selectUpdateTypeButton->setMenu(selectUpdateTypeMenu);
 
     defaultAction->trigger();
 }

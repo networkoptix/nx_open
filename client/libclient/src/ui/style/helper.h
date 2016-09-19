@@ -40,6 +40,8 @@ namespace style
         static const qreal kGroupBoxCornerRadius;       /**< Group box corner rounding radius */
         static const int kDefaultIconSize;              /**< Default size of UI icon */
         static const int kToolTipHeight;                /**< Height of a single line tooltip */
+        static const int kMenuButtonIndicatorMargin;    /**< Margin between menu button text and dropdown indicator */
+        static const int kTextButtonIconMargin;         /**< Margin between text button icon and text */
     };
 
     class Hints
