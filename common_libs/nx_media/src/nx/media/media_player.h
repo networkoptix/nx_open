@@ -127,6 +127,10 @@ public:
     void setSource(const QUrl &source);
 
     QAbstractVideoSurface *videoSurface(int channel = 0) const;
+
+    /**
+     * Set video source to render specified video channel number
+     */
     void setVideoSurface(QAbstractVideoSurface *videoSurface, int channel = 0);
 
     qint64 position() const;

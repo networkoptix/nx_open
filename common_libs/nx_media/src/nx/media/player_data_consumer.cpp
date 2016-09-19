@@ -239,6 +239,11 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
 
+    /**
+     * m_hurryUpToFrame hold frame number from which player should display data without delay.
+     * Additionally, for panoramic cameras frames should be processed without delay unless
+     * it got at least 1 frame for each channel
+     */
     if ((metadata.videoChannel != m_hurryUpToFrame.videoChannel &&
         m_awaitingFramesMask.hasChannel(m_hurryUpToFrame.videoChannel)) ||
         metadata.frameNum < m_hurryUpToFrame.frameNumber)
