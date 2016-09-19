@@ -2,7 +2,8 @@
 #rvm install ruby-2.3.0
 rvm use 2.3.0 --default
 
-export PATH=$PATH:~/.rvm/bin:~/.rvm/rubies/ruby-2.3.0/bin:~/.rvm/gems/ruby-2.3.0/bin
+export PATH=$PATH:~/.rvm/bin:~/.rvm/rubies/ruby-2.3.0/bin:~/.rvm/gems/ruby-2.3.0/bin:$PWD/node_modules/.bin
+
 #sleep 2
 #echo $PATH
 #sleep 2
