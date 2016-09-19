@@ -10,6 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <cdb/result_code.h>
+#include <utils/common/id.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include <transaction/transaction.h>
@@ -28,9 +29,6 @@ namespace cdb {
 namespace ec2 {
 
 class OutgoingTransactionDispatcher;
-
-// TODO: #ak this constant should be stored in DB and generated 
-static const QnUuid kDbInstanceGuid("{dfd33cce-92e5-48e4-ab7e-d4f164b2a94e}");
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
@@ -131,7 +129,7 @@ public:
         transaction.command = static_cast<::ec2::ApiCommand::Value>(TransactionCommandValue);
         transaction.peerID = m_peerId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
-        transaction.persistentInfo.dbID = kDbInstanceGuid;
+        transaction.persistentInfo.dbID = guidFromArbitraryData(systemId);
         transaction.persistentInfo.sequence = tranSequence;
         transaction.persistentInfo.timestamp =
             generateNewTransactionTimestamp(connection, systemId);

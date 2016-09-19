@@ -462,7 +462,7 @@ int TransactionLog::generateNewTransactionSequence(
     //QnMutexLocker lk(&m_mutex);
     //int& currentSequence =
     //    m_systemIdToTransactionLog[systemId].transactionState.
-    //        values[::ec2::QnTranStateKey(m_peerId, kDbInstanceGuid)];
+    //        values[::ec2::QnTranStateKey(m_peerId, systemId)];
     //++currentSequence;
     //return currentSequence;
 }
