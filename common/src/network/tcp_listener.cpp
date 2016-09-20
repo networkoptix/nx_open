@@ -26,6 +26,7 @@ public:
     bool useSSL;
     int maxConnections;
     bool ddosWarned;
+    SystemError::ErrorCode lastError;
 
     static QByteArray defaultPage;
     static QString pathIgnorePrefix;
@@ -36,7 +37,8 @@ public:
         localPort(0),
         useSSL(false),
         maxConnections(0),
-        ddosWarned(false)
+        ddosWarned(false),
+        lastError(SystemError::noError)
     {
     }
 };
@@ -80,8 +82,7 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
 QnTcpListener::QnTcpListener(
     const QHostAddress& address, int port, int maxConnections, bool useSSL)
     :
-    d_ptr(new QnTcpListenerPrivate()),
-    m_lastError(SystemError::noError)
+    d_ptr(new QnTcpListenerPrivate())
 {
     Q_D(QnTcpListener);
     d->serverAddress = address;
@@ -113,7 +114,7 @@ bool QnTcpListener::bindToLocalAddress()
         || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
         const auto errorMessage = lm("Can't bind and listen on %1, %2")
-            .strs(localAddress, SystemError::toString(m_lastError));
+            .strs(localAddress, SystemError::toString(d->lastError));
 
         NX_LOGX(errorMessage, cl_logWARNING);
         qCritical() << errorMessage;
@@ -133,12 +134,14 @@ AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
     bool sslNeeded,
     const SocketAddress& localAddress)
 {
+    Q_D(QnTcpListener);
+
     auto serverSocket = SocketFactory::createStreamServerSocket(sslNeeded);
     if (!serverSocket->setReuseAddrFlag(true) ||
         !serverSocket->bind(localAddress) ||
         !serverSocket->listen())
     {
-        m_lastError = SystemError::getLastOSErrorCode();
+        d->lastError = SystemError::getLastOSErrorCode();
         return nullptr;
     }
 
