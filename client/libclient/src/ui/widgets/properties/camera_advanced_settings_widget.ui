@@ -91,6 +91,20 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="unavailablePage">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="unavailableLabel">
+         <property name="text">
+          <string>Advanced settings are unavailable</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

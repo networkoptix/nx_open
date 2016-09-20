@@ -167,6 +167,7 @@ void QnWorkbenchNotificationsHandler::forcedUpdate()
     checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
     checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
     checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message)

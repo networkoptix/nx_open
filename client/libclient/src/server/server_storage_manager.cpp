@@ -23,10 +23,14 @@ namespace {
     /** Delay between requests when the backup is running. */
     const int updateBackupStatusDelayMs = 500;
 
-    void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo) {
+    void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo)
+    {
         storage->setFreeSpace(spaceInfo.freeSpace);
         storage->setTotalSpace(spaceInfo.totalSpace);
         storage->setWritable(spaceInfo.isWritable);
+        storage->setSpaceLimit(spaceInfo.reservedSpace);
+        storage->setStatus(spaceInfo.isOnline ? Qn::Online : Qn::Offline);
+
     }
 }
 

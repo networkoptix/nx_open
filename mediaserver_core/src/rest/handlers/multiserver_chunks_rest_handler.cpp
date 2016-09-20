@@ -79,6 +79,20 @@ void loadLocalData(MultiServerPeriodDataList& outputData, QnChunksRequestContext
                 outputData.push_back(std::move(record));
             });
     }
+
+    static std::atomic<int> staticRequestNum;
+
+    QString toString(const QnVirtualCameraResourceList& cameras)
+    {
+        QString result;
+        for (const auto& camera: cameras)
+        {
+            if (!result.isEmpty())
+                result += L',';
+            result += camera->getUniqueId();
+        }
+        return result;
+    }
 }
 
 } // namespace
@@ -92,12 +106,24 @@ QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(const QString& pa
 MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     const QnChunksRequestData& request, const QnRestConnectionProcessor* owner)
 {
+    int requestNum = ++staticRequestNum;
+    QElapsedTimer timer;
+    timer.restart();
+    qDebug() << "Start executing request QnMultiserverChunksRestHandler::loadDataSync #" << requestNum << ". cameras=" << toString(request.resList);
+    auto result = loadDataSync(request, owner, requestNum, timer);
+    qDebug() << "Finishing executing request QnMultiserverChunksRestHandler::loadDataSync #" << requestNum;
+    return result;
+}
+
+MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnChunksRequestData& request, const QnRestConnectionProcessor* owner, int requestNum, QElapsedTimer& timer)
+{
     const auto ownerPort = owner->owner()->getPort();
     QnChunksRequestContext ctx(request, ownerPort);
     MultiServerPeriodDataList outputData;
     if (request.isLocal)
     {
         loadLocalData(outputData, &ctx);
+        qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #" << requestNum << ". After loading local data timeout=" << timer.elapsed();
     }
     else
     {
@@ -108,9 +134,14 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
         for (const auto& server: onlineServers)
         {
             if (server->getId() == qnCommon->moduleGUID())
+            {
                 loadLocalData(outputData, &ctx);
-            else
+                qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #" << requestNum << ". After loading local data. timeout=" << timer.elapsed();
+            }
+            else {
                 loadRemoteDataAsync(outputData, server, &ctx);
+                qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #" << requestNum << ". After loading remote data from server" << server->getId() << ". timeout=" << timer.elapsed();
+            }
         }
 
         ctx.waitForDone();
@@ -122,17 +153,24 @@ int QnMultiserverChunksRestHandler::executeGet(
     const QString& /*path*/, const QnRequestParamList& params, QByteArray& result,
     QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
+    Q_UNUSED(path);
     MultiServerPeriodDataList outputData;
     QnRestResult restResult;
     QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+
+    int requestNum = ++staticRequestNum;
+    QElapsedTimer timer;
+    timer.restart();
+    qDebug() << "Start executing request QnMultiserverChunksRestHandler::executeGet #" << requestNum << ". cameras=" << toString(request.resList);
+
     if (!request.isValid())
     {
         restResult.setError(QnRestResult::InvalidParameter, "Invalid parameters");
-        QnFusionRestHandlerDetail::serializeRestReply(
-            outputData, params, result, contentType, restResult);
+        QnFusionRestHandlerDetail::serializeRestReply(outputData, params, result, contentType, restResult);
         return nx_http::StatusCode::ok;
     }
-    outputData = loadDataSync(request, owner);
+    outputData = loadDataSync(request, owner, requestNum, timer);
+    qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #" << requestNum << ". After loading data. timeout=" << timer.elapsed();
 
     if (request.flat)
     {
@@ -166,6 +204,8 @@ int QnMultiserverChunksRestHandler::executeGet(
                 outputData, params, result, contentType, restResult);
         }
     }
+
+    qDebug() << "Finish executing request QnMultiserverChunksRestHandler::executeGet #" << requestNum << ". timeout=" << timer.elapsed();
 
     return nx_http::StatusCode::ok;
 }

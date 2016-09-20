@@ -219,37 +219,27 @@ PasswordHelper::PasswordHelper()
 
 void PasswordHelper::setPasswordInfo(const char* manufacturer, const char* login, const char* passwd)
 {
-    QString manufacturerStr = QLatin1String(manufacturer);
-    ManufacturerPasswords::Iterator iter = manufacturerPasswords.find(manufacturerStr);
-    if (iter == manufacturerPasswords.end()) {
-        iter = manufacturerPasswords.insert(manufacturerStr, PasswordList());
-    }
-
-    iter.value().insert(QPair<const char*, const char*>(login, passwd));
+    QLatin1String manufacturerStr(manufacturer);
+    manufacturerPasswords[manufacturerStr].emplace_back(login, passwd);
 }
 
-void PasswordHelper::setPasswordInfo(const char* manufacturer)
+void PasswordHelper::setPasswordInfo(const char *manufacturer)
 {
-    QString manufacturerStr = QLatin1String(manufacturer);
-    ManufacturerPasswords::Iterator iter = manufacturerPasswords.find(manufacturerStr);
-    if (iter == manufacturerPasswords.end()) {
-        manufacturerPasswords.insert(manufacturerStr, PasswordList());
-    }
+    QLatin1String manufStr(manufacturer);
+    manufacturerPasswords[manufStr] =
+            std::list<std::pair<const char*, const char*>>();
 }
 
-const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
+const PasswordList PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
 {
 #ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer: " << manufacturer
         << ", normalized: " << manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString());
 #endif
-    ManufacturerPasswords::ConstIterator it = manufacturer.isEmpty()? manufacturerPasswords.end():
-        manufacturerPasswords.find(manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString()));
+    if (manufacturerPasswords.contains(manufacturer))
+        return manufacturerPasswords[manufacturer];
 
-    if (it == manufacturerPasswords.end())
-        it = manufacturerPasswords.find(QLatin1String(DEFAULT_MANUFACTURER));
-
-    return it.value();
+    return manufacturerPasswords[DEFAULT_MANUFACTURER];
 }
 
 void PasswordHelper::printPasswords() const

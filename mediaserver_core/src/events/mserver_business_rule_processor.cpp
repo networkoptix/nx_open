@@ -63,6 +63,10 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
+#include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <common/common_module.h>
+#include <rest/handlers/multiserver_thumbnail_rest_handler.h>
+#include <api/helpers/thumbnail_request_data.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -523,9 +527,27 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 
 QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize)
 {
-    const QnResourcePtr& cameraRes = qnResPool->getResourceById(id);
-    QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize, QnThumbnailRequestData::KeyFrameAfterMethod);
-    return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
+    QnVirtualCameraResourcePtr cameraRes = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    const QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (!cameraRes || !server)
+        return QByteArray();
+
+    QnThumbnailRequestData request;
+    request.camera = cameraRes;
+    request.msecSinceEpoch = timestampUsec / 1000;
+    request.size = dstSize;
+    request.imageFormat = QnThumbnailRequestData::JpgFormat;
+    request.roundMethod = QnThumbnailRequestData::PreciseMethod;
+
+    QnMultiserverThumbnailRestHandler handler;
+    QByteArray frame;
+    QByteArray contentType;
+    if (handler.getScreenshot(request, frame, contentType, server->getPort()) != nx_http::StatusCode::ok)
+        return QByteArray();
+    return frame;
+
+    //QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize, QnThumbnailRequestData::KeyFrameAfterMethod);
+    //return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }
 
 bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
@@ -687,21 +709,24 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
     contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
 
-    if (eventType == QnBusiness::CameraMotionEvent)
+    if (eventType == QnBusiness::CameraMotionEvent ||
+        eventType == QnBusiness::CameraInputEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
         qnCameraHistoryPool->updateCameraHistorySync(camRes);
+        if (camRes->hasVideo(nullptr))
+        {
+            QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
+            if (!screenshotData.isNull())
+            {
+                contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
+                contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
 
-        contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
-        contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
-
-        QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
-        if (!screenshotData.isNull()) {
-            QBuffer screenshotStream(&screenshotData);
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                QBuffer screenshotStream(&screenshotData);
+                attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+                contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+            }
         }
-
     }
     else if (eventType == QnBusiness::UserDefinedEvent)
     {

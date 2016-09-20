@@ -13,9 +13,8 @@ public:
     static const size_t kBufferSize = 1024*16;
 
 public:
-    SimpleEIPClient(QHostAddress addr);
+    SimpleEIPClient(QString addr);
     ~SimpleEIPClient();
-    bool connect();
     bool registerSession();
     bool unregisterSession();
     void setPort(const quint16 port);
@@ -29,7 +28,7 @@ public:
     MessageRouterResponse doServiceRequest(const MessageRouterRequest& request);
 
 private:
-    QHostAddress m_hostAddress;
+    QString m_hostAddress;
     quint16 m_port;
     QnMutex m_mutex;
     quint32 m_sessionHandle;
@@ -39,7 +38,15 @@ private:
 
 
 private:
-    void initSocket();
+    bool initSocket();
+    bool connectIfNeeded();
+
+    bool sendAll(TCPSocketPtr& socket, QByteArray& data);
+    bool receiveMessage(TCPSocketPtr& socket, char* const buffer);
+    void handleSocketError();
+
+    bool registerSessionUnsafe();
+
     MessageRouterRequest buildMessageRouterRequest(
         const quint8 serviceId,
         const quint8 classId,
@@ -54,7 +61,7 @@ private:
 
     MessageRouterResponse getServiceResponseData(const QByteArray& response) const;
 
-    eip_status_t tryGetResponse(const MessageRouterRequest& req, QByteArray& data);
+    bool tryGetResponse(const MessageRouterRequest& req, QByteArray& data, eip_status_t* outEipStatus=nullptr);
 
 };
 

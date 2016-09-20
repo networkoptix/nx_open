@@ -30,6 +30,7 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
+#include "compatibility.h"
 
 namespace ec2 {
 
@@ -1567,6 +1568,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
 {
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
 
+    connectionInfo->compatibilityItems = localCompatibilityItems();
     connectionInfo->version = qnCommon->engineVersion();
     connectionInfo->brand = localInfo.brand;
     connectionInfo->customization = localInfo.customization;
