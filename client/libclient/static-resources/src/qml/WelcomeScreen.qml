@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import NetworkOptix.Qml 1.0;
+import com.networkoptix.qml 1.0;
 
 import "."
 
@@ -12,6 +13,11 @@ Rectangle
     height: context.pageSize.height;
 
     color: Style.colors.window;
+    
+    QnAppInfo 
+    {
+        id: appInfo
+    }
 
     Item
     {
@@ -243,7 +249,7 @@ Rectangle
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no Internet access. Some cloud features could be unavailable.");
+            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(appInfo.cloudName());
         }
     }
 
