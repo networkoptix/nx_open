@@ -430,11 +430,17 @@ RTPSession::TransportType QnMulticodecRtpReader::getRtpTransport() const
     if (!m_resource)
         return result;
 
-    QString transportStr = m_rtpTransport;
-    if (transportStr.isEmpty())
-        transportStr = m_resource->getProperty(QnMediaResource::rtpTransportKey());
+    QString transportStr = m_resource
+        ->getProperty(QnMediaResource::rtpTransportKey())
+            .toUpper()
+            .trimmed();
+
+    if (transportStr.isEmpty() || transportStr == RtpTransport::_auto)
+        transportStr = m_rtpTransport;
+
     if (transportStr.isEmpty())
         transportStr = RtpTransport::defaultTransportToUse; // if not defined, try transport from registry
+
     transportStr = transportStr.toUpper().trimmed();
     if (transportStr == RtpTransport::udp)
         result = RTPSession::TRANSPORT_UDP;
