@@ -466,7 +466,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             break;
 
         case QnCheckForUpdateResult::IncompatibleCloudHost:
-            detail = tr("Incompatible cloud instance. To update disconnect system from the cloud first.");
+            detail = tr("Incompatible %1 instance. To update disconnect system from %1 first.").arg(QnAppInfo::cloudName());
             break;
 
         default:

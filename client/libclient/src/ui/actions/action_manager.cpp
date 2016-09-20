@@ -969,7 +969,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
-        text(tr("Login to Cloud..."));
+        text(tr("Login to %1...").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).

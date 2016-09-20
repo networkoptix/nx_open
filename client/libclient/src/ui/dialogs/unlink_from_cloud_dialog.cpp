@@ -274,7 +274,7 @@ bool QnUnlinkFromCloudDialogPrivate::validateAuth()
 
 QString QnUnlinkFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return tr("All cloud users and features will be disabled.");
+    return tr("All %1 users and features will be disabled.").arg(QnAppInfo::cloudName());
 }
 
 QString QnUnlinkFromCloudDialogPrivate::enterPasswordMessage() const
@@ -298,7 +298,7 @@ void QnUnlinkFromCloudDialogPrivate::setupResetPasswordPage()
 
     q->setText(tr("Reset admin password"));
     q->setInformativeText(
-        tr("You wont be able to connect to this system with your cloud account after you disconnect this system from %1.")
+        tr("You wont be able to connect to this system with your %1 account after you disconnect this system from %1.")
             .arg(QnAppInfo::cloudName())
         + L'\n'
         + tr("Enter new password for the local administrator.")

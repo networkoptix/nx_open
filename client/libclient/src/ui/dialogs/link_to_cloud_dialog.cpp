@@ -281,7 +281,7 @@ void QnLinkToCloudDialogPrivate::showFailure(const QString &message)
     QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             tr("Error"),
-                            tr("Could not link the system to the cloud"),
+                            tr("Could not link the system to %1").arg(QnAppInfo::cloudName()),
                             QDialogButtonBox::Ok,
                             q);
 

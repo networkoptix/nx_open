@@ -20,6 +20,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/utils/string.h>
+
+#include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
 namespace {
@@ -47,7 +49,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     ui->setupUi(this);
 
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
-    ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
+    ui->userTypeComboBox->insertItem(kCloudIndex, QnAppInfo::cloudName());
 
     ui->cloudIconLabel->setPixmap(qnSkin->pixmap("user_settings/cloud_user_icon.png"));
 

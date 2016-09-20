@@ -8,6 +8,9 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#include <utils/common/app_info.h>
+
 #include <nx/utils/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject>
@@ -279,7 +282,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
                     switch (user->userType())
                     {
                         case QnUserType::Local  : return tr("Local user");
-                        case QnUserType::Cloud  : return tr("Cloud user");
+                        case QnUserType::Cloud  : return tr("%1 user").arg(QnAppInfo::cloudName());
                         case QnUserType::Ldap   : return tr("LDAP user");
                         default                 : break;
                     }
