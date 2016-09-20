@@ -52,7 +52,6 @@ bool QnTransactionLog::clear()
     m_updateHistory.clear();
     m_commitData.clear();
 
-    // TODO: transaction timestamp. add sequence?
     m_lastTimestamp = Timestamp::fromInteger(qnSyncTime->currentMSecsSinceEpoch());
     m_baseTime = m_lastTimestamp;
     m_relativeTimer.restart();
@@ -128,7 +127,6 @@ bool QnTransactionLog::init()
         return false;
     }
 
-    // TODO: transaction timestamp. add sequence?
     m_lastTimestamp = Timestamp::fromInteger(qnSyncTime->currentMSecsSinceEpoch());
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.setForwardOnly(true);
