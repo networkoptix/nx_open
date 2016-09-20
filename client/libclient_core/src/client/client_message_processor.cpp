@@ -33,30 +33,8 @@ QnClientMessageProcessor::QnClientMessageProcessor()
 
     m_status(),
     m_connected(false),
-    m_holdConnection(false),
-    m_waitingForPeerReconnect(false)
+    m_holdConnection(false)
 {
-    /*
-     * On changing ec2 settings qnTransactionMessageBus reconnects all peers, therefore
-     * disconnecting us from server. After that 'Reconnect' dialog appears and reconnects us.
-     * This leads to unnecessary connectionClosed/connectionOpened sequence and closing
-     * all state-dependent dialogs and notifications.
-     * This workaround depends on fact that qnTransactionMessageBus works in own thread and
-     * connects to ec2ConnectionSettingsChanged via queued connection.
-     */
-    connect(qnGlobalSettings, &QnGlobalSettings::ec2ConnectionSettingsChanged, this, [this]()
-    {
-        //TODO: #gdm #3.0 improve dependency logic
-        if (!m_connected)
-            return;
-
-        if (m_waitingForPeerReconnect)
-            return;
-
-        m_waitingForPeerReconnect = true;
-    });
-
-
 }
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection)
@@ -181,8 +159,11 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
 {
     base_type::handleRemotePeerFound(data);
 
-    /* Avoiding double connectionOpened() if reconnecting while client was on breakpoint */
-    if (m_connected && !m_waitingForPeerReconnect)
+    /*
+     * Avoiding multiple connectionOpened() if client was on breakpoint or
+     * if ec connection settings were changed.
+     */
+    if (m_connected)
         return;
 
     if (qnCommon->remoteGUID().isNull())
@@ -197,11 +178,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     trace(lit("peer found, state -> Connected"));
     m_status.setState(QnConnectionState::Connected);
     m_connected = true;
-
-    if (m_waitingForPeerReconnect)
-        m_waitingForPeerReconnect = false;
-    else
-        emit connectionOpened();
+    emit connectionOpened();
 }
 
 void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data)
@@ -235,7 +212,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 
     m_connected = false;
 
-    if (!m_holdConnection && !m_waitingForPeerReconnect)
+    if (!m_holdConnection)
         emit connectionClosed();
 }
 

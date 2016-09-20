@@ -396,18 +396,15 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
         return;
     }
 
-    //TODO: #ak fix server behavior
-    /* When client tries to reconnect to a single server very fast we can
-    * get "unauthorized" reply, because we try to connect before the
-    * server have initialized its auth classes. Need to return
-    * temporaryUnauthorized error code in this case.
-    */
     switch (status)
     {
         case Qn::ConnectionResult::Unauthorized:
-//          m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
+            /* Looks like server team has not fixed VMS-3794 */
+            NX_ASSERT(false);
+            m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
             break;
         case Qn::ConnectionResult::IncompatibleInternal:
+        case Qn::ConnectionResult::IncompatibleCloudHost:
         case Qn::ConnectionResult::IncompatibleVersion:
         case Qn::ConnectionResult::IncompatibleProtocol:
             m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());

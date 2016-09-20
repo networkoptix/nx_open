@@ -50,10 +50,9 @@ protected:
     virtual QString toolTipAt(const QPointF &pos) const override;
     virtual bool showOwnTooltip(const QPointF &pos) override;
 
-private:
     void hideToolTip();
     void showToolTip();
-
+private:
     void updateToolTipVisibility();
     Q_SLOT void updateToolTipPosition();
     void updateToolTipOpacity();

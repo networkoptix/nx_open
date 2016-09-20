@@ -29,7 +29,8 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
 
     ui->buildNumberInputField->setTitle(tr("Build Number"));
-    ui->buildNumberInputField->setInputMask(lit("99990"));
+    ui->buildNumberInputField->setValidator(
+        Qn::defaultIntValidator(0, std::numeric_limits<int>::max(), tr("Invalid build number")));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setValidator(

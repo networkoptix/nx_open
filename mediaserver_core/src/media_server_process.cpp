@@ -1961,7 +1961,7 @@ void MediaServerProcess::run()
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
-    runtimeData.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
+    runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
@@ -2013,6 +2013,7 @@ void MediaServerProcess::run()
         switch (connectionResult)
         {
             case Qn::ConnectionResult::IncompatibleInternal:
+            case Qn::ConnectionResult::IncompatibleCloudHost:
             case Qn::ConnectionResult::IncompatibleVersion:
             case Qn::ConnectionResult::IncompatibleProtocol:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);

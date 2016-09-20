@@ -129,6 +129,7 @@ signals:
     void speedRangeChanged();
     void positionChanged();
     void bookmarksModeEnabledChanged();
+    void timelineRelevancyChanged(bool isRelevant);
 
 protected:
     enum SliderLine
@@ -280,6 +281,8 @@ private:
     qreal m_lastMaximalSpeed;
 
     bool m_lastAdjustTimelineToPosition;
+
+    bool m_timelineRelevant;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 

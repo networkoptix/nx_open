@@ -2,33 +2,38 @@
 
 #include <ui/workbench/panels/abstract_workbench_panel.h>
 
-class QnControlBackgroundWidget;
-class QnNotificationsCollectionWidget;
+class QnMaskedProxyWidget;
+class QnCalendarWidget;
 class QnImageButtonWidget;
-class QnBlinkingImageButtonWidget;
-class HoverFocusProcessor;
-class AnimatorGroup;
+class QnDayTimeWidget;
 class VariantAnimator;
+class AnimatorGroup;
+class HoverFocusProcessor;
 
 namespace NxUi {
 
-class NotificationsWorkbenchPanel: public AbstractWorkbenchPanel
+class CalendarWorkbenchPanel: public AbstractWorkbenchPanel
 {
     using base_type = AbstractWorkbenchPanel;
 
     Q_OBJECT
 public:
-    NotificationsWorkbenchPanel(
+    CalendarWorkbenchPanel(
         const QnPaneSettings& settings,
         QGraphicsWidget* parentWidget,
         QObject* parent = nullptr);
 
-    QnControlBackgroundWidget* backgroundItem;
-    QnNotificationsCollectionWidget* item;
-    QnImageButtonWidget* pinButton;
-    VariantAnimator* xAnimator;
+    QnMaskedProxyWidget* item;
 
+    /** Hover processor that is used to hide the panel when the mouse leaves it. */
+    HoverFocusProcessor* hidingProcessor;
 public:
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
+
+    QPointF origin() const;
+    void setOrigin(const QPointF& position);
+
     virtual bool isPinned() const override;
 
     virtual bool isOpened() const override;
@@ -44,24 +49,35 @@ public:
 
     virtual QRectF effectiveGeometry() const override;
 
+    void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+
+protected:
+    void setProxyUpdatesEnabled(bool updatesEnabled) override;
+
 private:
-    void setShowButtonUsed(bool used);
     void updateControlsGeometry();
 
 private:
-    void at_showingProcessor_hoverEntered();
+    void at_widget_dateClicked(const QDate &date);
 
 private:
     bool m_ignoreClickEvent;
     bool m_visible;
 
-    QnBlinkingImageButtonWidget* m_showButton;
+    QPointF m_origin;
 
-    /** Hover processor that is used to hide the panel when the mouse leaves it. */
-    HoverFocusProcessor* m_hidingProcessor;
+    QnCalendarWidget* m_widget;
+    QnImageButtonWidget* m_pinButton;
+    QnImageButtonWidget* m_dayTimeMinimizeButton;
+    VariantAnimator* m_yAnimator;
 
-    /** Hover processor that is used to show the panel when the mouse hovers over show button. */
-    HoverFocusProcessor* m_showingProcessor;
+    QPoint m_pinOffset;
+
+    bool m_dayTimeOpened;
+    QnMaskedProxyWidget* m_dayTimeItem;
+    QnDayTimeWidget* m_dayTimeWidget;
+
+    QPoint m_dayTimeOffset;
 
     /** Hover processor that is used to change panel opacity when mouse hovers over it. */
     HoverFocusProcessor* m_opacityProcessor;

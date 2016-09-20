@@ -297,7 +297,6 @@ private:
     qint64 m_posUtcMs;
 
     QVector<QColor> m_motionSensitivityColors;
-    const QColor m_backgroundColor;
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget;
 };

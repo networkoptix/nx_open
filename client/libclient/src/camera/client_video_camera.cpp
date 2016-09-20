@@ -123,9 +123,9 @@ QnMediaResourcePtr QnClientVideoCamera::resource() {
 qint64 QnClientVideoCamera::getCurrentTime() const
 {
     if (m_extTimeSrc && m_extTimeSrc->isEnabled())
-        return m_extTimeSrc->getCurrentTime();
+        return m_extTimeSrc->getDisplayedTime();
     else
-        return m_camdispay.getCurrentTime();
+        return m_camdispay.getDisplayedTime();
 }
 
 /*

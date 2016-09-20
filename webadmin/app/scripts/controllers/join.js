@@ -66,6 +66,7 @@ angular.module('webadminApp')
                     errorToShow = L.join.configError;
                     break;
                 case 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD':
+                case 'BOTH_SYSTEM_BOUND_TO_CLOUD':
                     errorToShow = L.join.cloudError;
                     break;
                 case 'DIFFERENT_CLOUD_HOST':

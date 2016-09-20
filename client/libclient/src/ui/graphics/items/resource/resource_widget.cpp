@@ -853,7 +853,7 @@ void QnResourceWidget::updateHud(bool animate)
 
     bool alwaysShowName = m_options.testFlag(AlwaysShowName);
 
-    const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName) 
+    const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName)
 		&& (!m_mouseInWidget || qnRuntime->isVideoWallMode());
     const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
     const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
@@ -1015,6 +1015,13 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter,
         return;
 
     m_framePainter.paint(*painter);
+}
+
+Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
+    const QRectF& /*channelRect*/, const QRectF& paintRect)
+{
+    painter->fillRect(paintRect, palette().color(QPalette::Window));
+    return Qn::NewFrameRendered;
 }
 
 void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)

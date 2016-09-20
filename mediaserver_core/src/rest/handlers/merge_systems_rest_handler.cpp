@@ -254,6 +254,7 @@ int QnMergeSystemsRestHandler::execute(
 
     auto connectionResult = QnConnectionValidator::validateConnection(remoteModuleInformation);
     if (connectionResult == Qn::ConnectionResult::IncompatibleInternal
+        || connectionResult == Qn::ConnectionResult::IncompatibleCloudHost
         || connectionResult == Qn::ConnectionResult::IncompatibleVersion)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. "
