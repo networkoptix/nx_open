@@ -7,8 +7,8 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <ui/dialogs/link_to_cloud_dialog.h>
-#include <ui/dialogs/unlink_from_cloud_dialog.h>
+#include <ui/dialogs/cloud/connect_to_cloud_dialog.h>
+#include <ui/dialogs/cloud/disconnect_from_cloud_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
@@ -71,7 +71,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     connect(ui->linkButton, &QPushButton::clicked, this,
         [this]()
         {
-            QScopedPointer<QnLinkToCloudDialog> dialog(new QnLinkToCloudDialog(this));
+            QScopedPointer<QnConnectToCloudDialog> dialog(new QnConnectToCloudDialog(this));
             dialog->exec();
         });
 
@@ -121,7 +121,7 @@ void QnCloudManagementWidget::unlinkFromCloud()
 
     //bool loggedAsCloud = context()->user()->isCloud();
 
-    QScopedPointer<QnUnlinkFromCloudDialog> messageBox(new QnUnlinkFromCloudDialog(this));
+    QScopedPointer<QnDisconnectFromCloudDialog> messageBox(new QnDisconnectFromCloudDialog(this));
     messageBox->exec();
 }
 
