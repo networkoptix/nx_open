@@ -5,14 +5,15 @@
 
 #include <ui/models/abstract_permissions_model.h>
 
-namespace
-{
-    const char* kPermissionProperty = "_qn_global_permission_property";
+namespace {
 
-    Qn::GlobalPermission permission(QCheckBox* checkbox)
-    {
-        return checkbox->property(kPermissionProperty).value<Qn::GlobalPermission>();
-    }
+const char* kPermissionProperty = "_qn_global_permission_property";
+
+Qn::GlobalPermission permission(QCheckBox* checkbox)
+{
+    return checkbox->property(kPermissionProperty).value<Qn::GlobalPermission>();
+}
+
 }
 
 QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissionsModel, QWidget* parent /*= 0*/):
@@ -23,30 +24,19 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     NX_ASSERT(m_permissionsModel);
     ui->setupUi(this);
 
-    auto createCheckBox = [this](Qn::GlobalPermission permission, const QString& text)
-    {
-        QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(text);
-        checkbox->setProperty(kPermissionProperty, qVariantFromValue(permission));
-        ui->permissionsLayout->addWidget(checkbox);
-        m_checkboxes << checkbox;
-
-        connect(checkbox, &QCheckBox::clicked, this, &QnPermissionsWidget::updateDependentPermissions);
-        connect(checkbox, &QCheckBox::clicked, this, &QnAbstractPreferencesWidget::hasChangesChanged);
-        return checkbox;
-    };
-
     /* Manager permissions. */
-    createCheckBox(Qn::GlobalEditCamerasPermission,         tr("Edit camera settings"));
-    createCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Control videowalls"));
-    createCheckBox(Qn::GlobalViewLogsPermission,            tr("View event log"));
+    addCheckBox(Qn::GlobalEditCamerasPermission,         tr("Edit camera settings"),
+        tr("This is also required to create/edit PTZ presets and tours."));
+    addCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Control video walls"));
+    addCheckBox(Qn::GlobalViewLogsPermission,            tr("View event log"));
 
     /* Viewer permissions. */
-    createCheckBox(Qn::GlobalViewArchivePermission,         tr("View archive"));
-    createCheckBox(Qn::GlobalExportPermission,              tr("Export archive"));
-    createCheckBox(Qn::GlobalViewBookmarksPermission,       tr("View bookmarks"));
-    createCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Modify bookmarks"));
-    createCheckBox(Qn::GlobalUserInputPermission,           tr("User Input"));
+    addCheckBox(Qn::GlobalViewArchivePermission,         tr("View archive"));
+    addCheckBox(Qn::GlobalExportPermission,              tr("Export archive"));
+    addCheckBox(Qn::GlobalViewBookmarksPermission,       tr("View bookmarks"));
+    addCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Modify bookmarks"));
+    addCheckBox(Qn::GlobalUserInputPermission,           tr("User Input"),
+        tr("PTZ, Device Output, 2-way Audio"));
 
     ui->permissionsLayout->addStretch();
 
@@ -116,4 +106,27 @@ void QnPermissionsWidget::updateDependentPermissions()
         }
 
     }
+}
+
+void QnPermissionsWidget::addCheckBox(Qn::GlobalPermission permission, const QString& text, const QString& description /*= QString()*/)
+{
+    QCheckBox* checkbox = new QCheckBox(this);
+    checkbox->setText(text);
+    checkbox->setProperty(kPermissionProperty, qVariantFromValue(permission));
+    m_checkboxes << checkbox;
+
+    if (description.isEmpty())
+    {
+        ui->permissionsLayout->addWidget(checkbox);
+    }
+    else
+    {
+        auto layout = new QHBoxLayout();
+        layout->addWidget(checkbox);
+        layout->addWidget(new QLabel(description, this), 0x1000);
+        ui->permissionsLayout->addLayout(layout);
+    }
+
+    connect(checkbox, &QCheckBox::clicked, this, &QnPermissionsWidget::updateDependentPermissions);
+    connect(checkbox, &QCheckBox::clicked, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
