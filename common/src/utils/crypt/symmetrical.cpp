@@ -1,4 +1,7 @@
 #include <array>
+#include <stdint.h>
+#include <string.h> // CBC mode, for memset
+
 #include "symmetrical.h"
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>

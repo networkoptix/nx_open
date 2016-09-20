@@ -1,8 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-#include <string.h> // CBC mode, for memset
-
 #include <QtCore>
 
 namespace nx {
