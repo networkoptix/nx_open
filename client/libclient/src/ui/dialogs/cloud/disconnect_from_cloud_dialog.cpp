@@ -298,7 +298,8 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
 
     q->setText(tr("Reset admin password"));
     q->setInformativeText(
-        tr("You wont be able to connect to this system with your %1 account after you disconnect this system from %1.")
+        tr("You wont be able to connect to this system with your %1 account after you disconnect this system from %1.",
+            "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
             .arg(QnAppInfo::cloudName())
         + L'\n'
         + tr("Enter new password for the local administrator.")
