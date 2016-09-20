@@ -45,6 +45,7 @@ private:
         UnableConnect
     };
 
-    static QString strings(ErrorStrings id);
-    static QString getErrorString(Qn::ConnectionResult result, const QnConnectionInfo& connectionInfo);
+    static QString getErrorString(ErrorStrings id);
+    static QString getErrorDescription(
+        Qn::ConnectionResult result, const QnConnectionInfo& connectionInfo);
 };

@@ -247,7 +247,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_ioCouldBeShown(false),
     m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
     m_posUtcMs(DATETIME_INVALID),
-    m_backgroundColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2)),
     m_twoWayAudioWidget(nullptr)
 {
     NX_ASSERT(m_resource, "Media resource widget was created with a non-media resource.");
@@ -1117,7 +1116,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     QnGlNativePainting::end(painter);
 
     if (result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
-        painter->fillRect(paintRect, m_backgroundColor);
+        base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
 
     return result;
 }

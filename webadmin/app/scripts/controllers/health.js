@@ -9,6 +9,8 @@ angular.module('webadminApp')
         $scope.interval = 1000;// 1 секунда
         $scope.serverIsOnline = true;
 
+        $scope.chartData = {};
+
         var colors =  {
             'StatisticsCPU':        ['#3776ca'],
             'StatisticsRAM':        ['#db3ba9'],

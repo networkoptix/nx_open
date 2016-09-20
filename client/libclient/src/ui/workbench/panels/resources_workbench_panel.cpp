@@ -239,6 +239,14 @@ bool ResourceTreeWorkbenchPanel::isHovered() const
     return m_opacityProcessor->isHovered();
 }
 
+QRectF ResourceTreeWorkbenchPanel::effectiveGeometry() const
+{
+    QRectF geometry = item->geometry();
+    if (xAnimator->isRunning())
+        geometry.moveLeft(xAnimator->targetValue().toReal());
+    return geometry;
+}
+
 void ResourceTreeWorkbenchPanel::updateResizerGeometry()
 {
     if (m_updateResizerGeometryLater)

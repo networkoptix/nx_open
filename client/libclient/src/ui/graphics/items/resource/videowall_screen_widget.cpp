@@ -72,8 +72,7 @@ Qn::RenderStatus QnVideowallScreenWidget::paintChannelBackground(QPainter *paint
         return Qn::NothingRendered;
 
     updateLayout();
-    painter->fillRect(paintRect, palette().color(QPalette::Window));
-    return Qn::NewFrameRendered;
+    return base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
 }
 
 int QnVideowallScreenWidget::calculateButtonsVisibility() const {

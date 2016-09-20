@@ -29,6 +29,9 @@ public:
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction);
 
+    bool tryClose(bool force);
+    void forcedUpdate();
+
 signals:
     void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
     void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params );

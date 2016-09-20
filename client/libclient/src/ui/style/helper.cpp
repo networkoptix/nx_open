@@ -62,8 +62,10 @@ namespace style
     const char* Properties::kSuppressHoverPropery = "_qn_suppressHover";
     const char* Properties::kSideIndentation = "_qn_sideIndentation";
     const char* Properties::kCheckBoxAsButton = "_qn_checkBoxAsButton";
-    const char* Properties::kButtonMarginProperty = "_qn_buttonMargin";
     const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
+
+    //TODO: #vkutin Refactor this property to something else in the future
+    const char* Properties::kButtonMarginProperty = "_qn_buttonMargin";
 
     qreal dpr(qreal value)
     {

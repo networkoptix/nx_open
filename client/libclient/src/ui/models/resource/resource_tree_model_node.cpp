@@ -362,7 +362,9 @@ void QnResourceTreeModelNode::updateRecursive()
 {
     update();
 
-    for (auto child: m_children)
+    /* Node may set bastard flag and therefore be removed from m_children */
+    auto nodesToUpdate = m_children;
+    for (auto child: nodesToUpdate)
         child->updateRecursive();
 }
 
