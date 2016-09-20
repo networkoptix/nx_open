@@ -26,7 +26,7 @@
 #include "ec2/data_conversion.h"
 #include "ec2/incoming_transaction_dispatcher.h"
 #include "ec2/transaction_log.h"
-#include "event_manager.h"
+#include "system_health_info_provider.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
 
@@ -38,7 +38,7 @@ SystemManager::SystemManager(
     const conf::Settings& settings,
     nx::utils::TimerManager* const timerManager,
     const AccountManager& accountManager,
-    const EventManager& eventManager,
+    const SystemHealthInfoProvider& systemHealthInfoProvider,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
     ec2::TransactionLog* const transactionLog,
     ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error)
@@ -46,7 +46,7 @@ SystemManager::SystemManager(
     m_settings(settings),
     m_timerManager(timerManager),
     m_accountManager(accountManager),
-    m_eventManager(eventManager),
+    m_systemHealthInfoProvider(systemHealthInfoProvider),
     m_dbManager(dbManager),
     m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
@@ -307,7 +307,7 @@ void SystemManager::getSystems(
     for (auto& systemDataEx : resultData.systems)
     {
         systemDataEx.stateOfHealth = 
-            m_eventManager.isSystemOnline(systemDataEx.id)
+            m_systemHealthInfoProvider.isSystemOnline(systemDataEx.id)
             ? api::SystemHealth::online
             : api::SystemHealth::offline;
     }
