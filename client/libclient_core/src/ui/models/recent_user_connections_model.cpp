@@ -2,8 +2,6 @@
 
 #include <client/client_recent_connections_manager.h>
 
-#include <client_core/client_core_settings.h>
-
 #include <nx/utils/raii_guard.h>
 #include <utils/math/math.h>
 

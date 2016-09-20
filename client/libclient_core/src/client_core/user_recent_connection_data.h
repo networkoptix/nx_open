@@ -16,7 +16,8 @@ struct QnUserRecentConnectionData
         const QUrl& url,
         bool isStoredPassword);
 
-    QString name;
+    QString name;           //< Alias of connection. Used for saved connections in dialogs.
+                            // Empty alias means that it was real (not saved) connection.
     QString systemName;
     QUrl url;
     bool isStoredPassword;

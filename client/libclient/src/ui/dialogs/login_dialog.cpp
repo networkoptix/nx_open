@@ -593,6 +593,8 @@ void QnLoginDialog::at_saveButton_clicked()
     }
 
     bool rejected = false;
+
+    // Filters out all systems with the same system name and user name
     const auto itNewEnd = std::remove_if(connections.begin(), connections.end(),
         [this, &rejected, systemName, userName = url.userName()]
     (const QnUserRecentConnectionData& connection)
@@ -653,6 +655,8 @@ void QnLoginDialog::at_deleteButton_clicked()
     }
 
     connections.removeAll(connection);
+
+    // Stores the fact of connection
     connection.isStoredPassword = false;
     connection.name = QString();
     connections.prepend(connection);
