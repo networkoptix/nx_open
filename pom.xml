@@ -1097,19 +1097,6 @@
             </properties>
         </profile>
         <profile>
-            <id>mobile-android-desktop</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>android-desktop</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
-                </file>
-            </activation>
-        </profile>
-        <profile>
             <id>mobile-ios</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
