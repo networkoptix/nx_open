@@ -15,6 +15,7 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
+#include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>
 
@@ -96,14 +97,24 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-                lit("%1:%2").arg(auth.user()).arg(auth.password()));
+    setProperty(
+        Qn::CAMERA_CREDENTIALS_PARAM_NAME, 
+        QString::fromLatin1( 
+            nx::utils::encodeAES128CBC( 
+                lit("%1:%2").arg(auth.user()) 
+                            .arg(auth.password()) 
+                            .toUtf8()).toHex()));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
-    setProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
-                lit("%1:%2").arg(auth.user()).arg(auth.password()));
+    setProperty(
+        Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
+        QString::fromLatin1( 
+            nx::utils::encodeAES128CBC( 
+                lit("%1:%2").arg(auth.user()) 
+                            .arg(auth.password()) 
+                            .toUtf8()).toHex()));
 }
 
 QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
@@ -127,6 +138,10 @@ QAuthenticator QnNetworkResource::getAuth() const
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    value = QString::fromUtf8(
+        nx::utils::decodeAES128CBC(
+            QByteArray::fromHex(value.toLatin1())));
 
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
