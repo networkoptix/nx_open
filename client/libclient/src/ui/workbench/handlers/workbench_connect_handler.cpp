@@ -260,6 +260,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             {
                 case QnConnectionState::Disconnected:
                 {
+                    welcomeScreen->resetConnectingToSystem();
                     welcomeScreen->setGlobalPreloaderVisible(false);
                     resourceModeAction->setChecked(false);  //< Shows welcome screen
                     break;
@@ -270,6 +271,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                     break;
                 case QnConnectionState::Connected:
                     // If connection is successful we show global preloader while loading resources
+                    welcomeScreen->resetConnectingToSystem();
                     welcomeScreen->setGlobalPreloaderVisible(true);
                     break;
                 case QnConnectionState::Ready:
@@ -584,8 +586,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     const auto settings = ConnectionSettings::create(
         parameters.argument(Qn::StorePasswordRole, false),
         parameters.argument(Qn::AutoLoginRole, false),
-        parameters.argument(Qn::ForceRemoveOldConnectionRole, false),
-        parameters.argument(Qn::CompletionWatcherRole, QnRaiiGuardPtr()));
+        parameters.argument(Qn::ForceRemoveOldConnectionRole, false));
 
     if (url.isValid())
     {
@@ -603,7 +604,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         if (autoLogin && url.isValid() && !url.password().isEmpty())
         {
             const auto connectionSettings = ConnectionSettings::create(
-                false, true, false, settings->completionWatcher);
+                false, true, false);
 
             trace(lit("state -> Connecting"));
             m_state.setState(QnConnectionState::Connecting);
@@ -642,14 +643,12 @@ QnWorkbenchConnectHandler::ConnectionSettingsPtr
 QnWorkbenchConnectHandler::ConnectionSettings::create(
     bool storePassword,
     bool autoLogin,
-    bool forceRemoveOldConnection,
-    const QnRaiiGuardPtr& completionWatcher)
+    bool forceRemoveOldConnection)
 {
     const ConnectionSettingsPtr result(new ConnectionSettings());
     result->storePassword = storePassword;
     result->autoLogin = autoLogin;
     result->forceRemoveOldConnection = forceRemoveOldConnection;
-    result->completionWatcher = completionWatcher;
     return result;
 }
 

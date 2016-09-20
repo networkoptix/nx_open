@@ -203,6 +203,11 @@ QString QnWorkbenchWelcomeScreen::connectingToSystem() const
     return m_connectingSystemName;
 }
 
+void QnWorkbenchWelcomeScreen::resetConnectingToSystem()
+{
+    setConnectingToSystem(QString());
+}
+
 void QnWorkbenchWelcomeScreen::setConnectingToSystem(const QString& value)
 {
     if (m_connectingSystemName == value)
@@ -289,9 +294,6 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
         {
             setConnectingToSystem(systemId);
 
-            const auto completionGuard = QnRaiiGuard::createDestructable(
-                [this]() { setConnectingToSystem(QString()); });
-
             QUrl url = serverUrl;
             if (!credentials.password.isEmpty())
                 url.setPassword(credentials.password);
@@ -303,7 +305,6 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             params.setArgument(Qn::StorePasswordRole, storePassword);
             params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
-            params.setArgument(Qn::CompletionWatcherRole, completionGuard);
 
             menu()->trigger(QnActions::ConnectAction, params);
         };

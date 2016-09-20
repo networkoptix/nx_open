@@ -63,6 +63,8 @@ public: // Properties
 
     QString connectingToSystem() const;
 
+    void resetConnectingToSystem();
+
     void setConnectingToSystem(const QString& value);
 
     bool globalPreloaderVisible() const;
