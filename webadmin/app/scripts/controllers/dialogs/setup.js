@@ -309,6 +309,8 @@ angular.module('webadminApp')
 
         function connectToAnotherSystem(){
             $log.log("Connect to another system");
+            $log.log($scope.settings.remoteSystem);
+
             var systemUrl = $scope.settings.remoteSystem.url || $scope.settings.remoteSystem;
             $scope.settings.remoteError = false;
             if(debugMode){
