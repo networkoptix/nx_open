@@ -218,8 +218,8 @@ public:
     void setMinDays(int value);
     int minDays() const;
 
-    void setPreferedServerId(const QnUuid& value);
-    QnUuid preferedServerId() const;
+    void setPreferredServerId(const QnUuid& value);
+    QnUuid preferredServerId() const;
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!

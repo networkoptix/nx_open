@@ -185,6 +185,16 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    void AsyncHttpClient::doGet(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        doHttpOperation<const QUrl&>(
+            std::move(completionHandler),
+            static_cast<void(AsyncHttpClient::*)(const QUrl&)>(&AsyncHttpClient::doGet),
+            url);
+    }
+
     void AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
@@ -205,6 +215,28 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    void AsyncHttpClient::doPost(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody,
+        bool includeContentLength,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(
+            const QUrl& /*url*/,
+            const nx_http::StringType& /*contentType*/,
+            nx_http::StringType /*messageBody*/,
+            bool /*includeContentLength*/);
+
+        doHttpOperation<const QUrl&, const nx_http::StringType&, nx_http::StringType, bool>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doPost),
+            url,
+            contentType,
+            std::move(messageBody),
+            includeContentLength);
+    }
+
     void AsyncHttpClient::doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
@@ -222,6 +254,25 @@ namespace nx_http
         initiateHttpMessageDelivery(url);
     }
 
+    void AsyncHttpClient::doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(
+            const QUrl& /*url*/,
+            const nx_http::StringType& /*contentType*/,
+            nx_http::StringType /*messageBody*/);
+
+        doHttpOperation<const QUrl&, const nx_http::StringType&, nx_http::StringType>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doPut),
+            url,
+            contentType,
+            std::move(messageBody));
+    }
+
     void AsyncHttpClient::doOptions(const QUrl& url)
     {
         NX_ASSERT(url.isValid());
@@ -231,6 +282,18 @@ namespace nx_http
         m_url.setPath(QLatin1String("*"));
         composeRequest(nx_http::Method::OPTIONS);
         initiateHttpMessageDelivery(url);
+    }
+
+    void AsyncHttpClient::doOptions(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(const QUrl& /*url*/);
+
+        doHttpOperation<const QUrl&>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doOptions),
+            url);
     }
 
     const nx_http::Request& AsyncHttpClient::request() const
@@ -392,7 +455,7 @@ namespace nx_http
         }
 
         NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
-            arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_lastSysErrorCode = errorCode;
         if (reconnectIfAppropriate())
             return;
@@ -423,7 +486,7 @@ namespace nx_http
         {
             if (reconnectIfAppropriate())
                 return;
-            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
             const auto requestSequenceBak = m_requestSequence;
@@ -458,7 +521,7 @@ namespace nx_http
         m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
         {
-            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
             m_state = sFailed;
             const auto requestSequenceBak = m_requestSequence;
             emit done(sharedThis);
@@ -500,7 +563,7 @@ namespace nx_http
             }
 
             NX_LOGX(lit("Error reading (state %1) http response from %2. %3")
-                .arg(stateBak).arg(m_url.toString()).arg(SystemError::toString(errorCode)),
+                .arg(stateBak).arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)),
                 cl_logDEBUG1);
             m_lastSysErrorCode = errorCode;
             const auto requestSequenceBak = m_requestSequence;
@@ -829,7 +892,7 @@ namespace nx_http
         if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead))
         {
             NX_LOGX(lit("Error parsing http response from %1. %2").
-                arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
+                arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
             m_state = sFailed;
             return -1;
         }
@@ -1086,6 +1149,36 @@ namespace nx_http
         nx_http::insertOrReplaceHeader(
             &request->headers,
             HttpHeader(Qn::REALM_HEADER_NAME, realmIter->second));
+    }
+
+    namespace {
+
+    struct SharedState
+    {
+        QMetaObject::Connection qtConnection;
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
+    };
+
+    } // namespace 
+
+    template<typename ... Args>
+    void AsyncHttpClient::doHttpOperation(
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler,
+        void(AsyncHttpClient::*func)(Args...),
+        Args... args)
+    {
+        auto sharedState = std::make_shared<SharedState>();
+        sharedState->completionHandler = std::move(completionHandler);
+        auto* qtConnectionPtr = &sharedState->qtConnection;
+        *qtConnectionPtr = QObject::connect(
+            this, &AsyncHttpClient::done,
+            [this, sharedState = std::move(sharedState)](
+                AsyncHttpClientPtr httpClient)
+            {
+                sharedState->completionHandler(httpClient);
+                disconnect(sharedState->qtConnection);
+            });
+        (this->*func)(args...);
     }
 
     const char* AsyncHttpClient::toString(State state)

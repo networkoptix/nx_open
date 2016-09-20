@@ -199,7 +199,8 @@ void AsyncClient::doUpnp( const QUrl& url, const Message& message,
         }
 
         NX_LOGX( lit( "Could not parse message from %1" )
-                 .arg( url.toString() ), cl_logERROR );
+                .arg( url.toString(QUrl::RemovePassword) ),
+            cl_logERROR );
 
         callback( Message() );
     };

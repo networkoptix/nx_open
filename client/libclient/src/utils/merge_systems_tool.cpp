@@ -88,7 +88,10 @@ void QnMergeSystemsTool::pingSystem(const QUrl& url, const QAuthenticator& userA
 
 int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth, bool ownSettings)
 {
-    NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2").arg(proxy->getApiUrl().toString()).arg(url.toString()), cl_logDEBUG1);
+    NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2")
+            .arg(proxy->getApiUrl().toString(QUrl::RemovePassword))
+            .arg(url.toString(QUrl::RemovePassword)),
+        cl_logDEBUG1);
 
     TwoStepRequestCtx ctx;
     ctx.proxy = proxy;

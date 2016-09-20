@@ -830,7 +830,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     const QnUuid serverId = server->getId();
     qnResourcesChangesManager->saveCameras(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera)
     {
-        camera->setPreferedServerId(serverId);
+        camera->setPreferredServerId(serverId);
     });
 
     qnResourcesChangesManager->saveCamerasCore(modifiedResources, [serverId](const QnVirtualCameraResourcePtr &camera)

@@ -18,13 +18,14 @@ namespace api {
 
 enum class NatTraversalResultCode
 {
-    ok,
+    ok = 0,
     noResponseFromMediator,
     mediatorReportedError,
     targetPeerHasNoUdpAddress,
     noSynFromTargetPeer,
     udtConnectFailed,
-    tcpConnectFailed
+    tcpConnectFailed,
+    endpointVerificationFailure
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(NatTraversalResultCode)

@@ -44,7 +44,7 @@ namespace ec2 {
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
-        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)(backupType)
+        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferredServerId)(backupType)
 
     struct ApiStorageDataStatistics
         : ApiStorageData

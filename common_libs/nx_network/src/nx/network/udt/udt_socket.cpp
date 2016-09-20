@@ -603,8 +603,11 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
         sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags & ~MSG_DONTWAIT);
 
+        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
         if (!setNonBlockingMode(value))
             return -1;
+        // Restoring system error code.
+        SystemError::setLastErrorCode(sysErrorCodeBak);
     }
     else
     {

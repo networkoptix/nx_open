@@ -132,7 +132,7 @@ namespace ec2
                 }
                 break;
             }
-            case ApiCommand::removeBusinessRule:
+            case ApiCommand::removeEventRule:
             {
                 eventType = Qn::AR_BEventRemove;
                 auto msgProc = QnCommonMessageProcessor::instance();

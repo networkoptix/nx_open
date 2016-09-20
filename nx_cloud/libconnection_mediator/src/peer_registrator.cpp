@@ -247,12 +247,20 @@ void PeerRegistrator::clientBind(
     stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
+    const auto reject = [&](api::ResultCode code)
+    {
+        NX_LOGX(lm("Reject client bind (requested from %1): %2")
+            .strs(connection->getSourceAddress(), code), cl_logDEBUG2);
+
+        completionHandler(code);
+    };
+
     // Only local peers are alowed while auth is not avaliable for clients
     if (!connection->getSourceAddress().address.isLocal())
-        completionHandler(api::ResultCode::notAuthorized);
+        return reject(api::ResultCode::notAuthorized);
 
     if (requestData.tcpReverseEndpoints.empty())
-        completionHandler(api::ResultCode::badRequest);
+        return reject(api::ResultCode::badRequest);
 
     nx::stun::Message indication;
     std::vector<ConnectionWeakRef> listeningPeerConnections;
@@ -270,8 +278,9 @@ void PeerRegistrator::clientBind(
         listeningPeerConnections = m_listeningPeerPool->getAllConnections();
     }
 
-    NX_LOGX(lm("Successfully bound client %1 with tcpReverseEndpoints=%2)")
-        .str(clientIt->originatingPeerID).container(clientIt->tcpReverseEndpoints), cl_logDEBUG2);
+    NX_LOGX(lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %2)")
+        .str(clientIt->originatingPeerID).container(clientIt->tcpReverseEndpoints)
+        .str(connection->getSourceAddress()), cl_logDEBUG2);
 
     connection->addOnConnectionCloseHandler(
         [this, clientIt]()

@@ -518,10 +518,6 @@ void CloudServerSocket::onConnectionRequested(
                     startAcceptor(std::move(acceptor));
                 }
             }
-
-            if (event.connectionMethods)
-                NX_LOGX(lm("Unsupported ConnectionMethods: %1")
-                    .arg(event.connectionMethods), cl_logWARNING);
         });
 }
 

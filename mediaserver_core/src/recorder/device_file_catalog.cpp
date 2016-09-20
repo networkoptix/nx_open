@@ -719,6 +719,17 @@ qint64 DeviceFileCatalog::lastChunkStartTime() const
     return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
 }
 
+qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
+{
+    QnMutexLocker lock( &m_mutex );
+    for (auto itr = m_chunks.rbegin(); itr != m_chunks.rend(); ++itr)
+    {
+        if (itr->storageIndex == storageIndex)
+            return itr->startTimeMs;
+    }
+    return 0;
+}
+
 DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration)
 {
     NX_ASSERT(durationMs < 1000 * 1000);

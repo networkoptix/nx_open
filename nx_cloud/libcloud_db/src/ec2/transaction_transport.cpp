@@ -42,7 +42,8 @@ TransactionTransport::TransactionTransport(
     m_systemId(systemId),
     m_connectionId(connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
-    m_haveToSendSyncDone(false)
+    m_haveToSendSyncDone(false),
+    m_closed(false)
 {
     using namespace std::placeholders;
 
@@ -239,8 +240,19 @@ void TransactionTransport::onGotTransaction(
     const QByteArray& data,
     ::ec2::QnTransactionTransportHeader transportHeader)
 {
+    NX_CRITICAL(isInSelfAioThread());
+
     if (!m_gotTransactionEventHandler)
         return;
+
+    if (m_closed)
+    {
+        NX_LOGX(
+            lm("systemId %1. Received transaction from %2 after connection closure")
+                .arg(m_systemId).str(m_commonTransportHeaderOfRemoteTransaction),
+            cl_logDEBUG2);
+        return;
+    }
 
     TransactionTransportHeader cdbTransportHeader;
     cdbTransportHeader.endpoint = m_connectionOriginatorEndpoint;
@@ -256,9 +268,12 @@ void TransactionTransport::onGotTransaction(
 void TransactionTransport::onStateChanged(
     ::ec2::QnTransactionTransportBase::State newState)
 {
+    NX_CRITICAL(isInSelfAioThread());
+
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
+        m_closed = true;
         if (m_connectionClosedEventHandler)
             m_connectionClosedEventHandler(SystemError::connectionReset);
     }

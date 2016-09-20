@@ -64,7 +64,9 @@ QnDirectModuleFinder::QnDirectModuleFinder(QObject* parent)
 }
 
 void QnDirectModuleFinder::addUrl(const QUrl &url) {
-    NX_LOG(lit("QnDirectModuleFinder::addUrl %1").arg(url.toString()), cl_logDEBUG2);
+    NX_LOG(lit("QnDirectModuleFinder::addUrl %1")
+            .arg(url.toString(QUrl::RemovePassword)),
+        cl_logDEBUG2);
 
     QUrl locUrl = trimmedUrl(url);
     if (!m_urls.contains(locUrl)) {
@@ -74,7 +76,9 @@ void QnDirectModuleFinder::addUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::removeUrl(const QUrl &url) {
-    NX_LOG(lit("QnDirectModuleFinder::removeUrl %1").arg(url.toString()), cl_logDEBUG2);
+    NX_LOG(lit("QnDirectModuleFinder::removeUrl %1")
+            .arg(url.toString(QUrl::RemovePassword)),
+        cl_logDEBUG2);
 
     QUrl locUrl = trimmedUrl(url);
     m_urls.remove(locUrl);
@@ -83,7 +87,9 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::checkUrl(const QUrl &url) {
-    NX_LOG(lit("QnDirectModuleFinder::checkUrl %1").arg(url.toString()), cl_logDEBUG2);
+    NX_LOG(lit("QnDirectModuleFinder::checkUrl %1")
+            .arg(url.toString(QUrl::RemovePassword)),
+        cl_logDEBUG2);
 
     if (QThread::currentThread() != thread()) {
         QMetaObject::invokeMethod(this, "checkUrl", Q_ARG(QUrl, url));
@@ -234,7 +240,9 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
     qint64 currentTime = m_elapsedTimer.elapsed();
 
     for (const QUrl &url: m_urls) {
-        NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1").arg(url.toString()), cl_logDEBUG2);
+        NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1")
+                .arg(url.toString(QUrl::RemovePassword)),
+            cl_logDEBUG2);
 
         const bool alive = currentTime - m_lastPingByUrl.value(url) < maxPingTimeout().count();
         const qint64 lastCheck = m_lastCheckByUrl.value(url);
@@ -242,14 +250,20 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
             if (currentTime - lastCheck < aliveCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (1) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(aliveCheckInterval().count()), cl_logDEBUG2);
+                        .arg(url.toString(QUrl::RemovePassword))
+                        .arg(currentTime - lastCheck)
+                        .arg(aliveCheckInterval().count()),
+                    cl_logDEBUG2);
                 continue;
             }
         } else {
             if (currentTime - lastCheck < discoveryCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (2) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(discoveryCheckInterval().count()), cl_logDEBUG2);
+                        .arg(url.toString(QUrl::RemovePassword))
+                        .arg(currentTime - lastCheck)
+                        .arg(discoveryCheckInterval().count()),
+                    cl_logDEBUG2);
                 continue;
             }
         }

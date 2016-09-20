@@ -24,7 +24,7 @@ public:
         aio::AbstractAioThread* aioThread,
         nx::String connectSessionId,
         SocketAddress targetEndpoint,
-        std::unique_ptr<TCPSocket> connection);
+        std::unique_ptr<AbstractStreamSocket> connection);
     virtual ~DirectTcpEndpointTunnel();
 
     virtual void stopWhileInAioThread() override;
@@ -41,12 +41,12 @@ private:
     {
         SocketAttributes socketAttributes;
         OnNewConnectionHandler handler;
-        std::unique_ptr<TCPSocket> tcpSocket;
+        std::unique_ptr<AbstractStreamSocket> tcpSocket;
     };
 
     const nx::String m_connectSessionId;
     const SocketAddress m_targetEndpoint;
-    std::unique_ptr<TCPSocket> m_tcpConnection;
+    std::unique_ptr<AbstractStreamSocket> m_tcpConnection;
     std::list<ConnectionContext> m_connections;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
     mutable QnMutex m_mutex;
@@ -61,7 +61,7 @@ private:
     void reportConnectResult(
         std::list<ConnectionContext>::iterator connectionContextIter,
         SystemError::ErrorCode sysErrorCode,
-        std::unique_ptr<TCPSocket> tcpSocket,
+        std::unique_ptr<AbstractStreamSocket> tcpSocket,
         bool stillValid);
 };
 

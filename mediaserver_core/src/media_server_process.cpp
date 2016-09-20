@@ -1596,7 +1596,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupControl", new QnBackupControlRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // deprecated
-    QnRestProcessorPool::instance()->registerHandler("api/businessEvents", new QnBusinessLog2RestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // new version
+    QnRestProcessorPool::instance()->registerHandler("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -2227,7 +2227,7 @@ void MediaServerProcess::run()
         const auto hwInfo = HardwareInformation::instance();
         server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
         server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-        server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
+        server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
 
         server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
         server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());

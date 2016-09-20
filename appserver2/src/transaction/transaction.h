@@ -748,7 +748,7 @@ APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \
+APPLY(800, getEventRules, ApiBusinessRuleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -759,7 +759,7 @@ APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(801, saveBusinessRule, ApiBusinessRuleData, \
+APPLY(801, saveEventRule, ApiBusinessRuleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -770,7 +770,7 @@ APPLY(801, saveBusinessRule, ApiBusinessRuleData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(802, removeBusinessRule, ApiIdData, \
+APPLY(802, removeEventRule, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -781,7 +781,7 @@ APPLY(802, removeBusinessRule, ApiIdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(803, resetBusinessRules, ApiResetBusinessRuleData, \
+APPLY(803, resetEventRules, ApiResetBusinessRuleData, \
                        true, \
                        false, \
                        [] (const ApiResetBusinessRuleData&) { return QnTransactionLog::makeHash("reset_brule", ADD_HASH_DATA); }, \
@@ -792,7 +792,7 @@ APPLY(803, resetBusinessRules, ApiResetBusinessRuleData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(804, broadcastBusinessAction, ApiBusinessActionData, \
+APPLY(804, broadcastAction, ApiBusinessActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -803,7 +803,7 @@ APPLY(804, broadcastBusinessAction, ApiBusinessActionData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(805, execBusinessAction, ApiBusinessActionData, \
+APPLY(805, execAction, ApiBusinessActionData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1149,7 +1149,7 @@ APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
                        LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(4001, getClientInfos, ApiClientInfoDataList, \
+APPLY(4001, getClientInfoList, ApiClientInfoDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \

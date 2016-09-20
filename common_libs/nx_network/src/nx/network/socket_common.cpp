@@ -37,14 +37,23 @@ bool HostAddress::isResolved() const
 
 bool HostAddress::isLocal() const
 {
-    const auto& string = toString();
+    if (const auto& ip = ipV4())
+    {
+        const auto addr = ntohl(ip->s_addr);
+        return (addr == 0x7F000001) // 127.0.0.1
+            || (addr >= 0x0A000000 && addr <= 0x0AFFFFFF) // 10.*.*.*
+            || (addr >= 0xAC100000 && addr <= 0xAC1FFFFF) // 172.16.*.* - 172.31.*.*
+            || (addr >= 0xC0A80000 && addr <= 0xC0A8FFFF); // 192.168.0.0
+    }
 
-    // TODO: add some more IPv4
-    return string == QLatin1String("127.0.0.1") // localhost
-        || string.startsWith(QLatin1String("10.")) // IPv4 private
-        || string.startsWith(QLatin1String("192.168")) // IPv4 private
-        || string.startsWith(QLatin1String("fd00::")) // IPv6 private
-        || string.startsWith(QLatin1String("fe80::")); // IPv6 link-local
+    if (const auto& ip = ipV6())
+    {
+        return (std::memcmp(&*ip, &in6addr_loopback, sizeof(*ip)) == 0) // ::1
+            || (ip->s6_addr[0] == 0xFD && ip->s6_addr[1] == 0x00) // FD00:*
+            || (ip->s6_addr[0] == 0xFE && ip->s6_addr[1] == 0x80); // FE00:*
+    }
+
+    return false; // not even IP address
 }
 
 bool HostAddress::operator==( const HostAddress& rhs ) const

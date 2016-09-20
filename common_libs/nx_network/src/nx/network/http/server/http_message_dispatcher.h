@@ -43,10 +43,10 @@ namespace nx_http
         bool registerRequestProcessor(
             const QString& path, const nx_http::StringType& method = kAnyMethod)
         {
-            return registerRequestProcessor(
-                path, method,
-                []()->std::unique_ptr<AbstractHttpRequestHandler>{
-                    return std::make_unique<RequestHandlerType>(); } ).second;
+            return registerRequestProcessor<RequestHandlerType>(
+                path,
+                []() {return std::make_unique<RequestHandlerType>();},
+                method);
         }
 
         template<typename RequestHandlerType>
