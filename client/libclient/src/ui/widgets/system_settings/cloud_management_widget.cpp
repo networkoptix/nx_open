@@ -47,7 +47,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     // TODO: #help Set help topic
 
     ui->unlinkButton->setText(tr("Disconnect System from %1").arg(QnAppInfo::cloudName()));
-    ui->goToCloudButton->setText(tr("Open %1 Portal").arg(QnAppInfo::cloudName()));
+    ui->goToCloudButton->setText(tr("Open %1 Portal", "Open Nx Cloud Portal").arg(QnAppInfo::cloudName()));
 
     ui->createAccountButton->setText(tr("Create %1 Account").arg(QnAppInfo::cloudName()));
     ui->linkButton->setText(tr("Connect System to %1").arg(QnAppInfo::cloudName()));

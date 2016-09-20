@@ -977,7 +977,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
-        text(tr("Open %1 Portal...").arg(QnAppInfo::cloudName()));
+        text(tr("Open %1 Portal...", "Open Nx Cloud Portal").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudManagementUrl).
         flags(Qn::NoTarget).
