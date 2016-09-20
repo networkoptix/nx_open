@@ -116,7 +116,6 @@
                                 <argument>-Ddonotrebuild=${donotrebuild}</argument>
                                 <argument>-Dnewmobile=${newmobile}</argument>
                                 <argument>-Dbuild.configuration=${build.configuration}</argument>
-                                <argument>-Dqt.debug=${qt.debug}</argument>
                             </arguments>
 			    <skip>buildenv.skip</skip>
                             <workingDirectory>${root.dir}/build_environment</workingDirectory>
