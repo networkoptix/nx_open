@@ -69,6 +69,9 @@ public:
     static boost::optional<in_addr> ipV4from(const QString& ip);
     static boost::optional<in6_addr> ipV6from(const QString& ip);
 
+    static boost::optional<in_addr> ipV4from(const in6_addr& addr);
+    static in6_addr ipV6from(const in_addr& addr);
+
 private:
     mutable boost::optional<QString> m_string;
     mutable boost::optional<in_addr> m_ipV4;
