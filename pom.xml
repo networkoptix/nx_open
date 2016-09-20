@@ -143,14 +143,8 @@
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
-        <!-- compile.option2. See profile angle  -->
-        <angle>false</angle>
 
         <root.dir>${basedir}</root.dir>
-        <compile.option1/>
-        <compile.option2/>
-        <compile.option3/>
-        <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
@@ -755,7 +749,6 @@
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <compile.option1/>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
             <build>
@@ -1029,21 +1022,6 @@
                 <skip.sign>false</skip.sign>
             </properties>
         </profile>
-        <profile>
-            <id>angle</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>angle</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <compile.option2>-angle</compile.option2>
-            </properties>
-        </profile>
 
         <!-- Mobile client profiles -->
         <profile>
@@ -1055,9 +1033,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <properties>
-                <compile.options/>
-            </properties>
             <modules>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
@@ -1119,7 +1094,6 @@
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
-                <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>
         </profile>
