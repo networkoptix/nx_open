@@ -8,7 +8,6 @@
 #include <utils/common/id.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-
 struct QnModuleInformation
 {
     QString type;
@@ -38,7 +37,14 @@ struct QnModuleInformation
     static QString nxMediaServerId();
     static QString nxECId();
     static QString nxClientId();
+
 };
+
+namespace helpers {
+
+    // Extracts system id from module information
+    QString getTargetSystemId(const QnModuleInformation& info);
+} // helpers namespace
 
 struct QnModuleInformationWithAddresses : QnModuleInformation
 {

@@ -17,7 +17,7 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
     : QObject(parent)
     , QnWorkbenchContextAware(parent)
 {
-    auto moduleFinder = QnModuleFinder::instance();
+    auto moduleFinder = qnModuleFinder;
     if (!moduleFinder)
         return;
 

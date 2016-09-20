@@ -8,7 +8,6 @@
 #include <QtGui/QStandardItemModel>
 
 #include <QtWidgets/QDesktopWidget>
-
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 #include <api/model/connection_info.h>
@@ -48,6 +47,9 @@
 
 #include <utils/common/app_info.h>
 #include <ui/style/custom_style.h>
+#include <nx/utils/raii_guard.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <rest/server/json_rest_result.h>
 
 namespace {
 
@@ -176,11 +178,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context):
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
 
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleAddressFound, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost, this, &QnLoginDialog::at_moduleFinder_moduleLost);
+    connect(qnModuleFinder, &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(qnModuleFinder, &QnModuleFinder::moduleAddressFound, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(qnModuleFinder, &QnModuleFinder::moduleLost, this, &QnLoginDialog::at_moduleFinder_moduleLost);
 
-    foreach(const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+    foreach(const QnModuleInformation &moduleInformation, qnModuleFinder->foundModules())
         at_moduleFinder_moduleChanged(moduleInformation);
 }
 
@@ -333,7 +335,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         url.setUserName(lit("admin"));
 
         recentConnections.append(QnUserRecentConnectionData(
-            lit("default"), QString(), url, false));
+            lit("default"), QString(), QString(), url, false));
     }
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
@@ -481,27 +483,39 @@ void QnLoginDialog::at_testButton_clicked()
         accept();
 }
 
-QString QnLoginDialog::gatherSystemName(const QUrl& url)
+QnUserRecentConnectionData QnLoginDialog::gatherSystemConnectionData(const QUrl& url,
+    const QString& name,
+    bool savePassword)
 {
+    QnUserRecentConnectionData result;
+    result.isStoredPassword = savePassword;
+    result.url = url;
+
     QEventLoop loop;
     QString systemName;
-    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(url, this,
-        [this, &loop, &systemName, url]
-    (int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
-    {
-        Q_UNUSED(errorCode);
-        systemName = connectionInfo.systemName;
-        if (m_requestHandle == handle)
-            m_requestHandle = -1;
 
-        loop.quit();
-    });
+    const auto callback =
+        [this, &loop, &result, url] (int handle,
+            ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+        {
+            Q_UNUSED(errorCode);
+            result.systemName = connectionInfo.systemName;
+            const auto serverModuleInformation = qnModuleFinder->moduleInformation(
+                QnUuid::fromStringSafe(connectionInfo.ecsGuid));
+            result.systemId = helpers::getTargetSystemId(serverModuleInformation);
+            if (m_requestHandle == handle)
+                m_requestHandle = -1;
+
+            loop.quit();
+        };
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+        url, this, callback);
 
     updateUsability();
     loop.exec();
     updateUsability();
 
-    return systemName;
+    return result;
 }
 
 
@@ -581,8 +595,9 @@ void QnLoginDialog::at_saveButton_clicked()
         }
     }
 
-    const auto systemName = gatherSystemName(url);
-    if (systemName.isEmpty())
+    auto connectionData = gatherSystemConnectionData(url, name, savePassword);
+
+    if (connectionData.systemName.isEmpty())
     {
         const auto button = QnMessageBox::warning(this, tr("Can't connect to the server"),
             tr("Can't connect to server with specified credentials. Do you want to save this connection?"),
@@ -596,17 +611,17 @@ void QnLoginDialog::at_saveButton_clicked()
 
     // Filters out all systems with the same system name and user name
     const auto itNewEnd = std::remove_if(connections.begin(), connections.end(),
-        [this, &rejected, systemName, userName = url.userName()]
+        [this, &rejected, connectionData, userName = url.userName()]
     (const QnUserRecentConnectionData& connection)
     {
-        if (rejected || (connection.systemName != systemName) || (connection.url.userName() != userName))
+        if (rejected || (connection.systemId != connectionData.systemId) || (connection.url.userName() != userName))
             return false;
 
         if (!connection.isStoredPassword)   // remove all recent connections, if any
             return true;
 
         static const auto kMessageTemplate = tr("A connection to the system \"%1\" with user \"%2\" already exists. Do you want to overwrite it?");
-        const auto message = kMessageTemplate.arg(systemName, userName);
+        const auto message = kMessageTemplate.arg(connectionData.systemName, userName);
         const QDialogButtonBox::StandardButton button =
             QnMessageBox::warning(this, tr("Connection already exists."), message,
                 QDialogButtonBox::Yes | QDialogButtonBox::Cancel, QDialogButtonBox::Yes);
@@ -619,7 +634,6 @@ void QnLoginDialog::at_saveButton_clicked()
         return;
 
     connections.erase(itNewEnd, connections.end());
-    QnUserRecentConnectionData connectionData(name, systemName, url, savePassword);
     if (!savePassword)
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
@@ -667,7 +681,7 @@ void QnLoginDialog::at_deleteButton_clicked()
 
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation)
 {
-    auto addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
+    auto addresses = qnModuleFinder->moduleAddresses(moduleInformation.id);
 
     if (addresses.isEmpty())
     {

@@ -7,13 +7,14 @@
 #include <nx/utils/string.h>
 #include <client_core/user_recent_connection_data.h>
 
-namespace 
+namespace
 {
     const auto kXorKey = lit("thereIsSomeKeyForXorOperation");
 
     const auto kUrlNameTag = lit("url");
     const auto kPasswordTag = lit("password");
     const auto kSystemNameTag = lit("systemName");
+    const auto kSystemIdTag = lit("systemId");
     const auto kStoredPasswordTag = lit("storedPassword");
     const auto kNameTag = lit("name");
 }
@@ -24,16 +25,19 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 QnUserRecentConnectionData::QnUserRecentConnectionData() :
     name(),
     systemName(),
+    systemId(),
     url(),
     isStoredPassword(false)
 {}
 
 QnUserRecentConnectionData::QnUserRecentConnectionData(const QString& name,
     const QString& systemName,
+    const QString& systemId,
     const QUrl& url,
-    bool isStoredPassword) : 
+    bool isStoredPassword) :
     name(name),
     systemName(systemName),
+    systemId(systemId),
     url(url),
     isStoredPassword(isStoredPassword)
 {}
@@ -45,6 +49,7 @@ void QnUserRecentConnectionData::writeToSettings(QSettings* settings
     settings->setValue(kUrlNameTag, data.url.toString());
     settings->setValue(kPasswordTag, encryptedPass);
     settings->setValue(kSystemNameTag, data.systemName);
+    settings->setValue(kSystemIdTag, data.systemId);
     settings->setValue(kStoredPasswordTag, data.isStoredPassword);
     settings->setValue(kNameTag, data.name);
 }
@@ -55,6 +60,7 @@ QnUserRecentConnectionData QnUserRecentConnectionData::fromSettings(QSettings *s
 
     data.url = QUrl(settings->value(kUrlNameTag).toString());
     data.systemName = settings->value(kSystemNameTag).toString();
+    data.systemId = settings->value(kSystemIdTag).toString();
     data.isStoredPassword = settings->value(kStoredPasswordTag).toBool();
     data.name = settings->value(kNameTag).toString();
 
@@ -108,7 +114,7 @@ QString QnUserRecentConnectionDataList::generateUniqueName(const QString &base) 
 
 bool QnUserRecentConnectionDataList::remove(const QString &name)
 {
-    const auto newEnd = std::remove_if(begin(), end(), 
+    const auto newEnd = std::remove_if(begin(), end(),
         [name](const QnUserRecentConnectionData &data)
     {
         return (data.name == name);

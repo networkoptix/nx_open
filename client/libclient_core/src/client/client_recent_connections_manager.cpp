@@ -82,7 +82,7 @@ void QnClientRecentConnectionsManager::updateModelsData()
     const auto lastConnectionsData = qnClientCoreSettings->recentUserConnections();
     for (const auto connectionDesc : lastConnectionsData)
     {
-        m_dataCache[connectionDesc.systemName].append(connectionDesc);
+        m_dataCache[connectionDesc.systemId].append(connectionDesc);
     }
     for (const auto model : m_models)
     {

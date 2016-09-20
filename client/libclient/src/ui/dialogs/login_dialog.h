@@ -76,7 +76,9 @@ private:
     QUrl currentUrl() const;
     QString currentName() const;
 
-    QString gatherSystemName(const QUrl& url);
+    QnUserRecentConnectionData gatherSystemConnectionData(const QUrl& url,
+        const QString& name,
+        bool savePassword);
 
     QStandardItem* newConnectionItem(const QnUserRecentConnectionData& connection);
 

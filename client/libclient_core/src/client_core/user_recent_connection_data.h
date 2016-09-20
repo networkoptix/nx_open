@@ -13,12 +13,17 @@ struct QnUserRecentConnectionData
 
     QnUserRecentConnectionData(const QString& name,
         const QString& systemName,
+        const QString& systemId,
         const QUrl& url,
         bool isStoredPassword);
 
     QString name;           //< Alias of connection. Used for saved connections in dialogs.
                             // Empty alias means that it was real (not saved) connection.
     QString systemName;
+    QString systemId;       //< Identifier of system. Could be:
+                            // a) id of server if it is new system
+                            // b) cloud id (if it is cloud system)
+                            // c) system name in case of local system
     QUrl url;
     bool isStoredPassword;
 
@@ -28,7 +33,7 @@ struct QnUserRecentConnectionData
     static QnUserRecentConnectionData fromSettings(QSettings* settings);
 };
 
-#define QnUserRecentConnectionData_Fields (systemName)(url)(isStoredPassword)
+#define QnUserRecentConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)
 QN_FUSION_DECLARE_FUNCTIONS(QnUserRecentConnectionData, (datastream)(metatype)(eq))
 
 

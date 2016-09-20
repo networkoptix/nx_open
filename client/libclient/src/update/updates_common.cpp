@@ -8,7 +8,7 @@ QSet<QnUuid> QnUpdateUtils::getServersLinkedToCloud(const QSet<QnUuid>& peers)
 {
     QSet<QnUuid> result;
 
-    const auto moduleFinder = QnModuleFinder::instance();
+    const auto moduleFinder = qnModuleFinder;
     if (!moduleFinder)
         return result;
 

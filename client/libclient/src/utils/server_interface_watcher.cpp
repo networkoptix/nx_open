@@ -10,8 +10,8 @@
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleAddressFound,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
-    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleAddressLost,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
+    connect(qnModuleFinder,     &QnModuleFinder::moduleAddressFound,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
+    connect(qnModuleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
     connect(qnResPool,  &QnResourcePool::statusChanged, this,   &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
     connect(qnResPool,  &QnResourcePool::resourceAdded, this,   &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
 }
@@ -56,8 +56,8 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
 void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr &server)
 {
     const auto serverId = server->getId();
-    const auto newAddress = QnModuleFinder::instance()->primaryAddress(serverId);
-    const bool sslAllowed = QnModuleFinder::instance()->moduleInformation(serverId).sslAllowed;
+    const auto newAddress = qnModuleFinder->primaryAddress(serverId);
+    const bool sslAllowed = qnModuleFinder->moduleInformation(serverId).sslAllowed;
 
     if (sslAllowed != server->isSslAllowed())
         server->setSslAllowed(sslAllowed);

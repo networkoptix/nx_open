@@ -80,7 +80,7 @@ namespace {
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 
-void storeSystemConnection(const QString &systemName, QUrl url,
+void storeSystemConnection(const QString& systemName, const QString& systemId, QUrl url,
     bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
 {
     auto recentConnections = qnClientCoreSettings->recentUserConnections();
@@ -93,13 +93,13 @@ void storeSystemConnection(const QString &systemName, QUrl url,
         url.setPassword(QString());
 
     const auto itFoundConnection = std::find_if(recentConnections.begin(), recentConnections.end(),
-        [systemName, userName = url.userName()](const QnUserRecentConnectionData& connection)
+        [systemId, userName = url.userName()](const QnUserRecentConnectionData& connection)
         {
-            return QString::compare(connection.systemName, systemName, Qt::CaseInsensitive) == 0
+            return (connection.systemId == systemId)
                 && QString::compare(connection.url.userName(), userName, Qt::CaseInsensitive) == 0;
         });
 
-    QnUserRecentConnectionData targetConnection(QString(), systemName, url, storePassword);
+    QnUserRecentConnectionData targetConnection(QString(), systemName, systemId, url, storePassword);
 
     if (itFoundConnection != recentConnections.end())
     {
@@ -470,8 +470,12 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (!storeSettings)
         return;
 
+    const auto serverModuleInfo =
+        qnModuleFinder->moduleInformation(QnUuid::fromStringSafe(info.ecsGuid));
+
     storeSystemConnection(
         info.systemName,
+        helpers::getTargetSystemId(serverModuleInfo),
         info.ecUrl,
         storeSettings->storePassword,
         storeSettings->autoLogin,

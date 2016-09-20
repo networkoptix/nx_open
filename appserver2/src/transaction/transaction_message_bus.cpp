@@ -1208,7 +1208,7 @@ QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModul
 {
     QnTransaction<ApiDiscoveredServerDataList> transaction(ApiCommand::discoveredServersList);
 
-    QnModuleFinder *moduleFinder = QnModuleFinder::instance();
+    QnModuleFinder *moduleFinder = qnModuleFinder;
     for (const QnModuleInformation &moduleInformation : moduleFinder->foundModules())
     {
         ApiDiscoveredServerData serverData(moduleInformation);
