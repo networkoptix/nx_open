@@ -282,7 +282,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
                     switch (user->userType())
                     {
                         case QnUserType::Local  : return tr("Local user");
-                        case QnUserType::Cloud  : return tr("%1 user").arg(QnAppInfo::cloudName());
+                        case QnUserType::Cloud  : return tr("Cloud user");
                         case QnUserType::Ldap   : return tr("LDAP user");
                         default                 : break;
                     }

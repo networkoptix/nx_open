@@ -49,7 +49,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     ui->setupUi(this);
 
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
-    ui->userTypeComboBox->insertItem(kCloudIndex, QnAppInfo::cloudName());
+    ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
 
     ui->cloudIconLabel->setPixmap(qnSkin->pixmap("user_settings/cloud_user_icon.png"));
 
