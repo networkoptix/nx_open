@@ -114,7 +114,7 @@ bool QnTcpListener::bindToLocalAddress()
         || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
         const auto errorMessage = lm("Can't bind and listen on %1, %2")
-            .strs(localAddress, SystemError::toString(d->lastError));
+            .strs(localAddress, SystemError::toString(lastError()));
 
         NX_LOGX(errorMessage, cl_logWARNING);
         qCritical() << errorMessage;
@@ -141,7 +141,7 @@ AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
         !serverSocket->bind(localAddress) ||
         !serverSocket->listen())
     {
-        d->lastError = SystemError::getLastOSErrorCode();
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
 
@@ -209,6 +209,18 @@ bool QnTcpListener::isSslEnabled() const
 {
     Q_D(const QnTcpListener);
     return d->useSSL;
+}
+
+SystemError::ErrorCode QnTcpListener::lastError() const
+{
+    Q_D(const QnTcpListener);
+    return d->lastError;
+}
+
+void QnTcpListener::setLastError(SystemError::ErrorCode error)
+{
+    Q_D(QnTcpListener);
+    d->lastError = error;
 }
 
 void QnTcpListener::pleaseStop()

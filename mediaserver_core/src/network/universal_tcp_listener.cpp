@@ -93,14 +93,14 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         !tcpServerSocket->bind(localAddress) ||
         !tcpServerSocket->listen())
     {
-        m_lastError = SystemError::getLastOSErrorCode();
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
     if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
     {
-        m_lastError = SystemError::getLastOSErrorCode();
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
 
@@ -111,7 +111,7 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
             !udtServerSocket->listen() ||
             !multipleServerSocket->addSocket(std::move(udtServerSocket)))
         {
-            m_lastError = SystemError::getLastOSErrorCode();
+            setLastError(SystemError::getLastOSErrorCode());
             return nullptr;
         }
     #endif
