@@ -28,14 +28,22 @@ namespace
 
 QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler( const QString& path )
 {
-    urlPath = path;
+    // todo: remove this variable
+    if (!path.isEmpty())
+        urlPath = path;
 }
 
 int QnMultiserverThumbnailRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor *processor )
 {
     Q_UNUSED(path);
-    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(params);
 
+    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(params);
+    const auto ownerPort = processor->owner()->getPort();
+    return getScreenshot(request, result, contentType, ownerPort);
+}
+
+int QnMultiserverThumbnailRestHandler::getScreenshot(const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort)
+{
     if (request.camera && !request.camera->hasVideo(nullptr))
     {
         return genericError(
@@ -62,7 +70,6 @@ int QnMultiserverThumbnailRestHandler::executeGet( const QString& path, const Qn
     if (!server || server->getId() == qnCommon->moduleGUID() || server->getStatus() != Qn::Online)
         return getThumbnailLocal(request, result, contentType);
 
-    const auto ownerPort = processor->owner()->getPort();
     return getThumbnailRemote(server, request, result, contentType, ownerPort);
 }
 
