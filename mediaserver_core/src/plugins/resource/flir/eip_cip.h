@@ -11,6 +11,8 @@ typedef quint16 eip_status_t;
 typedef quint8 cip_general_status_t;
 typedef quint32 eip_session_handle_t;
 
+const unsigned int kDefaultEipPort = 44818;
+
 struct EIPEncapsulationHeader
 {
     quint16 commandCode;
