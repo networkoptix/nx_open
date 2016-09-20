@@ -1733,7 +1733,16 @@ void QnNxStyle::drawControl(
         {
             if (auto header = qstyleoption_cast<const QStyleOptionHeader*>(option))
             {
-                if (header->state.testFlag(State_MouseOver))
+                bool hovered = header->state.testFlag(State_MouseOver);
+                if (auto headerWidget = qobject_cast<const QHeaderView*>(widget))
+                {
+                    /* In addition to Qt's requirement of sectionsClickable()
+                     * we demand isSortIndicatorShown() to be also true to enable hover: */
+                    if (!headerWidget->isSortIndicatorShown())
+                        hovered = false;
+                }
+
+                if (hovered)
                 {
                     QColor color = findColor(header->palette.midlight().color());
                     painter->fillRect(header->rect, color);
