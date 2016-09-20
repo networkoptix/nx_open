@@ -468,9 +468,6 @@
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
-            <properties>
-                <additional.compiler>${compiler}</additional.compiler>
-            </properties>
         </profile>
         <profile>
             <id>desktop</id>
@@ -512,7 +509,6 @@
                 <buildenv.script>get_buildenv_2.6.bat</buildenv.script>
                 <platform>windows</platform>
                 <box>none</box>
-                <compiler>msvc2015u1</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
@@ -641,7 +637,6 @@
                 <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>
                 <common.platform>unix</common.platform>
-                <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <unix>true</unix>
                 <windows>false</windows>
@@ -675,7 +670,6 @@
                 </os>
             </activation>
             <properties>
-                <additional.compiler>clang</additional.compiler>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -786,7 +780,6 @@
             </activation>
             <properties>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
-                <compiler>2011.09</compiler>
                 <qt.spec/>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
@@ -816,7 +809,6 @@
             </activation>
             <properties>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
@@ -846,7 +838,6 @@
             </activation>
             <properties>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
@@ -879,7 +870,6 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
@@ -919,7 +909,6 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
@@ -952,7 +941,6 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <modification>tx1</modification>
                 <rdep.target>tx1</rdep.target>
@@ -1120,9 +1108,6 @@
                     <missing>customization/${customization}/mobile.skip</missing>
                 </file>
             </activation>
-            <properties>
-                <additional.compiler>${compiler}</additional.compiler>
-            </properties>
         </profile>
         <profile>
             <id>mobile-ios</id>
@@ -1147,8 +1132,6 @@
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec/>
                 <libdir>${root.dir}/build_environment/target</libdir>
-                <compiler>clang</compiler>
-                <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
