@@ -637,9 +637,10 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
 
     connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource, false)) {
+    auto loader = m_cameraDataManager->loader(syncedResource));
+    Q_ASSERT(loader);
+    if (loader)
         loader->setEnabled(true);
-    }
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())

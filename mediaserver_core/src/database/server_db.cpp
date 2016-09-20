@@ -611,6 +611,9 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 {
     QnWriteLocker lock(&m_mutex);
 
+    if (action->isReceivedFromRemoteHost())
+        return false; //< server should save action before proxing localy
+
     if (!m_sdb.isOpen())
         return false;
 
