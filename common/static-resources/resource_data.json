@@ -1307,7 +1307,8 @@
                 "PelcoOptera|IMM12027",
                 "PelcoOptera|IMM12036"
             ],
-            "doNotConfigureCamera": false 
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true
         },
 		{
 			"keys": [

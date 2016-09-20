@@ -330,7 +330,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     if (status != CL_HTTP_SUCCESS)
     {
         return CameraDiagnostics::RequestFailedResult(
-            lit("/cgi-bin/encoder?VIDEO_REOLUTION_CAP"),
+            lit("/cgi-bin/encoder?VIDEO_RESOLUTION_CAP"),
             QString::fromUtf8(resolutions));
     }
 
@@ -374,9 +374,27 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     auto desiredTransport = resData.value<QString>(Qn::DESIRED_TRANSPORT_PARAM_NAME, RtpTransport::_auto);
     m_desiredTransport = RtpTransport::fromString(desiredTransport);
 
+    auto dualStreamingCapability = false;
+
+    if (report.contains("streaming mode cap"))
+    {
+        auto streamingModeCapabilities = report.value("streaming mode cap")
+            .toLower()
+            .split(',');
+
+        for (const auto& cap: streamingModeCapabilities)
+        {
+            if (cap.trimmed() == lit("dual"))
+            {
+                dualStreamingCapability = true;
+                break;
+            }
+        }
+    }
+
     bool dualStreaming = report.value("channels").toInt() > 1 ||
         !report.value("video2_resolution_cap").isEmpty() ||
-        report.value("streaming_mode_cap").toLower() == lit("dual");
+        dualStreamingCapability;
 
     QList<QSize> availResolutions = parseResolutionStr(resolutions);
     if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
@@ -390,7 +408,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     if (dualStreaming)
     {
         if (report.contains("streaming mode")
-            && report.value("streaming mode") != lit("DUAL"))
+            && report.value("streaming mode").toLower() != lit("dual"))
         {
             makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=DUAL"), status);
 

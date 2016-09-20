@@ -22,6 +22,8 @@
 #include "core/resource/camera_user_attribute_pool.h"
 #include "utils/license_usage_helper.h"
 #include "media_server/settings.h"
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
 
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
@@ -63,11 +65,10 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
-        
-        auto secResource = resource.dynamicCast<QnSecurityCamResource>();
 
         QString urlStr = cameraResource->getUrl();
-        if (secResource && !secResource->getGroupId().isEmpty())
+        const QnResourceData resourceData = qnCommon->dataPool()->data(cameraResource);
+        if (resourceData.contains(QString("ignoreMultisensors")))
             urlStr = urlStr.left(urlStr.indexOf('?'));
 
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(urlStr))
