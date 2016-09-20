@@ -19,7 +19,7 @@ namespace ec2
         int port;
         QString user;
         QString from;
-        QString password;
+        QByteArray password;
         QnEmail::ConnectionType connectionType;
     };
 #define ApiEmailSettingsData_Fields (host)(port)(user)(from)(password)(connectionType)

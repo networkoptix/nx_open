@@ -19,5 +19,9 @@ QByteArray decodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>
 // Otherwise it is stripped off to 16 bytes.
 QByteArray encodeAES128CBC(const QByteArray& data, const QByteArray& key);
 QByteArray decodeAES128CBC(const QByteArray& data, const QByteArray& key);
+
+// These overloads use internal constant key
+QByteArray encodeAES128CBC(const QByteArray& data);
+QByteArray decodeAES128CBC(const QByteArray& data);
 }
 }

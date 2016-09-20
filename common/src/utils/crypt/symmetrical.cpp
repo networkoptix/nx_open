@@ -5,16 +5,6 @@
 
 namespace nx {
 namespace utils {
-QByteArray encodeSimple(const QByteArray& data)
-{
-    static const QByteArray mask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312"); // generated from guid
-    static const int maskSize = mask.size();
-    QByteArray result = data;
-    for (int i = 0; i < result.size(); ++i)
-        result.data()[i] ^= mask.data()[i % maskSize];
-    return result;
-}
-
 namespace detail {
 #ifndef CBC
 #define CBC 1
@@ -39,6 +29,8 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
 
 QnMutex stateMutex;
 const size_t kKeySize = 16;
+const QByteArray kMask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312"); // generated from guid
+const int kMaskSize = kMask.size();
 
 using KeyType = std::array<uint8_t, kKeySize>;
 
@@ -58,8 +50,18 @@ KeyType keyFromByteArray(const QByteArray& data)
 }
 }
 
+QByteArray encodeSimple(const QByteArray& data)
+{
+    QByteArray result = data;
+    for (int i = 0; i < result.size(); ++i)
+        result.data()[i] ^= detail::kMask.data()[i % detail::kMaskSize];
+    return result;
+}
+
 QByteArray encodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
 {
+    if (data.isNull())
+        return QByteArray();
     QnMutexLocker lock(&detail::stateMutex);
     const QByteArray* pdata = &data;
     QByteArray dataCopy;
@@ -83,6 +85,8 @@ QByteArray encodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
 
 QByteArray decodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
 {
+    if (data.isNull())
+        return QByteArray();
     QnMutexLocker lock(&detail::stateMutex);
     if (data.size() % 16 != 0)
         return QByteArray();
@@ -105,6 +109,16 @@ QByteArray encodeAES128CBC(const QByteArray& data, const QByteArray& key)
 QByteArray decodeAES128CBC(const QByteArray& data, const QByteArray& key)
 {
     return decodeAES128CBC(data, detail::keyFromByteArray(key));
+}
+
+QByteArray encodeAES128CBC(const QByteArray& data)
+{
+    return encodeAES128CBC(data, detail::keyFromByteArray(detail::kMask));
+}
+
+QByteArray decodeAES128CBC(const QByteArray& data)
+{
+    return decodeAES128CBC(data, detail::keyFromByteArray(detail::kMask));
 }
 
 namespace detail {

@@ -9,6 +9,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
+#include <utils/crypt/symmetrical.h>
 
 namespace {
 QList<QnEmail::ConnectionType> connectionTypesAllowed()
@@ -121,7 +122,7 @@ QnEmailSettings QnSmtpAdvancedSettingsWidget::settings() const
     result.email = ui->emailInputField->text();
     result.port = ui->portComboBox->currentText().toInt();
     result.user = ui->userInputField->text();
-    result.password = ui->passwordInputField->text();
+    result.password = ui->passwordInputField->text().toUtf8();
     result.connectionType = ui->tlsRadioButton->isChecked()
         ? QnEmail::Tls
         : ui->sslRadioButton->isChecked()
@@ -140,7 +141,9 @@ void QnSmtpAdvancedSettingsWidget::setSettings(const QnEmailSettings &value)
     ui->serverInputField->setText(value.server);
     ui->userInputField->setText(value.user);
     ui->emailInputField->setText(value.email);
-    ui->passwordInputField->setText(value.password);
+    ui->passwordInputField->setText(
+        QTextCodec::codecForMib(106)->toUnicode(
+            nx::utils::decodeAES128CBC(value.password)));
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
 }

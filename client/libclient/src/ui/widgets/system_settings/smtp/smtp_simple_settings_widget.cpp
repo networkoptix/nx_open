@@ -7,6 +7,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
+#include <utils/crypt/symmetrical.h>
 
 QnEmailSettings QnSimpleSmtpSettings::toSettings(const QnEmailSettings &base) const
 {
@@ -88,7 +89,7 @@ QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const
 {
     QnSimpleSmtpSettings result;
     result.email = ui->emailInputField->text();
-    result.password = ui->passwordInputField->text();
+    result.password = ui->passwordInputField->text().toUtf8();
     result.signature = ui->signatureInputField->text();
     result.supportEmail = ui->supportInputField->text();
     return result;
@@ -99,7 +100,9 @@ void QnSmtpSimpleSettingsWidget::setSettings(const QnSimpleSmtpSettings &value)
     QScopedValueRollback<bool> guard(m_updating, true);
 
     ui->emailInputField->setText(value.email);
-    ui->passwordInputField->setText(value.password);
+    ui->passwordInputField->setText(
+        QTextCodec::codecForMib(106)->toUnicode(
+            nx::utils::decodeAES128CBC(value.password)));
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
 }

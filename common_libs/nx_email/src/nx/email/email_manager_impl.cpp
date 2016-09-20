@@ -7,6 +7,7 @@
 #include <nx_ec/data/api_email_data.h>
 #include <nx/utils/log/log.h>
 #include <utils/email/email.h>
+#include <utils/crypt/symmetrical.h>
 
 #include "smtpclient/smtpclient.h"
 #include "smtpclient/QnSmtpMime"
@@ -87,7 +88,10 @@ bool EmailManagerImpl::sendEmail(
         return false;
     }
 
-    if (!settings.user.isEmpty() && !smtp.login(settings.user, settings.password) )
+    if (!settings.user.isEmpty() && 
+        !smtp.login(settings.user, 
+                    QTextCodec::codecForMib(106)->toUnicode(
+                        nx::utils::decodeAES128CBC(settings.password))))
     {
         NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
         smtp.quit();

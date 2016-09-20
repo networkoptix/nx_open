@@ -10,7 +10,7 @@ namespace Ui
 struct QnSimpleSmtpSettings
 {
     QString email;
-    QString password;
+    QByteArray password;
     QString signature;
     QString supportEmail;
 

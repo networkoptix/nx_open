@@ -29,7 +29,7 @@ struct QnEmailSettings {
     QString email;                      /**< Sender email. Used as MAIL FROM. */
     QString server;                     /**< Target smtp server. */
     QString user;                       /**< Username for smtp authorization. */
-    QString password;                   /**< Password for smtp authorization. */
+    QByteArray password;                   /**< Password for smtp authorization. */
     QString signature;                  /**< Signature text. Used in the email text. */
     QString supportEmail;               /**< Support link. Named as email to maintain compatibility. */
     QnEmail::ConnectionType connectionType;      /**< Connection protocol (TLS/SSL/Unsecure). */
