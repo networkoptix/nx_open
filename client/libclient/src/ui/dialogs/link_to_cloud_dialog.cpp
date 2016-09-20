@@ -84,6 +84,8 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     d_ptr(new QnLinkToCloudDialogPrivate(this))
 {
     ui->setupUi(this);
+    setWindowTitle(tr("Link to %1").arg(QnAppInfo::cloudName()));
+
     Q_D(QnLinkToCloudDialog);
 
     using nx::vms::utils::SystemUri;
