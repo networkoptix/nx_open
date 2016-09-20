@@ -43,7 +43,7 @@ class Settings;
 }   // namespace conf
 
 class AccountManager;
-class EventManager;
+class SystemHealthInfoProvider;
 
 namespace ec2 {
 class IncomingTransactionDispatcher;
@@ -68,7 +68,7 @@ public:
         const conf::Settings& settings,
         nx::utils::TimerManager* const timerManager,
         const AccountManager& accountManager,
-        const EventManager& eventManager,
+        const SystemHealthInfoProvider& systemHealthInfoProvider,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         ec2::TransactionLog* const transactionLog,
         ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error);
@@ -205,7 +205,7 @@ private:
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
     const AccountManager& m_accountManager;
-    const EventManager& m_eventManager;
+    const SystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     ec2::TransactionLog* const m_transactionLog;
     ec2::IncomingTransactionDispatcher* const m_transactionDispatcher;

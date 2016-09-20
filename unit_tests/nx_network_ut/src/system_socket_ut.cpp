@@ -55,6 +55,13 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
+TEST(TcpSocket, ErrorHandling)
+{
+    nx::network::test::socketErrorHandling(
+        []() { return std::make_unique<TCPServerSocket>(AF_INET); },
+        []() { return std::make_unique<TCPSocket>(false, AF_INET); });
+}
+
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, TcpSocketV4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },

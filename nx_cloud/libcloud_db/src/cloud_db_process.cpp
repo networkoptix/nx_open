@@ -46,6 +46,7 @@
 #include "managers/email_manager.h"
 #include "managers/event_manager.h"
 #include "managers/maintenance_manager.h"
+#include "managers/system_health_info_provider.h"
 #include "managers/system_manager.h"
 #include "managers/temporary_account_password_manager.h"
 #include "stree/stree_manager.h"
@@ -211,11 +212,13 @@ int CloudDBProcess::exec()
             &incomingTransactionDispatcher,
             &ec2OutgoingTransactionDispatcher);
 
+        SystemHealthInfoProvider systemHealthInfoProvider(ec2ConnectionManager);
+
         SystemManager systemManager(
             settings,
             &timerManager,
             accountManager,
-            eventManager,
+            systemHealthInfoProvider,
             &dbManager,
             &transactionLog,
             &incomingTransactionDispatcher);

@@ -47,6 +47,8 @@ public:
 
     bool isSslEnabled() const;
 
+    SystemError::ErrorCode lastError() const;
+
     static void setDefaultPage(const QByteArray& path);
     static QByteArray defaultPage();
 
@@ -73,6 +75,8 @@ protected:
         bool sslNeeded,
         const SocketAddress& localAddress);
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket);
+
+    void setLastError(SystemError::ErrorCode error);
 
 private:
     void removeDisconnectedConnections();
