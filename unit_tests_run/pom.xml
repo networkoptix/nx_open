@@ -34,7 +34,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/debsetup/client-deb/pom.xml</systemPath>
         </dependency>	
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common_ut</artifactId>
@@ -43,7 +43,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/unit_tests/common_ut/pom.xml</systemPath>
         </dependency>	
-	    <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_network_ut</artifactId>
             <version>${project.version}</version>
@@ -91,7 +91,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/unit_tests/cloud_connectivity_ut/pom.xml</systemPath>
         </dependency>	
-	    <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>utils_ut</artifactId>
             <version>${project.version}</version>
@@ -100,7 +100,7 @@
             <systemPath>${root.dir}/unit_tests/utils_ut/pom.xml</systemPath>		
         </dependency>	            
     </dependencies>		    
-    
+
     <build>
         <plugins>
             <plugin> 
@@ -117,6 +117,9 @@
                         <configuration>
                             <executable>./run_tests.sh</executable>
                             <workingDirectory>${root.dir}</workingDirectory>
+                            <arguments>
+                                <argument>stable_tests</argument>
+                            </arguments>                            
                         </configuration>
                     </execution>  
                 </executions>                            
