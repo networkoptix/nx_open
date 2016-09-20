@@ -89,7 +89,7 @@ QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const
 {
     QnSimpleSmtpSettings result;
     result.email = ui->emailInputField->text();
-    result.password = ui->passwordInputField->text().toUtf8();
+    result.password = ui->passwordInputField->text();
     result.signature = ui->signatureInputField->text();
     result.supportEmail = ui->supportInputField->text();
     return result;
@@ -100,9 +100,11 @@ void QnSmtpSimpleSettingsWidget::setSettings(const QnSimpleSmtpSettings &value)
     QScopedValueRollback<bool> guard(m_updating, true);
 
     ui->emailInputField->setText(value.email);
-    ui->passwordInputField->setText(
-        QTextCodec::codecForMib(106)->toUnicode(
-            nx::utils::decodeAES128CBC(value.password)));
+    ui->passwordInputField->setText( 
+        QString::fromUtf8(
+            nx::utils::decodeAES128CBC(
+                QByteArray::fromHex(
+                    value.password.toLatin1()))));
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
 }

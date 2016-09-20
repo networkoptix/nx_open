@@ -138,7 +138,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initEmailAdaptors() {
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameUser, QString(), this);
-    m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(kNamePassword, QByteArray(), this);
+    m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNamePassword, QString(), this);
     m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSignature, QString(), this);
     m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSupportEmail, defaultSupportLink, this);
     m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(kNameConnectionType, QnEmail::Unsecure, this);
@@ -472,7 +472,11 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
     m_fromAdaptor->setValue(settings.email);
     m_portAdaptor->setValue(settings.port == QnEmailSettings::defaultPort(settings.connectionType) ? 0 : settings.port);
     m_userAdaptor->setValue(settings.user);
-    m_passwordAdaptor->setValue(settings.isValid() ? nx::utils::encodeAES128CBC(settings.password) : QByteArray());
+    m_passwordAdaptor->setValue(
+        settings.isValid() 
+        ? QString::fromLatin1(
+            nx::utils::encodeAES128CBC(settings.password.toUtf8()).toHex()) 
+        : QString());
     m_connectionTypeAdaptor->setValue(settings.connectionType);
     m_signatureAdaptor->setValue(settings.signature);
     m_supportLinkAdaptor->setValue(settings.supportEmail);

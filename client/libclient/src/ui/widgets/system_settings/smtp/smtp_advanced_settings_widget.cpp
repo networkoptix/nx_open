@@ -122,7 +122,7 @@ QnEmailSettings QnSmtpAdvancedSettingsWidget::settings() const
     result.email = ui->emailInputField->text();
     result.port = ui->portComboBox->currentText().toInt();
     result.user = ui->userInputField->text();
-    result.password = ui->passwordInputField->text().toUtf8();
+    result.password = ui->passwordInputField->text();
     result.connectionType = ui->tlsRadioButton->isChecked()
         ? QnEmail::Tls
         : ui->sslRadioButton->isChecked()
@@ -142,8 +142,9 @@ void QnSmtpAdvancedSettingsWidget::setSettings(const QnEmailSettings &value)
     ui->userInputField->setText(value.user);
     ui->emailInputField->setText(value.email);
     ui->passwordInputField->setText(
-        QTextCodec::codecForMib(106)->toUnicode(
-            nx::utils::decodeAES128CBC(value.password)));
+        QString::fromUtf8(
+            nx::utils::decodeAES128CBC(
+                QByteArray::fromHex(value.password.toLatin1()))));
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
 }
