@@ -256,7 +256,7 @@ void QnConnectionManagerPrivate::doConnect()
     {
         Q_Q(QnConnectionManager);
         updateConnectionState();
-        emit q->connectionFailed(Qn::ConnectionResult::NetworkError, QVariant());
+        emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
         return;
     }
 
@@ -290,12 +290,12 @@ void QnConnectionManagerPrivate::doConnect()
             auto status = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
             QVariant infoParameter;
 
-            if (status == Qn::ConnectionResult::IncompatibleVersion)
+            if (status == Qn::IncompatibleVersionConnectionResult)
                 infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
 
             Q_Q(QnConnectionManager);
 
-            if (status != Qn::ConnectionResult::Success)
+            if (status != Qn::SuccessConnectionResult)
             {
                 updateConnectionState();
                 emit q->connectionFailed(status, infoParameter);

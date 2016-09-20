@@ -322,7 +322,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     auto status = silent
         ? QnConnectionValidator::validateConnection(connectionInfo, errorCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindow());
-    NX_ASSERT(connection || status != Qn::ConnectionResult::Success);
+    NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
 
     if (m_state.state() == QnConnectionState::Reconnecting)
     {
@@ -332,7 +332,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     switch (status)
     {
-        case Qn::ConnectionResult::Success:
+        case Qn::SuccessConnectionResult:
             storeConnectionRecord(connectionInfo, storeSettings);
             if (connectionInfo.newSystem)
             {
@@ -346,7 +346,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
                 establishConnection(connection);
             }
             break;
-        case Qn::ConnectionResult::IncompatibleProtocol:
+        case Qn::IncompatibleProtocolConnectionResult:
             storeConnectionRecord(connectionInfo, storeSettings);
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break;
@@ -380,7 +380,7 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
     }
 
     NX_ASSERT(m_reconnectDialog && m_reconnectDialog->isVisible());
-    bool success = status == Qn::ConnectionResult::Success;
+    bool success = status == Qn::SuccessConnectionResult;
     if (success)
     {
         NX_ASSERT(connection);
@@ -401,15 +401,15 @@ void QnWorkbenchConnectHandler::processReconnectingReply(
 
     switch (status)
     {
-        case Qn::ConnectionResult::Unauthorized:
+        case Qn::UnauthorizedConnectionResult:
             /* Looks like server team has not fixed VMS-3794 */
             NX_ASSERT(false);
             m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
             break;
-        case Qn::ConnectionResult::IncompatibleInternal:
-        case Qn::ConnectionResult::IncompatibleCloudHost:
-        case Qn::ConnectionResult::IncompatibleVersion:
-        case Qn::ConnectionResult::IncompatibleProtocol:
+        case Qn::IncompatibleInternalConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
+        case Qn::IncompatibleVersionConnectionResult:
+        case Qn::IncompatibleProtocolConnectionResult:
             m_reconnectHelper->markServerAsInvalid(m_reconnectHelper->currentServer());
             break;
         default:

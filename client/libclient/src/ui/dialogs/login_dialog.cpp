@@ -224,7 +224,7 @@ void QnLoginDialog::accept()
         auto status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, this);
         switch (status)
         {
-            case Qn::ConnectionResult::Success:
+            case Qn::SuccessConnectionResult:
             {
                 const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                 QnActionParameters params;
@@ -234,7 +234,7 @@ void QnLoginDialog::accept()
                 menu()->trigger(QnActions::ConnectAction, params);
                 break;
             }
-            case Qn::ConnectionResult::IncompatibleProtocol:
+            case Qn::IncompatibleProtocolConnectionResult:
                 menu()->trigger(QnActions::DelayedForcedExitAction);
                 break; // to avoid cycle
             default:    //error
@@ -365,13 +365,13 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
             /* Do not show servers with incompatible customization or cloud host */
             if (!qnRuntime->isDevMode()
-                && (compatibilityCode == Qn::ConnectionResult::IncompatibleInternal
-                    || compatibilityCode == Qn::ConnectionResult::IncompatibleCloudHost))
+                && (compatibilityCode == Qn::IncompatibleInternalConnectionResult
+                    || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult))
             {
                     continue;
             }
 
-            bool isCompatible = (compatibilityCode == Qn::ConnectionResult::Success);
+            bool isCompatible = (compatibilityCode == Qn::SuccessConnectionResult);
 
             QString title;
             if (!data.info.systemName.isEmpty())

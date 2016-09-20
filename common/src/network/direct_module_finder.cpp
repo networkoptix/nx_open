@@ -208,7 +208,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     }
 
     auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
-    if (connectionResult == Qn::ConnectionResult::IncompatibleInternal)
+    if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
         NX_LOG(lit("QnDirectModuleFinder. Received reply from incompatible server: url %1, "
             "customization %2, cloud host %3. Ignoring reply...")
