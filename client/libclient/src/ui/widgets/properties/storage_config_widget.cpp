@@ -245,6 +245,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
+    m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
     m_storagePoolMenu->addAction(tr("Main"))->setData(false);
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 

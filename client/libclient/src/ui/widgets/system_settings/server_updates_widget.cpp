@@ -181,6 +181,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
 void QnServerUpdatesWidget::initDropdownActions()
 {
     auto selectUpdateTypeMenu = new QMenu(this);
+    selectUpdateTypeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+
     auto defaultAction = selectUpdateTypeMenu->addAction(tr("Latest Available Update"),
         [this]()
         {
