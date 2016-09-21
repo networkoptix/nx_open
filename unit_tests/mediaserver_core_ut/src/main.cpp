@@ -3,8 +3,6 @@
 #include <qcoreapplication.h>
 #include <QCommandLineParser>
 
-#include "storage/abstract_storage_resource.h"
-
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
