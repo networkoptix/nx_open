@@ -61,7 +61,7 @@ angular.module('cloudApp')
         };
 
         $scope.getSystemOwnerName = function(system, forOrder) {
-            if(system.ownerAccountEmail == $scope.account.email ){
+            if($scope.account && system.ownerAccountEmail == $scope.account.email ){
                 if(forOrder){
                     return '!!!!!!!'; // Force my systems to be first
                 }

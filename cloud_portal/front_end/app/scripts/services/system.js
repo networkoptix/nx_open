@@ -47,7 +47,7 @@ angular.module('cloudApp')
                 self.accessRole = role.name;
                 self.permissions.editAdmins = self.isOwner(self.currentUserRecord);
                 self.permissions.isAdmin = self.isOwner(self.currentUserRecord) || self.isAdmin(self.currentUserRecord);
-                self.permissions.editUsers = self.permissions.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag>=0);
+                self.permissions.editUsers = self.permissions.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag)>=0;
             }else{
                 self.accessRole = self.info.accessRole;
                 if(self.isMine){
@@ -55,8 +55,8 @@ angular.module('cloudApp')
                     self.permissions.editAdmins = true;
                     self.permissions.isAdmin = true;
                 }else{
-                    self.permissions.editUsers = self.info.accessRole.indexOf(Config.accessRoles.editUserAccessRoleFlag>=0);
-                    self.permissions.isAdmin = self.info.accessRole.indexOf(Config.accessRoles.globalAdminAccessRoleFlag>=0);
+                    self.permissions.editUsers = self.info.accessRole.indexOf(Config.accessRoles.editUserAccessRoleFlag)>=0;
+                    self.permissions.isAdmin = self.info.accessRole.indexOf(Config.accessRoles.globalAdminAccessRoleFlag)>=0;
                 }
             }
         };
