@@ -5,9 +5,9 @@
 
 #include <nx/utils/singleton.h>
 
-#include <client_core/user_recent_connection_data.h>
+#include <client_core/local_connection_data.h>
 
-class QnRecentUserConnectionsModel;
+class QnrecentLocalConnectionsModel;
 
 class QnClientRecentConnectionsManager: public QObject, public Singleton<QnClientRecentConnectionsManager>
 {
@@ -18,18 +18,18 @@ public:
     QnClientRecentConnectionsManager();
     virtual ~QnClientRecentConnectionsManager();
 
-    void addModel(QnRecentUserConnectionsModel* model);
-    void removeModel(QnRecentUserConnectionsModel* model);
+    void addModel(QnrecentLocalConnectionsModel* model);
+    void removeModel(QnrecentLocalConnectionsModel* model);
 
 private:
-    void updateModelBinding(QnRecentUserConnectionsModel* model);
+    void updateModelBinding(QnrecentLocalConnectionsModel* model);
     void updateModelsData();
 
 private:
-    using QnRecentUserConnectionsModelPtr = QPointer<QnRecentUserConnectionsModel>;
-    using DataCache = QHash<QString, QnUserRecentConnectionDataList>;
+    using QnrecentLocalConnectionsModelPtr = QPointer<QnrecentLocalConnectionsModel>;
+    using DataCache = QHash<QString, QnLocalConnectionDataList>;
 
-    QList<QnRecentUserConnectionsModelPtr> m_models;
+    QList<QnrecentLocalConnectionsModelPtr> m_models;
     DataCache m_dataCache;
     bool m_updating;
 };

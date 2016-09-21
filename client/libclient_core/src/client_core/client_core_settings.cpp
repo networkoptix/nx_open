@@ -49,22 +49,22 @@ DataList readListData(QSettings* settings, const QString& tag,
     return result;
 }
 
-void writeRecentUserConnections(QSettings* settings,
-    const QnUserRecentConnectionDataList& connections)
+void writerecentLocalConnections(QSettings* settings,
+    const QnLocalConnectionDataList& connections)
 {
     writeListData(settings, connections, kUserConnectionsSectionTag,
-        [](QSettings* settings, const QnUserRecentConnectionData& data)
+        [](QSettings* settings, const QnLocalConnectionData& data)
         {
-            QnUserRecentConnectionData::writeToSettings(settings, data);
+            QnLocalConnectionData::writeToSettings(settings, data);
         });
 }
 
-QnUserRecentConnectionDataList readRecentUserConnections(QSettings* settings)
+QnLocalConnectionDataList readrecentLocalConnections(QSettings* settings)
 {
-    return readListData<QnUserRecentConnectionDataList>(settings, kUserConnectionsSectionTag,
+    return readListData<QnLocalConnectionDataList>(settings, kUserConnectionsSectionTag,
         [](QSettings* settings)
         {
-            return QnUserRecentConnectionData::fromSettings(settings);
+            return QnLocalConnectionData::fromSettings(settings);
         });
 }
 
@@ -110,8 +110,8 @@ void QnClientCoreSettings::writeValueToSettings(
 {
     switch (id)
     {
-        case RecentUserConnections:
-            writeRecentUserConnections(settings, value.value<QnUserRecentConnectionDataList>());
+        case RecentLocalConnections:
+            writerecentLocalConnections(settings, value.value<QnLocalConnectionDataList>());
             break;
         case RecentCloudSystems:
             writeRecentCloudSystems(settings, value.value<QnCloudSystemList>());
@@ -132,9 +132,9 @@ QVariant QnClientCoreSettings::readValueFromSettings(
 {
     switch (id)
     {
-        case RecentUserConnections:
-            return QVariant::fromValue<QnUserRecentConnectionDataList>(
-                readRecentUserConnections(settings));
+        case RecentLocalConnections:
+            return QVariant::fromValue<QnLocalConnectionDataList>(
+                readrecentLocalConnections(settings));
         case RecentCloudSystems:
             return QVariant::fromValue<QnCloudSystemList>(
                 readRecentCloudSystems(settings));

@@ -301,9 +301,9 @@ void QnLoginDialog::resetConnectionsModel()
         m_connectionsModel->removeRow(0); //last-used-connection row
 
     QModelIndex selectedIndex;
-    auto connections = qnClientCoreSettings->recentUserConnections();
+    auto connections = qnClientCoreSettings->recentLocalConnections();
     const auto lastConnection = (connections.empty() ?
-        QnUserRecentConnectionData() : connections.first());
+        QnLocalConnectionData() : connections.first());
 
     m_lastUsedItem = ::newConnectionItem(tr("* Last used connection *"), lastConnection.url);
 
@@ -325,7 +325,7 @@ void QnLoginDialog::resetConnectionsModel()
 
 void QnLoginDialog::resetSavedSessionsModel()
 {
-    auto recentConnections = qnClientCoreSettings->recentUserConnections();
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
 
     if (recentConnections.isEmpty())
     {
@@ -334,7 +334,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
         url.setUserName(lit("admin"));
 
-        recentConnections.append(QnUserRecentConnectionData(
+        recentConnections.append(QnLocalConnectionData(
             lit("default"), QString(), QString(), url, false));
     }
 
@@ -451,8 +451,8 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->passwordLineEdit->setText(url.password());
 
     const auto currentConnection = ui->connectionsComboBox->currentData(
-        Qn::ConnectionInfoRole).value<QnUserRecentConnectionData>();
-    ui->deleteButton->setEnabled(currentConnection != QnUserRecentConnectionData());
+        Qn::ConnectionInfoRole).value<QnLocalConnectionData>();
+    ui->deleteButton->setEnabled(currentConnection != QnLocalConnectionData());
     ui->autoLoginCheckBox->setChecked(false);
     updateFocus();
 }
@@ -483,11 +483,11 @@ void QnLoginDialog::at_testButton_clicked()
         accept();
 }
 
-QnUserRecentConnectionData QnLoginDialog::gatherSystemConnectionData(const QUrl& url,
+QnLocalConnectionData QnLoginDialog::gatherSystemConnectionData(const QUrl& url,
     const QString& name,
     bool savePassword)
 {
-    QnUserRecentConnectionData result;
+    QnLocalConnectionData result;
     result.isStoredPassword = savePassword;
     result.url = url;
 
@@ -519,9 +519,9 @@ QnUserRecentConnectionData QnLoginDialog::gatherSystemConnectionData(const QUrl&
 }
 
 
-QStandardItem* QnLoginDialog::newConnectionItem(const QnUserRecentConnectionData& connection)
+QStandardItem* QnLoginDialog::newConnectionItem(const QnLocalConnectionData& connection)
 {
-    if (connection == QnUserRecentConnectionData())
+    if (connection == QnLocalConnectionData())
         return nullptr;
 
     const auto text = (!connection.name.isEmpty() ? connection.name
@@ -570,7 +570,7 @@ void QnLoginDialog::at_saveButton_clicked()
     QString password = ui->passwordLineEdit->text();
     bool autoLogin = qnSettings->autoLogin();
 
-    auto connections = qnClientCoreSettings->recentUserConnections();
+    auto connections = qnClientCoreSettings->recentLocalConnections();
     const auto connectionIndex = connections.getIndexByName(name);
     if ((connectionIndex != -1) &&
         connections.at(connectionIndex).isStoredPassword)
@@ -612,7 +612,7 @@ void QnLoginDialog::at_saveButton_clicked()
     // Filters out all systems with the same system name and user name
     const auto itNewEnd = std::remove_if(connections.begin(), connections.end(),
         [this, &rejected, connectionData, userName = url.userName()]
-    (const QnUserRecentConnectionData& connection)
+    (const QnLocalConnectionData& connection)
     {
         if (rejected || (connection.systemId != connectionData.systemId) || (connection.url.userName() != userName))
             return false;
@@ -637,7 +637,7 @@ void QnLoginDialog::at_saveButton_clicked()
     if (!savePassword)
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
-    qnClientCoreSettings->setRecentUserConnections(connections);
+    qnClientCoreSettings->setRecentLocalConnections(connections);
 
     resetSavedSessionsModel();
 
@@ -651,10 +651,10 @@ void QnLoginDialog::at_saveButton_clicked()
 
 void QnLoginDialog::at_deleteButton_clicked()
 {
-    auto connections = qnClientCoreSettings->recentUserConnections();
+    auto connections = qnClientCoreSettings->recentLocalConnections();
 
     auto connection = ui->connectionsComboBox->currentData(
-        Qn::ConnectionInfoRole).value<QnUserRecentConnectionData>();
+        Qn::ConnectionInfoRole).value<QnLocalConnectionData>();
     if (!connections.contains(connection))
         return;
 
@@ -675,7 +675,7 @@ void QnLoginDialog::at_deleteButton_clicked()
     connection.name = QString();
     connections.prepend(connection);
 
-    qnClientCoreSettings->setRecentUserConnections(connections);
+    qnClientCoreSettings->setRecentLocalConnections(connections);
     resetConnectionsModel();
 }
 

@@ -29,11 +29,13 @@ public:
 
     struct ConnectionSettings
     {
+        bool isConnectionToCloud;
         bool storePassword;
         bool autoLogin;
         bool forceRemoveOldConnection;
 
         static ConnectionSettingsPtr create(
+            bool isConnectionToCloud,
             bool storePassword,
             bool autoLogin,
             bool forceRemoveOldConnection);

@@ -175,7 +175,7 @@ void QnUserProfileWidget::applyChanges()
             url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
-            auto connections = qnClientCoreSettings->recentUserConnections();
+            auto connections = qnClientCoreSettings->recentLocalConnections();
             if (!connections.isEmpty() &&
                 !connections.first().url.password().isEmpty() &&
                 qnUrlEqual(connections.first().url, url))
@@ -183,7 +183,7 @@ void QnUserProfileWidget::applyChanges()
                 auto current = connections.takeFirst();
                 current.url = url;
                 connections.prepend(current);
-                qnClientCoreSettings->setRecentUserConnections(connections);
+                qnClientCoreSettings->setRecentLocalConnections(connections);
             }
 
             auto lastUsed = qnSettings->lastUsedConnection();

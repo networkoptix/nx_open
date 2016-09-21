@@ -17,7 +17,7 @@ Item
     property bool autoLogin: expandedArea.autoLoginCheckBox.checked;
     property bool isConnecting: false;
     property var hostsModel;
-    property var recentUserConnectionsModel;
+    property var recentLocalConnectionsModel;
 
     property var prevTabObject;
 
@@ -62,7 +62,7 @@ Item
 
     Connections
     {
-        target: (recentUserConnectionsModel ? recentUserConnectionsModel : null);
+        target: (recentLocalConnectionsModel ? recentLocalConnectionsModel : null);
         onConnectionDataChanged: { control.impl.updatePasswordData(index); }
     }
 
@@ -98,7 +98,7 @@ Item
         {
             id: userChooseItem;
 
-            model: control.recentUserConnectionsModel;
+            model: control.recentLocalConnectionsModel;
 
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
             visible: control.impl.hasRecentConnections;
@@ -145,7 +145,7 @@ Item
 
     property QtObject impl: QtObject
     {
-        readonly property bool hasRecentConnections: (recentUserConnectionsModel && recentUserConnectionsModel.hasConnections);
+        readonly property bool hasRecentConnections: (recentLocalConnectionsModel && recentLocalConnectionsModel.hasConnections);
 
         function updatePasswordData(currentItemIndex)
         {
@@ -158,15 +158,15 @@ Item
                 return;
             }
 
-            var hasStoredPasswordValue = (control.recentUserConnectionsModel
-                && control.recentUserConnectionsModel.getData("hasStoredPassword", currentItemIndex));
+            var hasStoredPasswordValue = (control.recentLocalConnectionsModel
+                && control.recentLocalConnectionsModel.getData("hasStoredPassword", currentItemIndex));
 
             // value can be <undefined>, thus we use explicit conversion here
             var hasStoredPassword = (hasStoredPasswordValue ? true : false);
             expandedArea.savePasswordCheckbox.checked = hasStoredPassword;
 
             expandedArea.passwordTextField.text = (hasStoredPassword ?
-                recentUserConnectionsModel.getData("password", currentItemIndex) : "")
+                recentLocalConnectionsModel.getData("password", currentItemIndex) : "")
         }
     }
 

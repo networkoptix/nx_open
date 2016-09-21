@@ -1,11 +1,10 @@
 
-#include "user_recent_connection_data.h"
+#include "local_connection_data.h"
 
 #include <QtCore/QSettings>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
-#include <client_core/user_recent_connection_data.h>
 
 namespace
 {
@@ -19,10 +18,9 @@ namespace
     const auto kNameTag = lit("name");
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnUserRecentConnectionData), (datastream)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (QnLocalConnectionData), (datastream)(eq), _Fields)
 
-QnUserRecentConnectionData::QnUserRecentConnectionData() :
+QnLocalConnectionData::QnLocalConnectionData() :
     name(),
     systemName(),
     systemId(),
@@ -30,11 +28,12 @@ QnUserRecentConnectionData::QnUserRecentConnectionData() :
     isStoredPassword(false)
 {}
 
-QnUserRecentConnectionData::QnUserRecentConnectionData(const QString& name,
+QnLocalConnectionData::QnLocalConnectionData(const QString& name,
     const QString& systemName,
     const QString& systemId,
     const QUrl& url,
-    bool isStoredPassword) :
+    bool isStoredPassword)
+    :
     name(name),
     systemName(systemName),
     systemId(systemId),
@@ -42,8 +41,8 @@ QnUserRecentConnectionData::QnUserRecentConnectionData(const QString& name,
     isStoredPassword(isStoredPassword)
 {}
 
-void QnUserRecentConnectionData::writeToSettings(QSettings* settings
-    , const QnUserRecentConnectionData& data)
+void QnLocalConnectionData::writeToSettings(QSettings* settings
+    , const QnLocalConnectionData& data)
 {
     const auto encryptedPass = nx::utils::xorEncrypt(data.url.password(), kXorKey);
     settings->setValue(kUrlNameTag, data.url.toString());
@@ -54,9 +53,9 @@ void QnUserRecentConnectionData::writeToSettings(QSettings* settings
     settings->setValue(kNameTag, data.name);
 }
 
-QnUserRecentConnectionData QnUserRecentConnectionData::fromSettings(QSettings *settings)
+QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
 {
-    QnUserRecentConnectionData data;
+    QnLocalConnectionData data;
 
     data.url = QUrl(settings->value(kUrlNameTag).toString());
     data.systemName = settings->value(kSystemNameTag).toString();
@@ -73,34 +72,34 @@ QnUserRecentConnectionData QnUserRecentConnectionData::fromSettings(QSettings *s
 
 ///
 
-QnUserRecentConnectionDataList::QnUserRecentConnectionDataList()
+QnLocalConnectionDataList::QnLocalConnectionDataList()
     : base_type()
 {}
 
-QnUserRecentConnectionDataList::~QnUserRecentConnectionDataList()
+QnLocalConnectionDataList::~QnLocalConnectionDataList()
 {}
 
-int QnUserRecentConnectionDataList::getIndexByName(const QString& name) const
+int QnLocalConnectionDataList::getIndexByName(const QString& name) const
 {
-    const auto it = std::find_if(begin(), end(), [name](const QnUserRecentConnectionData &data)
+    const auto it = std::find_if(begin(), end(), [name](const QnLocalConnectionData &data)
     {
         return (data.name == name);
     });
     return (it == end() ? -1 : it - begin());
 }
 
-QnUserRecentConnectionData QnUserRecentConnectionDataList::getByName(const QString& name) const
+QnLocalConnectionData QnLocalConnectionDataList::getByName(const QString& name) const
 {
     const auto index = getIndexByName(name);
-    return (index == -1 ? QnUserRecentConnectionData() : at(index));
+    return (index == -1 ? QnLocalConnectionData() : at(index));
 }
 
-bool QnUserRecentConnectionDataList::contains(const QString& name) const
+bool QnLocalConnectionDataList::contains(const QString& name) const
 {
     return (getIndexByName(name) != -1);
 }
 
-QString QnUserRecentConnectionDataList::generateUniqueName(const QString &base) const
+QString QnLocalConnectionDataList::generateUniqueName(const QString &base) const
 {
     int counter = 0;
     QString uniqueName;
@@ -112,10 +111,10 @@ QString QnUserRecentConnectionDataList::generateUniqueName(const QString &base) 
     return uniqueName;
 }
 
-bool QnUserRecentConnectionDataList::remove(const QString &name)
+bool QnLocalConnectionDataList::remove(const QString &name)
 {
     const auto newEnd = std::remove_if(begin(), end(),
-        [name](const QnUserRecentConnectionData &data)
+        [name](const QnLocalConnectionData &data)
     {
         return (data.name == name);
     });

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
-#include <client_core/user_recent_connection_data.h>
+#include <client_core/local_connection_data.h>
 
-class QnRecentUserConnectionsModel : public QAbstractListModel
+class QnrecentLocalConnectionsModel : public QAbstractListModel
 {
     Q_OBJECT
     typedef QAbstractListModel base_type;
@@ -24,9 +24,9 @@ public:
         RolesCount
     };
 
-    QnRecentUserConnectionsModel(QObject *parent = nullptr);
+    QnrecentLocalConnectionsModel(QObject *parent = nullptr);
 
-    virtual ~QnRecentUserConnectionsModel();
+    virtual ~QnrecentLocalConnectionsModel();
 
 public: // properties
     QString systemName() const;
@@ -44,7 +44,7 @@ public: // overrides
 
     QHash<int, QByteArray> roleNames() const override;
 
-    void updateData(const QnUserRecentConnectionDataList &newData);
+    void updateData(const QnLocalConnectionDataList &newData);
 
 public slots:
     QVariant getData(const QString &dataRole, int row);
@@ -57,5 +57,5 @@ signals:
 
 private:
     QString m_systemName;
-    QnUserRecentConnectionDataList m_data;
+    QnLocalConnectionDataList m_data;
 };

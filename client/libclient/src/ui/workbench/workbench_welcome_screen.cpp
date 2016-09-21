@@ -38,7 +38,7 @@ namespace
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnQmlSortFilterProxyModel>("NetworkOptix.Qml", 1, 0, "QnQmlSortFilterProxyModel");
-        qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentUserConnectionsModel");
+        qmlRegisterType<QnrecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnrecentLocalConnectionsModel");
 
         auto holder = new QStackedWidget();
         holder->addWidget(new QWidget());
@@ -268,7 +268,8 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
         QUrl::fromUserInput(serverUrl),
         QnCredentials(userName, password),
         storePassword,
-        autoLogin);
+        autoLogin,
+        false);
 }
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
@@ -282,6 +283,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QnCredentials& credentials,
     bool storePassword,
     bool autoLogin,
+    bool isConnectionToCloud,
     const QnRaiiGuardPtr& completionTracker)
 {
     if (!connectingToSystem().isEmpty())
@@ -305,7 +307,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             params.setArgument(Qn::StorePasswordRole, storePassword);
             params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
-
+            params.setArgument(Qn::IsConnectionToCloud, isConnectionToCloud);
             menu()->trigger(QnActions::ConnectAction, params);
         };
 
@@ -321,7 +323,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
         return;
 
     connectToSystemInternal(systemId, QUrl::fromUserInput(serverUrl),
-        qnCloudStatusWatcher->credentials(), false, false);
+        qnCloudStatusWatcher->credentials(), false, false, true);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()

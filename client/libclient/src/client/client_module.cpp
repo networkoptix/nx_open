@@ -41,6 +41,7 @@
 #include <finders/systems_finder.h>
 #include <finders/direct_systems_finder.h>
 #include <finders/cloud_systems_finder.h>
+#include <finders/recent_local_systems_finder.h>
 
 #include <network/module_finder.h>
 #include <network/router.h>
@@ -472,11 +473,24 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     moduleFinder->start();
     qnCommon->store<QnModuleFinder>(moduleFinder);
 
+    enum
+    {
+        kCloudPriority,
+        kDirectFinder,
+        kRecentFinder,
+    };
+
     QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
-    QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
+
     QScopedPointer<QnCloudSystemsFinder> cloudSystemsFinder(new QnCloudSystemsFinder());
-    systemsFinder->addSystemsFinder(directSystemsFinder.data(), false);
-    systemsFinder->addSystemsFinder(cloudSystemsFinder.data(), true);
+    systemsFinder->addSystemsFinder(cloudSystemsFinder.data(), kCloudPriority);
+
+    QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
+    systemsFinder->addSystemsFinder(directSystemsFinder.data(), kDirectFinder);
+
+    QScopedPointer<QnRecentLocalSystemsFinder> recentLocalSystemsFinder(new QnRecentLocalSystemsFinder());
+    systemsFinder->addSystemsFinder(recentLocalSystemsFinder.data(), kRecentFinder);
+
     qnCommon->store<QnSystemsFinder>(systemsFinder.take());
     qnCommon->store<QnDirectSystemsFinder>(directSystemsFinder.take());
     qnCommon->store<QnCloudSystemsFinder>(cloudSystemsFinder.take());
