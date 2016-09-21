@@ -512,19 +512,22 @@ TEST(Storage_load_balancing_algorithm_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    QnStorageResourcePtr storage1 = QnStorageResourcePtr(new MockStorageResource1); 
-    storage1->setUrl("url1");
-    storage1->setId("{45FF0AD9-649B-4EDC-B032-13603EA37077}"); 
+    QString fileStorageUrl = qApp->applicationDirPath() + lit("/tmp");
+    QDir().mkpath(fileStorageUrl);
+
+    QnStorageResourcePtr storage1 = QnStorageResourcePtr(new MockStorageResource1);
+    storage1->setUrl(fileStorageUrl);
+    storage1->setId("{45FF0AD9-649B-4EDC-B032-13603EA37077}");
     storage1->setUsedForWriting(true);
 
     QnStorageResourcePtr storage2 = QnStorageResourcePtr(new MockStorageResource2);
-    storage2->setUrl("url2");
-    storage2->setId("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}"); 
+    storage2->setUrl(fileStorageUrl);
+    storage2->setId("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}");
     storage2->setUsedForWriting(true);
 
     QnStorageResourcePtr storage3 = QnStorageResourcePtr(new MockStorageResource3);
-    storage3->setUrl("url3");
-    storage3->setId("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}"); 
+    storage3->setUrl(fileStorageUrl);
+    storage3->setId("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}");
     storage3->setUsedForWriting(true);
 
     qnNormalStorageMan->addStorage(storage1);
@@ -539,7 +542,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     storage1->setWritedCoeff(0.3);
     storage1->setWritedCoeff(0.4);
 
-    const int writeCount = 1000 * 1000 * 1;
+    const int writeCount = 5000;
     QnUuid currentStorageId;
 
     int currentStorageUseCount = 0;
@@ -549,18 +552,18 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     const int kMaxUseInARowOverflowCount = 5;
     const double kMaxUsageDelta = 50;
 
-    for (int i = 0; i < writeCount; ++i) 
+    for (int i = 0; i < writeCount; ++i)
     {
         auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
         ASSERT_TRUE(storage);
-        if (currentStorageId != storage->getId()) 
+        if (currentStorageId != storage->getId())
         {
             currentStorageId = storage->getId();
             if (currentStorageUseCount > kMaxStorageUseInARow)
                 ++useInARowOverflowCount;
             currentStorageUseCount = 0;
         }
-        else 
+        else
         {
             ++currentStorageUseCount;
         }
