@@ -23,7 +23,7 @@ QnTransactionLog::QnTransactionLog(detail::QnDbManager* db): m_dbManager(db)
     NX_ASSERT(!globalInstance);
     globalInstance = this;
     m_lastTimestamp = Timestamp::fromInteger(0);
-    m_baseTime = Timestamp::fromInteger(0);
+    m_baseTime = 0;
 }
 
 QnTransactionLog::~QnTransactionLog()
@@ -52,8 +52,8 @@ bool QnTransactionLog::clear()
     m_updateHistory.clear();
     m_commitData.clear();
 
-    m_lastTimestamp = Timestamp::fromInteger(qnSyncTime->currentMSecsSinceEpoch());
-    m_baseTime = m_lastTimestamp;
+    m_baseTime = qnSyncTime->currentMSecsSinceEpoch();
+    m_lastTimestamp = Timestamp::fromInteger(m_baseTime);
     m_relativeTimer.restart();
 
     return true;
@@ -132,7 +132,7 @@ bool QnTransactionLog::init()
     queryTime.setForwardOnly(true);
     queryTime.prepare(
         R"sql(
-        SELECT timestamp_hi, MAX(timestamp) FROM transaction_log 
+        SELECT timestamp_hi, MAX(timestamp) FROM transaction_log
         GROUP BY timestamp_hi ORDER BY timestamp_hi DESC LIMIT 1
         )sql");
     if( !queryTime.exec() )
@@ -143,7 +143,7 @@ bool QnTransactionLog::init()
         readTimestamp.ticks = queryTime.value(1).toLongLong();
         m_lastTimestamp = qMax(m_lastTimestamp, readTimestamp);
     }
-    m_baseTime = m_lastTimestamp;
+    m_baseTime = m_lastTimestamp.ticks;
     m_relativeTimer.start();
 
     return true;
@@ -152,31 +152,32 @@ bool QnTransactionLog::init()
 Timestamp QnTransactionLog::getTimeStamp()
 {
     const qint64 absoluteTime = qnSyncTime->currentMSecsSinceEpoch();
-    // TODO: transaction timestamp: add sequence
-    Timestamp newTime = Timestamp::fromInteger(absoluteTime);
+
+    Timestamp newTime = Timestamp(m_lastTimestamp.sequence, absoluteTime);
 
     QnMutexLocker lock( &m_timeMutex );
     if (newTime > m_lastTimestamp)
     {
-        m_baseTime = m_lastTimestamp = newTime;
+        m_lastTimestamp = newTime;
+        m_baseTime = absoluteTime;
         m_relativeTimer.restart();
     }
     else
     {
         static const int TIME_SHIFT_DELTA = 1000;
-        newTime = m_baseTime + m_relativeTimer.elapsed();
+        newTime.ticks = m_baseTime + m_relativeTimer.elapsed();
         if (newTime > m_lastTimestamp)
         {
             if (newTime > m_lastTimestamp + TIME_SHIFT_DELTA && newTime > absoluteTime + TIME_SHIFT_DELTA) {
                 newTime -= TIME_SHIFT_DELTA; // try to reach absolute time
-                m_baseTime = newTime;
+                m_baseTime = newTime.ticks;
                 m_relativeTimer.restart();
             }
             m_lastTimestamp = newTime;
         }
         else {
             m_lastTimestamp++;
-            m_baseTime = m_lastTimestamp;
+            m_baseTime = m_lastTimestamp.ticks;
             m_relativeTimer.restart();
         }
     }

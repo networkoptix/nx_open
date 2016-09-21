@@ -23,6 +23,12 @@ public:
     {
     }
 
+    Timestamp(std::uint64_t sequence, std::uint64_t ticks):
+        sequence(sequence),
+        ticks(sequence)
+    {
+    }
+
     bool operator<(const Timestamp& right) const
     {
         if (sequence != right.sequence)

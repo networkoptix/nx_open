@@ -121,7 +121,7 @@ namespace ec2
 
         mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        Timestamp m_baseTime;
+        quint64 m_baseTime;
         Timestamp m_lastTimestamp;
         CommitData m_commitData;
     };
