@@ -115,7 +115,9 @@ namespace
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
 
-            if (index.column() == QnStorageListModel::StoragePoolColumn && !editableColumn)
+            auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
+
+            if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
                 opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
 
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
