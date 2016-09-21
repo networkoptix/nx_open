@@ -15,7 +15,7 @@
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
@@ -38,7 +38,7 @@
                         <param>
                             <name>sortBy</name>
                             <description>
-                                Sorts result by specified value. Default value is 'startTime'.
+                                Sorts result by specified value. Default value is "startTime".
                             </description>
                             <optional>true</optional>
                             <values>
@@ -131,7 +131,7 @@
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
@@ -285,7 +285,7 @@
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
@@ -376,13 +376,13 @@
                 </function>
                 <function proprietary="true">
                     <name>execAction</name>
-                    <description>Execute business action. Action data should be in a internal
-                        binary format. This method is going to be refactored at next
+                    <description>Execute an action. Action data should be in a internal
+                        binary format. This method is going to be refactored in the next
                         version.</description>
                     <method>POST</method>
                     <params/>
                     <result>
-                        <caption>Return XML with 'OK' message or error code</caption>
+                        <caption>Return XML with "OK" message or error code</caption>
                     </result>
                 </function>
                 <function proprietary="true">
@@ -413,7 +413,7 @@
                         </param>
                         <param>
                             <name>brule_id</name>
-                            <description>Business rule id.</description>
+                            <description>Event rule id.</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -451,12 +451,12 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Json result with error code</caption>
+                        <caption>JSON result with error code</caption>
                     </result>
               </function>
               <function>
                 <name>setupLocalSystem</name>
-                <description>Configure server's system name and password. This function can be called for server with default system name. Otherwise function returns error.
+                <description>Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
                 </description>
                 <method>GET</method>
                 <params>
@@ -477,13 +477,13 @@
                   </param>
                 </params>
                 <result>
-                  <caption>Json result with error code</caption>
+                  <caption>JSON result with error code</caption>
                 </result>
               </function>
               <function>
                 <name>setupCloudSystem</name>
                 <description>
-                  Configure server's system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
+                  Configure server system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
                 </description>
                 <method>GET</method>
                 <params>
@@ -509,7 +509,7 @@
                   </param>
                 </params>
                 <result>
-                  <caption>Json result with error code</caption>
+                  <caption>JSON result with error code</caption>
                 </result>
                 </function>
                 <function>
@@ -520,7 +520,7 @@
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
@@ -564,7 +564,7 @@
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
@@ -589,7 +589,7 @@
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
@@ -614,13 +614,13 @@
                             <name>cameraId</name>
                             <optional>false</optional>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                         </param>
                         <param>
                             <name>time</name>
                             <description>required image time. Microseconds since 1970 UTC or string
-                                in format 'YYYY-MM-DDThh24:mi:ss.zzz'. Date format is auto detected.
+                                in format "YYYY-MM-DDThh24:mi:ss.zzz". Date format is auto detected.
                                 Also, additional special values are allowed.</description>
                             <optional>false</optional>
                             <values>
@@ -646,7 +646,7 @@
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Image format. Default value 'jpeg'</description>
+                            <description>Image format. Default value "jpeg"</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -670,7 +670,7 @@
                         <param>
                             <name>method</name>
                             <description>Parameter defines method to search frame inside GOP
-                                structure. Default value 'before'. Parameter not used for Motion
+                                structure. Default value "before". Parameter not used for Motion
                                 jpeg video codec.</description>
                             <optional>true</optional>
                             <values>
@@ -743,28 +743,28 @@
                     </result>
                 </function>
                 <function>
-                    <name>businessEvents</name>
-                    <description>Returns event log information at requested format.</description>
+                    <name>getEvents</name>
+                    <description>Returns event log information in the requested format.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>from</name>
                             <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
                                 detected.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
                             <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
                                 detected.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).
                                 Used to filter events log by a single camera.
                             </description>
@@ -782,7 +782,7 @@
                         </param>
                         <param>
                             <name>brule_id</name>
-                            <description>Filter events log by specified business event rule (keep only records generated via that business rule). This id could be obtained via 'ec2/getBusinessRules' call.</description>
+                            <description>Filter events log by specified event rule (keep only records generated via that event rule). This id could be obtained via /ec2/getEventRules.</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -798,14 +798,14 @@
                         <param>
                             <name>from</name>
                             <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
                                 detected.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
                             <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
                                 detected.</description>
                             <optional>true</optional>
                         </param>
@@ -883,7 +883,7 @@
                 <function>
                     <name>manualCamera/add</name>
                     <description>Manually add camera(s). If several cameras are added, parameters
-                        'url' and 'manufacturer' must be defined several times.</description>
+                        "url" and "manufacturer" must be defined several times.</description>
                     <method>POST</method>
                     <params>
                         <param>
@@ -954,7 +954,7 @@
                         <param>
                             <name>cameraId</name>
                             <description>
-                                Camera id (can be obtained by ec2/getCamerasEx) or
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                 MAC address (not supported for certain cameras).</description>
                             <optional>false</optional>
                         </param>
@@ -1015,7 +1015,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Json message with error code and error message.</caption>
+                        <caption>JSON message with error code and error message.</caption>
                     </result>
                 </function>
                 <function>
@@ -1088,7 +1088,7 @@
                     <params>
                         <param>
                             <name>cameraId</name>
-                            <description>Camera id (can be obtained by ec2/getCamerasEx) or
+                            <description>Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                  MAC address (not supported for certain cameras).
                                  Parameter can be used several times to define a list of cameras.</description>
                             <optional>false</optional>
@@ -1096,14 +1096,14 @@
                         <param>
                             <name>startTime</name>
                             <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
                                 detected.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>endTime</name>
                             <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto
+                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
                                 detected.</description>
                             <optional>false</optional>
                         </param>
@@ -1112,14 +1112,14 @@
                             <description>This parameter is used for motion search (periodsType must be 1). Match motion on a video by specified rectangle.
                                 Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
                                 rectangle format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
-                                'x' and 'width' in range [0..43], 'y' and 'height' in range [0..31].
+                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format. Allowed values: 'json', 'xml', 'txt', 'bin'.
-                                Default value 'json'</description>
+                            <description>Data format. Allowed values: "json", "xml", "txt", "bin".
+                                Default value "json"</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1175,7 +1175,7 @@
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>XML with server's storages.</caption>
+                        <caption>XML with server storages.</caption>
                     </result>
                 </function>
                 <function>
@@ -1190,8 +1190,8 @@
                         </param>
                     </params>
                     <result>
-                        <caption>JSON data. 'OK' if specified folder may be used for writing on
-                        the server. Otherwise returns 'FAIL' </caption>
+                        <caption>JSON data. "OK" if specified folder may be used for writing on
+                        the server. Otherwise returns "FAIL" </caption>
                     </result>
                 </function>
                 <function>
@@ -1257,7 +1257,7 @@
                         INVALID_FILE if the provided file cannot be opened as a ZIP archive;
                         INCOMPATIBLE_SYSTEM if the update file is targeted for another system;
                         EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
-                        INSTALLATION_ERROR if the server couldn't execute installation script.</caption>
+                        INSTALLATION_ERROR if the server could not execute installation script.</caption>
                     </result>
                 </function>
                 <function proprietary="true">
@@ -1269,7 +1269,7 @@
                 </function>
                 <function proprietary="true">
                     <name>onEvent</name>
-                    <description>Process business event from external system. Reserved for future
+                    <description>Process an event from an external system. Reserved for future
                         use.</description>
                     <method>POST</method>
                     <params/>
@@ -1478,7 +1478,7 @@
                 </function>
                 <function>
                     <name>iflist</name>
-                    <description>Returns detail information about server's network interfaces</description>
+                    <description>Returns detail information about server network interfaces</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1487,14 +1487,14 @@
                 </function>
                 <function>
                     <name>aggregator</name>
-                    <description>This function allows to execute several requests with json content type and returns result as a single Json object</description>
+                    <description>This function allows to execute several requests with json content type and returns result as a single JSON object</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>exec_cmd</name>
                             <description>
                               HTTP url path to execute. This parameter could be repeated several times to execute several nested methods.
-							                All additions parameters after current 'exec_cmd' and before next 'exec_cmd' are passed as parameters
+							                All additions parameters after current "exec_cmd" and before next "exec_cmd" are passed as parameters
 							                to the nested method.
 							              </description>
                             <optional>true</optional>
@@ -1524,7 +1524,7 @@
                 </function>
                 <function proprietary="true">
                     <name>execute</name>
-                    <description>Execute any script from subfolder 'scripts' of media server. Script name provides directly in a URL path like '/api/execute/script1.sh'.
+                    <description>Execute any script from subfolder "scripts" of media server. Script name provides directly in a URL path like "/api/execute/script1.sh".
                                  All URL parameters are passed directly to a script as an parameters.
                     </description>
                     <method>GET</method>
@@ -1544,73 +1544,103 @@
                 </function>
                 <function>
                     <name>createEvent</name>
-                    <description>Using this method it's possible to deliver a generic event to the system from 3rd party systems.
-                                 It will be processed and logged according to current event rules.
+                    <description>
+                        Using this method it is possible to trigger a generic event in the system
+                        from a 3rd party system. Such event will be handled and logged according
+                        to current event rules. Parameters of the generated event, such as
+                        "source", "caption" and "description", are intended to be analyzed by these
+                        rules.
+                        <tt>
+                          <br/>Example:
+                          <pre><![CDATA[
+http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=CreditCardUsed&metadata={"cameraRefs":["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248","3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]}
+                          ]]></pre>
+                          This example triggers a generic event informing the system that a
+                          credit card has been used on September 16, 2016 at 16:03:41 UTC in a POS
+                          terminal being watched by the two specified cameras.
+                        </tt>
                     </description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>timestamp</name>
-                            <description>Event date and time. It could be either UTC milliseconds or human readible date and time at ISO 8601 format.
-                                         If eventTimestamp is absent, current server date and time is used.
+                            <description>
+                                Event date and time. It can be either a number of milliseconds
+                                since epoch (1970-01-01 00:00, UTC), or a human-readable date and
+                                time in ISO 8601 format. If "timestamp" is absent, current server
+                                date and time is used.
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>source</name>
-                            <description> External device name. It could be used as a filter at business rules to math different action with different devices.
-                                          Also, user could see device name in the notifications panel. For instance: 'POS terminal 5'.
+                            <description>
+                                Name of the device which has triggered the event. It can be used
+                                in a filter in event rules to assign different actions to different
+                                devices. Also, the user could see this name in the notifications
+                                panel. Example: "POS terminal 5".
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>caption</name>
-                            <description> Short event description. It could be used as a filter at business rules to math different action with different events.
+                            <description>Short event description. It can be used in a filter in
+                                event rules to assign actions depending on this text.
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>description</name>
-                            <description> Long event description. It could be used as a filter at business rules to math different action with different events.
+                            <description>Long event description. It can be used as a filter in
+                                event rules to assign actions depending on this text.
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>metadata</name>
-                            <description>Addition information for various purpose. This field should contain valid Json object.
-                                         Current version uses field 'cameraRefs', any other fields could be added for future purpose.
-                                         'cameraRefs' field sould contains list if camera's 'id' field. This value could be obtained
-                                         via '/ec2/getCamerasEx' call.
-                                <tt>
-                                    <br/>Json string example:
-                                    <pre>
-{
-  "cameraRefs": ["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248", "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]
-}
-                                    </pre>
-                                </tt>
+                            <description>
+                                Additional information associated with the event, in the
+                                form of a JSON object. Currently this object can specify the only
+                                field "cameraRefs", but other fields could be added in the future.
+                                <ul>
+                                    <li>"cameraRefs" specifies a number of cameras which are linked
+                                        to the event (e.g. the event will appear on their
+                                        timelines), in the form of a list of camera ids (can be
+                                        obtained from "id" field via /ec2/getCamerasEx or
+                                        /ec2/getCameras?extraFormatting).
+                                    </li>
+                                </ul>
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>state</name>
-                            <description> Generic events can be used either with long actions like 'do recording' or instant actions like 'send email'. If you are going to use long actions with Generic events, this parameter should be filled.
+                            <description>Generic events can be used either with "long" actions like
+                                "do recording", or instant actions like "send email". This
+                                parameter should be specified in case "long" actions are going to
+                                be used with generic events.
                             </description>
                             <optional>true</optional>
                             <values>
                                 <value>
                                     <name>Active</name>
-                                    <description>Generic event consider as a 'long' event. It goes to the 'active' state. Long actions will continue untill Generic event goes to the inactive state.</description>
+                                    <description>Generic event is considered a "long" event. It
+                                        transits to the "active" state. "Long" actions will
+                                        continue executing until the generic event transits to the
+                                        "inactive" state.
+                                    </description>
                                 </value>
                                 <value>
                                     <name>Inactive</name>
-                                    <description>Long action, associated with Generic event in busiless rules, will stop.</description>
+                                    <description>A "long" action associated with this generic event
+                                        in event rules will stop.
+                                    </description>
                                 </value>
                             </values>
                         </param>
                     </params>
                     <result>
-                        <caption>Json result with error code.</caption>
+                        <caption>JSON result with error code.</caption>
                     </result>
                 </function>
             </functions>
@@ -1619,7 +1649,7 @@
             <groupName>Video API</groupName>
             <urlPrefix/>
             <groupDescription>
-                This group contains information about accessing cameras' live video and footage.
+                This group contains information about accessing cameras" live video and footage.
             </groupDescription>
             <functions>
                 <function>
@@ -1628,7 +1658,7 @@
                     <description>
                         Open RTSP video stream from a camera.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        any camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
                         supported for certain cameras).
                         Example:
                         rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
@@ -1707,7 +1737,7 @@
                     <description>
                         Open HTTP video stream from a camera.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        any camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
                         supported for certain cameras).
                         Codec and stream format can be specified in URL parameters. Live stream and
                         archive can be downloaded. If required and possible, media stream
@@ -1732,7 +1762,7 @@
                         </param>
                         <param>
                             <name>endPos</name>
-                            <description>If present then specifies archive stream end positions. It used only if 'pos' parameter is present.
+                            <description>If present then specifies archive stream end positions. It used only if "pos" parameter is present.
                                          Milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
                                          </description>
                             <optional>true</optional>
@@ -1763,7 +1793,7 @@
                     <description>
                         Open HTTP Live Streaming (HLS) video stream from a camera.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        any camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
                         supported for certain cameras).
                         This protocol is supported by iOS-based devices (iPhone, iPad).
                         Example:
@@ -1798,7 +1828,7 @@
                         Download fragment of a camera archive, identified by its start time and
                         duration.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained by ec2/getCamerasEx) or MAC address (not
+                        any camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
                         supported for certain cameras).
                         Fragment can be downloaded in mpeg-2/ts (.ts) or Matroska (.mkv) format.
                         No transcoding is performed. Stream format can be one of following: ts, mkv.
@@ -1877,7 +1907,7 @@
                     <description>
                         Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
                         It provides you a way to replace it with your own. <br/>
-                        It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.<br/>
+                        It works mostly like sessions, but a bit more secure because it doesn"t send user"s password over HTTP.<br/>
                         <ul>
                         <li>To check authentication:
                             <ol>
@@ -1889,7 +1919,7 @@
                         <li>To log in:
                             <ol>
                                 <li>Request <code>/api/getNonce</code></li>
-                                <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
+                                <li>In response you"ll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
                                 <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
                                 <li>Request <code>/api/cookieLogin</code>(POST) pass auth parameter there</li>
                                 <li>Server will check authentification and will set session cookies</li>
@@ -1929,8 +1959,8 @@
                         For url-based authentification and cookie-based authentification you need to calculate hash manually, using the following algorythm:
                         <ul>
                             <li>Get <i>nonce</i> and <i>realm</i> from server</li>
-                            <li>Translate user's <i>username</i> to lower case</li>
-                            <li>Check required <i>method</i> ('GET' for http-requests, 'PLAY' for rtsp)</li>
+                            <li>Translate user"s <i>username</i> to lower case</li>
+                            <li>Check required <i>method</i> ("GET" for http-requests, "PLAY" for rtsp)</li>
                             <li>
                                 <i>ha1 = MD5(usename:realm:password)</i>
                             </li>

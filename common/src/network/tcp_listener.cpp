@@ -26,6 +26,7 @@ public:
     bool useSSL;
     int maxConnections;
     bool ddosWarned;
+    SystemError::ErrorCode lastError;
 
     static QByteArray defaultPage;
     static QString pathIgnorePrefix;
@@ -36,7 +37,8 @@ public:
         localPort(0),
         useSSL(false),
         maxConnections(0),
-        ddosWarned(false)
+        ddosWarned(false),
+        lastError(SystemError::noError)
     {
     }
 };
@@ -111,17 +113,15 @@ bool QnTcpListener::bindToLocalAddress()
     if (!d->serverSocket
         || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
-        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG(lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)")
-            .arg(d->serverAddress.toString()).arg(d->localPort)
-            .arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING);
-        qCritical() << "Can't start TCP listener at address"
-            << d->serverAddress << ":" << d->localPort << ". "
-            << "Reason: " << SystemError::toString(prevErrorCode) << "(" << prevErrorCode << ")";
+        const auto errorMessage = lm("Can't bind and listen on %1, %2")
+            .strs(localAddress, SystemError::toString(lastError()));
+
+        NX_LOGX(errorMessage, cl_logWARNING);
+        qCritical() << errorMessage;
         return false;
     }
 
-    NX_LOG(lit("Server started at %1").arg(localAddress.toString()), cl_logINFO);
+    NX_LOGX(lm("Server started at %1").str(localAddress), cl_logINFO);
     return true;
 }
 
@@ -134,11 +134,14 @@ AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
     bool sslNeeded,
     const SocketAddress& localAddress)
 {
+    Q_D(QnTcpListener);
+
     auto serverSocket = SocketFactory::createStreamServerSocket(sslNeeded);
     if (!serverSocket->setReuseAddrFlag(true) ||
         !serverSocket->bind(localAddress) ||
         !serverSocket->listen())
     {
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
 
@@ -206,6 +209,18 @@ bool QnTcpListener::isSslEnabled() const
 {
     Q_D(const QnTcpListener);
     return d->useSSL;
+}
+
+SystemError::ErrorCode QnTcpListener::lastError() const
+{
+    Q_D(const QnTcpListener);
+    return d->lastError;
+}
+
+void QnTcpListener::setLastError(SystemError::ErrorCode error)
+{
+    Q_D(QnTcpListener);
+    d->lastError = error;
 }
 
 void QnTcpListener::pleaseStop()

@@ -17,7 +17,7 @@ ReverseConnectionPool::ReverseConnectionPool(
         QnUuid::createUuid().toByteArray(),
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            NX_LOGX(lm("New socket(%1) from '%2").args(socket, hostName), cl_logDEBUG1);
+            NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
             getHolder(hostName, true)->saveSocket(std::move(socket));
         })
 {
@@ -34,8 +34,8 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(serverAddress, m_mediatorConnection->getAioThread()))
     {
-        NX_LOGX(lm("Could not start acceptor: %1").arg(SystemError::getLastOSErrorText()),
-            cl_logWARNING);
+        NX_LOGX(lm("Could not start acceptor %1: %2")
+            .strs(m_acceptor.selfHostName(), SystemError::getLastOSErrorText()), cl_logWARNING);
 
         return false;
     }
@@ -53,13 +53,19 @@ std::shared_ptr<ReverseConnectionHolder>
 {
     auto holder = getHolder(hostName, false);
     if (!holder)
+    {
+        NX_LOGX(lm("There is not holder for %1").str(hostName), cl_logDEBUG2);
         return nullptr;
+    }
 
     const auto connections = holder->socketCount();
     if (connections == 0)
+    {
+        NX_LOGX(lm("There are no sockets on holder for %1").str(hostName), cl_logDEBUG2);
         return nullptr;
+    }
 
-    NX_LOGX(lm("Returning holder for '%1' with %2 connections(s)")
+    NX_LOGX(lm("Returning holder for %1 with %2 connections(s)")
         .strs(hostName, connections), cl_logDEBUG1);
 
     return holder;
@@ -113,10 +119,10 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
             }
             else
             {
-                NX_LOGX(lm("Could not register on mediator: %1").str(code), cl_logWARNING);
+                NX_LOGX(lm("Could not register on mediator by %1: %2")
+                    .strs(m_acceptor.selfHostName(), code), cl_logWARNING);
             }
 
-            // Reregister on reconnect:
             m_mediatorConnection->setOnReconnectedHandler([this](){ registerOnMediator(); });
 
             if (registrationPromise)

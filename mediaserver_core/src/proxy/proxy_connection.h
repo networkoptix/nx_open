@@ -23,7 +23,6 @@ public:
     virtual ~QnProxyConnectionProcessor();
 protected:
     virtual void run() override;
-	virtual void pleaseStop() override;
 private:
     static bool doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize);
     static int getDefaultPortByProtocol(const QString& protocol);

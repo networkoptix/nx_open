@@ -67,7 +67,7 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
             QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
 
         ASSERT_TRUE(httpClient.response() != nullptr);
-        ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+        ASSERT_EQ(nx_http::StatusCode::notFound, httpClient.response()->statusLine.statusCode);
         ASSERT_EQ(nx_http::FusionRequestErrorClass::unauthorized, requestResult.errorClass);
         ASSERT_EQ(
             QnLexical::serialized(api::ResultCode::accountNotActivated),

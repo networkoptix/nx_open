@@ -302,15 +302,14 @@ TEST_F(Account, badRegistration)
     auto doneFuture = donePromise.get_future();
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,
-        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) {
-            donePromise.set_value();
-        },
+        client.get(),
+        [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); }, 
         Qt::DirectConnection);
     client->doPost(url, "application/json", QJson::serialized(account1));
 
     doneFuture.wait();
     ASSERT_TRUE(client->response() != nullptr);
-    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+    ASSERT_EQ(nx_http::StatusCode::notFound, client->response()->statusLine.statusCode);
 
     bool success = false;
     nx_http::FusionRequestResult requestResult =

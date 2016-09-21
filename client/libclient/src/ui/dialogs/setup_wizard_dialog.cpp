@@ -54,7 +54,7 @@ int QnSetupWizardDialog::exec()
     QUrl url = constructUrl(d->url);
 
     NX_LOG(lit("QnSetupWizardDialog: Opening setup URL: %1")
-           .arg(url.toString()), cl_logDEBUG1);
+           .arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
 
     d->webView->load(url);
 

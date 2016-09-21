@@ -86,7 +86,7 @@ struct ApiCameraAttributesData: ApiData
     QnLatin1Array dewarpingParams;
     int minArchiveDays;
     int maxArchiveDays;
-    QnUuid preferedServerId;
+    QnUuid preferredServerId;
     Qn::FailoverPriority failoverPriority;
     Qn::CameraBackupQualities backupType;
 };
@@ -103,7 +103,7 @@ struct ApiCameraAttributesData: ApiData
     (dewarpingParams) \
     (minArchiveDays) \
     (maxArchiveDays) \
-    (preferedServerId) \
+    (preferredServerId) \
     (failoverPriority) \
     (backupType)
 #define ApiCameraAttributesData_Fields (cameraId)(cameraName) ApiCameraAttributesData_Fields_Short

@@ -129,6 +129,21 @@ namespace nx_http
         To get error description use SystemError::getLastOSErrorCode()
         */
         void doGet(const QUrl& url);
+        /**
+         * This overload is same as:
+         * \code{.cpp}
+         * QObject::connect(
+         *     httpClient.get(), &nx_http::AsyncHttpClient::done,
+         *     [completionHandler](AsyncHttpClientPtr httpClient)
+         *     {
+         *         completionHandler(httpClient);
+         *     });
+         * httpClient->doGet();
+         * \endcode
+         */
+        void doGet(
+            const QUrl& url,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         //!Start POST request to \a url
         /*!
@@ -141,13 +156,27 @@ namespace nx_http
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody,
             bool includeContentLength = true);
+        void doPost(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            nx_http::StringType messageBody,
+            bool includeContentLength,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         void doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody);
+        void doPut(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            nx_http::StringType messageBody,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         void doOptions(const QUrl& url);
+        void doOptions(
+            const QUrl& url,
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
         const nx_http::Request& request() const;
 
@@ -322,6 +351,12 @@ namespace nx_http
             const nx_http::Response& response,
             Request* const request);
         void stopWhileInAioThread();
+
+        template<typename ... Args>
+        void doHttpOperation(
+            nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler,
+            void(AsyncHttpClient::*func)(Args...),
+            Args... args);
 
         AsyncHttpClient(const AsyncHttpClient&);
         AsyncHttpClient& operator=(const AsyncHttpClient&);

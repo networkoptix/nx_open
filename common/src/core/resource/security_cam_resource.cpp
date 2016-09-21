@@ -749,16 +749,16 @@ int QnSecurityCamResource::maxDays() const
     return (*userAttributesLock)->maxDays;
 }
 
-void QnSecurityCamResource::setPreferedServerId(const QnUuid& value)
+void QnSecurityCamResource::setPreferredServerId(const QnUuid& value)
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    (*userAttributesLock)->preferedServerId = value;
+    (*userAttributesLock)->preferredServerId = value;
 }
 
-QnUuid QnSecurityCamResource::preferedServerId() const
+QnUuid QnSecurityCamResource::preferredServerId() const
 {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    return (*userAttributesLock)->preferedServerId;
+    return (*userAttributesLock)->preferredServerId;
 }
 
 void QnSecurityCamResource::setMinDays(int value)

@@ -265,7 +265,7 @@ namespace detail
         QXmlInputSource input( &xmlFile );
         if( !reader.parse( &input ) )
         {
-            NX_LOG( QString::fromLatin1( "Failed to parse contents.xml from remote folder %1. %2" ).arg(m_downloadUrl.toString()).arg(xmlHandler.errorString()), cl_logERROR );
+            NX_LOG( QString::fromLatin1( "Failed to parse contents.xml from remote folder %1. %2" ).arg(m_downloadUrl.toString(QUrl::RemovePassword)).arg(xmlHandler.errorString()), cl_logERROR );
             setResult( ResultCode::downloadFailure );
             m_handler->operationDone( shared_from_this() );
             return;

@@ -39,7 +39,7 @@ void IncomingReverseTunnelConnection::accept(AcceptHandler handler)
         [this, handler = std::move(handler)]()
         {
             m_acceptHandler = std::move(handler);
-            NX_LOGX(lm("monitor sockets(%1) on accept").container(m_sockets), cl_logDEBUG1);
+            NX_LOGX(lm("Monitor sockets(%1) on accept").container(m_sockets), cl_logDEBUG1);
             for (auto it = m_sockets.begin(); it != m_sockets.end(); ++it)
                 monitorSocket(it);
         });
@@ -144,7 +144,7 @@ void IncomingReverseTunnelConnection::saveConnection(
     const auto socketIt = m_sockets.insert(m_sockets.end(), std::move(socket));
     if (m_acceptHandler)
     {
-        NX_LOGX(lm("monitor socket(%1) from connector(%2)")
+        NX_LOGX(lm("Monitor socket(%1) from connector(%2)")
             .args(*socketIt).arg(connector), cl_logDEBUG2);
 
         monitorSocket(socketIt);
@@ -161,7 +161,7 @@ void IncomingReverseTunnelConnection::monitorSocket(
 
             auto socket = std::move(*socketIt);
             m_sockets.erase(socketIt);
-            NX_LOGX(lm("socket(%1) event: %2").arg(socket)
+            NX_LOGX(lm("Socket(%1) event: %2").arg(socket)
                 .arg(SystemError::toString(code)), cl_logDEBUG1);
 
             spawnConnectorIfNeeded();

@@ -33,8 +33,7 @@ CloudUserAuthenticator::CloudUserAuthenticator(
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultAuthenticator(std::move(defaultAuthenticator)),
-    m_cdbNonceFetcher(cdbNonceFetcher),
-    m_systemAccessListUpdatedSubscriptionId(nx::utils::kInvalidSubscriptionId)
+    m_cdbNonceFetcher(cdbNonceFetcher)
 {
     using namespace std::placeholders;
 
@@ -42,17 +41,10 @@ CloudUserAuthenticator::CloudUserAuthenticator(
     Qn::directConnect(
         m_cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
         this, &CloudUserAuthenticator::cloudBindingStatusChanged);
-
-    m_cloudConnectionManager->subscribeToSystemAccessListUpdatedEvent(
-        std::bind(&CloudUserAuthenticator::onSystemAccessListUpdated, this, _1),
-        &m_systemAccessListUpdatedSubscriptionId);
 }
 
 CloudUserAuthenticator::~CloudUserAuthenticator()
 {
-    m_cloudConnectionManager->unsubscribeFromSystemAccessListUpdatedEvent(
-        m_systemAccessListUpdatedSubscriptionId);
-
     directDisconnectAll();
 }
 
@@ -254,7 +246,7 @@ void CloudUserAuthenticator::removeExpiredRecordsFromCache(QnMutexLockerBase* co
 
 QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
     const nx_http::StringType& userName,
-    nx::cdb::api::SystemAccessRole cloudAccessRole) const
+    nx::cdb::api::SystemAccessRole /*cloudAccessRole*/) const
 {
     const auto userNameQString = QString::fromUtf8(userName);
     //if there is user with same name in system, resolving to that user
@@ -269,7 +261,6 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
 
     //cloud user is created by cloud portal during sharing process
     return QnUserResourcePtr();
-    //return createCloudUser(userNameQString, cloudAccessRole);
 }
 
 void CloudUserAuthenticator::fetchAuthorizationFromCloud(
@@ -404,13 +395,6 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     {
         return std::make_tuple(Qn::Auth_WrongPassword, std::move(localUser));
     }
-}
-
-void CloudUserAuthenticator::onSystemAccessListUpdated(
-    nx::cdb::api::SystemAccessListModifiedEvent /*event*/)
-{
-    NX_LOGX(lm("Received SystemAccessListModified event"), cl_logDEBUG1);
-    //TODO #ak
 }
 
 QnUserResourcePtr CloudUserAuthenticator::createCloudUser(

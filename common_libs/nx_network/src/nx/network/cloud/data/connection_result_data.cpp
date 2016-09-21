@@ -22,6 +22,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(NatTraversalResultCode,
     (NatTraversalResultCode::targetPeerHasNoUdpAddress, "targetPeerHasNoUdpAddress")
     (NatTraversalResultCode::noSynFromTargetPeer, "noSynFromTargetPeer")
     (NatTraversalResultCode::udtConnectFailed, "udtConnectFailed")
+    (NatTraversalResultCode::udtConnectFailed, "tcpConnectFailed")
+    (NatTraversalResultCode::udtConnectFailed, "endpointVerificationFailure")
     )
 
 

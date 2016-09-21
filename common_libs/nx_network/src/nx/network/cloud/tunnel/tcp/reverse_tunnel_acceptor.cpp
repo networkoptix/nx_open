@@ -32,8 +32,8 @@ void ReverseTunnelAcceptor::accept(AcceptHandler handler)
                     std::make_unique<IncomingReverseTunnelConnection>(
                                 selfHostName, m_remotePeerId, endpoint));
 
-                NX_LOGX(lm("Start connection(%1) to %2").strs(*connectionIt, endpoint),
-                    cl_logDEBUG1);
+                NX_LOGX(lm("Start connection(%1) to %2 endpoint %3")
+                    .strs(*connectionIt, m_remotePeerId, endpoint), cl_logDEBUG1);
 
                 (*connectionIt)->start(
                     m_mediatorConnection->getAioThread(),

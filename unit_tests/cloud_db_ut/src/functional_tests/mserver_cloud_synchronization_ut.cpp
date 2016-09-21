@@ -152,6 +152,8 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
     {
         // Cdb can change port after restart.
         appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+        if (i > 0)
+            verifyThatUsersMatchInCloudAndVms();
         verifyTransactionConnection();
         testSynchronizingCloudOwner();
         testSynchronizingUserFromCloudToMediaServer();
