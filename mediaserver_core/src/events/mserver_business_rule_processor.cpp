@@ -212,6 +212,20 @@ void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resou
     qnServerDb->removeLogForRes(resource->getId());
 }
 
+void QnMServerBusinessRuleProcessor::prepareAdditionActionParams(const QnAbstractBusinessActionPtr& action)
+{
+    switch(action->actionType())
+    {
+    case QnBusiness::SendMailAction:
+        // Add user's email addresses to action emailAddress field and filter invalid addresses
+        if (auto emailAction = action.dynamicCast<QnSendMailBusinessAction>())
+            updateRecipientsList(emailAction);
+        break;
+    default:
+        break;
+    }
+}
+
 bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
     bool result = QnBusinessRuleProcessor::executeActionInternal(action);
@@ -614,8 +628,6 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 {
     //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
-    // Add user's email addresses to action emailAddress field and filter invalid addresses
-    updateRecipientsList(action);
 	QStringList recipients = getRecipients(action);
 
     //aggregating by recipients and eventtype
