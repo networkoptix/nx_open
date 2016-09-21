@@ -276,7 +276,6 @@ void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
     if (m_dayTimeOpened == opened)
         return;
     m_dayTimeOpened = opened;
-    qDebug() << "set daytime opened" << opened;
 
     ensureAnimationAllowed(&animate);
     qreal opacity = opened ? kOpaque : kHidden;
