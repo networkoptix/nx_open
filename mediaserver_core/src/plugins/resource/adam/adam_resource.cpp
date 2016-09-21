@@ -93,6 +93,8 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
     QN_UNUSED(completionHandler);
+    if (!m_ioManager)
+        return false;
 
     auto callback = [this](QString portId, nx_io_managment::IOPortState inputState)
     {

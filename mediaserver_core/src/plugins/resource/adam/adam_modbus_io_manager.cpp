@@ -91,7 +91,7 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_client.setEndpoint(endpoint);
     m_outputClient.setEndpoint(endpoint);
 
-    fetchAllPortStates();
+    fetchAllPortStatesUnsafe();
 
     return true;
 }
@@ -100,6 +100,10 @@ void QnAdamModbusIOManager::stopIOMonitoring()
 {
     QnMutexLocker lock(&m_mutex);
     m_monitoringIsInProgress = false;
+
+    lock.unlock();
+    TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
+    lock.relock();
 
     QObject::disconnect(
         &m_client, &nx_modbus::QnModbusAsyncClient::done, 
@@ -117,7 +121,7 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
     auto coil = getPortCoil(outputId, success);
 
     auto defaultPortStateIsActive = 
-        nx_io_managment::isActiveIOPortState(getPortDefaultStateUnsafe(outputId));
+        nx_io_managment::isActiveIOPortState(getPortDefaultState(outputId));
 
     nx_modbus::ModbusResponse response;
     bool status = false;
@@ -158,11 +162,13 @@ bool QnAdamModbusIOManager::isMonitoringInProgress() const
 
 QnIOPortDataList QnAdamModbusIOManager::getInputPortList() const 
 {
+    QnMutexLocker lock(&m_mutex);
     return m_inputs;
 }
 
 QnIOPortDataList QnAdamModbusIOManager::getOutputPortList() const 
 {
+    QnMutexLocker lock(&m_mutex);
     return m_outputs;
 }
 
@@ -261,14 +267,23 @@ bool QnAdamModbusIOManager::initializeIO()
     return true;
 }
 
-void QnAdamModbusIOManager::fetchAllPortStates()
+void QnAdamModbusIOManager::fetchAllPortStatesUnsafe()
 {
+    if (m_inputs.empty() || m_outputs.empty())
+        return;
+
     bool status = true;
     auto startCoil = getPortCoil(m_inputs[0].id, status);
     auto lastCoil = getPortCoil(m_outputs[m_outputs.size() - 1].id, status);
 
     if (status)
         m_client.readCoilsAsync(startCoil, lastCoil - startCoil + 1);
+}
+
+void QnAdamModbusIOManager::fetchAllPortStates()
+{
+    QnMutexLocker lock(&m_mutex);
+    fetchAllPortStatesUnsafe();
 }
 
 void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::ModbusResponse& response)
@@ -288,14 +303,25 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
     }
 
     bool status = true;
+    int inputCount = 0;
+    int outputCount = 0;
+    quint32 startInputCoilBit = 0;
+    quint32 startOutputCoilBit = 0;
 
-    auto inputCount = m_inputs.size();
-    auto outputCount = m_outputs.size();
-    
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        inputCount = m_inputs.size();
+        outputCount = m_outputs.size();
+
+        if (!inputCount || !outputCount)
+            return;
+
+        startInputCoilBit = getPortCoil(m_inputs[0].id, status);
+        startOutputCoilBit = getPortCoil(m_outputs[0].id, status);
+    }
+
     auto fetchedPortStates = response.data.mid(1);
-
-    auto startInputCoilBit = getPortCoil(m_inputs[0].id, status);
-    auto startOutputCoilBit = getPortCoil(m_outputs[0].id, status);
 
     if (!status)
         return;

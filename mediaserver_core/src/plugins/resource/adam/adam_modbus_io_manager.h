@@ -56,6 +56,7 @@ private:
     bool initializeIO();
 
     void fetchAllPortStates();
+    void fetchAllPortStatesUnsafe();
 
     void processAllPortStatesResponse(const nx_modbus::ModbusResponse& response);
     void updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
