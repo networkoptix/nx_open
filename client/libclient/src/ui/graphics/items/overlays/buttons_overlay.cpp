@@ -1,6 +1,7 @@
 
 #include "buttons_overlay.h"
 
+#include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -78,12 +79,21 @@ QnButtonsOverlay::~QnButtonsOverlay()
 
 }
 
-void QnButtonsOverlay::setSimpleMode(bool isSimpleMode)
+void QnButtonsOverlay::setSimpleMode(bool isSimpleMode, bool animate)
 {
     const bool extraVisible = !isSimpleMode;
 
-    m_extraInfoLabel->setVisible(extraVisible);
-    m_rightButtonsPanel->setVisible(extraVisible);
+    if (animate)
+    {
+        auto targetValue = extraVisible ? 1.0 : 0.0;
+        opacityAnimator(m_extraInfoLabel)->animateTo(targetValue);
+        opacityAnimator(m_rightButtonsPanel)->animateTo(targetValue);
+    }
+    else
+    {
+        m_extraInfoLabel->setVisible(extraVisible);
+        m_rightButtonsPanel->setVisible(extraVisible);
+    }
 }
 
 QnImageButtonBar *QnButtonsOverlay::leftButtonsBar()

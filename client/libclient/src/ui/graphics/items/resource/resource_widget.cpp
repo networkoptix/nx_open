@@ -327,6 +327,16 @@ QnResourceWidget *QnResourceWidget::zoomTargetWidget() const
     return QnWorkbenchContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
 }
 
+qreal QnResourceWidget::frameOpacity() const
+{
+    return m_frameOpacity;
+}
+
+void QnResourceWidget::setFrameOpacity(qreal frameOpacity)
+{
+    m_frameOpacity = frameOpacity;
+}
+
 QColor QnResourceWidget::frameDistinctionColor() const
 {
     return m_frameDistinctionColor;
@@ -342,6 +352,11 @@ void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor)
     emit frameDistinctionColorChanged();
 }
 
+float QnResourceWidget::aspectRatio() const
+{
+    return m_aspectRatio;
+}
+
 void QnResourceWidget::setAspectRatio(float aspectRatio)
 {
     if (qFuzzyCompare(m_aspectRatio, aspectRatio))
@@ -351,6 +366,11 @@ void QnResourceWidget::setAspectRatio(float aspectRatio)
     updateGeometry(); /* Discard cached size hints. */
 
     emit aspectRatioChanged();
+}
+
+bool QnResourceWidget::hasAspectRatio() const
+{
+    return m_aspectRatio > 0.0;
 }
 
 float QnResourceWidget::visualAspectRatio() const
@@ -725,6 +745,11 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted()
     emit aboutToBeDestroyed();
 }
 
+void QnResourceWidget::setOption(Option option, bool value /*= true*/)
+{
+    setOptions(value ? m_options | option : m_options & ~option);
+}
+
 void QnResourceWidget::setOptions(Options options)
 {
     if (m_options == options)
@@ -828,7 +853,6 @@ int QnResourceWidget::channelCount() const
 
 void QnResourceWidget::updateHud(bool animate)
 {
-
     /*
         Logic must be the following:
         * if widget is in full screen mode and there is no activity - hide all following overlays
@@ -873,7 +897,7 @@ void QnResourceWidget::updateHud(bool animate)
         updateDetailsText();
 
     setOverlayWidgetVisible(m_overlayWidgets->buttonsOverlay, showButtonsOverlay, animate);
-    m_overlayWidgets->buttonsOverlay->setSimpleMode(showOnlyCameraName);
+    m_overlayWidgets->buttonsOverlay->setSimpleMode(showOnlyCameraName, animate);
 }
 
 bool QnResourceWidget::isHovered() const
