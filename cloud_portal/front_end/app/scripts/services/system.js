@@ -247,7 +247,7 @@ angular.module('cloudApp')
 
 
         system.prototype.saveUser = function(user, role){
-            var accessRole = role.Name || role.label;
+            var accessRole = role.name || role.label;
 
             if(!user.userId){
                 if(user.accountEmail == this.currentUserEmail){
