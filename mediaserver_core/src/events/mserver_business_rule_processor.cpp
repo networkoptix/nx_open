@@ -568,8 +568,17 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 	{
 		attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
 		contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
-		// contextMap[tpCloudOwner] = cloudOwner; // TODO: VMS-2880	Add cloud owner's name
-		contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
+        contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
+
+        const auto allUsers = qnResPool->getResources<QnUserResource>();
+        for (const auto& user: allUsers)
+        {
+            if (user->isCloud() && user->getEmail() == cloudOwnerAccount)
+            {
+                contextMap[tpCloudOwner] = user->fullName();
+                break;
+            }
+        }
 	}
 
 //    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
