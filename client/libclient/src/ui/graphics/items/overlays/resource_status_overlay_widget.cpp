@@ -128,9 +128,6 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
     m_button(new QPushButton()),
     m_description(new QnWordWrappedLabel())
 {
-    m_preloader->setIndicatorColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6));
-    m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
-
     setOpacity(kBaseOpacity);
     setAcceptedMouseButtons(Qt::NoButton);
 
@@ -220,13 +217,13 @@ void QnStatusOverlayWidget::setDescription(const QString& description)
 
 void QnStatusOverlayWidget::setupPreloader()
 {
-    const auto preloader = new QnBusyIndicatorGraphicsWidget();
-    preloader->setDotSpacing(8);
-    preloader->setDotRadius(8);
-    preloader->setVisible(false);
+    m_preloader->setIndicatorColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6));
+    m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
+    m_preloader->setDotRadius(8);
+    m_preloader->setDotSpacing(8);
 
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->addItem(preloader);
+    layout->addItem(m_preloader);
 
     m_preloaderHolder->setLayout(layout);
     m_preloaderHolder->setAcceptedMouseButtons(Qt::NoButton);
