@@ -14,16 +14,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemStatus,
-    (ssInvalid, "invalid")
-    (ssNotActivated, "notActivated")
-    (ssActivated, "activated"));
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemHealth,
-    (SystemHealth::offline, "offline")
-    (SystemHealth::online, "online"));
-
-
 ////////////////////////////////////////////////////////////
 //// class SystemRegistrationData
 ////////////////////////////////////////////////////////////
@@ -54,23 +44,6 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
         SystemRegistrationData_customization_field,
         data.customization.c_str());
 }
-
-
-////////////////////////////////////////////////////////////
-//// system sharing data
-////////////////////////////////////////////////////////////
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
-    (SystemAccessRole::none, "none")
-    (SystemAccessRole::disabled, "disabled")
-    (SystemAccessRole::custom, "custom")
-    (SystemAccessRole::liveViewer, "liveViewer")
-    (SystemAccessRole::viewer, "viewer")
-    (SystemAccessRole::advancedViewer, "advancedViewer")
-    (SystemAccessRole::localAdmin, "localAdmin")
-    (SystemAccessRole::cloudAdmin, "cloudAdmin")
-    (SystemAccessRole::maintenance, "maintenance")
-    (SystemAccessRole::owner, "owner"));
 
 ////////////////////////////////////////////////////////////
 //// class SystemSharing
@@ -201,8 +174,6 @@ void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery
         QString::fromStdString(data.name));
 }
 
-
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
     (json),
@@ -219,3 +190,27 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 }   //api
 }   //cdb
 }   //nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemStatus,
+    (nx::cdb::api::ssInvalid, "invalid")
+    (nx::cdb::api::ssNotActivated, "notActivated")
+    (nx::cdb::api::ssActivated, "activated")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemHealth,
+    (nx::cdb::api::SystemHealth::offline, "offline")
+    (nx::cdb::api::SystemHealth::online, "online")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemAccessRole,
+    (nx::cdb::api::SystemAccessRole::none, "none")
+    (nx::cdb::api::SystemAccessRole::disabled, "disabled")
+    (nx::cdb::api::SystemAccessRole::custom, "custom")
+    (nx::cdb::api::SystemAccessRole::liveViewer, "liveViewer")
+    (nx::cdb::api::SystemAccessRole::viewer, "viewer")
+    (nx::cdb::api::SystemAccessRole::advancedViewer, "advancedViewer")
+    (nx::cdb::api::SystemAccessRole::localAdmin, "localAdmin")
+    (nx::cdb::api::SystemAccessRole::cloudAdmin, "cloudAdmin")
+    (nx::cdb::api::SystemAccessRole::maintenance, "maintenance")
+    (nx::cdb::api::SystemAccessRole::owner, "owner")
+)

@@ -19,14 +19,14 @@ SimpleEIPClient::~SimpleEIPClient()
 bool SimpleEIPClient::initSocket()
 {
     m_connected = false;
-    m_eipSocket = TCPSocketPtr(SocketFactory::createStreamSocket(false));
+    m_eipSocket = SocketFactory::createStreamSocket(false);
     bool success = m_eipSocket->setSendTimeout(kDefaultEipTimeout * 1000)
         && m_eipSocket->setRecvTimeout(kDefaultEipTimeout * 1000);
 
     return success;
 }
 
-bool SimpleEIPClient::sendAll(TCPSocketPtr& socket, QByteArray& data)
+bool SimpleEIPClient::sendAll(AbstractStreamSocket* socket, QByteArray& data)
 {
     int totalBytesSent = 0;
     int dataSize = data.size();
@@ -52,7 +52,7 @@ bool SimpleEIPClient::sendAll(TCPSocketPtr& socket, QByteArray& data)
     return true;
 }
 
-bool SimpleEIPClient::receiveMessage(TCPSocketPtr& socket, char* const buffer)
+bool SimpleEIPClient::receiveMessage(AbstractStreamSocket* socket, char* const buffer)
 {
     int totalBytesRead = 0;
 
@@ -198,14 +198,14 @@ bool SimpleEIPClient::tryGetResponse(const MessageRouterRequest &request, QByteA
     auto encPacket = buildEIPEncapsulatedPacket(request);
     auto encodedEncapPacket = EIPPacket::encode(encPacket);
 
-    auto success = sendAll(m_eipSocket, encodedEncapPacket);
+    auto success = sendAll(m_eipSocket.get(), encodedEncapPacket);
     if (!success)
     {
         handleSocketError();
         return false;
     }
 
-    success = receiveMessage(m_eipSocket, m_recvBuffer);
+    success = receiveMessage(m_eipSocket.get(), m_recvBuffer);
     if (!success)
     {
         handleSocketError();
@@ -312,14 +312,14 @@ bool SimpleEIPClient::registerSessionUnsafe()
     stream << protocolVersion << optionFlags;
     encoded.append(buf);
 
-    bool success = sendAll(m_eipSocket, encoded);
+    bool success = sendAll(m_eipSocket.get(), encoded);
     if (!success)
     {
         handleSocketError();
         return false;
     }
 
-    success = receiveMessage(m_eipSocket, m_recvBuffer);
+    success = receiveMessage(m_eipSocket.get(), m_recvBuffer);
     if (!success)
     {
         handleSocketError();
@@ -363,7 +363,7 @@ bool SimpleEIPClient::unregisterSession()
 
     auto encodedPacket = EIPEncapsulationHeader::encode(encHeader);
 
-    auto success = sendAll(m_eipSocket, encoded);  
+    auto success = sendAll(m_eipSocket.get(), encoded);
     if (!success)
     {
         handleSocketError();

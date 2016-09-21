@@ -61,17 +61,13 @@ private:
     bool doServiceRequestAsyncInternal(const MessageRouterRequest& request);
     void sendPendingRequest();
 
-    void asyncConnectDone(
-        std::shared_ptr<AbstractStreamSocket> socket,
-        SystemError::ErrorCode errorCode);
+    void asyncConnectDone(SystemError::ErrorCode errorCode);
 
     void asyncSendDone(
-        AbstractStreamSocket* socket,
         SystemError::ErrorCode errorCode,
         size_t bytesWritten);
 
     void onSomeBytesReadAsync(
-        AbstractStreamSocket* socket,
         SystemError::ErrorCode errorCode,
         size_t bytesRead);
 

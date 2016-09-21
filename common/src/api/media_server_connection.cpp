@@ -398,14 +398,16 @@ int QnMediaServerConnection::sendAsyncGetRequestLogged(
 
 int QnMediaServerConnection::sendAsyncPostRequestLogged(
     int object,
-    const QnRequestHeaderList& headers,
+    nx_http::HttpHeaders headers,
     const QnRequestParamList& params,
     const QByteArray& data,
     const char* replyTypeName,
     QObject* target,
     const char* slot)
 {
-    int handle = sendAsyncPostRequest(object, headers, params, data, replyTypeName, target, slot);
+    int handle = sendAsyncPostRequest(
+        object, std::move(headers), params, data, replyTypeName, target, slot);
+
     trace(handle, object);
     return handle;
 }

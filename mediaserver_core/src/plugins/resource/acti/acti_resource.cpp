@@ -753,12 +753,12 @@ int QnActiResource::roundBitrate(int srcBitrateKbps) const
 {
     int minDistance = INT_MAX;
     int result = srcBitrateKbps;
-    for (int i = 0; i < m_availBitrate.size(); ++i)
+    for (const auto& bitrate: m_availableBitrates.keys())
     {
-        int distance = qAbs(m_availBitrate[i] - srcBitrateKbps);
+        int distance = qAbs(bitrate - srcBitrateKbps);
         if (distance <= minDistance) { // preffer higher bitrate if same distance
             minDistance = distance;
-            result = m_availBitrate[i];
+            result = bitrate;
         }
     }
 

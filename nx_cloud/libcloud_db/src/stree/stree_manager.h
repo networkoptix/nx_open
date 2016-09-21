@@ -28,7 +28,6 @@ enum class StreeOperation
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreeOperation)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((StreeOperation), (lexical))
 
 class StreeManager
 :
@@ -52,5 +51,7 @@ public:
 
 }   //cdb
 }   //nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::StreeOperation), (lexical));
 
 #endif  //NX_CDB_STREE_MANAGER_H

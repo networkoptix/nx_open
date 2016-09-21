@@ -48,8 +48,7 @@ void EIPAsyncClient::terminate()
 
 bool EIPAsyncClient::initSocket()
 {
-    m_socket.reset(SocketFactory::createStreamSocket());
-
+    m_socket = SocketFactory::createStreamSocket();
     bool success = m_socket->setNonBlockingMode(true)
         && m_socket->setSendTimeout(kSendTimeout.count())
         && m_socket->setRecvTimeout(kReceiveTimeout.count());
@@ -62,7 +61,7 @@ bool EIPAsyncClient::initSocket()
     return success;
 }
 
-void EIPAsyncClient::asyncConnectDone(std::shared_ptr<AbstractStreamSocket> socket, SystemError::ErrorCode errorCode)
+void EIPAsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
     QnMutexLocker lock(&m_mutex);
     if (errorCode != SystemError::noError)
@@ -72,7 +71,6 @@ void EIPAsyncClient::asyncConnectDone(std::shared_ptr<AbstractStreamSocket> sock
 }
 
 void EIPAsyncClient::asyncSendDone(
-    std::shared_ptr<AbstractStreamSocket> socket,
     SystemError::ErrorCode errorCode,
     size_t bytesWritten)
 {
@@ -91,11 +89,10 @@ void EIPAsyncClient::asyncSendDone(
         &m_recvBuffer,
         std::bind(
             &EIPAsyncClient::onSomeBytesReadAsync, this,
-            m_socket, std::placeholders::_1, std::placeholders::_2));
+            std::placeholders::_1, std::placeholders::_2));
 }
 
 void EIPAsyncClient::onSomeBytesReadAsync(
-    std::shared_ptr<AbstractStreamSocket> socket,
     SystemError::ErrorCode errorCode,
     size_t bytesRead)
 {
@@ -230,7 +227,7 @@ void EIPAsyncClient::processState()
                 &m_recvBuffer,
                 std::bind(
                     &EIPAsyncClient::onSomeBytesReadAsync, this,
-                    m_socket, std::placeholders::_1, std::placeholders::_2));
+                    std::placeholders::_1, std::placeholders::_2));
     }
 }
 
@@ -282,11 +279,11 @@ bool EIPAsyncClient::doServiceRequestAsync(const MessageRouterRequest &request)
     if (m_currentState == EIPClientState::NeedSession)
     {
         m_hasPendingRequest = true;
-        return m_socket->connectAsync(
+        m_socket->connectAsync(
             SocketAddress(m_hostAddress, m_port),
-            std::bind(
-                &EIPAsyncClient::asyncConnectDone, this,
-                m_socket, std::placeholders::_1 ));
+            [this](SystemError::ErrorCode c) { asyncConnectDone(c); });
+
+        return true;
     }
     
     return doServiceRequestAsyncInternal(m_pendingRequest);
@@ -298,11 +295,11 @@ bool EIPAsyncClient::doServiceRequestAsyncInternal(const MessageRouterRequest &r
     m_currentState = EIPClientState::ReadingHeader;
     m_sendBuffer.append(buildEIPServiceRequest(request));
 
-    return m_socket->sendAsync(
+    m_socket->sendAsync(
         m_sendBuffer,
-        std::bind(
-            &EIPAsyncClient::asyncSendDone, this, 
-            m_socket, std::placeholders::_1, std::placeholders::_2));
+        [this](SystemError::ErrorCode c, size_t b) { asyncSendDone(c, b); });
+
+    return true;
 }
 
 bool EIPAsyncClient::registerSessionAsync()
@@ -314,11 +311,11 @@ bool EIPAsyncClient::registerSessionAsync()
     m_sendBuffer.append(buf);
     m_currentState = EIPClientState::WaitingForSession;
 
-    return m_socket->sendAsync(
+    m_socket->sendAsync(
         m_sendBuffer,
-        std::bind(
-            &EIPAsyncClient::asyncSendDone, this,
-            m_socket, std::placeholders::_1, std::placeholders::_2));
+        [this](SystemError::ErrorCode c, size_t b) { asyncSendDone(c, b); });
+
+    return true;
 }
 
 nx::Buffer EIPAsyncClient::buildEIPServiceRequest(const MessageRouterRequest &request) const

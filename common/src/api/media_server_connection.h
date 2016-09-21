@@ -275,7 +275,7 @@ protected:
 
     int sendAsyncPostRequestLogged(
         int object,
-        const QnRequestHeaderList& headers,
+        nx_http::HttpHeaders headers,
         const QnRequestParamList& params,
         const QByteArray& data,
         const char* replyTypeName,

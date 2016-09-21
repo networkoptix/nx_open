@@ -41,8 +41,8 @@ private:
     bool initSocket();
     bool connectIfNeeded();
 
-    bool sendAll(TCPSocketPtr& socket, QByteArray& data);
-    bool receiveMessage(TCPSocketPtr& socket, char* const buffer);
+    bool sendAll(AbstractStreamSocket* socket, QByteArray& data);
+    bool receiveMessage(AbstractStreamSocket* socket, char* const buffer);
     void handleSocketError();
 
     bool registerSessionUnsafe();

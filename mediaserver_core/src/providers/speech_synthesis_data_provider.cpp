@@ -33,9 +33,8 @@ QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext()
     auto format = synthesizer->getAudioFormat();
     auto codecId = AV_CODEC_ID_PCM_S16LE; // synthesizer->getCodecId();
 
-    auto mediaCtx = QnMediaContextPtr(new QnMediaContext(codecId));
-    auto ctx = mediaCtx->ctx();
-
+    auto mediaCtx = std::make_shared<QnAvCodecMediaContext>(codecId);
+    auto ctx = mediaCtx->getAvCodecContext();
     if (!ctx)
         return QnConstMediaContextPtr();
 
