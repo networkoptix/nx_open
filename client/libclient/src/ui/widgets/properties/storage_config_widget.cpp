@@ -48,8 +48,7 @@
 
 namespace
 {
-    static const int kColumnSpacing = 8;
-    static const int kMinColWidth = 60;
+    static const int kMinimumColumnWidth = 80;
 
     class StoragesSortModel : public QSortFilterProxyModel
     {
@@ -95,6 +94,9 @@ namespace
             {
                 result.rwidth() += style::Metrics::kArrowSize + style::Metrics::kStandardPadding;
             }
+
+            if (index.column() != QnStorageListModel::CheckBoxColumn)
+                result.setWidth(qMax(result.width(), kMinimumColumnWidth));
 
             return result;
         }
