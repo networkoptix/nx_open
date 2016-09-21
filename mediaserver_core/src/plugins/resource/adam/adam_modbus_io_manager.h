@@ -59,7 +59,7 @@ private:
     void fetchAllPortStatesUnsafe();
 
     void processAllPortStatesResponse(const nx_modbus::ModbusResponse& response);
-    void updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
+    std::pair<nx_io_managment::IOPortState, bool> updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
     void setDebounceForPort(const QString& portId, bool portState);
     QnIOStateDataList getDebouncedStates() const;
 

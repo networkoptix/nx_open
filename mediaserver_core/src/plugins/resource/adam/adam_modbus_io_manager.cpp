@@ -288,6 +288,8 @@ void QnAdamModbusIOManager::fetchAllPortStates()
 
 void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::ModbusResponse& response)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (!m_monitoringIsInProgress)
         return;
 
@@ -303,23 +305,14 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
     }
 
     bool status = true;
-    int inputCount = 0;
-    int outputCount = 0;
-    quint32 startInputCoilBit = 0;
-    quint32 startOutputCoilBit = 0;
+    auto inputCount = m_inputs.size();
+    auto outputCount = m_outputs.size();
 
-    {
-        QnMutexLocker lock(&m_mutex);
+    if (!inputCount || !outputCount)
+        return;
 
-        inputCount = m_inputs.size();
-        outputCount = m_outputs.size();
-
-        if (!inputCount || !outputCount)
-            return;
-
-        startInputCoilBit = getPortCoil(m_inputs[0].id, status);
-        startOutputCoilBit = getPortCoil(m_outputs[0].id, status);
-    }
+    auto startInputCoilBit = getPortCoil(m_inputs[0].id, status);
+    auto startOutputCoilBit = getPortCoil(m_outputs[0].id, status);
 
     auto fetchedPortStates = response.data.mid(1);
 
@@ -330,23 +323,47 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
     auto endOutputCoilBit = startOutputCoilBit + outputCount;
     size_t portIndex = 0;
 
+    std::vector<std::pair<QString, IOPortState>> changedStates;
+
     for (auto bitIndex = startInputCoilBit; bitIndex < endInputCoilBit; ++bitIndex)
     {
-        updatePortState(bitIndex, fetchedPortStates, portIndex);
+        auto portState = updatePortState(bitIndex, fetchedPortStates, portIndex);
+
+        if (portState.second)
+        {
+            changedStates.push_back(
+                std::make_pair(m_ioStates[portIndex].id, portState.first));
+        }
+
         portIndex++;
     }
 
     for (auto bitIndex = startOutputCoilBit; bitIndex < endOutputCoilBit; ++bitIndex)
     {
-        updatePortState(bitIndex, fetchedPortStates, portIndex);
+        auto portState = updatePortState(bitIndex, fetchedPortStates, portIndex);
+
+        if (portState.second)
+        {
+            changedStates.push_back(
+                std::make_pair(m_ioStates[portIndex].id, portState.first));
+        }
+
         portIndex++;
     }
+
+    for (const auto& change: changedStates)
+    {
+        lock.unlock();
+        m_inputStateChangedCallback(
+            change.first,
+            change.second);
+        lock.relock();
+    }
+
 }
 
-void QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex)
+std::pair<IOPortState, bool> QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex)
 {
-    QnMutexLocker lock(&m_mutex);
-
     auto portId = m_ioStates[portIndex].id;
     auto currentState = 
         nx_io_managment::fromBoolToIOPortState(getBitValue(bytes, bitIndex));
@@ -359,14 +376,7 @@ void QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& b
     m_ioStates[portIndex].isActive = isActive;
     m_ioStates[portIndex].timestamp = qnSyncTime->currentMSecsSinceEpoch();
 
-    if (stateChanged)
-    {
-        lock.unlock();
-        m_inputStateChangedCallback(
-            m_ioStates[portIndex].id,
-            currentState);
-        lock.relock();
-    }
+    return std::make_pair(currentState, stateChanged);
 }
 
 void QnAdamModbusIOManager::setDebounceForPort(const QString& portId, bool portState)
