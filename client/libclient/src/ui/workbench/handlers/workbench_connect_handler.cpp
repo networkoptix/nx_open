@@ -467,15 +467,19 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const QnConnectionInfo& info,
     const ConnectionSettingsPtr& storeSettings)
 {
-    if (!storeSettings || storeSettings->isConnectionToCloud)   // Do not save connections to cloud
+    // We don't save connection to cloud or new systems
+    if (!storeSettings || storeSettings->isConnectionToCloud)
         return;
 
     const auto serverModuleInfo =
         qnModuleFinder->moduleInformation(QnUuid::fromStringSafe(info.ecsGuid));
 
+    if (serverModuleInfo.serverFlags.testFlag(Qn::SF_NewSystem))
+        return;
+
     storeLocalSystemConnection(
         info.systemName,
-        helpers::getTargetSystemId(serverModuleInfo),
+        helpers::getTargetSystemId(serverModuleInfo),   //< getTargetSystemId is used for consistency
         info.ecUrl,
         storeSettings->storePassword,
         storeSettings->autoLogin,
