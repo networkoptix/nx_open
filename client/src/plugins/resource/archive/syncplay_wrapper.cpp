@@ -273,14 +273,15 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     connect(reader, SIGNAL(jumpOccured(qint64)), this, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
     connect(reader, SIGNAL(jumpCanceled(qint64)), this, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
 
-    if (d->enabled && currentTime != DATETIME_NOW && currentTime != qint64(AV_NOPTS_VALUE)) {
-        reader->jumpToPreviousFrame(currentTime);
+    if (d->enabled)
+    {
+
+        if (currentTime != DATETIME_NOW && currentTime != qint64(AV_NOPTS_VALUE))
+            reader->jumpToPreviousFrame(currentTime);
         reader->setSpeed(d->speed, currentTime);
         if (d->speed == 0)
             reader->pauseMedia();
-    }
 
-    if (d->enabled) {
         reader->setNavDelegate(this);
     }
 
