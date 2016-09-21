@@ -71,8 +71,8 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
     QString supportedFormats = tr("Sound Files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
 
-    QScopedPointer<QnCustomFileDialog> dialog(
-        new QnSessionAwareDialog<QnCustomFileDialog>(
+    QScopedPointer<QnSessionAwareFileDialog> dialog(
+        new QnSessionAwareFileDialog(
             this,
             tr("Select File..."),
             qnSettings->mediaFolder(),

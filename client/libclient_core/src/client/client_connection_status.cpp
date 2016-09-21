@@ -66,6 +66,9 @@ void QnClientConnectionStatus::setState(QnConnectionState state)
     if (!m_allowedTransactions.values(m_state).contains(state))
         warn(lit("Invalid state transaction %1 -> %2").arg(stateToString[m_state]).arg(stateToString[state]));
 
+    if (m_state == state)
+        return;
+
     m_state = state;
     emit stateChanged(state);
 }

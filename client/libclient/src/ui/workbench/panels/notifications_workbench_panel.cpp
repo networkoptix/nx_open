@@ -27,7 +27,7 @@
 namespace {
 
 static const int kShowAnimationDurationMs = 300;
-static const int kHideAnimationDurationMs = 200;
+static const int kHideAnimationDurationMs = 300;
 
 }
 
@@ -149,9 +149,9 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 
     xAnimator->stop();
     if (opened)
-        xAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::InOutQuad);
     else
-        xAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::OutQuad);
     xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
 
     qreal width = item->size().width();

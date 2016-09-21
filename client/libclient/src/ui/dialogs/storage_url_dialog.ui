@@ -108,6 +108,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>protocolComboBox</tabstop>
+  <tabstop>urlEdit</tabstop>
+  <tabstop>loginLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

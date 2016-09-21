@@ -20,6 +20,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/utils/string.h>
+
+#include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
 namespace {

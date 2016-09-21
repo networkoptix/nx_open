@@ -199,7 +199,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 
     m_itemDelegate = new QnResourceItemDelegate(this);
     m_itemDelegate->setFixedHeight(0); // automatic height
-    ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
+    ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 0)));
 
     connect(ui->resourcesTreeView, SIGNAL(enterPressed(QModelIndex)), this, SLOT(at_treeView_enterPressed(QModelIndex)));

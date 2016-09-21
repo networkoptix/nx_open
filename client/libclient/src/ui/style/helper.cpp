@@ -50,6 +50,9 @@ namespace style
 
     const int Metrics::kToolTipHeight = 24;
 
+    const int Metrics::kMenuButtonIndicatorMargin = 2;
+    const int Metrics::kTextButtonIconMargin = 2;
+
     const qreal Hints::kDisabledItemOpacity = 0.3;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";

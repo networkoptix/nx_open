@@ -218,7 +218,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
         case QnCloudStatusWatcher::UnknownError:
         default:
         {
-            message = tr("Can not login to the cloud");
+            message = tr("Can not login to %1").arg(QnAppInfo::cloudName());
             break;
         }
     }

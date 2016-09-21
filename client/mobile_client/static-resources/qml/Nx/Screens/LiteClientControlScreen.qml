@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Items 1.0
 import com.networkoptix.qml 1.0
 
 import "private/LiteClientControlScreen"
@@ -131,6 +132,15 @@ Page
         height: 168
     }
 
+    DummyMessage
+    {
+        id: offlineDummy
+        anchors.fill: parent
+        title: qsTr("Nx1 is offline")
+        image: lp("images/alert_nx1_offline.png")
+        visible: !liteClientController.serverOnline
+    }
+
     Component
     {
         id: selectorComponent
@@ -208,12 +218,6 @@ Page
 
     Component
     {
-        id: serverOfflineDummyComponent
-        ServerOfflineDummy {}
-    }
-
-    Component
-    {
         id: switchedOffDummyComponent
         SwitchedOffDummy {}
     }
@@ -246,7 +250,7 @@ Page
             PropertyChanges
             {
                 target: screenLoader
-                sourceComponent: serverOfflineDummyComponent
+                sourceComponent: undefined
             }
             PropertyChanges
             {

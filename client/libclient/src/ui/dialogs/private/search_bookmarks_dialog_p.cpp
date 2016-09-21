@@ -20,6 +20,7 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -30,53 +31,6 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
-
-namespace
-{
-    enum
-    {
-        kMillisecondsInSeconds = 1000
-        , kStartDayOffsetMs = 0
-        , kMillisecondsInDay = 60 * 60 * 24 * kMillisecondsInSeconds
-    };
-
-    qint64 getStartOfTheDayMs(qint64 timeMs)
-    {
-        return timeMs - (timeMs % kMillisecondsInDay);
-    }
-
-    qint64 getEndOfTheDayMs(qint64 timeMs)
-    {
-        return getStartOfTheDayMs(timeMs) + kMillisecondsInDay;
-    }
-
-    qint64 getTimeOnServerMs(QnWorkbenchContext *context
-        , const QDate &clientDate
-        , qint64 dayEndOffset = kStartDayOffsetMs)
-    {
-        if (qnSettings->timeMode() == Qn::ClientTimeMode)
-        {
-            // QDateTime is created from date, thus it always started
-            // from the start of the day in current timezone
-            return QDateTime(clientDate).toMSecsSinceEpoch() + dayEndOffset;
-        }
-
-        const auto timeWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
-        const auto server = qnCommon->currentServer();
-        const auto serverUtcOffsetSecs = timeWatcher->utcOffset(server) / kMillisecondsInSeconds;
-        const QDateTime serverTime(clientDate, QTime(0, 0), Qt::OffsetFromUTC, serverUtcOffsetSecs);
-        return serverTime.toMSecsSinceEpoch() + dayEndOffset;
-    }
-
-    QDate extractDisplayDate(QnWorkbenchContext *context
-        , qint64 timestamp)
-    {
-        return context->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestamp).date();
-    };
-}
-
-
-///
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
     , qint64 utcStartTimeMs
@@ -98,6 +52,9 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , m_updatingNow(false)
 {
     m_ui->setupUi(m_owner);
+    m_ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
+    m_ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+
     m_ui->gridBookmarks->setModel(m_model);
 
     QnBookmarkSortOrder sortOrder = QnSearchBookmarksModel::defaultSortOrder();
@@ -106,8 +63,10 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     const auto updateFilterText = [this]()
     {
-        m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
+        auto text = m_ui->filterLineEdit->lineEdit()->text();
+        m_model->setFilterText(text);
         applyModelChanges();
+        //m_ui->clearFilterButton->setEnabled(!text.isEmpty());
     };
 
     enum { kUpdateFilterDelayMs = 200 };
@@ -123,18 +82,15 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         applyModelChanges();
     });
 
-    connect(m_ui->dateEditFrom, &QDateEdit::userDateChanged, this, [this](const QDate &date)
-    {
-        m_model->setRange(getTimeOnServerMs(context(), date)
-            , getTimeOnServerMs(context(), m_ui->dateEditTo->date(), kMillisecondsInDay));
-        applyModelChanges();
-    });
-    connect(m_ui->dateEditTo, &QDateEdit::userDateChanged, this, [this](const QDate &date)
-    {
-        m_model->setRange(getTimeOnServerMs(context(), m_ui->dateEditFrom->date())
-            , getTimeOnServerMs(context(), date, kMillisecondsInDay));
-        applyModelChanges();
-    });
+    connect(m_ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this,
+        [this](qint64 startTimeMs, qint64 endTimeMs)
+        {
+            m_model->setRange(startTimeMs, endTimeMs);
+            applyModelChanges();
+        });
+
+    connect(m_ui->clearFilterButton, &QPushButton::clicked, this,
+        &QnSearchBookmarksDialogPrivate::reset);
 
     connect(m_ui->refreshButton, &QPushButton::clicked, this, &QnSearchBookmarksDialogPrivate::refresh);
     connect(m_ui->cameraButton, &QPushButton::clicked, this, &QnSearchBookmarksDialogPrivate::chooseCamera);
@@ -160,11 +116,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
-        [this]
-        {
-            resetToAllAvailableCameras();
-            applyModelChanges();
-        });
+        &QnSearchBookmarksDialogPrivate::reset);
+
 
     m_ui->filterLineEdit->lineEdit()->setPlaceholderText(tr("Search bookmarks by name, tag or description"));
 }
@@ -179,25 +132,33 @@ void QnSearchBookmarksDialogPrivate::applyModelChanges()
         m_model->applyFilter();
 }
 
+void QnSearchBookmarksDialogPrivate::reset()
+{
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
+        resetToAllAvailableCameras();
+        m_ui->filterLineEdit->clear();
+        m_ui->dateRangeWidget->reset();
+    }
+
+    applyModelChanges();
+}
+
 void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
     , qint64 utcStartTimeMs
     , qint64 utcFinishTimeMs)
 {
-    /* Working with the 1-day precision */
-    qint64 startOfTheDayMs = getStartOfTheDayMs(utcStartTimeMs);
-    qint64 endOfTheDayMs = getEndOfTheDayMs(utcFinishTimeMs);
-
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
 
         resetToAllAvailableCameras();
 
         m_ui->filterLineEdit->lineEdit()->setText(filterText);
-        m_ui->dateEditFrom->setDate(extractDisplayDate(context(), startOfTheDayMs));
-        m_ui->dateEditTo->setDate(extractDisplayDate(context(), endOfTheDayMs));
+        m_ui->dateRangeWidget->setRange(utcStartTimeMs, utcFinishTimeMs);
 
         m_model->setFilterText(filterText);
-        m_model->setRange(startOfTheDayMs, endOfTheDayMs);
+        /* Start/end values are rounded in the widget to 1-day granularity. */
+        m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
     }
 
     applyModelChanges();
@@ -330,10 +291,11 @@ void QnSearchBookmarksDialogPrivate::updateHeadersWidth()
 
 void QnSearchBookmarksDialogPrivate::refresh()
 {
-    m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
-    m_model->setRange(getTimeOnServerMs(context(), m_ui->dateEditFrom->date())
-        , getTimeOnServerMs(context(), m_ui->dateEditTo->date(), kMillisecondsInDay));
-
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
+        m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
+        m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
+    }
     m_model->applyFilter();
 }
 

@@ -488,9 +488,9 @@ QString QnSystemsModelPrivate::getCompatibleVersion(
         const auto result = QnConnectionValidator::validateConnection(serverInfo);
         switch (result)
         {
-            case Qn::ConnectionResult::IncompatibleProtocol:
+            case Qn::IncompatibleProtocolConnectionResult:
                 return serverInfo.version.toString(QnSoftwareVersion::BugfixFormat);
-            case Qn::ConnectionResult::IncompatibleCloudHost:
+            case Qn::IncompatibleCloudHostConnectionResult:
                 return serverInfo.version.toString();
             default:
                 break;
@@ -510,7 +510,7 @@ QString QnSystemsModelPrivate::getIncompatibleVersion(
     const auto predicate = [this](const QnModuleInformation& serverInfo)
     {
         auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-        return connectionResult == Qn::ConnectionResult::IncompatibleVersion;
+        return connectionResult == Qn::IncompatibleVersionConnectionResult;
     };
 
     const auto incompatibleIt =
@@ -533,7 +533,7 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
         [](const QnModuleInformation& serverInfo)
         {
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult == Qn::ConnectionResult::Success;
+            return connectionResult == Qn::SuccessConnectionResult;
         });
 }
 
@@ -545,7 +545,7 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
         [](const QnModuleInformation& serverInfo)
         {
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult != Qn::ConnectionResult::IncompatibleInternal;
+            return connectionResult != Qn::IncompatibleInternalConnectionResult;
         });
 }
 

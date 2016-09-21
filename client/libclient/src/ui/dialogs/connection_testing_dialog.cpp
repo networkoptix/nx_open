@@ -96,7 +96,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     auto testResult = QnConnectionDiagnosticsHelper::validateConnectionTest(
         connectionInfo, errorCode);
 
-    updateUi(testResult.result == Qn::ConnectionResult::Success,
+    updateUi(testResult.result == Qn::SuccessConnectionResult,
         testResult.details, testResult.helpTopicId);
 }
 

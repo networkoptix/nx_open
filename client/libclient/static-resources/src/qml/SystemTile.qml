@@ -110,7 +110,7 @@ BaseTile
         {
             var cloudHost = control.impl.hostsModel.firstHost;
             console.log("Connecting to cloud system <", systemName,
-                ">, throug the host <", cloudHost, ">");
+                ">, through the host <", cloudHost, ">");
             context.connectToCloudSystem(control.systemId, cloudHost);
         }
         else // Local system tile

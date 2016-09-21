@@ -163,6 +163,14 @@ namespace
         return false;
     }
 
+    bool isTextButton(const QStyleOption* option)
+    {
+        if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+            return button->features.testFlag(QStyleOptionButton::Flat);
+
+        return false;
+    }
+
     bool isSwitchButtonCheckbox(const QWidget* widget)
     {
         return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
@@ -1725,7 +1733,16 @@ void QnNxStyle::drawControl(
         {
             if (auto header = qstyleoption_cast<const QStyleOptionHeader*>(option))
             {
-                if (header->state.testFlag(State_MouseOver))
+                bool hovered = header->state.testFlag(State_MouseOver);
+                if (auto headerWidget = qobject_cast<const QHeaderView*>(widget))
+                {
+                    /* In addition to Qt's requirement of sectionsClickable()
+                     * we demand isSortIndicatorShown() to be also true to enable hover: */
+                    if (!headerWidget->isSortIndicatorShown())
+                        hovered = false;
+                }
+
+                if (hovered)
                 {
                     QColor color = findColor(header->palette.midlight().color());
                     painter->fillRect(header->rect, color);
@@ -2008,32 +2025,8 @@ void QnNxStyle::drawControl(
 
         case CE_PushButtonBevel:
         {
-            if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
-            {
-                /* Draw panel for hovered and pressed flat buttons: */
-                if (buttonOption->features.testFlag(QStyleOptionButton::Flat)
-                    && (buttonOption->state.testFlag(State_Sunken)
-                     || buttonOption->state.testFlag(State_MouseOver)))
-                {
-                    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
-                    QnScopedPainterBrushRollback brushRollback(painter);
-
-                    if (buttonOption->state.testFlag(State_Sunken))
-                        painter->setBrush(findColor(option->palette.color(QPalette::Base)).darker(1).color());
-                    else
-                        painter->setBrush(option->palette.dark());
-
-                    static const qreal kRoundingRadius = 2.0;
-                    painter->drawRoundedRect(option->rect, kRoundingRadius, kRoundingRadius);
-
-                    /* Call standard paint for frames etc.
-                     * Clear pressed state to avoid more panel painting. */
-                    QStyleOptionButton optionCopy(*buttonOption);
-                    optionCopy.state &= ~(State_On | State_Sunken);
-                    base_type::drawControl(element, &optionCopy, painter, widget);
-                    return;
-                }
-            }
+            if (isTextButton(option))
+                return;
 
             break;
         }
@@ -2042,13 +2035,25 @@ void QnNxStyle::drawControl(
         {
             if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
             {
+                bool customForeground = widget && widget->foregroundRole() != QPalette::ButtonText;
+                QStyleOptionButton newOpt(*buttonOption);
+
+                /* Support for custom foreground role for buttons: */
+                if (customForeground)
+                    newOpt.palette.setBrush(QPalette::ButtonText, newOpt.palette.brush(widget->foregroundRole()));
+
+                if (isTextButton(option))
+                {
+                    if (!customForeground)
+                        newOpt.palette.setBrush(QPalette::ButtonText, newOpt.palette.windowText());
+
+                    d->drawTextButton(painter, &newOpt, widget);
+                    return;
+                }
+
                 bool checkable = isCheckableButton(option);
                 bool leftAligned = checkable
                     || widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
-
-                bool customForeground = widget && widget->foregroundRole() != QPalette::ButtonText;
-
-                QStyleOptionButton newOpt(*buttonOption);
 
                 if (leftAligned)
                 {
@@ -2062,10 +2067,6 @@ void QnNxStyle::drawControl(
                     /* Draw standard button content left-aligned: */
                     newOpt.rect.setWidth(minLabelWidth);
                 }
-
-                /* Support for custom foreground role for buttons: */
-                if (customForeground)
-                    newOpt.palette.setColor(QPalette::ButtonText, newOpt.palette.color(widget->foregroundRole()));
 
                 base_type::drawControl(element, &newOpt, painter, widget);
 
@@ -2721,8 +2722,16 @@ QSize QnNxStyle::sizeFromContents(
             if (isCheckableButton(option))
                 switchSize = Metrics::kButtonSwitchSize + QSize(Metrics::kSwitchMargin, 0);
 
-            return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + switchSize.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
-                qMax(qMax(size.height(), switchSize.height()), Metrics::kButtonHeight));
+            int minButtonWidth = isTextButton(option) ? 0 : Metrics::kMinimumButtonWidth;
+
+            return QSize(
+                qMax(
+                    minButtonWidth,
+                    size.width() + switchSize.width() +
+                        2 * pixelMetric(PM_ButtonMargin, option, widget)),
+                qMax(
+                    qMax(size.height(), switchSize.height()),
+                    Metrics::kButtonHeight));
         }
 
         case CT_LineEdit:
@@ -2878,16 +2887,25 @@ QSize QnNxStyle::sizeFromContents(
 }
 
 int QnNxStyle::pixelMetric(
-        PixelMetric metric,
-        const QStyleOption *option,
-        const QWidget *widget) const
+    PixelMetric metric,
+    const QStyleOption* option,
+    const QWidget* widget) const
 {
     switch (metric)
     {
         case PM_ButtonMargin:
         {
             int margin = widget ? widget->property(Properties::kButtonMarginProperty).toInt() : 0;
-            return margin ? margin : dp(16);
+            if (margin)
+                return margin;
+
+            if (isCheckableButton(option))
+                return Metrics::kStandardPadding;
+
+            if (isTextButton(option))
+                return 0;
+
+            return dp(16);
         }
 
         case PM_ButtonShiftVertical:
@@ -2950,6 +2968,9 @@ int QnNxStyle::pixelMetric(
             return Metrics::kDefaultLayoutSpacing.width();
         case PM_LayoutVerticalSpacing:
             return (qobject_cast<const QnDialog*>(widget)) ? 0 : Metrics::kDefaultLayoutSpacing.height();
+
+        case PM_MenuButtonIndicator:
+            return 20 + Metrics::kMenuButtonIndicatorMargin;
 
         case PM_MenuVMargin:
             return dp(2);
@@ -3110,6 +3131,16 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QGroupBox*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
+
+        /*
+        * Fix for Qt 5.6 bug: QDateTimeEdit doesn't calculate hovered subcontrol rect
+        *  which causes calendar dropdown button to not redraw properly
+        */
+        #if QT_VERSION != 0x050600 && QT_VERSION != 0x050601
+        #error Check if this workaround is required in current Qt version
+        #endif
+        if (qobject_cast<QDateTimeEdit*>(widget))
+            widget->installEventFilter(this);
     }
 
     if (qobject_cast<QPushButton*>(widget) ||
@@ -3447,6 +3478,23 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 }
                 break;
             }
+            default:
+                break;
+        }
+    }
+    /* Fix for Qt 5.6 bug: QDateTimeEdit doesn't calculate hovered subcontrol rect
+     * which causes calendar dropdown button to not redraw properly. We simply update
+     * entire control on each hover event, it's not optimal but will suffice for now: */
+    else if (auto dateTime = qobject_cast<QDateTimeEdit*>(object))
+    {
+        switch (event->type())
+        {
+            case QEvent::HoverEnter:
+            case QEvent::HoverMove:
+            case QEvent::HoverLeave:
+                dateTime->update();
+                break;
+
             default:
                 break;
         }

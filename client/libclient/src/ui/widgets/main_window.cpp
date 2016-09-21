@@ -676,6 +676,13 @@ void QnMainWindow::updateDwmState() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
+    if ((event->type() == QEvent::WindowActivate) && isWelcomeScreenVisible())
+    {
+        // Welcome screen looses focus after window deactivation. We restore it here.
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->forceActiveFocus();
+    }
+
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);
 

@@ -32,13 +32,11 @@ public:
         bool storePassword;
         bool autoLogin;
         bool forceRemoveOldConnection;
-        QnRaiiGuardPtr completionWatcher;
 
         static ConnectionSettingsPtr create(
             bool storePassword,
             bool autoLogin,
-            bool forceRemoveOldConnection,
-            const QnRaiiGuardPtr& completionWatcher);
+            bool forceRemoveOldConnection);
     };
 
 private:

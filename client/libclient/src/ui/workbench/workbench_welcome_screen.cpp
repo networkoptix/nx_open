@@ -30,7 +30,7 @@ namespace
 {
     typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
 
-    QWidget* createMainView(QObject* context)
+    QWidget* createMainView(QObject* context, QQuickView* quickView)
     {
         static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
         static const auto kContextVariableName = lit("context");
@@ -40,7 +40,6 @@ namespace
         qmlRegisterType<QnQmlSortFilterProxyModel>("NetworkOptix.Qml", 1, 0, "QnQmlSortFilterProxyModel");
         qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentUserConnectionsModel");
 
-        const auto quickView = new QQuickView();
         auto holder = new QStackedWidget();
         holder->addWidget(new QWidget());
         holder->addWidget(QWidget::createWindowContainer(quickView));
@@ -98,7 +97,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_visible(false),
     m_connectingSystemName(),
     m_palette(extractPalette()),
-    m_widget(createMainView(this)),
+    m_quickView(new QQuickView()),
+    m_widget(createMainView(this, m_quickView)),
     m_pageSize(m_widget->size())
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
@@ -203,6 +203,11 @@ QString QnWorkbenchWelcomeScreen::connectingToSystem() const
     return m_connectingSystemName;
 }
 
+void QnWorkbenchWelcomeScreen::resetConnectingToSystem()
+{
+    setConnectingToSystem(QString());
+}
+
 void QnWorkbenchWelcomeScreen::setConnectingToSystem(const QString& value)
 {
     if (m_connectingSystemName == value)
@@ -266,6 +271,11 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
         autoLogin);
 }
 
+void QnWorkbenchWelcomeScreen::forceActiveFocus()
+{
+    m_quickView->requestActivate();
+}
+
 void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QString& systemId,
     const QUrl& serverUrl,
@@ -284,9 +294,6 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
         {
             setConnectingToSystem(systemId);
 
-            const auto completionGuard = QnRaiiGuard::createDestructable(
-                [this]() { setConnectingToSystem(QString()); });
-
             QUrl url = serverUrl;
             if (!credentials.password.isEmpty())
                 url.setPassword(credentials.password);
@@ -298,7 +305,6 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             params.setArgument(Qn::StorePasswordRole, storePassword);
             params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
-            params.setArgument(Qn::CompletionWatcherRole, completionGuard);
 
             menu()->trigger(QnActions::ConnectAction, params);
         };

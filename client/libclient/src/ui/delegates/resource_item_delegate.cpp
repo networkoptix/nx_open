@@ -165,13 +165,6 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             NX_ASSERT(false); // Should never get here
     }
 
-    if (index.column() == Qn::CustomColumn)
-    {
-        QVariant customColor = index.data(Qt::ForegroundRole);
-        if (!customColor.isNull() && customColor.canConvert<QColor>())
-            mainColor = customColor.value<QColor>();
-    };
-
     /* Due to Qt bug, State_Editing is not set in option.state, so detect editing differently: */
     const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(option.widget);
     bool editing = view && view->indexWidget(option.index);

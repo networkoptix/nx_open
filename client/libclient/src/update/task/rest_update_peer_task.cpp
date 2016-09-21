@@ -58,10 +58,19 @@ void QnRestUpdatePeerTask::doStart()
         const auto handle = server->apiConnection()->installUpdate(
             m_updateId, true, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
-        m_serverByRealId.insert(server->getOriginalGuid(), server);
+
+        const auto originalId = server->getOriginalGuid();
+        m_serverByRealId.insert(originalId, server);
 
         connect(server.data(), &QnMediaServerResource::versionChanged,
             this, &QnRestUpdatePeerTask::at_resourceChanged);
+
+        const auto originalServer = qnResPool->getResourceById<QnMediaServerResource>(originalId);
+        if (originalServer)
+        {
+            connect(originalServer.data(), &QnMediaServerResource::versionChanged,
+                this, &QnRestUpdatePeerTask::at_resourceChanged);
+        }
     }
 
     if (m_serverByRequest.isEmpty())

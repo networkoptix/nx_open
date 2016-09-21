@@ -198,9 +198,9 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_yAnimator->stop();
     if (opened)
-        m_yAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::OutQuad);
     else
-        m_yAnimator->setEasingCurve(QEasingCurve::InCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::InQuad);
 
     if (animate)
         m_yAnimator->animateTo(newY);

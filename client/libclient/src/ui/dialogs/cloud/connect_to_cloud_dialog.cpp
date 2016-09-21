@@ -1,5 +1,5 @@
-#include "link_to_cloud_dialog.h"
-#include "ui_link_to_cloud_dialog.h"
+#include "connect_to_cloud_dialog.h"
+#include "ui_connect_to_cloud_dialog.h"
 
 #include <api/server_rest_connection.h>
 #include <core/resource_management/resource_pool.h>
@@ -48,15 +48,15 @@ namespace
     }
 }
 
-class QnLinkToCloudDialogPrivate : public QObject
+class QnConnectToCloudDialogPrivate : public QObject
 {
-    QnLinkToCloudDialog *q_ptr;
+    QnConnectToCloudDialog *q_ptr;
 
-    Q_DECLARE_PUBLIC(QnLinkToCloudDialog)
-    Q_DECLARE_TR_FUNCTIONS(QnLinkToCloudDialogPrivate)
+    Q_DECLARE_PUBLIC(QnConnectToCloudDialog)
+    Q_DECLARE_TR_FUNCTIONS(QnConnectToCloudDialogPrivate)
 
 public:
-    QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *parent);
+    QnConnectToCloudDialogPrivate(QnConnectToCloudDialog *parent);
 
     void updateUi();
     void lockUi(bool locked);
@@ -78,13 +78,15 @@ public:
     QnBusyIndicatorButton* indicatorButton;
 };
 
-QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
+QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     base_type(parent),
-    ui(new Ui::QnLinkToCloudDialog),
-    d_ptr(new QnLinkToCloudDialogPrivate(this))
+    ui(new Ui::ConnectToCloudDialog),
+    d_ptr(new QnConnectToCloudDialogPrivate(this))
 {
     ui->setupUi(this);
-    Q_D(QnLinkToCloudDialog);
+    setWindowTitle(tr("Connect to %1").arg(QnAppInfo::cloudName()));
+
+    Q_D(QnConnectToCloudDialog);
 
     using nx::vms::utils::SystemUri;
     QnCloudUrlHelper urlHelper(
@@ -134,8 +136,8 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     else
         ui->passwordInputField->setText(QString());
 
-    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLinkToCloudDialogPrivate::updateUi);
-    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLinkToCloudDialogPrivate::updateUi);
+    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
+    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
 
     setWarningStyle(ui->invalidCredentialsLabel);
 
@@ -147,13 +149,13 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget* parent) :
     setResizeToContentsMode(Qt::Vertical);
 }
 
-QnLinkToCloudDialog::~QnLinkToCloudDialog()
+QnConnectToCloudDialog::~QnConnectToCloudDialog()
 {
 }
 
-void QnLinkToCloudDialog::accept()
+void QnConnectToCloudDialog::accept()
 {
-    Q_D(QnLinkToCloudDialog);
+    Q_D(QnConnectToCloudDialog);
 
     if (!d->linkedSuccessfully)
     {
@@ -164,7 +166,7 @@ void QnLinkToCloudDialog::accept()
     base_type::accept();
 }
 
-QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog* parent) :
+QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDialog* parent) :
     QObject(parent),
     q_ptr(parent),
     connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
@@ -184,9 +186,9 @@ QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog* pare
     }
 }
 
-void QnLinkToCloudDialogPrivate::updateUi()
+void QnConnectToCloudDialogPrivate::updateUi()
 {
-    Q_Q(QnLinkToCloudDialog);
+    Q_Q(QnConnectToCloudDialog);
     indicatorButton->setEnabled(q->ui->loginInputField->isValid()
                              && q->ui->passwordInputField->isValid());
 
@@ -194,16 +196,16 @@ void QnLinkToCloudDialogPrivate::updateUi()
 };
 
 
-void QnLinkToCloudDialogPrivate::showCredentialsError(bool show)
+void QnConnectToCloudDialogPrivate::showCredentialsError(bool show)
 {
-    Q_Q(QnLinkToCloudDialog);
+    Q_Q(QnConnectToCloudDialog);
     q->ui->invalidCredentialsLabel->setVisible(show);
     q->ui->credentialsWidget->layout()->activate();
 }
 
-void QnLinkToCloudDialogPrivate::lockUi(bool locked)
+void QnConnectToCloudDialogPrivate::lockUi(bool locked)
 {
-    Q_Q(QnLinkToCloudDialog);
+    Q_Q(QnConnectToCloudDialog);
     const bool enabled = !locked;
 
     q->ui->credentialsWidget->setEnabled(enabled);
@@ -217,9 +219,9 @@ void QnLinkToCloudDialogPrivate::lockUi(bool locked)
     indicatorButton->showIndicator(locked);
 }
 
-void QnLinkToCloudDialogPrivate::bindSystem()
+void QnConnectToCloudDialogPrivate::bindSystem()
 {
-    Q_Q(QnLinkToCloudDialog);
+    Q_Q(QnConnectToCloudDialog);
 
     lockUi(true);
     q->ui->invalidCredentialsLabel->hide();
@@ -245,7 +247,7 @@ void QnLinkToCloudDialogPrivate::bindSystem()
                 sysRegistrationData,
                 [this, serverConnection](api::ResultCode result, api::SystemData systemData)
     {
-        Q_Q(QnLinkToCloudDialog);
+        Q_Q(QnConnectToCloudDialog);
 
         executeDelayed(
                 [this, result, systemData, serverConnection]()
@@ -257,13 +259,13 @@ void QnLinkToCloudDialogPrivate::bindSystem()
     });
 }
 
-void QnLinkToCloudDialogPrivate::showSuccess()
+void QnConnectToCloudDialogPrivate::showSuccess()
 {
-    Q_Q(QnLinkToCloudDialog);
+    Q_Q(QnConnectToCloudDialog);
     QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             q->windowTitle(),
-                            tr("The system is successfully linked to %1").arg(q->ui->loginInputField->text().trimmed()),
+                            tr("The system is successfully connected to %1").arg(q->ui->loginInputField->text().trimmed()),
                             QDialogButtonBox::Ok,
                             q->parentWidget());
 
@@ -272,14 +274,14 @@ void QnLinkToCloudDialogPrivate::showSuccess()
     q->accept();
 }
 
-void QnLinkToCloudDialogPrivate::showFailure(const QString &message)
+void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
 {
-    Q_Q(QnLinkToCloudDialog);
+    Q_Q(QnConnectToCloudDialog);
 
     QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             tr("Error"),
-                            tr("Could not link the system to the cloud"),
+                            tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
                             QDialogButtonBox::Ok,
                             q);
 
@@ -289,12 +291,12 @@ void QnLinkToCloudDialogPrivate::showFailure(const QString &message)
     messageBox.exec();
 }
 
-void QnLinkToCloudDialogPrivate::at_bindFinished(
+void QnConnectToCloudDialogPrivate::at_bindFinished(
         api::ResultCode result,
         const api::SystemData &systemData,
         const rest::QnConnectionPtr &connection)
 {
-    Q_Q(QnLinkToCloudDialog);
+    Q_Q(QnConnectToCloudDialog);
 
     if (result != api::ResultCode::ok)
     {
