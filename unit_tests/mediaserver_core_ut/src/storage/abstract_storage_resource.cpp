@@ -1,4 +1,3 @@
-#include "abstract_storage_resource.h"
 #include <qcoreapplication.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
