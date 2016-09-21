@@ -155,6 +155,8 @@ public:
 
         TIMELAPSE_SPEED,
 
+        SHOW_HIDPI_WARNING,
+
         VARIABLE_COUNT
     };
 
@@ -251,6 +253,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)
+        QN_DECLARE_RW_PROPERTY(bool,                        showHiDpiWarning,       setShowHiDpiWarning,        SHOW_HIDPI_WARNING,         true)
     QN_END_PROPERTY_STORAGE()
 
 private:
