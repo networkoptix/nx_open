@@ -22,6 +22,10 @@ QByteArray decodeAES128CBC(const QByteArray& data, const QByteArray& key);
 QByteArray encodeAES128CBC(const QByteArray& data);
 QByteArray decodeAES128CBC(const QByteArray& data);
 
+// Convenient string overloads
+QString encodeHexStringFromStringAES128CBC(const QString& s, const QByteArray& key);
+QString decodeStringFromHexStringAES128CBC(const QString& s, const QByteArray& key);
+
 QString encodeHexStringFromStringAES128CBC(const QString& s);
 QString decodeStringFromHexStringAES128CBC(const QString& s);
 }

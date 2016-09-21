@@ -71,3 +71,27 @@ TEST(SymmetricalEncryptionCBC, BuiltInKey)
         ASSERT_EQ(nx::utils::decodeAES128CBC(encryptedData), data);
     }
 }
+
+TEST(SymmetricalEncryptionCBC, StringFunctionsBuiltInKey)
+{
+    for (const auto& data : kTestData)
+    {
+        auto dataString = QString::fromUtf8(data);
+        auto encryptedString = nx::utils::encodeHexStringFromStringAES128CBC(dataString);
+        ASSERT_EQ(nx::utils::decodeStringFromHexStringAES128CBC(encryptedString), dataString);
+    }
+}
+
+TEST(SymmetricalEncryptionCBC, StringFunctionsBAKeys)
+{
+    for (const auto& k : kVariableKeys)
+    {
+        for (const auto& data : kTestData)
+        {
+            auto dataString = QString::fromUtf8(data);
+            QByteArray baKey((const char*)k.data(), k.size());
+            auto encryptedString = nx::utils::encodeHexStringFromStringAES128CBC(dataString, baKey);
+            ASSERT_EQ(nx::utils::decodeStringFromHexStringAES128CBC(encryptedString, baKey), dataString);
+        }
+    }
+}
