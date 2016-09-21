@@ -44,39 +44,39 @@ var L = {
     accessRoles: {
         disabled:{
             label: 'Disabled',
-            description: 'User is disabled in the system'
+            description: 'User is disabled in the system.'
         },
         'Owner': {
             label: 'Owner',
-            description: 'Can do pretty much everything with his system'
+            description: 'Can do pretty much everything with his system.'
         },
         'Viewer': {
             label: 'Viewer',
-            description: 'Can view live video from cameras and archive'
+            description: 'Can view live video and browse the archive.'
         },
         'Live Viewer': {
             label: 'Live Viewer',
-            description: 'Can view only live video from cameras'
+            description: 'Can only view live video.'
         },
         'Advanced Viewer': {
             label: 'Advanced Viewer',
-            description: 'Can view live video from cameras and archive, configure cameras'
+            description: 'Can view live video, browse the archive, configure cameras, control PTZ etc.'
         },
         'Administrator':{
             label: 'Administrator',
-            description: 'Can configure system and share it'
+            description: 'Unrestricted access including the ability to share.'
         },
         'Custom':{
             label: 'Custom',
-            description: 'Access to specified resources with specified rights'
+            description: 'Use the desktop client application to set up custom permissions.'
         },
         cloudAdmin: {
             label: 'Administrator',
-            description: 'Can configure system and share it'
+            description: 'Can configure system and share it.'
         },
         customRole:{
             label: 'Custom role',
-            description: 'Custom user role specified in the system'
+            description: 'Custom user role specified in the system.'
         }
     },
     errorCodes:{
