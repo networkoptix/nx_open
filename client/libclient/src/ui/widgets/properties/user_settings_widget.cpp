@@ -50,15 +50,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
     ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
-
-    ui->cloudIconLabel->setPixmap(qnSkin->pixmap("user_settings/cloud_user_icon.png"));
-
-    QFont font;
-    font.setPixelSize(kCloudUserFontSizePixels);
-    font.setWeight(kCloudUserFontWeight);
-    ui->cloudEmailLabel->setFont(font);
-    ui->cloudEmailLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
-    ui->cloudEmailLabel->setForegroundRole(QPalette::Text);
+    ui->cloudPanelWidget->setShowLink(false);
 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
@@ -66,7 +58,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     ui->roleComboBox->setModel(m_rolesModel);
 
-    connect(ui->enabledButton,          &QPushButton::clicked,          this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->enabledButton,          &QPushButton::toggled,          this,   &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->roleComboBox,           QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
 
     connect(m_rolesModel,               &QnUserRolesModel::modelReset,  this,   &QnUserSettingsWidget::updateRoleComboBox);
@@ -74,24 +66,22 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     /* Synchronize controls for local and cloud users for convenience (local controls are master controls): */
     connect(ui->enabledButton,          &QPushButton::toggled,          this,
-        [this](bool on) { ui->enabledButtonCloud->setChecked(on); });
+        [this](bool on) { ui->cloudPanelWidget->setEnabled(on); });
 
-    connect(ui->enabledButtonCloud,     &QPushButton::clicked,          this,
-        [this]() { ui->enabledButton->setChecked(ui->enabledButtonCloud->isChecked()); });
+    connect(ui->cloudPanelWidget, &QnCloudUserPanelWidget::enabledChanged, this,
+        [this](bool value) { ui->enabledButton->setChecked(value); });
 
     connect(ui->loginInputField,        &QnInputField::textChanged,     this,
         [this](const QString& text)
         {
-            ui->cloudEmailLabel->setText(text);
+            ui->cloudPanelWidget->setEmail(text);
             ui->cloudEmailInputField->setText(text);
         });
 
     connect(ui->nameInputField,         &QnInputField::textChanged,     this,
         [this](const QString& text)
         {
-            ui->cloudFullNameLabel->setText(text);
-            ui->cloudFullNameLabel->setHidden(text.trimmed().isEmpty());
-            ui->cloudUserTitlePanel->layout()->activate();
+            ui->cloudPanelWidget->setFullName(text);
         });
 
     emit ui->loginInputField->textChanged(QString());
