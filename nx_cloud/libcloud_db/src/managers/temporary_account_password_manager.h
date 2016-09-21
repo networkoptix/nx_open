@@ -74,10 +74,17 @@ public:
         std::function<void(api::ResultCode)> completionHandler);
 
     std::string generateRandomPassword();
-    /** Adds password and password digest.
-        If \a data->login is empty, random login is generated
-    */
+    /**
+     * Adds password and password digest.
+     * If \a data->login is empty, random login is generated
+     */
     void addRandomCredentials(data::TemporaryAccountCredentials* const data);
+
+    nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+        QSqlDatabase* const connection,
+        std::string accountEmail);
+    void removeTemporaryPasswordsFromCacheByAccountEmail(
+        std::string accountEmail);
 
 private:
     const conf::Settings& m_settings;
