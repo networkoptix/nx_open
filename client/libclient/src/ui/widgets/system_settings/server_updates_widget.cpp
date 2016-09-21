@@ -247,6 +247,8 @@ void QnServerUpdatesWidget::initDropdownActions()
 void QnServerUpdatesWidget::initDownloadActions()
 {
     auto downloadLinkMenu = new QMenu(this);
+    downloadLinkMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+
     downloadLinkMenu->addAction(tr("Download in External Browser"),
         [this]()
         {
