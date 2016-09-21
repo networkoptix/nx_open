@@ -19,14 +19,6 @@ namespace api {
 //// class AccountData
 ////////////////////////////////////////////////////////////
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
-    (AccountStatus::invalid, "invalid")
-    (AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
-    (AccountStatus::activated, "activated")
-    (AccountStatus::blocked, "blocked")
-    )
-
-
 MAKE_FIELD_NAME_STR_CONST(AccountData, id)
 MAKE_FIELD_NAME_STR_CONST(AccountData, email)
 MAKE_FIELD_NAME_STR_CONST(AccountData, passwordHa1)
@@ -280,3 +272,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 }   //api
 }   //cdb
 }   //nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, AccountStatus,
+    (nx::cdb::api::AccountStatus::invalid, "invalid")
+    (nx::cdb::api::AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
+    (nx::cdb::api::AccountStatus::activated, "activated")
+    (nx::cdb::api::AccountStatus::blocked, "blocked")
+)

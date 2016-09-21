@@ -471,9 +471,11 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     /* Check if somebody have added this storage right now */
     if (item.id.isNull())
     {
+        // New storages has tested and ready to add
         item.id = QnStorageResource::fillID(m_server->getId(), item.url);
         item.isBackup = !addToMain;
         item.isUsed = true;
+        item.isOnline = true;
     }
 
     m_model->addStorage(item);  // Adds or updates storage model data

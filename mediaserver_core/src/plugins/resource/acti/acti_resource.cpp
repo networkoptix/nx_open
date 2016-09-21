@@ -17,6 +17,7 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
+#include <core/resource/param.h>
 
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
@@ -32,8 +33,8 @@ static int actiEventPort = 0;
 
 static int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
 
-QnActiResource::QnActiResource()
-:
+QnActiResource::QnActiResource() :
+    m_desiredTransport(RtpTransport::_auto),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
     m_outputCount(0),
@@ -43,7 +44,11 @@ QnActiResource::QnActiResource()
     setVendor(lit("ACTI"));
 
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
-        m_availBitrate.push_back(DEFAULT_AVAIL_BITRATE_KBPS[i]);
+    {
+        m_availableBitrates.insert(
+            DEFAULT_AVAIL_BITRATE_KBPS[i],
+            bitrateToDefaultString(DEFAULT_AVAIL_BITRATE_KBPS[i]));
+    }
 }
 
 QnActiResource::~QnActiResource()
@@ -244,19 +249,33 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
         qnSyncTime->currentUSecsSinceEpoch() );
 }
 
-QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
+QMap<int, QString> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
 {
-    QList<int> result;
-    for(QByteArray bitrate: bitrateCap.split(','))
+    QMap<int, QString> result;
+    int coeff = 1;
+    for(auto bitrate: bitrateCap.split(','))
     {
         bitrate = bitrate.trimmed().toUpper();
-        int coeff = 1;
         if (bitrate.endsWith("M"))
             coeff = 1000;
-        bitrate.chop(1);
-        result.push_back(bitrate.toFloat()*coeff);
+        else
+            coeff = 1;
+
+        result.insert(
+            bitrate.left(bitrate.size() - 1).toDouble() * coeff,
+            bitrate);
     }
+
     return result;
+}
+
+QString QnActiResource::bitrateToDefaultString(int bitrateKbps) const
+{
+    const int kKbitInMbit = 1000;
+    if (bitrateKbps < kKbitInMbit)
+        return lit("%1K").arg(bitrateKbps);
+
+    return lit("%1.%2M").arg(bitrateKbps / 1000).arg((bitrateKbps % 1000) / 100);
 }
 
 bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const
@@ -298,6 +317,8 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+
     CLHttpStatus status;
 
     QByteArray resolutions= makeActiRequest(
@@ -337,6 +358,23 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         .trimmed()
         .toUpper()
         .toLatin1();
+
+    auto encodersStr = report.value("encoder_cap");
+
+    if (!encodersStr.isEmpty())
+    {
+        auto encoders = encodersStr.split(',');
+        for (const auto& encoder: encoders)
+            m_availableEncoders.insert(encoder.trimmed());
+    }
+    else
+    {
+        //Try to use h264 if no codecs defined;
+        m_availableEncoders.insert(lit("H264"));
+    }
+
+    auto desiredTransport = resData.value<QString>(Qn::DESIRED_TRANSPORT_PARAM_NAME, RtpTransport::_auto);
+    m_desiredTransport = RtpTransport::fromString(desiredTransport);
 
     bool dualStreaming = report.value("channels").toInt() > 1 ||
         !report.value("video2_resolution_cap").isEmpty() ||
@@ -458,10 +496,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     auto bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())
-    {
-        m_availBitrate = parseVideoBitrateCap(bitrateCap.toLatin1());
-        m_rawBitrate = bitrateCap.split(',');
-    }
+        m_availableBitrates = parseVideoBitrateCap(bitrateCap.toLatin1());
 
     initializeIO(report);
 
@@ -676,40 +711,20 @@ int QnActiResource::getMaxFps() const
 
 QString QnActiResource::formatBitrateString(int bitrateKbps) const
 {
-    if (bitrateKbps < 1000)
-    {
-        return lit("%1K").arg(bitrateKbps);
-    }
-    else
-    {
-        bool usePoint = true;
+    if (m_availableBitrates.contains(bitrateKbps))
+        return m_availableBitrates[bitrateKbps];
 
-        if (!m_rawBitrate.empty())
-        {
-            int bitrateIndex = -1;
-            for(size_t i=0; i < m_availBitrate.size(); ++i)
-            {
-                if (bitrateKbps == m_availBitrate[i])
-                {
-                    bitrateIndex = i;
-                    break;
-                }
-            }
+    return bitrateToDefaultString(bitrateKbps);
+}
 
-            if (bitrateIndex != -1 && m_rawBitrate.size() > bitrateIndex)
-            {
-                usePoint = m_rawBitrate[bitrateIndex].indexOf('.') != -1;
-            }
-        }
+QSet<QString> QnActiResource::getAvailableEncoders() const
+{
+    return m_availableEncoders;
+}
 
-        QString tpl = usePoint ? lit("%1.%2M") : lit("%1M");
-        QString result = tpl.arg(bitrateKbps/1000);
-
-        if(usePoint)
-            result = result.arg((bitrateKbps%1000)/100);
-
-        return result;
-    }
+RtpTransport::Value QnActiResource::getDesiredTransport() const
+{
+    return m_desiredTransport;
 }
 
 QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
@@ -738,12 +753,12 @@ int QnActiResource::roundBitrate(int srcBitrateKbps) const
 {
     int minDistance = INT_MAX;
     int result = srcBitrateKbps;
-    for (int i = 0; i < m_availBitrate.size(); ++i)
+    for (const auto& bitrate: m_availableBitrates.keys())
     {
-        int distance = qAbs(m_availBitrate[i] - srcBitrateKbps);
+        int distance = qAbs(bitrate - srcBitrateKbps);
         if (distance <= minDistance) { // preffer higher bitrate if same distance
             minDistance = distance;
-            result = m_availBitrate[i];
+            result = bitrate;
         }
     }
 
@@ -860,6 +875,11 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
         m_outputCount = it.value().toInt();
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
+
+    auto ports = getInputPortList();
+    for (auto item: getRelayOutputList())
+        ports.push_back(item);
+    setIOPorts(ports);
 }
 
 bool QnActiResource::getParamPhysical(const QString& id, QString& value)
@@ -1259,11 +1279,13 @@ bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPara
 #ifdef _DEBUG
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
+
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
-#ifdef _DEBUG
     if (!result)
-        qWarning() << "Error while parsing xml" << templateFilename;
-#endif
+    {
+        NX_LOG(lit("Error while parsing xml (acti) %1").arg(templateFilename), cl_logWARNING);
+    }
+
     return result;
 }
 

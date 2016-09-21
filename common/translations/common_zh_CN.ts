@@ -420,7 +420,7 @@
     </message>
     <message>
         <source>Do HTTP request</source>
-        <translation type="unfinished"></translation>
+        <translation>进行HTTP请求</translation>
     </message>
 </context>
 <context>

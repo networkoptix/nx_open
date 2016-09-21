@@ -242,12 +242,14 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     QnMdnsPacket packet;
     if (packet.fromDatagram(responseData))
     {
-        for (const auto& answer: packet.answerRRs)
+        auto rrsToInspect = packet.answerRRs + packet.additionalRRs;
+
+        for (const auto& record: rrsToInspect)
         {
-            if (answer.recordType == QnMdnsPacket::kSrvRecordType)
+            if (record.recordType == QnMdnsPacket::kSrvRecordType)
             {
                 QnMdnsSrvData srv;
-                srv.decode(answer.data);
+                srv.decode(record.data);
                 port = srv.port;
             }
         }

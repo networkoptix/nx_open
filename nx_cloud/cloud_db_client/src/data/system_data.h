@@ -22,12 +22,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemHealth)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemHealth), (lexical))
-
 #define SystemRegistrationData_Fields (name)(customization)
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
@@ -75,9 +69,6 @@ void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery
 //// system sharing data
 ////////////////////////////////////////////////////////////
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemAccessRole)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemAccessRole), (lexical))
-
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
@@ -104,8 +95,16 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json));
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
+
 }   //api
 }   //cdb
 }   //nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
 
 #endif //CLOUD_DB_CL_SYSTEM_DATA_H

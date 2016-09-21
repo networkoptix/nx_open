@@ -25,6 +25,7 @@
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "database/server_db.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -136,6 +137,9 @@ void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& a
         ec2::fromApiToResource(actionData, actionToSend);
 
         qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
+        // we need to save action to the log before proxy. It need for event log for 'view video' operation.
+        // Otherwise foreign server can't perform this
+        qnServerDb->saveActionToDB(action);
     }
 }
 
@@ -174,7 +178,12 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         {
             // execute say to client once and before proxy
             if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+            {
                 broadcastBusinessAction(action);
+                // This actions marked as requiredCameraResource, but can be performed to client without camRes
+                if (resources.isEmpty())
+                    qnServerDb->saveActionToDB(action);
+            }
             break;
         }
 

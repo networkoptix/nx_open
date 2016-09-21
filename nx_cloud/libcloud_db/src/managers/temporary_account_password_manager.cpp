@@ -137,6 +137,35 @@ void TemporaryAccountPasswordManager::addRandomCredentials(
         data->password.c_str()).constData();
 }
 
+nx::db::DBResult TemporaryAccountPasswordManager::removeTemporaryPasswordsFromDbByAccountEmail(
+    QSqlDatabase* const connection,
+    std::string accountEmail)
+{
+    QSqlQuery removeTempPasswordsQuery(*connection);
+    removeTempPasswordsQuery.prepare(
+        R"sql(
+        DELETE FROM account_password 
+        WHERE account_id=(SELECT id FROM account WHERE email=?)
+        )sql");
+    removeTempPasswordsQuery.addBindValue(QnSql::serialized_field(accountEmail));
+    if (!removeTempPasswordsQuery.exec())
+    {
+        NX_LOGX(lm("Failed to remove temporary passwords of account %1. %2")
+            .arg(accountEmail).arg(removeTempPasswordsQuery.lastError().text()),
+            cl_logDEBUG1);
+        return nx::db::DBResult::ioError;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+void TemporaryAccountPasswordManager::removeTemporaryPasswordsFromCacheByAccountEmail(
+    std::string accountEmail)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_accountPassword.erase(accountEmail);
+}
+
 bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
     QnMutexLockerBase* const /*lk*/,
     std::multimap<std::string, TemporaryAccountCredentialsEx>::iterator passwordIter)

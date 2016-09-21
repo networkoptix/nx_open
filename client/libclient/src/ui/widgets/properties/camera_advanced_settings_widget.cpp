@@ -84,6 +84,8 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page)
                 return ui->manualPage;
             case Page::Web:
                 return ui->webPage;
+            case Page::Unavailable:
+                return ui->unavailablePage;
         }
         return nullptr;
     };
@@ -95,21 +97,22 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page)
 void QnCameraAdvancedSettingsWidget::updatePage()
 {
 
-    auto calculatePage = [this]
+    auto calculatePage =
+        [this]
         {
-            if (!m_camera)
-                return Page::Empty;
+            if (!m_camera || !isStatusValid(m_camera->getStatus()))
+                return Page::Unavailable;
 
-            QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
-            bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
-            if (hasWebPage)
-                return Page::Web;
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
+        if (hasWebPage)
+            return Page::Web;
 
-            if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
-                return Page::Manual;
+        if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
+            return Page::Manual;
 
-            return Page::Empty;
-        };
+        return Page::Empty;
+    };
 
     Page newPage = calculatePage();
     setPage(newPage);
@@ -138,11 +141,12 @@ void QnCameraAdvancedSettingsWidget::reloadData()
 {
     updatePage();
 
-    if (!m_camera || !isStatusValid(m_camera->getStatus()))
-        return;
-
     if (m_page == Page::Web)
     {
+        Q_ASSERT(m_camera);
+        if (!m_camera)
+            return;
+
         // QUrl doesn't work if it isn't constructed from QString and uses credentials.
         // It stays invalid with error code 'AuthorityPresentAndPathIsRelative'
         //  --rvasilenko, Qt 5.2.1

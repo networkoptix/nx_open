@@ -1042,10 +1042,12 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
 
+#if 0
     /* Do not take local screenshot if displayed frame has different size.
        Checking only height because width can be modified by forced AR. */
     if (!anyQuality && m_lastDisplayedFrame->height != m_imageSize.height())
         return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
+#endif
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     if (!m_decoder.isEmpty())
@@ -1099,7 +1101,7 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
         if( (*outFrame)->format == AV_PIX_FMT_YUV420P )
         {
             // optimization
-            for (int i = 0; i < 3; ++ i)
+            for (int i = 0; i < 3; ++i)
             {
                 int h = lastFrame->height >> (i > 0 ? 1 : 0);
                 memcpy( (*outFrame)->data[i], lastFrame->data[i], lastFrame->linesize[i]* h );

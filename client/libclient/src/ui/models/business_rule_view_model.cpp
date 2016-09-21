@@ -813,11 +813,17 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.url.isEmpty() &&
-                    isResourcesListValid<QnCameraAudioTransmitPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
+            return !m_actionParams.url.isEmpty()
+                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                    QnBusiness::filteredResources<QnCameraAudioTransmitPolicy::resource_type>(m_actionResources))
+                    || m_actionParams.playToClient
+                );
         case QnBusiness::SayTextAction:
-            return !m_actionParams.sayText.isEmpty() &&
-                    isResourcesListValid<QnCameraAudioTransmitPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
+            return !m_actionParams.sayText.isEmpty()
+                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+                    QnBusiness::filteredResources<QnCameraAudioTransmitPolicy::resource_type>(m_actionResources))
+                    || m_actionParams.playToClient
+                );
         case QnBusiness::ExecutePtzPresetAction:
             return isResourcesListValid<QnExecPtzPresetPolicy>(QnBusiness::filteredResources<QnExecPtzPresetPolicy::resource_type>(m_actionResources)) &&
                     m_actionResources.size() == 1 &&

@@ -504,6 +504,11 @@
         <source>This camera has no advanced settings</source>
         <translation>Ennél a kameránál nincs lehetőség haladó beállítások elérésére</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -886,32 +891,32 @@
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP tartalom</translation>
     </message>
     <message>
         <location/>
         <source>HTTP url</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP url</translation>
     </message>
     <message>
         <location/>
         <source>Login to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználónév az azonosításhoz (opcionális)</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Felhasználónév</translation>
     </message>
     <message>
         <location/>
         <source>Password to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelszó az azonosításhoz (opcionális)</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelszó</translation>
     </message>
 </context>
 <context>
@@ -927,27 +932,27 @@
     <message>
         <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
         <source>Export Rapid Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyors áttekintés exportálása</translation>
     </message>
     <message>
         <location/>
         <source>Initial Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Kezdeti videó hossz</translation>
     </message>
     <message>
         <location/>
         <source>Exported Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportált videó hossz</translation>
     </message>
     <message>
         <location/>
         <source>Rapid Review speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyors áttekintés sebessége</translation>
     </message>
     <message>
         <location/>
         <source>Frames Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Frame időköz</translation>
     </message>
 </context>
 <context>
@@ -1659,7 +1664,7 @@
     <message>
         <location/>
         <source>Volume:</source>
-        <translation>Terjedelem:</translation>
+        <translation>Hangerő:</translation>
     </message>
     <message>
         <location/>
@@ -1669,7 +1674,7 @@
     <message>
         <location/>
         <source>Play to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Lejátszás felhasználónak</translation>
     </message>
 </context>
 <context>
@@ -2452,7 +2457,7 @@
     <message>
         <location/>
         <source>Speak to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Beszéd felhasználóhoz</translation>
     </message>
 </context>
 <context>
@@ -2511,7 +2516,7 @@
     <message>
         <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
         <source>for</source>
-        <translation>Érintett:</translation>
+        <translation>Érintett</translation>
     </message>
     <message>
         <location/>

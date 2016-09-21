@@ -51,12 +51,13 @@ private slots:
     void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, qint64 startTimeMs, Qn::TimePeriodContent dataType);
 
 protected:
-    void loadInternal(Qn::TimePeriodContent periodType);
+    bool loadInternal(Qn::TimePeriodContent periodType);
 
 private:
     void init();
     void initLoaders();
     void updateTimePeriods(Qn::TimePeriodContent dataType, bool forced = false);
+    void trace(const QString& message, Qn::TimePeriodContent periodType = Qn::RecordingContent);
 
 private:
     bool m_enabled;
