@@ -12,6 +12,8 @@ QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent):
             if (valueId == QnClientCoreSettings::RecentLocalConnections)
                 updateSystems();
         });
+
+    updateSystems();
 }
 
 QnAbstractSystemsFinder::SystemDescriptionList QnRecentLocalSystemsFinder::systems() const

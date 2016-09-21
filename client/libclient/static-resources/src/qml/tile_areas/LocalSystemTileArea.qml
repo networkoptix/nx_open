@@ -6,6 +6,7 @@ Item
 {
     id: control;
 
+    property bool isOnline: false;
     property bool isExpandedTile: false;
     property real expandedOpacity: 0;
 
@@ -92,6 +93,7 @@ Item
 
             KeyNavigation.tab: userChooseItem;
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
+            visible: control.isOnline;
         }
 
         InfoItem
@@ -101,7 +103,7 @@ Item
             model: control.recentLocalConnectionsModel;
 
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
-            visible: control.impl.hasRecentConnections;
+            visible: control.impl.hasRecentConnections && control.isOnline;
 
             comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";

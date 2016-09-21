@@ -292,7 +292,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, serverUrl, credentials, storePassword, autoLogin, systemId, completionTracker]()
+        [this, serverUrl, credentials, storePassword, autoLogin, systemId, completionTracker, isConnectionToCloud]()
         {
             setConnectingToSystem(systemId);
 

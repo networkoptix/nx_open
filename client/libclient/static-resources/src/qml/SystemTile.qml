@@ -29,10 +29,7 @@ BaseTile
         if (wrongVersion.length || !isCompatibleInternal)
             return false;
 
-        if (isCloudTile)
-            return control.impl.isOnline;
-
-        return true;
+        return control.impl.isOnline;
     }
 
     tileColor:
@@ -126,7 +123,7 @@ BaseTile
 
     menuButton
     {
-        visible: impl.hasSavedConnection;
+        visible: impl.hasSavedConnection && impl.isOnline;
 
         menu: NxPopupMenu
         {
@@ -163,6 +160,7 @@ BaseTile
 
             if (control.impl.tileType === control.impl.kLocalSystemTileType)
             {
+                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.isOnline; });
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
