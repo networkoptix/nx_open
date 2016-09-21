@@ -302,7 +302,7 @@ TEST( Socket, HostNameResolve3 )
     {
         HostAddress resolvedAddress("ya.ru");
         ASSERT_TRUE(
-            HostAddressResolver::instance()->resolveAddressSync(
+            dnsResolver.resolveAddressSync(
                 resolvedAddress.toString(),
                 &resolvedAddress,
                 AF_INET));
