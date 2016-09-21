@@ -183,7 +183,7 @@ private:
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true);
 
-    void initGraphicsMessageBox();
+    void initGraphicsMessageBoxHolder();
 
     /** Make sure animation is allowed, set animate to false otherwise. */
     void ensureAnimationAllowed(bool &animate);

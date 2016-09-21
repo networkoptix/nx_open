@@ -233,7 +233,7 @@ struct ScreenWidgetKey
 };
 
 const int identifyTimeout = 5000;
-const int identifyFontSize = 100;
+const int kIdentifyFontSize = 100;
 
 const int cacheMessagesTimeoutMs = 500;
 
@@ -999,7 +999,15 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
 
             QnVideoWallItem data = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
             if (!data.name.isEmpty())
-                QnGraphicsMessageBox::information(data.name, identifyTimeout, identifyFontSize);
+            {
+                auto messageBox = QnGraphicsMessageBox::information(data.name, identifyTimeout);
+                if (messageBox)
+                {
+                    QFont f = messageBox->font();
+                    f.setPixelSize(kIdentifyFontSize);
+                    messageBox->setFont(f);
+                }
+            }
             break;
         }
         case QnVideoWallControlMessage::RadassModeChanged:

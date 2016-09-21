@@ -239,7 +239,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     createDebugWidget();
 #endif
 
-    initGraphicsMessageBox();
+    initGraphicsMessageBoxHolder();
 
     /* Connect to display. */
     display()->view()->addAction(action(QnActions::FreespaceAction));
@@ -538,12 +538,12 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
     setNotificationsOpened(panels & NotificationsPanel, animate);
 }
 
-void QnWorkbenchUi::initGraphicsMessageBox()
+void QnWorkbenchUi::initGraphicsMessageBoxHolder()
 {
-    QGraphicsWidget *graphicsMessageBoxWidget = new QnUiElementsWidget();
-    graphicsMessageBoxWidget->setAcceptedMouseButtons(0);
-    display()->scene()->addItem(graphicsMessageBoxWidget);
-    display()->setLayer(graphicsMessageBoxWidget, Qn::MessageBoxLayer);
+    auto overlayWidget = new QnUiElementsWidget();
+    overlayWidget->setAcceptedMouseButtons(0);
+    display()->scene()->addItem(overlayWidget);
+    display()->setLayer(overlayWidget, Qn::MessageBoxLayer);
 
     QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);
     messageBoxVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -553,14 +553,14 @@ void QnWorkbenchUi::initGraphicsMessageBox()
     messageBoxHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     messageBoxHLayout->setSpacing(0.0);
 
-    graphicsMessageBoxWidget->setLayout(messageBoxHLayout);
+    overlayWidget->setLayout(messageBoxHLayout);
 
     messageBoxHLayout->addStretch();
     messageBoxHLayout->addItem(messageBoxVLayout);
     messageBoxHLayout->addStretch();
 
     messageBoxVLayout->addStretch();
-    messageBoxVLayout->addItem(new QnGraphicsMessageBoxItem(graphicsMessageBoxWidget));
+    messageBoxVLayout->addItem(new QnGraphicsMessageBoxHolder(overlayWidget));
     messageBoxVLayout->addStretch();
 }
 
