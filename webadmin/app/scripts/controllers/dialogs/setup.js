@@ -613,7 +613,7 @@ angular.module('webadminApp')
                 next: function(){
                     $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
                     $scope.settings.cloudPassword = $scope.settings.presetCloudPassword;
-                    return 'cloudProcess';
+                    return $scope.next('cloudProcess');
                 }
             },
             cloudLogin:{
