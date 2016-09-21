@@ -232,16 +232,13 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->backupTimeLabel->setForegroundRole(QPalette::Light);
     ui->backupScheduleLabel->setForegroundRole(QPalette::Light);
+    ui->realtimeBackupStatusLabel->setForegroundRole(QPalette::Light);
 
     ui->cannotStartBackupLabel->setVisible(false);
     ui->backupStartButton->setVisible(false);
 
     ui->realtimeBackupControlButton->hide(); /* Unused in the current version. */
-
     ui->estimatedTimeLabel->hide(); /* Unused in the current version. */
-
-    setWarningStyle(ui->cannotStartBackupLabel);
-    setWarningStyle(ui->realtimeBackupWarningLabel);
 
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
@@ -784,7 +781,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    if (m_model->storages().empty())
+    if (m_model->storages().size() < 2)
         return error(tr("Add more drives to use them as backup storage."));
 
     const auto isCorrectStorage = [](const QnStorageModelInfo& storage)
