@@ -30,7 +30,7 @@
             </includes>		
         </fileSet>
 		<fileSet>
-			<directory>${env.environment}/qt542/${arch}/icu</directory>
+			<directory>${environment.dir}/qt542/${arch}/icu</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
                 <include>icu*.dll</include>
