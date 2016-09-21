@@ -40,7 +40,7 @@ private:
     const SocketAddress m_targetEndpoint;
 
     nx_http::AsyncHttpClient::Timeouts m_httpTimeouts;
-    size_t m_expectedPoolSize = 3;
+    size_t m_expectedPoolSize = 1;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
 
     std::unique_ptr<RetryTimer> m_timer;

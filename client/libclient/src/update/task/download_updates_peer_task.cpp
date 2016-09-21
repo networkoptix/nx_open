@@ -81,7 +81,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     QString fileName = updateFilePath(m_targets[url]);
     m_resultingFiles.insert(url, fileName);
 
-    NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Starting download [%1 -> %2].").arg(url.toString()).arg(fileName), cl_logDEBUG1);
+    NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Starting download [%1 -> %2].").arg(url.toString(QUrl::RemovePassword)).arg(fileName), cl_logDEBUG1);
 
     m_file.reset(new QFile(fileName));
     if (!m_file->open(QFile::WriteOnly | QFile::Truncate)) {

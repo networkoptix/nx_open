@@ -149,8 +149,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     /**%apidoc GET /ec2/getResourceTypes
      * Read all resource types. Resource type contain object type such as
-     * 'Server', 'Camera' e.t.c. Also, resource types contain additional information
-     * for cameras such as maximum fps, resolution, e.t.c
+     * "Server", "Camera", etc. Also, resource types contain additional information
+     * for cameras such as maximum fps, resolution, etc.
      * %param[default] format
      * %return Return object in requested format
      * %// AbstractResourceManager::getResourceTypes
@@ -385,7 +385,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     * %param motionMask List of motion detection areas and their
     *     sensitivity. The format is proprietary and is likely to change in
     *     future API versions. Currently, this string defines several rectangles separated with
-    *     ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+    *     ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
     *     left top corner), width, height.
     * %param scheduleTasks List of scheduleTask objects which define the camera recording
     *     schedule.
@@ -443,9 +443,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     *     If the value is less than or equal to zero, it is not used.
     * %param maxArchiveDays Maximum number of days to keep the archive for.
     *     If the value is less than or equal to zero, it is not used.
-    * %param preferedServerId Unique id of a server which is preferred for
+    * %param preferredServerId Unique id of a server which is preferred for
     *     the camera for failover.
-    *     %// TODO: Typo in parameter name: "prefered" -> "preferred".
     * %param failoverPriority Priority for the camera for being transferred
     *     to another server for failover.
     *     %value FP_Never Will never be transferred to another server.
@@ -486,7 +485,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param motionMask List of motion detection areas and their
      *     sensitivity. The format is proprietary and is likely to change in
      *     future API versions. Currently, this string defines several rectangles separated with
-     *     ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+     *     ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
      *     left top corner), width, height.
      * %param scheduleTasks List of scheduleTask objects which define the camera recording
      *     schedule.
@@ -544,9 +543,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     If the value is less than or equal to zero, it is not used.
      * %param maxArchiveDays Maximum number of days to keep the archive for.
      *     If the value is less than or equal to zero, it is not used.
-     * %param preferedServerId Unique id of a server which is preferred for
+     * %param preferredServerId Unique id of a server which is preferred for
      *     the camera for failover.
-     *     %// TODO: Typo in parameter name: "prefered" -> "preferred".
      * %param failoverPriority Priority for the camera for being transferred
      *     to another server for failover.
      *     %value FP_Never Will never be transferred to another server.
@@ -588,7 +586,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
-     *         with ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x
+     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x
      *         and y (for left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
@@ -646,9 +644,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         If the value is less than or equal to zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
      *         If the value is less than or equal to zero, it is not used.
-     *     %param preferedServerId Unique id of a server which is preferred for
+     *     %param preferredServerId Unique id of a server which is preferred for
      *         the camera for failover.
-     *         %// TODO: Typo in parameter name: "prefered" -> "preferred".
      *     %param failoverPriority Priority for the camera for being transferred
      *         to another server for failover.
      *         %value FP_Never Will never be transferred to another server.
@@ -685,7 +682,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return List of objects with camera information formatted in the requested format.
      *     %// From struct ApiResourceData:
      *     %param id Camera unique Id.
-     *     %param parentId Unique Id of a camera's server.
+     *     %param parentId Unique Id of a camera server.
      *     %param name Camera name.
      *     %param url Camera IP address, or a complete HTTP URL if the camera was added manually.
      *         Also, for multichannel encoders a complete URL is used.
@@ -727,7 +724,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
-     *         with ':', each rectangle is described by 5 comma-separated numbers: sensitivity, x
+     *         with ":", each rectangle is described by 5 comma-separated numbers: sensitivity, x
      *         and y (for left top corner), width, height.
      *     %param scheduleTasks List of scheduleTask objects which define the camera recording
      *         schedule.
@@ -785,9 +782,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         If the value is less than or equal to zero, it is not used.
      *     %param maxArchiveDays Maximum number of days to keep the archive for.
      *         If the value is less than or equal to zero, it is not used.
-     *     %param preferedServerId Unique id of a server which is preferred for
+     *     %param preferredServerId Unique id of a server which is preferred for
      *         the camera for failover.
-     *         %// TODO: Typo in parameter name: "prefered" -> "preferred".
      *     %param failoverPriority Priority for the camera for being transferred
      *         to another server for failover.
      *         %value FP_Never Will never be transferred to another server.
@@ -843,24 +839,24 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     // AbstractLicenseManager::removeLicense
     regUpdate<ApiLicenseData>(p, ApiCommand::removeLicense);
 
-    /**%apidoc GET /ec2/getBusinessRules
-     * Return business rules
+    /**%apidoc GET /ec2/getEventRules
+     * Return all event rules.
      * %param[default] format
      * %return Return object in requested format
      * %// AbstractBusinessEventManager::getBusinessRules
      */
-    regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
+    regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
     // AbstractBusinessEventManager::save
-    regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);
+    regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveEventRule);
     // AbstractBusinessEventManager::deleteRule
-    regUpdate<ApiIdData>(p, ApiCommand::removeBusinessRule);
+    regUpdate<ApiIdData>(p, ApiCommand::removeEventRule);
 
-    regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetBusinessRules);
-    regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastBusinessAction);
-    regUpdate<ApiBusinessActionData>(p, ApiCommand::execBusinessAction);
+    regUpdate<ApiResetBusinessRuleData>(p, ApiCommand::resetEventRules);
+    regUpdate<ApiBusinessActionData>(p, ApiCommand::broadcastAction);
+    regUpdate<ApiBusinessActionData>(p, ApiCommand::execAction);
 
     /**%apidoc GET /ec2/getUsers
      * Return users registered in the system. User's password contain MD5
@@ -925,7 +921,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value GlobalExportPermission Can export archives of available cameras.
      *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
      *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
-     *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O
+     *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      * %param email User's email.
@@ -977,7 +973,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value GlobalExportPermission Can export archives of available cameras.
      *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
      *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
-     *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O
+     *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      * %// AbstractUserManager::saveGroup
@@ -1242,7 +1238,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     // ApiClientInfoData
     regUpdate<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
-    regGet<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
+    regGet<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfoList);
 
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
@@ -1474,7 +1470,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "Ec2DirectConnectionFactory::remoteConnectionFinished. errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(ecUrl.toString()), cl_logDEBUG2);
+        .arg((int)errorCode).arg(ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
     // TODO: #ak async ssl is working now, make async request to old ec here
 
@@ -1522,7 +1518,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString()), cl_logDEBUG2);
+        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         std::make_shared<FixedUrlClientQueryProcessor>(
@@ -1594,12 +1590,13 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         auto clientInfo = loginInfo.clientInfo;
         clientInfo.parentId = qnCommon->moduleGUID();
 
-        ApiClientInfoDataList infos;
-        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infos);
+        ApiClientInfoDataList infoList;
+        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
         if (result != ErrorCode::ok)
             return result;
 
-        if (infos.size() && QJson::serialized(clientInfo) == QJson::serialized(infos.front()))
+        if (infoList.size() > 0
+            && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
         {
             NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
                 cl_logDEBUG2);

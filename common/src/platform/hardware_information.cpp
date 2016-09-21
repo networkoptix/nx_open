@@ -55,7 +55,7 @@ const QString& compileCpuArchicture()
     {
         MEMORYSTATUSEX stat;
         stat.dwLength = sizeof(stat);
-		phisicalMemory = GlobalMemoryStatusEx(&stat) ? stat.ullTotalPhys : 0;
+		physicalMemory = GlobalMemoryStatusEx(&stat) ? stat.ullTotalPhys : 0;
         cpuArchitecture = compileCpuArchicture();
 
         HKEY key;
@@ -80,7 +80,7 @@ const QString& compileCpuArchicture()
     HardwareInformation::HardwareInformation()
     {
         struct sysinfo sys;
-        phisicalMemory = (sysinfo(&sys) == 0) ? sys.totalram : 0;
+        physicalMemory = (sysinfo(&sys) == 0) ? sys.totalram : 0;
         cpuArchitecture = compileCpuArchicture();
 
         std::ifstream cpu("/proc/cpuinfo");
@@ -105,9 +105,9 @@ const QString& compileCpuArchicture()
     HardwareInformation::HardwareInformation()
     {
         int mibMem[2] = { CTL_HW, HW_MEMSIZE };
-        size_t length = sizeof(phisicalMemory);
-        if (sysctl(mibMem, 2, &phisicalMemory, &length, NULL, 0) == -1)
-            phisicalMemory = 0;
+        size_t length = sizeof(physicalMemory);
+        if (sysctl(mibMem, 2, &physicalMemory, &length, NULL, 0) == -1)
+            physicalMemory = 0;
 
         cpuArchitecture = compileCpuArchicture();
 
@@ -120,7 +120,7 @@ const QString& compileCpuArchicture()
 #else
 
     HardwareInformation::HardwareInformation()
-        : phisicalMemory(0)
+        : physicalMemory(0)
         , cpuArchitecture(CPU_UNKNOWN)
     {
     }

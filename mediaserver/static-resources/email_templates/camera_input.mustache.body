@@ -16,3 +16,9 @@
     {{/aggregated}}
     </tbody>
 </table>
+
+{{#screenshot}}
+    <div class="description">
+        <img alt="Screenshot" src="{{screenshot}}"/>
+    </div>
+{{/screenshot}}

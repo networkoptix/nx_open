@@ -263,7 +263,7 @@ namespace ec2
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
         NX_LOGX(lm("Sending statistics asynchronously to %1")
-               .arg(url.toString()), cl_logDEBUG1);
+               .arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
 
         if (reportApi)
             *reportApi = url.toString();

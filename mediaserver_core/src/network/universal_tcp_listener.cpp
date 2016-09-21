@@ -93,23 +93,28 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         !tcpServerSocket->bind(localAddress) ||
         !tcpServerSocket->listen())
     {
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
     if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
-        return nullptr;
-
-#ifdef LISTEN_ON_UDT_SOCKET
-    auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
-    if (!udtServerSocket->setReuseAddrFlag(true) ||
-        !udtServerSocket->bind(localAddress) ||
-        !udtServerSocket->listen())
     {
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
-    multipleServerSocket->addSocket(std::move(udtServerSocket));
-#endif
+
+    #ifdef LISTEN_ON_UDT_SOCKET
+        auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
+        if (!udtServerSocket->setReuseAddrFlag(true) ||
+            !udtServerSocket->bind(localAddress) ||
+            !udtServerSocket->listen() ||
+            !multipleServerSocket->addSocket(std::move(udtServerSocket)))
+        {
+            setLastError(SystemError::getLastOSErrorCode());
+            return nullptr;
+        }
+    #endif
 
     m_multipleServerSocket = multipleServerSocket.get();
     m_serverSocket = std::move(multipleServerSocket);

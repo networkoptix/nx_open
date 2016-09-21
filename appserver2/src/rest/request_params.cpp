@@ -78,7 +78,7 @@ namespace ec2
             deserialize(params, lit("info_fullVersion"),        &data->clientInfo.fullVersion);
             deserialize(params, lit("info_cpuArchitecture"),    &data->clientInfo.cpuArchitecture);
             deserialize(params, lit("info_cpuModelName"),       &data->clientInfo.cpuModelName);
-            deserialize(params, lit("info_phisicalMemory"),     &data->clientInfo.phisicalMemory);
+            deserialize(params, lit("info_physicalMemory"),     &data->clientInfo.physicalMemory);
             deserialize(params, lit("info_openGLVersion"),      &data->clientInfo.openGLVersion);
             deserialize(params, lit("info_openGLVendor"),       &data->clientInfo.openGLVendor);
             deserialize(params, lit("info_openGLRenderer"),     &data->clientInfo.openGLRenderer);
@@ -102,7 +102,7 @@ namespace ec2
             serialize(data.clientInfo.fullVersion,     lit("info_fullVersion"),     query);
             serialize(data.clientInfo.cpuArchitecture, lit("info_cpuArchitecture"), query);
             serialize(data.clientInfo.cpuModelName,    lit("info_cpuModelName"),    query);
-            serialize(data.clientInfo.phisicalMemory,  lit("info_phisicalMemory"),  query);
+            serialize(data.clientInfo.physicalMemory,  lit("info_physicalMemory"),  query);
             serialize(data.clientInfo.openGLVersion,   lit("info_openGLVersion"),   query);
             serialize(data.clientInfo.openGLVendor,    lit("info_openGLVendor"),    query);
             serialize(data.clientInfo.openGLRenderer,  lit("info_openGLRenderer"),  query);

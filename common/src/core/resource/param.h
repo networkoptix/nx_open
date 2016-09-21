@@ -79,7 +79,7 @@ namespace Qn
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
-    static const QString PHISICAL_MEMORY = lit("phisicalMemory");
+    static const QString PHYSICAL_MEMORY = lit("physicalMemory");
     static const QString BETA = lit("beta");
     static const QString PUBLIC_IP = lit("publicIp");
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");

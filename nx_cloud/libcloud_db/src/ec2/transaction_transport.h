@@ -142,6 +142,7 @@ private:
      */
     ::ec2::QnTranState m_remotePeerTranState;
     bool m_haveToSendSyncDone;
+    bool m_closed;
 
     void onGotTransaction(
         Qn::SerializationFormat tranFormat,

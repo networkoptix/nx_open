@@ -157,7 +157,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeUser:
         case ApiCommand::removeUserGroup:
             return notificationParams.userNotificationManager->triggerNotification(tran);
-        case ApiCommand::removeBusinessRule:
+        case ApiCommand::removeEventRule:
             return notificationParams.businessEventNotificationManager->triggerNotification(tran);
         case ApiCommand::removeLayout:
             return notificationParams.layoutNotificationManager->triggerNotification(tran);

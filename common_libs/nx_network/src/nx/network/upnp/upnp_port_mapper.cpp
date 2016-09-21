@@ -210,8 +210,9 @@ void PortMapper::addNewDevice( const HostAddress& localAddress,
     }
 
     NX_LOGX( lit( "New device %1 ( %2 ) has been found on %3" )
-             .arg( url.toString() )
-             .arg( serial ).arg( localAddress.toString() ), cl_logDEBUG2 );
+            .arg( url.toString(QUrl::RemovePassword) )
+            .arg( serial ).arg( localAddress.toString() ),
+        cl_logDEBUG2 );
 }
 
 void PortMapper::removeMapping( PortId portId )
@@ -258,7 +259,7 @@ void PortMapper::updateExternalIp( Device& device )
             QnMutexLocker lock( &m_mutex );
             NX_LOGX( lit( "externalIp='%1' on device %2" )
                      .arg( externalIp.toString() )
-                     .arg( device.url.toString() ), cl_logDEBUG1 );
+                     .arg( device.url.toString(QUrl::RemovePassword) ), cl_logDEBUG1 );
 
             if( externalIp == HostAddress() )
             {
@@ -407,10 +408,16 @@ void PortMapper::makeMapping( Device& device, quint16 inPort,
             device.failCounter.failure();
 
             if( retries > 0 )
+            {
                 makeMapping( device, inPort, protocol, retries - 1 );
+            }
             else
-                NX_LOGX( lit( "Cound not forward any port on %1" )
-                         .arg( device.url.toString() ), cl_logERROR );
+            {
+                NX_LOGX(lit("Cound not forward any port on %1")
+                        .arg(device.url.toString(QUrl::RemovePassword)),
+                    cl_logERROR );
+            }
+
             return;
         }
 

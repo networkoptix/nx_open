@@ -142,7 +142,7 @@ ec2::ApiClientInfoData clientInfo()
     clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
 
     const auto& hw = HardwareInformation::instance();
-    clientData.phisicalMemory = hw.phisicalMemory;
+    clientData.physicalMemory = hw.physicalMemory;
     clientData.cpuArchitecture = hw.cpuArchitecture;
     clientData.cpuModelName = hw.cpuModelName;
 

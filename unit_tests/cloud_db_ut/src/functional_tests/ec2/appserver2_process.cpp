@@ -207,6 +207,12 @@ int Appserver2Process::exec()
     QnCommonModule commonModule;
     commonModule.setModuleGUID(QnUuid::createUuid());
 
+    QnResourceDiscoveryManager resourceDiscoveryManager;
+    // Starting receiving notifications.
+    auto messageProcessor = std::make_unique<Appserver2MessageProcessor>(
+        QnResourcePool::instance(),
+        &resourceDiscoveryManager);
+
     QnRuntimeInfoManager runtimeInfoManager;
 
     ec2::ApiRuntimeData runtimeData;
@@ -289,11 +295,6 @@ int Appserver2Process::exec()
 
     tcpListener.start();
 
-    QnResourceDiscoveryManager resourceDiscoveryManager;
-    // Starting receiving notifications.
-    auto messageProcessor = std::make_unique<Appserver2MessageProcessor>(
-        QnResourcePool::instance(),
-        &resourceDiscoveryManager);
     messageProcessor->init(QnAppServerConnectionFactory::getConnection2());
     //ec2Connection->startReceivingNotifications();
 

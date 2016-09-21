@@ -73,7 +73,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
-    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
+    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == qnCommon->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     const bool takeCameraWithoutLock =
         (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
@@ -138,7 +138,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     ec2::ApiCameraAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return;
-    userAttrsData.preferedServerId = qnCommon->moduleGUID();
+    userAttrsData.preferredServerId = qnCommon->moduleGUID();
     m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }

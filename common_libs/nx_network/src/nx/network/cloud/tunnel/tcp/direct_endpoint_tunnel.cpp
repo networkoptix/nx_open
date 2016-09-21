@@ -18,7 +18,7 @@ DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
     aio::AbstractAioThread* aioThread,
     nx::String connectSessionId,
     SocketAddress targetEndpoint,
-    std::unique_ptr<TCPSocket> connection)
+    std::unique_ptr<AbstractStreamSocket> connection)
     :
     AbstractOutgoingTunnelConnection(aioThread),
     m_connectSessionId(std::move(connectSessionId)),
@@ -87,9 +87,15 @@ void DirectTcpEndpointTunnel::startConnection(
     {
         auto tcpConnection = std::move(m_tcpConnection);
         m_tcpConnection = nullptr;
+        SystemError::ErrorCode sysErrorCodeToReport = SystemError::noError;
+        if (!connectionContextIter->socketAttributes.applyTo(tcpConnection.get()))
+        {
+            sysErrorCodeToReport = SystemError::getLastOSErrorCode();
+            tcpConnection.reset();
+        }
         reportConnectResult(
             connectionContextIter,
-            SystemError::noError,
+            sysErrorCodeToReport,
             std::move(tcpConnection),
             true);
         return;
@@ -129,7 +135,7 @@ void DirectTcpEndpointTunnel::onConnectDone(
 void DirectTcpEndpointTunnel::reportConnectResult(
     std::list<ConnectionContext>::iterator connectionContextIter,
     SystemError::ErrorCode sysErrorCode,
-    std::unique_ptr<TCPSocket> tcpSocket,
+    std::unique_ptr<AbstractStreamSocket> tcpSocket,
     bool stillValid)
 {
     auto context = std::move(*connectionContextIter);

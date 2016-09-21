@@ -36,8 +36,6 @@ angular.module('webadminApp')
         $scope.serverAddress = window.location.host;
 
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
-        var debugMode = $location.search().debug;
-
         var cloudAuthorized = false;
 
         $log.log("check getCredentials from client");
@@ -58,12 +56,6 @@ angular.module('webadminApp')
                 $scope.settings.presetCloudEmail = authObject.cloudEmail;
                 $scope.settings.presetCloudPassword = authObject.cloudPassword;
             }
-        }
-
-        if(debugMode){
-            $log.log("Wizard works in debug mode: no changes on server or portal will be made.");
-            cloudAuthorized = true;
-            $scope.settings.presetCloudEmail = "debug@hdw.mx";
         }
 
         /* Funсtions for external calls (open links) */
@@ -93,13 +85,7 @@ angular.module('webadminApp')
         }
 
         function checkInternet(reload){
-
             $log.log("check internet connection");
-            if(debugMode){ // Temporary skip all internet checks
-                $scope.hasInternetOnServer = true;
-                $scope.hasInternetOnClient = true;
-                return;
-            }
 
             mediaserver.checkInternet().then(function(hasInternetOnServer){
                 $scope.hasInternetOnServer = hasInternetOnServer;
@@ -122,24 +108,11 @@ angular.module('webadminApp')
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
             $log.log("check system configuration, current user:", user);
-            if(!user){
-                $log.log("Authorization failed, user is not defined.", user);
+            if(user){
+                $scope.settings.localLogin = user.name || Config.defaultLogin;
             }
-            $scope.settings.localLogin = user.name || Config.defaultLogin;
 
-
-            if(debugMode) {
-                checkInternet(false);
-
-                var search = $location.search();
-                if(search.debug !== true){ // fast redirect to desired step
-                    $scope.next(search.debug);
-                }else {
-                    $scope.next('start');// go to start
-                }
-                return;
-            }
-            mediaserver.systemCloudInfo().then(function(data){
+            return mediaserver.systemCloudInfo().then(function(data){
                 $scope.settings.cloudSystemID = data.cloudSystemID;
                 $scope.settings.cloudEmail = data.cloudAccountName;
                 $log.log("Got response about systemCloudInfo");
@@ -151,12 +124,13 @@ angular.module('webadminApp')
                 $scope.next('cloudSuccess');
             },function(){
                 $log.log("failed to get systemCloudInfo");
-                mediaserver.getModuleInformation(true).then(function (r) {
+                return mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
                     checkInternet(false);
-                    if(debugMode || $scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
+                    if($scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
+                        return $q.reject();
                     }else{
                         sendCredentialsToNativeClient();
                         $log.log("System is local - go to local success");
@@ -309,24 +283,10 @@ angular.module('webadminApp')
 
         function connectToAnotherSystem(){
             $log.log("Connect to another system");
+            $log.log($scope.settings.remoteSystem);
+
             var systemUrl = $scope.settings.remoteSystem.url || $scope.settings.remoteSystem;
             $scope.settings.remoteError = false;
-            if(debugMode){
-                $log.log("Debug mode - only ping remote system: " + systemUrl);
-
-                mediaserver.pingSystem(
-                    systemUrl,
-                    $scope.settings.remoteLogin,
-                    $scope.settings.remotePassword).then(function(r){
-                        if(r.data.error !== 0 && r.data.error !=='0') {
-                            remoteErrorHandler(r);
-                            return;
-                        }
-                        updateCredentials( Config.defaultLogin, Config.defaultPassword).catch(remoteErrorHandler);
-                    },remoteErrorHandler);
-                return;
-            }
-
 
             $log.log("Request /api/mergeSystems ...");
             mediaserver.mergeSystems(
@@ -370,17 +330,10 @@ angular.module('webadminApp')
             $scope.settings.cloudError = false;
         };
 
-        function connectToCloud(preset){
+        function connectToCloud(){
             $log.log("Connect to cloud");
 
             $scope.settings.cloudError = false;
-            if(debugMode){
-                $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
-                $scope.portalShortLink = Config.cloud.portalUrl;
-
-                $scope.next('cloudSuccess');
-                return;
-            }
 
             function cloudErrorHandler(error)
             {
@@ -477,11 +430,6 @@ angular.module('webadminApp')
         function initOfflineSystem(){
 
             $log.log("Initiate offline (local) system");
-
-            if(debugMode){
-                $scope.next('localSuccess');
-                return;
-            }
 
             $log.log("Request /api/setupLocalSystem on cloud portal ...");
             mediaserver.setupLocalSystem($scope.settings.systemName,
@@ -615,7 +563,7 @@ angular.module('webadminApp')
             0:{
             },
             start:{
-                cancel: !!nativeClientObject || debugMode,
+                cancel: !!nativeClientObject,
                 next: 'systemName'
             },
             systemName:{
@@ -665,7 +613,7 @@ angular.module('webadminApp')
                 next: function(){
                     $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
                     $scope.settings.cloudPassword = $scope.settings.presetCloudPassword;
-                    return 'cloudProcess';
+                    return $scope.next('cloudProcess');
                 }
             },
             cloudLogin:{
@@ -726,7 +674,7 @@ angular.module('webadminApp')
                 }
             },
             initFailure:{
-                cancel: !!nativeClientObject || debugMode,
+                cancel: !!nativeClientObject,
                 retry: function(){
                     initWizard();
                 }
@@ -782,18 +730,20 @@ angular.module('webadminApp')
                 getAdvancedSettings();
                 discoverSystems();
             },function(error){
-                $log.log("Couldn't run setup wizard: auth failed");
-                $log.error(error);
-                if( $location.search().retry) {
-                    $log.log("Second try: show error to user");
-                    $scope.next("initFailure");
-                }else {
-                    $log.log("Reload page to try again");
-                    $location.search("retry","true");
-                    setTimeout(function(){
-                        window.location.reload();
-                    });
-                }
+                checkMySystem().catch(function(){
+                    $log.log("Couldn't run setup wizard: auth failed");
+                    $log.error(error);
+                    if( $location.search().retry) {
+                        $log.log("Second try: show error to user");
+                        $scope.next("initFailure");
+                    }else {
+                        $log.log("Reload page to try again");
+                        $location.search("retry","true");
+                        setTimeout(function(){
+                            window.location.reload();
+                        });
+                    }
+                });
             });
         }
 

@@ -327,7 +327,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
 
-    if (camera->preferedServerId() == ownGuid)
+    if (camera->preferredServerId() == ownGuid)
         return true;
     else if (mServer->getStatus() == Qn::Online)
         return false;
