@@ -435,7 +435,10 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings)
 {
     m_ldapUriAdaptor->setValue(settings.uri);
     m_ldapAdminDnAdaptor->setValue(settings.adminDn);
-    m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
+    m_ldapAdminPasswordAdaptor->setValue(
+        settings.isValid() 
+        ? nx::utils::encodeHexStringFromStringAES128CBC(settings.adminPassword) 
+        : QString());
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
 }
@@ -474,8 +477,7 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
     m_userAdaptor->setValue(settings.user);
     m_passwordAdaptor->setValue(
         settings.isValid() 
-        ? QString::fromLatin1(
-            nx::utils::encodeAES128CBC(settings.password.toUtf8()).toHex()) 
+        ? nx::utils::encodeHexStringFromStringAES128CBC(settings.password) 
         : QString());
     m_connectionTypeAdaptor->setValue(settings.connectionType);
     m_signatureAdaptor->setValue(settings.signature);

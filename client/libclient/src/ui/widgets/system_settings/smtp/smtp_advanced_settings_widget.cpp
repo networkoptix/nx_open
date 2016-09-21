@@ -141,10 +141,7 @@ void QnSmtpAdvancedSettingsWidget::setSettings(const QnEmailSettings &value)
     ui->serverInputField->setText(value.server);
     ui->userInputField->setText(value.user);
     ui->emailInputField->setText(value.email);
-    ui->passwordInputField->setText(
-        QString::fromUtf8(
-            nx::utils::decodeAES128CBC(
-                QByteArray::fromHex(value.password.toLatin1()))));
+    ui->passwordInputField->setText(nx::utils::decodeStringFromHexStringAES128CBC(value.password));
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
 }

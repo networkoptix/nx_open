@@ -99,22 +99,18 @@ void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
     setProperty(
         Qn::CAMERA_CREDENTIALS_PARAM_NAME, 
-        QString::fromLatin1( 
-            nx::utils::encodeAES128CBC( 
-                lit("%1:%2").arg(auth.user()) 
-                            .arg(auth.password()) 
-                            .toUtf8()).toHex()));
+        nx::utils::encodeHexStringFromStringAES128CBC(
+            lit("%1:%2").arg(auth.user()) 
+                        .arg(auth.password())));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
     setProperty(
         Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
-        QString::fromLatin1( 
-            nx::utils::encodeAES128CBC( 
-                lit("%1:%2").arg(auth.user()) 
-                            .arg(auth.password()) 
-                            .toUtf8()).toHex()));
+        nx::utils::encodeHexStringFromStringAES128CBC(
+            lit("%1:%2").arg(auth.user()) 
+                        .arg(auth.password()))); 
 }
 
 QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
@@ -139,9 +135,7 @@ QAuthenticator QnNetworkResource::getAuth() const
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-    value = QString::fromUtf8(
-        nx::utils::decodeAES128CBC(
-            QByteArray::fromHex(value.toLatin1())));
+    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
 
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;

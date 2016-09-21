@@ -21,5 +21,8 @@ QByteArray decodeAES128CBC(const QByteArray& data, const QByteArray& key);
 // These overloads use internal constant key
 QByteArray encodeAES128CBC(const QByteArray& data);
 QByteArray decodeAES128CBC(const QByteArray& data);
+
+QString encodeHexStringFromStringAES128CBC(const QString& s);
+QString decodeStringFromHexStringAES128CBC(const QString& s);
 }
 }

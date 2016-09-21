@@ -2,6 +2,7 @@
 
 #include "api/global_settings.h"
 #include <nx/utils/log/log.h>
+#include <utils/crypt/symmetrical.h>
 #include <iostream>
 #include <sstream>
 
@@ -217,7 +218,7 @@ public:
 private:
     bool detectLdapVendor(LdapVendor &);
 
-    const QnLdapSettings& m_settings;
+    QnLdapSettings m_settings;
     LDAP_RESULT m_lastErrorCode;
 
     std::unique_ptr<DirectoryType> m_dType;
@@ -228,6 +229,7 @@ LdapSession::LdapSession(const QnLdapSettings &settings)
     : m_settings(settings),
       m_ld(0)
 {
+    m_settings.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_settings.adminPassword);
 }
 
 LdapSession::~LdapSession()

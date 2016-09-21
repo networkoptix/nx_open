@@ -124,6 +124,16 @@ QByteArray decodeAES128CBC(const QByteArray& data)
     return decodeAES128CBC(data, detail::keyFromByteArray(detail::kMask));
 }
 
+QString decodeStringFromHexStringAES128CBC(const QString& s)
+{
+    return QString::fromUtf8(nx::utils::decodeAES128CBC(QByteArray::fromHex(s.toLatin1())));
+}
+
+QString encodeHexStringFromStringAES128CBC(const QString& s)
+{
+    return QString::fromLatin1(nx::utils::encodeAES128CBC(s.toUtf8()).toHex());
+}
+
 namespace detail {
 /*
 

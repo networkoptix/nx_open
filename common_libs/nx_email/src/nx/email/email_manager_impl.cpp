@@ -91,10 +91,7 @@ bool EmailManagerImpl::sendEmail(
     if (!settings.user.isEmpty() && 
         !smtp.login(
             settings.user, 
-            QString::fromUtf8(
-                nx::utils::decodeAES128CBC(
-                    QByteArray::fromHex(
-                        settings.password.toLatin1())))))
+            nx::utils::decodeStringFromHexStringAES128CBC(settings.password)))
     {
         NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
         smtp.quit();
