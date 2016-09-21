@@ -7,7 +7,8 @@ namespace utils {
 QByteArray encodeSimple(const QByteArray& data);
 
 // NOTE: data to be encoded shouldn't contain '\0' because decrypted 
-//       data is stripped at the first '\0' symbol
+//       data is stripped at the first '\0' symbol. E.g. these below work 
+//       fine with utf-8 strings, but not with utf-16(32) ones.
 QByteArray encodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>& key);
 QByteArray decodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>& key);
 
