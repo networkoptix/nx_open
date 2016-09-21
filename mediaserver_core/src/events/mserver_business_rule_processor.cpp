@@ -68,10 +68,10 @@ namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
     const QString tpEventLogoFilename(lit("eventLogoFilename"));
     const QString tpProductLogo(lit("logo"));
-	const QString tpSystemIcon(lit("systemIcon"));
-	const QString tpOwnerIcon(lit("ownerIcon"));
-	const QString tpCloudOwner(lit("cloudOwner"));
-	const QString tpCloudOwnerEmail(lit("cloudOwnerEmail"));
+    const QString tpSystemIcon(lit("systemIcon"));
+    const QString tpOwnerIcon(lit("ownerIcon"));
+    const QString tpCloudOwner(lit("cloudOwner"));
+    const QString tpCloudOwnerEmail(lit("cloudOwnerEmail"));
     const QString tpCompanyName(lit("companyName"));
     const QString tpCompanyUrl(lit("companyUrl"));
     const QString tpSupportLink(lit("supportLink"));
@@ -86,17 +86,17 @@ namespace {
     static const QString tpProductName(lit("productName"));
     static const QString tpEvent(lit("event"));
     static const QString tpSource(lit("source"));
-	static const QString tpSourceIP(lit("sourceIp"));
+    static const QString tpSourceIP(lit("sourceIp"));
 
-	static const QString tpCameraName(lit("name"));
-	static const QString tpCameraIP(lit("cameraIP"));
+    static const QString tpCameraName(lit("name"));
+    static const QString tpCameraIP(lit("cameraIP"));
 
     static const QString tpUrlInt(lit("urlint"));
     static const QString tpUrlExt(lit("urlext"));
-	static const QString tpCount(lit("count"));
-	static const QString tpTimestamp(lit("timestamp"));
-	static const QString tpTimestampDate(lit("timestampDate"));
-	static const QString tpTimestampTime(lit("timestampTime"));
+    static const QString tpCount(lit("count"));
+    static const QString tpTimestamp(lit("timestamp"));
+    static const QString tpTimestampDate(lit("timestampDate"));
+    static const QString tpTimestampTime(lit("timestampTime"));
     static const QString tpReason(lit("reason"));
     static const QString tpReasonContext(lit("reasonContext"));
     static const QString tpAggregated(lit("aggregated"));
@@ -251,7 +251,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             break;
         case QnBusiness::ExecHttpRequestAction:
             result = executeHttpRequestAction(action);
-			break;
+            break;
 
         case QnBusiness::SayTextAction:
             result = executeSayTextAction(action);
@@ -554,20 +554,20 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
 {
     QnEmailAttachmentList attachments;
-	QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
+    QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
-	QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
+    QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-	attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
 //    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-	contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
-	if (!cloudOwnerAccount.isEmpty())
-	{
-		attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
-		contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+    contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    if (!cloudOwnerAccount.isEmpty())
+    {
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
+        contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
         const auto allUsers = qnResPool->getResources<QnUserResource>();
@@ -579,7 +579,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
                 break;
             }
         }
-	}
+    }
 
 //    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
@@ -594,7 +594,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
-	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
+    contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
@@ -623,7 +623,7 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 
     // Add user's email addresses to action emailAddress field and filter invalid addresses
     updateRecipientsList(action);
-	QStringList recipients = getRecipients(action);
+    QStringList recipients = getRecipients(action);
 
     //aggregating by recipients and eventtype
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
@@ -679,13 +679,13 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-	QVariantMap contextMap;
+    QVariantMap contextMap;
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType, qMax(1, deviceCount));
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
-	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
+    contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
 
     if (eventType == QnBusiness::CameraMotionEvent)
     {
@@ -716,9 +716,9 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
                 {
                     QVariantMap camera;
 
-					QnResourceDisplayInfo camInfo(camRes);
-					camera[tpCameraName] = camInfo.name();
-					camera[tpCameraIP] = camInfo.host();
+                    QnResourceDisplayInfo camInfo(camRes);
+                    camera[tpCameraName] = camInfo.name();
+                    camera[tpCameraIP] = camInfo.host();
 
                     qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
@@ -743,7 +743,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
     }
 
     contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, Qn::ResourceInfoLevel::RI_NameOnly);
-	// TODO: CHECK!
+    // TODO: CHECK!
     return contextMap;
 }
 
@@ -786,7 +786,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnBusinessEventParameters& params = aggregationData.runtimeParams();
     const int aggregationCount = aggregationData.count();
 
-	QVariantMap detailsMap;
+    QVariantMap detailsMap;
 
     if( addSubAggregationData )
     {
@@ -796,10 +796,10 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
             : (QVariantList() << eventDetailsMap(action, aggregationData, detailLevel, false));
     }
 
-	detailsMap[tpCount] = QString::number(aggregationCount);
+    detailsMap[tpCount] = QString::number(aggregationCount);
     detailsMap[tpTimestamp] = QnBusinessStringsHelper::eventTimestampShort(params, aggregationCount);
-	detailsMap[tpTimestampDate] = QnBusinessStringsHelper::eventTimestampDate(params);
-	detailsMap[tpTimestampTime] = QnBusinessStringsHelper::eventTimestampTime(params);
+    detailsMap[tpTimestampDate] = QnBusinessStringsHelper::eventTimestampDate(params);
+    detailsMap[tpTimestampTime] = QnBusinessStringsHelper::eventTimestampTime(params);
 
     switch (params.eventType) {
     case CameraDisconnectEvent: {
@@ -847,7 +847,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
         QVariantList conflicts;
         int n = 0;
         foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
-			QVariantMap conflict;
+            QVariantMap conflict;
             conflict[lit("number")] = ++n;
             conflict[lit("mac")] = mac;
             conflicts << conflict;
