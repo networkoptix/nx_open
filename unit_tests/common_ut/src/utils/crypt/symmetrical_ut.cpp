@@ -1,4 +1,4 @@
-#include <vector>
+﻿#include <vector>
 #include <array>
 #include <string>
 #include <gtest/gtest.h>
@@ -24,18 +24,20 @@ const std::vector<std::vector<uint8_t>> kVariableKeys = {
 };
 
 const std::vector<QByteArray> kTestData = {
-    "1",
-    "",
-    "abcdefghefjklmnoprstuvwxyz",
-    "abcdefghefjklmnoprstuvwxyzabcdefg hefj klmnoprstuvwxyzabcdefghefjklmnoprstuvwxyz",
-    "0",
-    "00",
-    "0123456789",
-    "9876543 210",
-    "101",
-    "0bcdefg hefjklmnoprstuvwxyzabcdefgh efj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0 \
+    u8"1",
+    u8"",
+    u8"abcdefghefjklmnoprstuvwxyz",
+    u8"abcdefghefjklmnopfавыф фывав rstuvwxyzabcdefg hefj klmnoprstuvwxyzabcdefghefjklmnoprstuvwxyz",
+    u8"0",
+    u8"00",
+    u8"0123456789",
+    u8"9876543 210",
+    u8"101",
+    u8"0bcdefg hefjklmnoprstuvwxyzabcdefgh efj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0 \
      0bcdefghefjklmnoprstuvwxyzabcdefghefj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0",
-    "0bcdefghefjklmnoprstuvwxyzabcdefghe fj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0", 
+    u8"0bcdefghefjklmnoprstuvwxyzabавыф фывафы  вфыавыфа фываcdefghe fj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0", 
+    u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12", 
+    u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12 аыфдлафыджвлавыджлаоджлауцйащшзуцоащш оывал дуцйщшзак уцщйзо", 
 };
 }
 
