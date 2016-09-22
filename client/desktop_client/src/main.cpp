@@ -151,6 +151,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         QObject::connect(application, &QtSingleApplication::messageReceived, mainWindow.data(), &QnMainWindow::handleMessage);
 
     client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
+    client.startLocalSearchers();
 
     if (!context->handleStartupParameters(startupParams))
         return kInvalidParametersCode;  /* For now it is only if starting videowall failed. */
