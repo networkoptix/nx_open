@@ -8,8 +8,8 @@
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <nx/utils/math/fuzzy.h>
-
 #include <ui/common/geometry.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
@@ -56,10 +56,10 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
 
         m_pixmapDirty = false;
     }
-    const auto aspect = m_pixmap.devicePixelRatio();
-    const auto size = renderRect.size() * aspect;
-    const auto topLeft = (renderRect.topLeft() - rect().topLeft()) * aspect;
-    painter->drawPixmap(renderRect, m_pixmap, QRectF(topLeft, size));
+    const auto size = renderRect.size();
+    const auto topLeft = (renderRect.topLeft() - rect().topLeft()).toPoint();
+
+    paintPixmapSharp(painter, m_pixmap, renderRect, QRect(topLeft, size));
 }
 
 bool QnMaskedProxyWidget::eventFilter(QObject* object, QEvent* event)
