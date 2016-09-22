@@ -722,6 +722,7 @@
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <festival.version>2.1x-SNAPSHOT</festival.version>
+                <quazip.version>0.7-SNAPSHOT</quazip.version>
                 <modification>rpi</modification>
             </properties>
             <modules>
