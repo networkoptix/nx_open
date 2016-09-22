@@ -9,7 +9,7 @@ nx::ut::cfg::Config config;
 static void fillConfig(const QStringList& arguments)
 {
     QCommandLineParser parser;
-    parser.addOptions({{{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
+    parser.addOptions({ {{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
                        {"ftp-storage-url", "Ftp storage url"},
                        {"smb-storage-url", "Smb storage url"} });
     parser.addHelpOption();
@@ -30,8 +30,9 @@ static void fillConfig(const QStringList& arguments)
     if (parser.isSet("ftp-storage-url"))
         config.ftpUrl = parser.value("ftp-storage-url");
     if (parser.isSet("smb-storage-url"))
-#include "storage/abstract_storage_resource.h"
-extern test::StorageTestGlobals tg;
+        config.smbUrl = parser.value("smb-storage-url");
+}
+
 static void fillConfig(QCoreApplication& app)
 {
     fillConfig(app.arguments());
