@@ -22,14 +22,14 @@ const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
 
 QnAdamResource::QnAdamResource()
 {
-    connect(
+    Qn::directConnect(
         this, &QnResource::propertyChanged, 
-        this, &QnAdamResource::at_propertyChanged, 
-        Qt::DirectConnection );
+        this, &QnAdamResource::at_propertyChanged);
 }
 
 QnAdamResource::~QnAdamResource()
 {
+    directDisconnectAll();
     stopInputPortMonitoringAsync();
     if (m_ioManager)
         m_ioManager->terminate();

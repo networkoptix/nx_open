@@ -70,15 +70,13 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
     m_debouncedValues.clear();
 
-    QObject::connect(
+    Qn::directConnect(
         &m_client, &nx_modbus::QnModbusAsyncClient::done, 
-        this, &QnAdamModbusIOManager::routeMonitoringFlow,
-        Qt::DirectConnection);
+        this, &QnAdamModbusIOManager::routeMonitoringFlow);
 
-    QObject::connect(
+    Qn::directConnect(
         &m_client, &nx_modbus::QnModbusAsyncClient::error, 
-        this, &QnAdamModbusIOManager::handleMonitoringError,
-        Qt::DirectConnection);
+        this, &QnAdamModbusIOManager::handleMonitoringError);
 
     m_monitoringIsInProgress = true;
 
@@ -105,13 +103,7 @@ void QnAdamModbusIOManager::stopIOMonitoring()
     TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
     lock.relock();
 
-    QObject::disconnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::done, 
-        this, &QnAdamModbusIOManager::routeMonitoringFlow);
-
-    QObject::disconnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::error, 
-        this, &QnAdamModbusIOManager::handleMonitoringError);
+    directDisconnectAll();
 }
 
 bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isActive)

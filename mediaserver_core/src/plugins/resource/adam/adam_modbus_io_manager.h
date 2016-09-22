@@ -8,8 +8,12 @@
 #include <modbus/modbus_async_client.h>
 #include <modbus/modbus_client.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
+#include <utils/common/safe_direct_connection.h>
 
-class QnAdamModbusIOManager: public QObject, public QnAbstractIOManager
+class QnAdamModbusIOManager:
+    public QObject,
+    public Qn::EnableSafeDirectConnection,
+    public QnAbstractIOManager
 {
     Q_OBJECT
 
