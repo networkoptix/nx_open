@@ -164,6 +164,35 @@ TEST_F(Ec2MserverCloudSynchronization2, general)
     }
 }
 
+TEST_F(Ec2MserverCloudSynchronization2, reconnecting)
+{
+    constexpr const int minDelay = 0;
+    constexpr const int maxDelay = 100;
+
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    for (int i = 0; i < 50; ++i)
+    {
+        // Cdb can change port after restart.
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(
+                nx::utils::random::number(minDelay, maxDelay)));
+
+        appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(
+                nx::utils::random::number(minDelay, maxDelay)));
+    }
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+    waitForCloudAndVmsToSyncUsers();
+}
+
 TEST_F(Ec2MserverCloudSynchronization2, addingUserLocallyWhileOffline)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
