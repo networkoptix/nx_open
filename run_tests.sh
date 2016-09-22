@@ -7,6 +7,7 @@ ci_dir=$nx_vms_dir/.test
 devtools_dir=../devtools
 latest_success_changeset=
 run_tests=true
+script_name=$(basename "$0")
 
 if [ -n "$TEST_BRANCH" ]; then
     if [ -f "$ci_dir/$branch" ]; then 
@@ -21,7 +22,7 @@ if [ $run_tests != "true" ]; then
 fi
 
 if [ -n "$TEST_BRANCH" ]; then
-    echo Called with devtools brach "$TEST_BRANCH" specified. $devtools_dir is switching to this branch with --clean!
+    echo "[${script_name}] Called with devtools brach "$TEST_BRANCH" specified. $devtools_dir is switching to this branch with --clean!"
     mkdir -p "$devtools_dir"
     cd "$devtools_dir"
     hg pull || hg clone ssh://hg@hdw.mx/devtools .
