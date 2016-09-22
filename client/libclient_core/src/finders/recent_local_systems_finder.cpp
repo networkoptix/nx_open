@@ -1,14 +1,15 @@
 
 #include "recent_local_systems_finder.h"
 
-#include <network/module_finder.h>
 #include <client_core/client_core_settings.h>
 #include <client_core/local_connection_data.h>
 #include <nx/network/http/asynchttpclient.h>
 
 QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent):
     base_type(parent),
-    m_systems()
+    m_systems(),
+    m_reservedSystems(),
+    m_onlineSystems()
 {
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
         [this](int valueId)
@@ -18,27 +19,35 @@ QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent):
         });
 
     updateSystems();
+}
 
-    const auto checkModulesChanged =
-        [this](const QnModuleInformation& /* module */)
+
+void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr& system)
+{
+    if (m_onlineSystems.contains(system->id()))
+        return;
+
+    m_onlineSystems.insert(system->id(), system->name());
+    checkAllSystems();
+}
+
+void QnRecentLocalSystemsFinder::processSystemRemoved(const QString& systemId)
+{
+    if (m_onlineSystems.remove(systemId))
+        checkAllSystems();
+}
+
+void QnRecentLocalSystemsFinder::checkAllSystems()
+{
+    const auto processSystems =
+        [this](const SystemsHash& systems)
         {
-            const auto modules = qnModuleFinder->foundModules();
-
-            const auto processSystems =
-                [this, modules](const SystemsHash& systems)
-                {
-                    const auto keys = systems.keys();
-                    for (const auto key : keys)
-                        checkSystem(systems.value(key), modules);
-                };
-
-            processSystems(m_systems);
-            processSystems(m_onlineSystems);
+            for (const auto id : systems.keys())
+                checkSystem(systems.value(id));
         };
 
-    const auto moduleFinder = qnModuleFinder;
-    connect(moduleFinder, &QnModuleFinder::moduleChanged, this, checkModulesChanged);
-    connect(qnModuleFinder, &QnModuleFinder::moduleLost, this, checkModulesChanged);
+    processSystems(m_systems);
+    processSystems(m_reservedSystems);
 }
 
 QnAbstractSystemsFinder::SystemDescriptionList QnRecentLocalSystemsFinder::systems() const
@@ -70,15 +79,14 @@ void QnRecentLocalSystemsFinder::updateSystems()
 
     for (const auto systemId : removed)
     {
-        m_onlineSystems.remove(systemId);
+        m_reservedSystems.remove(systemId);
         removeVisibleSystem(systemId);
     }
 
-    const auto modules = qnModuleFinder->foundModules();
     for (const auto systemId : added)
     {
         const auto system = newSystems.value(systemId);
-        checkSystem(system, modules);
+        checkSystem(system);
     }
 }
 
@@ -88,24 +96,23 @@ void QnRecentLocalSystemsFinder::removeVisibleSystem(const QString& systemId)
         emit systemLost(systemId);
 }
 
-void QnRecentLocalSystemsFinder::checkSystem(const QnSystemDescriptionPtr& system,
-    const ModulesList& modules)
+void QnRecentLocalSystemsFinder::checkSystem(const QnSystemDescriptionPtr& system)
 {
     if (!system)
         return;
 
     const auto systemId = system->id();
-    if (shouldRemoveSystem(system, modules))
+    if (shouldRemoveSystem(system))
     {
         // adds to online list
-        if (!m_onlineSystems.contains(systemId))
-            m_onlineSystems.insert(systemId, system);
+        if (!m_reservedSystems.contains(systemId))
+            m_reservedSystems.insert(systemId, system);
 
         removeVisibleSystem(systemId);
     }
     else
     {
-        m_onlineSystems.remove(systemId);
+        m_reservedSystems.remove(systemId);
         if (m_systems.contains(systemId))
             return;
 
@@ -114,21 +121,14 @@ void QnRecentLocalSystemsFinder::checkSystem(const QnSystemDescriptionPtr& syste
     }
 }
 
-bool QnRecentLocalSystemsFinder::shouldRemoveSystem(const QnSystemDescriptionPtr& system,
-    const ModulesList& modules)
+bool QnRecentLocalSystemsFinder::shouldRemoveSystem(const QnSystemDescriptionPtr& system)
 {
     if (!system)
         return true;
 
-    /*
-     * Local servers can be connected to cloud. Thus, if we have online server with
-     * same local system id we should filter it out.
-     */
-
-    for (const auto module : modules)
+    for (const auto systemName : m_onlineSystems)
     {
-        const auto localSystemId = helpers::getLocalSystemId(module);
-        if (system->id() == localSystemId)
+        if (system->name() == systemName)
             return true;
     }
     return false;

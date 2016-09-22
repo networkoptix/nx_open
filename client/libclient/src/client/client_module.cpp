@@ -489,6 +489,16 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     systemsFinder->addSystemsFinder(directSystemsFinder.data(), kDirectFinder);
 
     QScopedPointer<QnRecentLocalSystemsFinder> recentLocalSystemsFinder(new QnRecentLocalSystemsFinder());
+    connect(cloudSystemsFinder.data(), &QnAbstractSystemsFinder::systemDiscovered,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemAdded);
+    connect(directSystemsFinder.data(), &QnAbstractSystemsFinder::systemDiscovered,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemAdded);
+
+    connect(cloudSystemsFinder.data(), &QnAbstractSystemsFinder::systemLost,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemRemoved);
+    connect(directSystemsFinder.data(), &QnAbstractSystemsFinder::systemLost,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemRemoved);
+
     systemsFinder->addSystemsFinder(recentLocalSystemsFinder.data(), kRecentFinder);
 
     qnCommon->store<QnSystemsFinder>(systemsFinder.take());
