@@ -24,6 +24,7 @@ void printHelp()
         "Common options:\n"
         "  --enforce-mediator={endpoint}    Enforces custom mediator address\n"
         "  --log-level={level}              Log level to console"
+        "  --rw-timeout={time}              Socket send/recv timeouts"
         "\n"
         << std::endl;
 }
