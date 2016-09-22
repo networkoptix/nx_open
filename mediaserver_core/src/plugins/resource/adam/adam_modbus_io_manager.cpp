@@ -350,8 +350,6 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
             change.first,
             change.second);
     }
-    lock.relock();
-
 }
 
 QnAdamModbusIOManager::PortStateChangeInfo QnAdamModbusIOManager::updatePortState(
