@@ -2,7 +2,7 @@
 
 #include <client_core/client_core_settings.h>
 
-#include <ui/models/recent_user_connections_model.h>
+#include <ui/models/recent_local_connections_model.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -28,12 +28,12 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager():
 QnClientRecentConnectionsManager::~QnClientRecentConnectionsManager()
 {}
 
-void QnClientRecentConnectionsManager::addModel(QnrecentLocalConnectionsModel* model)
+void QnClientRecentConnectionsManager::addModel(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
 
-    connect(model, &QnrecentLocalConnectionsModel::systemNameChanged, this,
+    connect(model, &QnRecentLocalConnectionsModel::systemNameChanged, this,
         [this, model]()
         {
             updateModelBinding(model);
@@ -45,7 +45,7 @@ void QnClientRecentConnectionsManager::addModel(QnrecentLocalConnectionsModel* m
         updateModelBinding(model);
 }
 
-void QnClientRecentConnectionsManager::removeModel(QnrecentLocalConnectionsModel* model)
+void QnClientRecentConnectionsManager::removeModel(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
@@ -58,7 +58,7 @@ void QnClientRecentConnectionsManager::removeModel(QnrecentLocalConnectionsModel
     m_models.removeOne(model);
 }
 
-void QnClientRecentConnectionsManager::updateModelBinding(QnrecentLocalConnectionsModel* model)
+void QnClientRecentConnectionsManager::updateModelBinding(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);

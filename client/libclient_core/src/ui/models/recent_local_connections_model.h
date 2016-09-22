@@ -3,7 +3,7 @@
 #include <QtCore/QAbstractListModel>
 #include <client_core/local_connection_data.h>
 
-class QnrecentLocalConnectionsModel : public QAbstractListModel
+class QnRecentLocalConnectionsModel : public QAbstractListModel
 {
     Q_OBJECT
     typedef QAbstractListModel base_type;
@@ -24,9 +24,9 @@ public:
         RolesCount
     };
 
-    QnrecentLocalConnectionsModel(QObject *parent = nullptr);
+    QnRecentLocalConnectionsModel(QObject *parent = nullptr);
 
-    virtual ~QnrecentLocalConnectionsModel();
+    virtual ~QnRecentLocalConnectionsModel();
 
 public: // properties
     QString systemName() const;

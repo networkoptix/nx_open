@@ -7,7 +7,7 @@
 
 #include <client_core/local_connection_data.h>
 
-class QnrecentLocalConnectionsModel;
+class QnRecentLocalConnectionsModel;
 
 class QnClientRecentConnectionsManager: public QObject, public Singleton<QnClientRecentConnectionsManager>
 {
@@ -18,15 +18,15 @@ public:
     QnClientRecentConnectionsManager();
     virtual ~QnClientRecentConnectionsManager();
 
-    void addModel(QnrecentLocalConnectionsModel* model);
-    void removeModel(QnrecentLocalConnectionsModel* model);
+    void addModel(QnRecentLocalConnectionsModel* model);
+    void removeModel(QnRecentLocalConnectionsModel* model);
 
 private:
-    void updateModelBinding(QnrecentLocalConnectionsModel* model);
+    void updateModelBinding(QnRecentLocalConnectionsModel* model);
     void updateModelsData();
 
 private:
-    using QnrecentLocalConnectionsModelPtr = QPointer<QnrecentLocalConnectionsModel>;
+    using QnrecentLocalConnectionsModelPtr = QPointer<QnRecentLocalConnectionsModel>;
     using DataCache = QHash<QString, QnLocalConnectionDataList>;
 
     QList<QnrecentLocalConnectionsModelPtr> m_models;

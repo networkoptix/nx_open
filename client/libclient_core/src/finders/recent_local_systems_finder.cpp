@@ -31,6 +31,9 @@ void QnRecentLocalSystemsFinder::updateSystems()
     SystemsHash newSystems;
     for (const auto connection : qnClientCoreSettings->recentLocalConnections())
     {
+        if (connection.systemId.isEmpty())
+            continue;
+
         newSystems.insert(connection.systemId,
             QnSystemDescription::createLocalSystem(connection.systemId, connection.systemName));
     }

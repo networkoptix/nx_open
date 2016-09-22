@@ -1,4 +1,4 @@
-#include "recent_user_connections_model.h"
+#include "recent_local_connections_model.h"
 
 #include <client/client_recent_connections_manager.h>
 
@@ -11,9 +11,9 @@ namespace
     const auto kRoleNames = []()-> RoleNameHash
     {
         RoleNameHash result;
-        result.insert(QnrecentLocalConnectionsModel::UserNameRole, "userName");
-        result.insert(QnrecentLocalConnectionsModel::PasswordRole, "password");
-        result.insert(QnrecentLocalConnectionsModel::HasStoredPasswordRole, "hasStoredPassword");
+        result.insert(QnRecentLocalConnectionsModel::UserNameRole, "userName");
+        result.insert(QnRecentLocalConnectionsModel::PasswordRole, "password");
+        result.insert(QnRecentLocalConnectionsModel::HasStoredPasswordRole, "hasStoredPassword");
         return result;
     }();
 
@@ -62,7 +62,7 @@ namespace
 
 }
 
-QnrecentLocalConnectionsModel::QnrecentLocalConnectionsModel(QObject *parent):
+QnRecentLocalConnectionsModel::QnRecentLocalConnectionsModel(QObject *parent):
     base_type(parent),
     m_systemName(),
     m_data()
@@ -70,17 +70,17 @@ QnrecentLocalConnectionsModel::QnrecentLocalConnectionsModel(QObject *parent):
     QnClientRecentConnectionsManager::instance()->addModel(this);
 }
 
-QnrecentLocalConnectionsModel::~QnrecentLocalConnectionsModel()
+QnRecentLocalConnectionsModel::~QnRecentLocalConnectionsModel()
 {
     QnClientRecentConnectionsManager::instance()->removeModel(this);
 }
 
-QString QnrecentLocalConnectionsModel::systemName() const
+QString QnRecentLocalConnectionsModel::systemName() const
 {
     return m_systemName;
 }
 
-void QnrecentLocalConnectionsModel::setSystemName(const QString &systemName)
+void QnRecentLocalConnectionsModel::setSystemName(const QString &systemName)
 {
     if (m_systemName == systemName)
         return;
@@ -89,12 +89,12 @@ void QnrecentLocalConnectionsModel::setSystemName(const QString &systemName)
     emit systemNameChanged();
 }
 
-bool QnrecentLocalConnectionsModel::hasConnections() const
+bool QnRecentLocalConnectionsModel::hasConnections() const
 {
     return !m_data.isEmpty();
 }
 
-QString QnrecentLocalConnectionsModel::firstUser() const
+QString QnRecentLocalConnectionsModel::firstUser() const
 {
     if (!hasConnections())
         return QString();
@@ -102,7 +102,7 @@ QString QnrecentLocalConnectionsModel::firstUser() const
     return m_data.first().url.userName();
 }
 
-void QnrecentLocalConnectionsModel::updateData(const QnLocalConnectionDataList &newData)
+void QnRecentLocalConnectionsModel::updateData(const QnLocalConnectionDataList &newData)
 {
     const auto filteredData = removeDuplicates(newData);
     if (m_data == filteredData)
@@ -166,12 +166,12 @@ void QnrecentLocalConnectionsModel::updateData(const QnLocalConnectionDataList &
         emit firstUserChanged();
 }
 
-int QnrecentLocalConnectionsModel::rowCount(const QModelIndex &parent) const
+int QnRecentLocalConnectionsModel::rowCount(const QModelIndex &parent) const
 {
     return (parent.isValid() ? 0 : m_data.size());
 }
 
-QVariant QnrecentLocalConnectionsModel::data(const QModelIndex &index, int role) const
+QVariant QnRecentLocalConnectionsModel::data(const QModelIndex &index, int role) const
 {
     const int row = index.row();
     if (!qBetween(0, row, rowCount())
@@ -194,12 +194,12 @@ QVariant QnrecentLocalConnectionsModel::data(const QModelIndex &index, int role)
     }
 }
 
-RoleNameHash QnrecentLocalConnectionsModel::roleNames() const
+RoleNameHash QnRecentLocalConnectionsModel::roleNames() const
 {
     return kRoleNames;
 }
 
-QVariant QnrecentLocalConnectionsModel::getData(const QString &dataRole
+QVariant QnRecentLocalConnectionsModel::getData(const QString &dataRole
     , int row)
 {
     const auto it = kRoleIdByName.find(dataRole.toLatin1());
