@@ -5,6 +5,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/flag_config.h>
 
 #include "aio/aioservice.h"
 
@@ -23,6 +24,19 @@ namespace network {
 class NX_NETWORK_API SocketGlobals
 {
 public:
+    struct NX_NETWORK_API DebugFlags: nx::utils::FlagConfig
+    {
+        DebugFlags(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
+
+        NX_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
+        NX_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
+        NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
+    };
+
+    inline static
+    DebugFlags& debugFlags()
+    { return s_instance->m_debugFlags; }
+
     inline static
     aio::AIOService& aioService()
     { return s_instance->m_aioService; }
@@ -85,6 +99,7 @@ private:
     static SocketGlobals* s_instance;
 
 private:
+    DebugFlags m_debugFlags;
     std::shared_ptr< QnLog::Logs > m_log;
     aio::AIOService m_aioService;
 
