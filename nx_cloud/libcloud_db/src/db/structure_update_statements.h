@@ -567,10 +567,10 @@ DELETE FROM system_to_account_old;
 DELETE FROM system_old;
 
 DROP TABLE system_to_account_old;
-DROP TABLE system_old;
-
 
 DROP TABLE transaction_log;
+
+DROP TABLE system_old;
 
 CREATE TABLE transaction_log (
     system_id   VARCHAR(64) NOT NULL,
