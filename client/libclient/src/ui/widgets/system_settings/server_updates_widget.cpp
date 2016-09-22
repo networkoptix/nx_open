@@ -479,6 +479,10 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             detail = tr("Unable to extract update file. No free space left on the disk.");
             break;
 
+        case QnCheckForUpdateResult::IncompatibleCloudHost:
+            detail = tr("Incompatible cloud instance. To update disconnect system from the cloud first.");
+            break;
+
         default:
             NX_ASSERT(false); // should never get here
     }
@@ -743,27 +747,6 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 
             case QnUpdateResult::AlreadyUpdated:
                 QnMessageBox::information(this, tr("Update is not needed."), tr("All servers are already updated."));
-                break;
-
-            case QnUpdateResult::ValidationFailed:
-                QnMessageBox::critical(
-                    this,
-                    tr("Update unsuccessful."),
-                    tr("Could not start update.")
-                        + lit("\n")
-                        + tr("The problem is caused by %n servers:",
-                           "", result.failedServers.size())
-                        + lit("\n")
-                        + serverNamesString(result.failedServers));
-                break;
-
-            case QnUpdateResult::ValidationFailed_CloudHostConflict:
-                QnMessageBox::critical(
-                    this,
-                    tr("Update unsuccessful."),
-                    tr("Incompatible cloud instance.")
-                        + lit("\n")
-                        + tr("To update disconnect system from the cloud first."));
                 break;
 
             case QnUpdateResult::DownloadingFailed:

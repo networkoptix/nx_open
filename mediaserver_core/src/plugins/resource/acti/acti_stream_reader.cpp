@@ -41,19 +41,53 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     QString SET_FPS(QLatin1String("CHANNEL=%1&VIDEO_FPS_NUM=%2"));
     QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2&VIDEO_MAX_BITRATE=%2"));
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
+    QString SET_STREAMING_METHOD(QLatin1String("CHANNEL=%1&STREAMING_METHOD_CURRENT=%2"));
+
+    const int kStreamingMethodTcpOnly = 0;
+    const int kStreamingMethodMulticast = 1;
+    const int kStreamingMethodRtpUdp = 3;
+    const int kStreamingMethodRtpMulticast = 4;
+    const int kStreamingMethodRtpUdpMulticast = 5;
 
     m_multiCodec.setRole(m_role);
     int fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
+
     QSize resolution = m_actiRes->getResolution(m_role);
     QString resolutionStr = formatResolutionStr(resolution);
+
     int bitrate = m_actiRes->suggestBitrateKbps(params.quality, resolution, fps);
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
-    QString encoderStr(QLatin1String("H264"));
+
+    auto encoders = m_actiRes->getAvailableEncoders();
+    QString encoderStr;
+
+    if (encoders.contains(lit("H264")))
+        encoderStr = lit("H264");
+    else if (encoders.contains(lit("MJPEG")))
+        encoderStr = lit("MJPEG");
+    else
+        return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
+    
+    auto desiredTransport = m_actiRes->getDesiredTransport();
+
     if (isCameraControlRequired)
     {
         CLHttpStatus status;
+        if (desiredTransport == RtpTransport::udp)
+        {
+            QByteArray result = m_actiRes->makeActiRequest(
+                QLatin1String("encoder"),
+                SET_STREAMING_METHOD
+                    .arg(ch)
+                    .arg(kStreamingMethodRtpUdp),
+                status);
+
+            if (status != CL_HTTP_SUCCESS)
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("streaming method"));
+        }
+
         QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
@@ -89,6 +123,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(Qn::Unauthorized);
+
     return result;
 }
 

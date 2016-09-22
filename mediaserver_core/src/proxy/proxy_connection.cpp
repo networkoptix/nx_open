@@ -503,7 +503,7 @@ void QnProxyConnectionProcessor::doRawProxy()
     while (!m_needStop)
     {
         int rez = 0;
-        auto pollLimitTime = std::chrono::steady_clock::now() + kPollTimeout;
+        auto pollLimitTime = std::chrono::steady_clock::now() + kIoTimeout;
         while (rez == 0)
         {
             if (pollLimitTime <= std::chrono::steady_clock::now())
@@ -555,7 +555,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
     while (!m_needStop)
     {
         int rez = 0;
-        auto pollLimitTime = std::chrono::steady_clock::now() + kPollTimeout;
+        auto pollLimitTime = std::chrono::steady_clock::now() + kIoTimeout;
         while (rez == 0)
         {
             if (pollLimitTime <= std::chrono::steady_clock::now())

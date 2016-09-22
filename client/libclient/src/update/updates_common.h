@@ -5,18 +5,20 @@
 #include <utils/common/system_information.h>
 #include <nx/utils/uuid.h>
 
-
-struct QnCheckForUpdateResult {
-    enum Value {
-        UpdateFound
-        , InternetProblem
-        , NoNewerVersion
-        , NoSuchBuild
-        , ServerUpdateImpossible
-        , ClientUpdateImpossible
-        , BadUpdateFile
-        , NoFreeSpace
-        , DowngradeIsProhibited
+struct QnCheckForUpdateResult
+{
+    enum Value
+    {
+        UpdateFound,
+        InternetProblem,
+        NoNewerVersion,
+        NoSuchBuild,
+        IncompatibleCloudHost,
+        ServerUpdateImpossible,
+        ClientUpdateImpossible,
+        BadUpdateFile,
+        NoFreeSpace,
+        DowngradeIsProhibited
     };
 
     QnCheckForUpdateResult():
@@ -26,22 +28,22 @@ struct QnCheckForUpdateResult {
         result(result) {}
 
     Value result;
-    QSet<QnSystemInformation> systems;  /**< Set of supported system, for which updates were found. */
+    QSet<QnSystemInformation> systems; /**< Set of supported system, for which updates were found. */
     QnSoftwareVersion version;
     bool clientInstallerRequired;
     QUrl releaseNotesUrl;
+    QString cloudHost;
 };
-Q_DECLARE_METATYPE(QnCheckForUpdateResult);
+Q_DECLARE_METATYPE(QnCheckForUpdateResult)
 
-
-struct QnUpdateResult {
-    enum Value {
+struct QnUpdateResult
+{
+    enum Value
+    {
         Successful,
         Cancelled,
         LockFailed,
         AlreadyUpdated,
-        ValidationFailed,
-        ValidationFailed_CloudHostConflict,
         DownloadingFailed,
         DownloadingFailed_NoFreeSpace,
         UploadingFailed,
@@ -66,9 +68,10 @@ struct QnUpdateResult {
     bool protocolChanged;
     QnMediaServerResourceList failedServers;
 };
-Q_DECLARE_METATYPE(QnUpdateResult);
+Q_DECLARE_METATYPE(QnUpdateResult)
 
-enum class QnPeerUpdateStage {
+enum class QnPeerUpdateStage
+{
     Init,               /**< Prepare peer update. */
     Download,           /**< Download update package for the peer. */
     Push,               /**< Push update package to the peer. */
@@ -76,9 +79,10 @@ enum class QnPeerUpdateStage {
 
     Count
 };
-Q_DECLARE_METATYPE(QnPeerUpdateStage);
+Q_DECLARE_METATYPE(QnPeerUpdateStage)
 
-enum class QnFullUpdateStage {
+enum class QnFullUpdateStage
+{
     Init,               /**< Prepare updater tool. */
     Check,              /**< Check for updates. */
     Validate,           /**< Check if update is allowed for the system posiible. */
@@ -91,9 +95,10 @@ enum class QnFullUpdateStage {
 
     Count
 };
-Q_DECLARE_METATYPE(QnFullUpdateStage);
+Q_DECLARE_METATYPE(QnFullUpdateStage)
 
-struct QnUpdateFileInformation {
+struct QnUpdateFileInformation
+{
     QnSoftwareVersion version;
     QString fileName;
     qint64 fileSize;
@@ -113,15 +118,23 @@ struct QnUpdateFileInformation {
 };
 typedef QSharedPointer<QnUpdateFileInformation> QnUpdateFileInformationPtr;
 
-struct QnUpdateTarget {
-
-    QnUpdateTarget(QSet<QnUuid> targets, const QnSoftwareVersion &version, bool denyClientUpdates = false) :
+struct QnUpdateTarget
+{
+    QnUpdateTarget(
+        QSet<QnUuid> targets,
+        const QnSoftwareVersion& version,
+        bool denyClientUpdates = false)
+        :
         targets(targets),
         version(version),
         denyClientUpdates(denyClientUpdates)
     {}
 
-    QnUpdateTarget(QSet<QnUuid> targets, const QString &fileName, bool denyClientUpdates = false) :
+    QnUpdateTarget(
+        QSet<QnUuid> targets,
+        const QString &fileName,
+        bool denyClientUpdates = false)
+        :
         targets(targets),
         fileName(fileName),
         denyClientUpdates(denyClientUpdates)
@@ -131,4 +144,10 @@ struct QnUpdateTarget {
     QnSoftwareVersion version;
     QString fileName;
     bool denyClientUpdates;
+};
+
+class QnUpdateUtils
+{
+public:
+    static QSet<QnUuid> getServersLinkedToCloud(const QSet<QnUuid>& peers);
 };

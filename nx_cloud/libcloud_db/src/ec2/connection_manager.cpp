@@ -64,6 +64,20 @@ ConnectionManager::~ConnectionManager()
         ->removeSubscription(m_onNewTransactionSubscriptionId);
 
     m_startedAsyncCallsCounter.wait();
+
+    ConnectionDict localConnections;
+    decltype(m_connectionsToRemove) localConnectionsToRemove;
+    {
+        QnMutexLocker lk(&m_mutex);
+        localConnections = std::move(m_connections);
+        localConnectionsToRemove = std::move(m_connectionsToRemove);
+    }
+
+    for (auto& connectionContext: localConnections)
+        connectionContext.connection->pleaseStopSync();
+
+    for (auto& elem: localConnectionsToRemove)
+        elem.second->pleaseStopSync();
 }
 
 void ConnectionManager::createTransactionConnection(
@@ -320,6 +334,20 @@ api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
     }
 
     return result;
+}
+
+bool ConnectionManager::isSystemConnected(const std::string& systemId) const
+{
+    QnMutexLocker lk(&m_mutex);
+
+    const auto& connectionBySystemIdAndPeerIdIndex =
+        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+    const auto systemIter = connectionBySystemIdAndPeerIdIndex.lower_bound(
+        std::make_pair(nx::String(systemId.c_str()), nx::String()));
+
+    return 
+        systemIter != connectionBySystemIdAndPeerIdIndex.end() &&
+        systemIter->systemIdAndPeerId.first == systemId;
 }
 
 void ConnectionManager::addNewConnection(ConnectionContext context)

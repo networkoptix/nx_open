@@ -37,8 +37,6 @@ public:
         MRS_COLOR,
         RECORD_ALWAYS_COLOR,
 
-        OPACITY_CHANGE_PERIOD,
-
         SELECTION_OPACITY_DELTA,
         SELECTION_BORDER_DELTA,
 
@@ -124,7 +122,6 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   motionMaskColor,                MOTION_MASK_COLOR,                      QColor(180, 180, 180, 96))
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
 
-        QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(int,      buttonAnimationPeriod,          BUTTON_ANIMATION_PERIOD,                1)
 
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))

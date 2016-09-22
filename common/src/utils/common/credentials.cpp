@@ -29,3 +29,11 @@ bool QnCredentials::isValid(bool allowEmptyPassword) const
 
     return allowEmptyPassword || !password.isEmpty();
 }
+
+bool QnCredentials::operator<(const QnCredentials &other) const
+{
+    if (user != other.user)
+        return user < other.user;
+
+    return password < other.password;
+}

@@ -40,7 +40,6 @@ private:
     QnClientConnectionStatus m_status;
     bool m_connected;
     bool m_holdConnection;
-    bool m_waitingForPeerReconnect;
 };
 
 #define qnClientMessageProcessor static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())

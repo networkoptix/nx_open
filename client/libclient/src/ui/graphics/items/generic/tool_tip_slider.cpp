@@ -14,6 +14,9 @@
 namespace {
     const int toolTipHideDelay = 2500;
 
+    /* Tooltip animation speed. */
+    const int kTooltipAnimationDurationMs = 160;
+
 } // anonymous namespace
 
 /**
@@ -39,7 +42,8 @@ public:
         return checked_cast<const QnToolTipSlider *>(object)->m_tooltipWidgetVisibility;
     }
 
-    virtual void set(QObject *object, const QVariant &value) const override {
+    virtual void set(QObject *object, const QVariant &value) const override
+    {
         checked_cast<QnToolTipSlider *>(object)->m_tooltipWidgetVisibility = value.toReal();
     }
 };
@@ -57,9 +61,9 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
 {
     setOrientation(Qt::Horizontal);
 
-    m_tooltipWidgetVisibilityAnimator->setSpeed(2.0);
     m_tooltipWidgetVisibilityAnimator->setAccessor(new QnToolTipSliderVisibilityAccessor());
     m_tooltipWidgetVisibilityAnimator->setTargetObject(this);
+    m_tooltipWidgetVisibilityAnimator->setTimeLimit(kTooltipAnimationDurationMs);
     registerAnimation(m_tooltipWidgetVisibilityAnimator);
 
     m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
@@ -128,27 +132,32 @@ void QnToolTipSlider::setAutoHideToolTip(bool autoHideToolTip) {
     updateToolTipVisibility();
 }
 
-void QnToolTipSlider::hideToolTip() {
-    m_tooltipWidgetVisibilityAnimator->animateTo(0.0);
+void QnToolTipSlider::hideToolTip()
+{
+    //TODO: #GDM we certainly need to find place for these constants
+    const qreal kHidden = 0.0;
+    m_tooltipWidgetVisibilityAnimator->animateTo(kHidden);
 }
 
-void QnToolTipSlider::showToolTip() {
-    m_tooltipWidgetVisibilityAnimator->animateTo(1.0);
+void QnToolTipSlider::showToolTip()
+{
+    const qreal kOpaque = 1.0;
+    m_tooltipWidgetVisibilityAnimator->animateTo(kOpaque);
 }
 
-void QnToolTipSlider::updateToolTipVisibility() {
+void QnToolTipSlider::updateToolTipVisibility()
+{
+    /* Check if tooltip visibility is controlled manually */
+    if (!m_autoHideToolTip)
+        return;
+
     if(!toolTipItem())
         return;
 
-    if(m_autoHideToolTip) {
-        if(m_sliderUnderMouse || m_toolTipUnderMouse || m_hideTimer.isActive()) {
-            showToolTip();
-        } else {
-            hideToolTip();
-        }
-    } else {
+    if (m_sliderUnderMouse || m_toolTipUnderMouse || m_hideTimer.isActive())
         showToolTip();
-    }
+    else
+        hideToolTip();
 }
 
 void QnToolTipSlider::updateToolTipOpacity() {

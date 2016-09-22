@@ -57,25 +57,25 @@ void CompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged(
 
     switch (status) {
     case QnCompatibilityVersionInstallationTool::Installing:
-        setWindowTitle(tr("Installing version %1").arg(m_versionToInstall.toString(QnSoftwareVersion::MinorFormat)));
+        setMessage(tr("Installing version %1").arg(m_versionToInstall.toString(QnSoftwareVersion::MinorFormat)));
         button = QDialogButtonBox::Cancel;
         break;
     case QnCompatibilityVersionInstallationTool::Canceling:
         button = QDialogButtonBox::Cancel;
         break;
     case QnCompatibilityVersionInstallationTool::Success:
-        setWindowTitle(tr("Installation completed"));
+        setMessage(tr("Installation completed"));
         m_installationOk = true;
         button = QDialogButtonBox::Ok;
         break;
     case QnCompatibilityVersionInstallationTool::Failed:
-        setWindowTitle(tr("Installation failed"));
+        setMessage(tr("Installation failed"));
         break;
     case QnCompatibilityVersionInstallationTool::Canceled:
-        setWindowTitle(tr("Installation has been cancelled"));
+        setMessage(tr("Installation has been cancelled"));
         break;
     case QnCompatibilityVersionInstallationTool::CancelFailed:
-        setWindowTitle(tr("Could not cancel installation"));
+        setMessage(tr("Could not cancel installation"));
         break;
     default:
         break;
@@ -101,15 +101,15 @@ void CompatibilityVersionInstallationDialog::at_updateTool_updateFinished(QnUpda
 
     switch (result.result) {
     case QnUpdateResult::Successful:
-        setWindowTitle(tr("Installation completed"));
+        setMessage(tr("Installation completed"));
         m_installationOk = true;
         button = QDialogButtonBox::Ok;
         break;
     case QnUpdateResult::Cancelled:
-        setWindowTitle(tr("Installation has been cancelled"));
+        setMessage(tr("Installation has been cancelled"));
         break;
     default:
-        setWindowTitle(tr("Installation failed"));
+        setMessage(tr("Installation failed"));
         break;
     }
 
@@ -141,7 +141,7 @@ int CompatibilityVersionInstallationDialog::installUpdate() {
         m_ui->progressBar->setValue((static_cast<int>(stage) * 100 + progress) / static_cast<int>(QnFullUpdateStage::Count));
     });
 
-    setWindowTitle(tr("Installing version %1").arg(m_versionToInstall.toString()));
+    setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
 
     m_updateTool->startOnlineClientUpdate(m_versionToInstall);
@@ -151,4 +151,9 @@ int CompatibilityVersionInstallationDialog::installUpdate() {
     m_updateTool.reset();
 
     return result;
+}
+
+void CompatibilityVersionInstallationDialog::setMessage(const QString& message)
+{
+    m_ui->progressBar->setFormat(lit("%1\t%p%").arg(message));
 }

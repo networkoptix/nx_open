@@ -88,6 +88,7 @@ public:
         std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
 
     api::VmsConnectionDataList getVmsConnections() const;
+    bool isSystemConnected(const std::string& systemId) const;
 
 private:
     struct ConnectionContext

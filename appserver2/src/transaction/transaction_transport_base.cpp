@@ -395,6 +395,7 @@ void QnTransactionTransportBase::setStateNoLock(State state)
     {
         this->m_state = state;
 
+        // TODO: #ak: if stateChanged handler frees this object then m_mutex is destroyed locked
         nx::utils::ObjectDestructionFlag::Watcher watcher(
             &m_connectionFreedFlag);
         emit stateChanged(state);

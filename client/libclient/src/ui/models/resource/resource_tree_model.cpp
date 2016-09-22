@@ -1940,6 +1940,7 @@ void QnResourceTreeModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     auto node = ensureResourceNode(resource);
     updateNodeParent(node);
+    node->update();
     cleanupGroupNodes(Qn::SystemNode);
 }
 

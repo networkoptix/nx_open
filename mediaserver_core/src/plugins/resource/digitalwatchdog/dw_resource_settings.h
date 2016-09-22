@@ -35,12 +35,17 @@ public:
     virtual QnCameraAdvancedParamValueList getParamsList() const override;
     //virtual bool setParam(const QnCameraAdvancedParameter &parameter, const QString &value) override;
     virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = nullptr) override;
-    virtual void setCameraAdvancedParams(const QnCameraAdvancedParams &) override {}
+    virtual void setCameraAdvancedParams(const QnCameraAdvancedParams& params) override { m_params = params; };
+
 private:
     QnCameraAdvancedParamValueList fetchParamsFromHttpResponse(const QByteArray& body) const;
     QnCameraAdvancedParamValueList requestParamValues(const QString &request) const;
     QString toInnerValue(const QnCameraAdvancedParameter &parameter, const QString &value) const;
+    QString fromInnerValue(const QnCameraAdvancedParameter& parameter, const QString& value) const;
     bool setParam(const QnCameraAdvancedParameter &parameter, const QString &value);
+
+private:
+    QnCameraAdvancedParams m_params;
 };
 
 class QnPravisCameraProxy: public DWAbstractCameraProxy

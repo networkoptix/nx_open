@@ -28,6 +28,8 @@ struct QnCredentials{
      * @param allowEmptyPassword    Disable password check
      */
     bool isValid(bool allowEmptyPassword = false) const;
+
+    bool operator<(const QnCredentials& other) const;
 };
 
 inline uint qHash(const QnCredentials& creds)

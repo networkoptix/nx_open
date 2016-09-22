@@ -33,6 +33,9 @@ public:
 
     virtual bool isHovered() const = 0;
 
+    /** This geometry the panel will have when all animations are finished. */
+    virtual QRectF effectiveGeometry() const = 0;
+
 signals:
     void openedChanged(bool value, bool animated);
     void visibleChanged(bool value, bool animated);

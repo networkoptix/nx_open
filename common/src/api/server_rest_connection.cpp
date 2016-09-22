@@ -21,10 +21,16 @@
 #include <http/custom_headers.h>
 #include <nx/network/http/httptypes.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/log/log.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
     static const size_t TcpConnectTimeoutMs   = 5 * 1000;
+
+    void trace(int handle, const QString& message)
+    {
+        NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
+    }
 }
 
 // --------------------------- public methods -------------------------------------------
@@ -196,7 +202,9 @@ template <typename ResultType>
 Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
     nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
-    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 template <typename ResultType>
@@ -208,16 +216,28 @@ Handle ServerConnection::executePost(const QString& path,
                                            QThread* targetThread)
 {
     nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
-    return request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, path);
+    return handle;
 }
 
 template <typename ResultType>
 void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool success, const Handle& id, const ResultType& result)
 {
     if (targetThread)
-        executeDelayed([callback, success, id, result] { callback(success, id, result); }, 0, targetThread);
+    {
+        executeDelayed(
+        [callback, success, id, result]
+        {
+            trace(id, lit("Reply"));
+            callback(success, id, result);
+        }, 0, targetThread);
+    }
     else
+    {
+        trace(id, lit("Reply"));
         callback(success, id, result);
+    }
 }
 
 template <typename ResultType>

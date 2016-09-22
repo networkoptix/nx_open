@@ -280,6 +280,9 @@ void QnTwoWayAudioWidgetPrivate::updateCamera(const QnVirtualCameraResourcePtr& 
         bool enabled = isAllowed();
         q->setEnabled(enabled);
         button->setEnabled(enabled);
+        if (!enabled)
+            stopStreaming();
+
         q->setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
     };
 

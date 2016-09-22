@@ -51,6 +51,15 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloud_db_client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -127,6 +136,25 @@
 
             <properties>
                 <rdep.linux.packages>festival any/festival-vox</rdep.linux.packages>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lquazip -lnxemail -lnx_speach_synthesizer -lFestival -lestools -leststring -lestbase</global.libs>
+                <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
+                <linux.arm.oslibs>-llber -lsasl2 -lssl -lcrypto -lsigar -lldap</linux.arm.oslibs>
             </properties>
         </profile>
     </profiles>

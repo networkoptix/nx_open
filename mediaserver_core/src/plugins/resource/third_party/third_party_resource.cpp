@@ -681,12 +681,16 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
                 //parsing xml to load param list and get cameraId
                 QnCameraAdvancedParams params;
                 bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
-#ifdef _DEBUG
+
                 if (!success) {
-                    qWarning() << "Error while parsing xml for the camera" << getPhysicalId();
-                    qWarning() << paramDescXML;
+                    NX_LOG( lit("Error while parsing xml for the camera (third party) %1 %2 %3")
+                        .arg(getVendor())
+                        .arg(getModel())
+                        .arg(getPhysicalId()), cl_logWARNING);
+
+                    NX_LOG(lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)), cl_logWARNING);
                 }
-#endif
+
 				if (success)
                     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
             }

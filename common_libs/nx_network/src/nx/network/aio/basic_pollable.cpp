@@ -66,6 +66,11 @@ Timer* BasicPollable::timer()
     return &m_timer;
 }
 
+bool BasicPollable::isInSelfAioThread() const
+{
+    return m_timer.isInSelfAioThread();
+}
+
 } // namespace aio
 } // namespace network
 } // namespace nx

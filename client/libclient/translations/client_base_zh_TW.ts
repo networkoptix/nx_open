@@ -1204,7 +1204,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>匯出縮時預覽...</translation>
     </message>
 </context>
 <context>
@@ -1993,15 +1993,22 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">載入...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>選擇裝置</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 不支援雙向語音%n</numerusform>
         </translation>
     </message>
 </context>
@@ -2686,19 +2693,19 @@ to view more bookmarks</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">找不到聲音編碼器 &apos;%1&apos;。</translation>
+        <translation>找不到聲音編碼器 &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">無法初始化聲音編碼器。</translation>
+        <translation>無法初始化聲音編碼器.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>未選擇主要聲音裝置.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>輸入裝置的格式 %1 未支援.</translation>
     </message>
 </context>
 <context>
@@ -2892,9 +2899,9 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform>多 %1 個使用者...</numerusform>
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>多 %n個使用者...</numerusform>
         </translation>
     </message>
 </context>
@@ -2932,49 +2939,44 @@ to view more bookmarks</source>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">秒</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">分</translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">時</translation>
+        <translation>時</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">日</translation>
+        <translation>日</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>毫秒</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>秒</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>分</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>時</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>日</translation>
     </message>
 </context>
 <context>
@@ -2986,7 +2988,7 @@ to view more bookmarks</source>
     <message>
         <source>Never</source>
         <comment>Failover priority</comment>
-        <translation>永久</translation>
+        <translation>不做</translation>
     </message>
     <message>
         <source>Low</source>
@@ -4281,7 +4283,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>聲音設定</translation>
     </message>
 </context>
 <context>
@@ -4666,7 +4668,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>傳輸速率</translation>
     </message>
 </context>
 <context>
@@ -4864,7 +4866,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">匯出書籤...</translation>
+        <translation>匯出書籤...</translation>
     </message>
 </context>
 <context>
@@ -5437,7 +5439,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">無法執行測試.</translation>
+        <translation>無法執行測試.</translation>
     </message>
 </context>
 <context>
@@ -6055,19 +6057,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>輸入裝置未選取.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>串流仍未正常運作, 請稍候再試.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>網路問題.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>按住以發話</translation>
     </message>
 </context>
 <context>
@@ -6649,19 +6651,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 被偵測到有高解析輸出但 %1 可能未正常顯示.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>我們已知此問題, 並會在v3.0修復.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>現在請調整您的螢幕解析度以獲得更佳的瀏覽.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>HiDpi螢幕支援警告</translation>
     </message>
 </context>
 <context>
@@ -6953,7 +6955,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>選取的區段太短因此無法匯出縮時預覽.</translation>
     </message>
 </context>
 <context>

@@ -32,25 +32,18 @@ QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext()
     auto synthesizer = TextToWaveServer::instance();
     auto format = synthesizer->getAudioFormat();
     auto codecId = AV_CODEC_ID_PCM_S16LE; // synthesizer->getCodecId();
-    auto codec = avcodec_find_decoder(codecId);
 
-    if (!codec)
-        return QnConstMediaContextPtr();
-
-    auto ctx = avcodec_alloc_context3(codec);
-
+    auto mediaCtx = std::make_shared<QnAvCodecMediaContext>(codecId);
+    auto ctx = mediaCtx->getAvCodecContext();
     if (!ctx)
         return QnConstMediaContextPtr();
 
-    ctx->codec = codec;
-    ctx->codec_id = codecId;
-    ctx->codec_type = AVMEDIA_TYPE_AUDIO;
     ctx->sample_fmt = QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(format);
     ctx->sample_rate = format.sampleRate();
     ctx->frame_size = kDefaultDataChunkSize / 2;
     ctx->channels = format.channelCount();
 
-    return QnConstMediaContextPtr(new QnAvCodecMediaContext(ctx));
+    return mediaCtx;
 }
 
 QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()

@@ -1214,7 +1214,7 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>Rapid Review exportieren...</translation>
     </message>
 </context>
 <context>
@@ -1711,8 +1711,8 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
-            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+        <translation>
+            <numerusform>Quell-Kamera und %n weitere Kamera</numerusform>
             <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
         </translation>
     </message>
@@ -2018,16 +2018,23 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Lade...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerät auswählen</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 unterstützt kein Zweiwege-Audio</numerusform>
+            <numerusform>%1 unterstützen kein Zweiwege-Audio</numerusform>
         </translation>
     </message>
 </context>
@@ -2598,7 +2605,7 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message>
         <source>Launcher process not found.</source>
-        <translation>Ladeprozess nicht gefunden</translation>
+        <translation>Ladeprozess nicht gefunden.</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
@@ -2613,7 +2620,7 @@ um mehr Lesezeichen zu sehen</translation>
     </message>
     <message>
         <source>Request timeout</source>
-        <translation>Zeitüberschreitung der Anforderung.</translation>
+        <translation>Zeitüberschreitung der Anforderung</translation>
     </message>
     <message>
         <source>Test Failed</source>
@@ -2722,19 +2729,19 @@ um mehr Lesezeichen zu sehen</translation>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">Audio-Encoder &apos;%1&apos; konnte nicht gefunden werden.</translation>
+        <translation>Audio-Encoder &apos;%1&apos; konnte nicht gefunden werden.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">Audio-Encoder konnte nicht initialisiert werden.</translation>
+        <translation>Audio-Encoder konnte nicht initialisiert werden.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Primäres Audiogerät wurde nicht ausgewählt.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sample-Format des Eingabegeräts %1 wird nicht unterstützt.</translation>
     </message>
 </context>
 <context>
@@ -2931,10 +2938,10 @@ um mehr Lesezeichen zu sehen</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform>und %1 Benutzer mehr...</numerusform>
-            <numerusform></numerusform>
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>und %n Benutzer mehr...</numerusform>
+            <numerusform>und %n Benutzer mehr...</numerusform>
         </translation>
     </message>
 </context>
@@ -2972,54 +2979,44 @@ um mehr Lesezeichen zu sehen</translation>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">Sek</translation>
+        <translation>Sek</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">Min</translation>
+        <translation>Min</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">Std</translation>
+        <translation>Std</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">Tage</translation>
+        <translation>Tage</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>s</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>m</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>h</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>d</translation>
     </message>
 </context>
 <context>
@@ -4338,7 +4335,7 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -4734,7 +4731,7 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate</translation>
     </message>
 </context>
 <context>
@@ -4914,28 +4911,28 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+        <translation>
+            <numerusform>&lt;%n Gerät&gt;</numerusform>
             <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+        <translation>
+            <numerusform>&lt;%n Kamera&gt;</numerusform>
             <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+        <translation>
+            <numerusform>&lt;%n I/O Modul&gt;</numerusform>
             <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">Exportiere Lesezeichen...</translation>
+        <translation>Exportiere Lesezeichen...</translation>
     </message>
 </context>
 <context>
@@ -5515,7 +5512,7 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">Test konnte nicht ausgeführt werden.</translation>
+        <translation>Test konnte nicht ausgeführt werden.</translation>
     </message>
 </context>
 <context>
@@ -5695,15 +5692,15 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform>%n Kamera(s)</numerusform>
+        <translation>
+            <numerusform>%n Kamera</numerusform>
             <numerusform>%n Kamera(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform>%n Gerät(e)</numerusform>
+        <translation>
+            <numerusform>%n Gerät</numerusform>
             <numerusform>%n Gerät(e)</numerusform>
         </translation>
     </message>
@@ -6135,19 +6132,19 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingabegerät wurde nicht ausgewählt.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Streaming ist momentan nicht möglich, versuchen Sie es später erneut.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netzwerkfehler.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>Halten, um zu Sprechen</translation>
     </message>
 </context>
 <context>
@@ -6753,19 +6750,19 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 hat festgestellt, dass Sie eine hohe Auflösung nutzen und deswegen %1 möglicherweise nicht korrekt angezeigt wird.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wir sind uns dieses Problems bewusst und ein Update wird mit v3.0 erscheinen.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>In der Zwischenzeit passen Sie bitte Ihre Bildschirmauflösung für eine bessere Erfahrung an.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Support-Warnung HiDpi</translation>
     </message>
 </context>
 <context>
@@ -6804,8 +6801,8 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
-            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+        <translation>
+            <numerusform>Sind Sie sicher, dass Sie das %n Lesezeichen löschen wollen?</numerusform>
             <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
         </translation>
     </message>
@@ -7059,7 +7056,7 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die ausgewählte Periode ist zu kurz und kann nicht als Rapid Review exportiert werden.</translation>
     </message>
 </context>
 <context>

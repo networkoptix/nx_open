@@ -592,6 +592,8 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption* option) const
         qint64 range = d->maximum - d->minimum;
         NX_ASSERT(range >= 0);
 
+        range += qMax(d->singleStep, d->pageStep);
+
         qint64 base = 0;
         qreal scale = 1.0;
 

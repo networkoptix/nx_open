@@ -42,7 +42,8 @@ TransactionTransport::TransactionTransport(
     m_systemId(systemId),
     m_connectionId(connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
-    m_haveToSendSyncDone(false)
+    m_haveToSendSyncDone(false),
+    m_closed(false)
 {
     using namespace std::placeholders;
 
@@ -50,11 +51,6 @@ TransactionTransport::TransactionTransport(
     m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
     m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = remotePeer.id;
-
-    //m_transactionLogReader->setOnUbjsonTransactionReady(
-    //    std::bind(&TransactionTransport::addTransportHeaderToUbjsonTransaction, this, _1));
-    //m_transactionLogReader->setOnJsonTransactionReady(
-    //    std::bind(&TransactionTransport::addTransportHeaderToJsonTransaction, this, _1));
 
     nx::network::aio::BasicPollable::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
@@ -83,16 +79,18 @@ TransactionTransport::~TransactionTransport()
 
 void TransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
-    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    // Implementation should be done in ::ec2::QnTransactionTransportBase.
+    NX_CRITICAL(false);
 
-    //implementation should be done in ::ec2::QnTransactionTransportBase
-    //NX_ASSERT(false);
-    //socket->bindToAioThread(aioThread);
-    //m_transactionLogReader->bindToAioThread(aioThread);
+    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    m_transactionLogReader->bindToAioThread(aioThread);
+
+    //socket()->bindToAioThread(aioThread);
 }
 
 void TransactionTransport::stopWhileInAioThread()
 {
+    close();
     m_transactionLogReader.reset();
 }
 
@@ -239,8 +237,19 @@ void TransactionTransport::onGotTransaction(
     const QByteArray& data,
     ::ec2::QnTransactionTransportHeader transportHeader)
 {
+    NX_CRITICAL(isInSelfAioThread());
+
     if (!m_gotTransactionEventHandler)
         return;
+
+    if (m_closed)
+    {
+        NX_LOGX(
+            lm("systemId %1. Received transaction from %2 after connection closure")
+                .arg(m_systemId).str(m_commonTransportHeaderOfRemoteTransaction),
+            cl_logDEBUG2);
+        return;
+    }
 
     TransactionTransportHeader cdbTransportHeader;
     cdbTransportHeader.endpoint = m_connectionOriginatorEndpoint;
@@ -256,9 +265,15 @@ void TransactionTransport::onGotTransaction(
 void TransactionTransport::onStateChanged(
     ::ec2::QnTransactionTransportBase::State newState)
 {
+    NX_CRITICAL(isInSelfAioThread());
+
+    if (m_closed)
+        return; //< Not reporting multiple close events.
+
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
+        m_closed = true;
         if (m_connectionClosedEventHandler)
             m_connectionClosedEventHandler(SystemError::connectionReset);
     }
@@ -347,16 +362,6 @@ void TransactionTransport::enableOutputChannel()
         sendTransaction(std::move(tranSyncDone), std::move(transportHeader));
     }
 }
-
-//void TransactionTransport::addTransportHeaderToUbjsonTransaction(
-//    nx::Buffer* const ubjsonTransaction)
-//{
-//}
-//
-//void TransactionTransport::addTransportHeaderToJsonTransaction(
-//    QJsonObject* /*jsonTransaction*/)
-//{
-//}
 
 } // namespace ec2
 } // namespace cdb

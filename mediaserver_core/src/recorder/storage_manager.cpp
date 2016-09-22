@@ -2071,27 +2071,23 @@ bool QnStorageManager::isWritableStoragesAvailable() const
     return m_isWritableStorageAvail;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
-{
-    return getWritableStorages(
-        [](const QnStorageResourcePtr& storage)
-    {
-        return storage->getStatus() != Qn::Offline;
-    });
-}
-
 QSet<QnStorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
 {
-    return getWritableStorages(
-        [](const QnStorageResourcePtr& storage)
-        {
-            return storage->getStatus() != Qn::Offline &&
-                   storage->isUsedForWriting();
-        });
+    auto allWritableStorages = getAllWritableStorages();
+    QSet<QnStorageResourcePtr> result;
+    for (const auto& storage: allWritableStorages)
+        if (storage->isUsedForWriting())
+            result.insert(storage);
+
+    if (!result.empty())
+        m_isWritableStorageAvail = true;
+    else
+        m_isWritableStorageAvail = false;
+
+    return result;
 }
 
-QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages(
-    std::function<bool (const QnStorageResourcePtr& storage)> filter) const
+QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
 
@@ -2100,7 +2096,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages(
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage = itr.value();
-        if (filter(fileStorage))
+        if (fileStorage->getStatus() != Qn::Offline)
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             bigStorageThreshold = qMax(bigStorageThreshold, available);
@@ -2111,7 +2107,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages(
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage = itr.value();
-        if (filter(fileStorage))
+        if (fileStorage->getStatus() != Qn::Offline)
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available >= bigStorageThreshold)
@@ -2142,10 +2138,6 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages(
             result.remove(*it);
     }
 
-    if (!result.empty())
-        m_isWritableStorageAvail = true;
-    else
-        m_isWritableStorageAvail = false;
     return result;
 }
 
@@ -2390,9 +2382,8 @@ void QnStorageManager::updateStorageStatistics()
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
-    QnAbstractMediaStreamDataProvider                   *provider,
-    std::function<bool(const QnStorageResourcePtr &)>   pred
-)
+    QnAbstractMediaStreamDataProvider *provider,
+    std::function<bool(const QnStorageResourcePtr &)> pred)
 {
     QnStorageResourcePtr result;
     updateStorageStatistics();
@@ -2681,7 +2672,8 @@ bool QnStorageManager::renameFileWithDuration(
     for (int i = 1; i < nameParts.size(); ++i)
         newName += lit(".") + nameParts[i];
 
-    return storage->renameFile(oldName, fpath + newName);
+    newName = fpath + newName;
+    return storage->renameFile(oldName, newName);
 }
 
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* /*provider*/, qint64 fileSize)

@@ -18,12 +18,12 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/eg/app/hd-witness/id648369716?mt=8",
+            url: "https://itunes.apple.com/eg/app/hd-witness/id1050899754?mt=8",
             button: "iOS Client",
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.networkoptix.hdwitness",
+            url: "https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness",
             class:'googleplay',
             button: "Android Client"
         }

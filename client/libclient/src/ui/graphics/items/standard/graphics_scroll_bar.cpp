@@ -244,7 +244,7 @@ void GraphicsScrollBar::sliderChange(SliderChange change) {
         sendPendingMouseMoves(false);
 }
 
-bool GraphicsScrollBar::event(QEvent *event)
+bool GraphicsScrollBar::sceneEvent(QEvent *event)
 {
     switch(event->type()) {
     case QEvent::GraphicsSceneHoverEnter:
@@ -276,10 +276,10 @@ bool GraphicsScrollBar::event(QEvent *event)
         break;
     }
 
-    return base_type::event(event);
+    return base_type::sceneEvent(event);
 }
 
-void GraphicsScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) 
+void GraphicsScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget)
 {
     Q_D(GraphicsScrollBar);
 

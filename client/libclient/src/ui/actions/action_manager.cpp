@@ -1988,16 +1988,15 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Hide Tree")).
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
-    factory(QnActions::ToggleSliderAction).
+    factory(QnActions::ToggleTimelineAction).
         flags(Qn::NoTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
 
     factory(QnActions::ToggleNotificationsAction).
-        flags(Qn::NoTarget);
-    //text(tr("Show Notifications")).         // TODO: #ynikitenkov: uncomment in 2.6
-    //toggledText(tr("Hide Notifications"));  // TODO: #ynikitenkov: uncomment in 2.6
-    action(QnActions::ToggleNotificationsAction)->setCheckable(true);   // TODO: remove in 2.6
+        flags(Qn::NoTarget).
+        text(tr("Show Notifications")).
+        toggledText(tr("Hide Notifications"));
 
     factory(QnActions::PinNotificationsAction).
         flags(Qn::Notifications | Qn::NoTarget).

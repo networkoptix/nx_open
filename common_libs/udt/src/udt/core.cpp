@@ -218,6 +218,13 @@ CUDT::CUDT(const CUDT& ancestor)
 
 CUDT::~CUDT()
 {
+   // NOTE: #mux Not sure how it is supposed to work but close() does not remove this pointer from
+   //   sending queue in case of async IO and enabled linger...
+   //
+   // This workaround is here to prevent a segfault:
+   if (m_pSNode)
+      m_pSndQueue->m_pSndUList->remove(this);
+
    // release mutex/condtion variables
    destroySynch();
 
