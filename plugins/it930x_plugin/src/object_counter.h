@@ -33,7 +33,7 @@ public:
             m_ostream = std::shared_ptr<std::ostream>(new std::ofstream(fname));
             if (!*m_ostream)
             {
-//                std::cout << "[LOGGER] Log file open failed. Logging to stdout" << std::endl;
+                //std::cout << "[It930x LOGGER] Log file open failed. Logging to stdout" << std::endl;
                 m_ostream.reset();
                 m_ostream = std::shared_ptr<std::ostream>(&std::cout, [] (std::ostream *) {});
             }

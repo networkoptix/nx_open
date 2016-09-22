@@ -132,7 +132,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
     if( !url.scheme().isEmpty() && doMultichannelCheck )
         return result;
 
-    SocketAddress endpoint(url.host(), 502);
+    SocketAddress endpoint(url.host(), url.port(nx_modbus::kDefaultModbusPort));
 
     nx::modbus::QnModbusClient modbusClient(endpoint);
 
@@ -162,18 +162,19 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
     resource->setModel(model);
     resource->setFirmware(firmware);
 
-    // Advantech ADAM modules do not have any unique identifier that we can obtain.
-    auto uid = generatePhysicalId(url.toString());
-
     modbusClient.disconnect();
 
-    resource->setPhysicalId(uid);
-
-    QUrl webInterfaceUrl(url);
-    webInterfaceUrl.setScheme(lit("http"));
+    QUrl modbusUrl(url);
+    modbusUrl.setScheme(lit("http"));
+    modbusUrl.setPort(url.port(nx_modbus::kDefaultModbusPort));
     resource->setVendor(lit("Advantech"));
+    resource->setUrl(modbusUrl.toString());
+
+    // Advantech ADAM modules do not have any unique identifier that we can obtain.
+    auto uid = generatePhysicalId(modbusUrl.toString());
+    resource->setPhysicalId(uid);
     resource->setMAC( QnMacAddress(uid));
-    resource->setUrl(webInterfaceUrl.toString());
+
     resource->setDefaultAuth(auth);
 
     result << resource;
@@ -260,7 +261,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
             else
             {
                 QUrl url;
-                url.setScheme(lit("//"));
+                url.setScheme(lit("http"));
                 url.setHost(remoteEndpoint.address.toString());
                 url.setPort(nx::modbus::kDefaultModbusPort);
 

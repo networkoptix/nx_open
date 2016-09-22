@@ -161,6 +161,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         NX_ASSERT(0, Q_FUNC_INFO, "No action to execute");
         return; // something wrong. It shouldn't be
     }
+    prepareAdditionActionParams(action);
 
     QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
 

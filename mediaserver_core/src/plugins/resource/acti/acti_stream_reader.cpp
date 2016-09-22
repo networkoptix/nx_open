@@ -69,7 +69,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
         encoderStr = lit("MJPEG");
     else
         return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
-    
+
     auto desiredTransport = m_actiRes->getDesiredTransport();
 
     if (isCameraControlRequired)
@@ -120,6 +120,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
 
     m_multiCodec.setRequest(streamUrl);
 	m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
+    m_multiCodec.setRtpTransport(desiredTransport);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(Qn::Unauthorized);

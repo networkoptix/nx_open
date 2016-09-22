@@ -30,10 +30,8 @@ static void fillConfig(const QStringList& arguments)
     if (parser.isSet("ftp-storage-url"))
         config.ftpUrl = parser.value("ftp-storage-url");
     if (parser.isSet("smb-storage-url"))
-        config.smbUrl = parser.value("smb-storage-url");
-
-}
-
+#include "storage/abstract_storage_resource.h"
+extern test::StorageTestGlobals tg;
 static void fillConfig(QCoreApplication& app)
 {
     fillConfig(app.arguments());
