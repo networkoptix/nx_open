@@ -50,7 +50,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
     ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
-    ui->cloudPanelWidget->setShowLink(false);
+    ui->cloudPanelWidget->setOptions(QnCloudUserPanelWidget::ShowEnableButtonOption);
 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);

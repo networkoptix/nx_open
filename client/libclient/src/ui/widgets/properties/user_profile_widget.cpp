@@ -36,9 +36,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 
     ::setReadOnly(ui->loginInputField, true);
     ::setReadOnly(ui->groupInputField, true);
-
-    ui->cloudPanelWidget->setShowEnableButton(false);
-
+   
     ui->loginInputField->setTitle(tr("Login"));
     ui->nameInputField->setTitle(tr("Name"));
     ui->groupInputField->setTitle(tr("Role"));
@@ -143,8 +141,11 @@ void QnUserProfileWidget::loadDataToUi()
     ui->cloudPanelWidget->setEnabled(m_model->user()->isEnabled());
     ui->cloudPanelWidget->setEmail(m_model->user()->getEmail());
     ui->cloudPanelWidget->setFullName(m_model->user()->fullName());
-    ui->cloudPanelWidget->setShowLink(m_model->mode() == QnUserSettingsModel::OwnProfile);
 
+    auto options = m_model->mode() == QnUserSettingsModel::OwnProfile
+        ? QnCloudUserPanelWidget::ShowManageLinkOption
+        : QnCloudUserPanelWidget::NoOptions;
+    ui->cloudPanelWidget->setOptions(options);
 }
 
 void QnUserProfileWidget::updatePermissionsLabel(const QString& text)

@@ -15,17 +15,22 @@ class QnCloudUserPanelWidget : public QnPanel
 
     typedef QnPanel base_type;
 public:
+    enum Option
+    {
+        NoOptions              = 0,
+        ShowEnableButtonOption = 0x1,
+        ShowManageLinkOption   = 0x2
+    };
+    Q_DECLARE_FLAGS(Options, Option)
+
     QnCloudUserPanelWidget(QWidget* parent = 0);
     virtual ~QnCloudUserPanelWidget();
 
     bool enabled() const;
     void setEnabled(bool value);
 
-    bool showEnableButton() const;
-    void setShowEnableButton(bool value);
-
-    bool showLink() const;
-    void setShowLink(bool value);
+    Options options() const;
+    void setOptions(Options value);
 
     QString email() const;
     void setEmail(const QString& value);

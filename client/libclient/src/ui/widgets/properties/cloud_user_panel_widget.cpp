@@ -57,24 +57,22 @@ void QnCloudUserPanelWidget::setEnabled(bool value)
     ui->enabledButton->setChecked(value);
 }
 
-bool QnCloudUserPanelWidget::showEnableButton() const
+QnCloudUserPanelWidget::Options QnCloudUserPanelWidget::options() const
 {
-    return ui->enabledButton->isVisible();
+    Options result = 0;
+    if (!ui->enabledButton->isHidden())
+        result |= ShowEnableButtonOption;
+
+    if (!ui->manageAccountLabel->isHidden())
+        result |= ShowManageLinkOption;
+
+    return result;
 }
 
-void QnCloudUserPanelWidget::setShowEnableButton(bool value)
+void QnCloudUserPanelWidget::setOptions(Options value)
 {
-    ui->enabledButton->setVisible(value);
-}
-
-bool QnCloudUserPanelWidget::showLink() const
-{
-    return ui->manageAccountLabel->isVisible();
-}
-
-void QnCloudUserPanelWidget::setShowLink(bool value)
-{
-    ui->manageAccountLabel->setVisible(value);
+    ui->enabledButton->setHidden(!value.testFlag(ShowEnableButtonOption));
+    ui->manageAccountLabel->setHidden(!value.testFlag(ShowManageLinkOption));
 }
 
 QString QnCloudUserPanelWidget::email() const
