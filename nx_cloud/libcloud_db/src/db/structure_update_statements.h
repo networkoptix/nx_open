@@ -520,7 +520,6 @@ INSERT INTO cloud_db_transaction_sequence(max_sequence) VALUES(1000);
 
 /**
  * #CLOUD-545. Adding persistent system sequence for transaction timestamp
- * TODO: ak: MySQL: "BIGINT PRIMARY KEY AUTO_INCREMENT"
  */
 static const char kAddSystemSequence[] =
 R"sql(
@@ -529,7 +528,7 @@ ALTER TABLE system_to_account RENAME TO system_to_account_old;
 ALTER TABLE system RENAME TO system_old;
 
 CREATE TABLE system(
-    seq                         INTEGER PRIMARY KEY AUTOINCREMENT,
+    seq                         %bigint_primary_key_auto_increment%,
     id                          VARCHAR(64) NOT NULL UNIQUE,
     name                        VARCHAR(1024) NOT NULL,
     auth_key                    VARCHAR(255) NOT NULL,

@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include <cdb/account_manager.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
@@ -47,10 +48,8 @@ CdbLauncher::CdbLauncher(QString tmpDir)
     addArg("-syncroLog/logLevel"); addArg("DEBUG2");
 
     addArg("-db/driverName");
-    if (!sConnectionOptions.driverName.isEmpty())
-        addArg(sConnectionOptions.driverName.toLatin1().constData());
-    else
-        addArg("QSQLITE");
+    addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(
+        sConnectionOptions.driverType).toLatin1().constData());
 
     if (!sConnectionOptions.hostName.isEmpty())
     {
