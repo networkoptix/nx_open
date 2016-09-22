@@ -70,11 +70,11 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_debouncedValues.clear();
 
     Qn::directConnect(
-        &m_client, &nx::modbus::QnModbusAsyncClient::done, 
+        &m_client, &nx::modbus::QnModbusAsyncClient::done,
         this, &QnAdamModbusIOManager::routeMonitoringFlow);
 
     Qn::directConnect(
-        &m_client, &nx::modbus::QnModbusAsyncClient::error, 
+        &m_client, &nx::modbus::QnModbusAsyncClient::error,
         this, &QnAdamModbusIOManager::handleMonitoringError);
 
     m_monitoringIsInProgress = true;
@@ -99,7 +99,7 @@ void QnAdamModbusIOManager::stopIOMonitoring()
     m_monitoringIsInProgress = false;
 
     lock.unlock();
-    TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
+    nx::utils::TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
     lock.relock();
 
     directDisconnectAll();
@@ -111,7 +111,7 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
 
     auto coil = getPortCoil(outputId, success);
 
-    auto defaultPortStateIsActive = 
+    auto defaultPortStateIsActive =
         nx_io_managment::isActiveIOPortState(getPortDefaultState(outputId));
 
     nx::modbus::ModbusResponse response;

@@ -132,7 +132,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
     if( !url.scheme().isEmpty() && doMultichannelCheck )
         return result;
 
-    SocketAddress endpoint(url.host(), url.port(nx_modbus::kDefaultModbusPort));
+    SocketAddress endpoint(url.host(), url.port(nx::modbus::kDefaultModbusPort));
 
     nx::modbus::QnModbusClient modbusClient(endpoint);
 
@@ -166,7 +166,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
 
     QUrl modbusUrl(url);
     modbusUrl.setScheme(lit("http"));
-    modbusUrl.setPort(url.port(nx_modbus::kDefaultModbusPort));
+    modbusUrl.setPort(url.port(nx::modbus::kDefaultModbusPort));
     resource->setVendor(lit("Advantech"));
     resource->setUrl(modbusUrl.toString());
 

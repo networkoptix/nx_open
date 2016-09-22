@@ -54,8 +54,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        QString urlStr = cameraResource->getUrl();
-        const QnResourceData resourceData = qnCommon->dataPool()->data(cameraResource);
+        QString urlStr = camera->getUrl();
+        const QnResourceData resourceData = qnCommon->dataPool()->data(camera);
         if (resourceData.contains(QString("ignoreMultisensors")))
             urlStr = urlStr.left(urlStr.indexOf('?'));
 
