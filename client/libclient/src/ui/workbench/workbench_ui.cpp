@@ -1105,7 +1105,7 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
         ((!m_titleVisible || !m_titleUsed) && isNotificationsVisible()) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
 
     qreal top = m_controlsWidgetRect.bottom();
-    if (m_calendar && m_calendar->isOpened())
+    if (m_calendar && m_calendar->isOpened() && m_calendar->isEnabled())
         top = m_calendar->effectiveGeometry().top();
     else if (m_timeline->isVisible() && m_timeline->isOpened())
         top = m_timeline->effectiveGeometry().top();
@@ -1240,18 +1240,17 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate)
 
     bool calendarEnabled = !calendarEmpty
         && navigator()->currentWidget()
-        && navigator()->currentWidget()->resource()->flags().testFlag(Qn::utc);
-    m_calendar->setEnabled(calendarEnabled);
-
-    bool calendarVisible = calendarEnabled
+        && navigator()->currentWidget()->resource()->flags().testFlag(Qn::utc)
         && (!m_inactive || m_timeline->isHovered())
         && m_timeline->isVisible()
         && m_timeline->isOpened();
 
-    if (!calendarVisible)
-        m_calendar->setOpened(false, animate);
-    else if (m_calendar->isPinned())
-        m_calendar->setOpened(true, animate);
+    /* Avoid double notifications geometry calculations. */
+    if (m_calendar->isEnabled() == calendarEnabled)
+        return;
+
+    m_calendar->setEnabled(calendarEnabled, animate);
+    updateNotificationsGeometry();
 }
 
 void QnWorkbenchUi::updateCalendarGeometry()
@@ -1325,17 +1324,14 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
         {
             if (opened && m_timeline->isPinned())
                 m_inFreespace = false;
-            if (!opened)
-                setCalendarOpened(false, animated);
+            updateCalendarVisibility(animated);
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        [this](bool value, bool animated)
+        [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
-            updateNotificationsGeometry();
-            if (!value)
-                setCalendarOpened(false, animated);
+            updateCalendarVisibility(animated);
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,
