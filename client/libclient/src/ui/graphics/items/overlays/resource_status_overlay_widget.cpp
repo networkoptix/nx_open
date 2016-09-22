@@ -241,7 +241,7 @@ void QnStatusOverlayWidget::setupCentralControls()
     //
 
     const auto centralLayout = new QVBoxLayout();
-    centralLayout->addStretch(kBigStretch * 2);
+    centralLayout->addStretch(kBigStretch);
     centralLayout->addSpacing(60);
     centralLayout->addWidget(m_centralAreaImage);
     centralLayout->addWidget(m_caption);
