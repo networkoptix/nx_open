@@ -1,100 +1,130 @@
-#include "abstract_storage_resource.h"
 #include <qcoreapplication.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
 
 #include <sstream>
+
+#include <core/resource_management/resource_properties.h>
+#include <memory>
+#include <algorithm>
+#include <utility>
+#include <cstring>
+#include <string>
+#include <random>
+
+#include <utils/common/long_runnable.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <core/resource_management/resource_pool.h>
+#include <recorder/file_deletor.h>
+#include <recorder/storage_manager.h>
+#include <plugins/plugin_manager.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
+#include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
+#include <media_server/settings.h>
+#include <core/resource_management/status_dictionary.h>
+#include "utils/common/util.h"
+#include <common/common_module.h>
+
+#ifndef _WIN32
+#   include <platform/monitoring/global_monitor.h>
+#   include <platform/platform_abstraction.h>
+#endif
+
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
-#include <core/resource_management/resource_properties.h>
+bool recursiveClean(const QString &path);
 
-std::unique_ptr<test::StorageTestGlobals> tg;
-
-bool recursiveClean(const QString &path); 
-
-TEST(AbstractStorageResourceTest, Init)
+class AbstractStorageResourceTest: public ::testing::Test
 {
-    tg.reset(new test::StorageTestGlobals());
-
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Test helper");
-
-    QCommandLineOption ftpUrlOption(
-        QStringList() << "F" << "ftp-storage-url",
-        QCoreApplication::translate("main", "Ftp storage URL."),
-        QCoreApplication::translate("main", "URL")
-    );
-    parser.addOption(ftpUrlOption);
-
-    QCommandLineOption smbUrlOption(
-        QStringList() << "S" << "smb-storage-url",
-        QCoreApplication::translate("main", "SMB storage URL."),
-        QCoreApplication::translate("main", "URL")
-    );
-    parser.addOption(smbUrlOption);
-
-    parser.process(*QCoreApplication::instance());
-
-    tg->prepare(
-        parser.value(
-            ftpUrlOption
-        ),
-        parser.value(
-            smbUrlOption
-        )
-    );
-
-
-    QString fileStorageUrl = qApp->applicationDirPath() + lit("/tmp");
-    QnStorageResourcePtr fileStorage = QnStorageResourcePtr(
-        QnStoragePluginFactory::instance()->createStorage(
-            fileStorageUrl
-        )
-    );
-    ASSERT_TRUE(fileStorage);
-    fileStorage->setUrl(fileStorageUrl);
-
-    tg->storageManager->addStorage(fileStorage);
-
-    if (!tg->ftpStorageUrl.isEmpty())
+public:
+    void SetUp()
     {
+        QnStoragePluginFactory::instance()->registerStoragePlugin(
+            "file",
+            QnFileStorageResource::instance,
+            true);
+        PluginManager::instance()->loadPlugins(MSSettings::roSettings());
+
+        using namespace std::placeholders;
+        for (const auto storagePlugin :
+                PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(
+                    nx_spl::IID_StorageFactory))
+        {
+            QnStoragePluginFactory::instance()->registerStoragePlugin(
+                storagePlugin->storageType(),
+                std::bind(
+                    &QnThirdPartyStorageResource::instance,
+                    _1,
+                    storagePlugin),
+                false);
+        }
+
+        fileStorageUrl = qApp->applicationDirPath() + lit("/tmp");
+        QDir().mkpath(fileStorageUrl);
+
+        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(
+            QnStoragePluginFactory::instance()->createStorage(
+                fileStorageUrl));
+
+        ASSERT_TRUE(fileStorage);
+        fileStorage->setUrl(fileStorageUrl);
+        ASSERT_TRUE(fileStorage->initOrUpdate());
+        storages.push_back(fileStorage);
+
+
+#if defined (TEST_FTP)
+        ftpStorageUrl = ftp://127.0.0.1/test;
         QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(
             QnStoragePluginFactory::instance()->createStorage(
-                tg->ftpStorageUrl,
-                false
-            )
-        );
-        EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate());
-        if (ftpStorage && ftpStorage->initOrUpdate())
-        {
-            ftpStorage->setUrl(tg->ftpStorageUrl);
-            tg->storageManager->addStorage(ftpStorage);
-            //tg->storages.push_back(ftpStorage);
-        }
-        else
-            std::cout
-                << "Ftp storage is unavailable. Check if server is online and url is correct."
-                << std::endl;
-    }
+                ftpStorageUrl,
+                false));
 
-    if (!tg->smbStorageUrl.isEmpty())
-    {
+        ASSERT_TRUE(ftpStorage);
+        ftpStorage->setUrl(ftpStorageUrl);
+
+        ASSERT_TRUE(ftpStorage->initOrUpdate())
+            << "Ftp storage is unavailable. Check if server is online and url is correct."
+            << std::endl;
+        storages.push_back(ftpStorage);
+#endif // TEST_FTP
+
+#if defined (TEST_SMB)
+        smbStorageUrl = smb://127.0.0.1/test;
         QnStorageResourcePtr smbStorage = QnStorageResourcePtr(
             QnStoragePluginFactory::instance()->createStorage(
-                tg->smbStorageUrl
-            )
-        );
-        EXPECT_TRUE(smbStorage);
-        smbStorage->setUrl(tg->smbStorageUrl);
-        tg->storageManager->addStorage(smbStorage);
-    }
-}
+                smbStorageUrl));
 
-TEST(AbstractStorageResourceTest, Capabilities)
+        ASSERT_TRUE(smbStorage);
+        smbStorage->setUrl(smbStorageUrl);
+
+        ASSERT_TRUE(smbStorage->initOrUpdate())
+            << "Smb storage is unavailable."
+            << std::endl;
+        storages.push_back(smbStorage);
+#endif // TEST_SMB
+    }
+
+    ~AbstractStorageResourceTest()
+    {
+        recursiveClean(qApp->applicationDirPath() + lit("/tmp"));
+    }
+
+    QnCommonModule commonModule;
+    PluginManager pluginManager;
+    std::vector<QnStorageResourcePtr> storages;
+
+    QString fileStorageUrl;
+
+#if !defined (Q_OS_WIN)
+    QnPlatformAbstraction platformAbstraction;
+#endif
+};
+
+TEST_F(AbstractStorageResourceTest, Capabilities)
 {
-    for (auto storage : tg->storageManager->getStorages())
+    for (auto storage : storages)
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
         // storage general functions
@@ -110,12 +140,12 @@ TEST(AbstractStorageResourceTest, Capabilities)
     }
 }
 
-TEST(AbstractStorageResourceTest, StorageCommonOperations)
+TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 {
     const size_t fileCount = 500;
     std::vector<QString> fileNames;
     const char *dummyData = "abcdefgh";
-    const size_t dummyDataLen = strlen(dummyData);
+    const int dummyDataLen = strlen(dummyData);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -148,7 +178,7 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
         return pathStream.str();
     };
 
-    for (auto storage : tg->storageManager->getStorages())
+    for (auto storage : storages)
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -159,11 +189,9 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
             QString fileName = closeDirPath(storage->getUrl()) + QString::fromStdString(randomFilePath());
             fileNames.push_back(fileName);
             std::unique_ptr<QIODevice> ioDevice = std::unique_ptr<QIODevice>(
-                storage->open(
-                    fileName.toLatin1().constData(), 
-                    QIODevice::WriteOnly
-                )
-            );
+                    storage->open(fileName.toLatin1().constData(),
+                                  QIODevice::WriteOnly));
+
             ASSERT_TRUE((bool)ioDevice)
                 << "ioDevice creation failed: " 
                 << fileName.toStdString() 
@@ -180,9 +208,8 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
         }
 
         // remove all
-        QnAbstractStorageResource::FileInfoList rootFileList = storage->getFileList(
-            storage->getUrl()
-        );
+        QnAbstractStorageResource::FileInfoList rootFileList = storage->getFileList(storage->getUrl());
+
         ASSERT_TRUE(!rootFileList.isEmpty());
 
         std::function<void (const QnAbstractStorageResource::FileInfoList &)> recursiveRemover =
@@ -234,12 +261,10 @@ TEST(AbstractStorageResourceTest, StorageCommonOperations)
     }
 }
 
-TEST(AbstractStorageResourceTest, IODevice)
+TEST_F(AbstractStorageResourceTest, IODevice)
 {
-    for (auto storage : tg->storageManager->getStorages())
+    for (auto storage : /*storageManager->getStorages()*/storages)
     {
-        std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
-
         // write, seek
         QString fileName = closeDirPath(storage->getUrl()) + lit("test.tmp");
         std::unique_ptr<QIODevice> ioDevice = std::unique_ptr<QIODevice>(
@@ -250,10 +275,10 @@ TEST(AbstractStorageResourceTest, IODevice)
         );
         ASSERT_TRUE((bool)ioDevice);
 
-        const size_t dataSize = 10*1024*1024;
-        const size_t seekCount = 10000;
+        const int dataSize = 10*1024*1024;
+        const int seekCount = 10000;
         const char* newData = "bcdefg";
-        const size_t newDataSize = strlen(newData);
+        const int newDataSize = strlen(newData);
         std::vector<char> data(dataSize);
 
         std::random_device rd;
@@ -266,7 +291,7 @@ TEST(AbstractStorageResourceTest, IODevice)
                 return dataDistribution(gen);
             }
         );
-        ASSERT_TRUE(ioDevice->write(data.data(), dataSize) == dataSize);
+        ASSERT_EQ(ioDevice->write(data.data(), dataSize), dataSize);
 
         std::uniform_int_distribution<> seekDistribution(0, dataSize - 32);
 
@@ -413,51 +438,24 @@ public:
     }
 };
 
-TEST(Storage_load_balancing_algorithm_test, Main) 
+TEST_F(AbstractStorageResourceTest, LoadBalancingAlgorithmTest)
 {
-    std::unique_ptr<QnCommonModule> commonModule;
-    if (!qnCommon) {
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
-    }
-    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+    QnStorageManager storageManager(QnServer::StoragePool::Normal);
+    Q_UNUSED(storageManager);
 
-    std::unique_ptr<QnStorageManager> storageManager;
-    if (!qnNormalStorageMan) {
-        storageManager = std::unique_ptr<QnStorageManager>(
-                new QnStorageManager(QnServer::StoragePool::Normal));
-    }
-    storageManager->stopAsyncTasks();
-
-    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
-    if (!qnStatusDictionary) {
-        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
-                new QnResourceStatusDictionary);
-    }
-
-    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
-    if (!propertyDictionary) {
-        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
-                new QnResourcePropertyDictionary);
-    }
-
-    std::unique_ptr<QnStorageDbPool> dbPool;
-    if (!qnStorageDbPool) {
-        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
-    }
-
-    QnStorageResourcePtr storage1 = QnStorageResourcePtr(new MockStorageResource1); 
-    storage1->setUrl("url1");
-    storage1->setId("{45FF0AD9-649B-4EDC-B032-13603EA37077}"); 
+    QnStorageResourcePtr storage1 = QnStorageResourcePtr(new MockStorageResource1);
+    storage1->setUrl(fileStorageUrl);
+    storage1->setId("{45FF0AD9-649B-4EDC-B032-13603EA37077}");
     storage1->setUsedForWriting(true);
 
     QnStorageResourcePtr storage2 = QnStorageResourcePtr(new MockStorageResource2);
-    storage2->setUrl("url2");
-    storage2->setId("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}"); 
+    storage2->setUrl(fileStorageUrl);
+    storage2->setId("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}");
     storage2->setUsedForWriting(true);
 
     QnStorageResourcePtr storage3 = QnStorageResourcePtr(new MockStorageResource3);
-    storage3->setUrl("url3");
-    storage3->setId("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}"); 
+    storage3->setUrl(fileStorageUrl);
+    storage3->setId("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}");
     storage3->setUsedForWriting(true);
 
     qnNormalStorageMan->addStorage(storage1);
@@ -472,7 +470,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     storage1->setWritedCoeff(0.3);
     storage1->setWritedCoeff(0.4);
 
-    const int writeCount = 1000 * 1000 * 1;
+    const int writeCount = 5000;
     QnUuid currentStorageId;
 
     int currentStorageUseCount = 0;
@@ -482,18 +480,18 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     const int kMaxUseInARowOverflowCount = 5;
     const double kMaxUsageDelta = 50;
 
-    for (int i = 0; i < writeCount; ++i) 
+    for (int i = 0; i < writeCount; ++i)
     {
         auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
         ASSERT_TRUE(storage);
-        if (currentStorageId != storage->getId()) 
+        if (currentStorageId != storage->getId())
         {
             currentStorageId = storage->getId();
             if (currentStorageUseCount > kMaxStorageUseInARow)
                 ++useInARowOverflowCount;
             currentStorageUseCount = 0;
         }
-        else 
+        else
         {
             ++currentStorageUseCount;
         }
@@ -513,10 +511,4 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     ASSERT_TRUE(qAbs(storage1UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
     ASSERT_TRUE(qAbs(storage1UsageCoeff - storage3UsageCoeff) < kMaxUsageDelta);
     ASSERT_TRUE(qAbs(storage3UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
-}
-
-TEST(AbstractStorageResourceTest, fini)
-{
-    tg.reset();
-    recursiveClean(qApp->applicationDirPath() + lit("/tmp"));
 }

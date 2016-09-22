@@ -23,7 +23,7 @@ public:
     * How long to keep event log in usecs
     */
     void setEventLogPeriod(qint64 periodUsec);
-
+    virtual void prepareAdditionActionParams(const QnAbstractBusinessActionPtr& action) override;
 protected slots:
     virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action) override;
     void onRemoveResource(const QnResourcePtr &resource);

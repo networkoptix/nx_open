@@ -135,6 +135,9 @@ void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& a
         ec2::fromApiToResource(actionData, actionToSend, qnResPool);
 
         qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
+        // we need to save action to the log before proxy. It need for event log for 'view video' operation.
+        // Otherwise foreign server can't perform this
+        qnServerDb->saveActionToDB(action);
     }
 }
 
@@ -156,6 +159,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         Q_ASSERT_X(0, Q_FUNC_INFO, "No action to execute");
         return; // something wrong. It shouldn't be
     }
+    prepareAdditionActionParams(action);
 
     QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
 

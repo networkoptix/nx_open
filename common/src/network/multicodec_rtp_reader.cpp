@@ -26,10 +26,27 @@
 #include "api/app_server_connection.h"
 
 
+namespace {
 static const int RTSP_RETRY_COUNT = 6;
 static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 
-static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
+} // namespace
+
+namespace RtpTransport {
+
+Value fromString(const QString& str)
+{
+    if (str == RtpTransport::udp)
+        return RtpTransport::udp;
+    else if (str == RtpTransport::tcp)
+        return RtpTransport::tcp;
+    else
+        return RtpTransport::_auto;
+}
+
+static Value defaultTransportToUse( RtpTransport::_auto );
+
+} // RtpTransport
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(
     const QnResourcePtr& res,
@@ -105,12 +122,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
             result = getNextDataTCP();
 
     } while(result && !gotKeyData(result));
-    
+
     if (result) {
         m_gotSomeFrame = true;
         return result;
     }
-    
+
     if (!m_gotSomeFrame)
         return result; // if no frame received yet do not report network issue error
 
@@ -152,7 +169,7 @@ void QnMulticodecRtpReader::processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer
         if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
             ioDevice->setStatistic(stats);
     }
-    
+
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {
@@ -203,7 +220,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
-        while (m_gotData) 
+        while (m_gotData)
         {
             QnAbstractMediaDataPtr data = getNextDataInternal();
             if (data)
@@ -216,7 +233,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         m_RtpSession.sendKeepAliveIfNeeded();
         if (readed < 1)
             break; // error
-        
+
         RTPSession::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
         int channelNum = m_RtpSession.getChannelNum(rtpChannelNum);
         QnRtpStreamParser* parser = m_tracks[channelNum].parser;
@@ -226,7 +243,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
 
-        if (format == RTPSession::TT_VIDEO || format == RTPSession::TT_AUDIO) 
+        if (format == RTPSession::TT_VIDEO || format == RTPSession::TT_AUDIO)
         {
             if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic(), m_gotData))
             {
@@ -279,7 +296,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
-        while (m_gotData) 
+        while (m_gotData)
         {
             QnAbstractMediaDataPtr data = getNextDataInternal();
             if (data)
@@ -297,7 +314,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         }
 
         const int rez = poll( mediaSockPollArray, nfds, MEDIA_DATA_READ_TIMEOUT_MS );
-        if (rez < 1) 
+        if (rez < 1)
             continue;
         for( int i = 0; i < rez; ++i )
         {
@@ -315,7 +332,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                     m_demuxedData[rtpChannelNum]->finishWriting(readed);
                     quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
                     bool gotData = false;
-                    if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic(), gotData)) 
+                    if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic(), gotData))
                     {
                         clearKeyData(track.parser->logicalChannelNum());
                         m_demuxedData[rtpChannelNum]->clear();
@@ -362,7 +379,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         result = audioParser;
     }
     else if (codecName.startsWith(QLatin1String("G726"))) // g726-24, g726-32 e.t.c
-    { 
+    {
         int bitRatePos = codecName.indexOf(QLatin1Char('-'));
         if (bitRatePos == -1)
             return 0;
@@ -379,7 +396,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
-    
+
     if (result)
         Qn::directConnect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
     return result;
@@ -413,9 +430,17 @@ RTPSession::TransportType QnMulticodecRtpReader::getRtpTransport() const
     if (!m_resource)
         return result;
 
-    QString transportStr = m_resource->getProperty(QnMediaResource::rtpTransportKey());
+    QString transportStr = m_resource
+        ->getProperty(QnMediaResource::rtpTransportKey())
+            .toUpper()
+            .trimmed();
+
+    if (transportStr.isEmpty() || transportStr == RtpTransport::_auto)
+        transportStr = m_rtpTransport;
+
     if (transportStr.isEmpty())
-        transportStr = defaultTransportToUse; // if not defined, try transport from registry
+        transportStr = RtpTransport::defaultTransportToUse; // if not defined, try transport from registry
+
     transportStr = transportStr.toUpper().trimmed();
     if (transportStr == RtpTransport::udp)
         result = RTPSession::TRANSPORT_UDP;
@@ -424,6 +449,12 @@ RTPSession::TransportType QnMulticodecRtpReader::getRtpTransport() const
 
     return result;
 }
+
+void QnMulticodecRtpReader::setRtpTransport( const RtpTransport::Value& value )
+{
+    m_rtpTransport = value;
+}
+
 
 CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 {
@@ -448,7 +479,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         {
             url = m_request;
         }
-        else 
+        else
         {
             QTextStream(&url) << "rtsp://" << address.toString();
             if (!m_request.startsWith(QLatin1Char('/')))
@@ -493,7 +524,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
                     camRes->saveParams();
         }
     }
-    
+
     RTPSession::TrackMap trackInfo =  m_RtpSession.getTrackInfo();
     m_tracks.resize(trackInfo.size());
     bool videoExist = false;
@@ -504,7 +535,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         RTPSession::TrackType trackType = trackInfo[i]->trackType;
         videoExist |= trackType == RTPSession::TT_VIDEO;
         audioExist |= trackType == RTPSession::TT_AUDIO;
-        if (trackType == RTPSession::TT_VIDEO || trackType == RTPSession::TT_AUDIO) 
+        if (trackType == RTPSession::TT_VIDEO || trackType == RTPSession::TT_AUDIO)
         {
             m_tracks[i].parser = createParser(trackInfo[i]->codecName.toUpper());
             if (m_tracks[i].parser) {
@@ -577,9 +608,9 @@ void QnMulticodecRtpReader::pleaseStop()
     m_RtpSession.shutdown();
 }
 
-void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _defaultTransportToUse )
+void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& value )
 {
-    defaultTransportToUse = _defaultTransportToUse;
+    RtpTransport::defaultTransportToUse = value;
 }
 
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)

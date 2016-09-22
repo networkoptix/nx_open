@@ -254,11 +254,14 @@ QnLog::~QnLog()
 
 QnLog* QnLog::instance( int logID )
 {
-    return qn_logsInstance()->get(logID);
+    const auto i = qn_logsInstance();
+    return i ? i->get(logID) : nullptr;
 }
 
-bool QnLog::instanceExists( int logID ) {
-    return qn_logsInstance()->exists(logID);
+bool QnLog::instanceExists( int logID )
+{
+    const auto i = qn_logsInstance();
+    return i ? i->exists(logID) : false;
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {

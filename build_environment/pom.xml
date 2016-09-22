@@ -582,7 +582,7 @@
                     <artifactId>festival</artifactId>
                     <version>${festival.version}</version>
                     <type>tar.gz</type>
-                    <classifier>${profile.classifier}-bpi</classifier>
+                    <classifier>${profile.classifier}-rpi</classifier>
                 </dependency>
             </dependencies>
         </profile>

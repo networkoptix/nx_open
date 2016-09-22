@@ -69,7 +69,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
         encoderStr = lit("MJPEG");
     else
         return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("encoder"));
-    
+
     auto desiredTransport = m_actiRes->getDesiredTransport();
 
     if (isCameraControlRequired)
@@ -113,7 +113,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
     m_multiCodec.setRequest(streamUrl);
-    m_multiCodec.setDefaultTransport(desiredTransport);
+    m_multiCodec.setRtpTransport(desiredTransport);
 
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
 

@@ -508,7 +508,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
     if(playing) {
         if (reader->isRealTimeSource()) {
             /* Media was paused while on live. Jump to archive when resumed. */
-            qint64 time = camDisplay->getCurrentTime();
+            qint64 time = m_currentMediaWidget->display()->camera()->getCurrentTime();
             reader->resumeMedia();
             if (time != (qint64)AV_NOPTS_VALUE && !reader->isReverseMode())
                 reader->directJumpToNonKeyFrame(time+1);
@@ -637,9 +637,10 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
 
     connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource, false)) {
+    auto loader = m_cameraDataManager->loader(syncedResource);
+    Q_ASSERT(loader);
+    if (loader)
         loader->setEnabled(true);
-    }
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())

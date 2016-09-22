@@ -107,14 +107,14 @@ private:
 #define NX_LOG_2(msg, level)                                        \
     {                                                               \
         QnLog* logInstance = QnLog::instance(QnLog::MAIN_LOG_ID);   \
-        if( level <= logInstance->logLevel() )                      \
+        if( logInstance && level <= logInstance->logLevel() )       \
             logInstance->log( msg, level );                         \
     }
 
 #define NX_LOG_3(logID, msg, level)                             \
     {                                                           \
         QnLog* logInstance = QnLog::instance(logID);            \
-        if( level <= logInstance->logLevel() )                  \
+        if( logInstance && level <= logInstance->logLevel() )   \
             logInstance->log( msg, level );                     \
     }
 
