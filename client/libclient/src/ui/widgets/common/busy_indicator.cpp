@@ -437,6 +437,7 @@ QnBusyIndicatorGraphicsWidget::QnBusyIndicatorGraphicsWidget(QGraphicsItem* pare
     m_indicatorColor(palette().color(QPalette::Foreground)),
     m_borderColor(QColor())
 {
+    setAcceptedMouseButtons(Qt::NoButton);
     setFocusPolicy(Qt::NoFocus);
 
     registerAnimation(this);
