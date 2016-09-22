@@ -42,7 +42,16 @@ struct QnModuleInformation
 
 namespace helpers {
 
-    // Extracts system id from module information
+    // Returns systems id as if it is local servers that is not in cloud and is not in "new state"
+    QString getLocalSystemId(const QnModuleInformation& info);
+
+    /*
+     * Extracts system id from module information
+     * Result is:
+     * - identifier of server if it is in "new state"
+     * - cloud id if server in cloud
+     * - system name in other cases
+     */
     QString getTargetSystemId(const QnModuleInformation& info);
 } // helpers namespace
 

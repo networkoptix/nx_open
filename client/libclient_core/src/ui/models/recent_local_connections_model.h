@@ -8,6 +8,7 @@ class QnRecentLocalConnectionsModel : public QAbstractListModel
     Q_OBJECT
     typedef QAbstractListModel base_type;
 
+    // TODO: #ynikitenkov use systemId instead of systemName
     Q_PROPERTY(QString systemName READ systemName WRITE setSystemName NOTIFY systemNameChanged)
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
     Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)

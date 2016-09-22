@@ -494,6 +494,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     qnCommon->store<QnSystemsFinder>(systemsFinder.take());
     qnCommon->store<QnDirectSystemsFinder>(directSystemsFinder.take());
     qnCommon->store<QnCloudSystemsFinder>(cloudSystemsFinder.take());
+    qnCommon->store<QnRecentLocalSystemsFinder>(recentLocalSystemsFinder.take());
 
     QnRouter* router = new QnRouter(moduleFinder);
     qnCommon->store<QnRouter>(router);

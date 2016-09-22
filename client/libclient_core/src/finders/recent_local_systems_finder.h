@@ -21,7 +21,17 @@ public:
 private:
     void updateSystems();
 
+    typedef QList<QnModuleInformation> ModulesList;
+    void checkSystem(const QnSystemDescriptionPtr& system,
+        const ModulesList& modules);
+
+    void removeVisibleSystem(const QString& systemId);
+
+    bool shouldRemoveSystem(const QnSystemDescriptionPtr& system,
+        const ModulesList& modules);
+
 private:
     typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
     SystemsHash m_systems;
+    SystemsHash m_onlineSystems;
 };
