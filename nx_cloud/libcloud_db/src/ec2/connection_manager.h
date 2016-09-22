@@ -129,7 +129,7 @@ private:
     QnCounter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
 
-    void addNewConnection(ConnectionContext connectionContext);
+    bool addNewConnection(ConnectionContext connectionContext);
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
             QnMutexLockerBase* const /*lock*/,

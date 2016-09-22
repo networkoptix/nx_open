@@ -64,9 +64,14 @@ public:
 
     const char* moduleName() const;
 
+    /** Configures if std out and error output is allowed */
+    static void allowOutput(bool isAllowed);
+
 private:
     class Impl;
     Impl* const d;
+
+    static bool s_isOutputAllowed; //< TODO: atomic?
 };
 
 #define NX_FLAG(DEFAULT, NAME, DESCR) bool NAME = regFlagParam(&NAME, (DEFAULT), #NAME, (DESCR))

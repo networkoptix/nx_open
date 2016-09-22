@@ -8,6 +8,9 @@
 #include "tunnel/udp/acceptor.h"
 #include "tunnel/tcp/reverse_tunnel_acceptor.h"
 
+#define DEBUG_LOG(message) \
+    if (nx::network::SocketGlobals::debugFlags().cloudServerSocket) \
+        NX_LOGX(message, cl_logDEBUG1);
 
 namespace nx {
 namespace network {
@@ -255,6 +258,7 @@ void CloudServerSocket::acceptAsync(
                 case State::readyToListen:
                     m_state = State::registeringOnMediator;
                     m_savedAcceptHandler = std::move(handler);
+                    DEBUG_LOG("Register on mediator from acceptAsync()");
                     issueRegistrationRequest();
                     break;
 
@@ -379,8 +383,7 @@ void CloudServerSocket::moveToListeningState()
 
 void CloudServerSocket::initTunnelPool(int queueLen)
 {
-    m_tunnelPool = std::make_unique<IncomingTunnelPool>(
-        getAioThread(), queueLen);
+    m_tunnelPool = std::make_unique<IncomingTunnelPool>(getAioThread(), queueLen);
 }
 
 void CloudServerSocket::startAcceptor(
@@ -394,16 +397,15 @@ void CloudServerSocket::startAcceptor(
             std::unique_ptr<AbstractIncomingTunnelConnection> connection)
         {
             NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
-            NX_LOGX(lm("acceptor %1 returned %2: %3")
-                    .arg(acceptorPtr).arg(connection)
-                    .arg(SystemError::toString(code)), cl_logDEBUG2);
+            DEBUG_LOG(lm("Acceptor %1 returned %2: %3")
+                .strs((void*)acceptorPtr, (void*)connection.get(), SystemError::toString(code)));
 
             const auto it = std::find_if(
                 m_acceptors.begin(), m_acceptors.end(),
                 [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
                 { return a.get() == acceptorPtr; });
 
-            NX_ASSERT(it != m_acceptors.end(), Q_FUNC_INFO, "where did it go?");
+            NX_CRITICAL(it != m_acceptors.end(), Q_FUNC_INFO, "where did it go?");
             m_acceptors.erase(it);
 
             if (code == SystemError::noError)
@@ -422,7 +424,7 @@ void CloudServerSocket::onListenRequestCompleted(
         m_mediatorConnection->setOnReconnectedHandler(
             std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
 
-        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG2);
+        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
         auto acceptHandler = std::move(m_savedAcceptHandler);
         m_savedAcceptHandler = nullptr;
         if (acceptHandler)
@@ -430,19 +432,22 @@ void CloudServerSocket::onListenRequestCompleted(
     }
     else
     {
-        //should retry if failed since system registration data
-            //can be propagated to mediator with some delay
-        if (m_mediatorRegistrationRetryTimer.scheduleNextTry(
-                std::bind(&CloudServerSocket::issueRegistrationRequest, this)))
-        {
-            //another attempt will follow
-            return;
-        }
+        // Should retry if failed since system registration data can be propagated to mediator
+        // with some delay.
+        const auto retry = m_mediatorRegistrationRetryTimer.scheduleNextTry(
+            [this]
+            {
+                NX_LOGX(lm("Retry to register on mediator"), cl_logDEBUG1);
+                issueRegistrationRequest();
+            });
+
+        if (retry)
+            return; //< Another attempt will follow.
 
         m_state = State::readyToListen;
-
         NX_LOGX(lm("Listen request has failed: %1")
-            .arg(QnLexical::serialized(resultCode)), cl_logINFO);
+            .arg(QnLexical::serialized(resultCode)), cl_logINFO); // TODO: #ak INFO?
+
         auto acceptHandler = std::move(m_savedAcceptHandler);
         m_savedAcceptHandler = nullptr;
         if (acceptHandler)
@@ -461,12 +466,12 @@ void CloudServerSocket::acceptAsyncInternal(
         {
             if (socket)
             {
-                NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
+                DEBUG_LOG(lm("Return socket from tunnel pool %1").arg(socket));
                 handler(SystemError::noError, socket.release());
             }
             else
             {
-                NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
+                DEBUG_LOG(lm("Tunnel pool accept timed out"));
                 handler(SystemError::timedOut, nullptr);
             }
         },
@@ -503,41 +508,33 @@ void CloudServerSocket::issueRegistrationRequest()
 void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
-    m_mediatorRegistrationRetryTimer.dispatch(
-        [this, event = std::move(event)]() mutable
+    event.connectionMethods &= m_supportedConnectionMethods;
+    for (const auto& maker : m_acceptorMakers)
+    {
+        if (auto acceptor = maker(event))
         {
-            event.connectionMethods &= m_supportedConnectionMethods;
-            for (const auto& maker : m_acceptorMakers)
-            {
-                if (auto acceptor = maker(event))
-                {
-                    acceptor->setConnectionInfo(
-                        event.connectSessionId, event.originatingPeerID);
+            DEBUG_LOG(lm("Create acceptor %1 by connection request %2 from %3")
+                .strs(acceptor, event.connectSessionId, event.originatingPeerID));
 
-                    acceptor->setMediatorConnection(m_mediatorConnection);
-                    startAcceptor(std::move(acceptor));
-                }
-            }
-        });
+            acceptor->setConnectionInfo(
+                event.connectSessionId, event.originatingPeerID);
+
+            acceptor->setMediatorConnection(m_mediatorConnection);
+            startAcceptor(std::move(acceptor));
+        }
+    }
 }
 
 void CloudServerSocket::onMediatorConnectionRestored()
 {
-    //TODO #ak it's a pity we cannot move m_mediatorConnection to this object's aio thread
-    m_mediatorRegistrationRetryTimer.dispatch(  //modifiyng state only in aio thread
-        [this]
-        {
-            NX_LOGX(lm("Connection to mediator has been restored after failure. "
-                "Re-sending listen request"), cl_logDEBUG1);
+    if (m_state == State::listening)
+    {
+        m_state = State::registeringOnMediator;
+        m_mediatorRegistrationRetryTimer.reset();
 
-            if (m_state == State::listening)
-            {
-                m_state = State::registeringOnMediator;
-                //sending listen request again
-                m_mediatorRegistrationRetryTimer.reset();
-                issueRegistrationRequest();
-            }
-        });
+        NX_LOGX(lm("Register on mediator after reconnect"), cl_logDEBUG1);
+        issueRegistrationRequest();
+    }
 }
 
 } // namespace cloud
