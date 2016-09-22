@@ -50,10 +50,19 @@ void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyVal
         *allowed = isAllowed;
 }
 
-void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList)
+void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList, bool* allowed)
 {
+    if (allowed)
+        *allowed = true;
+
     for (auto filter : filterList)
-        filter(accessData, keyValue, nullptr);
+    {
+        bool isAllowed = true;
+        filter(accessData, keyValue, &isAllowed);
+
+        if (allowed && !isAllowed)
+            *allowed = false;
+    }
 }
 
 }
@@ -553,11 +562,12 @@ struct ModifyResourceParamAccess
 
     bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
+        bool result = false;
         if (hasSystemAccess(accessData))
             return true;
 
         if (isRemove)
-            return qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
+            result = qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
                 qnResPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
 
@@ -565,8 +575,20 @@ struct ModifyResourceParamAccess
         if (param.name == Qn::USER_FULL_NAME)
             permissions |= Qn::WriteFullNamePermission;
 
-        return resourceAccessHelper(accessData, param.resourceId, permissions);
+        result = resourceAccessHelper(accessData, param.resourceId, permissions);
 
+        if (result)
+        {
+            access_helpers::FilterFunctorListType filters = {
+                &access_helpers::globalSettingsSystemOnlyFilter
+            };
+
+            QString dummy = lit("dummy");
+            access_helpers::KeyValueFilterType keyValue = std::make_pair(param.name, &dummy);
+            ec2::access_helpers::applyValueFilters(accessData, &keyValue, filters, &result);
+        }
+
+        return result;
     }
 
     bool isRemove;
