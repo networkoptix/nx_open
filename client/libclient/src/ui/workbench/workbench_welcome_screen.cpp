@@ -17,7 +17,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/models/recent_user_connections_model.h>
+#include <ui/models/recent_local_connections_model.h>
 #include <ui/models/qml_sort_filter_proxy_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
@@ -38,7 +38,7 @@ namespace
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnQmlSortFilterProxyModel>("NetworkOptix.Qml", 1, 0, "QnQmlSortFilterProxyModel");
-        qmlRegisterType<QnrecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnrecentLocalConnectionsModel");
+        qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
 
         auto holder = new QStackedWidget();
         holder->addWidget(new QWidget());
