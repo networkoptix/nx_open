@@ -79,7 +79,7 @@ public:
     nx::db::DBResult updateTimestampHiForSystem(
         QSqlDatabase* connection,
         const nx::String& systemId,
-        std::uint64_t newValue);
+        quint64 newValue);
 
     /** 
      * If transaction is not needed (it can be late or something), 

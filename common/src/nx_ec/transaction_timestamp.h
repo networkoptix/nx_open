@@ -13,9 +13,9 @@ public:
      * This is some sequence introduced to give transactions generated after
      * unbinding from cloud / binding to cloud higher priority.
      */
-    std::uint64_t sequence;
+    quint64 sequence;
     /** This is a regular transaction timestamp. Close to millis since epoch. */
-    std::uint64_t ticks;
+    quint64 ticks;
 
     Timestamp():
         sequence(0),
@@ -23,7 +23,7 @@ public:
     {
     }
 
-    Timestamp(std::uint64_t sequence, std::uint64_t ticks):
+    Timestamp(quint64 sequence, quint64 ticks):
         sequence(sequence),
         ticks(ticks)
     {
@@ -94,12 +94,12 @@ public:
         return result;
     }
 
-    static Timestamp fromInteger(std::uint64_t value)
+    static Timestamp fromInteger(unsigned long long value)
     {
         return Timestamp(value);
     }
 
-    static Timestamp fromInteger(std::int64_t value)
+    static Timestamp fromInteger(long long value)
     {
         return Timestamp(value);
     }
@@ -110,15 +110,15 @@ public:
     }
 
 private:
-    Timestamp(std::uint64_t value):
+    Timestamp(unsigned long long value):
         sequence(0),
         ticks(value)
     {
     }
 
-    Timestamp(std::int64_t value):
+    Timestamp(long long value):
         sequence(0),
-        ticks(static_cast<std::uint64_t>(value))
+        ticks(static_cast<quint64>(value))
     {
     }
 
@@ -156,6 +156,6 @@ QString toString(const Timestamp& val);
 
 #define Timestamp_Fields (sequence)(ticks)
 
+QN_FUSION_DECLARE_FUNCTIONS(Timestamp, (json)(ubjson)(xml)(csv_record))
 } // namespace ec2
 
-QN_FUSION_DECLARE_FUNCTIONS(::ec2::Timestamp, (json)(ubjson)(xml)(csv_record))

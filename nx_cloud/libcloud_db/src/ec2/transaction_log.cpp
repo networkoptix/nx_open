@@ -62,7 +62,7 @@ void TransactionLog::startDbTransaction(
 nx::db::DBResult TransactionLog::updateTimestampHiForSystem(
     QSqlDatabase* connection,
     const nx::String& systemId,
-    std::uint64_t newValue)
+    quint64 newValue)
 {
     QnMutexLocker lk(&m_mutex);
     m_systemIdToTransactionLog[systemId].timestampSequence = newValue;

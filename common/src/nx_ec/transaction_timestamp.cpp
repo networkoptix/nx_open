@@ -21,10 +21,10 @@ QString toString(const Timestamp& val)
     return lit("(%1, %2)").arg(val.sequence).arg(val.ticks);
 }
 
-} // namespace ec2
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ::ec2::Timestamp,
+    Timestamp,
     (json)(ubjson)(xml)(csv_record),
     Timestamp_Fields,
     (optional, false))
+
+} // namespace ec2
