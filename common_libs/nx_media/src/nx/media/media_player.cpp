@@ -108,8 +108,8 @@ public:
     // UTC Playback position at msec. Holds QT property value.
     qint64 positionMs;
 
-    // Video surface to render. Holds QT property value.
-    QAbstractVideoSurface* videoSurface;
+    // Video surface list to render. Holds QT property value.
+    QMap<int, QAbstractVideoSurface*> videoSurfaces;
 
     // Media URL to play. Holds QT property value.
     QUrl url;
@@ -228,7 +228,6 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     aspectRatio(1.0),
     reconnectOnPlay(false),
     positionMs(0),
-    videoSurface(0),
     maxTextureSize(kDefaultMaxTextureSize),
     ptsTimerBaseMs(0),
     execTimer(new QTimer(this)),
@@ -414,6 +413,11 @@ void PlayerPrivate::presentNextFrame()
     setMediaStatus(Player::MediaStatus::Loaded);
     gotDataTimer.restart();
 
+    FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
+
+    auto videoSurface = videoSurfaces.value(metadata.videoChannel);
+
+
     // Update video surface's pixel format if needed.
     if (videoSurface)
     {
@@ -433,7 +437,6 @@ void PlayerPrivate::presentNextFrame()
         }
     }
 
-    auto metadata = FrameMetadata::deserialize(videoFrameToRender);
     bool isLivePacket = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
     bool isPacketOK = (isLivePacket == liveMode);
 
@@ -888,10 +891,10 @@ QUrl Player::source() const
     return d->url;
 }
 
-QAbstractVideoSurface* Player::videoSurface() const
+QAbstractVideoSurface* Player::videoSurface(int channel) const
 {
     Q_D(const Player);
-    return d->videoSurface;
+    return d->videoSurfaces.value(channel);
 }
 
 qint64 Player::position() const
@@ -1009,14 +1012,14 @@ void Player::setSource(const QUrl& url)
     d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));
 }
 
-void Player::setVideoSurface(QAbstractVideoSurface* videoSurface)
+void Player::setVideoSurface(QAbstractVideoSurface* videoSurface, int channel)
 {
     Q_D(Player);
 
-    if (d->videoSurface == videoSurface)
+    if (d->videoSurfaces.value(channel) == videoSurface)
         return;
 
-    d->videoSurface = videoSurface;
+    d->videoSurfaces[channel] = videoSurface;
 
     emit videoSurfaceChanged();
 }
