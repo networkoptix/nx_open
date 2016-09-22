@@ -220,6 +220,8 @@ void QnUserSettingsWidget::loadDataToUi()
     ui->loginInputField->setText(m_model->user()->getName());
     ui->emailInputField->setText(m_model->user()->getEmail());
     ui->nameInputField->setText(m_model->user()->fullName());
+    ui->cloudEmailInputField->setText(m_model->user()->getEmail());
+    ui->cloudPanelWidget->setEmail(m_model->user()->getEmail());
     ui->passwordInputField->clear();
     ui->confirmPasswordInputField->clear();
     ui->enabledButton->setChecked(m_model->user()->isEnabled());
