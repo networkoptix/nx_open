@@ -17,6 +17,17 @@ class QnAdamModbusIOManager:
 {
     Q_OBJECT
 
+    struct PortStateChangeInfo
+    {
+        PortStateChangeInfo(nx_io_managment::IOPortState _state, bool _isChanged):
+            state(_state),
+            isChanged(_isChanged)
+        {}
+
+        nx_io_managment::IOPortState state;
+        bool isChanged;
+    };
+
     struct DebouncedValue
     {
         bool debouncedValue;
@@ -63,7 +74,7 @@ private:
     void fetchAllPortStatesUnsafe();
 
     void processAllPortStatesResponse(const nx_modbus::ModbusResponse& response);
-    std::pair<nx_io_managment::IOPortState, bool> updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
+    PortStateChangeInfo updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
     void setDebounceForPort(const QString& portId, bool portState);
     QnIOStateDataList getDebouncedStates() const;
 

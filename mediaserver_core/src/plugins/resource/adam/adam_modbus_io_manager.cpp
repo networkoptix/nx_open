@@ -321,10 +321,10 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
     {
         auto portState = updatePortState(bitIndex, fetchedPortStates, portIndex);
 
-        if (portState.second)
+        if (portState.isChanged)
         {
             changedStates.push_back(
-                std::make_pair(m_ioStates[portIndex].id, portState.first));
+                std::make_pair(m_ioStates[portIndex].id, portState.state));
         }
 
         portIndex++;
@@ -334,27 +334,30 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::Modbus
     {
         auto portState = updatePortState(bitIndex, fetchedPortStates, portIndex);
 
-        if (portState.second)
+        if (portState.isChanged)
         {
             changedStates.push_back(
-                std::make_pair(m_ioStates[portIndex].id, portState.first));
+                std::make_pair(m_ioStates[portIndex].id, portState.state));
         }
 
         portIndex++;
     }
 
+    lock.unlock();
     for (const auto& change: changedStates)
     {
-        lock.unlock();
         m_inputStateChangedCallback(
             change.first,
             change.second);
-        lock.relock();
     }
+    lock.relock();
 
 }
 
-std::pair<IOPortState, bool> QnAdamModbusIOManager::updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex)
+QnAdamModbusIOManager::PortStateChangeInfo QnAdamModbusIOManager::updatePortState(
+    size_t bitIndex,
+    const QByteArray& bytes,
+    size_t portIndex)
 {
     auto portId = m_ioStates[portIndex].id;
     auto currentState = 
@@ -368,7 +371,7 @@ std::pair<IOPortState, bool> QnAdamModbusIOManager::updatePortState(size_t bitIn
     m_ioStates[portIndex].isActive = isActive;
     m_ioStates[portIndex].timestamp = qnSyncTime->currentMSecsSinceEpoch();
 
-    return std::make_pair(currentState, stateChanged);
+    return PortStateChangeInfo(currentState, stateChanged);
 }
 
 void QnAdamModbusIOManager::setDebounceForPort(const QString& portId, bool portState)
