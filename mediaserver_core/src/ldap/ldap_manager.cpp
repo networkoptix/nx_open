@@ -218,7 +218,7 @@ public:
 private:
     bool detectLdapVendor(LdapVendor &);
 
-    QnLdapSettings m_settings;
+    const QnLdapSettings& m_settings;
     LDAP_RESULT m_lastErrorCode;
 
     std::unique_ptr<DirectoryType> m_dType;
@@ -229,7 +229,6 @@ LdapSession::LdapSession(const QnLdapSettings &settings)
     : m_settings(settings),
       m_ld(0)
 {
-    m_settings.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_settings.adminPassword);
 }
 
 LdapSession::~LdapSession()

@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include <api/global_settings.h>
+
 #include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/camera_resource.h>
@@ -27,6 +29,35 @@
 #include "managers/webpage_manager.h"
 
 namespace ec2 {
+namespace access_helpers {
+
+void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, bool* allowed)
+{
+    using namespace nx::settings_names;
+
+    const QString& key = keyValue->first;
+    QString* value = keyValue->second;
+    bool isAllowed = true;
+
+    if ((key == kNamePassword        || key == ldapAdminPassword ||
+         key == kNameCloudSystemID   || key == kNameCloudAuthKey) && accessData != Qn::kSystemAccess)
+    {
+        value->clear();
+        isAllowed = false;
+    }
+
+    if (allowed)
+        *allowed = isAllowed;
+}
+
+void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList)
+{
+    for (auto filter : filterList)
+        filter(accessData, keyValue, nullptr);
+}
+
+}
+
 namespace detail {
 
 template<typename T, typename F>
@@ -453,12 +484,26 @@ struct ModifyResourceAccess
     bool isRemove;
 };
 
+template<typename Param>
+void applyColumnFilter(const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
+
+void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData& data) 
+{
+    if (accessData != Qn::kSystemAccess)
+        data.authKey.clear();
+}
+
 struct ReadResourceAccess
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData& accessData, const Param& param)
+    bool operator()(const Qn::UserAccessData& accessData, Param& param)
     {
-        return resourceAccessHelper(accessData, param.id, Qn::ReadPermission);
+        if (resourceAccessHelper(accessData, param.id, Qn::ReadPermission))
+        {
+            applyColumnFilter(accessData, param);
+            return true;
+        }
+        return false;
     }
 };
 
@@ -475,9 +520,20 @@ struct ReadResourceAccessOut
 
 struct ReadResourceParamAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    bool operator()(const Qn::UserAccessData& accessData, ApiResourceParamWithRefData& param)
     {
-        return resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission);
+        if (resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission))
+        {
+            access_helpers::FilterFunctorListType filters = {
+                &access_helpers::globalSettingsSystemOnlyFilter
+            };
+
+            access_helpers::KeyValueFilterType keyValue = std::make_pair(param.name, &param.value);
+            ec2::access_helpers::applyValueFilters(accessData, &keyValue, filters);
+
+            return true;
+        }
+        return false;
     }
 };
 
@@ -761,7 +817,7 @@ struct FilterListByAccess
     void operator()(const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData](const typename ParamContainer::value_type &param)
+            [&accessData](typename ParamContainer::value_type &param)
         {
             return !SingleAccess()(accessData, param);
         }), outList.end());

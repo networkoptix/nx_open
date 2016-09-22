@@ -1831,7 +1831,9 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
     //we need break connection only if following settings have been changed:
     //  connectionKeepAliveTimeout
     //  keepAliveProbeCount
-    if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    using namespace nx::settings_names;
+
+    if (key == kConnectionKeepAliveTimeoutKey)
     {
         const auto timeout = qnGlobalSettings->connectionKeepAliveTimeout();
         QnMutexLocker lock(&m_mutex);
@@ -1842,7 +1844,7 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
                 transport->setState(ec2::QnTransactionTransport::Error);
         }
     }
-    else if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    else if (key == kConnectionKeepAliveTimeoutKey)
     {
         const auto probeCount = qnGlobalSettings->keepAliveProbeCount();
         QnMutexLocker lock(&m_mutex);

@@ -4,6 +4,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include <nx_ec/data/api_fwd.h>
 
@@ -23,6 +24,59 @@ class QnAbstractResourcePropertyAdaptor;
 template<class T>
 class QnResourcePropertyAdaptor;
 class QSettings;
+
+namespace nx {
+namespace settings_names {
+
+const QString kNameDisabledVendors(lit("disabledVendors"));
+const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
+const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
+const QString kNameHost(lit("smtpHost"));
+const QString kNamePort(lit("smtpPort"));
+const QString kNameUser(lit("smtpUser"));
+const QString kNamePassword(lit("smptPassword"));
+const QString kNameConnectionType(lit("smtpConnectionType"));
+const QString kNameSimple(lit("smtpSimple"));
+const QString kNameTimeout(lit("smtpTimeout"));
+const QString kNameFrom(lit("emailFrom"));
+const QString kNameSignature(lit("emailSignature"));
+const QString kNameSupportEmail(lit("emailSupportEmail"));
+const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
+const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
+const QString kNameBackupQualities(lit("backupQualities"));
+const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
+const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
+const QString kNameNewSystem(lit("newSystem"));
+const QString kCloudHostName(lit("cloudHost"));
+
+const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
+const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
+const QString kNameStatisticsReportLastVersion(lit("statisticsReportLastVersion"));
+const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
+const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
+const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
+const QString kNameSystemId(lit("systemId"));
+const QString kNameSystemNameForId(lit("systemNameForId"));
+const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
+const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
+
+
+const QString ldapUri(lit("ldapUri"));
+const QString ldapAdminDn(lit("ldapAdminDn"));
+const QString ldapAdminPassword(lit("ldapAdminPassword"));
+const QString ldapSearchBase(lit("ldapSearchBase"));
+const QString ldapSearchFilter(lit("ldapSearchFilter"));
+
+const QString kNameCloudAccountName(lit("cloudAccountName"));
+const QString kNameCloudSystemID(lit("cloudSystemID"));
+const QString kNameCloudAuthKey(lit("cloudAuthKey"));
+const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
+const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
+const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
+
+} // namespace settings_names
+} // namespace nx
 
 class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSettings> {
     Q_OBJECT
@@ -88,7 +142,6 @@ public:
     QString statisticsReportUpdateDelay() const;
     void setStatisticsReportUpdateDelay(const QString& value);
 
-    static const QString kNameUpnpPortMappingEnabled;
     bool isUpnpPortMappingEnabled() const;
     void setUpnpPortMappingEnabled(bool value);
 
@@ -105,11 +158,9 @@ public:
     QString statisticsReportServerApi() const;
     void setStatisticsReportServerApi(const QString &value);
 
-    static const QString kConnectionKeepAliveTimeoutKey;
     std::chrono::seconds connectionKeepAliveTimeout() const;
     void setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout);
 
-    static const QString kKeepAliveProbeCountKey;
     int keepAliveProbeCount() const;
     void setKeepAliveProbeCount(int newProbeCount);
 
@@ -125,15 +176,12 @@ public:
 
     // -- Cloud settings
 
-    static const QString kNameCloudAccountName;
     QString cloudAccountName() const;
     void setCloudAccountName(const QString& value);
 
-    static const QString kNameCloudSystemID;
     QString cloudSystemID() const;
     void setCloudSystemID(const QString& value);
 
-    static const QString kNameCloudAuthKey;
     QString cloudAuthKey() const;
     void setCloudAuthKey(const QString& value);
 

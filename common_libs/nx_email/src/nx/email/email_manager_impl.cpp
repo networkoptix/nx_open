@@ -89,9 +89,7 @@ bool EmailManagerImpl::sendEmail(
     }
 
     if (!settings.user.isEmpty() && 
-        !smtp.login(
-            settings.user, 
-            nx::utils::decodeStringFromHexStringAES128CBC(settings.password)))
+        !smtp.login(settings.user, settings.password))
     {
         NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
         smtp.quit();

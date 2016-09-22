@@ -10,12 +10,14 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
 #include <api/model/system_settings_reply.h>
+#include <rest/server/rest_connection_processor.h>
+#include <transaction/transaction_descriptor.h>
 
 int QnSystemSettingsHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor*)
+    const QnRestConnectionProcessor* owner)
 {
     QnSystemSettingsReply reply;
 
@@ -23,15 +25,27 @@ int QnSystemSettingsHandler::executeGet(
     const auto& settings = QnGlobalSettings::instance()->allSettings();
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
+        bool allowed;
+        QString dummy = lit("dummy");
+
+        ec2::access_helpers::KeyValueFilterType keyValue(setting->key(), &dummy);
+        ec2::access_helpers::globalSettingsSystemOnlyFilter(owner->accessRights(), &keyValue, &allowed);
+
         if (!params.isEmpty())
         {
             auto paramIter = params.find(setting->key());
             if (paramIter == params.end())
                 continue;
+
+            if (!allowed)
+                return nx_http::StatusCode::forbidden;
+
             setting->setSerializedValue(paramIter.value());
             dirty = true;
         }
-        reply.settings.insert(setting->key(), setting->serializedValue());
+
+        if (allowed)
+            reply.settings.insert(setting->key(), setting->serializedValue());
     }
     if (dirty)
         QnGlobalSettings::instance()->synchronizeNow();

@@ -74,6 +74,18 @@ enum class RemotePeerAccess
     Partial
 };
 
+namespace access_helpers {
+
+using KeyValueFilterType        =   std::pair<const QString&, QString*>;
+using FilterFunctorType         =   std::function<void(const Qn::UserAccessData&, KeyValueFilterType*, bool*)>;
+using FilterFunctorListType     =   std::vector<FilterFunctorType>;
+
+void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, bool* allowed = nullptr);
+
+void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList);
+
+} // namespace access_helpers
+
 namespace detail {
 
 struct NoneType {};
@@ -82,7 +94,7 @@ template<typename ParamType>
 using CheckSavePermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using CheckReadPermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckReadPermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, ParamType&)>;
 
 template<typename ParamType>
 using FilterByReadPermissionFuncType = std::function<void(const Qn::UserAccessData& accessData, ParamType&)>;

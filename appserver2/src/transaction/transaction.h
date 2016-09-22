@@ -423,7 +423,7 @@ APPLY(401, saveMediaServer, ApiMediaServerData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       [](const Qn::UserAccessData& accessData, const ApiMediaServerData&) { return accessData == Qn::kSystemAccess; }, /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
