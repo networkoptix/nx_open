@@ -2,10 +2,11 @@
 
 #include <api/app_server_connection.h>
 
-#include "network/module_finder.h"
-#include "network/direct_module_finder_helper.h"
-#include "client/client_message_processor.h"
-#include "client/client_settings.h"
+#include <network/module_finder.h>
+#include <network/direct_module_finder_helper.h>
+#include <client/client_message_processor.h>
+#include <client/client_settings.h>
+#include <client_core/client_core_settings.h>
 
 namespace
 {
@@ -37,6 +38,28 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
             this, [this, directModuleFinderHelper]()
             {
                 QUrl url = QnAppServerConnectionFactory::url();
+
+                const bool isLocalConnection =
+                    [url]() -> bool
+                    {
+                        /*
+                        * We save only local connection to the recent list.
+                        * So, we check if last saved connection is current.
+                        * If not - it means it was connection through the cloud
+                        * and we don't save it.
+                        */
+
+                        const auto localConnections = qnClientCoreSettings->recentLocalConnections();
+                        if (localConnections.isEmpty())
+                            return false;
+
+                        return (url.host() == localConnections.first().url.host());
+                    }();
+
+                if (!isLocalConnection)
+                    return;
+
+
                 url.setPath(QString());
 
                 // Place url to the top of the list
@@ -45,8 +68,7 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
                 while (m_urls.size() > kMaxUrlsToStore)
                     m_urls.removeLast();
 
-                directModuleFinderHelper->setForcedUrls(
-                            QSet<QUrl>::fromList(m_urls));
+                directModuleFinderHelper->setForcedUrls(QSet<QUrl>::fromList(m_urls));
 
                 qnSettings->setKnownServerUrls(m_urls);
             }
