@@ -140,6 +140,7 @@ namespace detail
 
         // --------- misc -----------------------------
         QnUuid getID() const;
+        bool updateId();
 
         ApiObjectType getObjectType(const QnUuid& objectId)
         {

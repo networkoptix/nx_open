@@ -4668,6 +4668,25 @@ QnUuid QnDbManager::getID() const
     return m_dbInstanceId;
 }
 
+bool QnDbManager::updateId()
+{
+    auto newDbInstanceId = QnUuid::createUuid();
+
+    QSqlQuery query(m_sdb);
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
+    insQuery.addBindValue(DB_INSTANCE_KEY);
+    insQuery.addBindValue(newDbInstanceId.toRfc4122());
+    if (!insQuery.exec())
+    {
+        qWarning() << "can't update db instance ID";
+        return false;
+    }
+
+    m_dbInstanceId = newDbInstanceId;
+    return true;
+}
+
 QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 {
     return &m_tran;

@@ -48,6 +48,9 @@ bool QnTransactionLog::clear()
         return false;
     }
 
+    if (!m_dbManager->updateId())
+        return false;
+
     m_state.values.clear();
     m_updateHistory.clear();
     m_commitData.clear();
