@@ -89,7 +89,8 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_client.setEndpoint(endpoint);
     m_outputClient.setEndpoint(endpoint);
 
-    fetchAllPortStatesUnsafe();
+    lock.unlock();
+    fetchAllPortStates();
 
     return true;
 }
@@ -259,8 +260,9 @@ bool QnAdamModbusIOManager::initializeIO()
     return true;
 }
 
-void QnAdamModbusIOManager::fetchAllPortStatesUnsafe()
+void QnAdamModbusIOManager::fetchAllPortStates()
 {
+    QnMutexLocker lock(&m_mutex);
     if (m_inputs.empty() || m_outputs.empty())
         return;
 
@@ -268,14 +270,9 @@ void QnAdamModbusIOManager::fetchAllPortStatesUnsafe()
     auto startCoil = getPortCoil(m_inputs[0].id, status);
     auto lastCoil = getPortCoil(m_outputs[m_outputs.size() - 1].id, status);
 
+    lock.unlock();
     if (status)
         m_client.readCoilsAsync(startCoil, lastCoil - startCoil + 1);
-}
-
-void QnAdamModbusIOManager::fetchAllPortStates()
-{
-    QnMutexLocker lock(&m_mutex);
-    fetchAllPortStatesUnsafe();
 }
 
 void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::ModbusResponse& response)
