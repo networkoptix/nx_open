@@ -203,11 +203,11 @@ namespace ec2
     {
     }
 
-    qint64 OldEcConnection::getTransactionLogTime() const {
-        return -1;
+    Timestamp OldEcConnection::getTransactionLogTime() const {
+        return Timestamp();
     }
 
-    void OldEcConnection::setTransactionLogTime(qint64 /* value */)
+    void OldEcConnection::setTransactionLogTime(Timestamp /* value */)
     {
 
     }

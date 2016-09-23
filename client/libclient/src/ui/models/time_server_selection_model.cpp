@@ -363,10 +363,12 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec)
     static const int kDoNotSuppress = -1;
     static const int kMinimalOffsetMs = 1000;
 
+    offsetMSec = qAbs(offsetMSec);
+
     if (offsetMSec < kMinimalOffsetMs)
         return QString();
 
-    return QTimeSpan(qAbs(offsetMSec)).toApproximateString(kDoNotSuppress, kFormat);
+    return QTimeSpan(offsetMSec).toApproximateString(kDoNotSuppress, kFormat);
 }
 
 bool QnTimeServerSelectionModel::sameTimezone() const {

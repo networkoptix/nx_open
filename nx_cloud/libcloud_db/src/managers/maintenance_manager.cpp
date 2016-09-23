@@ -72,7 +72,7 @@ void MaintenanceManager::onTransactionLogRead(
     const std::string& systemId,
     api::ResultCode resultCode,
     std::vector<ec2::TransactionData> serializedTransactions,
-    ::ec2::QnTranState readedUpTo,
+    ::ec2::QnTranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,
         ::ec2::ApiTransactionDataList)> completionHandler)

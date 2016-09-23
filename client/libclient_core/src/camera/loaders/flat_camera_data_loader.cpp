@@ -94,11 +94,17 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs)
 int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     auto server = qnCommon->currentServer();
     if (!server)
+    {
+        trace(lit("There is no current server, cannot send request"));
         return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
+    }
 
     auto connection = server->apiConnection();
     if (!connection)
+    {
+        trace(lit("There is no server api connection, cannot send request"));
         return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
+    }
 
     QnChunksRequestData requestData;
     requestData.resList << m_resource.dynamicCast<QnVirtualCameraResource>();

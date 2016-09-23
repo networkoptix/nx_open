@@ -894,13 +894,19 @@ bool QnBusinessRuleViewModel::isValid(int column) const
                         QnBusiness::toResources<QnCameraOutputPolicy::resource_type>(filtered));
                 case QnBusiness::PlaySoundAction:
                 case QnBusiness::PlaySoundOnceAction:
-                    return !m_actionParams.url.isEmpty()
-                        && isResourcesListValid<QnCameraAudioTransmitPolicy>(
-                            QnBusiness::toResources<QnCameraOutputPolicy::resource_type>(filtered));
+		            return !m_actionParams.url.isEmpty()
+		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+		                    QnBusiness::toResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+		                    || m_actionParams.playToClient
+		                );
+
                 case QnBusiness::SayTextAction:
-                    return !m_actionParams.sayText.isEmpty()
-                        && isResourcesListValid<QnCameraAudioTransmitPolicy>(
-                            QnBusiness::toResources<QnCameraOutputPolicy::resource_type>(filtered));
+		            return !m_actionParams.sayText.isEmpty()
+		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
+		                    QnBusiness::toResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+		                    || m_actionParams.playToClient
+		                );
+
                 case QnBusiness::ExecutePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(
                         QnBusiness::toResources<QnExecPtzPresetPolicy::resource_type>(filtered))

@@ -8,10 +8,25 @@
 #include <modbus/modbus_async_client.h>
 #include <modbus/modbus_client.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
+#include <utils/common/safe_direct_connection.h>
 
-class QnAdamModbusIOManager: public QObject, public QnAbstractIOManager
+class QnAdamModbusIOManager:
+    public QObject,
+    public Qn::EnableSafeDirectConnection,
+    public QnAbstractIOManager
 {
     Q_OBJECT
+
+    struct PortStateChangeInfo
+    {
+        PortStateChangeInfo(nx_io_managment::IOPortState _state, bool _isChanged):
+            state(_state),
+            isChanged(_isChanged)
+        {}
+
+        nx_io_managment::IOPortState state;
+        bool isChanged;
+    };
 
     struct DebouncedValue
     {
@@ -56,9 +71,10 @@ private:
     bool initializeIO();
 
     void fetchAllPortStates();
+    void fetchAllPortStatesUnsafe();
 
     void processAllPortStatesResponse(const nx::modbus::ModbusMessage& response);
-    void updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
+    PortStateChangeInfo updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
     void setDebounceForPort(const QString& portId, bool portState);
     QnIOStateDataList getDebouncedStates() const;
 

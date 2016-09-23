@@ -59,7 +59,7 @@ public:
     typedef QnVirtualCameraResource resource_type;
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static QString getText(const QnResourceList &resources, const bool detailed = true);
-    static inline bool emptyListIsValid() { return true; }
+    static inline bool emptyListIsValid() { return false; }
     static bool multiChoiceListIsValid() { return true; }
 };
 
@@ -81,13 +81,15 @@ static bool isResourcesListValid(const QnResourceList& resources)
 {
     typedef typename CheckingPolicy::resource_type ResourceType;
 
-    QnSharedResourcePointerList<ResourceType> filtered = resources.filtered<ResourceType>();
+    auto filtered = resources.filtered<ResourceType>();
+
     if (filtered.isEmpty())
         return CheckingPolicy::emptyListIsValid();
-    else if (filtered.size() > 1 && !CheckingPolicy::multiChoiceListIsValid())
+
+    if (filtered.size() > 1 && !CheckingPolicy::multiChoiceListIsValid())
         return false;
 
-    foreach(const QnSharedResourcePointer<ResourceType> &resource, filtered)
+    for (const auto& resource: filtered)
         if (!CheckingPolicy::isResourceValid(resource))
             return false;
     return true;
@@ -140,7 +142,7 @@ public:
 
     bool isMultiChoiceAllowed() const override
     {
-        return CheckingPolicy::multiChoiceListIsValid();
+    static inline bool emptyListIsValid() { return true; }
     }
 
 private:

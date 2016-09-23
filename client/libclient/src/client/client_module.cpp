@@ -216,8 +216,14 @@ void QnClientModule::initDesktopCamera(QGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     QnDesktopResourceSearcher* desktopSearcher(new QnDesktopResourceSearcher(window));
+    desktopSearcher->setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher);
     qnCommon->store<QnDesktopResourceSearcher>(desktopSearcher);
+}
+
+void QnClientModule::startLocalSearchers()
+{
+    QnResourceDiscoveryManager::instance()->start();
 }
 
 void QnClientModule::initMetaInfo()
@@ -584,7 +590,6 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start();
 
     qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
     qnCommon->store<QnClientResourceProcessor>(resourceProcessor);

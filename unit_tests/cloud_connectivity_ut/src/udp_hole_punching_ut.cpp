@@ -65,7 +65,7 @@ private:
 
         //registering server in mediator
         m_system = mediator().addRandomSystem();
-        m_server = mediator().addRandomServer(m_system, false);
+        m_server = mediator().addRandomServer(m_system, boost::none, false);
         ASSERT_NE(nullptr, m_server);
 
         SocketGlobals::mediatorConnector().setSystemCredentials(

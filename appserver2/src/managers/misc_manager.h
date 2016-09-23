@@ -27,7 +27,7 @@ namespace ec2
         virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) override;
 
     protected:
-        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) override;
+        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

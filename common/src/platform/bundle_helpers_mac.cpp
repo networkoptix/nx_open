@@ -1,5 +1,8 @@
-
 #include "bundle_helpers_mac.h"
+
+#if defined(Q_OS_MACX)
+
+#include <ApplicationServices/ApplicationServices.h>
 
 #include <platform/core_foundation_mac/cf_url.h>
 #include <platform/core_foundation_mac/cf_string.h>
@@ -11,6 +14,48 @@ const auto kHiDpiSupportTag = cf::QnCFString(lit("NSHighResolutionCapable"));
 
 const auto kAppCalssAplicationValue = lit("NSApplication");
 
+}
+
+bool QnBundleHelpers::isHiDpiSupported()
+{
+    uint32_t displaysCount = 0;
+    if (CGGetOnlineDisplayList(0, nullptr, &displaysCount) != kCGErrorSuccess)
+        return true;
+
+    typedef QVector<CGDirectDisplayID> DisplayIDs;
+    DisplayIDs displayIDs(displaysCount, CGDirectDisplayID());
+    if (CGGetOnlineDisplayList(displaysCount, displayIDs.data(), nullptr) != kCGErrorSuccess)
+        return true;
+
+    typedef QVector<int> WidthsVector;
+
+    WidthsVector displayWidths;
+    for (const auto id: displayIDs)
+    {
+        typedef cf::QnCFRefHolder<CFArrayRef> ArrayType;
+        ArrayType modes(CGDisplayCopyAllDisplayModes(id, nullptr));
+        if (!modes.ref())
+            continue;
+
+        // TODO: #ynikitenkov add QnCFArray class
+        const auto modesCount = CFArrayGetCount(modes.ref());
+        if (modesCount < 0)
+            continue;
+
+        for (auto i = 0; i != modesCount; ++i)
+        {
+            auto modeHandle = const_cast<CGDisplayModeRef>(
+                static_cast<const CGDisplayMode*>(CFArrayGetValueAtIndex(modes.ref(), i)));
+            if (!modeHandle)
+                continue;
+
+            static const auto kFullHDWidth = 1920;
+            if (CGDisplayModeGetWidth(modeHandle) > kFullHDWidth)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -44,3 +89,5 @@ bool QnBundleHelpers::isInHiDpiMode(const QString& path)
 
     return static_cast<bool>(CFBooleanGetValue(isHiDpiRef.ref()));
 }
+
+#endif // defined(Q_OS_MACX)

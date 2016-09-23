@@ -126,6 +126,9 @@ public:
     int keepAliveProbeCount() const;
 
     void doOutgoingConnect(const QUrl& remotePeerUrl);
+    /**
+     * \note This method is non-blocking if called within internal socket's aio thread.
+     */
     void close();
 
     // these getters/setters are using from a single thread

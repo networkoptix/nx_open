@@ -52,11 +52,6 @@ TransactionTransport::TransactionTransport(
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
     m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = remotePeer.id;
 
-    //m_transactionLogReader->setOnUbjsonTransactionReady(
-    //    std::bind(&TransactionTransport::addTransportHeaderToUbjsonTransaction, this, _1));
-    //m_transactionLogReader->setOnJsonTransactionReady(
-    //    std::bind(&TransactionTransport::addTransportHeaderToJsonTransaction, this, _1));
-
     nx::network::aio::BasicPollable::bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
     setState(ReadyForStreaming);
@@ -84,16 +79,18 @@ TransactionTransport::~TransactionTransport()
 
 void TransactionTransport::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
-    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    // Implementation should be done in ::ec2::QnTransactionTransportBase.
+    NX_CRITICAL(false);
 
-    //implementation should be done in ::ec2::QnTransactionTransportBase
-    //NX_ASSERT(false);
-    //socket->bindToAioThread(aioThread);
-    //m_transactionLogReader->bindToAioThread(aioThread);
+    nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+    m_transactionLogReader->bindToAioThread(aioThread);
+
+    //socket()->bindToAioThread(aioThread);
 }
 
 void TransactionTransport::stopWhileInAioThread()
 {
+    close();
     m_transactionLogReader.reset();
 }
 
@@ -270,6 +267,9 @@ void TransactionTransport::onStateChanged(
 {
     NX_CRITICAL(isInSelfAioThread());
 
+    if (m_closed)
+        return; //< Not reporting multiple close events.
+
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
@@ -362,16 +362,6 @@ void TransactionTransport::enableOutputChannel()
         sendTransaction(std::move(tranSyncDone), std::move(transportHeader));
     }
 }
-
-//void TransactionTransport::addTransportHeaderToUbjsonTransaction(
-//    nx::Buffer* const ubjsonTransaction)
-//{
-//}
-//
-//void TransactionTransport::addTransportHeaderToJsonTransaction(
-//    QJsonObject* /*jsonTransaction*/)
-//{
-//}
 
 } // namespace ec2
 } // namespace cdb

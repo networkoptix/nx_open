@@ -178,11 +178,14 @@ bool DirectEndpointConnector::verifyHostResponse(
         return false;
     }
 
-    if (m_targetHostAddress.host.toString().indexOf(moduleInformation.cloudSystemId) == -1)
+    const auto actualHostName = 
+        moduleInformation.id.toSimpleString() + "."
+        + moduleInformation.cloudSystemId;
+
+    if (!actualHostName.endsWith(m_targetHostAddress.host.toString()))
     {
-        NX_LOGX(lm("cross-nat %1. Received unexpected cloud system id %2 from %3")
-            .arg(m_connectSessionId).arg(moduleInformation.cloudSystemId)
-            .str(httpClient->url()),
+        NX_LOGX(lm("cross-nat %1. Connected to a wrong server (%2) instead of %3")
+            .arg(m_connectSessionId).arg(actualHostName).str(m_targetHostAddress.host),
             cl_logDEBUG2);
         return false;
     }

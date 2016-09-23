@@ -7,26 +7,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-
 namespace nx_http {
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorClass,
-    (FusionRequestErrorClass::noError, "noError")
-    (FusionRequestErrorClass::badRequest, "badRequest")
-    (FusionRequestErrorClass::unauthorized, "unauthorized")
-    (FusionRequestErrorClass::logicError, "logicError")
-    (FusionRequestErrorClass::ioError, "ioError")
-    (FusionRequestErrorClass::internalError, "internalError")
-    )
-
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorDetail,
-    (FusionRequestErrorDetail::ok, "ok")
-    (FusionRequestErrorDetail::responseSerializationError, "responseSerializationError")
-    (FusionRequestErrorDetail::deserializationError, "deserializationError")
-    (FusionRequestErrorDetail::notAcceptable, "notAcceptable")
-    )
-
 
 FusionRequestResult::FusionRequestResult()
 :
@@ -100,4 +81,21 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-}
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, FusionRequestErrorClass,
+    (nx_http::FusionRequestErrorClass::noError, "noError")
+    (nx_http::FusionRequestErrorClass::badRequest, "badRequest")
+    (nx_http::FusionRequestErrorClass::unauthorized, "unauthorized")
+    (nx_http::FusionRequestErrorClass::logicError, "logicError")
+    (nx_http::FusionRequestErrorClass::ioError, "ioError")
+    (nx_http::FusionRequestErrorClass::internalError, "internalError")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, FusionRequestErrorDetail,
+    (nx_http::FusionRequestErrorDetail::ok, "ok")
+    (nx_http::FusionRequestErrorDetail::responseSerializationError, "responseSerializationError")
+    (nx_http::FusionRequestErrorDetail::deserializationError, "deserializationError")
+    (nx_http::FusionRequestErrorDetail::notAcceptable, "notAcceptable")
+)
+
+} // namespace nx_http

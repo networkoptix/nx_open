@@ -22,6 +22,12 @@
 namespace nx {
 namespace cdb {
 
+struct AccountWithPassword
+{
+    api::AccountData data;
+    std::string password;
+};
+
 class CdbLauncher
 :
     public utils::test::ModuleLauncher<CloudDBProcessPublic>
@@ -91,6 +97,11 @@ public:
         const std::string& password,
         const std::string& systemID,
         std::vector<api::SystemDataEx>* const systems);
+    api::ResultCode getSystem(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemID,
+        api::SystemDataEx* const system);
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,

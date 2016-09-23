@@ -539,7 +539,7 @@ bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManage
 
 bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
 {
-    if( dbManager->connectionOptions().driverName != lit("QSQLITE") )
+    if( dbManager->connectionOptions().driverType != nx::db::RdbmsDriverType::sqlite )
         return true;
 
     std::promise<nx::db::DBResult> cacheFilledPromise;
@@ -617,6 +617,8 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddSystemTransactionLog);
     dbStructureUpdater.addUpdateScript(db::kChangeTransactionLogTimestampTypeToBigInt);
     dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
+    dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
+    dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
     return dbStructureUpdater.updateStructSync();
 }
 

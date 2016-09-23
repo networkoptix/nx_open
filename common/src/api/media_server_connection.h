@@ -266,6 +266,21 @@ protected:
     virtual QnAbstractReplyProcessor* newReplyProcessor(int object) override;
     virtual bool isReady() const override;
 
+    int sendAsyncGetRequestLogged(
+        int object,
+        const QnRequestParamList& params,
+        const char* replyTypeName,
+        QObject* target,
+        const char* slot);
+
+    int sendAsyncPostRequestLogged(
+        int object,
+        nx_http::HttpHeaders headers,
+        const QnRequestParamList& params,
+        const QByteArray& data,
+        const char* replyTypeName,
+        QObject* target,
+        const char* slot);
 private:
     QString m_proxyAddr;
     int m_proxyPort;

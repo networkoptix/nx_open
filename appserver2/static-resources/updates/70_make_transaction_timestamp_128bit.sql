@@ -1,0 +1,1 @@
+ALTER TABLE transaction_log ADD COLUMN "timestamp_hi" BIGINT DEFAULT 0;

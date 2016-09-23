@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="collect_log">Capturar Log</string>
+    <string name="acquiring_log_progress_dialog_message">A obter o Log do sistema &#8230;</string>
+    <string name="chooser_title">"Seleccionar uma aplicação para enviar o Log"</string>
+    <string name="failed_to_get_log_message">"Falha ao tentar obter o log do sistema."</string>
+    <string name="main_dialog_text">"Esta aplicação vai tentar obter o Log do dispositivo.
+	O Log obtido será enviado através de uma aplicação à sua escolha.
+	Terá também a oportunidade de ver e alterar os dados que serão enviados."
+    </string>  
+</resources>
