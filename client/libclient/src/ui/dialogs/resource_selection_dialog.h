@@ -1,5 +1,4 @@
-#ifndef SELECT_CAMERAS_DIALOG_H
-#define SELECT_CAMERAS_DIALOG_H
+#pragma once
 
 #include <QtCore/QModelIndex>
 
@@ -16,30 +15,31 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
-    class ResourceSelectionDialog;
+class ResourceSelectionDialog;
 }
 
 class QnResourceTreeModel;
 class QnCameraThumbnailManager;
 
-class QnResourceSelectionDialog : public QnSessionAwareButtonBoxDialog {
+class QnResourceSelectionDialog: public QnSessionAwareButtonBoxDialog
+{
     Q_OBJECT
-    typedef QnSessionAwareButtonBoxDialog base_type;
 
+    using base_type = QnSessionAwareButtonBoxDialog;
 public:
-    enum SelectionTarget {
-        CameraResourceTarget,
-        UserResourceTarget
+    enum class Filter
+    {
+        cameras,
+        users
     };
 
-    explicit QnResourceSelectionDialog(SelectionTarget target, QWidget *parent = NULL);
-    explicit QnResourceSelectionDialog(QWidget *parent = NULL);
+    explicit QnResourceSelectionDialog(Filter filter, QWidget* parent = nullptr);
     ~QnResourceSelectionDialog();
 
     QnResourceList selectedResources() const;
     void setSelectedResources(const QnResourceList &selected);
 
-    QnResourceSelectionDialogDelegate *delegate() const;
+    QnResourceSelectionDialogDelegate* delegate() const;
     void setDelegate(QnResourceSelectionDialogDelegate* delegate);
 
 protected:
@@ -48,20 +48,20 @@ protected:
     QnResourceList selectedResourcesInner(const QModelIndex &parent = QModelIndex()) const;
     int setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent = QModelIndex());
 
-private slots:
+    private slots:
     void at_resourceModel_dataChanged();
 
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
+
 private:
     void initModel();
+
 private:
     QScopedPointer<Ui::ResourceSelectionDialog> ui;
-    QnResourceTreeModel *m_resourceModel;
+    QnResourceTreeModel* m_resourceModel;
     QnResourceSelectionDialogDelegate* m_delegate;
-    SelectionTarget m_target;
+    Filter m_filter;
 
     bool m_updating;
 };
-
-#endif // SELECT_CAMERAS_DIALOG_H

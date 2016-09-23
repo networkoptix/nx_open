@@ -509,7 +509,7 @@ void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
 
 void QnEventLogDialog::at_cameraButton_clicked()
 {
-    QnResourceSelectionDialog dialog(this);
+    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this);
     dialog.setSelectedResources(m_filterCameraList);
 
     if (dialog.exec() == QDialog::Accepted)

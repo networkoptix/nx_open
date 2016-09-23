@@ -1127,7 +1127,8 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
     bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
     bool hasVideo = boost::algorithm::all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
 
-    QScopedPointer<QnResourceSelectionDialog> dialog(new QnResourceSelectionDialog(this));
+    QScopedPointer<QnResourceSelectionDialog> dialog(
+        new QnResourceSelectionDialog(QnResourceSelectionDialog::Filter::cameras, this));
     auto dialogDelegate = new QnExportScheduleResourceSelectionDialogDelegate(this, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);
     dialog->setDelegate(dialogDelegate);
     dialog->setSelectedResources(m_cameras);

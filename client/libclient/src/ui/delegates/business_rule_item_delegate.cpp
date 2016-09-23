@@ -34,7 +34,7 @@ namespace {
 QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
     base_type(parent),
     m_dialogDelegate(NULL),
-    m_target(QnResourceSelectionDialog::CameraResourceTarget)
+    m_target(QnResourceSelectionDialog::Filter::cameras)
 {
     connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
@@ -58,11 +58,11 @@ void QnSelectResourcesDialogButton::setDialogDelegate(QnResourceSelectionDialogD
     m_dialogDelegate = delegate;
 }
 
-QnResourceSelectionDialog::SelectionTarget  QnSelectResourcesDialogButton::selectionTarget() const {
+QnResourceSelectionDialog::Filter  QnSelectResourcesDialogButton::selectionTarget() const {
     return m_target;
 }
 
-void QnSelectResourcesDialogButton::setSelectionTarget(QnResourceSelectionDialog::SelectionTarget target) {
+void QnSelectResourcesDialogButton::setSelectionTarget(QnResourceSelectionDialog::Filter target) {
     m_target = target;
 }
 
@@ -198,7 +198,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         else if (actionType == QnBusiness::SendMailAction)
         {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(btn));
-            btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
+            btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
         }
         else if (actionType == QnBusiness::PlaySoundAction ||
             actionType == QnBusiness::PlaySoundOnceAction ||

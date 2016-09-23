@@ -367,11 +367,7 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
 
 void QnSearchBookmarksDialogPrivate::chooseCamera()
 {
-    /// Do not allow user without administrator privileges to choose cameras
-//     if (!currentUserHasAllCameras())
-//         return;
-
-    QnResourceSelectionDialog dialog(m_owner);
+    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, m_owner);
     dialog.setSelectedResources(m_allCamerasChoosen
         ? QnVirtualCameraResourceList() : m_model->cameras());
 

@@ -399,7 +399,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog dialog(this); //TODO: #GDM #Business or servers?
+    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this); //TODO: #GDM #Business or servers?
 
     QnBusiness::EventType eventType = m_model->eventType();
     if (eventType == QnBusiness::CameraMotionEvent)
@@ -418,11 +418,11 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog::SelectionTarget target;
+    QnResourceSelectionDialog::Filter target;
     if (QnBusiness::requiresCameraResource(m_model->actionType()))
-        target = QnResourceSelectionDialog::CameraResourceTarget;
+        target = QnResourceSelectionDialog::Filter::cameras;
     else if (QnBusiness::requiresUserResource(m_model->actionType()))
-        target = QnResourceSelectionDialog::UserResourceTarget;
+        target = QnResourceSelectionDialog::Filter::users;
     else
         return;
 

@@ -26,8 +26,8 @@ public:
     QnResourceSelectionDialogDelegate* dialogDelegate() const;
     void setDialogDelegate(QnResourceSelectionDialogDelegate* delegate);
 
-    QnResourceSelectionDialog::SelectionTarget selectionTarget() const;
-    void setSelectionTarget(QnResourceSelectionDialog::SelectionTarget target);
+    QnResourceSelectionDialog::Filter selectionTarget() const;
+    void setSelectionTarget(QnResourceSelectionDialog::Filter target);
 signals:
     void commit();
 
@@ -40,7 +40,7 @@ private slots:
 private:
     QnResourceList m_resources;
     QnResourceSelectionDialogDelegate* m_dialogDelegate;
-    QnResourceSelectionDialog::SelectionTarget m_target;
+    QnResourceSelectionDialog::Filter m_target;
 };
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware {

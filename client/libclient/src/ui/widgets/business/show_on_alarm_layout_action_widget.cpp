@@ -63,7 +63,7 @@ void QnShowOnAlarmLayoutActionWidget::selectUsers() {
     if (!model() || m_updating)
         return;
 
-    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::UserResourceTarget, this);
+    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::users, this);
     dialog.setSelectedResources(usersFromIds(model()->actionParams().additionalResources));
     if (dialog.exec() != QDialog::Accepted)
         return;

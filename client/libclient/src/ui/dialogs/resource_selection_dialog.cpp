@@ -23,41 +23,41 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
-namespace
+namespace {
+
+class QnColoringProxyModel: public QIdentityProxyModel
 {
-    class QnColoringProxyModel: public QIdentityProxyModel
+public:
+    QnColoringProxyModel(QnResourceSelectionDialogDelegate* delegate, QObject *parent = 0):
+        QIdentityProxyModel(parent),
+        m_delegate(delegate)
     {
-    public:
-        QnColoringProxyModel(QnResourceSelectionDialogDelegate* delegate, QObject *parent = 0):
-            QIdentityProxyModel(parent),
-            m_delegate(delegate)
-        {}
+    }
 
-        QVariant data(const QModelIndex &proxyIndex, int role) const override
-        {
-            if (role == Qt::TextColorRole && m_delegate && !m_delegate->isValid(resource(proxyIndex)))
-                return QBrush(QColor(qnGlobals->errorTextColor()));
-            return QIdentityProxyModel::data(proxyIndex, role);
-        }
+    QVariant data(const QModelIndex &proxyIndex, int role) const override
+    {
+        if (role == Qt::TextColorRole && m_delegate && !m_delegate->isValid(resource(proxyIndex)))
+            return QBrush(QColor(qnGlobals->errorTextColor()));
+        return QIdentityProxyModel::data(proxyIndex, role);
+    }
 
-    private:
-        QnResourcePtr resource(const QModelIndex &proxyIndex) const {
-            return QIdentityProxyModel::data(proxyIndex, Qn::ResourceRole).value<QnResourcePtr>();
-        }
+private:
+    QnResourcePtr resource(const QModelIndex &proxyIndex) const
+    {
+        return QIdentityProxyModel::data(proxyIndex, Qn::ResourceRole).value<QnResourcePtr>();
+    }
 
-        QnResourceSelectionDialogDelegate* m_delegate;
-    };
-}
+    QnResourceSelectionDialogDelegate* m_delegate;
+};
 
-// -------------------------------------------------------------------------- //
-// QnResourceSelectionDialog
-// -------------------------------------------------------------------------- //
-QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWidget *parent):
+} // namespace
+
+QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* parent):
     base_type(parent),
     ui(new Ui::ResourceSelectionDialog),
     m_resourceModel(NULL),
     m_delegate(NULL),
-    m_target(target),
+    m_filter(filter),
     m_updating(false)
 {
     ui->setupUi(this);
@@ -84,22 +84,22 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWi
             ui->treeWidget->setContentsMargins(0, 0, margin, 0);
         });
 
-    switch (m_target)
+    switch (m_filter)
     {
-        case UserResourceTarget:
-            setWindowTitle(tr("Select Users..."));
+        case Filter::users:
+            setWindowTitle(tr("Select users..."));
             ui->detailsWidget->hide();
             resize(minimumSize());
             break;
 
-        case CameraResourceTarget:
+        case Filter::cameras:
             setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
                 tr("Select Devices..."),
                 tr("Select Cameras...")));
             break;
 
         default:
-            setWindowTitle(tr("Select Resources..."));
+            NX_ASSERT(false, "Should never get here");
             ui->detailsWidget->hide();
             resize(minimumSize());
             break;
@@ -108,30 +108,28 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWi
     initModel();
 }
 
-
-QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent) :
-    QnResourceSelectionDialog(CameraResourceTarget, parent)
-{}
-
 void QnResourceSelectionDialog::initModel()
 {
     QnResourceTreeModel::Scope scope;
 
-    switch (m_target) {
-    case UserResourceTarget:
-        scope = QnResourceTreeModel::UsersScope;
-        break;
-    case CameraResourceTarget:
-        scope = QnResourceTreeModel::CamerasScope;
-        break;
-    default:
-        scope = QnResourceTreeModel::FullScope;
-        break;
+    switch (m_filter)
+    {
+        case Filter::users:
+            scope = QnResourceTreeModel::UsersScope;
+            break;
+        case Filter::cameras:
+            scope = QnResourceTreeModel::CamerasScope;
+            break;
+        default:
+            NX_ASSERT(false, "Should never get here");
+            scope = QnResourceTreeModel::FullScope;
+            break;
     }
 
     m_resourceModel = new QnResourceTreeModel(scope, this);
 
-    connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
+    connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this,
+        &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
@@ -140,17 +138,25 @@ void QnResourceSelectionDialog::initModel()
     ui->resourcesWidget->treeView()->setMouseTracking(true);
     ui->resourcesWidget->itemDelegate()->setCustomInfoLevel(Qn::RI_FullInfo);
 
-    connect(ui->resourcesWidget, &QnResourceTreeWidget::beforeRecursiveOperation,   this, [this]{ m_updating = true;});
-    connect(ui->resourcesWidget, &QnResourceTreeWidget::afterRecursiveOperation,   this, [this]{
-        m_updating = false;
-        at_resourceModel_dataChanged();
-    });
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::beforeRecursiveOperation, this,
+        [this]
+        {
+            m_updating = true;
+        });
+
+    connect(ui->resourcesWidget, &QnResourceTreeWidget::afterRecursiveOperation, this,
+        [this]
+        {
+            m_updating = false;
+            at_resourceModel_dataChanged();
+        });
 
     ui->delegateFrame->setVisible(false);
 
-    if (m_target == CameraResourceTarget)
+    if (m_filter == Filter::cameras)
     {
-        connect(ui->resourcesWidget->treeView(), &QAbstractItemView::entered, this, &QnResourceSelectionDialog::updateThumbnail);
+        connect(ui->resourcesWidget->treeView(), &QAbstractItemView::entered, this,
+            &QnResourceSelectionDialog::updateThumbnail);
         updateThumbnail(QModelIndex());
     }
 
@@ -165,7 +171,7 @@ QnResourceList QnResourceSelectionDialog::selectedResources() const
     return selectedResourcesInner();
 }
 
-void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selected)
+void QnResourceSelectionDialog::setSelectedResources(const QnResourceList& selected)
 {
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
@@ -174,10 +180,11 @@ void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selec
     at_resourceModel_dataChanged();
 }
 
-QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelIndex &parent) const
+QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelIndex& parent) const
 {
     QnResourceList result;
-    for (int i = 0; i < m_resourceModel->rowCount(parent); ++i){
+    for (int i = 0; i < m_resourceModel->rowCount(parent); ++i)
+    {
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn, parent);
         if (m_resourceModel->rowCount(idx) > 0)
             result.append(selectedResourcesInner(idx));
@@ -188,37 +195,42 @@ QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelInd
             continue;
 
         QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (m_target == UserResourceTarget && resource.dynamicCast<QnUserResource>())
+        if (m_filter == Filter::users && resource.dynamicCast<QnUserResource>())
             result.append(resource);
 
-        if (m_target == CameraResourceTarget && resource.dynamicCast<QnVirtualCameraResource>())
+        if (m_filter == Filter::cameras && resource.dynamicCast<QnVirtualCameraResource>())
             result.append(resource);
     }
     return result;
 }
 
-int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent)
+int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList& selected,
+    const QModelIndex& parent)
 {
     int count = 0;
-    for (int i = 0; i < m_resourceModel->rowCount(parent); ++i) {
+    for (int i = 0; i < m_resourceModel->rowCount(parent); ++i)
+    {
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn, parent);
         QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
         bool checked = false;
 
         int childCount = m_resourceModel->rowCount(idx);
-        if (childCount > 0) {
+        if (childCount > 0)
+        {
             checked = (setSelectedResourcesInner(selected, idx) == childCount);
-        } else {
+        }
+        else
+        {
             QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
-            if ((m_target == UserResourceTarget && resource.dynamicCast<QnUserResource>())
-                    || (m_target == CameraResourceTarget && resource.dynamicCast<QnVirtualCameraResource>()))
+            if ((m_filter == Filter::users && resource.dynamicCast<QnUserResource>())
+                || (m_filter == Filter::cameras && resource.dynamicCast<QnVirtualCameraResource>()))
                 checked = selected.contains(resource);
         }
 
         if (checked)
             count++;
         m_resourceModel->setData(checkedIdx,
-                                 checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+            checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
     }
     return count;
 }
@@ -233,11 +245,12 @@ void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event)
     base_type::keyPressEvent(event);
 }
 
-void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate)
+void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate* delegate)
 {
     NX_ASSERT(!m_delegate);
     m_delegate = delegate;
-    if (m_delegate) {
+    if (m_delegate)
+    {
         m_delegate->init(ui->delegateFrame);
 
         QnColoringProxyModel* proxy = new QnColoringProxyModel(m_delegate, this);
@@ -247,6 +260,7 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *d
 
         setHelpTopic(ui->resourcesWidget->treeView(), m_delegate->helpTopicId());
     }
+
     ui->delegateFrame->setVisible(m_delegate && ui->delegateLayout->count() > 0);
     if (m_delegate && m_delegate->isFlat())
         ui->resourcesLayout->setSpacing(0);
@@ -259,16 +273,16 @@ QnResourceSelectionDialogDelegate* QnResourceSelectionDialog::delegate() const
     return m_delegate;
 }
 
-QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const
+QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint& pos) const
 {
     QAbstractItemView *treeView = ui->resourcesWidget->treeView();
-    if(!treeView->model())
+    if (!treeView->model())
         return QModelIndex();
     QPoint childPos = treeView->mapFrom(const_cast<QnResourceSelectionDialog *>(this), pos);
     return treeView->indexAt(childPos);
 }
 
-void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index)
+void QnResourceSelectionDialog::updateThumbnail(const QModelIndex& index)
 {
     QModelIndex baseIndex = index.sibling(index.row(), Qn::NameColumn);
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
@@ -281,5 +295,7 @@ void QnResourceSelectionDialog::at_resourceModel_dataChanged()
 {
     if (m_updating)
         return;
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(
+        !m_delegate || m_delegate->validate(selectedResources()));
 }

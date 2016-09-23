@@ -148,7 +148,7 @@ namespace {
 }
 
 QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
-    base_type(parent)
+    base_type(QnResourceSelectionDialog::Filter::cameras, parent)
 {
     const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Select Devices to Backup..."),

@@ -141,8 +141,8 @@ namespace {
 
 
 QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/):
-    base_type(parent)
-    , m_customColumnDelegate(new QnFailoverPriorityResourceModelDelegate(this))
+    base_type(QnResourceSelectionDialog::Filter::cameras, parent),
+    m_customColumnDelegate(new QnFailoverPriorityResourceModelDelegate(this))
 {
     setWindowTitle(tr("Failover Priority"));
     setMinimumWidth(dialogMinimumWidth);
