@@ -15,10 +15,12 @@ namespace Ui {
 
 class QnTimeServerSelectionModel;
 
-class QnTimeServerSelectionWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
+class QnTimeServerSelectionWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+{
     Q_OBJECT
+
 public:
-    QnTimeServerSelectionWidget(QWidget *parent = NULL);
+    QnTimeServerSelectionWidget(QWidget* parent = nullptr);
     virtual ~QnTimeServerSelectionWidget();
 
     virtual void loadDataToUi() override;
