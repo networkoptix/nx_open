@@ -137,6 +137,10 @@ public:
     QString cloudAuthKey() const;
     void setCloudAuthKey(const QString& value);
 
+    static const QString kNameSystemName;
+    QString systemName() const;
+    void setSystemName(const QString& value);
+
     void resetCloudParams();
 
     // -- Misc settings
@@ -168,6 +172,7 @@ public:
 signals:
     void initialized();
 
+    void systemNameChanged();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
@@ -251,6 +256,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
 
     // misc adaptors
+    QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
