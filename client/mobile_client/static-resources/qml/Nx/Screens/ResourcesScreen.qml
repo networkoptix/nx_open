@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
@@ -198,13 +198,11 @@ Page
             Text
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                height: 56
-                verticalAlignment: Qt.AlignVCenter
-
+                topPadding: 26
                 text: connectionManager.connectionState === QnConnectionManager.Connected
-                        ? qsTr("Loading...") : qsTr("Connecting...")
-                font.pixelSize: 32
-                color: ColorTheme.base13
+                    ? qsTr("Loading...") : qsTr("Connecting...")
+                font.pixelSize: 22
+                color: ColorTheme.contrast16
             }
         }
     }

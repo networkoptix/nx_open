@@ -1237,8 +1237,8 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
         businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
-        QDate date = QDateTime::currentDateTime().date();
-        businessEventsLogDialog()->setDateRange(date, date);
+        auto now = QDateTime::currentMSecsSinceEpoch();
+        businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(cameras);
         businessEventsLogDialog()->enableUpdateData();
     }
@@ -1471,7 +1471,7 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
 
     QScopedPointer<QnMediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnSessionAwareDialog<QnMediaFileSettingsDialog>(mainWindow()));
+        dialog.reset(new QnSessionAware<QnMediaFileSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
 

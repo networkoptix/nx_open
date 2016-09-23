@@ -106,6 +106,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
 
     d->tabBar = new QnLayoutTabBar(this);
+    d->tabBar->setFocusPolicy(Qt::NoFocus);
     d->tabBar->setFixedHeight(kTitleBarHeight);
     connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested, d,
         &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);

@@ -2010,7 +2010,7 @@ void MediaServerProcess::run()
         {
             connectInfo = ec2Connection->connectionInfo();
             auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
-            if (connectionResult == Qn::ConnectionResult::Success)
+            if (connectionResult == Qn::SuccessConnectionResult)
             {
                 NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
                 break;
@@ -2018,10 +2018,10 @@ void MediaServerProcess::run()
 
             switch (connectionResult)
             {
-            case Qn::ConnectionResult::IncompatibleInternal:
-            case Qn::ConnectionResult::IncompatibleCloudHost:
-            case Qn::ConnectionResult::IncompatibleVersion:
-            case Qn::ConnectionResult::IncompatibleProtocol:
+            case Qn::IncompatibleInternalConnectionResult:
+            case Qn::IncompatibleCloudHostConnectionResult:
+            case Qn::IncompatibleVersionConnectionResult:
+            case Qn::IncompatibleProtocolConnectionResult:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
                 return;
             default:

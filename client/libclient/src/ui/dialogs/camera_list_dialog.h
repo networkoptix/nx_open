@@ -19,10 +19,10 @@ namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QnSessionAwareDialog<QnDialog> {
+class QnCameraListDialog: public QnSessionAwareDialog {
     Q_OBJECT
 
-    typedef QnSessionAwareDialog<QnDialog> base_type;
+    typedef QnSessionAwareDialog base_type;
 
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL);

@@ -77,31 +77,12 @@
            <number>2</number>
           </property>
           <item>
-           <widget class="QLabel" name="versionTitleLabel">
-            <property name="text">
-             <string notr="true">&lt;available update&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="selectUpdateTypeButton">
-            <property name="minimumSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
             <property name="focusPolicy">
              <enum>Qt::TabFocus</enum>
             </property>
             <property name="text">
-             <string notr="true"/>
+             <string notr="true">&lt;Available update&gt;</string>
             </property>
             <property name="iconSize">
              <size>

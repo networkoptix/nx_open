@@ -10,19 +10,23 @@
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags)
-    : base_type(parent, windowFlags)
-    , ui(new Ui::StorageUrlDialog())
-    , m_server(server)
-    , m_protocols()
-    , m_descriptions()
-    , m_urlByProtocol()
-    , m_lastProtocol()
-    , m_storage()
-    , m_currentServerStorages()
+QnStorageUrlDialog::QnStorageUrlDialog(
+        const QnMediaServerResourcePtr& server,
+        QWidget* parent,
+        Qt::WindowFlags windowFlags) :
+
+    base_type(parent, windowFlags),
+    ui(new Ui::StorageUrlDialog()),
+    m_server(server),
+    m_protocols(),
+    m_descriptions(),
+    m_urlByProtocol(),
+    m_lastProtocol(),
+    m_storage(),
+    m_currentServerStorages()
 {
     ui->setupUi(this);
-
+    ui->urlEdit->setFocus();
     connect(ui->protocolComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_protocolComboBox_currentIndexChanged()));
 }
 

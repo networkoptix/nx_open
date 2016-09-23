@@ -49,8 +49,16 @@ QString QnAppInfo::applicationPlatformModification()
 }
 
 QString QnAppInfo::applicationCompiler()
- {
-    return QStringLiteral("${additional.compiler}");
+{
+    #if defined(__clang__)
+        return QStringLiteral("clang");
+    #elif defined(__GNUC__)
+        return QStringLiteral("gcc");
+    #elif defined(_MSC_VER)
+        return QStringLiteral("msvc");
+    #else
+        return QStringLiteral();
+    #endif
 }
 
 QString QnAppInfo::engineVersion()

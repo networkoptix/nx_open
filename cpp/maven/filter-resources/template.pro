@@ -242,9 +242,6 @@ unix: {
 linux*:!android {
   !arm {
     LIBS += ${linux.oslibs}
-    QMAKE_CXXFLAGS += ${compiler.arguments}
-    QMAKE_CFLAGS += ${compiler.arguments}
-    QMAKE_LFLAGS += ${compiler.arguments}
     !clang: {
         QMAKE_CXXFLAGS += -msse2
     } else {

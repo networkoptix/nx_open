@@ -173,6 +173,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     m_currentDetailsWidget = ui->detailsWidget;
 
+    //TODO: #GDM #3.0 fix icons
+    ui->advancedButton->setIcon(qnSkin->icon(lit("titlebar/dropdown_hovered.png")));
+    ui->eventLogButton->setIcon(qnSkin->icon(lit("tree/layout.png")));
+
     createActions();
 
     m_rulesViewModel = new QnBusinessRulesActualModel(this);

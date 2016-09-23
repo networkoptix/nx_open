@@ -10,6 +10,8 @@ Pane
     property alias title: title.text
     property alias description: description.text
     property alias buttonText: button.text
+    property alias image: image.source
+    property bool compact: height < 540
 
     signal buttonClicked()
 
@@ -25,20 +27,25 @@ Pane
 
         Column
         {
-            width: parent.width - 16
-            x: 8
-            y: (parent.height - height - (button.visible ? button.height : 0)) / 3
-            spacing: 8
+            width: parent.width
+            y: (parent.height - height) / 4
+
+            Image
+            {
+                id: image
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: !compact && status == Image.Ready
+            }
 
             Text
             {
                 id: title
                 width: parent.width
+                topPadding: 8
                 horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 26
-                font.weight: Font.Light
-                lineHeight: 1.2
-                color: ColorTheme.base15
+                font.pixelSize: 22
+                lineHeight: 1.25
+                color: ColorTheme.contrast16
                 wrapMode: Text.WordWrap
                 visible: text != ""
             }
@@ -46,11 +53,12 @@ Pane
             Text
             {
                 id: description
+                topPadding: 8
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 14
-                lineHeight: 1.2
-                color: ColorTheme.base15
+                lineHeight: 1.25
+                color: ColorTheme.base16
                 wrapMode: Text.WordWrap
                 visible: text != ""
             }
@@ -59,10 +67,10 @@ Pane
         Button
         {
             id: button
-            width: parent.width
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 8
-            padding: 8
+            anchors.bottomMargin: compact ? 32 : 64
+            anchors.horizontalCenter: parent.horizontalCenter
+            padding: 16
             onClicked: dummy.buttonClicked()
             visible: text != ""
         }

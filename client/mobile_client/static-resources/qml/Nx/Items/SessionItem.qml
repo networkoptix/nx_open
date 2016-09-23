@@ -27,7 +27,7 @@ Pane
         id: hostsModel
         systemId: control.systemId
     }
-    QnRecentUserConnectionsModel
+    QnRecentLocalConnectionsModel
     {
         id: connectionsModel
         systemName: control.systemName

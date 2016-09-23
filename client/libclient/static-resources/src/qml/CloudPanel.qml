@@ -1,5 +1,6 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
+import com.networkoptix.qml 1.0;
 
 import "."
 
@@ -19,18 +20,21 @@ Item
     width: 576;
     height: 168;
 
+    QnAppInfo
+    {
+        id: appInfo
+    }
+
     Image
     {
         id: statusImage;
 
-        width: 64;
-        height: 64;
+        width: 120;
+        height: 120;
         anchors.top: parent.top;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        source: (thisComponent.loggedIn
-            ? "qrc:/skin/welcome_page/cloud_account_logged.png"
-            : "qrc:/skin/welcome_page/cloud_account_not-logged.png");
+        source: "qrc:/skin/welcome_page/logo.png"
     }
 
     NxLabel
@@ -42,7 +46,7 @@ Item
         anchors.topMargin: 8;
         anchors.horizontalCenter: parent.horizontalCenter;
         text: (loggedIn ? thisComponent.userName
-            :  qsTr("You are not logged in to the cloud"));
+            :  qsTr("You are not logged into %1").arg(appInfo.cloudName()));
 
         color: Style.colors.text;
         font: Style.fonts.banner.userName;

@@ -2,12 +2,11 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
-namespace
-{
+namespace {
     const qreal kSharpnessEps = 0.0001;
-}
+} // namespace
 
-QTransform sharpTransform(const QTransform &transform, bool *corrected)
+QTransform sharpTransform(const QTransform& transform, bool* corrected)
 {
     /* Hand-rolled check for translation transform,
     * with lower precision than standard QTransform::type. */
@@ -32,23 +31,36 @@ QTransform sharpTransform(const QTransform &transform, bool *corrected)
     return transform;
 }
 
-void paintPixmapSharp( QPainter *painter, const QPixmap &pixmap, const QPointF &position ) {
+void paintPixmapSharp(QPainter* painter, const QPixmap& pixmap, const QPointF& position)
+{
+    const auto targetRect = QRectF(position, pixmap.size() / pixmap.devicePixelRatio());
+    paintPixmapSharp(painter, pixmap, targetRect);
+}
+
+void paintPixmapSharp(
+    QPainter* painter,
+    const QPixmap& pixmap,
+    const QRectF& rect,
+    const QRect& sourceRect)
+{
     NX_ASSERT(painter, Q_FUNC_INFO, "Painter must exist here");
     if (!painter || pixmap.isNull())
         return;
 
+    const auto srcRect = sourceRect.isValid() ? sourceRect : pixmap.rect();
+
     bool corrected = false;
     const QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
-    const QPointF roundedPosition(qRound(position.x()), qRound(position.y()));
-    const int ratio = pixmap.devicePixelRatio();
-    const auto targetRect = QRectF(roundedPosition, pixmap.size() / ratio);
+    const QPointF roundedPosition(qRound(rect.x()), qRound(rect.y()));
+    const auto targetRect = QRectF(roundedPosition, rect.size());
+
     if (corrected)
     {
         const QnScopedPainterTransformRollback rollback(painter, roundedTransform);
-        painter->drawPixmap(targetRect, pixmap, pixmap.rect());
+        painter->drawPixmap(targetRect, pixmap, srcRect);
     }
     else
     {
-        painter->drawPixmap(targetRect, pixmap, pixmap.rect());
+        painter->drawPixmap(targetRect, pixmap, srcRect);
     }
 }

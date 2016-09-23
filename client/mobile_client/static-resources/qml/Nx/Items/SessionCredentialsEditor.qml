@@ -120,7 +120,7 @@ Pane
         }
         FieldWarning
         {
-            text: LoginUtils.connectionErrorText(QnConnectionManager.Unauthorized)
+            text: LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
             width: parent.width
             opened: displayUserCredentialsError
         }
