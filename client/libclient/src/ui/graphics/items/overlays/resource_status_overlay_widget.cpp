@@ -241,6 +241,7 @@ void QnStatusOverlayWidget::setupCentralControls()
     const auto holderLayout = new QGraphicsLinearLayout(m_centralHolder);
     holderLayout->addItem(makeMaskedProxy(container, m_centralHolder));
 
+    m_centralHolder->setOpacity(0.7);
     m_centralHolder->setAcceptedMouseButtons(Qt::NoButton);
 }
 
