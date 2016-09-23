@@ -24,11 +24,10 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
 ResultCode fusionRequestResultToResultCode(nx_http::FusionRequestResult result);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ResultCode), (lexical))
 
 }   //api
 }   //cdb
 }   //nx
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::ResultCode), (lexical))
 
 #endif //NX_CDB_CLIENT_DATA_TYPES_H

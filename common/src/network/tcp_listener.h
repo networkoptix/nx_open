@@ -38,6 +38,7 @@ public:
     void waitForPortUpdated();
 
     int getPort() const;
+    SocketAddress getLocalEndpoint() const;
 
     /** Remove ownership from connection.*/
     void removeOwnership(QnLongRunnable* processor);

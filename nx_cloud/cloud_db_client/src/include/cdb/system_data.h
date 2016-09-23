@@ -1,20 +1,14 @@
-/**********************************************************
-* Sep 3, 2015
-* NetworkOptix
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef NX_CDB_SYSTEM_DATA_H
-#define NX_CDB_SYSTEM_DATA_H
-
+#include <cstdint>
 #include <string>
 #include <vector>
-
 
 namespace nx {
 namespace cdb {
 namespace api {
 
+/** Unused currently. */
 class SubscriptionData
 {
 public:
@@ -22,20 +16,25 @@ public:
     std::string systemID;
 };
 
-//!Information required to register system in cloud
+/**
+ * Information required to register system in cloud.
+ */
 class SystemRegistrationData
 {
 public:
-    //!Not unique system name
+    /** Not unique system name. */
     std::string name;
     std::string customization;
 };
 
-
-enum SystemStatus
+enum class SystemStatus
 {
+    // TODO: #ak remove "ss" prefix.
     ssInvalid = 0,
-    //!System has been bound but not a single request from that system has been received by cloud
+    /**
+     * System has been bound but not a single request from 
+     * that system has been received by cloud.
+     */
     ssNotActivated,
     ssActivated,
     ssDeleted
@@ -44,22 +43,25 @@ enum SystemStatus
 class SystemData
 {
 public:
-    //!Globally unique ID of system assigned by cloud
+    /** Globally unique ID of system assigned by cloud. */
     std::string id;
-    //!Not unique system name
+    /** Not unique system name. */
     std::string name;
     std::string customization;
-    //!Key, system uses to authenticate requests to any cloud module
+    /** Key, system uses to authenticate requests to any cloud module. */
     std::string authKey;
     std::string ownerAccountEmail;
     SystemStatus status;
-    //!a true, if cloud connection is activated for this system
+    /** \a true, if cloud connection is activated for this system. */
     bool cloudConnectionSubscriptionStatus;
+    /** MUST be used as upper 64 bits of 128-bit transaction timestamp. */
+    std::uint64_t systemSequence;
 
     SystemData()
     :
-        status(ssInvalid),
-        cloudConnectionSubscriptionStatus(true)
+        status(SystemStatus::ssInvalid),
+        cloudConnectionSubscriptionStatus(true),
+        systemSequence(0)
     {
     }
 
@@ -72,7 +74,8 @@ public:
             authKey == right.authKey &&
             ownerAccountEmail == right.ownerAccountEmail &&
             status == right.status &&
-            cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus;
+            cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus &&
+            systemSequence == right.systemSequence;
     }
 };
 
@@ -143,7 +146,9 @@ public:
     std::vector<SystemSharing> sharing;
 };
 
-/** adds account's full name to \a SystemSharing */
+/**
+ * Expands \a SystemSharing to contain account's full name.
+ */
 class SystemSharingEx
 :
     public SystemSharing
@@ -151,7 +156,7 @@ class SystemSharingEx
 public:
     SystemSharingEx() {}
 
-    /** unique account id */
+    /** Globally unique account id. */
     std::string accountID;
     std::string accountFullName;
 
@@ -206,7 +211,7 @@ class SystemDataEx
 public:
     std::string ownerFullName;
     SystemAccessRole accessRole;
-    /** permissions, account can share current system with */
+    /** Permissions, account can share current system with. */
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
 
@@ -232,8 +237,6 @@ public:
     std::vector<SystemDataEx> systems;
 };
 
-}   //api
-}   //cdb
-}   //nx
-
-#endif //NX_CDB_SYSTEM_DATA_H
+} // namespace api
+} // namespace cdb
+} // namespace nx

@@ -82,7 +82,7 @@ TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
 {
     const QByteArray testData =
         "{\"fullName\": \"a k\", \"passwordHa1\": \"5f6291102209098cf5432a415e26d002\", "
-        "\"email\": \"andreyk07@gmail.com\", \"customization\": \"default\"}";
+        "\"email\": \"abrakadabra@gmail.com\", \"customization\": \"default\"}";
 
     bool success = false;
     auto accountData = QJson::deserialized<api::AccountData>(

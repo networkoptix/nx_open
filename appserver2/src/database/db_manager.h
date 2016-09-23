@@ -596,7 +596,8 @@ namespace detail
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
-        bool upgradeSerializedTransactions();
+        bool upgradeSerializedTransactionsToV2();
+        bool upgradeSerializedTransactionsToV3();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
     private:
         QnUuid m_storageTypeId;

@@ -9,6 +9,7 @@
 #include <utils/common/optional.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
+#include <nx_ec/transaction_timestamp.h>
 #include <api/model/password_data.h>
 
 // TODO: #Elric this belongs together with server_settings
@@ -75,7 +76,6 @@ struct ConfigureSystemData : public PasswordData
         PasswordData(),
         wholeSystem(false),
         sysIdTime(0),
-        tranLogTime(0),
         port(0)
     {
     }
@@ -85,15 +85,17 @@ struct ConfigureSystemData : public PasswordData
         systemName(params.value(lit("systemName"))),
         wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
         sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
-        tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
+        //tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
         port(params.value(lit("port")).toInt())
     {
+        tranLogTime.sequence = params.value(lit("tranLogTimeSequence")).toULongLong();
+        tranLogTime.ticks = params.value(lit("tranLogTimeTicks")).toULongLong();
     }
 
     QString systemName;
     bool wholeSystem;
     qint64 sysIdTime;
-    qint64 tranLogTime;
+    ec2::Timestamp tranLogTime;
     int port;
     ec2::ApiMediaServerData foreignServer;
     ec2::ApiUserData foreignUser;

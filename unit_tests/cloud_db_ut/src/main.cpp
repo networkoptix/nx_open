@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_global.h>
@@ -20,7 +21,8 @@ int main(int argc, char **argv)
                 nx::cdb::CdbFunctionalTest::setTemporaryDirectoryPath(*value);
 
             nx::db::ConnectionOptions connectionOptions;
-            args.read("db/driverName", &connectionOptions.driverName);
+            QString driverName;
+            args.read("db/driverName", &driverName);
             args.read("db/hostName", &connectionOptions.hostName);
             args.read("db/port", &connectionOptions.port);
             args.read("db/name", &connectionOptions.dbName);
@@ -28,6 +30,8 @@ int main(int argc, char **argv)
             args.read("db/password", &connectionOptions.password);
             args.read("db/connectOptions", &connectionOptions.connectOptions);
             args.read("db/maxConnections", &connectionOptions.maxConnectionCount);
+            connectionOptions.driverType =
+                QnLexical::deserialized<nx::db::RdbmsDriverType>(driverName, connectionOptions.driverType);
 
             nx::cdb::CdbFunctionalTest::setDbConnectionOptions(
                 std::move(connectionOptions));

@@ -366,14 +366,16 @@ void BaseEc2Connection<QueryProcessorType>::sendRuntimeData(const ApiRuntimeData
 }
 
 template<class QueryProcessorType>
-qint64 BaseEc2Connection<QueryProcessorType>::getTransactionLogTime() const
+Timestamp BaseEc2Connection<QueryProcessorType>::getTransactionLogTime() const
 {
-    return transactionLog ? transactionLog->getTransactionLogTime() : -1;
+    NX_ASSERT(transactionLog);
+    return transactionLog ? transactionLog->getTransactionLogTime() : Timestamp();
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::setTransactionLogTime(qint64 value)
+void BaseEc2Connection<QueryProcessorType>::setTransactionLogTime(Timestamp value)
 {
+    NX_ASSERT(transactionLog);
     if (transactionLog)
         transactionLog->setTransactionLogTime(value);
 }

@@ -415,6 +415,18 @@ void ConnectionManager::removeExistingConnection(
     connectionIndex.erase(existingConnectionIter);
 
     TransactionTransport* existingConnectionPtr = existingConnection.get();
+    
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("Removing transaction connection %1 from %2")
+            .arg(existingConnectionPtr->connectionGuid())
+            .str(existingConnectionPtr->commonTransportHeaderOfRemoteTransaction()),
+        cl_logDEBUG1);
+
+    // ::ec2::TransactionTransportBase does not support its removal 
+    //  in signal handler, so have to remove it delayed.
+    // TODO: #ak have to ensure somehow that no events from 
+    //  connectionContext.connection are delivered.
+
     existingConnectionPtr->post(
         [existingConnection = std::move(existingConnection),
             locker = m_startedAsyncCallsCounter.getScopedIncrement()]() mutable
@@ -425,32 +437,8 @@ void ConnectionManager::removeExistingConnection(
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
-    // Always called within transport's aio thread.
-    NX_LOGX(QnLog::EC2_TRAN_LOG, 
-        lm("Removing transaction connection %1").arg(connectionId), cl_logDEBUG1);
-
     QnMutexLocker lk(&m_mutex);
-    auto& index = m_connections.get<kConnectionByIdIndex>();
-    auto iter = index.find(connectionId);
-    if (iter == index.end())
-        return; //assert?
-    ConnectionContext connectionContext;
-    index.modify(
-        iter,
-        [&connectionContext](ConnectionContext& value){ connectionContext = std::move(value); });
-    index.erase(iter);
-    lk.unlock();
-
-    // ::ec2::TransactionTransportBase does not support its removal 
-    //  in signal handler, so have to remove it delayed.
-    // TODO: #ak have to ensure somehow that no events from 
-    //  connectionContext.connection are delivered.
-    auto connectionPtr = connectionContext.connection.get();
-    connectionPtr->pleaseStop(
-        [connection = std::move(connectionContext.connection)]() mutable
-        {
-            connection.reset();
-        });
+    removeExistingConnection<kConnectionByIdIndex>(&lk, connectionId);
 }
 
 void ConnectionManager::onGotTransaction(
@@ -476,6 +464,12 @@ void ConnectionManager::onTransactionDone(
 {
     if (resultCode != api::ResultCode::ok)
     {
+        NX_LOGX(
+            QnLog::EC2_TRAN_LOG,
+            lm("Closing connection %1 due to failed transaction (result code %2)")
+                .arg(connectionId).arg(api::toString(resultCode)),
+            cl_logDEBUG1);
+
         // Closing connection in case of failure.
         QnMutexLocker lk(&m_mutex);
         removeExistingConnection<kConnectionByIdIndex, nx::String>(&lk, connectionId);
@@ -536,7 +530,9 @@ void ConnectionManager::processSpecialTransaction(
     QnMutexLocker lk(&m_mutex);
     const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
     auto connectionIter = connectionByIdIndex.find(transportHeader.connectionId);
-    NX_ASSERT(connectionIter != connectionByIdIndex.end());
+    if (connectionIter == connectionByIdIndex.end())
+        return; //< This can happen since connection destruction happens with some 
+                //  delay after connection has been removed from m_connections.
     lk.unlock();
 
     connectionIter->connection->processSpecialTransaction(

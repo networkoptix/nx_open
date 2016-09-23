@@ -81,7 +81,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} // namespace nx_http
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, FusionRequestErrorClass,
     (nx_http::FusionRequestErrorClass::noError, "noError")
@@ -98,3 +97,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx_http, FusionRequestErrorDetail,
     (nx_http::FusionRequestErrorDetail::deserializationError, "deserializationError")
     (nx_http::FusionRequestErrorDetail::notAcceptable, "notAcceptable")
 )
+
+} // namespace nx_http

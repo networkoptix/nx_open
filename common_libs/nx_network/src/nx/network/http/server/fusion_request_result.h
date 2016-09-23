@@ -65,13 +65,13 @@ public:
 bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, class FusionRequestResult*);
 void NX_NETWORK_API serialize(QnJsonContext*, const FusionRequestResult&, class QJsonValue*);
 
-} // namespace nx_http
-
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorClass)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx_http::FusionRequestErrorClass), (lexical))
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorDetail)
 //not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
 void NX_NETWORK_API serialize(const nx_http::FusionRequestErrorDetail&, QString*);
+
+} // namespace nx_http
 
 #endif  //NX_FUSION_REQUEST_RESULT_H
