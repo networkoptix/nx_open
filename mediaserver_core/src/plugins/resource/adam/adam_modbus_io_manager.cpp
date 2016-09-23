@@ -98,12 +98,8 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
 void QnAdamModbusIOManager::stopIOMonitoring()
 {
-    QnMutexLocker lock(&m_mutex);
     m_monitoringIsInProgress = false;
-
-    lock.unlock();
     TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
-    lock.relock();
 }
 
 bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isActive)
