@@ -33,8 +33,6 @@ add_executable(${PROJECT_SHORTNAME} WIN32
 target_link_libraries(${PROJECT_SHORTNAME}
   Qt5::Qml Qt5::Quick Qt5::Core Qt5::Gui Qt5::Network Ws2_32.lib glu32.lib opengl32.lib odbccp32.lib
 )
-#set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
-#cotire(${PROJECT_SHORTNAME})
 
 if (UNIX)
   install(TARGETS ${PROJECT_SHORTNAME}
