@@ -3,10 +3,10 @@
 #include <api/app_server_connection.h>
 
 #include <network/module_finder.h>
+#include <nx/network/socket_global.h>
 #include <network/direct_module_finder_helper.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_settings.h>
 
 namespace
 {
@@ -38,27 +38,8 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
             this, [this, directModuleFinderHelper]()
             {
                 QUrl url = QnAppServerConnectionFactory::url();
-
-                const bool isLocalConnection =
-                    [url]() -> bool
-                    {
-                        /*
-                        * We save only local connection to the recent list.
-                        * So, we check if last saved connection is current.
-                        * If not - it means it was connection through the cloud
-                        * and we don't save it.
-                        */
-
-                        const auto localConnections = qnClientCoreSettings->recentLocalConnections();
-                        if (localConnections.isEmpty())
-                            return false;
-
-                        return (url.host() == localConnections.first().url.host());
-                    }();
-
-                if (!isLocalConnection)
+                if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
                     return;
-
 
                 url.setPath(QString());
 
