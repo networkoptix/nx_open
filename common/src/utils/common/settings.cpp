@@ -3,7 +3,11 @@
 #include "command_line_parser.h"
 #include "app_info.h"
 
-QnSettings::QnSettings(const QString& applicationName_, const QString& moduleName_, int scope):
+QnSettings::QnSettings(
+    const QString& applicationName_,
+    const QString& moduleName_, 
+    QSettings::Scope scope)
+    :
     applicationName(applicationName_),
     moduleName(moduleName_),
     #ifdef _WIN32

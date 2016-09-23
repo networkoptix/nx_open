@@ -30,7 +30,7 @@ public:
     QnSettings(
         const QString& applicationName_,
         const QString& moduleName_,
-        int scope = QSettings::SystemScope);
+        QSettings::Scope scope = QSettings::SystemScope);
 
     void parseArgs(int argc, const char* argv[]);
     QVariant value(
