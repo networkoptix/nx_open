@@ -1571,6 +1571,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->customization = localInfo.customization;
     connectionInfo->systemName = qnCommon->localSystemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
+    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemID();
     #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif
