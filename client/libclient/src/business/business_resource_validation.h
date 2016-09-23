@@ -142,7 +142,7 @@ public:
 
     bool isMultiChoiceAllowed() const override
     {
-    static inline bool emptyListIsValid() { return true; }
+        return CheckingPolicy::multiChoiceListIsValid();
     }
 
 private:
