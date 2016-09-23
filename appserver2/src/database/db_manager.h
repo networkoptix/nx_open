@@ -583,7 +583,6 @@ namespace detail
 
         virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;
-        virtual bool afterAllUpdateActions() override;
 
         ErrorCode addCameraHistory(const ApiServerFootageData& params);
         ErrorCode removeCameraHistory(const QnUuid& serverId);

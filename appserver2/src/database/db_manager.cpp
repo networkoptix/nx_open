@@ -1290,62 +1290,46 @@ bool QnDbManager::upgradeSerializedTransactionsToV2()
     return true;
 }
 
-bool QnDbManager::afterAllUpdateActions()
-{
-    if (m_dbJustCreated)
-        return true;
-
-    return encryptKvPairs();
-}
-
 bool QnDbManager::encryptKvPairs()
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    QString queryStr = "SELECT rowid, resource_guid as resourceId, kv.value, kv.name FROM vms_kvpair";
+    QString queryStr = "SELECT rowid, value, name FROM vms_kvpair";
 
     if(!query.prepare(queryStr))
     {
-        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING );
-        false;
+        NX_LOG(lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING);
+        return false;
     }
 
-    struct TmpKvPair
+    if (!query.exec())
     {
-        int       rowid;
-        QString   name;
-        QString   value;
-    };
-    std::vector<TmpKvPair> tmpKvPairs;
+        NX_LOG(lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING);
+        return false;
+    }
+
+    QSqlQuery insQuery(m_sdb);
+    QString insQueryString = "UPDATE vms_kvpair SET value = :value WHERE rowid = :rowid";
 
     while (query.next())
     {
-        TmpKvPair kvp;
-
-        kvp.rowid  = query.value(0).toInt();
-        kvp.value  = query.value(2).toString();
-        kvp.name   = query.value(3).toString();
-
-        tmpKvPairs.push_back(kvp);
-    }
-
-    for (auto& kv : tmpKvPairs)
-    {
         bool allowed;
-        ec2::access_helpers::globalSettingsSystemOnlyFilter(Qn::UserAccessData(), kv.name, &allowed);
 
-        bool needEncrypt = !allowed || kv.name == Qn::CAMERA_CREDENTIALS_PARAM_NAME || kv.name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
-        if (needEncrypt)
+        int rowid     = query.value(0).toInt();
+        QString value = query.value(1).toString();
+        QString name  = query.value(2).toString();
+
+        ec2::access_helpers::globalSettingsSystemOnlyFilter(Qn::UserAccessData(), name, &allowed);
+
+        if (!allowed) // need encrypt
         {
-            kv.value = nx::utils::encodeHexStringFromStringAES128CBC(kv.value);
-            QSqlQuery insQuery(m_sdb);
-            QString insQueryString = "INSERT OR REPLACE INTO vms_kvpair(name, value) VALUES(:name, :value) WHERE rowid = :rowid";
+            value = nx::utils::encodeHexStringFromStringAES128CBC(value);
 
             insQuery.prepare(insQueryString);
 
-            insQuery.bindValue(":name",  kv.name);
-            insQuery.bindValue(":value", kv.value);
-            insQuery.bindValue(":rowid", kv.rowid);
+            insQuery.bindValue(":name",  name);
+            insQuery.bindValue(":value", value);
+            insQuery.bindValue(":rowid", rowid);
 
             if (!insQuery.exec())
             {
@@ -1576,6 +1560,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/70_make_transaction_timestamp_128bit.sql"))
     {
         return upgradeSerializedTransactionsToV3();
+    }
+    else if (updateName == lit(":/updates/73_encrypt_kvpairs.sql"))
+    {
+        return encryptKvPairs();
     }
 
     return true;

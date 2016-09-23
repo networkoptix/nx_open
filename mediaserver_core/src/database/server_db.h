@@ -91,7 +91,6 @@ private:
     bool migrateBusinessParamsUnderTransaction();
     bool createBookmarkTagTriggersUnderTransaction();
     bool cleanupAuditLog();
-    virtual bool afterAllUpdateActions() override { return true; }
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
