@@ -14,7 +14,6 @@
 namespace {
 
 const auto kBigStretch = 1000;
-const qreal kBaseOpacity = 0.75;
 
 QnMaskedProxyWidget* makeMaskedProxy(QWidget* source, QGraphicsItem* parentItem = nullptr)
 {
@@ -62,12 +61,12 @@ void setupButton(QPushButton& button)
     static const auto kBaseColor = QColor(qnNxStyle->mainColor(
         QnNxStyle::Colors::kContrast).darker(4));
 
-    static const auto kTextColor = toTransparent(kBaseColor, 0.5 / kBaseOpacity).name(QColor::HexArgb);
-    static const auto kHoveredTextColor = toTransparent(kBaseColor, 0.7 / kBaseOpacity).name(QColor::HexArgb);
+    static const auto kTextColor = toTransparent(kBaseColor, 0.8).name(QColor::HexArgb);
+    static const auto kHoveredTextColor = kBaseColor.name(QColor::HexArgb);
 
-    static const auto kBackground = toTransparent(kBaseColor, 0.1 / kBaseOpacity).name(QColor::HexArgb);
-    static const auto kHovered = toTransparent(kBaseColor, 0.15 / kBaseOpacity).name(QColor::HexArgb);
-    static const auto kPressed = toTransparent(kBaseColor, 0.1 / kBaseOpacity).name(QColor::HexArgb);
+    static const auto kBackground = toTransparent(kBaseColor, 0.15).name(QColor::HexArgb);
+    static const auto kHovered = toTransparent(kBaseColor, 0.2).name(QColor::HexArgb);
+    static const auto kPressed = toTransparent(kBaseColor, 0.15).name(QColor::HexArgb);
 
     const auto kStyleSheet = kStyleSheetTemplate.arg(kButtonName,
         kTextColor, kHoveredTextColor, kBackground, kHovered, kPressed);
@@ -75,40 +74,29 @@ void setupButton(QPushButton& button)
     button.setStyleSheet(kStyleSheet);
 }
 
-void setupCaptionLabel(QnWordWrappedLabel& label, bool isErrorStyle)
+void setupCaptionLabel(QLabel* label, bool isErrorStyle)
 {
-    static const auto makeFont =
-        [](int fontPixelSize)
-        {
-            QFont font;
-            font.setPixelSize(fontPixelSize);
-            font.setWeight(QFont::Light);
-            return font;
-        };
+    auto font = label->font();
+    font.setPixelSize(isErrorStyle ? 88 : 80);
+    font.setWeight(QFont::Light);
+    label->setFont(font);
 
-    static const auto kErrorFont = makeFont(88);
-    static const auto kNormalFont = makeFont(80);
-    static const auto kErrorLabelsize = 140;
-    static const auto kNormalLabelSize = 64;
-    static const auto kNormalColor = qnNxStyle->mainColor(QnNxStyle::Colors::kContrast);
-    static const auto kErrorColor = qnNxStyle->mainColor(QnNxStyle::Colors::kRed);
+    label->setAlignment(Qt::AlignCenter);
+    label->setFixedWidth(960);
+    label->setMinimumHeight(qMax(120, label->heightForWidth(label->width())));
+    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    label->setWordWrap(true);
+    label->setVisible(false);
 
-    label.setFont(isErrorStyle ? kErrorFont : kNormalFont);
-    label.setMinimumHeight(isErrorStyle ? kErrorLabelsize : kNormalLabelSize);
-    label.label()->setAlignment(Qt::AlignHCenter);
-    label.label()->setFixedWidth(960);
-    label.label()->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-    label.label()->setWordWrap(true);
-    label.setVisible(false);
-
-    setPaletteColor(&label, QPalette::WindowText,
-        (isErrorStyle ? kErrorColor : kNormalColor));
+    const auto color = isErrorStyle
+        ? qnNxStyle->mainColor(QnNxStyle::Colors::kRed)
+        : qnNxStyle->mainColor(QnNxStyle::Colors::kContrast);
+    setPaletteColor(label, QPalette::WindowText, color);
 }
 
-}
+} // namespace
 
-QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
-    :
+QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     base_type(parent),
 
     m_visibleControls(Control::kNoControl),
@@ -124,12 +112,12 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
     m_imageItem(new QGraphicsPixmapItem(this)),
 
     m_centralAreaImage(new QLabel()),
-    m_caption(new QnWordWrappedLabel()),
+    m_caption(new QLabel()),
 
     m_button(new QPushButton()),
     m_description(new QnWordWrappedLabel())
 {
-    setOpacity(kBaseOpacity);
+    setAutoFillBackground(true);
     setAcceptedMouseButtons(Qt::NoButton);
 
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
@@ -176,7 +164,7 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
 void QnStatusOverlayWidget::setIconOverlayPixmap(const QPixmap& pixmap)
 {
     m_imageItem.setPixmap(pixmap);
-     updateAreasSizes();
+    updateAreasSizes();
 }
 
 void QnStatusOverlayWidget::setIcon(const QPixmap& pixmap)
@@ -194,13 +182,14 @@ void QnStatusOverlayWidget::setErrorStyle(bool isErrorStyle)
 
     m_errorStyle = isErrorStyle;
 
-    setupCaptionLabel(*m_caption, isErrorStyle);
+    setupCaptionLabel(m_caption, isErrorStyle);
     updateAreasSizes();
 }
 
 void QnStatusOverlayWidget::setCaption(const QString& caption)
 {
     m_caption->setText(caption);
+    setupCaptionLabel(m_caption, m_errorStyle);
     updateAreasSizes();
 }
 
@@ -232,37 +221,26 @@ void QnStatusOverlayWidget::setupPreloader()
 
 void QnStatusOverlayWidget::setupCentralControls()
 {
-    m_centralAreaImage->setAlignment(Qt::AlignHCenter);
-    m_centralAreaImage->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    m_centralAreaImage->setScaledContents(true);
     m_centralAreaImage->setVisible(false);
+    setupCaptionLabel(m_caption, m_errorStyle);
 
-    setupCaptionLabel(*m_caption, m_errorStyle);
+    const auto container = new QWidget();
+    setPaletteColor(container, QPalette::Window, Qt::transparent);
 
-    //
+    const auto layout = new QVBoxLayout(container);
+    layout->setContentsMargins(16, 60, 16, 60);
+    layout->setSpacing(0);
 
-    const auto centralLayout = new QVBoxLayout();
-    centralLayout->addStretch(kBigStretch);
-    centralLayout->addSpacing(60);
-    centralLayout->addWidget(m_centralAreaImage);
-    centralLayout->addWidget(m_caption);
-    centralLayout->addSpacing(60);
-    centralLayout->addStretch(kBigStretch);
+    layout->addStretch(1);
+    layout->addWidget(m_centralAreaImage, 0, Qt::AlignHCenter);
+    layout->addWidget(m_caption, 0, Qt::AlignHCenter);
+    layout->addStretch(1);
 
-    centralLayout->setAlignment(m_centralAreaImage, Qt::AlignCenter);
-    centralLayout->setAlignment(m_caption, Qt::AlignCenter);
+    layout->setSizeConstraint(QLayout::SetMinimumSize);
 
-    //
+    const auto holderLayout = new QGraphicsLinearLayout(m_centralHolder);
+    holderLayout->addItem(makeMaskedProxy(container, m_centralHolder));
 
-    const auto holder = new QWidget();
-    holder->setLayout(centralLayout);
-    const auto proxy = makeMaskedProxy(holder);
-
-    const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->addItem(proxy);
-    layout->setAlignment(proxy, Qt::AlignCenter);
-
-    m_centralHolder->setLayout(layout);
     m_centralHolder->setAcceptedMouseButtons(Qt::NoButton);
 }
 
@@ -347,10 +325,8 @@ void QnStatusOverlayWidget::updateAreasSizes()
             extrasHeight = quater;
     }
 
-    m_preloaderHolder->setPos(0, 0);
     m_preloaderHolder->setFixedSize(rect.size());
 
-    m_centralHolder->setPos(0, 0);
     m_centralHolder->setFixedSize(QSizeF(rect.width(), height - extrasHeight));
 
     const bool showCentralArea = (!m_visibleControls.testFlag(Control::kPreloader)

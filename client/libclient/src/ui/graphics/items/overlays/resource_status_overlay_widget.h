@@ -69,7 +69,7 @@ private:
 
     // Central area
     QLabel* m_centralAreaImage;
-    QnWordWrappedLabel* m_caption;
+    QLabel* m_caption;
 
     // Extras
     QPushButton* const m_button;

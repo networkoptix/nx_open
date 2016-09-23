@@ -476,7 +476,7 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "dark4.setAlpha(77)",
+            "window": "dark5.setAlpha(230)",
             "windowText": "#801010c0"
         }}
     },
