@@ -43,11 +43,13 @@ EMailManager::EMailManager( const conf::Settings& settings ) throw(std::runtime_
         [&endpointPromise, this](
             nx_http::StatusCode::Value resCode,
             SocketAddress endpoint)
-    {
-        endpointPromise.set_value(resCode);
-        m_notificationModuleEndpoint = std::move(endpoint);
-    });
-    if (endpointFuture.get() != nx_http::StatusCode::ok)
+        {
+            endpointPromise.set_value(resCode);
+            m_notificationModuleEndpoint = std::move(endpoint);
+        });
+    const auto result = endpointFuture.get();
+    endPointFetcher.pleaseStopSync();
+    if (result != nx_http::StatusCode::ok)
         throw std::runtime_error("Failed to find out notification module address");
 }
 

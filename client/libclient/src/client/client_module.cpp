@@ -41,6 +41,7 @@
 #include <finders/systems_finder.h>
 #include <finders/direct_systems_finder.h>
 #include <finders/cloud_systems_finder.h>
+#include <finders/recent_local_systems_finder.h>
 
 #include <network/module_finder.h>
 #include <network/router.h>
@@ -215,8 +216,14 @@ void QnClientModule::initDesktopCamera(QGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     QnDesktopResourceSearcher* desktopSearcher(new QnDesktopResourceSearcher(window));
+    desktopSearcher->setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher);
     qnCommon->store<QnDesktopResourceSearcher>(desktopSearcher);
+}
+
+void QnClientModule::startLocalSearchers()
+{
+    QnResourceDiscoveryManager::instance()->start();
 }
 
 void QnClientModule::initMetaInfo()
@@ -472,14 +479,38 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     moduleFinder->start();
     qnCommon->store<QnModuleFinder>(moduleFinder);
 
+    enum
+    {
+        kCloudPriority,
+        kDirectFinder,
+        kRecentFinder,
+    };
+
     QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
-    QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
+
     QScopedPointer<QnCloudSystemsFinder> cloudSystemsFinder(new QnCloudSystemsFinder());
-    systemsFinder->addSystemsFinder(directSystemsFinder.data(), false);
-    systemsFinder->addSystemsFinder(cloudSystemsFinder.data(), true);
+    systemsFinder->addSystemsFinder(cloudSystemsFinder.data(), kCloudPriority);
+
+    QScopedPointer<QnDirectSystemsFinder> directSystemsFinder(new QnDirectSystemsFinder());
+    systemsFinder->addSystemsFinder(directSystemsFinder.data(), kDirectFinder);
+
+    QScopedPointer<QnRecentLocalSystemsFinder> recentLocalSystemsFinder(new QnRecentLocalSystemsFinder());
+    connect(cloudSystemsFinder.data(), &QnAbstractSystemsFinder::systemDiscovered,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemAdded);
+    connect(directSystemsFinder.data(), &QnAbstractSystemsFinder::systemDiscovered,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemAdded);
+
+    connect(cloudSystemsFinder.data(), &QnAbstractSystemsFinder::systemLost,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemRemoved);
+    connect(directSystemsFinder.data(), &QnAbstractSystemsFinder::systemLost,
+        recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemRemoved);
+
+    systemsFinder->addSystemsFinder(recentLocalSystemsFinder.data(), kRecentFinder);
+
     qnCommon->store<QnSystemsFinder>(systemsFinder.take());
     qnCommon->store<QnDirectSystemsFinder>(directSystemsFinder.take());
     qnCommon->store<QnCloudSystemsFinder>(cloudSystemsFinder.take());
+    qnCommon->store<QnRecentLocalSystemsFinder>(recentLocalSystemsFinder.take());
 
     QnRouter* router = new QnRouter(moduleFinder);
     qnCommon->store<QnRouter>(router);
@@ -559,7 +590,6 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start();
 
     qnCommon->store<QnResourceDiscoveryManager>(resourceDiscoveryManager);
     qnCommon->store<QnClientResourceProcessor>(resourceProcessor);

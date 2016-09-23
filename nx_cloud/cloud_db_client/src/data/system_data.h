@@ -32,7 +32,8 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
-#define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail)(status)(cloudConnectionSubscriptionStatus)
+#define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
+                          (status)(cloudConnectionSubscriptionStatus)(systemSequence)
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id

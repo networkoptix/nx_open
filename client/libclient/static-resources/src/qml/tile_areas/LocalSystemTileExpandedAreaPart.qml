@@ -85,7 +85,12 @@ Column
             KeyNavigation.backtab: loginTextItem;
 
             enabled: !control.isConnecting;
-        }
+            onEnabledChanged:
+            {
+                if (enabled)
+                    forceActiveFocus();
+            }
+         }
 
         NxCheckBox
         {

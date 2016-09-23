@@ -10,6 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <cdb/result_code.h>
+#include <utils/common/id.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include <transaction/transaction.h>
@@ -28,9 +29,6 @@ namespace cdb {
 namespace ec2 {
 
 class OutgoingTransactionDispatcher;
-
-// TODO: #ak this constant should be stored in DB and generated 
-static const QnUuid kDbInstanceGuid("{dfd33cce-92e5-48e4-ab7e-d4f164b2a94e}");
 
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
@@ -74,6 +72,14 @@ public:
         const nx::String& systemId,
         nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(QSqlDatabase*, nx::db::DBResult)> onDbUpdateCompleted);
+
+    /**
+     * \note This call should be made only once when generating first transaction.
+     */
+    nx::db::DBResult updateTimestampHiForSystem(
+        QSqlDatabase* connection,
+        const nx::String& systemId,
+        quint64 newValue);
 
     /** 
      * If transaction is not needed (it can be late or something), 
@@ -131,7 +137,7 @@ public:
         transaction.command = static_cast<::ec2::ApiCommand::Value>(TransactionCommandValue);
         transaction.peerID = m_peerId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
-        transaction.persistentInfo.dbID = kDbInstanceGuid;
+        transaction.persistentInfo.dbID = guidFromArbitraryData(systemId);
         transaction.persistentInfo.sequence = tranSequence;
         transaction.persistentInfo.timestamp =
             generateNewTransactionTimestamp(connection, systemId);
@@ -195,7 +201,7 @@ private:
     struct UpdateHistoryData
     {
         ::ec2::QnTranStateKey updatedBy;
-        qint64 timestamp;
+        ::ec2::Timestamp timestamp;
 
         //UpdateHistoryData():
         //    timestamp(0)
@@ -219,8 +225,9 @@ private:
         /** map<peer, transport sequence> */
         std::map<::ec2::QnTranStateKey, int> lastTransportSeq;
         ::ec2::QnTranState transactionState;
+        std::uint64_t timestampSequence;
 
-        //VmsTransactionLogData(): persistentSequence(0) {}
+        VmsTransactionLogData(): timestampSequence(0) {}
     };
 
     struct DbTransactionContext
@@ -290,7 +297,7 @@ private:
     int generateNewTransactionSequence(
         QSqlDatabase* connection,
         const nx::String& systemId);
-    qint64 generateNewTransactionTimestamp(
+    ::ec2::Timestamp generateNewTransactionTimestamp(
         QSqlDatabase* connection,
         const nx::String& systemId);
     void onDbTransactionCompleted(

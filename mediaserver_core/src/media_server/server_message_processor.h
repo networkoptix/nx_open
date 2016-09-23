@@ -23,6 +23,7 @@ public:
     virtual void updateResource(const QnResourcePtr &resource) override;
     void registerProxySender(QnUniversalTcpListener* tcpListener);
 
+    void startReceivingLocalNotifications(const ec2::AbstractECConnectionPtr &connection);
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;

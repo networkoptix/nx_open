@@ -52,6 +52,7 @@ public:
     /** Attaches to a local port and */
     bool start();
     nx::String serverId() const;
+    void setServerId(nx::String serverId);
     /** returns serverId.systemId */
     nx::String fullName() const;
     /** Server endpoint */
@@ -70,6 +71,11 @@ public:
         std::function<ActionToTake(api::ConnectionRequestedEvent)> handler);
     void setConnectionAckResponseHandler(
         std::function<ActionToTake(api::ResultCode)> handler);
+
+    void setCloudSystemIdForModuleInformation(
+        boost::optional<nx::String> cloudSystemId);
+    void setServerIdForModuleInformation(
+        boost::optional<nx::String> serverId);
 
     nx::hpm::api::ResultCode updateTcpAddresses(std::list<SocketAddress> addresses);
 
@@ -92,6 +98,8 @@ private:
     ActionToTake m_action;
     const int m_cloudConnectionMethodMask;
     std::unique_ptr<network::cloud::MediatorAddressPublisher> m_mediatorAddressPublisher;
+    boost::optional<nx::String> m_cloudSystemIdForModuleInformation;
+    boost::optional<nx::String> m_serverIdForModuleInformation;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);

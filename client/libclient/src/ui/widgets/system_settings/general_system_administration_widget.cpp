@@ -187,7 +187,7 @@ bool QnGeneralSystemAdministrationWidget::hasChanges() const
 
 void QnGeneralSystemAdministrationWidget::retranslateUi()
 {
-    m_buttons[kBusinessRulesButton]->setText(tr("Alarm/Event Rules"));
+    m_buttons[kBusinessRulesButton]->setText(tr("Event Rules"));
     m_buttons[kEventLogButton     ]->setText(tr("Event Log"));
     m_buttons[kAuditLogButton     ]->setText(tr("Audit Trail"));
     m_buttons[kHealthMonitorButton]->setText(tr("Health Monitoring"));
@@ -206,7 +206,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     };
 
     m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(QnActions::BusinessEventsAction,
-        tr("Open Alarm/Event Rules Management")));
+        tr("Open Event Rules Management")));
 
     m_buttons[kEventLogButton]->setToolTip(shortcutString(QnActions::OpenBusinessLogAction,
         tr("Open Event Log")));

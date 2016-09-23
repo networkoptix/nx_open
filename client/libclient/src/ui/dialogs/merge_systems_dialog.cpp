@@ -252,7 +252,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
         updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
         break;
     case QnMergeSystemsTool::notLocalOwner:
-        updateErrorLabel(tr("Can't connect to the other system because current system is already attached to the cloud."));
+        updateErrorLabel(tr("Can't connect to the other system because current system is already connected to %1.").arg(QnAppInfo::cloudName()));
         break;
     case QnMergeSystemsTool::SafeModeError:
         updateErrorLabel(tr("The discovered system %1 is in safe mode.").arg(moduleInformation.systemName));
@@ -301,7 +301,8 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
             message = tr("System has an incompatible version.");
             break;
         case QnMergeSystemsTool::notLocalOwner:
-            message = tr("Taking remote settings is not allowed because system owner is cloud user.");
+            /* User type is just 'cloud'. */
+            message = tr("Taking remote settings is not allowed because system owner is cloud user."); 
             break;
         case QnMergeSystemsTool::BackupError:
             message = tr("Could not create a backup of the server database.");
@@ -319,10 +320,10 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
             message = tr("Could not configure remote system.");
             break;
         case QnMergeSystemsTool::DependentSystemBoundToCloudError:
-            message = tr("System being merged cannot be bound to the %1.").arg(QnAppInfo::cloudName());
+            message = tr("System being merged cannot be connected to %1.").arg(QnAppInfo::cloudName());
             break;
         case QnMergeSystemsTool::BothSystemBoundToCloudError:
-            message = tr("Both systems are bound to the %1. Merge is not allowed.").arg(QnAppInfo::cloudName());
+            message = tr("Both systems are connected to %1. Merge is not allowed.").arg(QnAppInfo::cloudName());
             break;
         case QnMergeSystemsTool::differentCloudHostError:
             message = tr("These systems are built with different %1 URL. Merge is not allowed.").arg(QnAppInfo::cloudName());

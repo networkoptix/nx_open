@@ -251,8 +251,7 @@ angular.module('webadminApp')
                 });
             },
             systemCloudInfo:function(){
-                var deferred = $q.defer();
-                this.getSystemSettings().then(function(data){
+                return this.getSystemSettings().then(function(data){
 
                     var allSettings = data.data;
                     var cloudId = _.find(allSettings, function (setting) {
@@ -261,8 +260,7 @@ angular.module('webadminApp')
                     var cloudSystemID = cloudId ? cloudId.value : '';
 
                     if (cloudSystemID.trim() === '' || cloudSystemID === '{00000000-0000-0000-0000-000000000000}') {
-                        deferred.reject(null);
-                        return;
+                        return $q.reject(null);
                     }
 
                     var cloudAccount = _.find(allSettings, function (setting) {
@@ -270,12 +268,11 @@ angular.module('webadminApp')
                     });
                     cloudAccount = cloudAccount ? cloudAccount.value : '';
 
-                    deferred.resolve({
+                    return{
                         cloudSystemID:cloudSystemID,
                         cloudAccountName: cloudAccount
-                    });
+                    };
                 });
-                return deferred.promise;
             },
             disconnectFromCloud:function(ownerLogin,ownerPassword){
                 var params = ownerPassword ? {

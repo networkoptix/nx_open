@@ -58,6 +58,8 @@ protected:
         bool* const result = nullptr);
     api::ResultCode fetchCloudTransactionLog(
         ::ec2::ApiTransactionDataList* const transactionList);
+    api::ResultCode fetchCloudTransactionLogFromMediaserver(
+        ::ec2::ApiTransactionDataList* const transactionList);
 
 private:
     utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> m_appserver2;
@@ -66,6 +68,9 @@ private:
     std::string m_accountPassword;
     api::SystemData m_system;
 
+    api::ResultCode fetchTransactionLog(
+        const QUrl& url,
+        ::ec2::ApiTransactionDataList* const transactionList);
     bool findAdminUserId(QnUuid* const id);
 };
 

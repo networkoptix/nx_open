@@ -73,12 +73,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     ui->gridEvents->hoverTracker()->setAutomaticMouseCursor(true);
 
-    QDate dt = QDateTime::currentDateTime().date();
-    ui->dateEditFrom->setDate(dt);
-    ui->dateEditTo->setDate(dt);
-
-    QHeaderView* headers = ui->gridEvents->horizontalHeader();
-    headers->setSectionResizeMode(QHeaderView::Fixed);
+    //ui->gridEvents->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // init events model
     {
@@ -129,8 +124,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->gridEvents->addAction(m_filterAction);
     ui->gridEvents->addAction(m_resetFilterAction);
 
-    ui->clearFilterButton->setDefaultAction(m_resetFilterAction);
-    ui->cameraButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera | QnResourceIconCache::Online));
+    ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    connect(ui->clearFilterButton, &QPushButton::clicked, this,
+        &QnEventLogDialog::reset);
+
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
     ui->loadingProgressBar->hide();
@@ -139,13 +136,14 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(m_filterAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_filterAction_triggered);
-    connect(m_resetFilterAction,    &QAction::triggered,                this,   &QnEventLogDialog::at_resetFilterAction_triggered);
+    connect(m_resetFilterAction,    &QAction::triggered,                this,   &QnEventLogDialog::reset);
     connect(m_clipboardAction,      &QAction::triggered,                this,   &QnEventLogDialog::at_clipboardAction_triggered);
     connect(m_exportAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_exportAction_triggered);
     connect(m_selectAllAction,      &QAction::triggered,                ui->gridEvents, &QTableView::selectAll);
 
-    connect(ui->dateEditFrom,       &QDateEdit::dateChanged,            this,   &QnEventLogDialog::updateData);
-    connect(ui->dateEditTo,         &QDateEdit::dateChanged,            this,   &QnEventLogDialog::updateData);
+    connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this,
+        &QnEventLogDialog::updateData);
+
     connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
@@ -156,8 +154,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
-    ui->mainGridLayout->activate();
-    updateHeaderWidth();
+    reset();
 }
 
 QnEventLogDialog::~QnEventLogDialog() {
@@ -193,6 +190,16 @@ bool QnEventLogDialog::isFilterExist() const
     return false;
 }
 
+void QnEventLogDialog::reset()
+{
+    disableUpdateData();
+    setEventType(QnBusiness::AnyBusinessEvent);
+    setCameraList(QnVirtualCameraResourceList());
+    setActionType(QnBusiness::UndefinedAction);
+    ui->dateRangeWidget->reset();
+    enableUpdateData();
+}
+
 void QnEventLogDialog::updateData()
 {
     if (m_updateDisabled) {
@@ -222,8 +229,8 @@ void QnEventLogDialog::updateData()
         actionType = (QnBusiness::ActionType) m_actionTypesModel->index(idx, 0).data(Qt::UserRole+1).toInt();
     }
 
-    query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(),
-          ui->dateEditTo->dateTime().addDays(1).toMSecsSinceEpoch(),
+    query(ui->dateRangeWidget->startTimeMs(),
+          ui->dateRangeWidget->endTimeMs(),
           eventType,
           actionType);
 
@@ -245,9 +252,6 @@ void QnEventLogDialog::updateData()
         requestFinished(); // just clear grid
         ui->stackedWidget->setCurrentWidget(ui->warnPage);
     }
-
-    ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
-    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date().addMonths(1)); // 1 month forward should cover all local timezones diffs.
 
     m_updateDisabled = false;
     m_dirty = false;
@@ -313,47 +317,6 @@ void QnEventLogDialog::retranslateUi()
     ui->eventRulesButton->setVisible(menu()->canTrigger(QnActions::BusinessEventsAction));
 }
 
-void QnEventLogDialog::updateHeaderWidth()
-{
-    if (ui->dateEditFrom->width() == 0)
-        return;
-
-    int space = ui->mainGridLayout->spacing();
-    int offset = 0; // ui->gridEvents->verticalHeader()->sizeHint().width();
-    space--; // grid line delimiter
-    ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() + space - offset);
-    ui->gridEvents->horizontalHeader()->resizeSection(1, ui->eventComboBox->width() + space);
-    ui->gridEvents->horizontalHeader()->resizeSection(2, ui->cameraButton->width() + space);
-    ui->gridEvents->horizontalHeader()->resizeSection(3, ui->actionComboBox->width() + space);
-
-    int w = 0;
-    QSet<QString> cache;
-    QFontMetrics fm(ui->gridEvents->font());
-    for (int i = 0; i < m_model->rowCount(); ++i)
-    {
-        QModelIndex idx = m_model->index(i, (int) QnEventLogModel::ActionCameraColumn);
-        QString targetText = m_model->data(idx).toString();
-        int spaceIdx = targetText.indexOf(L' ');
-        int prevPos = 0;
-        if (spaceIdx == -1) {
-            cache << targetText;
-        }
-        else {
-            while (spaceIdx >= 0) {
-                cache << targetText.mid(prevPos, spaceIdx - prevPos);
-                prevPos = spaceIdx;
-                spaceIdx = targetText.indexOf(L' ', spaceIdx+1);
-            }
-            cache << targetText.mid(prevPos, targetText.length() - prevPos);
-        }
-    }
-
-    foreach(const QString& str, cache)
-        w = qMax(w, fm.size(0, str).width());
-
-    ui->gridEvents->horizontalHeader()->resizeSection(4, qMax(w + 32, ui->cameraButton->width() + space));
-}
-
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum)
 {
     if (!m_requests.contains(requestNum))
@@ -373,15 +336,18 @@ void QnEventLogDialog::requestFinished()
     m_allEvents.clear();
     ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
-    updateHeaderWidth();
-    if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
+    auto start = ui->dateRangeWidget->startDate();
+    auto end = ui->dateRangeWidget->endDate();
+
+    if (start != end)
         ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
-        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
-        .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate)));
+        .arg(start.toString(Qt::SystemLocaleLongDate))
+        .arg(end.toString(Qt::SystemLocaleLongDate)));
     else
         ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
-        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
+        .arg(start.toString(Qt::SystemLocaleLongDate)));
     ui->loadingProgressBar->hide();
+    ui->gridEvents->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 }
 
 void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
@@ -417,13 +383,9 @@ void QnEventLogDialog::setEventType(QnBusiness::EventType value)
         ui->eventComboBox->setCurrentIndex(found.first());
 }
 
-void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)
+void QnEventLogDialog::setDateRange(qint64 startTimeMs, qint64 endTimeMs)
 {
-    ui->dateEditFrom->setDateRange(QDate(2000,1,1), to);
-    ui->dateEditTo->setDateRange(from, QDateTime::currentDateTime().date());
-
-    ui->dateEditTo->setDate(to);
-    ui->dateEditFrom->setDate(from);
+    ui->dateRangeWidget->setRange(startTimeMs, endTimeMs);
 }
 
 void QnEventLogDialog::setCameraList(const QnVirtualCameraResourceList &cameras)
@@ -454,15 +416,6 @@ void QnEventLogDialog::setActionType(QnBusiness::ActionType value)
         if (idx.data(Qt::UserRole + 1).toInt() == value)
             ui->actionComboBox->setCurrentIndex(i);
     }
-}
-
-void QnEventLogDialog::at_resetFilterAction_triggered()
-{
-    disableUpdateData();
-    setEventType(QnBusiness::AnyBusinessEvent);
-    setCameraList(QnVirtualCameraResourceList());
-    setActionType(QnBusiness::UndefinedAction);
-    enableUpdateData();
 }
 
 void QnEventLogDialog::at_filterAction_triggered()

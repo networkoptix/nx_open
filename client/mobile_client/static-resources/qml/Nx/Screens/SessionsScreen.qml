@@ -130,7 +130,7 @@ Page
                 : qsTr("Connect to Another System")
 
             anchors.centerIn: parent
-            width: getDeviceIsPhone() ? parent.width - 16 : implicitWidth
+            width: parent.width - 16
 
             onClicked: Workflow.openNewSessionScreen()
         }

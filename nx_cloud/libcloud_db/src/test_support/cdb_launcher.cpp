@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include <cdb/account_manager.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
@@ -47,10 +48,8 @@ CdbLauncher::CdbLauncher(QString tmpDir)
     addArg("-syncroLog/logLevel"); addArg("DEBUG2");
 
     addArg("-db/driverName");
-    if (!sConnectionOptions.driverName.isEmpty())
-        addArg(sConnectionOptions.driverName.toLatin1().constData());
-    else
-        addArg("QSQLITE");
+    addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(
+        sConnectionOptions.driverType).toLatin1().constData());
 
     if (!sConnectionOptions.hostName.isEmpty())
     {
@@ -451,6 +450,24 @@ api::ResultCode CdbLauncher::getSystem(
     *systems = std::move(systemDataList.systems);
 
     return resCode;
+}
+
+api::ResultCode CdbLauncher::getSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    api::SystemDataEx* const system)
+{
+    std::vector<api::SystemDataEx> systems;
+    const auto res = getSystem(email, password, systemID, &systems);
+    if (res != api::ResultCode::ok)
+        return res;
+
+    if (systems.size() != 1)
+        return api::ResultCode::unknownError;
+
+    *system = systems[0];
+    return api::ResultCode::ok;
 }
 
 api::ResultCode CdbLauncher::shareSystem(

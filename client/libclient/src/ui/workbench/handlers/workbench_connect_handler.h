@@ -29,16 +29,16 @@ public:
 
     struct ConnectionSettings
     {
+        bool isConnectionToCloud;
         bool storePassword;
         bool autoLogin;
         bool forceRemoveOldConnection;
-        QnRaiiGuardPtr completionWatcher;
 
         static ConnectionSettingsPtr create(
+            bool isConnectionToCloud,
             bool storePassword,
             bool autoLogin,
-            bool forceRemoveOldConnection,
-            const QnRaiiGuardPtr& completionWatcher);
+            bool forceRemoveOldConnection);
     };
 
 private:

@@ -79,10 +79,10 @@ PageBase
     Loader
     {
         id: dummyLoader
-        anchors.centerIn: parent
-        visible: d.cameraWarningVisible
+        anchors.fill: parent
+        visible: active
         sourceComponent: dummyComponent
-        active: visible
+        active: d.cameraWarningVisible
     }
 
     Component

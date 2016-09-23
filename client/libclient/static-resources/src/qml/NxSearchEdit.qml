@@ -52,7 +52,7 @@ NxTextEdit
         parent: control.visualParent;
         anchors.fill: parent;
 
-        visible: control.state == "editable";
+        visible: control.visible && control.state == "editable";
 
         hoverEnabled: true;
         cursorShape: (cursorIsOutsideArea ? Qt.ArrowCursor : Qt.IBeamCursor);

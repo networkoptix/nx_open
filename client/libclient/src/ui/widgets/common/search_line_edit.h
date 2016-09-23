@@ -17,12 +17,14 @@ public:
     inline QLineEdit *lineEdit() const { return m_lineEdit; }
 
     QSize sizeHint() const;
+    QString text() const;
 
     QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
 
     int textChangedSignalFilterMs() const;
     void setTextChangedSignalFilterMs(int filterMs);
 
+    void clear();
 signals:
     void textChanged(const QString &text);
     void escKeyPressed();
@@ -34,7 +36,6 @@ protected:
     void focusInEvent(QFocusEvent *event) override;
     void focusOutEvent(QFocusEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
     void inputMethodEvent(QInputMethodEvent *e) override;
     bool event(QEvent *event) override;
     void changeEvent(QEvent *event);

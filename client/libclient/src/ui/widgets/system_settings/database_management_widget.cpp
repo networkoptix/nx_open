@@ -77,7 +77,7 @@ void QnDatabaseManagementWidget::backupDb()
         return;
     }
 
-    //TODO: #GDM QnSessionAwareDialog, QScopedPointer vs QObject-parent problem
+    //TODO: #GDM QnSessionAware, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog());
     dialog->setMinimum(0);
     dialog->setMaximum(0);
@@ -162,7 +162,7 @@ void QnDatabaseManagementWidget::restoreDb()
     data.data = file.readAll();
     file.close();
 
-    //TODO: #GDM QnSessionAwareDialog, QScopedPointer vs QObject-parent problem
+    //TODO: #GDM QnSessionAware, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog);
     dialog->setMinimum(0);
     dialog->setMaximum(0);

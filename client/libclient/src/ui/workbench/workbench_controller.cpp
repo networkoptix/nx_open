@@ -37,6 +37,8 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
+
 #include "client/client_settings.h"
 
 #include <ui/screen_recording/screen_recorder.h>
@@ -605,7 +607,16 @@ void QnWorkbenchController::updateDraggedItems()
 // -------------------------------------------------------------------------- //
 // Screen recording
 // -------------------------------------------------------------------------- //
-void QnWorkbenchController::startRecording() {
+void QnWorkbenchController::startRecording() 
+{
+    auto desktop = qnResPool->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
+    if (!desktop)
+    {
+        QnGraphicsMessageBox::information(tr("Screen capturing subsystem is not initialized yet. "
+            "Please try again later."), recordingCountdownMs);
+        return;
+    }
+
     if (!m_screenRecorder) {
         action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
         return;
@@ -1501,8 +1512,8 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
 void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
         if (m_tourModeHintLabel) {
-            m_tourModeHintLabel->hideImmideately();
             disconnect(m_tourModeHintLabel, NULL, this, NULL);
+            m_tourModeHintLabel->hideImmideately();
             m_tourModeHintLabel = NULL;
         }
         return;

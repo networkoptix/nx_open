@@ -67,7 +67,7 @@ namespace ec2
             return ErrorCode::ok;
         }
 
-        qint64 getTimeStamp();
+        Timestamp getTimeStamp();
         bool init();
         bool clear();
 
@@ -82,8 +82,8 @@ namespace ec2
         void commit();
         void rollback();
 
-        qint64 getTransactionLogTime() const;
-        void setTransactionLogTime(qint64 value);
+        Timestamp getTransactionLogTime() const;
+        void setTransactionLogTime(Timestamp value);
         ErrorCode saveToDB(
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
@@ -101,10 +101,10 @@ namespace ec2
     private:
         struct UpdateHistoryData
         {
-            UpdateHistoryData(): timestamp(0) {}
-            UpdateHistoryData(const QnTranStateKey& updatedBy, const qint64& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
+            UpdateHistoryData(): timestamp(Timestamp::fromInteger(0)) {}
+            UpdateHistoryData(const QnTranStateKey& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
             QnTranStateKey updatedBy;
-            qint64 timestamp;
+            Timestamp timestamp;
         };
         struct CommitData
         {
@@ -121,8 +121,8 @@ namespace ec2
 
         mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        qint64 m_baseTime;
-        qint64 m_lastTimestamp;
+        quint64 m_baseTime;
+        Timestamp m_lastTimestamp;
         CommitData m_commitData;
     };
 };

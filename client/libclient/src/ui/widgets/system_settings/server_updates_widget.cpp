@@ -181,13 +181,15 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
 void QnServerUpdatesWidget::initDropdownActions()
 {
     auto selectUpdateTypeMenu = new QMenu(this);
+    selectUpdateTypeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+
     auto defaultAction = selectUpdateTypeMenu->addAction(tr("Latest Available Update"),
         [this]()
         {
             m_targetVersion = QnSoftwareVersion();
             m_localFileName = QString();
 
-            ui->versionTitleLabel->setText(tr("Latest Available Update"));
+            ui->selectUpdateTypeButton->setText(tr("Latest Available Update"));
             ui->targetVersionLabel->setText(m_latestVersion.isNull()
                 ? kNoVersionNumberText
                 : m_latestVersion.toString());
@@ -210,7 +212,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             m_localFileName = QString();
 
             ui->targetVersionLabel->setText(m_targetVersion.toString());
-            ui->versionTitleLabel->setText(tr("Selected Version"));
+            ui->selectUpdateTypeButton->setText(tr("Selected Version"));
 
             ui->downloadButton->setText(tr("Download Update File"));
             ui->downloadButton->hide();
@@ -231,27 +233,13 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             ui->targetVersionLabel->setText(kNoVersionNumberText);
-            ui->versionTitleLabel->setText(tr("Selected Update File"));
+            ui->selectUpdateTypeButton->setText(tr("Selected Update File"));
             ui->downloadButton->hide();
 
             checkForUpdates(false);
         });
 
-    ui->selectUpdateTypeButton->setIcon(qnSkin->icon("buttons/expand.png"));
-    QIcon collapseIcon(qnSkin->icon("buttons/collapse.png"));
-
-    connect(ui->selectUpdateTypeButton, &QPushButton::clicked, this,
-        [this, collapseIcon, selectUpdateTypeMenu]()
-        {
-            QnScopedTypedPropertyRollback<QIcon, QPushButton> iconRollback(
-                ui->selectUpdateTypeButton,
-                &QPushButton::setIcon,
-                &QPushButton::icon,
-                collapseIcon);
-
-            selectUpdateTypeMenu->exec(ui->selectUpdateTypeButton->mapToGlobal(
-                ui->selectUpdateTypeButton->rect().bottomLeft() + QPoint(0, 1)));
-        });
+    ui->selectUpdateTypeButton->setMenu(selectUpdateTypeMenu);
 
     defaultAction->trigger();
 }
@@ -259,6 +247,8 @@ void QnServerUpdatesWidget::initDropdownActions()
 void QnServerUpdatesWidget::initDownloadActions()
 {
     auto downloadLinkMenu = new QMenu(this);
+    downloadLinkMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+
     downloadLinkMenu->addAction(tr("Download in External Browser"),
         [this]()
         {
@@ -480,7 +470,9 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             break;
 
         case QnCheckForUpdateResult::IncompatibleCloudHost:
-            detail = tr("Incompatible cloud instance. To update disconnect system from the cloud first.");
+            detail = tr("Incompatible %1 instance. To update disconnect system from %1 first.",
+                "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+                .arg(QnAppInfo::cloudName());
             break;
 
         default:

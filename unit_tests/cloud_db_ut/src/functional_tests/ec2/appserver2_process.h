@@ -18,6 +18,7 @@
 namespace ec2 {
 
 class AbstractECConnection;
+class QnSimpleHttpConnectionListener;
 
 class Appserver2Process
     :
@@ -35,6 +36,7 @@ public:
     int exec();
 
     ec2::AbstractECConnection* ecConnection();
+    SocketAddress endpoint() const;
 
 private:
     int m_argc;
@@ -43,8 +45,9 @@ private:
     nx::utils::promise<void> m_processTerminationEvent;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_onStartedEventHandler;
     std::atomic<AbstractECConnection*> m_ecConnection;
+    QnSimpleHttpConnectionListener* m_tcpListener;
     QCoreApplication* m_application;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 
@@ -65,6 +68,7 @@ public:
 
     const Appserver2Process* impl() const;
     ec2::AbstractECConnection* ecConnection();
+    SocketAddress endpoint() const;
 
 private:
     Appserver2Process* m_impl;

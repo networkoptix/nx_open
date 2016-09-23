@@ -503,13 +503,13 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
             if (m_state == Released || m_state == Error)
                 opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kVisible);
         });
-        m_hintAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        m_hintAnimator->setEasingCurve(QEasingCurve::OutQuad);
         m_hintAnimator->animateTo(kVisible);
 
     }
     else
     {
-        m_hintAnimator->setEasingCurve(QEasingCurve::InCubic);
+        m_hintAnimator->setEasingCurve(QEasingCurve::InQuad);
         m_hintAnimator->animateTo(kHidden);
         opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kHidden);
     }
@@ -545,7 +545,7 @@ void QnTwoWayAudioWidgetPrivate::ensureAnimator()
 
     Q_Q(QnTwoWayAudioWidget);
     m_hintAnimator = new VariantAnimator(this);
-    m_hintAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+    m_hintAnimator->setEasingCurve(QEasingCurve::InOutQuad);
     m_hintAnimator->setTimer(InstrumentManager::animationTimer(q->scene()));
     m_hintAnimator->setAccessor(accessor);
     m_hintAnimator->setTargetObject(this);

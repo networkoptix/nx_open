@@ -35,7 +35,7 @@ static const int kDefaultThumbnailsHeight = 48;
 static const int kVideoWallTimelineAutoHideTimeoutMs = 10000;
 
 static const int kShowAnimationDurationMs = 240;
-static const int kHideAnimationDurationMs = 160;
+static const int kHideAnimationDurationMs = 240;
 
 static const int kShowTimelineTimeoutMs = 100;
 static const int kCloseTimelineTimeoutMs = 250;
@@ -297,9 +297,9 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_yAnimator->stop();
     if (opened)
-        m_yAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::InOutQuad);
     else
-        m_yAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        m_yAnimator->setEasingCurve(QEasingCurve::OutQuad);
 
     m_yAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
 

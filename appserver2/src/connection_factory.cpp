@@ -916,7 +916,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param permissions Combination (via "|") of the following flags:
      *     %value GlobalAdminPermission Admin, can edit other non-admins.
      *     %value GlobalEditCamerasPermission Can edit camera settings.
-     *     %value GlobalControlVideoWallPermission Can control videowalls.
+     *     %value GlobalControlVideoWallPermission Can control video walls.
      *     %value GlobalViewArchivePermission Can view archives of available cameras.
      *     %value GlobalExportPermission Can export archives of available cameras.
      *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
@@ -968,7 +968,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param name Group name.
      * %param permissions Combination (via "|") of the following flags:
      *     %value GlobalEditCamerasPermission Can edit camera settings.
-     *     %value GlobalControlVideoWallPermission Can control videowalls.
+     *     %value GlobalControlVideoWallPermission Can control video walls.
      *     %value GlobalViewArchivePermission Can view archives of available cameras.
      *     %value GlobalExportPermission Can export archives of available cameras.
      *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.

@@ -209,7 +209,7 @@ Cloud Account&gt;</string>
          <item>
           <widget class="QPushButton" name="linkButton">
            <property name="text">
-            <string>&lt;Connect this system to the Cloud&gt;</string>
+            <string notr="true">&lt;Connect this system to the Cloud&gt;</string>
            </property>
           </widget>
          </item>

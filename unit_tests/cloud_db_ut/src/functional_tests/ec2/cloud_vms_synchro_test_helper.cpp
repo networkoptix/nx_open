@@ -574,21 +574,20 @@ void Ec2MserverCloudSynchronization2::waitForCloudAndVmsToSyncUsers(
 api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    nx_http::HttpClient httpClient;
     const QUrl url(lm("http://%1/%2?systemID=%3")
         .str(cdb()->endpoint()).arg("cdb/maintenance/get_transaction_log")
         .arg(registeredSystemData().id));
-    if (!httpClient.doGet(url))
-        return api::ResultCode::networkError;
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
-        return api::ResultCode::notAuthorized;
+    return fetchTransactionLog(url, transactionList);
+}
 
-    nx::Buffer msgBody;
-    while (!httpClient.eof())
-        msgBody += httpClient.fetchMessageBodyBuffer();
-    *transactionList = QJson::deserialized<::ec2::ApiTransactionDataList>(msgBody);
-
-    return api::ResultCode::ok;
+api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLogFromMediaserver(
+    ::ec2::ApiTransactionDataList* const transactionList)
+{
+    QUrl url(lm("http://%1/%2?cloud_only=true")
+        .str(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
+    url.setUserName("admin");
+    url.setPassword("admin");
+    return fetchTransactionLog(url, transactionList);
 }
 
 bool Ec2MserverCloudSynchronization2::findAdminUserId(QnUuid* const id)
@@ -611,6 +610,24 @@ bool Ec2MserverCloudSynchronization2::findAdminUserId(QnUuid* const id)
 
     *id = adminUserId;
     return true;
+}
+
+api::ResultCode Ec2MserverCloudSynchronization2::fetchTransactionLog(
+    const QUrl& url,
+    ::ec2::ApiTransactionDataList* const transactionList)
+{
+    nx_http::HttpClient httpClient;
+    if (!httpClient.doGet(url))
+        return api::ResultCode::networkError;
+    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        return api::ResultCode::notAuthorized;
+
+    nx::Buffer msgBody;
+    while (!httpClient.eof())
+        msgBody += httpClient.fetchMessageBodyBuffer();
+    *transactionList = QJson::deserialized<::ec2::ApiTransactionDataList>(msgBody);
+
+    return api::ResultCode::ok;
 }
 
 } // namespace cdb

@@ -2,8 +2,11 @@
 
 #include <QtCore/QString>
 
-struct QnAppInfo
+class QnAppInfo: public QObject
 {
+    Q_OBJECT
+
+public:
     static int ec2ProtoVersion();
 
     static QString organizationName();
@@ -51,7 +54,7 @@ struct QnAppInfo
     static QString defaultCloudHost();
     static QString defaultCloudPortalUrl();
     static QString defaultCloudModulesXmlUrl();
-    static QString cloudName();
+    static Q_INVOKABLE QString cloudName();
 
     static int     freeLicenseCount();
     static QString freeLicenseKey();

@@ -9,10 +9,12 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
+// TODO: ak: clarify where to use m_systemIdToTransactionLog against m_dbTransactionContexts.
+
 QString toString(const ::ec2::QnAbstractTransaction& tran)
 {
-    return lit("seq %1, ts %2")
-        .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
+    return lm("seq %1, ts %2")
+        .arg(tran.persistentInfo.sequence).str(tran.persistentInfo.timestamp);
 }
 
 TransactionLog::TransactionLog(
@@ -30,7 +32,7 @@ TransactionLog::TransactionLog(
 }
 
 void TransactionLog::startDbTransaction(
-    const nx::String& /*systemId*/,
+    const nx::String& systemId,
     nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbOperationsFunc,
     nx::utils::MoveOnlyFunc<void(QSqlDatabase*, nx::db::DBResult)> onDbUpdateCompleted)
 {
@@ -38,9 +40,14 @@ void TransactionLog::startDbTransaction(
     // TODO: monitoring request queue size and returning api::ResultCode::retryLater if exceeded
 
     m_dbManager->executeUpdate(
-        [dbOperationsFunc = std::move(dbOperationsFunc)](
+        [this, systemId, dbOperationsFunc = std::move(dbOperationsFunc)](
             QSqlDatabase* dbConnection) -> nx::db::DBResult
         {
+            {
+                QnMutexLocker lk(&m_mutex);
+                DbTransactionContext& dbTranContext = m_dbTransactionContexts[dbConnection];
+                dbTranContext.systemId = systemId;
+            }
             return dbOperationsFunc(dbConnection);
         },
         [this, onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
@@ -50,6 +57,34 @@ void TransactionLog::startDbTransaction(
             onDbUpdateCompleted(dbConnection, dbResult);
             onDbTransactionCompleted(dbConnection, dbResult);
         });
+}
+
+nx::db::DBResult TransactionLog::updateTimestampHiForSystem(
+    QSqlDatabase* connection,
+    const nx::String& systemId,
+    quint64 newValue)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_systemIdToTransactionLog[systemId].timestampSequence = newValue;
+    m_dbTransactionContexts[connection].transactionLogUpdate.timestampSequence = newValue;
+
+    QSqlQuery saveSystemTimestampSequence(*connection);
+    saveSystemTimestampSequence.prepare(
+        R"sql(
+        REPLACE INTO transaction_source_settings(system_id, timestamp_hi) VALUES (?, ?)
+        )sql");
+    saveSystemTimestampSequence.addBindValue(QLatin1String(systemId));
+    saveSystemTimestampSequence.addBindValue(newValue);
+    if (!saveSystemTimestampSequence.exec())
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("systemId %1. Error saving transaction timestamp sequence %2 to log. %3")
+            .arg(systemId).arg(newValue).arg(saveSystemTimestampSequence.lastError().text()),
+            cl_logWARNING);
+        return nx::db::DBResult::ioError;
+    }
+
+    return nx::db::DBResult::ok;
 }
 
 ::ec2::QnTranState TransactionLog::getTransactionState(const nx::String& systemId) const
@@ -119,9 +154,17 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(
         R"sql(
-        SELECT system_id, peer_guid, db_guid, sequence, tran_hash, timestamp
-        FROM transaction_log
-        ORDER BY system_id, peer_guid, db_guid
+        SELECT tl.system_id as system_id, 
+               tss.timestamp_hi as settings_timestamp_hi, 
+               peer_guid, 
+               db_guid, 
+               sequence, 
+               tran_hash, 
+               tl.timestamp_hi as timestamp_hi,
+               timestamp
+        FROM transaction_log tl
+        LEFT JOIN transaction_source_settings tss ON tl.system_id = tss.system_id
+        ORDER BY tl.system_id, peer_guid, db_guid
         )sql");
 
     if (!selectTransactionStateQuery.exec())
@@ -135,11 +178,14 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
     while (selectTransactionStateQuery.next())
     {
         const nx::String systemId = selectTransactionStateQuery.value("system_id").toString().toLatin1();
+        const std::uint64_t settingsTimestampHi = selectTransactionStateQuery.value("settings_timestamp_hi").toULongLong();
         const nx::String peerGuid = selectTransactionStateQuery.value("peer_guid").toString().toLatin1();
         const nx::String dbGuid = selectTransactionStateQuery.value("db_guid").toString().toLatin1();
         const int sequence = selectTransactionStateQuery.value("sequence").toInt();
         const nx::Buffer tranHash = selectTransactionStateQuery.value("tran_hash").toString().toLatin1();
-        const qint64 timestamp = selectTransactionStateQuery.value("timestamp").toLongLong();
+        ::ec2::Timestamp timestamp;
+        timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
+        timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
 
         const ::ec2::QnTranStateKey tranStateKey(
             QnUuid::fromStringSafe(peerGuid),
@@ -148,6 +194,8 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
         VmsTransactionLogData& vmsTranLog = m_systemIdToTransactionLog[systemId];
         if (vmsTranLog.systemId.isEmpty())
             vmsTranLog.systemId = systemId;
+        if (settingsTimestampHi > vmsTranLog.timestampSequence)
+            vmsTranLog.timestampSequence = settingsTimestampHi;
         qint32& persistentSequence = vmsTranLog.transactionState.values[tranStateKey];
         if (persistentSequence < sequence)
             persistentSequence = sequence;
@@ -155,26 +203,27 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
             UpdateHistoryData{tranStateKey, timestamp};
     }
 
-    QSqlQuery selectMaxTransactionSequence(*connection);
-    selectMaxTransactionSequence.setForwardOnly(true);
-    selectMaxTransactionSequence.prepare(
-        R"sql(
-        SELECT max_sequence FROM cloud_db_transaction_sequence;
-        )sql");
-    if (!selectMaxTransactionSequence.exec() ||
-        !selectMaxTransactionSequence.next())
-    {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Error fetching max sequence from transaction log. %1")
-            .arg(selectMaxTransactionSequence.lastError().text()), cl_logERROR);
-        return nx::db::DBResult::ioError;
-    }
-    
-    m_transactionSequence = selectMaxTransactionSequence.value(0).toLongLong();
+    //// Reading global transaction sequence from DB.
+    //QSqlQuery selectMaxTransactionSequence(*connection);
+    //selectMaxTransactionSequence.setForwardOnly(true);
+    //selectMaxTransactionSequence.prepare(
+    //    R"sql(
+    //    SELECT max_sequence FROM cloud_db_transaction_sequence;
+    //    )sql");
+    //if (!selectMaxTransactionSequence.exec() ||
+    //    !selectMaxTransactionSequence.next())
+    //{
+    //    NX_LOGX(QnLog::EC2_TRAN_LOG,
+    //        lm("Error fetching max sequence from transaction log. %1")
+    //        .arg(selectMaxTransactionSequence.lastError().text()), cl_logERROR);
+    //    return nx::db::DBResult::ioError;
+    //}
+    //
+    //m_transactionSequence = selectMaxTransactionSequence.value(0).toLongLong();
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Selected max sequence %1 from transaction log")
-        .arg(m_transactionSequence.load()), cl_logINFO);
+    //NX_LOGX(QnLog::EC2_TRAN_LOG,
+    //    lm("Selected max sequence %1 from transaction log")
+    //    .arg(m_transactionSequence.load()), cl_logINFO);
 
     return nx::db::DBResult::ok;
 }
@@ -288,7 +337,7 @@ bool TransactionLog::isShouldBeIgnored(
             lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
                 "because of timestamp: %5 <= %6")
             .arg(systemId).arg(ApiCommand::toString(tran.command)).str(tran)
-            .arg(hash).str(tran.persistentInfo.timestamp).arg(lastTime),
+            .arg(hash).str(tran.persistentInfo.timestamp).str(lastTime),
             cl_logDEBUG1);
         return true;    //< Transaction should be ignored.
     }
@@ -396,14 +445,15 @@ nx::db::DBResult TransactionLog::saveToDb(
     saveTranQuery.prepare(
         R"sql(
         REPLACE INTO transaction_log(system_id, peer_guid, db_guid, sequence,
-                                     timestamp, tran_hash, tran_data)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+                                     timestamp_hi, timestamp, tran_hash, tran_data)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         )sql");
     saveTranQuery.addBindValue(QLatin1String(systemId));
     saveTranQuery.addBindValue(transaction.peerID.toSimpleString());
     saveTranQuery.addBindValue(transaction.persistentInfo.dbID.toSimpleString());
     saveTranQuery.addBindValue(transaction.persistentInfo.sequence);
-    saveTranQuery.addBindValue(transaction.persistentInfo.timestamp);
+    saveTranQuery.addBindValue(transaction.persistentInfo.timestamp.sequence);
+    saveTranQuery.addBindValue(transaction.persistentInfo.timestamp.ticks);
     saveTranQuery.addBindValue(QLatin1String(transactionHash));
     saveTranQuery.addBindValue(ubjsonData);
     if (!saveTranQuery.exec())
@@ -455,25 +505,32 @@ nx::db::DBResult TransactionLog::saveToDb(
 
 int TransactionLog::generateNewTransactionSequence(
     QSqlDatabase* /*connection*/,
-    const nx::String& /*systemId*/)
+    const nx::String& systemId)
 {
-    return ++m_transactionSequence;
+    // global sequence
+    //return ++m_transactionSequence;
 
-    //QnMutexLocker lk(&m_mutex);
-    //int& currentSequence =
-    //    m_systemIdToTransactionLog[systemId].transactionState.
-    //        values[::ec2::QnTranStateKey(m_peerId, kDbInstanceGuid)];
-    //++currentSequence;
-    //return currentSequence;
+    QnMutexLocker lk(&m_mutex);
+    int& currentSequence =
+        m_systemIdToTransactionLog[systemId].transactionState.
+            values[::ec2::QnTranStateKey(m_peerId, guidFromArbitraryData(systemId))];
+    ++currentSequence;
+    return currentSequence;
 }
 
-qint64 TransactionLog::generateNewTransactionTimestamp(
+::ec2::Timestamp TransactionLog::generateNewTransactionTimestamp(
     QSqlDatabase* /*connection*/,
-    const nx::String& /*systemId*/)
+    const nx::String& systemId)
 {
-    // TODO: #ak copy function from ::ec2::QnTransactionLog
     using namespace std::chrono;
-    return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+
+    QnMutexLocker lk(&m_mutex);
+
+    ::ec2::Timestamp timestamp;
+    timestamp.sequence = m_systemIdToTransactionLog[systemId].timestampSequence;
+    timestamp.ticks = duration_cast<milliseconds>(
+        system_clock::now().time_since_epoch()).count();
+    return timestamp;
 }
 
 void TransactionLog::onDbTransactionCompleted(

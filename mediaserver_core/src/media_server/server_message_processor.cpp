@@ -94,6 +94,18 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     QnCommonMessageProcessor::init(connection);
 }
 
+void QnServerMessageProcessor::startReceivingLocalNotifications(const ec2::AbstractECConnectionPtr &connection)
+{
+    NX_ASSERT(connection);
+    if (m_connection) {
+        /* Safety check in case connection will not be deleted instantly. */
+        m_connection->stopReceivingNotifications();
+        disconnectFromConnection(m_connection);
+    }
+    m_connection = connection;
+    connectToConnection(connection);
+}
+
 void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::connectToConnection(connection);
 
@@ -108,7 +120,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-            this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime)
+            this, [this](const QString &systemName, qint64 sysIdTime, ec2::Timestamp tranLogTime)
                   {
                       ConfigureSystemData configSystemData;
                       configSystemData.systemName = systemName;

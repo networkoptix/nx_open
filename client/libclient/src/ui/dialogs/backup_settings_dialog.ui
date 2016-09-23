@@ -63,7 +63,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</string>
+                <string>Only further recording will be backed up. Backup process will ignore existing footage.</string>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>

@@ -17,6 +17,8 @@
 #include <QtWidgets/QStyleOptionFrameV2>
 
 #include <ui/common/palette.h>
+#include <ui/style/skin.h>
+
 #include <utils/common/delayed.h>
 
 QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
@@ -43,6 +45,8 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     clearPalette.setBrush(QPalette::Base, QBrush(Qt::transparent));
     m_lineEdit->setPalette(clearPalette);
     m_lineEdit->setPlaceholderText(tr("Search"));
+    m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 
     connect(m_lineEdit, &QLineEdit::textChanged, this
@@ -92,14 +96,15 @@ QSize QnSearchLineEdit::sizeHint() const
     return size;
 }
 
+QString QnSearchLineEdit::text() const
+{
+    return m_lineEdit->text();
+}
+
 void QnSearchLineEdit::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-
-    QStyleOptionFrameV2 panel;
-    initStyleOption(&panel);
-    const auto rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
-    m_lineEdit->setGeometry(rect);
+    m_lineEdit->setGeometry(rect());
 }
 
 void QnSearchLineEdit::focusInEvent(QFocusEvent *event)
@@ -153,15 +158,6 @@ bool QnSearchLineEdit::event(QEvent *event)
     return QWidget::event(event);
 }
 
-void QnSearchLineEdit::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event)
-    QPainter p(this);
-    QStyleOptionFrameV2 panel;
-    initStyleOption(&panel);
-    style()->drawPrimitive(QStyle::PE_PanelLineEdit, &panel, &p, this);
-}
-
 QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const
 {
     return m_lineEdit->inputMethodQuery(property);
@@ -175,6 +171,11 @@ int QnSearchLineEdit::textChangedSignalFilterMs() const
 void QnSearchLineEdit::setTextChangedSignalFilterMs(int filterMs)
 {
     m_textChangedSignalFilterMs = filterMs;
+}
+
+void QnSearchLineEdit::clear()
+{
+    m_lineEdit->clear();
 }
 
 void QnSearchLineEdit::inputMethodEvent(QInputMethodEvent *e)

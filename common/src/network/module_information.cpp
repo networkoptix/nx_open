@@ -18,6 +18,21 @@ namespace {
     const QString nxMediaServerId = lit("Media Server");
 }
 
+QString helpers::getLocalSystemId(const QnModuleInformation& info)
+{
+    return info.systemName;
+}
+
+QString helpers::getTargetSystemId(const QnModuleInformation& info)
+{
+    if (info.serverFlags.testFlag(Qn::SF_NewSystem))
+        return info.id.toString();
+    else if (!info.cloudSystemId.isEmpty())
+        return info.cloudSystemId;
+
+    return getLocalSystemId(info);
+}
+
 QnModuleInformation::QnModuleInformation():
     type(),
     customization(),
