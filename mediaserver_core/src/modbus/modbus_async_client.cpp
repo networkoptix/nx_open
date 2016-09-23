@@ -7,6 +7,7 @@ namespace
 {
     const int kSendTimeout = 4000;
     const int kRecvTimeout = 4000;
+    const int kConnectTimeout = 4000;
 }
 
 QnModbusAsyncClient::QnModbusAsyncClient():
@@ -237,7 +238,7 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
     m_sendBuffer.append(ModbusRequest::encode(request));
 
     if (m_sendBuffer.size() > nx_modbus::kModbusMaxMessageLength)
-    {
+    {   
         emitError(
             lit("Request size is too big: %1 bytes. Maximum request length is %2 bytes.")
                 .arg(m_sendBuffer.size())
@@ -280,7 +281,7 @@ void QnModbusAsyncClient::doModbusRequestAsync(const ModbusRequest &request)
 
     if (!m_connected)
     {
-        if (!(initSocket() && m_socket->connect(m_endpoint)))
+        if (!(initSocket() && m_socket->connect(m_endpoint, kConnectTimeout)))
         {
             emitError(
                 lit("ModbusAsyncClient, unable to connect to endpoint %1")
