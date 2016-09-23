@@ -19,19 +19,6 @@
 
 namespace
 {
-    //log settings
-    const QLatin1String kLogLevel( "log/logLevel" );
-#ifdef _DEBUG
-    const QLatin1String kDefaultLogLevel( "DEBUG" );
-#else
-    const QLatin1String kDefaultLogLevel( "INFO" );
-#endif
-    const QLatin1String kLogDir( "log/logDir" );
-
-    const QLatin1String kSyncLogLevel("syncroLog/logLevel");
-    const QLatin1String kDefaultSyncLogLevel("DEBUG2");
-    const QLatin1String kSyncLogDir("syncroLog/logDir");
-
     const QLatin1String kEndpointsToListen( "listenOn" );
     const QLatin1String kDefaultEndpointsToListen( "0.0.0.0:3346" );
 
@@ -133,17 +120,8 @@ EventManager::EventManager()
 
 Settings::Settings()
 :
-#ifdef _WIN32
-    m_settings(
-        QSettings::SystemScope,
-        QnAppInfo::organizationName(),
-        QnLibCloudDbAppInfo::applicationName()),
-#else
-    m_settings( lit("/opt/%1/%2/etc/%2.conf" )
-                .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName ),
-                QSettings::IniFormat ),
-#endif
-    m_showHelp( false )
+    m_settings(QnLibCloudDbAppInfo::applicationName(), kModuleName),
+    m_showHelp(false)
 {
     fillSupportedCmdParameters();
 }
@@ -153,12 +131,12 @@ bool Settings::showHelp() const
     return m_showHelp;
 }
 
-const Logging& Settings::logging() const
+const QnLogSettings& Settings::logging() const
 {
     return m_logging;
 }
 
-const Logging& Settings::vmsSynchronizationLogging() const
+const QnLogSettings& Settings::vmsSynchronizationLogging() const
 {
     return m_vmsSynchronizationLogging;
 }
@@ -254,11 +232,8 @@ void Settings::loadConfiguration()
     using namespace std::chrono;
 
     //log
-    m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
-    m_logging.logDir = m_settings.value(kLogDir, dataDir() + lit("/log/")).toString();
-
-    m_vmsSynchronizationLogging.logLevel = m_settings.value(kSyncLogLevel, kDefaultSyncLogLevel).toString();
-    m_vmsSynchronizationLogging.logDir = m_settings.value(kSyncLogDir, dataDir() + lit("/log/")).toString();
+    m_logging.load(m_settings, QLatin1String("log"));
+    m_vmsSynchronizationLogging.load(m_settings, QLatin1String("syncroLog"));
 
     //DB
     m_dbConnectionOptions.driverType =

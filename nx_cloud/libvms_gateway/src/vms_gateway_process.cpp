@@ -117,7 +117,9 @@ int VmsGatewayProcess::exec()
             return 0;
         }
 
-        initializeLogging(settings);
+        settings.logging().initLog(
+            settings.general().dataDir,
+            QnLibVmsGatewayAppInfo::applicationDisplayName());
 
         //enabling nat traversal
         if (!settings.general().mediatorEndpoint.isEmpty())
@@ -268,26 +270,6 @@ bool VmsGatewayProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
     return false;
 }
 #endif
-
-void VmsGatewayProcess::initializeLogging(const conf::Settings& settings)
-{
-    //logging
-    if (settings.logging().logLevel != QString::fromLatin1("none"))
-    {
-        const QString& logDir = settings.logging().logDir;
-
-        QDir().mkpath(logDir);
-        const QString& logFileName = logDir + lit("/log_file");
-        if (cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
-            QnLog::initLog(settings.logging().logLevel);
-        else
-            std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
-        NX_LOG(lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("%1 started").arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
-        NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-    }
-}
 
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
