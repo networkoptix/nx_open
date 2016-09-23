@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include <api/global_settings.h>
 #include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/camera_resource.h>
@@ -889,6 +890,21 @@ struct SaveUserTransactionType
     ec2::TransactionType::Value operator()(const ApiUserData& params)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
+    }
+};
+
+struct setResourceParamTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiResourceParamWithRefData& param)
+    {
+        if (param.resourceId == QnUserResource::kAdminGuid &&
+            param.name == QnGlobalSettings::kNameSystemName)
+        {
+            // System rename MUST be propagated to Nx Cloud
+            return TransactionType::Cloud;
+        }
+
+        return TransactionType::Regular;
     }
 };
 
