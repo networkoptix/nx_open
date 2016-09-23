@@ -71,7 +71,6 @@ private:
     bool initializeIO();
 
     void fetchAllPortStates();
-    void fetchAllPortStatesUnsafe();
 
     void processAllPortStatesResponse(const nx_modbus::ModbusResponse& response);
     PortStateChangeInfo updatePortState(size_t bitIndex, const QByteArray& bytes, size_t portIndex);
@@ -107,7 +106,7 @@ private:
     InputStateChangeCallback m_inputStateChangedCallback;
     NetworkIssueCallback m_networkIssueCallback;
 
-    quint8 m_networkFaultsCounter;
+    std::atomic<int> m_networkFaultsCounter;
 
     QMap<QString, nx_io_managment::IOPortState> m_defaultPortStates;
 

@@ -35,12 +35,21 @@ QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
     m_networkFaultsCounter(0)
 {
     initializeIO();
+
+    Qn::directConnect(
+        &m_client, &nx_modbus::QnModbusAsyncClient::done, 
+        this, &QnAdamModbusIOManager::routeMonitoringFlow);
+
+    Qn::directConnect(
+        &m_client, &nx_modbus::QnModbusAsyncClient::error, 
+        this, &QnAdamModbusIOManager::handleMonitoringError);
 }
 
 QnAdamModbusIOManager::~QnAdamModbusIOManager()
 {
     stopIOMonitoring();
     m_client.terminate();
+    directDisconnectAll();
 }
 
 bool QnAdamModbusIOManager::startIOMonitoring()
@@ -70,14 +79,6 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
     m_debouncedValues.clear();
 
-    Qn::directConnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::done, 
-        this, &QnAdamModbusIOManager::routeMonitoringFlow);
-
-    Qn::directConnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::error, 
-        this, &QnAdamModbusIOManager::handleMonitoringError);
-
     m_monitoringIsInProgress = true;
 
     QUrl url(m_resource->getUrl());
@@ -89,21 +90,16 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_client.setEndpoint(endpoint);
     m_outputClient.setEndpoint(endpoint);
 
-    fetchAllPortStatesUnsafe();
+    lock.unlock();
+    fetchAllPortStates();
 
     return true;
 }
 
 void QnAdamModbusIOManager::stopIOMonitoring()
 {
-    QnMutexLocker lock(&m_mutex);
     m_monitoringIsInProgress = false;
-
-    lock.unlock();
     TimerManager::instance()->joinAndDeleteTimer(m_inputMonitorTimerId);
-    lock.relock();
-
-    directDisconnectAll();
 }
 
 bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isActive)
@@ -259,8 +255,9 @@ bool QnAdamModbusIOManager::initializeIO()
     return true;
 }
 
-void QnAdamModbusIOManager::fetchAllPortStatesUnsafe()
+void QnAdamModbusIOManager::fetchAllPortStates()
 {
+    QnMutexLocker lock(&m_mutex);
     if (m_inputs.empty() || m_outputs.empty())
         return;
 
@@ -268,14 +265,9 @@ void QnAdamModbusIOManager::fetchAllPortStatesUnsafe()
     auto startCoil = getPortCoil(m_inputs[0].id, status);
     auto lastCoil = getPortCoil(m_outputs[m_outputs.size() - 1].id, status);
 
+    lock.unlock();
     if (status)
         m_client.readCoilsAsync(startCoil, lastCoil - startCoil + 1);
-}
-
-void QnAdamModbusIOManager::fetchAllPortStates()
-{
-    QnMutexLocker lock(&m_mutex);
-    fetchAllPortStatesUnsafe();
 }
 
 void QnAdamModbusIOManager::processAllPortStatesResponse(const nx_modbus::ModbusResponse& response)
