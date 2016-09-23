@@ -16,9 +16,9 @@ namespace {
 const auto kBigStretch = 1000;
 const qreal kBaseOpacity = 0.75;
 
-QGraphicsProxyWidget* makeMaskedProxy(QWidget* source)
+QnMaskedProxyWidget* makeMaskedProxy(QWidget* source, QGraphicsItem* parentItem = nullptr)
 {
-    const auto result = new QnMaskedProxyWidget();
+    const auto result = new QnMaskedProxyWidget(parentItem);
     result->setWidget(source);
     result->setAcceptDrops(false);
     return result;
@@ -45,6 +45,7 @@ void setupButton(QPushButton& button)
         "    padding-left: 16px;"
         "    padding-right: 16px;"
         "    min-height: 32px;"
+        "    max-height: 32px;"
         "}"
         "QPushButton#%1:hover"
         "{"
@@ -128,9 +129,6 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent)
     m_button(new QPushButton()),
     m_description(new QnWordWrappedLabel())
 {
-    m_preloader->setIndicatorColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6));
-    m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
-
     setOpacity(kBaseOpacity);
     setAcceptedMouseButtons(Qt::NoButton);
 
@@ -220,13 +218,13 @@ void QnStatusOverlayWidget::setDescription(const QString& description)
 
 void QnStatusOverlayWidget::setupPreloader()
 {
-    const auto preloader = new QnBusyIndicatorGraphicsWidget();
-    preloader->setDotSpacing(8);
-    preloader->setDotRadius(8);
-    preloader->setVisible(false);
+    m_preloader->setIndicatorColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6));
+    m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
+    m_preloader->setDotRadius(8);
+    m_preloader->setDotSpacing(8);
 
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->addItem(preloader);
+    layout->addItem(m_preloader);
 
     m_preloaderHolder->setLayout(layout);
     m_preloaderHolder->setAcceptedMouseButtons(Qt::NoButton);
@@ -244,7 +242,7 @@ void QnStatusOverlayWidget::setupCentralControls()
     //
 
     const auto centralLayout = new QVBoxLayout();
-    centralLayout->addStretch(kBigStretch * 2);
+    centralLayout->addStretch(kBigStretch);
     centralLayout->addSpacing(60);
     centralLayout->addWidget(m_centralAreaImage);
     centralLayout->addWidget(m_caption);
@@ -276,26 +274,17 @@ void QnStatusOverlayWidget::setupExtrasControls()
     m_description->label()->setAlignment(Qt::AlignHCenter);
     m_description->setVisible(false);
 
-    //
-    const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
+    const auto layout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);
+    layout->setContentsMargins(16, 0, 16, 16);
 
-    // Workaround for incorrect behavior of QGraphicsLinearLayout and QGraphicsProxyWidget
-    const auto workaroundProxy = new QWidget();
-    const auto workaroundLayout = new QVBoxLayout();
-    workaroundProxy->setLayout(workaroundLayout);
-    workaroundLayout->addWidget(m_button, 0, Qt::AlignHCenter | Qt::AlignTop);
-    workaroundLayout->addStretch(kBigStretch);
-    workaroundLayout->setContentsMargins(16, 0, 16, 16);
-
-    const auto buttonProxy = makeMaskedProxy(workaroundProxy);
+    const auto buttonProxy = makeMaskedProxy(m_button, m_extrasHolder);
     layout->addItem(buttonProxy);
-    layout->setAlignment(buttonProxy, Qt::AlignHCenter | Qt::AlignTop);
+    layout->setAlignment(buttonProxy, Qt::AlignHCenter);
 
-    const auto descriptionProxy = makeMaskedProxy(m_description);
+    const auto descriptionProxy = makeMaskedProxy(m_description, m_extrasHolder);
     layout->addItem(descriptionProxy);
-    layout->setAlignment(descriptionProxy, Qt::AlignHCenter | Qt::AlignTop);
+    layout->setAlignment(descriptionProxy, Qt::AlignHCenter);
 
-    m_extrasHolder->setLayout(layout);
     m_extrasHolder->setAcceptedMouseButtons(Qt::NoButton);
 }
 
@@ -345,10 +334,10 @@ void QnStatusOverlayWidget::updateAreasSizes()
     showExtras = showExtras && (rect.height() > minHeight); // Do not show extras on too small items
 
     qreal extrasHeight = 0.0;
-    if (showExtras && showExtras)
+    if (showExtras)
     {
         const qreal maxExtrasHeight = scale * 80;    // TODO: #ynikitnekov Change for description
-        const qreal minExtrasHeight = scale * (32 + 8);
+        const qreal minExtrasHeight = scale * 24;
 
         if (quater > maxExtrasHeight)
             extrasHeight = maxExtrasHeight;

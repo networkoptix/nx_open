@@ -46,12 +46,12 @@ Rectangle
 
         NxSearchEdit
         {
-            visible: (pageSwitcher.pagesCount > 1);
-            visualParent: screenHolder;
+            visible: grid.totalItemsCount > grid.itemsPerPage
+            visualParent: screenHolder
 
-            anchors.bottom: gridHolder.top;
-            anchors.bottomMargin: 8;
-            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.bottom: gridHolder.top
+            anchors.bottomMargin: 8
+            anchors.horizontalCenter: parent.horizontalCenter
 
             onQueryChanged: { grid.model.setFilterWildcard(query); }
         }
@@ -91,9 +91,11 @@ Rectangle
                         return 4;
                 }
 
-                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount);
-                readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
-                readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
+                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount)
+                readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
+                readonly property int itemsPerPage: colsCount * rowsCount
+                readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
+                readonly property int totalItemsCount: model.totalCount
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -152,6 +154,7 @@ Rectangle
                     model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
+                    readonly property int totalCount: model.rowCount()
                 }
 
                 delegate: Item

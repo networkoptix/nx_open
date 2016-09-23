@@ -29,14 +29,12 @@ Item
     {
         id: statusImage;
 
-        width: 64;
-        height: 64;
+        width: 120;
+        height: 120;
         anchors.top: parent.top;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        source: (thisComponent.loggedIn
-            ? "qrc:/skin/welcome_page/cloud_account_logged.png"
-            : "qrc:/skin/welcome_page/cloud_account_not-logged.png");
+        source: "qrc:/skin/welcome_page/logo.png"
     }
 
     NxLabel

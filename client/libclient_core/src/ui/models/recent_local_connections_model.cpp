@@ -1,8 +1,6 @@
-#include "recent_user_connections_model.h"
+#include "recent_local_connections_model.h"
 
 #include <client/client_recent_connections_manager.h>
-
-#include <client_core/client_core_settings.h>
 
 #include <nx/utils/raii_guard.h>
 #include <utils/math/math.h>
@@ -13,9 +11,9 @@ namespace
     const auto kRoleNames = []()-> RoleNameHash
     {
         RoleNameHash result;
-        result.insert(QnRecentUserConnectionsModel::UserNameRole, "userName");
-        result.insert(QnRecentUserConnectionsModel::PasswordRole, "password");
-        result.insert(QnRecentUserConnectionsModel::HasStoredPasswordRole, "hasStoredPassword");
+        result.insert(QnRecentLocalConnectionsModel::UserNameRole, "userName");
+        result.insert(QnRecentLocalConnectionsModel::PasswordRole, "password");
+        result.insert(QnRecentLocalConnectionsModel::HasStoredPasswordRole, "hasStoredPassword");
         return result;
     }();
 
@@ -31,9 +29,9 @@ namespace
 
     // Removes duplicate connection to same system with the same user.
     // Prefers to store connection with saved password
-    QnUserRecentConnectionDataList removeDuplicates(QnUserRecentConnectionDataList list)
+    QnLocalConnectionDataList removeDuplicates(QnLocalConnectionDataList list)
     {
-        QnUserRecentConnectionDataList result;
+        QnLocalConnectionDataList result;
         while (!list.empty())
         {
             const auto connectionData = *list.begin();
@@ -45,7 +43,7 @@ namespace
             }
 
             const auto itStoredPass = std::find_if(list.begin(), list.end(),
-                [userName](const QnUserRecentConnectionData &connection)
+                [userName](const QnLocalConnectionData &connection)
             {
                 return (connection.isStoredPassword && (connection.url.userName() == userName));
             });
@@ -53,7 +51,7 @@ namespace
             /// Stores first found connection with password (if found) or just first connection
             result.append(itStoredPass == list.end() ? connectionData : *itStoredPass);
             const auto newEnd = std::remove_if(list.begin(), list.end(),
-                [userName = connectionData.url.userName()](const QnUserRecentConnectionData &connection)
+                [userName = connectionData.url.userName()](const QnLocalConnectionData &connection)
             {
                 return (userName == connection.url.userName());
             });
@@ -64,7 +62,7 @@ namespace
 
 }
 
-QnRecentUserConnectionsModel::QnRecentUserConnectionsModel(QObject *parent):
+QnRecentLocalConnectionsModel::QnRecentLocalConnectionsModel(QObject *parent):
     base_type(parent),
     m_systemName(),
     m_data()
@@ -72,17 +70,17 @@ QnRecentUserConnectionsModel::QnRecentUserConnectionsModel(QObject *parent):
     QnClientRecentConnectionsManager::instance()->addModel(this);
 }
 
-QnRecentUserConnectionsModel::~QnRecentUserConnectionsModel()
+QnRecentLocalConnectionsModel::~QnRecentLocalConnectionsModel()
 {
     QnClientRecentConnectionsManager::instance()->removeModel(this);
 }
 
-QString QnRecentUserConnectionsModel::systemName() const
+QString QnRecentLocalConnectionsModel::systemName() const
 {
     return m_systemName;
 }
 
-void QnRecentUserConnectionsModel::setSystemName(const QString &systemName)
+void QnRecentLocalConnectionsModel::setSystemName(const QString &systemName)
 {
     if (m_systemName == systemName)
         return;
@@ -91,12 +89,12 @@ void QnRecentUserConnectionsModel::setSystemName(const QString &systemName)
     emit systemNameChanged();
 }
 
-bool QnRecentUserConnectionsModel::hasConnections() const
+bool QnRecentLocalConnectionsModel::hasConnections() const
 {
     return !m_data.isEmpty();
 }
 
-QString QnRecentUserConnectionsModel::firstUser() const
+QString QnRecentLocalConnectionsModel::firstUser() const
 {
     if (!hasConnections())
         return QString();
@@ -104,7 +102,7 @@ QString QnRecentUserConnectionsModel::firstUser() const
     return m_data.first().url.userName();
 }
 
-void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataList &newData)
+void QnRecentLocalConnectionsModel::updateData(const QnLocalConnectionDataList &newData)
 {
     const auto filteredData = removeDuplicates(newData);
     if (m_data == filteredData)
@@ -118,7 +116,7 @@ void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataLi
     {
         const auto connectionData = filteredData.at(newIndex);
         const auto it = std::find_if(m_data.begin(), m_data.end(),
-            [connectionData](const QnUserRecentConnectionData &data)
+            [connectionData](const QnLocalConnectionData &data)
             {
                 return (data.url.userName() == connectionData.url.userName());
             });
@@ -168,12 +166,12 @@ void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataLi
         emit firstUserChanged();
 }
 
-int QnRecentUserConnectionsModel::rowCount(const QModelIndex &parent) const
+int QnRecentLocalConnectionsModel::rowCount(const QModelIndex &parent) const
 {
     return (parent.isValid() ? 0 : m_data.size());
 }
 
-QVariant QnRecentUserConnectionsModel::data(const QModelIndex &index, int role) const
+QVariant QnRecentLocalConnectionsModel::data(const QModelIndex &index, int role) const
 {
     const int row = index.row();
     if (!qBetween(0, row, rowCount())
@@ -196,12 +194,12 @@ QVariant QnRecentUserConnectionsModel::data(const QModelIndex &index, int role) 
     }
 }
 
-RoleNameHash QnRecentUserConnectionsModel::roleNames() const
+RoleNameHash QnRecentLocalConnectionsModel::roleNames() const
 {
     return kRoleNames;
 }
 
-QVariant QnRecentUserConnectionsModel::getData(const QString &dataRole
+QVariant QnRecentLocalConnectionsModel::getData(const QString &dataRole
     , int row)
 {
     const auto it = kRoleIdByName.find(dataRole.toLatin1());

@@ -181,6 +181,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent) :
 void QnServerUpdatesWidget::initDropdownActions()
 {
     auto selectUpdateTypeMenu = new QMenu(this);
+    selectUpdateTypeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+
     auto defaultAction = selectUpdateTypeMenu->addAction(tr("Latest Available Update"),
         [this]()
         {
@@ -245,6 +247,8 @@ void QnServerUpdatesWidget::initDropdownActions()
 void QnServerUpdatesWidget::initDownloadActions()
 {
     auto downloadLinkMenu = new QMenu(this);
+    downloadLinkMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+
     downloadLinkMenu->addAction(tr("Download in External Browser"),
         [this]()
         {

@@ -17,7 +17,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/models/recent_user_connections_model.h>
+#include <ui/models/recent_local_connections_model.h>
 #include <ui/models/qml_sort_filter_proxy_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
@@ -38,7 +38,7 @@ namespace
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnQmlSortFilterProxyModel>("NetworkOptix.Qml", 1, 0, "QnQmlSortFilterProxyModel");
-        qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentUserConnectionsModel");
+        qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
 
         auto holder = new QStackedWidget();
         holder->addWidget(new QWidget());
@@ -268,7 +268,8 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
         QUrl::fromUserInput(serverUrl),
         QnCredentials(userName, password),
         storePassword,
-        autoLogin);
+        autoLogin,
+        false);
 }
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
@@ -282,6 +283,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QnCredentials& credentials,
     bool storePassword,
     bool autoLogin,
+    bool isConnectionToCloud,
     const QnRaiiGuardPtr& completionTracker)
 {
     if (!connectingToSystem().isEmpty())
@@ -290,7 +292,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, serverUrl, credentials, storePassword, autoLogin, systemId, completionTracker]()
+        [this, serverUrl, credentials, storePassword, autoLogin, systemId, completionTracker, isConnectionToCloud]()
         {
             setConnectingToSystem(systemId);
 
@@ -305,7 +307,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             params.setArgument(Qn::StorePasswordRole, storePassword);
             params.setArgument(Qn::ForceRemoveOldConnectionRole, !storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
-
+            params.setArgument(Qn::IsConnectionToCloud, isConnectionToCloud);
             menu()->trigger(QnActions::ConnectAction, params);
         };
 
@@ -321,7 +323,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
         return;
 
     connectToSystemInternal(systemId, QUrl::fromUserInput(serverUrl),
-        qnCloudStatusWatcher->credentials(), false, false);
+        qnCloudStatusWatcher->credentials(), false, false, true);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()

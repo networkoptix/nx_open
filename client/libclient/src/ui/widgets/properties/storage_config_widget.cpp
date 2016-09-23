@@ -48,8 +48,7 @@
 
 namespace
 {
-    static const int kColumnSpacing = 8;
-    static const int kMinColWidth = 60;
+    static const int kMinimumColumnWidth = 80;
 
     class StoragesSortModel : public QSortFilterProxyModel
     {
@@ -96,6 +95,9 @@ namespace
                 result.rwidth() += style::Metrics::kArrowSize + style::Metrics::kStandardPadding;
             }
 
+            if (index.column() != QnStorageListModel::CheckBoxColumn)
+                result.setWidth(qMax(result.width(), kMinimumColumnWidth));
+
             return result;
         }
 
@@ -113,7 +115,9 @@ namespace
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
 
-            if (index.column() == QnStorageListModel::StoragePoolColumn && !editableColumn)
+            auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
+
+            if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
                 opt.palette.setColor(QPalette::Text, qnGlobals->errorTextColor());
 
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
@@ -228,22 +232,20 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->backupTimeLabel->setForegroundRole(QPalette::Light);
     ui->backupScheduleLabel->setForegroundRole(QPalette::Light);
+    ui->realtimeBackupStatusLabel->setForegroundRole(QPalette::Light);
 
     ui->cannotStartBackupLabel->setVisible(false);
     ui->backupStartButton->setVisible(false);
 
     ui->realtimeBackupControlButton->hide(); /* Unused in the current version. */
-
     ui->estimatedTimeLabel->hide(); /* Unused in the current version. */
-
-    setWarningStyle(ui->cannotStartBackupLabel);
-    setWarningStyle(ui->realtimeBackupWarningLabel);
 
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
 
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
+    m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
     m_storagePoolMenu->addAction(tr("Main"))->setData(false);
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
@@ -780,7 +782,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    if (m_model->storages().empty())
+    if (m_model->storages().size() < 2)
         return error(tr("Add more drives to use them as backup storage."));
 
     const auto isCorrectStorage = [](const QnStorageModelInfo& storage)

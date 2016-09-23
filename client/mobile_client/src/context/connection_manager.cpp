@@ -424,19 +424,21 @@ void QnConnectionManagerPrivate::storeConnection(
         const QUrl& url,
         bool storePassword)
 {
-    auto lastConnections = qnClientCoreSettings->recentUserConnections();
+    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
 
-    const QnUserRecentConnectionData connectionInfo(QString(), systemName, url, storePassword);
+    const QnLocalConnectionData connectionInfo(
+        QString(), systemName, systemName, url, storePassword);
 
-    auto connectionEqual = [connectionInfo](const QnUserRecentConnectionData& connection)
+    auto connectionEqual = [connectionInfo](const QnLocalConnectionData& connection)
     {
         return connection.systemName == connectionInfo.systemName;
     };
-    lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
-                          lastConnections.end());
+    lastConnections.erase(
+        std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
+        lastConnections.end());
     lastConnections.prepend(connectionInfo);
 
-    qnClientCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
     qnClientCoreSettings->save();
 }
 

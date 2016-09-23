@@ -558,7 +558,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Alarm/Event Rules..."));
+        text(tr("Event Rules..."));
 
     factory(QnActions::OpenFailoverPriorityAction).
         mode(QnActionTypes::DesktopMode).
@@ -995,7 +995,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Alarm/Event Rules...")).
+        text(tr("Event Rules...")).
         icon(qnSkin->icon("events/settings.png")).
         shortcut(lit("Ctrl+E")).
         autoRepeat(false);

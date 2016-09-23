@@ -169,7 +169,7 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
     for (InterfaceInfo &item: interfaces)
         item.online = false;
 
-    auto modules = QnModuleFinder::instance()->foundModules();
+    auto modules = qnModuleFinder->foundModules();
     auto iter = boost::find_if(modules, [id](const QnModuleInformation &info){return info.id == id;});
     if (iter == boost::end(modules))
         return;
@@ -181,7 +181,7 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
         return;
     }
 
-    for (const SocketAddress &remoteAddress: QnModuleFinder::instance()->moduleAddresses(iter->id)) {
+    for (const SocketAddress &remoteAddress: qnModuleFinder->moduleAddresses(iter->id)) {
         bool found = false;
         auto sameUrl = [remoteAddress](const QUrl &url) {
             return url.port() == remoteAddress.port && url.host() == remoteAddress.address.toString();

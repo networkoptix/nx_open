@@ -147,14 +147,26 @@ bool CalendarWorkbenchPanel::isEnabled() const
     return action(QnActions::ToggleCalendarAction)->isEnabled();
 }
 
-void CalendarWorkbenchPanel::setEnabled(bool enabled)
+void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
 {
     if (isEnabled() == enabled)
         return;
 
     action(QnActions::ToggleCalendarAction)->setEnabled(enabled);
-    if (!enabled)
-        setOpened(false, false);
+    if (!isOpened())
+        return;
+   
+    if (enabled)
+    {
+        /* Minor hack to make animation look better. */
+        item->setY(m_origin.y() + kClosedPositionOffsetY);
+        setOpened(true, animated);
+    }
+    else
+    {
+        setVisible(false, animated);
+        setDayTimeWidgetOpened(false, animated);
+    }
 }
 
 QPointF CalendarWorkbenchPanel::origin() const
@@ -166,11 +178,18 @@ void CalendarWorkbenchPanel::setOrigin(const QPointF& position)
 {
     if (qFuzzyEquals(m_origin, position))
         return;
+
+    bool animating = m_yAnimator->isRunning();
+    m_yAnimator->stop();
     m_origin = position;
     QPointF targetPosition = position;
     if (!isOpened())
         targetPosition += QPointF(0, kClosedPositionOffsetY);
-    item->setPos(targetPosition);
+
+    if (animating)
+        m_yAnimator->animateTo(targetPosition.y());
+    else
+        item->setPos(targetPosition);
 }
 
 bool CalendarWorkbenchPanel::isPinned() const
@@ -186,8 +205,6 @@ bool CalendarWorkbenchPanel::isOpened() const
 void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 {
     ensureAnimationAllowed(&animate);
-    if (!action(QnActions::ToggleCalendarAction)->isEnabled())
-        opened = false;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(QnActions::ToggleCalendarAction)->setChecked(opened);
@@ -207,7 +224,7 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
     else
         item->setY(newY);
 
-    setVisible(opened, animate);
+    setVisible(opened && isEnabled(), animate);
     if (!opened)
         setDayTimeWidgetOpened(false, animate);
 
@@ -276,7 +293,6 @@ void CalendarWorkbenchPanel::setDayTimeWidgetOpened(bool opened, bool animate)
     if (m_dayTimeOpened == opened)
         return;
     m_dayTimeOpened = opened;
-    qDebug() << "set daytime opened" << opened;
 
     ensureAnimationAllowed(&animate);
     qreal opacity = opened ? kOpaque : kHidden;

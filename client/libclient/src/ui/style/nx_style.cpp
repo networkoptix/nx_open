@@ -1772,12 +1772,14 @@ void QnNxStyle::drawControl(
         {
             if (auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
             {
+                bool asDropdown = widget && widget->property(Properties::kMenuAsDropdown).toBool();
                 if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
                 {
                     QnScopedPainterPenRollback penRollback(painter, menuItem->palette.color(QPalette::Midlight));
                     int y = menuItem->rect.top() + menuItem->rect.height() / 2;
-                    painter->drawLine(Metrics::kMenuItemHPadding, y,
-                                      menuItem->rect.right() - Metrics::kMenuItemHPadding, y);
+                    int padding = asDropdown ? Metrics::kStandardPadding: Metrics::kMenuItemHPadding;
+                    painter->drawLine(padding, y,
+                                      menuItem->rect.right() - padding, y);
                     break;
                 }
 
@@ -1798,7 +1800,10 @@ void QnNxStyle::drawControl(
                 if (selected)
                     painter->fillRect(menuItem->rect, backgroundColor);
 
-                int xPos = Metrics::kMenuItemTextLeftPadding;
+                int xPos = asDropdown
+                    ? Metrics::kStandardPadding
+                    : Metrics::kMenuItemTextLeftPadding;
+
                 int y = menuItem->rect.y();
 
                 int textFlags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
@@ -1833,6 +1838,7 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->checked && menuItem->checkType != QStyleOptionMenuItem::NotCheckable)
                 {
+                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
                     drawMenuCheckMark(
                             painter,
                             QRect(Metrics::kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
@@ -1841,6 +1847,7 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
                 {
+                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
                     drawArrow(Right,
                               painter,
                               QRect(menuItem->rect.right() - Metrics::kMenuItemVPadding - Metrics::kArrowSize, menuItem->rect.top(),
@@ -2817,8 +2824,17 @@ QSize QnNxStyle::sizeFromContents(
         }
 
         case CT_MenuItem:
+        {
+            if (widget && widget->property(Properties::kMenuAsDropdown).toBool())
+            {
+                return QSize(
+                    qMax(size.width() + 2 * Metrics::kStandardPadding, Metrics::kMinimumButtonWidth),
+                    size.height() + 2 * Metrics::kMenuItemVPadding);
+            }
+
             return QSize(size.width() + dp(24) + 2 * Metrics::kMenuItemHPadding,
-                         size.height() + 2 * Metrics::kMenuItemVPadding);
+                size.height() + 2 * Metrics::kMenuItemVPadding);
+        }
 
         case CT_HeaderSection:
         {

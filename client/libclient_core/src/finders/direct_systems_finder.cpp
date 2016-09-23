@@ -7,7 +7,7 @@
 QnDirectSystemsFinder::QnDirectSystemsFinder(QObject *parent)
     : base_type(parent)
 {
-    const auto moduleFinder = QnModuleFinder::instance();
+    const auto moduleFinder = qnModuleFinder;
     NX_ASSERT(moduleFinder, Q_FUNC_INFO, "Module finder does not exist");
     if (!moduleFinder)
         return;
@@ -50,16 +50,6 @@ QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
         ? QnSystemDescriptionPtr() : QnSystemDescriptionPtr(*it));
 }
 
-QString getTargetSystemId(const QnModuleInformation& serverInfo)
-{
-    if (serverInfo.serverFlags.testFlag(Qn::SF_NewSystem))
-        return serverInfo.id.toString();
-    else if (!serverInfo.cloudSystemId.isEmpty())
-        return serverInfo.cloudSystemId;
-
-    return serverInfo.systemName;
-}
-
 void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 {
     const auto systemIt = getSystemItByServer(moduleInformation.id);
@@ -69,7 +59,7 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
         return;
     }
 
-    const auto systemId = getTargetSystemId(moduleInformation);
+    const auto systemId = helpers::getTargetSystemId(moduleInformation);
     auto itSystem = m_systems.find(systemId);
     const auto createNewSystem = (itSystem == m_systems.end());
     if (createNewSystem)

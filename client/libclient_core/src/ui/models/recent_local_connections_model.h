@@ -1,13 +1,14 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
-#include <client_core/user_recent_connection_data.h>
+#include <client_core/local_connection_data.h>
 
-class QnRecentUserConnectionsModel : public QAbstractListModel
+class QnRecentLocalConnectionsModel : public QAbstractListModel
 {
     Q_OBJECT
     typedef QAbstractListModel base_type;
 
+    // TODO: #ynikitenkov use systemId instead of systemName
     Q_PROPERTY(QString systemName READ systemName WRITE setSystemName NOTIFY systemNameChanged)
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
     Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)
@@ -24,9 +25,9 @@ public:
         RolesCount
     };
 
-    QnRecentUserConnectionsModel(QObject *parent = nullptr);
+    QnRecentLocalConnectionsModel(QObject *parent = nullptr);
 
-    virtual ~QnRecentUserConnectionsModel();
+    virtual ~QnRecentLocalConnectionsModel();
 
 public: // properties
     QString systemName() const;
@@ -44,7 +45,7 @@ public: // overrides
 
     QHash<int, QByteArray> roleNames() const override;
 
-    void updateData(const QnUserRecentConnectionDataList &newData);
+    void updateData(const QnLocalConnectionDataList &newData);
 
 public slots:
     QVariant getData(const QString &dataRole, int row);
@@ -57,5 +58,5 @@ signals:
 
 private:
     QString m_systemName;
-    QnUserRecentConnectionDataList m_data;
+    QnLocalConnectionDataList m_data;
 };

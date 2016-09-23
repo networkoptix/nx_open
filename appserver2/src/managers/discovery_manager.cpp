@@ -25,7 +25,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
     // TODO: maybe it's better to move it out and use signal?..
-    QnModuleFinder *moduleFinder = QnModuleFinder::instance();
+    QnModuleFinder *moduleFinder = qnModuleFinder;
     if (moduleFinder && moduleFinder->directModuleFinder())
         moduleFinder->directModuleFinder()->checkUrl(QUrl(transaction.params.url));
 
