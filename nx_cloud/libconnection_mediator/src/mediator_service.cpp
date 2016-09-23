@@ -85,8 +85,8 @@ int MediatorProcess::executeApplication()
         return 0;
     }
 
-    settings.logging().initLog(
-        settings.general().dataDir,
+    initializeQnLog(
+        settings.logging(), settings.general().dataDir,
         QnLibConnectionMediatorAppInfo::applicationDisplayName());
 
     if (settings.stun().addrToListenList.empty())

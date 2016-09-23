@@ -8,14 +8,29 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
-//!Able to take settings from \a QSettings class (win32 registry or ini file) or from command line arguments
-/*!
-    Value defined as command line argument has preference over registry
-*/
+/**
+ * Able to take settings from \a QSettings class (win32 registry or linux ini file) or from
+ *  command line arguments.
+ *
+ * Value defined as command line argument has preference over registry.
+ *
+ * example.reg
+ *      [pathToModule/section]
+ *      "item" = "value"
+ *
+ * example.ini
+ *      [section]
+ *      item = value
+ *
+ * arguments: --section/item=value
+ */
 class QnSettings
 {
 public:
-    QnSettings(const QString& applicationName_, const QString& moduleName_);
+    QnSettings(
+        const QString& applicationName_,
+        const QString& moduleName_,
+        int scope = QSettings::SystemScope);
 
     void parseArgs(int argc, const char* argv[]);
     QVariant value(
@@ -33,17 +48,24 @@ private:
 class QnLogSettings
 {
 public:
-    void load(const QnSettings& settings, QString prefix = QLatin1String("log"));
+    #ifdef _DEBUG
+        static constexpr QnLogLevel kDefaultLogLevel = cl_logDEBUG1;
+    #else
+        static constexpr QnLogLevel kDefaultLogLevel = cl_logINFO;
+    #endif
 
-    void initLog(
-        const QString& dataDir,
-        const QString& applicationName,
-        const QString& baseName = QLatin1String("log_file"),
-        int id = QnLog::MAIN_LOG_ID) const;
+    QnLogLevel level = kDefaultLogLevel;
+    QString directory = QString(); //< dataDir/log
+    quint32 maxFileSize = nx::utils::stringToBytesConst("10M");
+    quint8 maxBackupCount = 5;
 
-private:
-    QnLogLevel m_level = cl_logUNKNOWN;
-    QString m_dir;
-    quint32 m_maxFileSize = 1;
-    quint8 m_maxBackupCount = 1;
+    /** Rewrites values from settings if specified */
+    void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));
 };
+
+void initializeQnLog(
+    const QnLogSettings& settings,
+    const QString& dataDir,
+    const QString& applicationName,
+    const QString& baseName = QLatin1String("log_file"),
+    int id = QnLog::MAIN_LOG_ID);

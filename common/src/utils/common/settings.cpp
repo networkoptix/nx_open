@@ -3,18 +3,14 @@
 #include "command_line_parser.h"
 #include "app_info.h"
 
-QnSettings::QnSettings(const QString& applicationName_, const QString& moduleName_):
+QnSettings::QnSettings(const QString& applicationName_, const QString& moduleName_, int scope):
     applicationName(applicationName_),
     moduleName(moduleName_),
     #ifdef _WIN32
-        m_systemSettings(
-            QSettings::SystemScope,
-            QnAppInfo::organizationName(),
-            applicationName)
+        m_systemSettings(scope, QnAppInfo::organizationName(), applicationName)
     #else
-        m_systemSettings(
-            lm("/opt/%1/%2/etc/%2.conf").arg(QnAppInfo::linuxOrganizationName()).arg(moduleName),
-            QSettings::IniFormat)
+        m_systemSettings(lm("/opt/%1/%2/etc/%2.conf")
+            .arg(QnAppInfo::linuxOrganizationName()).arg(moduleName), QSettings::IniFormat)
     #endif
 {
 }
@@ -34,52 +30,53 @@ QVariant QnSettings::value(
     return m_systemSettings.value(key, defaultValue);
 }
 
-void QnLogSettings::load(const QnSettings& settings, QString prefix)
+void QnLogSettings::load(const QnSettings& settings, const QString& prefix)
 {
     const auto key = [&prefix](const char* key)
     {
         return QString(lm("%1/%2").arg(prefix).arg(key));
     };
 
-    m_level = QnLog::logLevelFromString(settings.value(key("logLevel")).toString());
-    if (m_level == cl_logUNKNOWN)
-    {
-        #ifdef _DEBUG
-            m_level = cl_logDEBUG1;
-        #else
-            m_level = cl_logINFO;
-        #endif
-    }
+    const auto confLevel = QnLog::logLevelFromString(settings.value(key("logLevel")).toString());
+    if (confLevel != cl_logUNKNOWN)
+        level = confLevel;
 
-    m_dir = settings.value(key("logDir")).toString();
-    m_maxBackupCount = (quint8) settings.value(key("maxBackupCount"), 5).toInt();
-    m_maxFileSize = (quint32) nx::utils::stringToBytes(
-            settings.value(key("maxFileSize")).toString(), QLatin1String("10M"));
+    directory = settings.value(key("logDir")).toString();
+    maxBackupCount = (quint8) settings.value(key("maxBackupCount"), 5).toInt();
+    maxFileSize = (quint32) nx::utils::stringToBytes(
+        settings.value(key("maxFileSize")).toString(), maxFileSize);
 }
 
-void QnLogSettings::initLog(
+void initializeQnLog(
+    const QnLogSettings& settings,
     const QString& dataDir,
     const QString& applicationName,
     const QString& baseName,
-    int id) const
+    int id)
 {
-    if (m_level == cl_logNONE)
+    if (settings.level == cl_logNONE)
         return;
 
-    const auto logDir = m_dir.isEmpty() ? (dataDir + QLatin1String("/log")) : m_dir;
-    QDir().mkpath(logDir);
+    const auto logDir = settings.directory.isEmpty()
+        ? (dataDir + QLatin1String("/log"))
+        : settings.directory;
 
+    QDir().mkpath(logDir);
     const QString& fileName = logDir + lit("/") + baseName;
-    if (!QnLog::instance(id)->create(fileName, m_maxFileSize, m_maxBackupCount, m_level))
+    if (!QnLog::instance(id)->create(
+            fileName, settings.maxFileSize, settings.maxBackupCount, settings.level))
     {
         std::wcerr << L"Failed to create log file " << fileName.toStdWString() << std::endl;
     }
+
+    const auto logInfo = lm("Logging level: %1, maxFileSize: %2, maxBackupCount: %3, fileName: %4")
+        .str(QnLog::logLevelToString(settings.level))
+        .str(nx::utils::bytesToString(settings.maxFileSize))
+        .strs(settings.maxBackupCount, fileName);
 
     NX_LOG(id, lm(QByteArray(80, '=')), cl_logALWAYS);
     NX_LOG(id, lm("%1 started").arg(applicationName), cl_logALWAYS);
     NX_LOG(id, lm("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
     NX_LOG(id, lm("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-    NX_LOG(id, lm("Logging level: %1, maxFileSize: %2, maxBackupCount: %3, fileName: %4")
-        .strs(QnLog::logLevelToString(m_level), nx::utils::bytesToString(m_maxFileSize),
-            m_maxBackupCount, fileName), cl_logALWAYS);
+    NX_LOG(id, logInfo, cl_logALWAYS);
 }
