@@ -1,54 +1,62 @@
 #include "resource_selection_dialog_delegate.h"
 
-#include <QtWidgets/QLayout>
-
-#include <core/resource/camera_resource.h>
-#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/help/help_topics.h>
-#include <ui/models/resource/resource_tree_model.h>
-
 
 // -------------------------------------------------------------------------- //
 // QnResourceSelectionDialogDelegate
 // -------------------------------------------------------------------------- //
-QnResourceSelectionDialogDelegate::QnResourceSelectionDialogDelegate(QObject *parent):
+QnResourceSelectionDialogDelegate::QnResourceSelectionDialogDelegate(QObject* parent):
     QObject(parent)
 {
-
 }
 
-QnResourceSelectionDialogDelegate::~QnResourceSelectionDialogDelegate() {
-
+QnResourceSelectionDialogDelegate::~QnResourceSelectionDialogDelegate()
+{
 }
 
-void QnResourceSelectionDialogDelegate::init(QWidget* parent) {
-    Q_UNUSED(parent)
+void QnResourceSelectionDialogDelegate::init(QWidget* /*parent*/)
+{
 }
 
-bool QnResourceSelectionDialogDelegate::validate(const QnResourceList &selectedResources) {
-    Q_UNUSED(selectedResources)
+bool QnResourceSelectionDialogDelegate::validate(const QSet<QnUuid>& /*selectedResources*/)
+{
     return true;
 }
 
-bool QnResourceSelectionDialogDelegate::isValid(const QnResourcePtr &resource) const {
-    Q_UNUSED(resource)
+bool QnResourceSelectionDialogDelegate::isValid(const QnUuid& /*resource*/) const
+{
     return true;
 }
 
-QnResourceTreeModelCustomColumnDelegate* QnResourceSelectionDialogDelegate::customColumnDelegate() const {
+QnResourceTreeModelCustomColumnDelegate* QnResourceSelectionDialogDelegate::customColumnDelegate() const
+{
     return nullptr;
 }
 
-bool QnResourceSelectionDialogDelegate::isFlat() const {
+bool QnResourceSelectionDialogDelegate::isFlat() const
+{
     return false;
 }
 
-int QnResourceSelectionDialogDelegate::helpTopicId() const {
+int QnResourceSelectionDialogDelegate::helpTopicId() const
+{
     return Qn::Forced_Empty_Help;
 }
 
-bool QnResourceSelectionDialogDelegate::isMultiChoiceAllowed() const {
+QnResourcePtr QnResourceSelectionDialogDelegate::getResource(const QnUuid& resource) const
+{
+    return qnResPool->getResourceById(resource);
+}
+
+QnResourceList QnResourceSelectionDialogDelegate::getResources(const QSet<QnUuid>& resources) const
+{
+    return qnResPool->getResources(resources);
+}
+
+bool QnResourceSelectionDialogDelegate::isMultiChoiceAllowed() const
+{
     return true;
 }
 

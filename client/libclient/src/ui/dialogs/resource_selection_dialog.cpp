@@ -27,24 +27,29 @@ namespace {
 
 class QnColoringProxyModel: public QIdentityProxyModel
 {
+    using base_type = QIdentityProxyModel;
 public:
-    QnColoringProxyModel(QnResourceSelectionDialogDelegate* delegate, QObject *parent = 0):
-        QIdentityProxyModel(parent),
+    QnColoringProxyModel(QnResourceSelectionDialogDelegate* delegate, QObject* parent = nullptr):
+        base_type(parent),
         m_delegate(delegate)
     {
     }
 
     QVariant data(const QModelIndex &proxyIndex, int role) const override
     {
-        if (role == Qt::TextColorRole && m_delegate && !m_delegate->isValid(resource(proxyIndex)))
+        if (role == Qt::TextColorRole && m_delegate
+            && !m_delegate->isValid(id(proxyIndex)))
             return QBrush(QColor(qnGlobals->errorTextColor()));
         return QIdentityProxyModel::data(proxyIndex, role);
     }
 
 private:
-    QnResourcePtr resource(const QModelIndex &proxyIndex) const
+    QnUuid id(const QModelIndex &proxyIndex) const
     {
-        return QIdentityProxyModel::data(proxyIndex, Qn::ResourceRole).value<QnResourcePtr>();
+        auto resource = base_type::data(proxyIndex, Qn::ResourceRole).value<QnResourcePtr>();
+        if (resource)
+            return resource->getId();
+        return base_type::data(proxyIndex, Qn::UuidRole).value<QnUuid>();
     }
 
     QnResourceSelectionDialogDelegate* m_delegate;
@@ -166,45 +171,58 @@ void QnResourceSelectionDialog::initModel()
 QnResourceSelectionDialog::~QnResourceSelectionDialog() {}
 
 
-QnResourceList QnResourceSelectionDialog::selectedResources() const
+QSet<QnUuid> QnResourceSelectionDialog::selectedResources() const
 {
-    return selectedResourcesInner();
+    return selectedResourcesInternal();
 }
 
-void QnResourceSelectionDialog::setSelectedResources(const QnResourceList& selected)
+void QnResourceSelectionDialog::setSelectedResources(const QSet<QnUuid>& selected)
 {
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        setSelectedResourcesInner(selected);
+        setSelectedResourcesInternal(selected);
     }
     at_resourceModel_dataChanged();
 }
 
-QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelIndex& parent) const
+QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIndex& parent) const
 {
-    QnResourceList result;
+    QSet<QnUuid> result;
     for (int i = 0; i < m_resourceModel->rowCount(parent); ++i)
     {
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn, parent);
         if (m_resourceModel->rowCount(idx) > 0)
-            result.append(selectedResourcesInner(idx));
+            result += selectedResourcesInternal(idx);
 
         QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
 
-        QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (m_filter == Filter::users && resource.dynamicCast<QnUserResource>())
-            result.append(resource);
+        auto nodeType = idx.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        auto resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
+        auto id = idx.data(Qn::UuidRole).value<QnUuid>();
 
-        if (m_filter == Filter::cameras && resource.dynamicCast<QnVirtualCameraResource>())
-            result.append(resource);
+        switch (m_filter)
+        {
+            case QnResourceSelectionDialog::Filter::cameras:
+                if (resource.dynamicCast<QnVirtualCameraResource>())
+                    result.insert(resource->getId());
+                break;
+            case QnResourceSelectionDialog::Filter::users:
+                if (resource.dynamicCast<QnUserResource>())
+                    result.insert(resource->getId());
+                if (nodeType == Qn::RoleNode)
+                    result.insert(id);
+                break;
+            default:
+                break;
+        }
     }
     return result;
 }
 
-int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList& selected,
+int QnResourceSelectionDialog::setSelectedResourcesInternal(const QSet<QnUuid>& selected,
     const QModelIndex& parent)
 {
     int count = 0;
@@ -217,14 +235,16 @@ int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList& s
         int childCount = m_resourceModel->rowCount(idx);
         if (childCount > 0)
         {
-            checked = (setSelectedResourcesInner(selected, idx) == childCount);
+            checked = (setSelectedResourcesInternal(selected, idx) == childCount);
         }
         else
         {
-            QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
-            if ((m_filter == Filter::users && resource.dynamicCast<QnUserResource>())
-                || (m_filter == Filter::cameras && resource.dynamicCast<QnVirtualCameraResource>()))
-                checked = selected.contains(resource);
+            auto resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
+            auto id = idx.data(Qn::UuidRole).value<QnUuid>();
+            if (resource)
+                checked = selected.contains(resource->getId());
+            else
+                checked = selected.contains(id);
         }
 
         if (checked)

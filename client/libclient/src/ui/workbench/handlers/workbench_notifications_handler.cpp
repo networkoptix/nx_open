@@ -114,10 +114,28 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
     {
+        //TODO: #GDM code duplication
+        auto allowedForUser =
+            [this](const std::vector<QnUuid>& ids)
+            {
+                if (ids.empty())
+                    return true;
+
+                auto user = context()->user();
+                if (!user)
+                    return false;
+
+                if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
+                    return true;
+
+                auto roleId = user->userGroup();
+                return !roleId.isNull()
+                    && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
+            };
+
+
         /* Skip action if it contains list of users, and we are not on the list. */
-        auto ids = businessAction->getParams().additionalResources;
-        if (!ids.empty()
-            && std::find(ids.cbegin(), ids.cend(), context()->user()->getId()) == ids.cend())
+        if (!allowedForUser(businessAction->getParams().additionalResources))
             return;
     }
 

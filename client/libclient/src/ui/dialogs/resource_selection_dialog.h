@@ -36,8 +36,8 @@ public:
     explicit QnResourceSelectionDialog(Filter filter, QWidget* parent = nullptr);
     ~QnResourceSelectionDialog();
 
-    QnResourceList selectedResources() const;
-    void setSelectedResources(const QnResourceList &selected);
+    QSet<QnUuid> selectedResources() const;
+    void setSelectedResources(const QSet<QnUuid> &selected);
 
     QnResourceSelectionDialogDelegate* delegate() const;
     void setDelegate(QnResourceSelectionDialogDelegate* delegate);
@@ -45,16 +45,15 @@ public:
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
 
-    QnResourceList selectedResourcesInner(const QModelIndex &parent = QModelIndex()) const;
-    int setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent = QModelIndex());
+    QSet<QnUuid> selectedResourcesInternal(const QModelIndex& parent = QModelIndex()) const;
+    int setSelectedResourcesInternal(const QSet<QnUuid>& selected,
+        const QModelIndex& parent = QModelIndex());
 
-    private slots:
+private:
     void at_resourceModel_dataChanged();
 
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
-
-private:
     void initModel();
 
 private:

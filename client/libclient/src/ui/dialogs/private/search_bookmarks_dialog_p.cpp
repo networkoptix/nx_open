@@ -368,12 +368,19 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
 void QnSearchBookmarksDialogPrivate::chooseCamera()
 {
     QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, m_owner);
-    dialog.setSelectedResources(m_allCamerasChoosen
-        ? QnVirtualCameraResourceList() : m_model->cameras());
+    QSet<QnUuid> ids;
+    if (!m_allCamerasChoosen)
+    {
+        for (auto camera: m_model->cameras())
+            ids << camera->getId();
+    }
+    dialog.setSelectedResources(ids);
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        setCameras(dialog.selectedResources().filtered<QnVirtualCameraResource>());
+        auto selectedCameras = qnResPool->getResources<QnVirtualCameraResource>(
+            dialog.selectedResources());
+        setCameras(selectedCameras);
         m_model->applyFilter();
     }
 }
