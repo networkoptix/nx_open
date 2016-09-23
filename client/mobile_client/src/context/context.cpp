@@ -10,7 +10,7 @@
 #include <context/context_settings.h>
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
-#include <ui/models/recent_user_connections_model.h>
+#include <ui/models/recent_local_connections_model.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
@@ -134,16 +134,16 @@ QString QnContext::initialTest() const
 
 void QnContext::removeSavedConnection(const QString& systemName)
 {
-    auto lastConnections = qnClientCoreSettings->recentUserConnections();
+    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
 
-    auto connectionEqual = [systemName](const QnUserRecentConnectionData& connection)
+    auto connectionEqual = [systemName](const QnLocalConnectionData& connection)
     {
         return connection.systemName == systemName;
     };
     lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
                           lastConnections.end());
 
-    qnClientCoreSettings->setRecentUserConnections(lastConnections);
+    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
     qnClientCoreSettings->save();
 }
 
@@ -175,13 +175,14 @@ QString QnContext::getLastUsedUrl() const
 
     if (url.password().isEmpty())
     {
-        QnRecentUserConnectionsModel connectionsModel;
+        QnRecentLocalConnectionsModel connectionsModel;
         connectionsModel.setSystemName(getLastUsedSystemId());
         if (!connectionsModel.hasConnections())
             return QString();
 
         const auto firstIndex = connectionsModel.index(0);
-        QString password = connectionsModel.data(firstIndex, QnRecentUserConnectionsModel::PasswordRole).toString();
+        const auto password = connectionsModel.data(
+            firstIndex, QnRecentLocalConnectionsModel::PasswordRole).toString();
         if (password.isEmpty())
             return QString();
 
