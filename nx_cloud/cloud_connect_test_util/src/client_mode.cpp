@@ -49,7 +49,7 @@ std::vector<SocketAddress> resolveTargets(
     {
         const auto systemSuffix = '.' + targetAddress.address.toString().toUtf8();
         targetList.push_back(SocketAddress(serverId + systemSuffix, 0));
-        for (int i = 1; i < serverCount; i++)
+        for (std::size_t i = 1; i < serverCount; ++i)
         {
             targetList.push_back(SocketAddress(
                 serverId + QString::number(i).toUtf8() + systemSuffix, 0));
