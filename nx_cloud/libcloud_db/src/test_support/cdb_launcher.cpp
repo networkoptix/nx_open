@@ -43,9 +43,9 @@ CdbLauncher::CdbLauncher(QString tmpDir)
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
-    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-log/level"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
-    addArg("-syncroLog/logLevel"); addArg("DEBUG2");
+    addArg("-syncroLog/level"); addArg("DEBUG2");
 
     addArg("-db/driverName");
     addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(

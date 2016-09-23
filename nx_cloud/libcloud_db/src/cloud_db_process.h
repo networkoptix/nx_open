@@ -170,10 +170,6 @@ private:
     AuthorizationManager* m_authorizationManager;
     AuthenticationProvider* m_authProvider;
 
-    void initializeLogging(
-        const conf::Logging& logSettings,
-        const QString& logFileNameBase,
-        int logInstanceId);
     void registerApiHandlers(
         nx_http::MessageDispatcher* const msgDispatcher,
         const AuthorizationManager& authorizationManager,

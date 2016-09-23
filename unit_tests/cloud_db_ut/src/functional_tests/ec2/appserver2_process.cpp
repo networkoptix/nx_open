@@ -45,16 +45,7 @@ class Settings
 public:
     Settings()
     :
-#ifdef _WIN32
-        m_settings(
-            QSettings::SystemScope,
-            QnAppInfo::organizationName(),
-            "Nx Appserver2"),
-#else
-        m_settings(lit("/opt/%1/%2/etc/%2.conf")
-            .arg("NetworkOptix").arg("appserver2"),
-            QSettings::IniFormat),
-#endif
+        m_settings("Nx Appserver2", "appserver2"),
         m_showHelp(false)
     {
     }

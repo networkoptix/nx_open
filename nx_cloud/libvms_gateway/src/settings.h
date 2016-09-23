@@ -30,13 +30,6 @@ public:
     QString mediatorEndpoint;
 };
 
-class Logging
-{
-public:
-    QString logLevel;
-    QString logDir;
-};
-
 class Auth
 {
 public:
@@ -97,7 +90,7 @@ public:
     bool showHelp() const;
 
     const General& general() const;
-    const Logging& logging() const;
+    const QnLogSettings& logging() const;
     const Auth& auth() const;
     const Tcp& tcp() const;
     const Http& http() const;
@@ -114,7 +107,7 @@ private:
     bool m_showHelp;
 
     General m_general;
-    Logging m_logging;
+    QnLogSettings m_logging;
     Auth m_auth;
     Tcp m_tcp;
     Http m_http;

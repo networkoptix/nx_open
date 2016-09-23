@@ -64,7 +64,6 @@ private:
 
     QString getDataDirectory();
     int printHelp();
-    void initializeLogging(const conf::Settings& settings);
     bool launchHttpServerIfNeeded(
         const conf::Settings& settings,
         const ListeningPeerPool& listeningPeerPool,

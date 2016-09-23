@@ -33,15 +33,6 @@ namespace
 
     const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
 
-    //log settings
-    const QLatin1String kLogLevel( "log/logLevel" );
-#ifdef _DEBUG
-    const QLatin1String kDefaultLogLevel( "DEBUG" );
-#else
-    const QLatin1String kDefaultLogLevel( "ERROR" );
-#endif
-    const QLatin1String kLogDir( "log/logDir" );
-
     //auth
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
     const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
@@ -119,17 +110,8 @@ CloudConnect::CloudConnect()
 
 Settings::Settings()
 :
-#ifdef _WIN32
-    m_settings(
-        QSettings::SystemScope,
-        QnAppInfo::organizationName(),
-        QnLibVmsGatewayAppInfo::applicationName()),
-#else
-    m_settings( lit("/opt/%1/%2/etc/%2.conf" )
-                .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName ),
-                QSettings::IniFormat ),
-#endif
-    m_showHelp( false )
+    m_settings(QnLibVmsGatewayAppInfo::applicationName(), kModuleName),
+    m_showHelp(false)
 {
     fillSupportedCmdParameters();
 }
@@ -144,7 +126,7 @@ const General& Settings::general() const
     return m_general;
 }
 
-const Logging& Settings::logging() const
+const QnLogSettings& Settings::logging() const
 {
     return m_logging;
 }
@@ -225,10 +207,7 @@ void Settings::loadConfiguration()
     m_general.mediatorEndpoint = m_settings.value(kGeneralMediatorEndpoint).toString();
 
     //log
-    m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
-    m_logging.logDir = m_settings.value(
-        kLogDir,
-        m_general.dataDir + lit("/log/")).toString();
+    m_logging.load(m_settings);
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();

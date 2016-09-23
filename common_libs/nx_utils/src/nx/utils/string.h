@@ -135,6 +135,7 @@ K, M, G suffix are supported.
 @return On failure returns 0 and (if not null) sets \a *ok to \a false
 */
 NX_UTILS_API uint64_t stringToBytes(const QString& str, bool* isOk = nullptr);
+NX_UTILS_API uint64_t stringToBytes(const QString& str, const QString& defaultValue);
 
 } // namespace utils
 } // namespace nx

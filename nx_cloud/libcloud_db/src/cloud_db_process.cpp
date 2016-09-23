@@ -144,8 +144,10 @@ int CloudDBProcess::exec()
             return 0;
         }
 
-        initializeLogging(settings.logging(), "log_file", QnLog::MAIN_LOG_ID);
-        initializeLogging(settings.vmsSynchronizationLogging(), "sync_log", QnLog::EC2_TRAN_LOG);
+        const auto dataDir = settings.dataDir();
+        const auto appName = QnLibCloudDbAppInfo::applicationDisplayName();
+        settings.logging().initLog(dataDir, appName, "log_file", QnLog::MAIN_LOG_ID);
+        settings.vmsSynchronizationLogging().initLog(dataDir, appName, "sync_log", QnLog::EC2_TRAN_LOG);
 
         const auto& httpAddrToListenList = settings.endpointsToListen();
         m_settings = &settings;
@@ -353,34 +355,6 @@ bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
     return false;
 }
 #endif
-
-void CloudDBProcess::initializeLogging(
-    const conf::Logging& logSettings,
-    const QString& logFileNameBase,
-    int logInstanceId)
-{
-    if (logSettings.logLevel == QString::fromLatin1("none"))
-        return;
-
-    const QString& logDir = logSettings.logDir;
-
-    QDir().mkpath(logDir);
-    const QString& logFileName = logDir + lit("/") + logFileNameBase;
-
-    if (!QnLog::instance(logInstanceId)->create(
-            logFileName,
-            1024 * 1024 * 10,
-            5,
-            QnLog::logLevelFromString(logSettings.logLevel)))
-    {
-        std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
-    }
-
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-}
 
 void CloudDBProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
