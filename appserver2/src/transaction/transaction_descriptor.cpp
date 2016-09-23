@@ -50,6 +50,20 @@ void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyVal
         *allowed = isAllowed;
 }
 
+void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, const QString& key, bool* allowed)
+{
+    QString dummy = lit("dummy");
+
+    KeyValueFilterType kv(key, &dummy);
+    globalSettingsSystemOnlyFilter(accessData, &kv, allowed);
+}
+
+void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, const QString& key, QString* value, bool* allowed)
+{
+    KeyValueFilterType kv(key, value);
+    globalSettingsSystemOnlyFilter(accessData, &kv, allowed);
+}
+
 void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList, bool* allowed)
 {
     if (allowed)
@@ -534,10 +548,10 @@ struct ReadResourceParamAccess
         if (resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission))
         {
             access_helpers::FilterFunctorListType filters = {
-                &access_helpers::globalSettingsSystemOnlyFilter
+                static_cast<void (*)(const Qn::UserAccessData&, access_helpers::KeyValueFilterType*, bool*)>(&access_helpers::globalSettingsSystemOnlyFilter)
             };
 
-            access_helpers::KeyValueFilterType keyValue = std::make_pair(param.name, &param.value);
+            access_helpers::KeyValueFilterType keyValue(param.name, &param.value);
             ec2::access_helpers::applyValueFilters(accessData, &keyValue, filters);
 
             return true;
@@ -575,20 +589,7 @@ struct ModifyResourceParamAccess
         if (param.name == Qn::USER_FULL_NAME)
             permissions |= Qn::WriteFullNamePermission;
 
-        result = resourceAccessHelper(accessData, param.resourceId, permissions);
-
-        if (result)
-        {
-            access_helpers::FilterFunctorListType filters = {
-                &access_helpers::globalSettingsSystemOnlyFilter
-            };
-
-            QString dummy = lit("dummy");
-            access_helpers::KeyValueFilterType keyValue = std::make_pair(param.name, &dummy);
-            ec2::access_helpers::applyValueFilters(accessData, &keyValue, filters, &result);
-        }
-
-        return result;
+        return resourceAccessHelper(accessData, param.resourceId, permissions);
     }
 
     bool isRemove;

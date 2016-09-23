@@ -49,6 +49,7 @@ public:
     bool applyUpdates(const QString &dirName);
     virtual bool beforeInstallUpdate(const QString& updateName);
     virtual bool afterInstallUpdate(const QString& updateName);
+    virtual bool afterAllUpdateActions() = 0;
 
     static bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details);
     /*!

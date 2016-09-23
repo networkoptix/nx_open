@@ -13,6 +13,7 @@
 #include "nx/fusion/serialization/sql_functions.h"
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
+#include "utils/crypt/symmetrical.h"
 #include "nx/fusion/serialization/json.h"
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
@@ -1236,6 +1237,74 @@ bool QnDbManager::upgradeSerializedTransactions()
         if (!updQuery.exec()) {
             qWarning() << Q_FUNC_INFO << query.lastError().text();
             return false;
+        }
+    }
+
+    return true;
+}
+
+bool QnDbManager::afterAllUpdateActions()
+{
+    if (m_dbJustCreated)
+        return true;
+
+    return encryptKvPairs();
+}
+
+bool QnDbManager::encryptKvPairs()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryStr = "SELECT rowid, resource_guid as resourceId, kv.value, kv.name FROM vms_kvpair";
+
+    if(!query.prepare(queryStr))
+    {
+        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING );
+        false;
+    }
+
+    struct TmpKvPair
+    {
+        int       rowid;
+        QString   name;
+        QString   value;
+    };
+    std::vector<TmpKvPair> tmpKvPairs;
+
+    while (query.next())
+    {
+        TmpKvPair kvp;
+
+        kvp.rowid  = query.value(0).toInt();
+        kvp.value  = query.value(2).toString();
+        kvp.name   = query.value(3).toString();
+
+        tmpKvPairs.push_back(kvp);
+    }
+
+    for (auto& kv : tmpKvPairs)
+    {
+        bool allowed;
+        ec2::access_helpers::globalSettingsSystemOnlyFilter(Qn::UserAccessData(), kv.name, &allowed);
+
+        bool needEncrypt = !allowed || kv.name == Qn::CAMERA_CREDENTIALS_PARAM_NAME || kv.name == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
+        if (needEncrypt)
+        {
+            kv.value = nx::utils::encodeHexStringFromStringAES128CBC(kv.value);
+            QSqlQuery insQuery(m_sdb);
+            QString insQueryString = "INSERT OR REPLACE INTO vms_kvpair(name, value) VALUES(:name, :value) WHERE rowid = :rowid";
+
+            insQuery.prepare(insQueryString);
+
+            insQuery.bindValue(":name",  kv.name);
+            insQuery.bindValue(":value", kv.value);
+            insQuery.bindValue(":rowid", kv.rowid);
+
+            if (!insQuery.exec())
+            {
+                NX_LOG( lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logWARNING );
+                return false;
+            }
         }
     }
 

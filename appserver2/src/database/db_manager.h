@@ -582,6 +582,7 @@ namespace detail
 
         virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;
+        virtual bool afterAllUpdateActions() override;
 
         ErrorCode addCameraHistory(const ApiServerFootageData& params);
         ErrorCode removeCameraHistory(const QnUuid& serverId);
@@ -597,6 +598,7 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         bool upgradeSerializedTransactions();
+        bool encryptKvPairs();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
     private:
         QnUuid m_storageTypeId;

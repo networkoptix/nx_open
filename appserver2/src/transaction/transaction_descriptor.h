@@ -81,6 +81,7 @@ using FilterFunctorType         =   std::function<void(const Qn::UserAccessData&
 using FilterFunctorListType     =   std::vector<FilterFunctorType>;
 
 void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, bool* allowed = nullptr);
+void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, const QString& key, bool* allowed = nullptr);
 
 void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList, bool* allowed = nullptr);
 

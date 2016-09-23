@@ -26,10 +26,7 @@ int QnSystemSettingsHandler::executeGet(
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
         bool allowed;
-        QString dummy = lit("dummy");
-
-        ec2::access_helpers::KeyValueFilterType keyValue(setting->key(), &dummy);
-        ec2::access_helpers::globalSettingsSystemOnlyFilter(owner->accessRights(), &keyValue, &allowed);
+        ec2::access_helpers::globalSettingsSystemOnlyFilter(owner->accessRights(), setting->key(), &allowed);
 
         if (!params.isEmpty())
         {

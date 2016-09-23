@@ -250,7 +250,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
         }
     }
 
-    return true;
+    return afterAllUpdateActions();
 }
 
 bool QnDbHelper::beforeInstallUpdate(const QString& updateName) {

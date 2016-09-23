@@ -100,7 +100,7 @@ void QnSmtpSimpleSettingsWidget::setSettings(const QnSimpleSmtpSettings &value)
     QScopedValueRollback<bool> guard(m_updating, true);
 
     ui->emailInputField->setText(value.email);
-    ui->passwordInputField->setText(nx::utils::decodeStringFromHexStringAES128CBC(value.password));
+    ui->passwordInputField->setText(value.password);
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
 }
