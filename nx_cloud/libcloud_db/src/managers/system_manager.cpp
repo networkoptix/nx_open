@@ -9,13 +9,16 @@
 
 #include <QtSql/QSqlQuery>
 
+#include <nx_ec/data/api_resource_data.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 
+#include <api/global_settings.h>
 #include <core/resource/param.h>
+#include <core/resource/user_resource.h>
 #include <utils/common/guard.h>
 #include <utils/common/id.h>
 #include <utils/common/sync_call.h>
@@ -53,7 +56,7 @@ SystemManager::SystemManager(
     m_dropSystemsTimerId(0),
     m_dropExpiredSystemsTaskStillRunning(false)
 {
-    //pre-filling cache
+    // Pre-filling cache.
     if (fillCache() != db::DBResult::ok)
         throw std::runtime_error("Failed to pre-load systems cache");
 
@@ -64,15 +67,24 @@ SystemManager::SystemManager(
             m_settings.systemManager().dropExpiredSystemsPeriod,
             std::chrono::seconds::zero());
 
-    //registering transaction handler
+    // Registering transaction handler.
     m_transactionDispatcher->registerTransactionHandler
         <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData, data::SystemSharing>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2, _3));
+
     m_transactionDispatcher->registerTransactionHandler
         <::ec2::ApiCommand::removeUser, ::ec2::ApiIdData, data::SystemSharing>(
             std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2RemoveUserDone, this, _1, _2, _3));
+
+    // Currently this transaction can only rename some system.
+    m_transactionDispatcher->registerTransactionHandler
+        <::ec2::ApiCommand::setResourceParam,
+         ::ec2::ApiResourceParamWithRefData,
+         data::SystemNameUpdate>(
+            std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3, _4),
+            std::bind(&SystemManager::onEc2SetResourceParamDone, this, _1, _2, _3));
 }
 
 SystemManager::~SystemManager()
@@ -1037,6 +1049,27 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
     QSqlDatabase* const connection,
     const data::SystemNameUpdate& data)
 {
+    const auto result = execSystemNameUpdate(connection, data);
+    if (result != db::DBResult::ok)
+        return result;
+
+    // Generating transaction.
+    ::ec2::ApiResourceParamWithRefData systemNameData;
+    systemNameData.resourceId = QnUserResource::kAdminGuid;
+    systemNameData.name = QnGlobalSettings::kNameSystemName;
+    systemNameData.value = QString::fromStdString(data.name);
+
+    return m_transactionLog->generateTransactionAndSaveToLog<
+        ::ec2::ApiCommand::setResourceParam>(
+            connection,
+            data.id.c_str(),
+            std::move(systemNameData));
+}
+
+nx::db::DBResult SystemManager::execSystemNameUpdate(
+    QSqlDatabase* const connection,
+    const data::SystemNameUpdate& data)
+{
     QSqlQuery updateSystemNameQuery(*connection);
     updateSystemNameQuery.prepare(
         "UPDATE system "
@@ -1050,20 +1083,23 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
             .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
-
-    //TODO #ak figure out what transaction to generate
-    ////generating transaction
-    //::ec2::ApiUserData userData;
-    //ec2::convert(sharing, &userData);
-    //result = m_transactionLog->generateTransactionAndSaveToLog<
-    //    ::ec2::ApiCommand::saveUser>(
-    //        connection,
-    //        sharing.systemID.c_str(),
-    //        std::move(userData));
-    //if (result != db::DBResult::ok)
-    //    return result;
-
     return db::DBResult::ok;
+}
+
+void SystemManager::updateSystemNameInCache(
+    data::SystemNameUpdate data)
+{
+    //updating system name in cache
+    QnMutexLocker lk(&m_mutex);
+
+    auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
+    auto systemIter = systemByIdIndex.find(data.id);
+    if (systemIter != systemByIdIndex.end())
+    {
+        systemByIdIndex.modify(
+            systemIter,
+            [&data](data::SystemData& system) { system.name = std::move(data.name); });
+    }
 }
 
 void SystemManager::systemNameUpdated(
@@ -1075,17 +1111,7 @@ void SystemManager::systemNameUpdated(
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        //updating system name in cache
-        QnMutexLocker lk(&m_mutex);
-
-        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-        auto systemIter = systemByIdIndex.find(data.id);
-        if (systemIter != systemByIdIndex.end())
-        {
-            systemByIdIndex.modify(
-                systemIter,
-                [&data](data::SystemData& system) { system.name = data.name; });
-        }
+        updateSystemNameInCache(std::move(data));
     }
 
     completionHandler(
@@ -1440,8 +1466,10 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     ::ec2::ApiIdData data,
     data::SystemSharing* const systemSharingData)
 {
-    NX_LOGX(lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
-        .arg(systemId).str(data.id),
+    NX_LOGX(
+        QnLog::EC2_TRAN_LOG,
+        lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
+            .arg(systemId).str(data.id),
         cl_logDEBUG2);
 
     systemSharingData->systemID = systemId.toStdString();
@@ -1459,8 +1487,10 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
         QnSql::serialized_field(systemSharingData->vmsUserId));
     if (!removeSharingQuery.exec())
     {
-        NX_LOGX(lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
-            .arg(systemId).str(data.id).arg(dbConnection->lastError().text()),
+        NX_LOGX(
+            QnLog::EC2_TRAN_LOG,
+            lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
+                .arg(systemId).str(data.id).arg(dbConnection->lastError().text()),
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -1482,6 +1512,40 @@ void SystemManager::onEc2RemoveUserDone(
         m_accountAccessRoleForSystem.get<kSharingBySystemIdAndVmsUserIdIndex>();
     systemSharingBySystemIdAndVmsUserId.erase(
         std::make_pair(sharing.systemID, sharing.vmsUserId));
+}
+
+nx::db::DBResult SystemManager::processSetResourceParam(
+    QSqlDatabase* dbConnection,
+    const nx::String& systemId,
+    ::ec2::ApiResourceParamWithRefData data,
+    data::SystemNameUpdate* const systemNameUpdate)
+{
+    if (data.resourceId != QnUserResource::kAdminGuid ||
+        data.name != QnGlobalSettings::kNameSystemName)
+    {
+        NX_LOGX(
+            QnLog::EC2_TRAN_LOG,
+            lm("Ignoring transaction setResourceParam with. "
+               "systemId %1, resourceId %2, param name %3, param value %4")
+                .arg(systemId).arg(data.resourceId).arg(data.name).arg(data.value),
+            cl_logDEBUG1);
+        return nx::db::DBResult::ok;
+    }
+
+    systemNameUpdate->id = systemId.toStdString();
+    systemNameUpdate->name = data.value.toStdString();
+    return execSystemNameUpdate(dbConnection, *systemNameUpdate);
+}
+
+void SystemManager::onEc2SetResourceParamDone(
+    QSqlDatabase* /*dbConnection*/,
+    nx::db::DBResult dbResult,
+    data::SystemNameUpdate systemNameUpdate)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        updateSystemNameInCache(std::move(systemNameUpdate));
+    }
 }
 
 }   //cdb

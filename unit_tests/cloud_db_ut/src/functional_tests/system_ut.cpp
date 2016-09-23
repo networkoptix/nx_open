@@ -9,6 +9,7 @@
 
 #include <nx/network/http/httpclient.h>
 #include <nx/utils/log/log_message.h>
+#include <nx/utils/random.h>
 
 #include "test_setup.h"
 
@@ -379,51 +380,69 @@ TEST_F(System, notification_of_system_removal)
 
 TEST_F(System, updateSystemName)
 {
-    constexpr const char newSystemName[] = "new_name";
-
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    api::AccountData account1;
-    std::string account1Password;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        addActivatedAccount(&account1, &account1Password));
+    const auto account1 = addActivatedAccount2();
 
-    //adding system1 to account1
+    // Adding system1 to account1.
     api::SystemData system1;
     ASSERT_EQ(
         api::ResultCode::ok,
-        bindRandomSystem(account1.email, account1Password, &system1));
+        bindRandomSystem(account1.data.email, account1.password, &system1));
 
+    const auto account2 = addActivatedAccount2();
+    shareSystem2(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+
+    const std::string actualSystemName = "new system name";
+    // Owner is allowed to rename his system.
     ASSERT_EQ(
         api::ResultCode::ok,
-        updateSystemName(system1.id, system1.authKey, system1.id, newSystemName));
+        updateSystemName(
+            account1.data.email, account1.password,
+            system1.id, actualSystemName));
 
-    for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 2; ++j)
     {
-        if (i == 1)
+        const bool restartRequired = j == 1;
+
+        if (restartRequired)
             restart();
 
-        //checking account1 system list
-        std::vector<api::SystemDataEx> systems;
+        // Checking system1 name.
+        api::SystemDataEx systemData;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account1.email, account1Password, &systems));
-        ASSERT_EQ(1, systems.size());
-        ASSERT_EQ(newSystemName, systems[0].name);
+            getSystem(account1.data.email, account1.password, system1.id, &systemData));
+        ASSERT_EQ(actualSystemName, systemData.name);
     }
+
+    // Only owner can rename system.
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        updateSystemName(system1.id, system1.authKey, system1.id, "aaa"));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        updateSystemName(account1.email, account1Password, system1.id, "some system name"));
+        updateSystemName(account2.data.email, account2.password, system1.id, "xxx"));
 
-    //trying bad system names
+    // Trying bad system names.
     ASSERT_EQ(
         api::ResultCode::badRequest,
-        updateSystemName(system1.id, system1.authKey, system1.id, std::string()));
+        updateSystemName(
+            account1.data.email, account1.password,
+            system1.id, std::string()));
     ASSERT_EQ(
         api::ResultCode::badRequest,
-        updateSystemName(system1.id, system1.authKey, system1.id, std::string(4096, 'z')));
+        updateSystemName(
+            account1.data.email, account1.password,
+            system1.id, std::string(4096, 'z')));
+
+    // Checking system1 name.
+    api::SystemDataEx systemData;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystem(account1.data.email, account1.password, system1.id, &systemData));
+    ASSERT_EQ(actualSystemName, systemData.name);
 }
 
 TEST_F(System, persistentSequence)

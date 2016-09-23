@@ -468,5 +468,36 @@ TEST_F(Ec2MserverCloudSynchronization2, newTransactionTimestamp)
     }
 }
 
+TEST_F(Ec2MserverCloudSynchronization2, updateSystemNameInCloud)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+    for (int i = 0; i < 2; ++i)
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->updateSystemName(
+                ownerAccount().email,
+                ownerAccountPassword(),
+                registeredSystemData().id,
+                "new_name"));
+
+        // Checking that system name has been updated in mediaserver.
+        waitForCloudAndVmsToSyncSystemData();
+
+        if (i == 0)
+            cdb()->restart();
+    }
+}
+
+TEST_F(Ec2MserverCloudSynchronization2, updateSystemNameInVms)
+{
+    // TODO:
+}
+
 } // namespace cdb
 } // namespace nx

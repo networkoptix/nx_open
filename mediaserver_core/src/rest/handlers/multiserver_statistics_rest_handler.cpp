@@ -1,6 +1,9 @@
 
 #include "multiserver_statistics_rest_handler.h"
 
+#include <QtGlobal>
+
+#include <utils/math/math.h>
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
 #include <nx/fusion/model_functions.h>

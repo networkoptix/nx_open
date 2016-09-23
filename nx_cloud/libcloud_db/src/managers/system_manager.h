@@ -284,6 +284,11 @@ private:
     nx::db::DBResult updateSystemNameInDB(
         QSqlDatabase* const connection,
         const data::SystemNameUpdate& data);
+    nx::db::DBResult execSystemNameUpdate(
+        QSqlDatabase* const connection,
+        const data::SystemNameUpdate& data);
+    void updateSystemNameInCache(
+        data::SystemNameUpdate data);
     void systemNameUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
         QSqlDatabase* /*dbConnection*/,
@@ -328,6 +333,7 @@ private:
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
+
     nx::db::DBResult processEc2RemoveUser(
         QSqlDatabase* dbConnection,
         const nx::String& systemId,
@@ -337,6 +343,16 @@ private:
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
+
+    nx::db::DBResult processSetResourceParam(
+        QSqlDatabase* dbConnection,
+        const nx::String& systemId,
+        ::ec2::ApiResourceParamWithRefData data,
+        data::SystemNameUpdate* const systemNameUpdate);
+    void onEc2SetResourceParamDone(
+        QSqlDatabase* /*dbConnection*/,
+        nx::db::DBResult dbResult,
+        data::SystemNameUpdate systemNameUpdate);
 };
 
 }   //cdb

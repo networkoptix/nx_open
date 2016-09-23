@@ -201,11 +201,11 @@
                     <condition value="/cdb/event/subscribe" resName="auth.systemID" matchType="presence">
                         <set value="false" resName="authorized" resValue="false"/>
                     </condition>
-                    <!-- only system can update self system name -->
+                    <!-- only system owner can rename the system -->
                     <sequence value="/cdb/system/update_system_name">
                         <set resName="authorized" resValue="false"/>
-                        <condition value="/cdb/system/update_system_name" resName="auth.selfSystemAccessRequested">
-                            <set value="true" resName="authorized" resValue="true"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <condition value="/cdb/account/create_temporary_credentials" resName="auth.accountEmail" matchType="presence">
