@@ -134,7 +134,7 @@ public:
 
     bool isValid(const QnUuid& resourceId) const override
     {
-        auto derived = getResource(resourceId).dynamicCast<ResourceType>();
+        auto derived = getResource(resourceId).template dynamicCast<ResourceType>();
 
         // return true for resources of other type - so root elements will not be highlighted
         return !derived || isResourceValid(derived);
