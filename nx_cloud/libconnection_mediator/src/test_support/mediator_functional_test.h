@@ -54,6 +54,7 @@ public:
 
     std::unique_ptr<MediaServerEmulator> addRandomServer(
         const AbstractCloudDataProvider::System& system,
+        boost::optional<QnUuid> serverId = boost::none,
         bool bindEndpoint = true);
 
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(

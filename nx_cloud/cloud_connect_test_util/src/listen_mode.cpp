@@ -237,8 +237,15 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
         serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
     }
 
+    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
+    {
+        QString value;
+        if (args.read("rw-timeout", &value))
+            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
+    }
+
     server.setServerSocket(std::move(serverSocket));
-    if (!server.start())
+    if (!server.start(rwTimeout))
     {
         auto osErrorText = SystemError::getLastOSErrorText().toStdString();
         std::cerr << "error. Failed to start accepting connections. Reason: "
@@ -260,7 +267,7 @@ int printStatsAndWaitForCompletion(
     using namespace std::chrono;
 
     constexpr const auto kUpdateStatisticsInterval = std::chrono::seconds(1);
-    constexpr const auto kStatisticsResetInterval = std::chrono::seconds(10);
+    constexpr const auto kStatisticsResetInterval = std::chrono::minutes(1);
     constexpr const auto zeroStatistics = ConnectionTestStatistics{ 0, 0, 0, 0 };
     constexpr const auto invalidStatistics =
         ConnectionTestStatistics{ (uint64_t)-1, (uint64_t)-1, (size_t)-1, (size_t)-1 };
@@ -296,6 +303,9 @@ int printStatsAndWaitForCompletion(
 
                     //resetting statistics
                     baseStatisticsData = data;
+                    baseStatisticsData.totalConnections -= baseStatisticsData.onlineConnections;
+                    baseStatisticsData.onlineConnections = 0;
+
                     prevStatistics = invalidStatistics;
                     statToDisplay = zeroStatistics;
                     sameStatisticsInterval.reset();

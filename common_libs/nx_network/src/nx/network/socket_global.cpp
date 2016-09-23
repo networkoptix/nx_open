@@ -7,12 +7,12 @@
 namespace nx {
 namespace network {
 
-SocketGlobals::SocketGlobals()
-    : m_log( QnLog::logs() )
-    , m_mediatorConnector(new hpm::api::MediatorConnector)
-    , m_addressResolver(m_mediatorConnector->clientConnection())
-    , m_addressPublisher(m_mediatorConnector->systemConnection())
-    , m_tcpReversePool(m_mediatorConnector->clientConnection())
+SocketGlobals::SocketGlobals():
+    m_log(QnLog::logs()),
+    m_mediatorConnector(new hpm::api::MediatorConnector),
+    m_addressResolver(m_mediatorConnector->clientConnection()),
+    m_addressPublisher(m_mediatorConnector->systemConnection()),
+    m_tcpReversePool(m_mediatorConnector->clientConnection())
 {
 }
 

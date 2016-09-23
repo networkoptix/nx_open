@@ -110,7 +110,37 @@ private:
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
 
 private:
-    std::unique_ptr<SeamlessVideoDecoder> m_videoDecoder;
+    /**
+    * In case of multi sensor video camera this class is used to calculate
+    * which video channels still don't provide frames.
+    * Player displays frames without delay unless each channel provide at least 1 frame.
+    */
+    class MultiSensorHelper
+    {
+    private:
+        int m_mask;
+        int m_channels;
+    public:
+        MultiSensorHelper() : m_mask(0), m_channels(1) {}
+
+        int channelCount() const { return m_channels;  }
+        void setChannelCount(int value)
+        {
+            if (m_channels == value)
+                return;
+            m_channels = value;
+            if (m_mask)
+                setMask(); //< update mask for new channels value
+        }
+        void setMask() { m_mask = (1 << m_channels) - 1; }
+        void resetMask() { m_mask = 0; }
+        void removeChannel(int channelNumber) { m_mask &= ~(1 << channelNumber); }
+        bool hasChannel(int channelNumber) const { return m_mask & (1 << channelNumber);  }
+        bool isEmpty() const { return m_mask == 0; }
+    };
+
+    typedef std::unique_ptr<SeamlessVideoDecoder> SeamlessVideoDecoderPtr;
+    std::vector<SeamlessVideoDecoderPtr> m_videoDecoders;
     std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
     std::unique_ptr<AudioOutput> m_audioOutput;
 
@@ -122,7 +152,16 @@ private:
 
     int m_awaitJumpCounter; //< how many jump requests are queued
     int m_buffering; //< reserved for future use for panoramic cameras
-    int m_hurryUpToFrame; //< display all data with no delay till this number
+
+    struct BofFrameInfo
+    {
+        BofFrameInfo() : videoChannel(0), frameNumber(0) {}
+
+        int videoChannel;
+        int frameNumber;
+    };
+    BofFrameInfo m_hurryUpToFrame; //< display all data with no delay till this frame number at specified video channel
+
     std::atomic<qint64> m_lastMediaTimeUsec; //< UTC usec timestamp for the very last packet
 
     // Delay video decoding. Used for AV sync.
@@ -140,6 +179,7 @@ private:
 
     std::atomic<qint64> m_lastFrameTimeUs;
     std::atomic<qint64> m_lastDisplayedTimeUs;
+    MultiSensorHelper m_awaitingFramesMask;
 };
 
 } // namespace media
