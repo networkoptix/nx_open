@@ -4,7 +4,7 @@ BOX_NAMES = {
     "Nat": "natj",
     "Behind": "behindj",
 }
-UT_VAG_UT_SUBDIR = "utj"
+UT_BOX_NAME = "utj"
 
 BOX_IP = {
     'Box1': '192.168.99.8',

@@ -420,7 +420,7 @@
     </message>
     <message>
         <source>Do HTTP request</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP Anfrage starten</translation>
     </message>
 </context>
 <context>

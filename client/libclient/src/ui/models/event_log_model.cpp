@@ -235,10 +235,9 @@ QModelIndex QnEventLogModel::parent(const QModelIndex &) const {
 bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action)
 {
     QnBusiness::EventType eventType = action.eventParams.eventType;
-    if (action.hasFlags(QnBusinessActionData::MotionExists))
+    if (action.hasFlags(QnBusinessActionData::VideoLinkExists))
     {
-        if (eventType == QnBusiness::CameraMotionEvent)
-            return true;
+        return true;
     }
     else if (eventType >= QnBusiness::UserDefinedEvent)
     {
@@ -422,7 +421,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
 
         if (eventType == QnBusiness::CameraMotionEvent)
         {
-            if (action.hasFlags(QnBusinessActionData::MotionExists))
+            if (action.hasFlags(QnBusinessActionData::VideoLinkExists))
                 result = tr("Motion video");
         }
         else
@@ -465,10 +464,7 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order) {
 }
 
 QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& action) {
-    if (column != DescriptionColumn || !action.hasFlags(QnBusinessActionData::MotionExists))
-        return QString();
-
-    if (action.eventParams.eventType != QnBusiness::CameraMotionEvent)
+    if (column != DescriptionColumn || !action.hasFlags(QnBusinessActionData::VideoLinkExists))
         return QString();
 
     return QnBusinessStringsHelper::urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
@@ -480,7 +476,7 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
     if (!index.isValid() || index.column() != DescriptionColumn)
         return QnResourceList();
     const QnBusinessActionData &action = m_index->at(index.row());
-    if (action.hasFlags(QnBusinessActionData::MotionExists)) {
+    if (action.hasFlags(QnBusinessActionData::VideoLinkExists)) {
         QnResourcePtr resource = qnResPool->getResourceById(action.eventParams.eventResourceId);
         if (resource)
             result << resource;

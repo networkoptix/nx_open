@@ -236,7 +236,9 @@ void SystemManager::getSystems(
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler )
 {
     //always providing only activated systems
-    filter.resources().put(attr::systemStatus, api::SystemStatus::ssActivated);
+    filter.resources().put(
+        attr::systemStatus,
+        static_cast<int>(api::SystemStatus::ssActivated));
 
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
@@ -604,11 +606,38 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     const data::SystemRegistrationDataWithAccount& newSystem,
     InsertNewSystemToDbResult* const result)
 {
+    nx::db::DBResult dbResult = nx::db::DBResult::ok;
+
+    dbResult = insertNewSystemDataToDb(connection, newSystem, result);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    dbResult = m_transactionLog->updateTimestampHiForSystem(
+        connection,
+        result->systemData.id.c_str(),
+        result->systemData.systemSequence);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    dbResult = insertOwnerSharingToDb(
+        connection, result->systemData.id, newSystem, &result->ownerSharing);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::insertNewSystemDataToDb(
+    QSqlDatabase* const connection,
+    const data::SystemRegistrationDataWithAccount& newSystem,
+    InsertNewSystemToDbResult* const result)
+{
     const auto account = m_accountManager.findAccountByUserName(newSystem.accountEmail);
     if (!account)
     {
-        NX_LOG(lm("Failed to add system %1 to account %2. Account not found").
-            arg(newSystem.name).arg(newSystem.accountEmail), cl_logDEBUG1);
+        NX_LOG(lm("Failed to add system %1 (%2) to account %3. Account not found")
+            .arg(newSystem.name).arg(result->systemData.id).arg(newSystem.accountEmail),
+            cl_logDEBUG1);
         return db::DBResult::notFound;
     }
 
@@ -637,22 +666,52 @@ nx::db::DBResult SystemManager::insertSystemToDB(
         result->systemData.expirationTimeUtc);
     if (!insertSystemQuery.exec())
     {
-        NX_LOG(lm("Could not insert system %1 into DB. %2")
-            .arg(newSystem.name).arg(insertSystemQuery.lastError().text()),
+        NX_LOG(lm("Could not insert system %1 (%2) into DB. %3")
+            .arg(newSystem.name).arg(result->systemData.id)
+            .arg(insertSystemQuery.lastError().text()),
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
 
-    result->ownerSharing.accountEmail = newSystem.accountEmail;
-    result->ownerSharing.systemID = result->systemData.id;
-    result->ownerSharing.accessRole = api::SystemAccessRole::owner;
-    result->ownerSharing.vmsUserId = guidFromArbitraryData(
-        result->ownerSharing.accountEmail).toSimpleString().toStdString();
-    result->ownerSharing.isEnabled = true;
-    result->ownerSharing.customPermissions = QnLexical::serialized(
+    // Selecting generated system sequence
+    QSqlQuery selectSystemSequence(*connection);
+    selectSystemSequence.setForwardOnly(true);
+    selectSystemSequence.prepare(
+        R"sql(
+        SELECT seq FROM system WHERE id=?
+        )sql");
+    selectSystemSequence.bindValue(0, QnSql::serialized_field(result->systemData.id));
+    if (!selectSystemSequence.exec() ||
+        !selectSystemSequence.next())
+    {
+        NX_LOG(lm("Error selecting sequence of newly-created system %1 (%2). %3")
+            .arg(newSystem.name).arg(result->systemData.id)
+            .arg(insertSystemQuery.lastError().text()),
+            cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+    result->systemData.systemSequence = selectSystemSequence.value(0).toULongLong();
+
+    return db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::insertOwnerSharingToDb(
+    QSqlDatabase* const connection,
+    const std::string& systemId,
+    const data::SystemRegistrationDataWithAccount& newSystem,
+    nx::cdb::data::SystemSharing* const ownerSharing)
+{
+    // Adding "owner" user to newly created system.
+    ownerSharing->accountEmail = newSystem.accountEmail;
+    ownerSharing->systemID = systemId;
+    ownerSharing->accessRole = api::SystemAccessRole::owner;
+    ownerSharing->vmsUserId = guidFromArbitraryData(
+        ownerSharing->accountEmail).toSimpleString().toStdString();
+    ownerSharing->isEnabled = true;
+    ownerSharing->customPermissions = QnLexical::serialized(
         static_cast<Qn::GlobalPermissions>(Qn::GlobalAdminPermissionSet)).toStdString();
-    const auto resultCode = 
-        updateSharingInDbAndGenerateTransaction(connection, result->ownerSharing);
+    const auto resultCode =
+        updateSharingInDbAndGenerateTransaction(connection, *ownerSharing);
     if (resultCode != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
@@ -1171,9 +1230,9 @@ nx::db::DBResult SystemManager::fillCache()
                 cacheFilledPromise.set_value(dbResult);
             });
         //waiting for completion
-        future.wait();
-        if (future.get() != db::DBResult::ok)
-            return future.get();
+        const auto result = future.get();
+        if (result != db::DBResult::ok)
+            return result;
     }
 
     return db::DBResult::ok;
@@ -1186,7 +1245,7 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
     readSystemsQuery.prepare(
         "SELECT s.id, s.name, s.customization, s.auth_key as authKey, "
         "       a.email as ownerAccountEmail, s.status_code as status, "
-        "       s.expiration_utc_timestamp as expirationTimeUtc "
+        "       s.expiration_utc_timestamp as expirationTimeUtc, s.seq as systemSequence "
         "FROM system s, account a "
         "WHERE s.owner_account_id = a.id");
     if (!readSystemsQuery.exec())

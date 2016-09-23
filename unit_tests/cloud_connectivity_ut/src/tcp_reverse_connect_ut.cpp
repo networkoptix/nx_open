@@ -22,7 +22,7 @@ protected:
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
 
         m_system = m_mediator.addRandomSystem();
-        m_server = m_mediator.addRandomServer(m_system, false);
+        m_server = m_mediator.addRandomServer(m_system, boost::none, false);
 
         SocketGlobals::mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(m_system.id, m_server->serverId(), m_system.authKey));

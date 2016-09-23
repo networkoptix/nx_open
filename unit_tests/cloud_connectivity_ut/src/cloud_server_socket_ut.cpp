@@ -175,7 +175,7 @@ private:
 
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
         auto system = m_mediator.addRandomSystem();
-        auto server = m_mediator.addRandomServer(system, false);
+        auto server = m_mediator.addRandomServer(system, boost::none, false);
         ASSERT_NE(nullptr, server);
 
         SocketGlobals::mediatorConnector().setSystemCredentials(
@@ -563,7 +563,7 @@ TEST_F(CloudServerSocketTest, reconnect)
         *nx::network::SocketGlobals::mediatorConnector().getSystemCredentials();
 
     auto system = m_mediator.addRandomSystem();
-    auto server = m_mediator.addRandomServer(system, false);
+    auto server = m_mediator.addRandomServer(system, boost::none, false);
 
     hpm::api::SystemCredentials otherCredentials;
     otherCredentials.systemId = system.id;

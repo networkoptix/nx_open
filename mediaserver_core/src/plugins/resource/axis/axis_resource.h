@@ -45,8 +45,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    bool isInitialized() const;
-
     AxisResolution getMaxResolution() const;
     AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const AxisResolution& resolution) const;
@@ -89,6 +87,7 @@ protected:
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
+    virtual bool isInitialized() const override;
 
 private:
     void clear();

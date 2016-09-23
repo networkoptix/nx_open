@@ -154,7 +154,9 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
             storage->setUrl(data.url); /* createStorage does not fill url. */
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
+
             data.isWritable = storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable();
+            data.isOnline = true;
         }
 
         result.push_back(data);

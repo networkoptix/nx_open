@@ -30,6 +30,8 @@ namespace
 
 //#define DEBUG_OUTPUT
 
+constexpr std::chrono::milliseconds TestConnection::kDefaultRwTimeout;
+
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
     TestTrafficLimitType limitType,
@@ -127,11 +129,11 @@ const std::chrono::milliseconds kDefaultSendTimeout(17000);
 const std::chrono::milliseconds kDefaultRecvTimeout(17000);
 const size_t kDefaultMaxTimeoutsInARow(5);
 
-void TestConnection::start()
+void TestConnection::start(std::chrono::milliseconds rwTimeout)
 {
     if (!m_socket->setNonBlockingMode(true) ||
-        !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
-        !m_socket->setRecvTimeout(kDefaultRecvTimeout.count()))
+        !m_socket->setSendTimeout(rwTimeout.count()) ||
+        !m_socket->setRecvTimeout(rwTimeout.count()))
     {
         return m_socket->post(std::bind(
             &TestConnection::onConnected, this,
@@ -191,8 +193,8 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 
     if( errorCode != SystemError::noError )
     {
-        NX_LOGX(lm("accepted %1. Connect error: %2")
-            .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logWARNING);
+        NX_LOGX(lm("Connect to %1 error: %2")
+            .strs(m_remoteAddress, SystemError::toString(errorCode)), cl_logWARNING);
 
         return reportFinish( errorCode );
     }
@@ -288,20 +290,10 @@ void TestConnection::readAllAsync( std::function<void()> handler )
         [this, handler = std::move(handler)](
             SystemError::ErrorCode code, size_t bytes)
         {
-            m_totalBytesReceived += bytes;
-
-            if (code == SystemError::timedOut)
-            {
-                if (++m_timeoutsInARow == kDefaultMaxTimeoutsInARow)
-                    return reportFinish( code );
-
-                return readAllAsync(std::move(handler));
-            }
-
-            m_timeoutsInARow = 0;
             if (code != SystemError::noError || bytes == 0)
                 return reportFinish( code );
 
+            m_totalBytesReceived += bytes;
             if (static_cast<size_t>(m_readBuffer.size()) >= kReadBufferSize)
                 handler();
             else
@@ -322,19 +314,10 @@ void TestConnection::sendAllAsync( std::function<void()> handler )
         [this, handler = std::move(handler)](
             SystemError::ErrorCode code, size_t bytes)
         {
-            m_totalBytesSent += bytes;
-
-            if (code == SystemError::timedOut)
-            {
-                if (++m_timeoutsInARow == kDefaultMaxTimeoutsInARow)
-                    return reportFinish( code );
-
-                return readAllAsync(std::move(handler));
-            }
-
             if (code != SystemError::noError || bytes == 0)
                 return reportFinish( code );
 
+            m_totalBytesSent += bytes;
             handler();
         });
 }
@@ -509,8 +492,9 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-bool RandomDataTcpServer::start()
+bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
 {
+    m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
     if( !m_serverSocket->bind(m_localAddress) ||
@@ -579,7 +563,7 @@ void RandomDataTcpServer::onNewConnection(
             .arg(testConnection.get()).arg(testConnection->getLocalAddress().toString()),
             cl_logDEBUG1);
         QnMutexLocker lk(&m_mutex);
-        testConnection->start();
+        testConnection->start(m_rwTimeout);
         m_aliveConnections.emplace_back(std::move(testConnection));
         ++m_totalConnectionsAccepted;
     }
@@ -713,8 +697,9 @@ void ConnectionsGenerator::resetRemoteAddresses(
     m_remoteAddressesIterator = m_remoteAddresses.begin();
 }
 
-void ConnectionsGenerator::start()
+void ConnectionsGenerator::start(std::chrono::milliseconds rwTimeout)
 {
+    m_rwTimeout = rwTimeout;
     for( size_t i = 0; i < m_maxSimultaneousConnectionsCount; ++i )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
@@ -730,7 +715,7 @@ void ConnectionsGenerator::start()
                 std::placeholders::_1, std::placeholders::_3));
         if (m_localAddress)
             connection->setLocalAddress(*m_localAddress);
-        connection->start();
+        connection->start(m_rwTimeout);
         ++m_totalConnectionsEstablished;
         m_connections.emplace(connection->id(), std::move(connection));
     }
@@ -860,7 +845,7 @@ void ConnectionsGenerator::addNewConnections(
             return;
         }
 
-        connection->start();
+        connection->start(m_rwTimeout);
         m_connections.emplace(connection->id(), std::move(connection));
         ++m_totalConnectionsEstablished;
     }

@@ -1566,7 +1566,6 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     nx_http::Response* response)
 {
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
-
     connectionInfo->version = qnCommon->engineVersion();
     connectionInfo->brand = localInfo.brand;
     connectionInfo->customization = localInfo.customization;

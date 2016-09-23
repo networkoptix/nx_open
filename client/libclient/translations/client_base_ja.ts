@@ -1205,7 +1205,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>ラピッドレビューのエクスポート...</translation>
     </message>
 </context>
 <context>
@@ -1692,7 +1692,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>ソースと %n 以上のカメラ</numerusform>
         </translation>
     </message>
@@ -1994,15 +1994,22 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">ロード中...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス選択</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 %n は双方向ｵｰﾃﾞｨｵがサポートされません</numerusform>
         </translation>
     </message>
 </context>
@@ -2687,19 +2694,19 @@ to view more bookmarks</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished">オーディオエンコーダー%1を検出できません.</translation>
+        <translation>オーディオエンコーダー%1を検出できません.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">オーディオエンコーダーをイニシャライズできません.</translation>
+        <translation>オーディオエンコーダーをイニシャライズできません.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>プライマリーオーディオデバイスが選択されていまえん.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力デバイス %1 のサンプルフォーマットはサポートされません.</translation>
     </message>
 </context>
 <context>
@@ -2893,9 +2900,9 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform> %1 ユーザー以上...</numerusform>
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>%n ユーザー以上...</numerusform>
         </translation>
     </message>
 </context>
@@ -2933,49 +2940,44 @@ to view more bookmarks</source>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">秒</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">分</translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">時</translation>
+        <translation>時</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">日</translation>
+        <translation>日</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>秒</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>分</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>時</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>日</translation>
     </message>
 </context>
 <context>
@@ -4282,7 +4284,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオ設定</translation>
     </message>
 </context>
 <context>
@@ -4667,7 +4669,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>ビットレート</translation>
     </message>
 </context>
 <context>
@@ -4847,25 +4849,25 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n デバイス&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n カメラ&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n IOモジュール&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">ブックマークのエクスポート...</translation>
+        <translation>ブックマークのエクスポート...</translation>
     </message>
 </context>
 <context>
@@ -5438,7 +5440,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">テストを実行できません.</translation>
+        <translation>テストを実行できません.</translation>
     </message>
 </context>
 <context>
@@ -5618,13 +5620,13 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n カメラ</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n デバイス</numerusform>
         </translation>
     </message>
@@ -6056,19 +6058,19 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力デバイスが選択されていません.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>ストリームの準備ができていません.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワークエラー.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>押して話す</translation>
     </message>
 </context>
 <context>
@@ -6650,19 +6652,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 は高解像度スクリーンを検出しましたが %1 は表示できません.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>この問題は v3.0.で修正されます.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>この間にスクリーン解像度を調整して下さい.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>HiDpiスクリーンサポート警告</translation>
     </message>
 </context>
 <context>
@@ -6701,7 +6703,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform> %n ブックマークを削除しますか?</numerusform>
         </translation>
     </message>
@@ -6954,7 +6956,7 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択範囲が短すぎてラピッドレビューのエクスポートができません.</translation>
     </message>
 </context>
 <context>

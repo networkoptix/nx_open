@@ -15,6 +15,7 @@ public:
     virtual ~QnClientModule();
 
     void initDesktopCamera(QGLWidget* window);
+    void startLocalSearchers();
 private:
     void initApplication();
     void initThread();

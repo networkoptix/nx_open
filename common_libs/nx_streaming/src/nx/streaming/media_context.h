@@ -20,7 +20,7 @@ typedef std::shared_ptr<const QnMediaContext> QnConstMediaContextPtr;
 class QnMediaContext
 {
 public:
-    virtual ~QnMediaContext() {};
+    virtual ~QnMediaContext() = default;
 
     /// Clone all fields except extradata, which is set empty (null).
     virtual QnMediaContext* cloneWithoutExtradata() const = 0;

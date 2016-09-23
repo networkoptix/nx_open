@@ -419,7 +419,7 @@
     </message>
     <message>
         <source>Do HTTP request</source>
-        <translation type="unfinished"></translation>
+        <translation>בצע בקשת HTTP</translation>
     </message>
 </context>
 <context>

@@ -112,8 +112,8 @@ void TunnelConnector::cancellationTest()
             std::chrono::milliseconds::zero(),
             [](SystemError::ErrorCode /*errorCode*/,
                 std::unique_ptr<AbstractOutgoingTunnelConnection> /*connection*/)
-        {
-        });
+            {
+            });
 
         //implying random delay
         std::this_thread::sleep_for(std::chrono::microseconds(
@@ -133,10 +133,9 @@ void TunnelConnector::doSimpleConnectTest(
     //starting mediaserver emulator with specified host name
     server->setConnectionAckResponseHandler(
         [actionOnConnectAckResponse](nx::hpm::api::ResultCode /*resultCode*/)
-        -> MediaServerEmulator::ActionToTake
-    {
-        return actionOnConnectAckResponse;
-    });
+        {
+            return actionOnConnectAckResponse;
+        });
 
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen());
 

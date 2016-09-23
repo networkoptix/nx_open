@@ -5,12 +5,12 @@
     <name>QnCameraFlow</name>
     <message>
         <source>Hidden cameras</source>
-        <translation>隠しカメラ</translation>
+        <translation>非表示カメラ</translation>
     </message>
     <message numerus="yes">
         <source>%n cameras are hidden</source>
         <translation>
-            <numerusform>%n 隠しカメラ</numerusform>
+            <numerusform>%n 非表示カメラ</numerusform>
         </translation>
     </message>
 </context>

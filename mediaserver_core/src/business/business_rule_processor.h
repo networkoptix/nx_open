@@ -124,7 +124,8 @@ public slots:
     static QnBusinessRuleProcessor* instance();
     static void init(QnBusinessRuleProcessor* instance);
     static void fini();
-
+protected:
+    virtual void prepareAdditionActionParams(const QnAbstractBusinessActionPtr& action) = 0;
 protected slots:
     /*
     * Execute action physically. Return true if action success executed

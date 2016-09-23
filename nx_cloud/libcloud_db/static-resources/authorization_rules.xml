@@ -139,8 +139,18 @@
                                 </condition>
                             </sequence>
                         </condition>
+                        <condition resName="data.accountRightsOnSystem">
+                            <!-- owner sharing cannot be modified by anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
+                        <condition resName="systemAccessRole">
+                            <!-- "owner" role cannot be assigned to anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
                         <condition resName="auth.selfAccountAccessRequested">
                             <sequence value="true">
+                                <!-- It is forbidden to change own access role (even downgrade). Only remove -->
+                                <set resName="authorized" resValue="false"/>
                                 <condition resName="systemAccessRole">
                                     <sequence value="none">  <!-- sharing removal... -->
                                         <!-- any account can remove non-owner sharing to itself -->
@@ -152,14 +162,6 @@
                                     </sequence>
                                 </condition>
                             </sequence>
-                        </condition>
-                        <condition resName="data.accountRightsOnSystem">
-                            <!-- owner sharing cannot be modified by anyone -->
-                            <set value="owner" resName="authorized" resValue="false"/>
-                        </condition>
-                        <condition resName="systemAccessRole">
-                            <!-- "owner" role cannot be assigned to anyone -->
-                            <set value="owner" resName="authorized" resValue="false"/>
                         </condition>
                     </sequence>
                     <sequence value="/cdb/system/bind">

@@ -261,25 +261,29 @@ void Settings::loadConfiguration()
     m_vmsSynchronizationLogging.logDir = m_settings.value(kSyncLogDir, dataDir() + lit("/log/")).toString();
 
     //DB
-    m_dbConnectionOptions.driverName = m_settings.value( kDbDriverName, kDefaultDbDriverName ).toString();
-    m_dbConnectionOptions.hostName = m_settings.value( kDbHostName, kDefaultDbHostName ).toString();
-    m_dbConnectionOptions.port = m_settings.value( kDbPort, kDefaultDbPort ).toInt();
-    m_dbConnectionOptions.dbName = m_settings.value( kDbName, kDefaultDbName ).toString();
-    m_dbConnectionOptions.userName = m_settings.value( kDbUserName, kDefaultDbUserName ).toString();
-    m_dbConnectionOptions.password = m_settings.value( kDbPassword, kDefaultDbPassword ).toString();
-    m_dbConnectionOptions.connectOptions = m_settings.value( kDbConnectOptions, kDefaultDbConnectOptions ).toString();
-    m_dbConnectionOptions.maxConnectionCount = m_settings.value( kDbMaxConnections, kDefaultDbMaxConnections ).toUInt();
-    if( m_dbConnectionOptions.maxConnectionCount == 0 )
+    m_dbConnectionOptions.driverType =
+        QnLexical::deserialized<nx::db::RdbmsDriverType>(
+            m_settings.value(kDbDriverName, kDefaultDbDriverName).toString(),
+            nx::db::RdbmsDriverType::unknown);
+    //< Ignoring error here since connection to DB will not be established anyway.
+    m_dbConnectionOptions.hostName = m_settings.value(kDbHostName, kDefaultDbHostName).toString();
+    m_dbConnectionOptions.port = m_settings.value(kDbPort, kDefaultDbPort).toInt();
+    m_dbConnectionOptions.dbName = m_settings.value(kDbName, kDefaultDbName).toString();
+    m_dbConnectionOptions.userName = m_settings.value(kDbUserName, kDefaultDbUserName).toString();
+    m_dbConnectionOptions.password = m_settings.value(kDbPassword, kDefaultDbPassword).toString();
+    m_dbConnectionOptions.connectOptions = m_settings.value(kDbConnectOptions, kDefaultDbConnectOptions).toString();
+    m_dbConnectionOptions.maxConnectionCount = m_settings.value(kDbMaxConnections, kDefaultDbMaxConnections).toUInt();
+    if (m_dbConnectionOptions.maxConnectionCount == 0)
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
     m_dbConnectionOptions.inactivityTimeout = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
             m_settings.value(kDbInactivityTimeout).toString(),
             kDefaultDbInactivityTimeout));
 
-    m_changeUser = m_settings.value( kChangeUser ).toString();
+    m_changeUser = m_settings.value(kChangeUser).toString();
 
     //email
-    m_notification.serviceEndpoint = 
+    m_notification.serviceEndpoint =
         m_settings.value(kNotificationServiceEndpoint).toString();
 
     m_notification.enabled =

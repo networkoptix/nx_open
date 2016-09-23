@@ -11,9 +11,12 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 
+namespace {
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
+static const int kMaxDroppedFrames = 5;
+}
 
 namespace {
 
@@ -211,8 +214,8 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         const auto& codingTime = m_averageCodingTimePerFrame;
         if (codingTime + (codingTime >> m_droppedFrames) > m_averageVideoTimePerFrame)
         {
-            ++m_droppedFrames;
-            return 0;
+            if (++m_droppedFrames < kMaxDroppedFrames)
+                return 0;
         }
     }
 

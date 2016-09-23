@@ -1220,12 +1220,27 @@ void CUDTUnited::checkBrokenSockets()
    for (vector<UDTSOCKET>::iterator k = tbc.begin(); k != tbc.end(); ++ k)
       m_Sockets.erase(*k);
 
+   std::vector<CMultiplexer> multiplexersToRemove;
    // remove those timeout sockets
    for (vector<UDTSOCKET>::iterator l = tbr.begin(); l != tbr.end(); ++ l)
-      removeSocket(*l);
+      removeSocket(*l, &multiplexersToRemove);
+
+   cg.unlock();
+
+   // Removing multiplexer with no mutex locked since it implies waiting for send/receive thread to exit
+   for (auto& multiplexer: multiplexersToRemove)
+   {
+      multiplexer.m_pChannel->close();
+      delete multiplexer.m_pSndQueue;
+      delete multiplexer.m_pRcvQueue;
+      delete multiplexer.m_pTimer;
+      delete multiplexer.m_pChannel;
+   }
 }
 
-void CUDTUnited::removeSocket(const UDTSOCKET u)
+void CUDTUnited::removeSocket(
+    const UDTSOCKET u,
+    std::vector<CMultiplexer>* const multiplexersToRemove)
 {
    map<UDTSOCKET, CUDTSocket*>::iterator i = m_ClosedSockets.find(u);
 
@@ -1277,12 +1292,8 @@ void CUDTUnited::removeSocket(const UDTSOCKET u)
    m->second.m_iRefCount --;
    if (0 == m->second.m_iRefCount)
    {
-      m->second.m_pChannel->close();
-      delete m->second.m_pSndQueue;
-      delete m->second.m_pRcvQueue;
-      delete m->second.m_pTimer;
-      delete m->second.m_pChannel;
-      m_mMultiplexer.erase(m);
+       multiplexersToRemove->push_back(m->second);
+       m_mMultiplexer.erase(m);
    }
 }
 

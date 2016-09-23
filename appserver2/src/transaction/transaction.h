@@ -14,6 +14,7 @@
 #include "nx/fusion/serialization/csv.h"
 #include "nx/fusion/serialization/ubjson.h"
 #include "common/common_module.h"
+#include <nx_ec/transaction_timestamp.h>
 
 namespace ec2
 {
@@ -1345,12 +1346,12 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
 
         struct PersistentInfo
         {
-            PersistentInfo(): sequence(0), timestamp(0) {}
+            PersistentInfo(): sequence(0), timestamp(Timestamp::fromInteger(0)) {}
             bool isNull() const { return dbID.isNull(); }
 
             QnUuid dbID;
             qint32 sequence;
-            qint64 timestamp;
+            Timestamp timestamp;
 
 #ifndef QN_NO_QT
             friend uint qHash(const ec2::QnAbstractTransaction::PersistentInfo &id) {

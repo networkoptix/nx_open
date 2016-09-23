@@ -1,6 +1,8 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <set>
+
 #include "openssl/evp.h"
 
 #include "soap_wrapper.h"
@@ -338,37 +340,38 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
     return result;
 }
 
-QSet<QAuthenticator> DeviceSoapWrapper::getPossibleCredentials(
+std::list<QnCredentials> DeviceSoapWrapper::getPossibleCredentials(
     const QString& manufacturer, 
     const QString& model) const
 {
-    QSet<QAuthenticator> result;
-
     QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
     auto credentials = resData.value<QList<QnCredentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-    for (const auto& credsEntry: credentials)
-        result.insert(credsEntry.toAuthenticator());
-
-    return result;
+    return credentials.toStdList();
 }
 
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
 {
-    auto possibleCredentials = getPossibleCredentials(manufacturer, model);
-
     calcTimeDrift();
 
-    auto passwords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
+    std::list<QnCredentials> possibleCredentials;
+    const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);
+    auto& oldPasswords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
 
-    for (const auto& creds: passwords)
+    std::set<QnCredentials> oldCredentialsSet;
+
+    for (const auto& creds: oldPasswords)
     {
-        QAuthenticator auth;
-        auth.setUser(creds.first);
-        auth.setPassword(creds.second);
+        QnCredentials auth(QLatin1String(creds.first), QLatin1String(creds.second));
+        oldCredentialsSet.insert(auth);
+        possibleCredentials.push_back(auth);
+    }
 
-        possibleCredentials.insert(auth);
+    for (const auto& creds: credentialsFromResourceData)
+    {
+        if (!oldCredentialsSet.count(creds))
+            possibleCredentials.push_back(creds);
     }
 
     for (const auto& auth: possibleCredentials)
@@ -376,8 +379,8 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
         if (QnResource::isStopping())
             return false;
 
-        setLogin(auth.user());
-        setPassword(auth.password());
+        setLogin(auth.user);
+        setPassword(auth.password);
 
         NetIfacesReq request;
         NetIfacesResp response;
@@ -389,6 +392,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
 
     setLogin(QString());
     setPassword(QString());
+
     return false;
 }
 

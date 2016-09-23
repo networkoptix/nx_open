@@ -282,24 +282,38 @@ int QnExportTimelapseDialog::fromSliderScale(int sliderValue) const
 
 QString QnExportTimelapseDialog::durationMsToString(qint64 durationMs)
 {
-    auto unitStringsConverter = [](Qt::TimeSpanUnit unit, int num)
-    {
-        switch (unit)
+    static const QString msSuffix = tr("ms", "Suffix for displaying milliseconds in rapid review dialog");
+    static const QString sSuffix = tr("s", "Suffix for displaying seconds in rapid review dialog");
+    static const QString mSuffix = tr("m", "Suffix for displaying minutes in rapid review dialog");
+    static const QString hSuffix = tr("h", "Suffix for displaying hours in rapid review dialog");
+    static const QString dSuffix = tr("d", "Suffix for displaying days in rapid review dialog");
+
+    auto unitStringsConverter =
+        [&](Qt::TimeSpanUnit unit, int num)
         {
+            QString format;
+            switch (unit)
+            {
             case::Qt::Milliseconds:
-                return tr("%nms", "", num);
+                format = msSuffix;
+                break;
             case::Qt::Seconds:
-                return tr("%ns", "", num);
+                format = sSuffix;
+                break;
             case::Qt::Minutes:
-                return tr("%nm", "", num);
+                format = mSuffix;
+                break;
             case::Qt::Hours:
-                return tr("%nh", "", num);
+                format = hSuffix;
+                break;
             case::Qt::Days:
-                return tr("%nd", "", num);
+                format = dSuffix;
+                break;
             default:
-                return QString();
-        }
-    };
+                break;
+            }
+            return QString::number(num) + format;
+        };
 
     /* Make sure passed format is fully covered by converter. */
     return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds, unitStringsConverter, lit(" "));

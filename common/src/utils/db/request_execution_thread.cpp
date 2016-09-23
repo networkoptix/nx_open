@@ -8,6 +8,7 @@
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
 
 
@@ -34,7 +35,7 @@ bool DbRequestExecutionThread::open()
 {
     //using guid as a unique connection name
     m_dbConnection = QSqlDatabase::addDatabase(
-        m_connectionOptions.driverName,
+        QnLexical::serialized<RdbmsDriverType>(m_connectionOptions.driverType),
         QUuid::createUuid().toString());
     m_dbConnection.setConnectOptions(m_connectionOptions.connectOptions);
     m_dbConnection.setDatabaseName(m_connectionOptions.dbName);

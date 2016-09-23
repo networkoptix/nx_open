@@ -416,7 +416,7 @@
     </message>
     <message>
         <source>Do HTTP request</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP kérés</translation>
     </message>
 </context>
 <context>

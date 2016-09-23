@@ -1206,7 +1206,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gyors áttekintés exportálása...</translation>
     </message>
 </context>
 <context>
@@ -1693,7 +1693,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Forrás és még %n kamera</numerusform>
         </translation>
     </message>
@@ -1995,15 +1995,22 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Beolvasás...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation>Válasszon eszközt</translation>
     </message>
     <message numerus="yes">
         <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 nem támodat kétirányú audiót</numerusform>
         </translation>
     </message>
 </context>
@@ -2688,19 +2695,19 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem található audió enkóder&apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished">Audió encoder inicializálása sikertelen.</translation>
+        <translation>Audió encoder inicializálása sikertelen.</translation>
     </message>
     <message>
         <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs elsődleges auidóeszköz kiválasztva.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>A %1 bemeneti eszköz minta formátuma nem támogatott.</translation>
     </message>
 </context>
 <context>
@@ -2894,9 +2901,9 @@ több könyvjelző megjelenítéséhez</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform>és még %1 felhasználó...</numerusform>
+        <source>and %n user(s) more...</source>
+        <translation>
+            <numerusform>és még %n felhasználó...</numerusform>
         </translation>
     </message>
 </context>
@@ -2934,49 +2941,44 @@ több könyvjelző megjelenítéséhez</translation>
     <name>QnExportTimelapseDialog</name>
     <message>
         <source>sec</source>
-        <translation type="unfinished">mp</translation>
+        <translation>mp</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished">perc</translation>
+        <translation>perc</translation>
     </message>
     <message>
         <source>hrs</source>
-        <translation type="unfinished">óra</translation>
+        <translation>óra</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">nap</translation>
+        <translation>nap</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>ms</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>mp</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>p</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>ó</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>n</translation>
     </message>
 </context>
 <context>
@@ -4284,7 +4286,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Audióbeállítás</translation>
     </message>
 </context>
 <context>
@@ -4669,7 +4671,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitráta</translation>
     </message>
 </context>
 <context>
@@ -4849,25 +4851,25 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n eszköz&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n kamera&gt;</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>&lt;%n I/O modul&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Export Bookmark...</source>
-        <translation type="unfinished">Könyvjelzők exportálása...</translation>
+        <translation>Könyvjelzők exportálása...</translation>
     </message>
 </context>
 <context>
@@ -5440,7 +5442,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Could not perform a test.</source>
-        <translation type="unfinished">Nem lehet a tesztet végrehajtani.</translation>
+        <translation>Nem lehet a tesztet végrehajtani.</translation>
     </message>
 </context>
 <context>
@@ -5620,13 +5622,13 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n kamera</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n eszköz</numerusform>
         </translation>
     </message>
@@ -6058,19 +6060,19 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs bemenneti eszköz kiválasztva.</translation>
     </message>
     <message>
         <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Streamelés nem lehetséges, próbálja meg később.</translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hálózati hiba.</translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>Tartsa lenyomva a beszédhez</translation>
     </message>
 </context>
 <context>
@@ -6335,7 +6337,7 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
         <translation>
-            <numerusform>Pc%1 - Képernyő %2</numerusform>
+            <numerusform>Pc %1.-.Képernyő %2</numerusform>
         </translation>
     </message>
 </context>
@@ -6652,19 +6654,19 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message>
         <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nagyfelbontású képernyőt érzékelt, ezért %1 lehet, hogy nem megfelelően jelenik meg.</translation>
     </message>
     <message>
         <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismert hiba.Javítása a 3.0-verzióban várható.</translation>
     </message>
     <message>
         <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha teheti állítson képernyője felbontásán a jobb felhasználói élmény eléréséhez.</translation>
     </message>
     <message>
         <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>HiDpi képernyő támogatás jelzése</translation>
     </message>
 </context>
 <context>
@@ -6703,7 +6705,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Biztosan törli ezt a %n könyvjelzőt?</numerusform>
         </translation>
     </message>
@@ -6956,7 +6958,7 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message>
         <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
+        <translation>A kiválasztott időtartam túl rövid. Nem exportálható gyors áttekintésként.</translation>
     </message>
 </context>
 <context>
