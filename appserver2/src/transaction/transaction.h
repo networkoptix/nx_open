@@ -1136,7 +1136,7 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \

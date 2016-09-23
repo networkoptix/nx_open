@@ -9,7 +9,6 @@
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
-#include <utils/crypt/symmetrical.h>
 
 namespace {
 QList<QnEmail::ConnectionType> connectionTypesAllowed()

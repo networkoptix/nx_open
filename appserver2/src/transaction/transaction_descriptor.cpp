@@ -8,6 +8,7 @@
 #include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/param.h>
 #include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
@@ -40,7 +41,9 @@ void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyVal
     bool isAllowed = true;
 
     if ((key == kNamePassword        || key == ldapAdminPassword ||
-         key == kNameCloudSystemID   || key == kNameCloudAuthKey) && accessData != Qn::kSystemAccess)
+         key == kNameCloudSystemID   || key == kNameCloudAuthKey ||
+         key == Qn::CAMERA_CREDENTIALS_PARAM_NAME                || 
+         key == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME) && accessData != Qn::kSystemAccess)
     {
         value->clear();
         isAllowed = false;
@@ -547,16 +550,22 @@ struct ReadResourceParamAccess
     {
         if (resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission))
         {
-            access_helpers::FilterFunctorListType filters = {
-                static_cast<void (*)(const Qn::UserAccessData&, access_helpers::KeyValueFilterType*, bool*)>(&access_helpers::globalSettingsSystemOnlyFilter)
-            };
-
-            access_helpers::KeyValueFilterType keyValue(param.name, &param.value);
-            ec2::access_helpers::applyValueFilters(accessData, &keyValue, filters);
-
+            operator()(accessData, static_cast<ApiResourceParamData&>(param));
             return true;
         }
         return false;
+    }
+
+    bool operator()(const Qn::UserAccessData& accessData, ApiResourceParamData& param)
+    {
+        access_helpers::FilterFunctorListType filters = {
+            static_cast<void (*)(const Qn::UserAccessData&, access_helpers::KeyValueFilterType*, bool*)>(&access_helpers::globalSettingsSystemOnlyFilter)
+        };
+
+        access_helpers::KeyValueFilterType keyValue(param.name, &param.value);
+        ec2::access_helpers::applyValueFilters(accessData, &keyValue, filters);
+
+        return true;
     }
 };
 
