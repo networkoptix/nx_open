@@ -47,7 +47,7 @@ void QnLogSettings::load(const QnSettings& settings, QString prefix)
         #ifdef _DEBUG
             m_level = cl_logDEBUG1;
         #else
-            level = cl_logINFO;
+            m_level = cl_logINFO;
         #endif
     }
 
