@@ -43,6 +43,8 @@ int QnSystemSettingsHandler::executeGet(
 
         if (allowed)
             reply.settings.insert(setting->key(), setting->serializedValue());
+        else 
+            reply.settings.insert(setting->key(), QString());
     }
     if (dirty)
         QnGlobalSettings::instance()->synchronizeNow();
