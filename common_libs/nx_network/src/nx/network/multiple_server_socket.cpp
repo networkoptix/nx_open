@@ -1,4 +1,3 @@
-
 #include "multiple_server_socket.h"
 
 #include <boost/optional.hpp>
@@ -8,9 +7,12 @@
 #include <nx/utils/log/log_message.h>
 
 #include "socket_global.h"
-#define DEBUG_LOG(message) \
-    if (nx::network::SocketGlobals::debugFlags().multipleServerSocket) \
-        NX_LOGX(message, cl_logDEBUG1);
+
+#define DEBUG_LOG(MESSAGE) do \
+    { \
+        if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+            NX_LOGX(MESSAGE, cl_logDEBUG1); \
+    } while(0)
 
 namespace nx {
 namespace network {

@@ -556,7 +556,7 @@ const char* FlagConfig::moduleName() const
     return d->moduleName();
 }
 
-void FlagConfig::allowOutput(bool isAllowed)
+void FlagConfig::setOutputAllowed(bool isAllowed)
 {
     s_isOutputAllowed = isAllowed;
 }

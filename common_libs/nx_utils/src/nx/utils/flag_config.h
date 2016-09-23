@@ -65,7 +65,7 @@ public:
     const char* moduleName() const;
 
     /** Configures if std out and error output is allowed */
-    static void allowOutput(bool isAllowed);
+    static void setOutputAllowed(bool isAllowed);
 
 private:
     class Impl;
