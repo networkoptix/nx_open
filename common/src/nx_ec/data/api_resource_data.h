@@ -30,26 +30,24 @@ struct ApiResourceParamWithRefData: ApiResourceParamData
 };
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
 
-struct ApiResourceData: ApiData
+struct ApiResourceData: ApiIdData
 {
     ApiResourceData() {}
 
-    QnUuid id;
     QnUuid parentId;
     QString name;
     QString url;
     QnUuid typeId;
 };
-#define ApiResourceData_Fields (id)(parentId)(name)(url)(typeId)
+#define ApiResourceData_Fields ApiIdData_Fields (parentId)(name)(url)(typeId)
 
-struct ApiResourceStatusData: ApiData
+struct ApiResourceStatusData: ApiIdData
 {
     ApiResourceStatusData(): status(Qn::Offline) {}
 
-    QnUuid id;
     Qn::ResourceStatus status;
 };
-#define ApiResourceStatusData_Fields (id)(status)
+#define ApiResourceStatusData_Fields ApiIdData_Fields (status)
 
 } // namespace ec2
 

@@ -419,6 +419,7 @@ bool QnUserResource::passwordExpired() const
 
 void QnUserResource::fillId()
 {
+    // ATTENTION: This logic is similar to ApiUserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
     QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
     setId(id);

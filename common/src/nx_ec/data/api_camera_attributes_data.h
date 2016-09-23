@@ -70,7 +70,7 @@ struct ApiCameraAttributesData: ApiData
     {
     }
 
-    QnUuid getIdForMerging() { return cameraId; } //< See ApiIdData::getIdForMerging().
+    QnUuid getIdForMerging() const { return cameraId; } //< See ApiIdData::getIdForMerging().
 
     QnUuid cameraId;
     QString cameraName;
