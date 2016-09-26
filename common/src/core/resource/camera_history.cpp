@@ -145,10 +145,13 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
         QnMutexLocker lock( &m_mutex );
         notify = m_historyValidCameras.contains(cameraId);
         m_historyValidCameras.remove(cameraId);
-        if (m_asyncRunningRequests.contains(cameraId)) {
-            server->restConnection()->cancelRequest(m_asyncRunningRequests[cameraId]);
+        if (m_asyncRunningRequests.contains(cameraId))
+        {
+            auto handle = m_asyncRunningRequests[cameraId];
             m_asyncRunningRequests.remove(cameraId);
             notify = true;
+            lock.unlock();
+            server->restConnection()->cancelRequest(handle);
         }
     }
 
@@ -194,12 +197,16 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
 {
     Q_UNUSED(requestId);
     QnMutexLocker lock(&m_mutex);
+    bool requestFound = false;
     for (auto itr = m_asyncRunningRequests.begin(); itr != m_asyncRunningRequests.end(); ++itr) {
         if (itr.value() == requestId) {
             m_asyncRunningRequests.erase(itr);
+            requestFound = true;
             break;
         }
     }
+    if (!requestFound)
+        return; //< request has been canceled
 
     QSet<QnUuid> loadedCamerasIds;
     if (success) {
