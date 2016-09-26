@@ -165,25 +165,25 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(newVLine());
     layout->addWidget(d->cloudPanel);
     layout->addWidget(newVLine());
+#ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
     layout->addWidget(newActionButton(
         QnActions::OpenLoginDialogAction,
         Qn::Login_Help,
         kControlButtonSize));
-    layout->addWidget(newVLine());
+#else
+    layout->addSpacing(8);
+#endif
     layout->addWidget(newActionButton(
         QnActions::WhatsThisAction,
         Qn::MainWindow_ContextHelp_Help,
         kControlButtonSize));
-    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
         QnActions::MinimizeAction,
         kControlButtonSize));
-    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
         QnActions::EffectiveMaximizeAction,
         Qn::MainWindow_Fullscreen_Help,
         kControlButtonSize));
-    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
         QnActions::ExitAction,
         kControlButtonSize));
