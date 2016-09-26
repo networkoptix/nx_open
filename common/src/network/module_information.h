@@ -8,7 +8,7 @@
 #include <utils/common/id.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-class QnConnectionInfo;
+struct QnConnectionInfo;
 
 struct QnModuleInformation
 {
