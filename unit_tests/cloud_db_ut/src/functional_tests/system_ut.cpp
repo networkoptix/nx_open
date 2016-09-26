@@ -378,17 +378,13 @@ TEST_F(System, notification_of_system_removal)
     }
 }
 
-TEST_F(System, updateSystemName)
+TEST_F(System, rename)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto account1 = addActivatedAccount2();
-
     // Adding system1 to account1.
-    api::SystemData system1;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        bindRandomSystem(account1.data.email, account1.password, &system1));
+    const auto system1 = addRandomSystemToAccount(account1);
 
     const auto account2 = addActivatedAccount2();
     shareSystem2(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
@@ -397,7 +393,7 @@ TEST_F(System, updateSystemName)
     // Owner is allowed to rename his system.
     ASSERT_EQ(
         api::ResultCode::ok,
-        updateSystemName(
+        renameSystem(
             account1.data.email, account1.password,
             system1.id, actualSystemName));
 
@@ -419,21 +415,21 @@ TEST_F(System, updateSystemName)
     // Only owner can rename system.
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        updateSystemName(system1.id, system1.authKey, system1.id, "aaa"));
+        renameSystem(system1.id, system1.authKey, system1.id, "aaa"));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        updateSystemName(account2.data.email, account2.password, system1.id, "xxx"));
+        renameSystem(account2.data.email, account2.password, system1.id, "xxx"));
 
     // Trying bad system names.
     ASSERT_EQ(
         api::ResultCode::badRequest,
-        updateSystemName(
+        renameSystem(
             account1.data.email, account1.password,
             system1.id, std::string()));
     ASSERT_EQ(
         api::ResultCode::badRequest,
-        updateSystemName(
+        renameSystem(
             account1.data.email, account1.password,
             system1.id, std::string(4096, 'z')));
 

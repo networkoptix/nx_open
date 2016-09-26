@@ -471,7 +471,7 @@ TEST_F(Ec2MserverCloudSynchronization2, newTransactionTimestamp)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization2, updateSystemNameInCloud)
+TEST_F(Ec2MserverCloudSynchronization2, renameSystem)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -500,7 +500,7 @@ TEST_F(Ec2MserverCloudSynchronization2, updateSystemNameInCloud)
         {
             ASSERT_EQ(
                 api::ResultCode::ok,
-                cdb()->updateSystemName(
+                cdb()->renameSystem(
                     ownerAccount().email,
                     ownerAccountPassword(),
                     registeredSystemData().id,

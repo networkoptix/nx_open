@@ -495,7 +495,7 @@ void SystemManager::getAccessRoleList(
 
 constexpr const std::size_t kMaxSystemNameLength = 1024;
 
-void SystemManager::updateSystemName(
+void SystemManager::rename(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemNameUpdate data,
     std::function<void(api::ResultCode)> completionHandler)

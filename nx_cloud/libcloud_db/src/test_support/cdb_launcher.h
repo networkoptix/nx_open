@@ -132,7 +132,7 @@ public:
         const std::string& password,
         const std::string& systemID,
         std::set<api::SystemAccessRole>* const accessRoles);
-    api::ResultCode updateSystemName(
+    api::ResultCode renameSystem(
         const std::string& login,
         const std::string& password,
         const std::string& systemID,

@@ -73,7 +73,7 @@ public:
     /**
         \note Currently, request can be performed by system only, not by account
     */
-    virtual void updateSystemName(
+    virtual void rename(
         const std::string& systemID,
         const std::string& systemName,
         std::function<void(api::ResultCode)> completionHandler) = 0;

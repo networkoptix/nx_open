@@ -105,7 +105,7 @@ void SystemManager::getAccessRoleList(
         std::bind(completionHandler, std::placeholders::_1, api::SystemAccessRoleList()));
 }
 
-void SystemManager::updateSystemName(
+void SystemManager::rename(
     const std::string& systemID,
     const std::string& systemName,
     std::function<void(api::ResultCode)> completionHandler)
@@ -115,7 +115,7 @@ void SystemManager::updateSystemName(
     data.name = systemName;
 
     executeRequest(
-        kSystemUpdateSystemNamePath,
+        kSystemRenamePath,
         std::move(data),
         completionHandler,
         completionHandler);

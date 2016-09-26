@@ -446,8 +446,8 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::system, DataActionType::fetch);
 
     registerHttpHandler(
-        kSystemUpdateSystemNamePath,
-        &SystemManager::updateSystemName, systemManager,
+        kSystemRenamePath,
+        &SystemManager::rename, systemManager,
         EntityType::system, DataActionType::update);
 
     //------------------------------------------
