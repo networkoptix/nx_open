@@ -147,8 +147,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 {
     using namespace std::placeholders;
 
-    // TODO: #mike Add where needed: @return Id of the object being created or updated.
-
     /**%apidoc GET /ec2/getResourceTypes
      * Read all resource types. Resource type contain object type such as
      * "Server", "Camera", etc. Also, resource types contain additional information
