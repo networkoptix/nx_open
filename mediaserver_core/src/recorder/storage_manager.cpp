@@ -2193,7 +2193,6 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         (qint16) timeZone
     );
     catalog->addRecord(chunk);
-    catalog->setLastSyncTime(startDateMs);
     return true;
 }
 
