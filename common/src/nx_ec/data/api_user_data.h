@@ -12,11 +12,11 @@ struct ApiUserData: ApiResourceData
     ApiUserData():
         isAdmin(false),
         permissions(Qn::NoGlobalPermissions),
+        realm(QnAppInfo::realm()),
         isLdap(false),
         isEnabled(true),
         isCloud(false),
-        fullName(),
-        realm(QnAppInfo::realm())
+        fullName()
     {
         typeId = QnResourceTypePool::kUserTypeUuid;
     }

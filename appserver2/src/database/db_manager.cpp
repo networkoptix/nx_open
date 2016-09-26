@@ -3830,7 +3830,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& res
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    const QString queryStr = lit(R"(
+    const QString queryStr = QString(R"(
         SELECT id, name, permissions
         FROM vms_user_groups
         %1
