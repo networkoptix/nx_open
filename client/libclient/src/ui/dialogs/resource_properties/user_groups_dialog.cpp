@@ -44,14 +44,8 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
     for (auto page : allPages())
     {
-        /* Changes are locally stored in model. */
-        connect(page.widget, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this, page]
-        {
-            if (!page.widget->hasChanges())
-                return;
-            page.widget->applyChanges();
-            updateButtonBox();
-        });
+        connect(page.widget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
+            &QnUserGroupsDialog::updateButtonBox);
     }
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
