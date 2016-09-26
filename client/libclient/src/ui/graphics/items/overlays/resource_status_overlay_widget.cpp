@@ -228,7 +228,6 @@ void QnStatusOverlayWidget::setupCentralControls()
     setPaletteColor(container, QPalette::Window, Qt::transparent);
 
     const auto layout = new QVBoxLayout(container);
-    layout->setContentsMargins(16, 60, 16, 60);
     layout->setSpacing(0);
 
     layout->addStretch(1);
@@ -239,6 +238,7 @@ void QnStatusOverlayWidget::setupCentralControls()
     layout->setSizeConstraint(QLayout::SetMinimumSize);
 
     const auto holderLayout = new QGraphicsLinearLayout(m_centralHolder);
+    holderLayout->setContentsMargins(16, 60, 16, 60);
     holderLayout->addItem(makeMaskedProxy(container, m_centralHolder));
 
     m_centralHolder->setOpacity(0.7);
