@@ -85,6 +85,32 @@ bool QnQmlSortFilterProxyModel::lessThan(const QModelIndex& left,
     return genericLessThan(left, right, m_cloudSystemWeight, localSystemsLess);
 }
 
+bool QnQmlSortFilterProxyModel::filterAcceptsRow(int row,
+    const QModelIndex &parent) const
+{
+    if (!base_type::filterAcceptsRow(row, parent))
+        return false;
+
+    // Filters out offline non-cloud systems with last connection more than N (defined) days ago
+    const auto index = sourceModel()->index(row, 0, parent);
+    if (!index.isValid())
+        return true;
+
+    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool()
+        || index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
+    {
+        return true;   //< Skip online or cloud systems
+    }
+
+    const auto systemId = index.data(QnSystemsModel::SystemIdRoleId).toString();
+    const auto itLocalSystemWeight = m_localSystemWeight.find(systemId);
+    if (itLocalSystemWeight == m_localSystemWeight.end())
+        return true;
+
+    static const auto kMinWeight = 0.00001;
+    return (itLocalSystemWeight.value() > kMinWeight);
+}
+
 void QnQmlSortFilterProxyModel::handleCloudSystemsChanged(const QnCloudSystemList& systems)
 {
     const auto newCloudSystemsOrder =

@@ -13,9 +13,12 @@ public:
 
     virtual ~QnQmlSortFilterProxyModel() = default;
 
-protected:
+protected: // overrides
     virtual bool lessThan(const QModelIndex& left,
         const QModelIndex& right) const override;
+
+    virtual bool filterAcceptsRow(int row,
+        const QModelIndex &parent) const override;
 
 private:
     void handleCloudSystemsChanged(const QnCloudSystemList& systems);
