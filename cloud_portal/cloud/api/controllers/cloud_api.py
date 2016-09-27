@@ -79,7 +79,7 @@ class System(object):
     def rename(email, password, system_id, system_name):
         request = CLOUD_DB_URL + "/system/rename"
         params = {
-            'id': system_id,
+            'systemID': system_id,
             'name': system_name
         }
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
