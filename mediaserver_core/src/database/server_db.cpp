@@ -580,6 +580,43 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction() {
     return true;
 }
 
+bool QnServerDb::bookmarksUniqueIdToCameraId()
+{
+    QMap<QnUuid, QString> uniqueIdByGuid;
+
+    // Build uniqueIdByGuid.
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(
+        "SELECT guid, unique_id FROM bookmarks_tmp");
+    if (!query.exec())
+        return false;
+    while (query.next())
+    {
+        const QnUuid guid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        const QString uniqueId = query.value(1).toString();
+        uniqueIdByGuid.insert(guid, uniqueId);
+    }
+
+    // Change uniqueId to cameraId: cameraId = md5(uniqueId).
+    for (auto it = uniqueIdByGuid.begin(); it != uniqueIdByGuid.end(); ++it)
+    {
+        const QnUuid cameraId = guidFromArbitraryData(it.value());
+
+        QSqlQuery query(m_sdb);
+        query.prepare(
+            "UPDATE bookmarks SET camera_id = :cameraId WHERE guid = :guid");
+        query.bindValue(":guid", QnSql::serialized_field(it.key()));
+        query.bindValue(":cameraId", QnSql::serialized_field(cameraId));
+        if (!query.exec())
+        {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return false;
+        }
+    }
+    return true;
+}
+
 bool QnServerDb::createBookmarkTagTriggersUnderTransaction() {
     /* DO NOT TRY to move this code to sql scripts.
        It uses semicolons inside SQL queries,
@@ -868,6 +905,11 @@ bool QnServerDb::afterInstallUpdate(const QString& updateName) {
 
     if (updateName.endsWith(lit("/03_add_bookmark_tag_counts_and_rename_tables.sql")))
         return createBookmarkTagTriggersUnderTransaction();
+
+    if (updateName.endsWith(lit("/07_1_bookmarks_unique_id_to_camera_id.sql")))
+        return bookmarksUniqueIdToCameraId();
+    // TODO: #mike
+
 
     return true;
 }

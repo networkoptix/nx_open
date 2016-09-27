@@ -90,6 +90,7 @@ private:
     int getRuntimeActionsRecordCount();
     bool migrateBusinessParamsUnderTransaction();
     bool createBookmarkTagTriggersUnderTransaction();
+    bool bookmarksUniqueIdToCameraId();
     bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
