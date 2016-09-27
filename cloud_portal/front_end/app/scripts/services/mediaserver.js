@@ -75,11 +75,6 @@ angular.module('cloudApp')
                 deleteUser: function(userId){
                     return this._post('/ec2/removeUser', {id:userId});
                 },
-                changeSystemName:function(systemName){
-                    return this._post('/web/api/configure', {
-                        systemName:systemName
-                    });
-                },
                 cleanUserObject:function(user){ // Remove unnesesary fields from the object
                     return user; //TODO: uncomment after #VMS-2968
     

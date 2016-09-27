@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('RenameCtrl', ['$scope', 'mediaserver', 'process', 'dialogs', '$q', 'account',
-    function ($scope, mediaserver, process, dialogs, $q, account) {
+    .controller('RenameCtrl', ['$scope', 'cloud_api', 'process', 'dialogs', '$q', 'account',
+    function ($scope, cloud_api, process, dialogs, $q, account) {
 
         $scope.Config = Config;
         $scope.L = L;
@@ -22,7 +22,7 @@ angular.module('cloudApp')
         }
 
         $scope.renaming = process.init(function(){
-            return mediaserver(systemId).changeSystemName($scope.model.systemName);
+            return cloud_api.renameSystem(systemId, $scope.model.systemName);
         },{
             successMessage: L.system.successRename
         }).then(function(){

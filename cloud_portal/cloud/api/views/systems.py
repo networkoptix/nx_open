@@ -48,6 +48,16 @@ def get_nonce(request, system_id):
     return api_success(data)
 
 
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
+def rename(request, system_id):
+    require_params(request, ('name',))
+    data = cloud_api.System.rename(request.session['login'], request.session['password'], system_id,
+                                   request.data['name'])
+    return api_success(data)
+
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions

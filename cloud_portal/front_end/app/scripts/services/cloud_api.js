@@ -163,6 +163,11 @@ angular.module('cloudApp')
                     }
                 },requestSystem); // Total cache miss
             },
+            renameSystem:function(systemId,systemName){
+                return $http.post(apiBase + '/systems/' + systemId + '/name',{
+                    name:systemName
+                });
+            },
 
             getSystemNonce:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/nonce');
