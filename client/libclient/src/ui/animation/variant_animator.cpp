@@ -153,8 +153,7 @@ void VariantAnimator::setTargetValue(const QVariant &targetValue)
         if (qFuzzyEquals(m_internalTargetValue.toDouble(), internalTargetValue.toDouble()))
             return;
     }
-
-    if (targetValue.canConvert(QMetaType::LongLong))
+    else if (targetValue.canConvert(QMetaType::LongLong))
     {
         if (m_internalTargetValue.toLongLong() == internalTargetValue.toLongLong())
             return;

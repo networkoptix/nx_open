@@ -78,7 +78,7 @@ namespace {
             layout->addStretch();
         }
 
-        virtual bool validate(const QnResourceList &selectedResources) override
+        virtual bool validate(const QSet<QnUuid>& selectedResources) override
         {
             static const auto kBackupInProgressWarning = QnDeviceDependentStrings::getDefaultNameFromSet(
                 tr("Cannot add new devices while backup process is running."),
@@ -88,7 +88,7 @@ namespace {
                 tr("Cannot add new devices because they store archive on external storage."),
                 tr("Cannot add new cameras because they store archive on external storage."));
 
-            const QnVirtualCameraResourceList cameras = selectedResources.filtered<QnVirtualCameraResource>();
+            auto cameras = qnResPool->getResources<QnVirtualCameraResource>(selectedResources);
             if (boost::algorithm::any_of(cameras, isDtsCamera))
             {
                 // If has dts-based cameras then change massage accordingly
@@ -110,8 +110,9 @@ namespace {
             return false;
         }
 
-        virtual bool isValid(const QnResourcePtr &resource) const override
+        virtual bool isValid(const QnUuid& resourceId) const override
         {
+            auto resource = qnResPool->getResourceById(resourceId);
             if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
                 return isValidServer(server);
 
@@ -148,7 +149,7 @@ namespace {
 }
 
 QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
-    base_type(parent)
+    base_type(QnResourceSelectionDialog::Filter::cameras, parent)
 {
     const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Select Devices to Backup..."),

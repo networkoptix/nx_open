@@ -26,7 +26,7 @@ struct QnLocalConnectionData
     bool isStoredPassword;
 
     static void writeToSettings(QSettings* settings
-        , const QnLocalConnectionData& data);
+        , QnLocalConnectionData data);
 
     static QnLocalConnectionData fromSettings(QSettings* settings);
 };

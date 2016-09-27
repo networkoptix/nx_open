@@ -2,6 +2,7 @@
 #include "ui_camera_input_business_event_widget.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <business/events/camera_input_business_event.h>
 
@@ -35,7 +36,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields f
         QnIOPortDataList inputPorts;
         bool inited = false;
 
-        QnVirtualCameraResourceList cameras = model()->eventResources().filtered<QnVirtualCameraResource>();
+        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(model()->eventResources());
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
             QnIOPortDataList cameraInputs = camera->getInputPortList();
             if (!inited) {
