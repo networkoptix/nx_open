@@ -37,6 +37,13 @@
 namespace nx {
 namespace cdb {
 
+static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
+{
+    api::SystemSharingEx result;
+    result.api::SystemSharing::operator=(std::move(right));
+    return result;
+}
+
 SystemManager::SystemManager(
     const conf::Settings& settings,
     nx::utils::TimerManager* const timerManager,
@@ -315,7 +322,7 @@ void SystemManager::getSystems(
             if (sharingData)
             {
                 systemDataEx.accessRole = sharingData->accessRole;
-                //systemDataEx.systemAccessWeight = ;
+                systemDataEx.sortingOrder = sharingData->systemAccessWeight;
             }
             else
             {
@@ -567,7 +574,7 @@ void SystemManager::rename(
         std::move(onDbUpdateCompletedFunc));
 }
 
-void SystemManager::startUserSession(
+void SystemManager::recordUserSessionStart(
     const AuthorizationInfo& authzInfo,
     data::UserSessionDescriptor userSessionDescriptor,
     std::function<void(api::ResultCode)> completionHandler)
@@ -649,8 +656,8 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     if (it == accountSystemPairIndex.end())
         return boost::none;
 
-    api::SystemSharingEx resultData;
-    resultData.api::SystemSharing::operator=(*it);
+    api::SystemSharingEx resultData = *it;
+    //resultData.api::SystemSharing::operator=(*it);
 
     const auto account = m_accountManager.findAccountByUserName(accountEmail);
     if (!account)
@@ -809,7 +816,7 @@ void SystemManager::systemAdded(
         //updating cache
         m_systems.insert(resultData.systemData);
         //updating "systems by account id" index
-        m_accountAccessRoleForSystem.emplace(std::move(resultData.ownerSharing));
+        m_accountAccessRoleForSystem.emplace(createDerivedFromBase(std::move(resultData.ownerSharing)));
     }
     completionHandler(
         dbResult == nx::db::DBResult::ok
@@ -829,7 +836,7 @@ void SystemManager::systemSharingAdded(
     {
         //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
-        m_accountAccessRoleForSystem.emplace(systemSharing);
+        m_accountAccessRoleForSystem.emplace(createDerivedFromBase(std::move(systemSharing)));
     }
 
     completionHandler(
@@ -1093,7 +1100,7 @@ void SystemManager::sharingUpdated(
         if (sharing.accessRole != api::SystemAccessRole::none)
         {
             //inserting modified version
-            accountSystemPairIndex.emplace(sharing);
+            accountSystemPairIndex.emplace(createDerivedFromBase(std::move(sharing)));
         }
 
         return completionHandler(api::ResultCode::ok);
@@ -1282,7 +1289,8 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
     const auto accountId = selectUsageStatisticsQuery.value("account_id").toString();
 
     using namespace std::chrono;
-    const qint64 currentTimeUtc = system_clock::now().time_since_epoch().count();
+    const qint64 currentTimeUtc = 
+        duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
     const auto fullDaysSinceLastLogin = 
         (currentTimeUtc - lastLoginTimeUtc) / kSecondsPerDay;
     *systemAccessWeight = std::max<float>(
@@ -1297,11 +1305,11 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
         SET last_login_time_utc=:last_login_time_utc, usage_frequency=:usage_frequency
         WHERE account_id=:account_id AND system_id=:system_id
         )sql");
-    updateUsageStatisticsQuery.bindValue("last_login_time_utc", currentTimeUtc);
-    updateUsageStatisticsQuery.bindValue("usage_frequency", newUsageFrequency);
-    updateUsageStatisticsQuery.bindValue("account_id", accountId);
+    updateUsageStatisticsQuery.bindValue(":last_login_time_utc", currentTimeUtc);
+    updateUsageStatisticsQuery.bindValue(":usage_frequency", newUsageFrequency);
+    updateUsageStatisticsQuery.bindValue(":account_id", accountId);
     updateUsageStatisticsQuery.bindValue(
-        "system_id",
+        ":system_id",
         QnSql::serialized_field(userSessionDescriptor.systemId.get()));
     if (!updateUsageStatisticsQuery.exec())
     {
@@ -1338,10 +1346,9 @@ void SystemManager::systemAccessWeightUpdatedInDb(
         {
             bySystemIdAndAccountEmailIndex.modify(
                 systemIter,
-                [systemAccessWeight](api::SystemSharing& systemSharing)
+                [systemAccessWeight](api::SystemSharingEx& systemSharing)
                 {
-                    // TODO:
-                    //systemSharing.systemAccessWeight = systemAccessWeight;
+                    systemSharing.systemAccessWeight = systemAccessWeight;
                 });
         }
     }
@@ -1496,7 +1503,7 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     std::vector<data::SystemSharing> systemToAccount;
     QnSql::fetch_many(readSystemToAccountQuery, &systemToAccount);
     for (auto& sharing: systemToAccount)
-        m_accountAccessRoleForSystem.emplace(std::move(sharing));
+        m_accountAccessRoleForSystem.emplace(createDerivedFromBase(std::move(sharing)));
 
     return db::DBResult::ok;
 }
@@ -1630,7 +1637,7 @@ void SystemManager::onEc2SaveUserDone(
     if (sharing.accessRole != api::SystemAccessRole::none)
     {
         //inserting modified version
-        accountSystemPairIndex.emplace(sharing);
+        accountSystemPairIndex.emplace(createDerivedFromBase(std::move(sharing)));
     }
 }
 

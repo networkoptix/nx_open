@@ -483,5 +483,42 @@ TEST_F(System, persistentSequence)
     ASSERT_EQ(system2.systemSequence + 1, system3.systemSequence);
 }
 
+TEST_F(System, sortingOrder)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account);
+    const auto system2 = addRandomSystemToAccount(account);
+    const auto system3 = addRandomSystemToAccount(account);
+
+    for (int i = 0; i < 3; ++i)
+        ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
+    for (int i = 0; i < 2; ++i)
+        ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system2.id));
+    for (int i = 0; i < 1; ++i)
+        ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
+
+    std::vector<api::SystemDataEx> systems;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+
+    ASSERT_EQ(3, systems.size());
+    std::sort(
+        systems.begin(), systems.end(),
+        [](const api::SystemDataEx& one, const api::SystemDataEx& two)
+        {
+            return one.sortingOrder > two.sortingOrder; //< Descending sort.
+        });
+
+    ASSERT_GT(systems[0].sortingOrder, systems[1].sortingOrder);
+    ASSERT_GT(systems[1].sortingOrder, systems[2].sortingOrder);
+
+    ASSERT_EQ(system1.id, systems[0].id);
+    ASSERT_EQ(system2.id, systems[1].id);
+    ASSERT_EQ(system3.id, systems[2].id);
+}
+
 }   //cdb
 }   //nx

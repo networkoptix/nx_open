@@ -121,7 +121,7 @@ public:
         data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
     
-    void startUserSession(
+    void recordUserSessionStart(
         const AuthorizationInfo& authzInfo,
         data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
@@ -180,7 +180,7 @@ private:
     constexpr static const int kSystemByExpirationTimeIndex = 1;
 
     typedef boost::multi_index::multi_index_container<
-        api::SystemSharing,
+        api::SystemSharingEx,
         boost::multi_index::indexed_by<
             boost::multi_index::ordered_unique<
                 boost::multi_index::identity<api::SystemSharing>>,

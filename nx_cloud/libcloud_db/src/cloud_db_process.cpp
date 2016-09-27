@@ -451,8 +451,8 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::system, DataActionType::update);
 
     registerHttpHandler(
-        kSystemStartUserSessionPath,
-        &SystemManager::startUserSession, systemManager,
+        kSystemRecordUserSessionStartPath,
+        &SystemManager::recordUserSessionStart, systemManager,
         EntityType::account, DataActionType::update);   //< TODO: #ak: current entity:action is not suitable for this request
 
     //------------------------------------------

@@ -170,6 +170,10 @@ public:
         const std::string& systemId,
         api::SystemDataEx* const systemData);
 
+    api::ResultCode recordUserSessionStart(
+        const AccountWithPassword& account,
+        const std::string& systemId);
+
     api::ResultCode getVmsConnections(
         api::VmsConnectionDataList* const vmsConnections);
 

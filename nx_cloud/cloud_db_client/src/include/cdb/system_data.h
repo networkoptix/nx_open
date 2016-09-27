@@ -155,11 +155,17 @@ class SystemSharingEx
     public SystemSharing
 {
 public:
-    SystemSharingEx() {}
+    SystemSharingEx()
+    :
+        systemAccessWeight(0.0)
+    {
+    }
 
     /** Globally unique account id. */
     std::string accountID;
     std::string accountFullName;
+    /** Shows how often user accesses given system in comparison to other user's systems. */
+    float systemAccessWeight;
 
     bool operator==(const SystemSharingEx& rhs) const
     {
@@ -215,16 +221,17 @@ public:
     /** Permissions, account can share current system with. */
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
-    /** This number shows how often user, performing request, 
+    /**
+     * This number shows how often user, performing request, 
      * uses this system in comparision to other systems.
      */
-    float accessWeight;
+    float sortingOrder;
 
     SystemDataEx()
     :
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
-        accessWeight(0)
+        sortingOrder(0)
     {
     }
 
@@ -233,7 +240,7 @@ public:
         SystemData(std::move(systemData)),
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
-        accessWeight(0)
+        sortingOrder(0)
     {
     }
 };

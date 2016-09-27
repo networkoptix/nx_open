@@ -121,6 +121,20 @@ void SystemManager::rename(
         completionHandler);
 }
 
+void SystemManager::recordUserSessionStart(
+    const std::string& systemId,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    api::UserSessionDescriptor userSessionDescriptor;
+    userSessionDescriptor.systemId = systemId;
+
+    executeRequest(
+        kSystemRecordUserSessionStartPath,
+        std::move(userSessionDescriptor),
+        completionHandler,
+        completionHandler);
+}
+
 }   //cl
 }   //cdb
 }   //nx

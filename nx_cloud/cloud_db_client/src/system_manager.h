@@ -50,6 +50,9 @@ public:
         const std::string& systemId,
         const std::string& systemName,
         std::function<void(api::ResultCode)> completionHandler) override;
+    virtual void recordUserSessionStart(
+        const std::string& systemId,
+        std::function<void(api::ResultCode)> completionHandler) override;
 };
 
 }   //cl
