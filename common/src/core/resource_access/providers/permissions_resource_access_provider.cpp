@@ -16,13 +16,13 @@ QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
 bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!resource)
+    if (!resource || !subject.isValid())
         return false;
 
     if (resource->hasFlags(Qn::desktop_camera))
         return hasAccessToDesktopCamera(subject, resource);
 
-    return qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+    return qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission);
 }
 
 bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(

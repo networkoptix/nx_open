@@ -96,7 +96,6 @@ protected:
         return storage;
     }
 
-    // Declares the variables your tests want to use.
     QSharedPointer<QnCommonModule> m_module;
     QSharedPointer<QnPermissionsResourceAccessProvider> m_accessProvider;
 };
@@ -191,4 +190,26 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByPermis
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
     ASSERT_FALSE(m_accessProvider->hasAccess(user, camera));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkCameraAccess)
+{
+    auto target = createCamera();
+
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+
+    user->setRawPermissions(Qn::GlobalEditCamerasPermission);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkWebPageAccess)
+{
+    auto target = createWebPage();
+
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+
+    user->setRawPermissions(Qn::GlobalEditCamerasPermission);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
 }
