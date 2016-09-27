@@ -26,6 +26,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/skin.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
@@ -46,6 +47,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->scheduleButton->setIcon(qnSkin->icon(lit("buttons/schedule.png")));
     setHelpTopic(ui->scheduleButton, Qn::EventsActions_Schedule_Help);
 
     ui->eventDefinitionGroupBox->installEventFilter(this);

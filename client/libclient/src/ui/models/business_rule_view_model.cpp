@@ -26,6 +26,7 @@
 #include <ui/help/business_help.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -790,7 +791,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
                 case QnBusiness::SendMailAction:
                 {
                     if (!isValid(QnBusiness::TargetColumn))
-                        return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+                        return qnSkin->icon("tree/user_invalid.png");
                     return qnResIconCache->icon(QnResourceIconCache::Users);
                 }
 

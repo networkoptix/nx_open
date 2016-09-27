@@ -134,7 +134,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
         &QnEventLogDialog::reset);
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
-    ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
+    ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules.png"));
     ui->loadingProgressBar->hide();
 
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);

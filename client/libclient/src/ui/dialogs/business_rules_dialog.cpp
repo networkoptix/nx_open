@@ -187,9 +187,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     m_currentDetailsWidget = ui->detailsWidget;
 
-    //TODO: #GDM #3.0 fix icons
+    //TODO: #GDM #3.0 fix icon
     ui->advancedButton->setIcon(qnSkin->icon(lit("titlebar/dropdown_hovered.png")));
-    ui->eventLogButton->setIcon(qnSkin->icon(lit("tree/layout.png")));
+    ui->eventLogButton->setIcon(qnSkin->icon(lit("buttons/event_log.png")));
 
     createActions();
 
