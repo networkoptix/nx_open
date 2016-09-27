@@ -55,7 +55,7 @@ angular.module('webadminApp')
                     }
                 });
 
-                $scope.canMerge = user.isOwner;
+                $scope.canConnectToCloud = $scope.canMerge = user.isOwner;
 
                 getCloudInfo();
                 requestScripts();
