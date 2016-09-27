@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
         $scope.Config = Config;
 
