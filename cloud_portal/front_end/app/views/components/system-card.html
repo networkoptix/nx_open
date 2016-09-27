@@ -3,7 +3,7 @@
     <div class="panel-body">
         <h2>Your system</h2>
 
-        <p ng-if="system.permissions.isAdmin && system.isAvailable">
+        <p ng-if="system.permissions.isAdmin">
             <button class="btn btn-default" ng-click="rename()">Rename the system</button>
         </p>
         <button class="btn btn-default" ng-click="disconnect()">Disconnect from
