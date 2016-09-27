@@ -16,6 +16,6 @@ void QnToolButton::adjustIconSize()
 
 void QnToolButton::mousePressEvent(QMouseEvent* event)
 {
-    emit justPressed();
     base_type::mousePressEvent(event);
+    emit justPressed();
 }

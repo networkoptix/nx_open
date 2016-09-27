@@ -81,8 +81,8 @@ public:
     QnBusiness::EventType eventType() const;
     void setEventType(const QnBusiness::EventType value);
 
-    QnResourceList eventResources() const;
-    void setEventResources(const QnResourceList &value);
+    QSet<QnUuid> eventResources() const;
+    void setEventResources(const QSet<QnUuid>& value);
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
@@ -93,8 +93,8 @@ public:
     QnBusiness::ActionType actionType() const;
     void setActionType(const QnBusiness::ActionType value);
 
-    QnResourceList actionResources() const;
-    void setActionResources(const QnResourceList &value);
+    QSet<QnUuid> actionResources() const;
+    void setActionResources(const QSet<QnUuid>& value);
 
     bool isActionProlonged() const;
 
@@ -146,14 +146,12 @@ private:
     bool m_modified;
 
     QnBusiness::EventType m_eventType;
-    //QnResourceList m_eventResources;
-    IDList  m_eventResources;
+    QSet<QnUuid> m_eventResources;
     QnBusinessEventParameters m_eventParams;
     QnBusiness::EventState m_eventState;
 
     QnBusiness::ActionType m_actionType;
-    //QnResourceList m_actionResources;
-    IDList  m_actionResources;
+    QSet<QnUuid> m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriodSec;

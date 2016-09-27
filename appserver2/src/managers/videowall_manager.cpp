@@ -43,7 +43,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, videowalls);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowalls, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowalls, QnUuid(), queryDoneHandler);
         return reqID;
     }
 

@@ -71,7 +71,6 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
         {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 }
 
-
 QnRequestParamList QnGetBookmarksRequestData::toParams() const
 {
     QnRequestParamList result = QnMultiserverRequestData::toParams();

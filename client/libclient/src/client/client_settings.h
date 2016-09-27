@@ -156,8 +156,6 @@ public:
 
         TIMELAPSE_SPEED,
 
-        SHOW_HIDPI_WARNING,
-
         VARIABLE_COUNT
     };
 
@@ -245,7 +243,6 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
         QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)
-        QN_DECLARE_RW_PROPERTY(bool,                        showHiDpiWarning,       setShowHiDpiWarning,        SHOW_HIDPI_WARNING,         true)
     QN_END_PROPERTY_STORAGE()
 
 private:

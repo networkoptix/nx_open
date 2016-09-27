@@ -980,6 +980,21 @@ struct SaveUserTransactionType
     }
 };
 
+struct SetResourceParamTransactionType
+{
+    ec2::TransactionType::Value operator()(const ApiResourceParamWithRefData& param)
+    {
+        if (param.resourceId == QnUserResource::kAdminGuid &&
+            param.name == QnGlobalSettings::kNameSystemName)
+        {
+            // System rename MUST be propagated to Nx Cloud
+            return TransactionType::Cloud;
+        }
+
+        return TransactionType::Regular;
+    }
+};
+
 struct RemoveUserTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiIdData& params)

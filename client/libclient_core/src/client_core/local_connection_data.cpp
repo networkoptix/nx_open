@@ -42,9 +42,10 @@ QnLocalConnectionData::QnLocalConnectionData(const QString& name,
 {}
 
 void QnLocalConnectionData::writeToSettings(QSettings* settings
-    , const QnLocalConnectionData& data)
+    , QnLocalConnectionData data)
 {
     const auto encryptedPass = nx::utils::xorEncrypt(data.url.password(), kXorKey);
+    data.url.setPassword(QString());
     settings->setValue(kUrlNameTag, data.url.toString());
     settings->setValue(kPasswordTag, encryptedPass);
     settings->setValue(kSystemNameTag, data.systemName);

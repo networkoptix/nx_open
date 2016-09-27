@@ -36,9 +36,12 @@ private:
 
 private:
     typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
-    typedef QHash<QString, QString> SystemNamesHash;
+    typedef QPair<QString, int> SystemNameCountPair;
+    typedef QHash<QString, SystemNameCountPair> SystemNamesHash;
 
     SystemsHash m_systems;
     SystemsHash m_reservedSystems;
+
     SystemNamesHash m_onlineSystems;
+
 };

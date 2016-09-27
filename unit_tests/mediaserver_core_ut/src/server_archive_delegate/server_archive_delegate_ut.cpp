@@ -20,6 +20,7 @@ extern "C" {
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/writer_pool.h>
 #include <nx/utils/log/log.h>
+#include <media_server/settings.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -274,6 +275,7 @@ private:
                 qDebug() << lit("Write header wrong offset %1").arg(fileName);
                 return;
             }
+
             file.seek(0x219 + 0xd);
             file.write(QString::number(timestamp).toLatin1().constData());
             file.close();
@@ -282,7 +284,7 @@ private:
         auto copyFile = [&](const QString& root, const QString &quality)
         {
             int curDuration = durationDist(gen) == 0 ? duration_1 : duration_2;
-            bool isHole = normalOrHoleDist(gen) <= 3 ? true : false;
+            bool isHole = normalOrHoleDist(gen) <= 1 ? true : false;
             int64_t curStartTime = isHole ? holeStartDistMs(gen) + startTimeMs :
                                             normalStartDistMs(gen) + startTimeMs;
             QString fileName = lit("%1_%2.mkv").arg(curStartTime).arg(curDuration);
@@ -467,6 +469,9 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         );
     }
 #endif
+
+    MSSettings::roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
+    MSSettings::roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
 
     TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
     testHelper.print();

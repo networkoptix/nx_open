@@ -230,7 +230,6 @@
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
 #include "cloud/cloud_connection_manager.h"
-#include "cloud/cloud_system_name_updater.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
@@ -1809,7 +1808,6 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
-    CloudSystemNameUpdater cloudSystemNameUpdater(&cloudConnectionManager);
     auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 

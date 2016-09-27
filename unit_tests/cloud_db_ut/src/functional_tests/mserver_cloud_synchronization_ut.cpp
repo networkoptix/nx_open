@@ -8,6 +8,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
+#include <api/global_settings.h>
+#include <core/resource/user_resource.h>
 #include <transaction/transaction_transport.h>
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
@@ -413,7 +415,8 @@ TEST_F(Ec2MserverCloudSynchronization2, reBindingSystemToCloud)
 
         if (i == 0)
         {
-            appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+            appserver2()->moduleInstance()->ecConnection()
+                ->deleteRemotePeer(cdbEc2TransactionUrl());
             ASSERT_EQ(api::ResultCode::ok, unbindSystem());
             cdb()->restart();
             ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
@@ -465,6 +468,63 @@ TEST_F(Ec2MserverCloudSynchronization2, newTransactionTimestamp)
                 api::ResultCode::ok,
                 cdb()->shareSystem(ownerAccount().email, ownerAccountPassword(), sharing));
         }
+    }
+}
+
+TEST_F(Ec2MserverCloudSynchronization2, renameSystem)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+    for (int i = 0; i < 4; ++i)
+    {
+        const bool needRestart = (i & 1) > 0;
+        const bool updateInCloud = i < 2;
+
+        if (needRestart)
+        {
+            appserver2()->moduleInstance()->ecConnection()
+                ->deleteRemotePeer(cdbEc2TransactionUrl());
+            cdb()->restart();
+            appserver2()->moduleInstance()->ecConnection()
+                ->addRemotePeer(cdbEc2TransactionUrl());
+        }
+
+        const std::string newSystemName =
+            nx::utils::random::generate(10, 'a', 'z').toStdString();
+
+        if (updateInCloud)
+        {
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                cdb()->renameSystem(
+                    ownerAccount().email,
+                    ownerAccountPassword(),
+                    registeredSystemData().id,
+                    newSystemName));
+        }
+        else
+        {
+            ::ec2::ApiResourceParamWithRefData param;
+            param.resourceId = QnUserResource::kAdminGuid;
+            param.name = QnGlobalSettings::kNameSystemName;
+            param.value = QString::fromStdString(newSystemName);
+            ::ec2::ApiResourceParamWithRefDataList paramList;
+            paramList.push_back(std::move(param));
+
+            ::ec2::ApiResourceParamWithRefDataList resultParamList;
+            ASSERT_EQ(
+                ec2::ErrorCode::ok,
+                appserver2()->moduleInstance()->ecConnection()
+                    ->getResourceManager(Qn::kSystemAccess)
+                    ->saveSync(paramList, &resultParamList));
+        }
+
+        // Checking that system name has been updated in mediaserver.
+        waitForCloudAndVmsToSyncSystemData();
     }
 }
 

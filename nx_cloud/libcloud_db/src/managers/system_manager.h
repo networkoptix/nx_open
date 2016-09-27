@@ -116,9 +116,14 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
-    void updateSystemName(
+    void rename(
         const AuthorizationInfo& authzInfo,
         data::SystemNameUpdate data,
+        std::function<void(api::ResultCode)> completionHandler);
+    
+    void recordUserSessionStart(
+        const AuthorizationInfo& authzInfo,
+        data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
 
     //void addSubscription(
@@ -153,7 +158,9 @@ public:
         
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
-        const api::SystemSharing&);
+        const api::SystemSharing& data);
+    static std::pair<std::string, std::string> extractSystemIdAndAccountEmail(
+        const api::SystemSharing& data);
 
     typedef boost::multi_index::multi_index_container<
         data::SystemData,
@@ -173,7 +180,7 @@ private:
     constexpr static const int kSystemByExpirationTimeIndex = 1;
 
     typedef boost::multi_index::multi_index_container<
-        api::SystemSharing,
+        api::SystemSharingEx,
         boost::multi_index::indexed_by<
             boost::multi_index::ordered_unique<
                 boost::multi_index::identity<api::SystemSharing>>,
@@ -187,7 +194,12 @@ private:
             boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
                 const api::SystemSharing&,
                 std::pair<std::string, std::string>,
-                &SystemManager::extractSystemIdAndVmsUserId>>
+                &SystemManager::extractSystemIdAndVmsUserId>>,
+            //indexing by pair<systemId, accountEmail>
+            boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
+                const api::SystemSharing&,
+                std::pair<std::string, std::string>,
+                &SystemManager::extractSystemIdAndAccountEmail>>
         >
     > AccountSystemAccessRoleDict;
 
@@ -201,6 +213,7 @@ private:
     constexpr static const int kSharingByAccountEmail = 1;
     constexpr static const int kSharingBySystemId = 2;
     constexpr static const int kSharingBySystemIdAndVmsUserIdIndex = 3;
+    constexpr static const int kSharingBySystemIdAndAccountEmailIndex = 4;
 
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
@@ -284,6 +297,11 @@ private:
     nx::db::DBResult updateSystemNameInDB(
         QSqlDatabase* const connection,
         const data::SystemNameUpdate& data);
+    nx::db::DBResult execSystemNameUpdate(
+        QSqlDatabase* const connection,
+        const data::SystemNameUpdate& data);
+    void updateSystemNameInCache(
+        data::SystemNameUpdate data);
     void systemNameUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
         QSqlDatabase* /*dbConnection*/,
@@ -299,6 +317,18 @@ private:
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         std::string systemId,
+        std::function<void(api::ResultCode)> completionHandler);
+
+    nx::db::DBResult updateSystemAccessWeightInDb(
+        QSqlDatabase* dbConnection,
+        const data::UserSessionDescriptor& userSessionDescriptor,
+        double* const systemAccessWeight);
+    void systemAccessWeightUpdatedInDb(
+        QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
+        nx::db::DBResult dbResult,
+        data::UserSessionDescriptor userSessionDescriptor,
+        double systemAccessWeight,
         std::function<void(api::ResultCode)> completionHandler);
 
     /** returns sharing permissions depending on current access role */
@@ -328,6 +358,7 @@ private:
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
+
     nx::db::DBResult processEc2RemoveUser(
         QSqlDatabase* dbConnection,
         const nx::String& systemId,
@@ -337,6 +368,16 @@ private:
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
+
+    nx::db::DBResult processSetResourceParam(
+        QSqlDatabase* dbConnection,
+        const nx::String& systemId,
+        ::ec2::ApiResourceParamWithRefData data,
+        data::SystemNameUpdate* const systemNameUpdate);
+    void onEc2SetResourceParamDone(
+        QSqlDatabase* /*dbConnection*/,
+        nx::db::DBResult dbResult,
+        data::SystemNameUpdate systemNameUpdate);
 };
 
 }   //cdb

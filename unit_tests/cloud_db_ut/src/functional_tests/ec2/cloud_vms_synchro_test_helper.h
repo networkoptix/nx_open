@@ -53,7 +53,13 @@ protected:
     void verifyThatUsersMatchInCloudAndVms(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+    void verifyThatSystemDataMatchInCloudAndVms(
+        bool assertOnFailure = true,
+        bool* const result = nullptr);
     void waitForCloudAndVmsToSyncUsers(
+        bool assertOnFailure = true,
+        bool* const result = nullptr);
+    void waitForCloudAndVmsToSyncSystemData(
         bool assertOnFailure = true,
         bool* const result = nullptr);
     api::ResultCode fetchCloudTransactionLog(

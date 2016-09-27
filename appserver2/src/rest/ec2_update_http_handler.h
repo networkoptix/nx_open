@@ -81,9 +81,14 @@ public:
 
         switch (processUpdateAsync(command, requestData, owner))
         {
-            case ErrorCode::ok: return nx_http::StatusCode::ok;
-            case ErrorCode::forbidden: return nx_http::StatusCode::forbidden;
-            default: return nx_http::StatusCode::internalServerError;
+            case ErrorCode::ok:
+                return nx_http::StatusCode::ok;
+            case ErrorCode::forbidden:
+                resultBody.clear();
+                return nx_http::StatusCode::forbidden;
+            default:
+                resultBody.clear();
+                return nx_http::StatusCode::internalServerError;
         }
     }
 
@@ -150,15 +155,107 @@ private:
             // omitted, object to merge with is not found in DB by Id, object type does not include
             // Id field), the behavior is the same as before introducing "merge" feature - attempt
             // such incomplete request with default values for omitted json fields.
-            auto httpStatusCode = buildRequestDataMergingIfNeeded(
-                requestData, incompleteJsonValue.get(), outResultBody, outSuccess, owner,
-                /*sfinae*/ nullptr);
-            if (!*outSuccess)
-                return httpStatusCode;
+            return buildRequestDataMergingIfNeeded(
+                requestData, incompleteJsonValue.get(), outResultBody, outSuccess, owner);
         }
+        else
+        {
+            return makeSuccess(requestData, outResultBody, outSuccess);
+        }
+    }
 
+    /**
+     * Sfinae wrapper.
+     */
+    template<typename T = RequestData>
+    void fillRequestDataIdIfPossible(RequestData* requestData)
+    {
+        fillRequestDataIdIfPossibleSfinae(requestData, /*enable_if_member_exists*/ nullptr);
+    }
+
+    /**
+     * Sfinae: Called when RequestData does not provide fillId() - do nothing.
+     */
+    template<typename T = RequestData>
+    void fillRequestDataIdIfPossibleSfinae(
+        RequestData* /*requestData*/,
+        ... /*enable_if_member_exists*/)
+    {
+    }
+
+    /**
+     * Sfinae: Called when RequestData provides fillId() - generate new id.
+     */
+    template<typename T = RequestData>
+    void fillRequestDataIdIfPossibleSfinae(
+        RequestData* requestData,
+        decltype(&T::fillId) /*enable_if_member_exists*/)
+    {
+        requestData->fillId();
+    }
+
+    /**
+     * Helper. Prepare API call result for successful execution.
+     * If RequestData provides getIdForMerging(), fill outResultBody with {"id": "<objectId>"},
+     * otherwise, set outResultBody to empty JSON object {}.
+     * Sfinae wrapper.
+     * @return HTTP OK (200), having set outSuccess to true.
+     */
+    template<typename T = RequestData>
+    static nx_http::StatusCode::Value makeSuccess(
+        const RequestData* requestData,
+        QByteArray* outResultBody,
+        bool* outSuccess)
+    {
+        return makeSuccessSfinae(
+            requestData, outResultBody, outSuccess, /*enable_if_member_exists*/ nullptr);
+    }
+
+    /**
+     * Sfinae: Called when RequestData provides getIdForMerging().
+     */
+    template<typename T = RequestData>
+    static nx_http::StatusCode::Value makeSuccessSfinae(
+        const RequestData* requestData,
+        QByteArray* outResultBody,
+        bool* outSuccess,
+        decltype(&T::getIdForMerging) /*enable_if_member_exists*/)
+    {
+        ApiIdData apiIdData(requestData->getIdForMerging());
+        QJson::serialize(apiIdData, outResultBody);
         *outSuccess = true;
         return nx_http::StatusCode::ok;
+    }
+
+    /**
+     * Sfinae: Called when RequestData does not provide getIdForMerging().
+     */
+    template<typename T = RequestData>
+    static nx_http::StatusCode::Value makeSuccessSfinae(
+        const RequestData* /*requestData*/,
+        QByteArray* outResultBody,
+        bool* outSuccess,
+        ... /*enable_if_member_exists*/)
+    {
+        *outResultBody = "{}";
+        *outSuccess = true;
+        return nx_http::StatusCode::ok;
+    }
+
+    /**
+     * Sfinae wrapper.
+     */
+    template<typename T = RequestData>
+    nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
+        RequestData* requestData,
+        const QJsonValue& incompleteJsonValue,
+        QByteArray* outResultBody,
+        bool* outSuccess,
+        const QnRestConnectionProcessor* owner)
+    {
+        return buildRequestDataMergingIfNeededSfinae(
+            requestData, incompleteJsonValue, outResultBody, outSuccess, owner,
+            /*enable_if_member_exists*/ nullptr);
     }
 
     /**
@@ -166,16 +263,15 @@ private:
      * merging for API parameters of exact type ApiIdData has no sence) - do not perform the merge.
      */
     template<typename T = RequestData>
-    nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
-        RequestData* /*requestData*/,
+    nx_http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
+        RequestData* requestData,
         const QJsonValue& /*incompleteJsonValue*/,
-        QByteArray* /*outResultBody*/,
+        QByteArray* outResultBody,
         bool* outSuccess,
         const QnRestConnectionProcessor* /*owner*/,
-        ... /*sfinae*/)
+        ... /*enable_if_member_exists*/)
     {
-        *outSuccess = true;
-        return nx_http::StatusCode::ok;
+        return makeSuccess(requestData, outResultBody, outSuccess);
     }
 
     /**
@@ -185,34 +281,31 @@ private:
      * @param requestData In: potentially incomplete data. Out: merge result.
      */
     template<typename T = RequestData>
-    nx_http::StatusCode::Value buildRequestDataMergingIfNeeded(
+    nx_http::StatusCode::Value buildRequestDataMergingIfNeededSfinae(
         RequestData* requestData,
         const QJsonValue& incompleteJsonValue,
         QByteArray* outResultBody,
         bool* outSuccess,
         const QnRestConnectionProcessor* owner,
-        decltype(&T::getIdForMerging) /*sfinae*/,
+        decltype(&T::getIdForMerging) /*enable_if_member_exists*/,
         typename std::enable_if<!std::is_same<ApiIdData, T>::value>::type* = nullptr)
     {
         const QnUuid id = requestData->getIdForMerging();
         if (id.isNull()) //< Id is omitted from request json - do not perform merge.
         {
-            *outSuccess = true;
-            return nx_http::StatusCode::ok;
+            fillRequestDataIdIfPossible(requestData);
+            return makeSuccess(requestData, outResultBody, outSuccess);
         }
 
         *outSuccess = false;
 
         RequestData existingData;
         bool found = false;
-        switch (processQueryAsync(id, &existingData, &found, owner, /*sfinae*/ nullptr))
+        switch (processQueryAsync(id, &existingData, &found, owner))
         {
             case ErrorCode::ok:
                 if (!found)
-                {
-                    *outSuccess = true;
-                    return nx_http::StatusCode::ok;
-                }
+                    return makeSuccess(requestData, outResultBody, outSuccess);
                 break;
 
             case ErrorCode::forbidden:
@@ -241,8 +334,7 @@ private:
             return nx_http::StatusCode::internalServerError;
         }
 
-        *outSuccess = true;
-        return nx_http::StatusCode::ok;
+        return makeSuccess(requestData, outResultBody, outSuccess);
     }
 
     static ApiCommand::Value extractCommandFromPath(const QString& path)
@@ -266,7 +358,7 @@ private:
         RequestData* outData,
         bool* outFound,
         const QnRestConnectionProcessor* owner,
-        decltype(&T::getIdForMerging) /*sfinae*/,
+        decltype(&T::getIdForMerging) /*enable_if_member_exists*/ = nullptr,
         typename std::enable_if<!std::is_same<ApiIdData, T>::value>::type* = nullptr)
     {
         typedef std::vector<RequestData> RequestDataList;

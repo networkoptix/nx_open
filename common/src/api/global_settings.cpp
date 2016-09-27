@@ -58,6 +58,7 @@ namespace
 }
 
 using namespace nx::settings_names;
+const QString QnGlobalSettings::kNameSystemName(lit("systemName"));
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
     base_type(parent)
@@ -253,6 +254,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 {
+    m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemName, QString(), this);
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
@@ -279,6 +281,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRecorderQueueSizePacketsDefault,
         this);
 
+    connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
@@ -289,6 +292,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     QnGlobalSettings::AdaptorList result;
     result
+        << m_systemNameAdaptor
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_auditTrailEnabledAdaptor
@@ -734,6 +738,16 @@ QString QnGlobalSettings::cloudAuthKey() const
 void QnGlobalSettings::setCloudAuthKey(const QString& value)
 {
     m_cloudAuthKeyAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::systemName() const
+{
+    return m_systemNameAdaptor->value();
+}
+
+void QnGlobalSettings::setSystemName(const QString& value)
+{
+    m_systemNameAdaptor->setValue(value);
 }
 
 void QnGlobalSettings::resetCloudParams()

@@ -117,8 +117,8 @@ int VmsGatewayProcess::exec()
             return 0;
         }
 
-        settings.logging().initLog(
-            settings.general().dataDir,
+        initializeQnLog(
+            settings.logging(), settings.general().dataDir,
             QnLibVmsGatewayAppInfo::applicationDisplayName());
 
         //enabling nat traversal

@@ -22,10 +22,10 @@ extern const char* kSystemBindPath;
 extern const char* kSystemUnbindPath;
 extern const char* kSystemGetPath;
 extern const char* kSystemSharePath;
-extern const char* kSystemSetSystemUserListPath;
 extern const char* kSystemGetCloudUsersPath;
 extern const char* kSystemGetAccessRoleListPath;
-extern const char* kSystemUpdateSystemNamePath;
+extern const char* kSystemRenamePath;
+extern const char* kSystemRecordUserSessionStartPath;
 
 extern const char* kAuthGetNoncePath;
 extern const char* kAuthGetAuthenticationPath;

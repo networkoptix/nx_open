@@ -144,10 +144,13 @@ int CloudDBProcess::exec()
             return 0;
         }
 
-        const auto dataDir = settings.dataDir();
-        const auto appName = QnLibCloudDbAppInfo::applicationDisplayName();
-        settings.logging().initLog(dataDir, appName, "log_file", QnLog::MAIN_LOG_ID);
-        settings.vmsSynchronizationLogging().initLog(dataDir, appName, "sync_log", QnLog::EC2_TRAN_LOG);
+        initializeQnLog(
+            settings.logging(), settings.dataDir(),
+            QnLibCloudDbAppInfo::applicationDisplayName(), "log_file", QnLog::MAIN_LOG_ID);
+
+        initializeQnLog(
+            settings.vmsSynchronizationLogging(), settings.dataDir(),
+            QnLibCloudDbAppInfo::applicationDisplayName(), "sync_log", QnLog::EC2_TRAN_LOG);
 
         const auto& httpAddrToListenList = settings.endpointsToListen();
         m_settings = &settings;
@@ -443,9 +446,14 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::system, DataActionType::fetch);
 
     registerHttpHandler(
-        kSystemUpdateSystemNamePath,
-        &SystemManager::updateSystemName, systemManager,
+        kSystemRenamePath,
+        &SystemManager::rename, systemManager,
         EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemRecordUserSessionStartPath,
+        &SystemManager::recordUserSessionStart, systemManager,
+        EntityType::account, DataActionType::update);   //< TODO: #ak: current entity:action is not suitable for this request
 
     //------------------------------------------
     // AuthenticationProvider
@@ -593,6 +601,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
     dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
     dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
+    dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     return dbStructureUpdater.updateStructSync();
 }
 
