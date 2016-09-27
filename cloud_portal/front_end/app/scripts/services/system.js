@@ -38,13 +38,15 @@ angular.module('cloudApp')
                 this.stateMessage = L.system.offline;
             }
         };
-        system.prototype.checkPermissions = function(){
+        system.prototype.checkPermissions = function(offline){
             var self = this;
             self.permissions = {};
             self.accessRole = self.info.accessRole;
             if(self.currentUserRecord){
-                var role = self.findAccessRole(self.currentUserRecord);
-                self.accessRole = role.name;
+                if(!offline){
+                    var role = self.findAccessRole(self.currentUserRecord);
+                    self.accessRole = role.name;
+                }
                 self.permissions.editAdmins = self.isOwner(self.currentUserRecord);
                 self.permissions.isAdmin = self.isOwner(self.currentUserRecord) || self.isAdmin(self.currentUserRecord);
                 self.permissions.editUsers = self.permissions.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag)>=0;
@@ -98,7 +100,16 @@ angular.module('cloudApp')
         system.prototype.getUsersCachedInCloud = function(){
             this.isAvailable = false;
             this.updateSystemState();
+            var self = this;
             return cloudApi.users(this.id).then(function(result){
+                 _.each(result.data,function(user){
+                    user.permissions = normalizePermissionString(user.customPermissions);
+
+                    if(user.accountEmail == self.currentUserEmail){
+                        self.currentUserRecord = user;
+                        self.checkPermissions(true);
+                    }
+                });
                 return result.data;
             })
         };
