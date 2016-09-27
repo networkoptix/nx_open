@@ -21,16 +21,23 @@ bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubjec
     if (!resource || !subject.isValid())
         return false;
 
+    if (resource == subject.user())
+        return true;
+
     if (resource->hasFlags(Qn::desktop_camera))
         return hasAccessToDesktopCamera(subject, resource);
 
     /* Web Pages behave totally like cameras. */
     bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
-        || resource.dynamicCast<QnWebPageResource>();
+        || resource->hasFlags(Qn::web_page);
 
-    auto requiredPermission = isMediaResource
-        ? Qn::GlobalAccessAllMediaPermission
-        : Qn::GlobalAdminPermission;
+    bool isVideoWall = resource->hasFlags(Qn::videowall);
+
+    auto requiredPermission = Qn::GlobalAdminPermission;
+    if (isMediaResource)
+        requiredPermission = Qn::GlobalAccessAllMediaPermission;
+    else if (isVideoWall)
+        requiredPermission = Qn::GlobalControlVideoWallPermission;
 
     return qnResourceAccessManager->hasGlobalPermission(subject, requiredPermission);
 }
@@ -38,6 +45,8 @@ bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubjec
 bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
 {
+    /* Desktop camera can be accessible directly when its name is equal to user's AND
+     * if the user has the ability to push his screen. */
     return subject.user()
         && subject.user()->getName() == resource->getName()
         && qnResourceAccessManager->hasGlobalPermission(subject,

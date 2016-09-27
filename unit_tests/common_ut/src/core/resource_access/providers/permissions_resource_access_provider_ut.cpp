@@ -178,7 +178,6 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByName)
     ASSERT_TRUE(m_accessProvider->hasAccess(user2, camera));
 }
 
-
 TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByPermissions)
 {
     auto camera = createCamera();
@@ -230,6 +229,36 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkStorageAccess)
     auto target = createStorage();
 
     auto user = addUser(Qn::GlobalAdminPermission);
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkLayoutAccess)
+{
+    auto target = createLayout();
+
+    auto user = addUser(Qn::GlobalAdminPermission);
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkUserAccess)
+{
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    auto target = addUser(Qn::GlobalAccessAllMediaPermission, kUserName2);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, user));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkVideoWallAccess)
+{
+    auto target = createVideoWall();
+
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
     ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
