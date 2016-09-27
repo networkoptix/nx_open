@@ -97,8 +97,9 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/settings'
         });
-}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location, $localStorage) {
     var original = $location.path;
+    $rootScope.storage = $localStorage;
     $location.path = function (path, reload) {
         if (reload === false) {
             var lastRoute = $route.current;
