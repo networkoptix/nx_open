@@ -33,12 +33,12 @@ void SystemManager::bindSystem(
 }
 
 void SystemManager::unbindSystem(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
         kSystemUnbindPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         completionHandler);
 }
@@ -53,12 +53,12 @@ void SystemManager::getSystems(
 }
 
 void SystemManager::getSystem(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
     executeRequest(
         kSystemGetPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }
@@ -84,34 +84,34 @@ void SystemManager::getCloudUsersOfSystem(
 }
 
 void SystemManager::getCloudUsersOfSystem(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
     executeRequest(
         kSystemGetCloudUsersPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
 
 void SystemManager::getAccessRoleList(
-    const std::string& systemID,
+    const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
 {
     executeRequest(
         kSystemGetAccessRoleListPath,
-        api::SystemID(systemID),
+        api::SystemID(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemAccessRoleList()));
 }
 
 void SystemManager::rename(
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& systemName,
     std::function<void(api::ResultCode)> completionHandler)
 {
     api::SystemNameUpdate data;
-    data.id = systemID;
+    data.systemID = systemId;
     data.name = systemName;
 
     executeRequest(

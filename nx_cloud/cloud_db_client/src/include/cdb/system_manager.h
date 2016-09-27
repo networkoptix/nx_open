@@ -34,7 +34,7 @@ public:
         \note Required access role: account (owner)
     */
     virtual void unbindSystem(
-        const std::string& systemID,
+        const std::string& systemId,
         std::function<void(ResultCode)> completionHandler) = 0;
     /** Fetch all systems, allowed for current credentials
         E.g., for system credentials, only one system is returned. 
@@ -46,7 +46,7 @@ public:
         std::function<void(ResultCode, api::SystemDataExList)> completionHandler ) = 0;
     /** Get system by id */
     virtual void getSystem(
-        const std::string& systemID,
+        const std::string& systemId,
         std::function<void(ResultCode, api::SystemDataExList)> completionHandler) = 0;
     /** Share system with specified account. Operation allowed for system owner and editor_with_sharing only
         \note Required access role: account (owner or editor_with_sharing)
@@ -62,19 +62,19 @@ public:
         \note \a owner or \a cloudAdmin account credentials MUST be provided
     */
     virtual void getCloudUsersOfSystem(
-        const std::string& systemID,
+        const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
-    /** Returns list of access roles which can be used to share system \a systemID.
+    /** Returns list of access roles which can be used to share system \a systemId.
         \note request is authorized with account credentials
     */
     virtual void getAccessRoleList(
-        const std::string& systemID,
+        const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler) = 0;
     /**
         \note Currently, request can be performed by system only, not by account
     */
     virtual void rename(
-        const std::string& systemID,
+        const std::string& systemId,
         const std::string& systemName,
         std::function<void(api::ResultCode)> completionHandler) = 0;
 };
