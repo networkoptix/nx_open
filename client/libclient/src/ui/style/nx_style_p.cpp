@@ -18,7 +18,7 @@ void paintLabelIcon(
     QIcon::Mode mode = QIcon::Normal,
     QIcon::State state = QIcon::Off)
 {
-    QSize iconSize = qnSkin->maximumSize(icon);
+    QSize iconSize = QnSkin::maximumSize(icon, mode, state);
     QRect iconRect = QStyle::alignedRect(
         direction,
         alignment,
