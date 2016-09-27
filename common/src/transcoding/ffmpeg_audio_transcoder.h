@@ -51,25 +51,25 @@ private:
         const std::size_t offset,
         const AVCodecContext* encoderCtx);
 
+    int doResample();
+
     QnAbstractMediaDataPtr createMediaDataFromAVPacket(const AVPacket& packet);
 
 private:
-    quint8* m_audioEncodingBuffer;
     AVCodecContext* m_encoderCtx;
     AVCodecContext* m_decoderCtx;
     qint64 m_firstEncodedPts;
-
-    QnByteArray m_unresampledData;
-    QnByteArray m_resampledData;
 
     qint64 m_lastTimestamp;
     QnConstMediaContextPtr m_context;
 
     bool m_downmixAudio;
     int m_frameNum;
-    //ReSampleContext* m_resampleCtx;
     SwrContext* m_resampleCtx;
+
     uint8_t** m_sampleBuffers;
+    uint8_t** m_sampleBuffersWithOffset;
+
     std::size_t m_currentSampleCount;
     std::size_t m_currentSampleBufferOffset;
 
