@@ -376,3 +376,16 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitPermissionsChangedAccess)
     awaitAccess(user, camera);
     user->setRawPermissions(Qn::GlobalAdminPermission);
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, suppressDuplicatedSignals)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::GlobalAdminPermission);
+    awaitAccess(user, camera, false);
+
+    /* Here we should NOT receive the signal */
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+
+    /* Here we should receive the 'false' value. */
+    qnResPool->removeResource(user);
+}

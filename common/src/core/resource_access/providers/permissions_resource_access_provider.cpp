@@ -14,36 +14,28 @@ QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject
         [this](const QnResourcePtr& resource)
         {
             for (const auto& user: qnResPool->getResources<QnUserResource>())
-                emit accessChanged(user, resource, hasAccess(user, resource));
+                updateAccess(user, resource);
 
             if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
             {
                 for (const auto& resource: qnResPool->getResources())
-                    emit accessChanged(user, resource, hasAccess(user, resource));
+                {
+                    /* We have already update access to ourselves before */
+                    if (user != resource)
+                        updateAccess(user, resource);
+                }
 
                 connect(user, &QnUserResource::permissionsChanged, this,
                     [this, user]
                     {
                         for (const auto& resource : qnResPool->getResources())
-                            emit accessChanged(user, resource, hasAccess(user, resource));
+                            updateAccess(user, resource);
                     });
             }
         });
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            for (const auto& user : qnResPool->getResources<QnUserResource>())
-                emit accessChanged(user, resource, hasAccess(user, resource));
-
-            if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-            {
-                disconnect(user, nullptr, this, nullptr);
-
-                for (const auto& resource : qnResPool->getResources())
-                    emit accessChanged(user, resource, false);
-            }
-        });
+        &QnPermissionsResourceAccessProvider::cleanAccess);
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
@@ -53,7 +45,35 @@ QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
 bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!resource || !subject.isValid() || !resource->resourcePool())
+    if (!acceptable(subject, resource))
+        return false;
+
+    NX_ASSERT(m_accessibleResources.contains(subject.effectiveId()));
+    return m_accessibleResources[subject.effectiveId()].contains(resource->getId());
+}
+
+bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
+    const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+{
+    /* Desktop camera can be accessible directly when its name is equal to user's AND
+     * if the user has the ability to push his screen. */
+    return subject.user()
+        && subject.user()->getName() == resource->getName()
+        && qnResourceAccessManager->hasGlobalPermission(subject,
+            Qn::GlobalControlVideoWallPermission);
+}
+
+bool QnPermissionsResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource) const
+{
+    return resource && resource->resourcePool() && subject.isValid();
+}
+
+bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource) const
+{
+    NX_ASSERT(acceptable(subject, resource));
+    if (!acceptable(subject, resource))
         return false;
 
     if (resource == subject.user())
@@ -77,13 +97,71 @@ bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubjec
     return qnResourceAccessManager->hasGlobalPermission(subject, requiredPermission);
 }
 
-bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
-    const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+void QnPermissionsResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource)
 {
-    /* Desktop camera can be accessible directly when its name is equal to user's AND
-     * if the user has the ability to push his screen. */
-    return subject.user()
-        && subject.user()->getName() == resource->getName()
-        && qnResourceAccessManager->hasGlobalPermission(subject,
-            Qn::GlobalControlVideoWallPermission);
+    NX_ASSERT(acceptable(subject, resource));
+    if (!acceptable(subject, resource))
+        return;
+
+    auto& accessible = m_accessibleResources[subject.effectiveId()];
+    auto targetId = resource->getId();
+
+    bool oldValue = accessible.contains(targetId);
+    bool newValue = calculateAccess(subject, resource);
+    if (oldValue == newValue)
+        return;
+
+    if (newValue)
+        accessible.insert(targetId);
+    else
+        accessible.remove(targetId);
+
+    emit accessChanged(subject, resource, newValue);
+}
+
+void QnPermissionsResourceAccessProvider::cleanAccess(const QnResourcePtr& resource)
+{
+    auto resourceId = resource->getId();
+
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+    {
+        disconnect(user, nullptr, this, nullptr);
+
+        QnResourceAccessSubject subject(user);
+        auto effectiveId = subject.effectiveId();
+
+        NX_ASSERT(m_accessibleResources.contains(effectiveId));
+        auto& accessible = m_accessibleResources[effectiveId];
+
+        for (const auto& targetResource : qnResPool->getResources(accessible.values()))
+        {
+            QnUuid targetId = targetResource->getId();
+            accessible.remove(targetId);
+            emit accessChanged(subject, targetResource, false);
+        }
+
+        /* We should get only own user resource there. */
+        NX_ASSERT(accessible.contains(resourceId));
+        emit accessChanged(subject, resource, false);
+        accessible.remove(resourceId);
+        NX_ASSERT(accessible.isEmpty());
+
+        m_accessibleResources.remove(effectiveId);
+    }
+
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user == resource)
+            continue;
+
+        QnResourceAccessSubject subject(user);
+        auto& accessible = m_accessibleResources[subject.effectiveId()];
+        if (!accessible.contains(resourceId))
+            continue;
+
+        accessible.remove(resourceId);
+        emit accessChanged(subject, resource, false);
+    }
+
 }

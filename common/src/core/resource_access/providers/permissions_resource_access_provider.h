@@ -16,4 +16,17 @@ public:
 private:
     bool hasAccessToDesktopCamera(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;
+
+    bool acceptable(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource) const;
+
+    bool calculateAccess(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource) const;
+
+    void updateAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
+    void cleanAccess(const QnResourcePtr& resource);
+
+private:
+    /** Hash of accessible resources by subject effective id. */
+    QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
 };
