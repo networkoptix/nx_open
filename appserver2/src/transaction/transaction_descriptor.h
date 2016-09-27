@@ -76,14 +76,30 @@ enum class RemotePeerAccess
 
 namespace access_helpers {
 
+enum class Mode 
+{
+    read,
+    write
+};
+
 using KeyValueFilterType        =   std::pair<const QString&, QString*>;
-using FilterFunctorType         =   std::function<void(const Qn::UserAccessData&, KeyValueFilterType*, bool*)>;
+using FilterFunctorType         =   std::function<bool(Mode mode, const Qn::UserAccessData&, KeyValueFilterType*)>;
 using FilterFunctorListType     =   std::vector<FilterFunctorType>;
 
-void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, bool* allowed = nullptr);
-void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, const QString& key, bool* allowed = nullptr);
+namespace detail {
+std::vector<QString> getRestrictedKeysByMode(Mode mode);
+}
 
-void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList, bool* allowed = nullptr);
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue);
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value);
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key);
+
+void applyValueFilters(
+    Mode mode,
+    const Qn::UserAccessData& accessData,
+    KeyValueFilterType* keyValue,
+    const FilterFunctorListType& filterList,
+    bool* allowed = nullptr);
 
 } // namespace access_helpers
 

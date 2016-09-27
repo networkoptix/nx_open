@@ -20,13 +20,22 @@ int QnSystemSettingsHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     QnSystemSettingsReply reply;
-
     bool dirty = false;
     const auto& settings = QnGlobalSettings::instance()->allSettings();
+
+    namespace ahlp = ec2::access_helpers;
+
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
-        bool allowed;
-        ec2::access_helpers::globalSettingsSystemOnlyFilter(owner->accessRights(), setting->key(), &allowed);
+        bool readAllowed = ahlp::kvSystemOnlyFilter(
+            ahlp::Mode::read,
+            owner->accessRights(), 
+            setting->key());
+
+        bool writeAllowed = ec2::access_helpers::kvSystemOnlyFilter(
+            ahlp::Mode::write,
+            owner->accessRights(), 
+            setting->key());
 
         if (!params.isEmpty())
         {
@@ -34,17 +43,15 @@ int QnSystemSettingsHandler::executeGet(
             if (paramIter == params.end())
                 continue;
 
-            if (!allowed)
+            if (!writeAllowed)
                 return nx_http::StatusCode::forbidden;
 
             setting->setSerializedValue(paramIter.value());
             dirty = true;
         }
 
-        if (allowed)
+        if (readAllowed)
             reply.settings.insert(setting->key(), setting->serializedValue());
-        else 
-            reply.settings.insert(setting->key(), QString());
     }
     if (dirty)
         QnGlobalSettings::instance()->synchronizeNow();

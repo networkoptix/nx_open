@@ -32,50 +32,74 @@
 namespace ec2 {
 namespace access_helpers {
 
-void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, bool* allowed)
+namespace detail {
+std::vector<QString> getRestrictedKeysByMode(Mode mode)
 {
     using namespace nx::settings_names;
 
-    const QString& key = keyValue->first;
-    QString* value = keyValue->second;
-    bool isAllowed = true;
-
-    if ((key == kNamePassword        || key == ldapAdminPassword ||
-         key == kNameCloudSystemID   || key == kNameCloudAuthKey ||
-         key == Qn::CAMERA_CREDENTIALS_PARAM_NAME                || 
-         key == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME) && accessData != Qn::kSystemAccess)
+    switch (mode)
     {
-        value->clear();
-        isAllowed = false;
+        case Mode::read:
+            return {
+                kNamePassword, 
+                ldapAdminPassword,
+                kNameCloudSystemID,
+                kNameCloudAuthKey,
+                Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+                Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME 
+            };
+        case Mode::write:
+            return {
+                kNameCloudSystemID,
+                kNameCloudAuthKey,
+                kCloudHostName
+            };
     }
 
-    if (allowed)
-        *allowed = isAllowed;
+    return std::vector<QString>();
+}
 }
 
-void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, const QString& key, bool* allowed)
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue)
+{
+    auto in_ = [] (const std::vector<QString>& vec, const QString& value)
+    {
+        return std::any_of(vec.cbegin(), vec.cend(), [&value](const QString& s) { return s == value; });
+    };
+
+    if (in_(detail::getRestrictedKeysByMode(mode), keyValue->first) && accessData != Qn::kSystemAccess)
+        return false;
+
+    return true;
+}
+
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key)
 {
     QString dummy = lit("dummy");
 
     KeyValueFilterType kv(key, &dummy);
-    globalSettingsSystemOnlyFilter(accessData, &kv, allowed);
+    return kvSystemOnlyFilter(mode, accessData, &kv);
 }
 
-void globalSettingsSystemOnlyFilter(const Qn::UserAccessData& accessData, const QString& key, QString* value, bool* allowed)
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value)
 {
     KeyValueFilterType kv(key, value);
-    globalSettingsSystemOnlyFilter(accessData, &kv, allowed);
+    return kvSystemOnlyFilter(mode, accessData, &kv);
 }
 
-void applyValueFilters(const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue, const FilterFunctorListType& filterList, bool* allowed)
+void applyValueFilters(
+    Mode mode,
+    const Qn::UserAccessData& accessData, 
+    KeyValueFilterType* keyValue, 
+    const FilterFunctorListType& filterList,
+    bool* allowed)
 {
     if (allowed)
         *allowed = true;
 
     for (auto filter : filterList)
     {
-        bool isAllowed = true;
-        filter(accessData, keyValue, &isAllowed);
+        bool isAllowed = filter(mode, accessData, keyValue);
 
         if (allowed && !isAllowed)
             *allowed = false;
@@ -558,12 +582,17 @@ struct ReadResourceParamAccess
 
     bool operator()(const Qn::UserAccessData& accessData, ApiResourceParamData& param)
     {
-        access_helpers::FilterFunctorListType filters = {
-            static_cast<void (*)(const Qn::UserAccessData&, access_helpers::KeyValueFilterType*, bool*)>(&access_helpers::globalSettingsSystemOnlyFilter)
+        namespace ahlp = access_helpers;
+        ahlp::FilterFunctorListType filters = {
+            static_cast<bool (*)(ahlp::Mode, const Qn::UserAccessData&, ahlp::KeyValueFilterType*)>(&ahlp::kvSystemOnlyFilter)
         };
 
-        access_helpers::KeyValueFilterType keyValue(param.name, &param.value);
-        ec2::access_helpers::applyValueFilters(accessData, &keyValue, filters);
+        bool allowed;
+        ahlp::KeyValueFilterType keyValue(param.name, &param.value);
+        ahlp::applyValueFilters(ahlp::Mode::read, accessData, &keyValue, filters, &allowed);
+
+        if (!allowed)
+            return false;
 
         return true;
     }

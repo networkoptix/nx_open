@@ -1348,13 +1348,14 @@ bool QnDbManager::encryptKvPairs()
 
     while (query.next())
     {
-        bool allowed;
-
         int rowid     = query.value(0).toInt();
         QString value = query.value(1).toString();
         QString name  = query.value(2).toString();
 
-        ec2::access_helpers::globalSettingsSystemOnlyFilter(Qn::UserAccessData(), name, &allowed);
+        bool allowed = ec2::access_helpers::kvSystemOnlyFilter(
+            ec2::access_helpers::Mode::read,
+            Qn::UserAccessData(), 
+            name);
 
         if (!allowed) // need encrypt
         {
@@ -1368,7 +1369,7 @@ bool QnDbManager::encryptKvPairs()
 
             if (!insQuery.exec())
             {
-                NX_LOG( lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logWARNING );
+                NX_LOG(lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logWARNING);
                 return false;
             }
         }
