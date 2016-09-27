@@ -29,13 +29,26 @@ protected:
     {
         m_module.reset(new QnCommonModule());
         m_accessProvider.reset(new QnPermissionsResourceAccessProvider());
+        QObject::connect(accessProvider(),
+            &QnPermissionsResourceAccessProvider::accessChanged,
+            [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+                bool value)
+            {
+                at_accessChanged(subject, resource, value);
+            });
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
+        ASSERT_TRUE(m_awaitedAccessQueue.empty());
         m_accessProvider.clear();
         m_module.clear();
+    }
+
+    QnAbstractResourceAccessProvider* accessProvider() const
+    {
+        return m_accessProvider.data();
     }
 
     QnUserResourcePtr addUser(Qn::GlobalPermissions globalPermissions,
@@ -96,8 +109,48 @@ protected:
         return storage;
     }
 
+    void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        bool value = true)
+    {
+        m_awaitedAccessQueue.emplace_back(subject, resource, value);
+    }
+
+    void at_accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        bool value)
+    {
+        ASSERT_EQ(value, accessProvider()->hasAccess(subject, resource));
+
+        if (m_awaitedAccessQueue.empty())
+            return;
+
+        auto awaited = m_awaitedAccessQueue.front();
+        if (awaited.subject == subject && awaited.resource == resource)
+        {
+            m_awaitedAccessQueue.pop_front();
+            ASSERT_EQ(value, awaited.value);
+        }
+    }
+
+private:
     QSharedPointer<QnCommonModule> m_module;
     QSharedPointer<QnPermissionsResourceAccessProvider> m_accessProvider;
+
+    struct AwaitedAccess
+    {
+        AwaitedAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+            bool value)
+            :
+            subject(subject),
+            resource(resource),
+            value(value)
+        {
+        }
+
+        QnResourceAccessSubject subject;
+        QnResourcePtr resource;
+        bool value;
+    };
+    std::deque<AwaitedAccess> m_awaitedAccessQueue;
 };
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkInvalidAccess)
@@ -107,62 +160,62 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkInvalidAccess)
     ec2::ApiUserGroupData role;
     QnResourceAccessSubject subject(role);
     ASSERT_FALSE(subject.isValid());
-    ASSERT_FALSE(m_accessProvider->hasAccess(subject, camera));
+    ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAccessToInvalidResource)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, QnResourcePtr()));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessCamera)
 {
     auto camera = createCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, camera));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, camera));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessUser)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = addUser(Qn::GlobalAdminPermission, kUserName2);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessLayout)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = createLayout();
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessWebPage)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = createWebPage();
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessVideoWall)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = createVideoWall();
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessServer)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = createServer();
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessStorage)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = createStorage();
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByName)
@@ -174,8 +227,8 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByName)
     auto user = addUser(Qn::GlobalAdminPermission);
     auto user2 = addUser(Qn::GlobalAdminPermission, kUserName2);
 
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, camera));
-    ASSERT_TRUE(m_accessProvider->hasAccess(user2, camera));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, camera));
+    ASSERT_TRUE(accessProvider()->hasAccess(user2, camera));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByPermissions)
@@ -185,10 +238,10 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByPermis
     camera->setName(kUserName);
 
     auto user = addUser(Qn::GlobalControlVideoWallPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, camera));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, camera));
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, camera));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, camera));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkCameraAccess)
@@ -196,10 +249,10 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkCameraAccess)
     auto target = createCamera();
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 
     user->setRawPermissions(Qn::GlobalEditCamerasPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkWebPageAccess)
@@ -207,10 +260,10 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkWebPageAccess)
     auto target = createWebPage();
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 
     user->setRawPermissions(Qn::GlobalEditCamerasPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkServerAccess)
@@ -218,10 +271,10 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkServerAccess)
     auto target = createServer();
 
     auto user = addUser(Qn::GlobalAdminPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkStorageAccess)
@@ -229,10 +282,10 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkStorageAccess)
     auto target = createStorage();
 
     auto user = addUser(Qn::GlobalAdminPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkLayoutAccess)
@@ -240,18 +293,18 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkLayoutAccess)
     auto target = createLayout();
 
     auto user = addUser(Qn::GlobalAdminPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkUserAccess)
 {
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
     auto target = addUser(Qn::GlobalAccessAllMediaPermission, kUserName2);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, user));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, user));
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkVideoWallAccess)
@@ -259,8 +312,8 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkVideoWallAccess)
     auto target = createVideoWall();
 
     auto user = addUser(Qn::GlobalControlVideoWallPermission);
-    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }

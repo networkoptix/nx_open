@@ -7,6 +7,7 @@
 /** Public interface for all Resource Access Provider classes. */
 class QnAbstractResourceAccessProvider: public QObject
 {
+    Q_OBJECT
     using base_type = QObject;
 public:
     QnAbstractResourceAccessProvider(QObject* parent = nullptr);
@@ -16,5 +17,6 @@ public:
         const QnResourcePtr& resource) const = 0;
 
 signals:
-    void accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
+    void accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        bool value);
 };

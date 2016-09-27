@@ -5,7 +5,6 @@
 /** Handles access via global permissions. */
 class QnPermissionsResourceAccessProvider: public QnAbstractResourceAccessProvider
 {
-    Q_OBJECT
     using base_type = QnAbstractResourceAccessProvider;
 public:
     QnPermissionsResourceAccessProvider(QObject* parent = nullptr);

@@ -25,6 +25,7 @@ public:
     /** Key value in the shared resources map. */
     QnUuid effectiveId() const;
 
+    bool operator==(const QnResourceAccessSubject& other) const;
 private:
     QScopedPointer<QnResourceAccessSubjectPrivate> d_ptr;
 };
