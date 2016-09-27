@@ -244,8 +244,15 @@ QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnResourceAccess
 void QnResourceAccessManager::setAccessibleResources(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {
+    NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;
+
+    NX_ASSERT(!subject.user()
+        || subject.user()->role() == Qn::UserRole::CustomPermissions
+        || resources.empty(),
+        "Security check. We must not set custom accessible resources to non-custom user."
+    );
 
     {
         auto id = subject.effectiveId();
