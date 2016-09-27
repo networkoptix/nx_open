@@ -4,11 +4,13 @@
 
 #include <core/resource_access/resource_access_subject.h>
 
+#include <utils/common/connective.h>
+
 /** Public interface for all Resource Access Provider classes. */
-class QnAbstractResourceAccessProvider: public QObject
+class QnAbstractResourceAccessProvider: public Connective<QObject>
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 public:
     QnAbstractResourceAccessProvider(QObject* parent = nullptr);
     virtual ~QnAbstractResourceAccessProvider();

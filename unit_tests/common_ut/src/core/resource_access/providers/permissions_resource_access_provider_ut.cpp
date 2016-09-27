@@ -368,3 +368,11 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedUserAccess)
     awaitAccess(user, camera, false);
     qnResPool->removeResource(user);
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitPermissionsChangedAccess)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    awaitAccess(user, camera);
+    user->setRawPermissions(Qn::GlobalAdminPermission);
+}

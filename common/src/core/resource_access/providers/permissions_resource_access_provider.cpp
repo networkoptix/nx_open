@@ -20,6 +20,13 @@ QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject
             {
                 for (const auto& resource: qnResPool->getResources())
                     emit accessChanged(user, resource, hasAccess(user, resource));
+
+                connect(user, &QnUserResource::permissionsChanged, this,
+                    [this, user]
+                    {
+                        for (const auto& resource : qnResPool->getResources())
+                            emit accessChanged(user, resource, hasAccess(user, resource));
+                    });
             }
         });
 
@@ -31,6 +38,8 @@ QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject
 
             if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
             {
+                disconnect(user, nullptr, this, nullptr);
+
                 for (const auto& resource : qnResPool->getResources())
                     emit accessChanged(user, resource, false);
             }
