@@ -309,9 +309,18 @@ void SystemManager::getSystems(
                 m_accountManager.findAccountByUserName(systemDataEx.ownerAccountEmail);
             if (accountData)
                 systemDataEx.ownerFullName = accountData->fullName;
-            systemDataEx.accessRole = getAccountRightsForSystem(
+            const auto sharingData = getSystemSharingData(
                 *accountEmail,
                 systemDataEx.id);
+            if (sharingData)
+            {
+                systemDataEx.accessRole = sharingData->accessRole;
+                //systemDataEx.systemAccessWeight = ;
+            }
+            else
+            {
+                systemDataEx.accessRole = api::SystemAccessRole::none;
+            }
             systemDataEx.sharingPermissions = 
                 std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
         }
@@ -500,6 +509,8 @@ void SystemManager::rename(
     data::SystemNameUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
 {
+    NX_LOGX(lm("Rename system %1 to %2").arg(data.systemID).arg(data.name), cl_logDEBUG2);
+
     if (data.name.empty() || data.name.size() > kMaxSystemNameLength)
         return completionHandler(api::ResultCode::badRequest);
 
@@ -508,7 +519,7 @@ void SystemManager::rename(
         QnMutexLocker lk(&m_mutex);
 
         auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-        auto systemIter = systemByIdIndex.find(data.id);
+        auto systemIter = systemByIdIndex.find(data.systemID);
         if (systemIter == systemByIdIndex.end())
         {
             NX_ASSERT(false);
@@ -551,9 +562,52 @@ void SystemManager::rename(
         };
 
     m_transactionLog->startDbTransaction(
-        systemNameDataOnHeapPtr->id.c_str(),
+        systemNameDataOnHeapPtr->systemID.c_str(),
         std::move(dbUpdateFunc),
         std::move(onDbUpdateCompletedFunc));
+}
+
+void SystemManager::startUserSession(
+    const AuthorizationInfo& authzInfo,
+    data::UserSessionDescriptor userSessionDescriptor,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    NX_ASSERT(userSessionDescriptor.systemId || userSessionDescriptor.accountEmail);
+    if (!(userSessionDescriptor.systemId || userSessionDescriptor.accountEmail))
+        return completionHandler(api::ResultCode::unknownError);
+
+    if (!userSessionDescriptor.systemId)
+    {
+        userSessionDescriptor.systemId = authzInfo.get<std::string>(attr::authSystemID);
+        if (!userSessionDescriptor.systemId)
+        {
+            NX_LOGX(lm("system id may be absent in request parameters "
+                "only if it has been used as a login"),
+                cl_logDEBUG1);
+            return completionHandler(api::ResultCode::forbidden);
+        }
+    }
+
+    if (!userSessionDescriptor.accountEmail)
+    {
+        userSessionDescriptor.accountEmail = 
+            authzInfo.get<std::string>(attr::authAccountEmail);
+        if (!userSessionDescriptor.accountEmail)
+        {
+            NX_LOGX(lm("account email may be absent in request parameters "
+                "only if it has been used as a login"),
+                cl_logDEBUG1);
+            return completionHandler(api::ResultCode::forbidden);
+        }
+    }
+
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<data::UserSessionDescriptor, double>(
+        std::bind(&SystemManager::updateSystemAccessWeightInDb, this, _1, _2, _3),
+        std::move(userSessionDescriptor),
+        std::bind(&SystemManager::systemAccessWeightUpdatedInDb, this,
+            m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, _3, _4, std::move(completionHandler)));
 }
 
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
@@ -572,7 +626,7 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
         ? it->accessRole
         : api::SystemAccessRole::none;
 #else
-    //TODO #ak getSystemSharingData does returns much data not needed for this method
+    //TODO #ak getSystemSharingData does returns a lot of data which is redundant for this method.
     const auto sharingData = getSystemSharingData(accountEmail, systemID);
     if (!sharingData)
         return api::SystemAccessRole::none;
@@ -611,6 +665,12 @@ std::pair<std::string, std::string> SystemManager::extractSystemIdAndVmsUserId(
     const api::SystemSharing& data)
 {
     return std::make_pair(data.systemID, data.vmsUserId);
+}
+
+std::pair<std::string, std::string> SystemManager::extractSystemIdAndAccountEmail(
+    const api::SystemSharing& data)
+{
+    return std::make_pair(data.systemID, data.accountEmail);
 }
 
 nx::db::DBResult SystemManager::insertSystemToDB(
@@ -1062,7 +1122,7 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
     return m_transactionLog->generateTransactionAndSaveToLog<
         ::ec2::ApiCommand::setResourceParam>(
             connection,
-            data.id.c_str(),
+            data.systemID.c_str(),
             std::move(systemNameData));
 }
 
@@ -1074,12 +1134,12 @@ nx::db::DBResult SystemManager::execSystemNameUpdate(
     updateSystemNameQuery.prepare(
         "UPDATE system "
         "SET name=:name "
-        "WHERE id=:id");
+        "WHERE id=:systemID");
     QnSql::bind(data, &updateSystemNameQuery);
     if (!updateSystemNameQuery.exec())
     {
         NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
-            .arg(data.id).arg(data.name)
+            .arg(data.systemID).arg(data.name)
             .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
         return db::DBResult::ioError;
     }
@@ -1093,7 +1153,7 @@ void SystemManager::updateSystemNameInCache(
     QnMutexLocker lk(&m_mutex);
 
     auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-    auto systemIter = systemByIdIndex.find(data.id);
+    auto systemIter = systemByIdIndex.find(data.systemID);
     if (systemIter != systemByIdIndex.end())
     {
         systemByIdIndex.modify(
@@ -1168,6 +1228,120 @@ void SystemManager::systemActivated(
                 [](data::SystemData& system) {
                     system.status = api::SystemStatus::ssActivated;
                     system.expirationTimeUtc = std::numeric_limits<int>::max();
+                });
+        }
+    }
+
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError);
+}
+
+constexpr const int kSecondsPerDay = 60*60*24;
+
+nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
+    QSqlDatabase* dbConnection,
+    const data::UserSessionDescriptor& userSessionDescriptor,
+    double* const systemAccessWeight)
+{
+    NX_ASSERT(userSessionDescriptor.accountEmail && userSessionDescriptor.systemId);
+
+    QSqlQuery selectUsageStatisticsQuery(*dbConnection);
+    selectUsageStatisticsQuery.setForwardOnly(true);
+    selectUsageStatisticsQuery.prepare(
+        R"sql(
+        SELECT sa.account_id, sa.last_login_time_utc, sa.usage_frequency 
+        FROM system_to_account sa, account a
+        WHERE sa.account_id=a.id AND a.email=:account_email AND sa.system_id=:system_id
+        )sql");
+    selectUsageStatisticsQuery.bindValue(
+        ":account_email",
+        QnSql::serialized_field(userSessionDescriptor.accountEmail.get()));
+    selectUsageStatisticsQuery.bindValue(
+        ":system_id",
+        QnSql::serialized_field(userSessionDescriptor.systemId.get()));
+    if (!selectUsageStatisticsQuery.exec())
+    {
+        NX_LOGX(lm("Error executing request to select system %1 usage by %2. %3")
+            .arg(*userSessionDescriptor.systemId)
+            .arg(*userSessionDescriptor.accountEmail)
+            .arg(selectUsageStatisticsQuery.lastError().text()), cl_logWARNING);
+        return nx::db::DBResult::ioError;
+    }
+    if (!selectUsageStatisticsQuery.next())
+    {
+        // User could be removed.
+        return nx::db::DBResult::notFound;
+    }
+
+    const auto lastLoginTimeUtc = 
+        selectUsageStatisticsQuery.value("last_login_time_utc").toLongLong();
+    const auto currentUsageFrequency =
+        selectUsageStatisticsQuery.value("usage_frequency").toFloat();
+    const auto accountId = selectUsageStatisticsQuery.value("account_id").toString();
+
+    using namespace std::chrono;
+    const qint64 currentTimeUtc = system_clock::now().time_since_epoch().count();
+    const auto fullDaysSinceLastLogin = 
+        (currentTimeUtc - lastLoginTimeUtc) / kSecondsPerDay;
+    *systemAccessWeight = std::max<float>(
+        (1 - fullDaysSinceLastLogin/30.0) * currentUsageFrequency,
+        0);
+    const auto newUsageFrequency = *systemAccessWeight + 1;
+
+    QSqlQuery updateUsageStatisticsQuery(*dbConnection);
+    updateUsageStatisticsQuery.prepare(
+        R"sql(
+        UPDATE system_to_account
+        SET last_login_time_utc=:last_login_time_utc, usage_frequency=:usage_frequency
+        WHERE account_id=:account_id AND system_id=:system_id
+        )sql");
+    updateUsageStatisticsQuery.bindValue("last_login_time_utc", currentTimeUtc);
+    updateUsageStatisticsQuery.bindValue("usage_frequency", newUsageFrequency);
+    updateUsageStatisticsQuery.bindValue("account_id", accountId);
+    updateUsageStatisticsQuery.bindValue(
+        "system_id",
+        QnSql::serialized_field(userSessionDescriptor.systemId.get()));
+    if (!updateUsageStatisticsQuery.exec())
+    {
+        NX_LOGX(lm("Error executing request to update system %1 usage by %2 in db. %3")
+            .arg(*userSessionDescriptor.systemId)
+            .arg(*userSessionDescriptor.accountEmail)
+            .arg(updateUsageStatisticsQuery.lastError().text()), cl_logWARNING);
+        return nx::db::DBResult::ioError;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::systemAccessWeightUpdatedInDb(
+    QnCounter::ScopedIncrement asyncCallLocker,
+    QSqlDatabase* /*dbConnection*/,
+    nx::db::DBResult dbResult,
+    data::UserSessionDescriptor userSessionDescriptor,
+    double systemAccessWeight,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        // Updating in cache.
+        QnMutexLocker lk(&m_mutex);
+
+        auto& bySystemIdAndAccountEmailIndex = 
+            m_accountAccessRoleForSystem.get<kSharingBySystemIdAndAccountEmailIndex>();
+        auto systemIter = bySystemIdAndAccountEmailIndex.find(
+            std::make_pair(
+                userSessionDescriptor.systemId.get(),
+                userSessionDescriptor.accountEmail.get()));
+        if (systemIter != bySystemIdAndAccountEmailIndex.end())
+        {
+            bySystemIdAndAccountEmailIndex.modify(
+                systemIter,
+                [systemAccessWeight](api::SystemSharing& systemSharing)
+                {
+                    // TODO:
+                    //systemSharing.systemAccessWeight = systemAccessWeight;
                 });
         }
     }
@@ -1532,7 +1706,7 @@ nx::db::DBResult SystemManager::processSetResourceParam(
         return nx::db::DBResult::ok;
     }
 
-    systemNameUpdate->id = systemId.toStdString();
+    systemNameUpdate->systemID = systemId.toStdString();
     systemNameUpdate->name = data.value.toStdString();
     return execSystemNameUpdate(dbConnection, *systemNameUpdate);
 }

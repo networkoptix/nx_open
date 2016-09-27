@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <boost/optional.hpp>
 
 namespace nx {
 namespace cdb {
@@ -214,11 +215,16 @@ public:
     /** Permissions, account can share current system with. */
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
+    /** This number shows how often user, performing request, 
+     * uses this system in comparision to other systems.
+     */
+    float accessWeight;
 
     SystemDataEx()
     :
         accessRole(SystemAccessRole::none),
-        stateOfHealth(SystemHealth::offline)
+        stateOfHealth(SystemHealth::offline),
+        accessWeight(0)
     {
     }
 
@@ -226,7 +232,8 @@ public:
     :
         SystemData(std::move(systemData)),
         accessRole(SystemAccessRole::none),
-        stateOfHealth(SystemHealth::offline)
+        stateOfHealth(SystemHealth::offline),
+        accessWeight(0)
     {
     }
 };
@@ -235,6 +242,16 @@ class SystemDataExList
 {
 public:
     std::vector<SystemDataEx> systems;
+};
+
+/**
+ * Information about newly started user session.
+ */
+class UserSessionDescriptor
+{
+public:
+    boost::optional<std::string> accountEmail;
+    boost::optional<std::string> systemId;
 };
 
 } // namespace api

@@ -450,6 +450,11 @@ void CloudDBProcess::registerApiHandlers(
         &SystemManager::rename, systemManager,
         EntityType::system, DataActionType::update);
 
+    registerHttpHandler(
+        kSystemStartUserSessionPath,
+        &SystemManager::startUserSession, systemManager,
+        EntityType::account, DataActionType::update);   //< TODO: #ak: current entity:action is not suitable for this request
+
     //------------------------------------------
     // AuthenticationProvider
     registerHttpHandler(
@@ -596,6 +601,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
     dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
     dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
+    dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     return dbStructureUpdater.updateStructSync();
 }
 

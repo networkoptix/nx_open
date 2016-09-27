@@ -120,6 +120,11 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
+    
+    void startUserSession(
+        const AuthorizationInfo& authzInfo,
+        data::UserSessionDescriptor userSessionDescriptor,
+        std::function<void(api::ResultCode)> completionHandler);
 
     //void addSubscription(
     //    const AuthorizationInfo& authzInfo,
@@ -153,7 +158,9 @@ public:
         
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
-        const api::SystemSharing&);
+        const api::SystemSharing& data);
+    static std::pair<std::string, std::string> extractSystemIdAndAccountEmail(
+        const api::SystemSharing& data);
 
     typedef boost::multi_index::multi_index_container<
         data::SystemData,
@@ -187,7 +194,12 @@ private:
             boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
                 const api::SystemSharing&,
                 std::pair<std::string, std::string>,
-                &SystemManager::extractSystemIdAndVmsUserId>>
+                &SystemManager::extractSystemIdAndVmsUserId>>,
+            //indexing by pair<systemId, accountEmail>
+            boost::multi_index::ordered_non_unique<boost::multi_index::global_fun<
+                const api::SystemSharing&,
+                std::pair<std::string, std::string>,
+                &SystemManager::extractSystemIdAndAccountEmail>>
         >
     > AccountSystemAccessRoleDict;
 
@@ -201,6 +213,7 @@ private:
     constexpr static const int kSharingByAccountEmail = 1;
     constexpr static const int kSharingBySystemId = 2;
     constexpr static const int kSharingBySystemIdAndVmsUserIdIndex = 3;
+    constexpr static const int kSharingBySystemIdAndAccountEmailIndex = 4;
 
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
@@ -304,6 +317,18 @@ private:
         QSqlDatabase* /*dbConnection*/,
         nx::db::DBResult dbResult,
         std::string systemId,
+        std::function<void(api::ResultCode)> completionHandler);
+
+    nx::db::DBResult updateSystemAccessWeightInDb(
+        QSqlDatabase* dbConnection,
+        const data::UserSessionDescriptor& userSessionDescriptor,
+        double* const systemAccessWeight);
+    void systemAccessWeightUpdatedInDb(
+        QnCounter::ScopedIncrement asyncCallLocker,
+        QSqlDatabase* /*dbConnection*/,
+        nx::db::DBResult dbResult,
+        data::UserSessionDescriptor userSessionDescriptor,
+        double systemAccessWeight,
         std::function<void(api::ResultCode)> completionHandler);
 
     /** returns sharing permissions depending on current access role */
