@@ -56,21 +56,21 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace
-{
-    const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
+namespace {
 
-    /** We limit the maximal number of notification items to prevent crashes due
-     * to reaching GDI resource limit. */
-    const int kMaxNotificationItems = 128;
-    const int kMultiThumbnailSpacing = 4;
+static const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
 
-    const char* kItemResourcePropertyName    = "_qn_itemResource";
-    const char* kItemActionTypePropertyName  = "_qn_itemActionType";
-    const char* kItemTimeStampPropertyName   = "_qn_itemTimeStamp";
+/** We limit the maximal number of notification items to prevent crashes due
+ * to reaching GDI resource limit. */
+static const int kMaxNotificationItems = 128;
+static const int kMultiThumbnailSpacing = 4;
+static const int kMaxThumbnailCount = 5;
+
+const char* kItemResourcePropertyName = "_qn_itemResource";
+const char* kItemActionTypePropertyName = "_qn_itemActionType";
+const char* kItemTimeStampPropertyName = "_qn_itemTimeStamp";
 
 } //anonymous namespace
-
 
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
@@ -249,22 +249,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
 
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (QnBusiness::isSourceCameraRequired(eventType))
-    {
-        NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
-        if (!camera || !accessController()->hasPermissions(camera, Qn::ReadPermission))
-            return;
-    }
-
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (QnBusiness::isSourceServerRequired(eventType))
-    {
-        NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
-        if (!server || !accessController()->hasPermissions(server, Qn::ReadPermission))
-            return;
-    }
-
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
     {
         if (alarmCameras.isEmpty())
@@ -298,7 +282,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QIcon icon = iconForAction(businessAction);
 
-    enum { kMaxThumbnailCount = 5 };
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
     {
         item->addActionButton(
@@ -311,6 +294,22 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     else
     {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (QnBusiness::isSourceCameraRequired(eventType))
+        {
+            NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
+            if (!camera || !accessController()->hasPermissions(camera, Qn::ReadPermission))
+                return;
+        }
+
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (QnBusiness::isSourceServerRequired(eventType))
+        {
+            NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
+            if (!server || !accessController()->hasPermissions(server, Qn::ReadPermission))
+                return;
+        }
+
         switch (eventType)
         {
             case QnBusiness::CameraMotionEvent:
