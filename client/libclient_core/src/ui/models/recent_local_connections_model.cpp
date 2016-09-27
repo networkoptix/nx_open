@@ -64,7 +64,7 @@ namespace
 
 QnRecentLocalConnectionsModel::QnRecentLocalConnectionsModel(QObject *parent):
     base_type(parent),
-    m_systemName(),
+    m_systemId(),
     m_data()
 {
     QnClientRecentConnectionsManager::instance()->addModel(this);
@@ -75,18 +75,18 @@ QnRecentLocalConnectionsModel::~QnRecentLocalConnectionsModel()
     QnClientRecentConnectionsManager::instance()->removeModel(this);
 }
 
-QString QnRecentLocalConnectionsModel::systemName() const
+QString QnRecentLocalConnectionsModel::systemId() const
 {
-    return m_systemName;
+    return m_systemId;
 }
 
-void QnRecentLocalConnectionsModel::setSystemName(const QString &systemName)
+void QnRecentLocalConnectionsModel::setSystemId(const QString &systemId)
 {
-    if (m_systemName == systemName)
+    if (m_systemId == systemId)
         return;
 
-    m_systemName = systemName;
-    emit systemNameChanged();
+    m_systemId = systemId;
+    emit systemIdChanged();
 }
 
 bool QnRecentLocalConnectionsModel::hasConnections() const

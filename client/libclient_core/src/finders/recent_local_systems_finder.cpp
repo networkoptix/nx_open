@@ -24,17 +24,32 @@ QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent):
 
 void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr& system)
 {
-    if (m_onlineSystems.contains(system->id()))
+    auto it = m_onlineSystems.find(system->id());
+    if (it == m_onlineSystems.end())
+        it = m_onlineSystems.insert(system->id(), SystemNameCountPair(system->name(), 1));
+    else
+        ++it->second;
+
+    if (it->second > 1)
         return;
 
-    m_onlineSystems.insert(system->id(), system->name());
     checkAllSystems();
 }
 
 void QnRecentLocalSystemsFinder::processSystemRemoved(const QString& systemId)
 {
-    if (m_onlineSystems.remove(systemId))
-        checkAllSystems();
+    const auto it = m_onlineSystems.find(systemId);
+    if (it == m_onlineSystems.end())
+        return;
+
+    if (it->second > 1)
+    {
+        --it->second;
+        return;
+    }
+
+    m_onlineSystems.erase(it);
+    checkAllSystems();
 }
 
 void QnRecentLocalSystemsFinder::checkAllSystems()
@@ -126,8 +141,9 @@ bool QnRecentLocalSystemsFinder::shouldRemoveSystem(const QnSystemDescriptionPtr
     if (!system)
         return true;
 
-    for (const auto systemName : m_onlineSystems)
+    for (const auto data: m_onlineSystems)
     {
+        const auto systemName = data.first;
         if (system->name() == systemName)
             return true;
     }

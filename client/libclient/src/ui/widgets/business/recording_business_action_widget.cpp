@@ -4,6 +4,7 @@
 #include <business/business_action_parameters.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -50,7 +51,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
     int maxFps = 0;
 
     if (fields & QnBusiness::ActionResourcesField) {
-        QnVirtualCameraResourceList cameras = model()->actionResources().filtered<QnVirtualCameraResource>();
+        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(model()->actionResources());
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
             maxFps = maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps());
         }

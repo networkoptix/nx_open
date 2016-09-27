@@ -103,8 +103,9 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QnHiDpiWorkarounds::showMenu(menu.data(),
                 QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
                     d->mainMenuButton->rect().bottomLeft()));
-    });
 
+            d->mainMenuButton->setDown(false);
+    });
 
     d->tabBar = new QnLayoutTabBar(this);
     d->tabBar->setFocusPolicy(Qt::NoFocus);
@@ -154,6 +155,8 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QnHiDpiWorkarounds::showMenu(menu.data(),
                 QnHiDpiWorkarounds::safeMapToGlobal(d->currentLayoutsButton,
                     d->currentLayoutsButton->rect().bottomLeft()));
+
+            d->currentLayoutsButton->setDown(false);
         });
 
     layout->addWidget(d->newTabButton);

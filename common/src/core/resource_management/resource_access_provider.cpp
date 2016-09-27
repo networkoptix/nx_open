@@ -145,7 +145,7 @@ bool QnResourceAccessProvider::isAccessibleViaLayouts(const QSet<QnUuid>& layout
         return false;
 
     QnUuid resourceId = resource->getId();
-    QnLayoutResourceList layouts = qnResPool->getResources(layoutIds).filtered<QnLayoutResource>();
+    QnLayoutResourceList layouts = qnResPool->getResources<QnLayoutResource>(layoutIds);
     for (const QnLayoutResourcePtr& layout : layouts)
     {
         /* When checking existing videowall, layouts may be not shared. */

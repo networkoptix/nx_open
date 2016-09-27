@@ -1,6 +1,7 @@
 #include "backup_settings_dialog.h"
 #include "ui_backup_settings_dialog.h"
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
@@ -57,14 +58,20 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
         //TODO: #vkutin #GDM #common In read-only mode display a different dialog
         // to view only selected cameras
 
+        QSet<QnUuid> ids;
+        for (auto camera: ui->backupResourcesButton->selectedDevices())
+            ids << camera->getId();
+
         QScopedPointer<QnBackupCamerasDialog> dialog(new QnBackupCamerasDialog(this));
-        dialog->setSelectedResources(ui->backupResourcesButton->selectedDevices());
+        dialog->setSelectedResources(ids);
         dialog->setBackupNewCameras(m_backupNewCameras);
 
         if (dialog->exec() != QDialog::Accepted || isReadOnly())
             return;
 
-        ui->backupResourcesButton->setSelectedDevices(dialog->selectedResources().filtered<QnVirtualCameraResource>());
+        ui->backupResourcesButton->setSelectedDevices(
+            qnResPool->getResources(dialog->selectedResources())
+            .filtered<QnVirtualCameraResource>());
         m_backupNewCameras = dialog->backupNewCameras();
     });
 

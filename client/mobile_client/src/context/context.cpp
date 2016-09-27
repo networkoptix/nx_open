@@ -176,7 +176,7 @@ QString QnContext::getLastUsedUrl() const
     if (url.password().isEmpty())
     {
         QnRecentLocalConnectionsModel connectionsModel;
-        connectionsModel.setSystemName(getLastUsedSystemId());
+        connectionsModel.setSystemId(getLastUsedSystemId());
         if (!connectionsModel.hasConnections())
             return QString();
 
