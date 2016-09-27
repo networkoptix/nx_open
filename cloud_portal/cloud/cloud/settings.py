@@ -22,6 +22,8 @@ sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+conf = get_config()
+CUSTOMIZATION = conf['customization']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -70,8 +72,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': (
-            '/app/www/',
-            '/app/www/static/'
+            '/app/www/customization/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
+            '/app/www/customization/{}/templates'.format(CUSTOMIZATION),
         ),
         'APP_DIRS': True,
         'OPTIONS': {
@@ -91,7 +93,6 @@ WSGI_APPLICATION = 'cloud.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-conf = get_config()
 cloud_db = conf['cloud_database']
 
 DATABASES = {
@@ -174,13 +175,6 @@ LOGGING = {
 
 STATIC_URL = '/static/'
 
-STATIC_LOCATION = os.path.join(BASE_DIR, "static", conf['customization'], "static")
-
-STATICFILES_DIRS = (
-    STATIC_LOCATION
-)
-
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
        'rest_framework.permissions.AllowAny',
@@ -199,7 +193,7 @@ CLOUD_CONNECT = {
     'gateway': conf['cloud_gateway']['url'],
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
-    'customization': conf['customization'],
+    'customization': CUSTOMIZATION,
     'password_realm': 'VMS'
 }
 

@@ -1,9 +1,13 @@
+import os.path
+
 from util.config import get_config
+from os.path import join
+
 
 conf = get_config()
 
-
-TEMPLATES_LOCATION = os.path.join(BASE_DIR, "static", conf['customization'], "templates")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATES_LOCATION = join(BASE_DIR, "static", conf['customization'], "templates")
 
 notifications_config = {
     'activate_account': {
