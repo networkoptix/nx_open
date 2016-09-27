@@ -259,10 +259,17 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     if (detailed)
         return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
 
-    QString result = tr("%n User(s)", "", users.size());
-    if (additional.size() > 0)
-        result = tr("%1, %n additional", "", additional.size()).arg(result);
-    return result;
+
+    QStringList recipients;
+    if (!users.empty())
+        recipients << tr("%n Users", "", users.size());
+    if (!roles.empty())
+        recipients << tr("%n Roles", "", roles.size());
+    if (!additional.empty())
+        recipients << tr("%n additional", "", additional.size());
+
+    NX_ASSERT(!recipients.empty());
+    return recipients.join(lit(", "));
 }
 
 QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional)

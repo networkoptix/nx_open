@@ -99,11 +99,11 @@ void QnShowOnAlarmLayoutActionWidget::updateUsersButtonText()
     else if (users.empty() && roles.empty())
         title = tr("<All Users>");
     else if (roles.empty())
-        title = tr("%n User(s)", "", users.size());
+        title = tr("%n Users", "", users.size());
     else if (users.empty())
-        title = tr("%n Role(s)", "", roles.size());
+        title = tr("%n Roles", "", roles.size());
     else
-        title = tr("%n Users and Roles", "", roles.size() + users.size());
+        title = tr("%n Users", "", users.size()) + lit(", ") + tr("%n Roles", "", roles.size());
 
     ui->selectUsersButton->setText(title);
     ui->selectUsersButton->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
