@@ -1,14 +1,21 @@
 #include "permissions_resource_access_provider.h"
 
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/webpage_resource.h>
 
 #include <core/resource_access/resource_access_manager.h>
 
 QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            for (const auto& user: qnResPool->getResources<QnUserResource>())
+                emit accessChanged(user, resource, hasAccess(user, resource));
+        });
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
@@ -18,7 +25,7 @@ QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
 bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!resource || !subject.isValid())
+    if (!resource || !subject.isValid() || !resource->resourcePool())
         return false;
 
     if (resource == subject.user())
