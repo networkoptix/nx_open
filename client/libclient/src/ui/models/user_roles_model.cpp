@@ -5,7 +5,7 @@
 
 #include <common/common_globals.h>
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <nx/utils/string.h>

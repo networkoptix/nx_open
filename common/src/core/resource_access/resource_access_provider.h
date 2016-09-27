@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource_management/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject.h>
 
 //TODO: #vkutin #GDM Need to move it to some forward declarations header
 using QnIndirectAccessProviders = QMap<QnUuid /*accessible resource*/, QSet<QnResourcePtr> /*access providers*/>;

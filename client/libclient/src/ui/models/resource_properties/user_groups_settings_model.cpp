@@ -1,6 +1,6 @@
 #include "user_groups_settings_model.h"
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 

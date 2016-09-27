@@ -9,8 +9,8 @@
 #include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
-#include <core/resource_management/resource_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_provider.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>

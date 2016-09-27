@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include <core/resource_management/user_access_data.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/user_access_data.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/camera_resource.h>
 #include <utils/license_usage_helper.h>
 

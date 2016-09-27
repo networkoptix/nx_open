@@ -5,7 +5,7 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject.h>
 
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_access_rights_data.h>

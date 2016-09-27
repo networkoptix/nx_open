@@ -2,7 +2,7 @@
 
 #include <transaction/transaction.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 namespace ec2
 {

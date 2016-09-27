@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <core/resource_management/resource_access_filter.h>
+#include <core/resource_access/resource_access_filter.h>
 
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>

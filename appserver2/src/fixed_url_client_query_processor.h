@@ -10,7 +10,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/mutex.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 #include "client_query_processor.h"
 

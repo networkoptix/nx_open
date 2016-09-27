@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QSortFilterProxyModel>
-#include <core/resource_management/resource_access_provider.h>
+#include <core/resource_access/resource_access_provider.h>
 
 /*
 * Proxy model that works with QnResourceListModel (or its proxy) as a source

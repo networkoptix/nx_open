@@ -6,7 +6,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <rest/ec2_update_http_handler.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
 #include <nx_ec/data/api_data.h>
 

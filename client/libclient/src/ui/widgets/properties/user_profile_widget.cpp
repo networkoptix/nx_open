@@ -7,7 +7,7 @@
 #include <client_core/client_core_settings.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/common/read_only.h>

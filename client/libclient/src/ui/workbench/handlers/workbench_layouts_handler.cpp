@@ -11,8 +11,8 @@
 #include <core/resource/videowall_resource.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
-#include <core/resource_management/resource_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_provider.h>
 #include <core/resource_management/resources_changes_manager.h>
 
 #include <nx_ec/dummy_handler.h>

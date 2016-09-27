@@ -1,6 +1,6 @@
 #include "resource_access_subject.h"
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx_ec/data/api_user_group_data.h>
 

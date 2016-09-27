@@ -32,7 +32,7 @@
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
 #include "cloud/cloud_system_name_updater.h"
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
 #include <nx/utils/log/assert.h>
