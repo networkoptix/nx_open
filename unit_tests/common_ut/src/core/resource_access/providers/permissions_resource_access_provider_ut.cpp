@@ -341,3 +341,16 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedCameraAccess)
     qnResPool->removeResource(camera);
 }
 
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitNewUserAccess)
+{
+    auto camera = createCamera();
+
+    QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
+    user->setId(QnUuid::createUuid());
+    user->setName(kUserName);
+    user->setRawPermissions(Qn::GlobalAdminPermission);
+    user->addFlags(Qn::remote);
+
+    awaitAccess(user, camera);
+    qnResPool->addResource(user);
+}
