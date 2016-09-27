@@ -21,4 +21,4 @@ cloud/notifications/static/templates/email_logo.png
 *.pid
 *.log
 
-cloud/build_scripts/*.ts
+build_scripts/*.ts
