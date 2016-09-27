@@ -343,22 +343,25 @@ void QnUserSettingsDialog::applyChanges()
                 m_user->fillId();
         });
 
-    auto accessibleResources = m_model->accessibleResources();
-
-    QnLayoutResourceList layoutsToShare = qnResPool->getResources(accessibleResources)
-        .filtered<QnLayoutResource>(
-            [](const QnLayoutResourcePtr& layout)
+    if (m_user->role() == Qn::UserRole::CustomPermissions)
     {
-        return !layout->isFile() && !layout->isShared();
-    });
+        auto accessibleResources = m_model->accessibleResources();
 
-    for (const auto& layout : layoutsToShare)
-    {
-        menu()->trigger(QnActions::ShareLayoutAction,
-            QnActionParameters(layout).withArgument(Qn::UserResourceRole, m_user));
+        QnLayoutResourceList layoutsToShare = qnResPool->getResources(accessibleResources)
+            .filtered<QnLayoutResource>(
+                [](const QnLayoutResourcePtr& layout)
+            {
+                return !layout->isFile() && !layout->isShared();
+            });
+
+        for (const auto& layout : layoutsToShare)
+        {
+            menu()->trigger(QnActions::ShareLayoutAction,
+                QnActionParameters(layout).withArgument(Qn::UserResourceRole, m_user));
+        }
+
+        qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);
     }
-
-    qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);
 
     /* We may fill password field to change current user password. */
     m_user->setPassword(QString());

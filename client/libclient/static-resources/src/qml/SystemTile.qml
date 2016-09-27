@@ -29,10 +29,7 @@ BaseTile
         if (wrongVersion.length || !isCompatibleInternal)
             return false;
 
-        if (isCloudTile)
-            return control.impl.isOnline;
-
-        return true;
+        return control.impl.isOnline;
     }
 
     tileColor:
@@ -110,7 +107,7 @@ BaseTile
         {
             var cloudHost = control.impl.hostsModel.firstHost;
             console.log("Connecting to cloud system <", systemName,
-                ">, throug the host <", cloudHost, ">");
+                ">, through the host <", cloudHost, ">");
             context.connectToCloudSystem(control.systemId, cloudHost);
         }
         else // Local system tile
@@ -126,7 +123,7 @@ BaseTile
 
     menuButton
     {
-        visible: impl.hasSavedConnection;
+        visible: impl.hasSavedConnection && impl.isOnline;
 
         menu: NxPopupMenu
         {
@@ -163,10 +160,11 @@ BaseTile
 
             if (control.impl.tileType === control.impl.kLocalSystemTileType)
             {
+                currentAreaItem.isOnline = Qt.binding( function() { return control.impl.isOnline; });
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
-                currentAreaItem.recentUserConnectionsModel = control.impl.recentConnectionsModel;
+                currentAreaItem.recentLocalConnectionsModel = control.impl.recentConnectionsModel;
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
@@ -211,7 +209,7 @@ BaseTile
     property QtObject impl: QtObject
     {
         property var hostsModel: QnSystemHostsModel { systemId: control.systemId; }
-        property var recentConnectionsModel: QnRecentUserConnectionsModel { systemName: control.systemName; }
+        property var recentConnectionsModel: QnRecentLocalConnectionsModel { systemName: control.systemName; }
 
         // TODO: add enum to c++ code, add type info to model
         readonly property int kFactorySystemTileType: 0;

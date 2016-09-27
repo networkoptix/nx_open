@@ -15,7 +15,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <ui/common/aligner.h>
 #include <ui/widgets/properties/camera_advanced_settings_web_page.h>
+
 #include <vms_gateway_embeddable.h>
 
 namespace {
@@ -33,9 +35,34 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
     m_page(Page::Empty)
 {
     ui->setupUi(this);
+
+    ui->cameraIdInputField->setTitle(tr("Camera ID"));
+    ui->cameraIdInputField->setReadOnly(true);
+
+    ui->primaryStreamUrlInputField->setTitle(tr("Primary Stream"));
+    ui->primaryStreamUrlInputField->setReadOnly(true);
+    ui->primaryStreamUrlInputField->setPlaceholderText(
+        tr("URL is not available. Open video stream and try again"));
+
+    ui->secondaryStreamUrlInputField->setTitle(tr("Secondary Stream"));
+    ui->secondaryStreamUrlInputField->setReadOnly(true);
+    ui->secondaryStreamUrlInputField->setPlaceholderText(
+        tr("URL is not available. Open video stream and try again"));
+
+    QnAligner* aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidgets({
+        ui->cameraIdInputField,
+        ui->primaryStreamUrlInputField,
+        ui->secondaryStreamUrlInputField
+    });
+
     initWebView();
 
-    connect(ui->cameraAdvancedParamsWidget, &QnCameraAdvancedParamsWidget::hasChangesChanged, this, &QnCameraAdvancedSettingsWidget::hasChangesChanged);
+    connect(ui->cameraAdvancedParamsWidget, 
+        &QnCameraAdvancedParamsWidget::hasChangesChanged, 
+        this, 
+        &QnCameraAdvancedSettingsWidget::hasChangesChanged);
 }
 
 QnCameraAdvancedSettingsWidget::~QnCameraAdvancedSettingsWidget()
@@ -84,6 +111,8 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page)
                 return ui->manualPage;
             case Page::Web:
                 return ui->webPage;
+            case Page::Unavailable:
+                return ui->unavailablePage;
         }
         return nullptr;
     };
@@ -95,21 +124,22 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page)
 void QnCameraAdvancedSettingsWidget::updatePage()
 {
 
-    auto calculatePage = [this]
+    auto calculatePage =
+        [this]
         {
-            if (!m_camera)
-                return Page::Empty;
+            if (!m_camera || !isStatusValid(m_camera->getStatus()))
+                return Page::Unavailable;
 
-            QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
-            bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
-            if (hasWebPage)
-                return Page::Web;
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
+        if (hasWebPage)
+            return Page::Web;
 
-            if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
-                return Page::Manual;
+        if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
+            return Page::Manual;
 
-            return Page::Empty;
-        };
+        return Page::Empty;
+    };
 
     Page newPage = calculatePage();
     setPage(newPage);
@@ -119,18 +149,28 @@ void QnCameraAdvancedSettingsWidget::updateUrls()
 {
     if (!m_camera)
     {
-        ui->primaryUrlLineEdit->setText(QString());
-        ui->secondaryUrlLineEdit->setText(QString());
-        ui->secondaryUrlLineEdit->setEnabled(true);
+        ui->cameraIdInputField->setText(QString());
+        ui->primaryStreamUrlInputField->setText(QString());
+        ui->secondaryStreamUrlInputField->setText(QString());
+        ui->secondaryStreamUrlInputField->setEnabled(true);
     }
     else
     {
-        ui->primaryUrlLineEdit->setText(m_camera->sourceUrl(Qn::CR_LiveVideo));
-        ui->secondaryUrlLineEdit->setEnabled(m_camera->hasDualStreaming2());
+        ui->cameraIdInputField->setText(m_camera->getId().toSimpleString());
+        ui->primaryStreamUrlInputField->setText(
+            m_camera->sourceUrl(Qn::CR_LiveVideo));
+        ui->secondaryStreamUrlInputField->setEnabled(
+            m_camera->hasDualStreaming2());
         if (m_camera->hasDualStreaming2())
-            ui->secondaryUrlLineEdit->setText(m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
+        {
+            ui->secondaryStreamUrlInputField->setText(
+                m_camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
+        }
         else
-            ui->secondaryUrlLineEdit->setText(tr("Camera has no secondary stream"));
+        {
+            ui->secondaryStreamUrlInputField->setText(
+                tr("Camera has no secondary stream"));
+        }
     }
 }
 
@@ -138,11 +178,12 @@ void QnCameraAdvancedSettingsWidget::reloadData()
 {
     updatePage();
 
-    if (!m_camera || !isStatusValid(m_camera->getStatus()))
-        return;
-
     if (m_page == Page::Web)
     {
+        Q_ASSERT(m_camera);
+        if (!m_camera)
+            return;
+
         // QUrl doesn't work if it isn't constructed from QString and uses credentials.
         // It stays invalid with error code 'AuthorityPresentAndPathIsRelative'
         //  --rvasilenko, Qt 5.2.1

@@ -204,7 +204,7 @@ namespace Qn
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
-        CompletionWatcherRole,                      /**< Role for guard that calls specified handler after action was processed.
+        IsConnectionToCloud,                        /**< Role shows if it is connection through the cloud system.
                                                          Used in QnActions::ConnectAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction. */

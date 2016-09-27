@@ -44,6 +44,7 @@
 #include "model/recording_stats_reply.h"
 #include <api/model/getnonce_reply.h>
 #include "common/common_module.h"
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -129,6 +130,16 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 }
 #endif // 0
 
+void trace(int handle, int obj, const QString& message = QString())
+{
+    RequestObject object = static_cast<RequestObject>(obj);
+    NX_LOG(lit("QnMediaServerConnection %1: %2 %3")
+        .arg(handle)
+        .arg(message)
+        .arg(QnLexical::serialized(object)),
+        cl_logDEBUG1);
+}
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -136,6 +147,7 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 
 void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response, int handle)
 {
+    trace(handle, object(), lit("Received reply"));
     switch (object())
     {
         case StorageStatusObject:
@@ -372,6 +384,34 @@ bool QnMediaServerConnection::isReady() const
     return status != Qn::Offline && status != Qn::NotDefined;
 }
 
+int QnMediaServerConnection::sendAsyncGetRequestLogged(
+    int object,
+    const QnRequestParamList& params,
+    const char* replyTypeName,
+    QObject* target,
+    const char* slot)
+{
+    int handle = sendAsyncGetRequest(object, params, replyTypeName, target, slot);
+    trace(handle, object);
+    return handle;
+}
+
+int QnMediaServerConnection::sendAsyncPostRequestLogged(
+    int object,
+    nx_http::HttpHeaders headers,
+    const QnRequestParamList& params,
+    const QByteArray& data,
+    const char* replyTypeName,
+    QObject* target,
+    const char* slot)
+{
+    int handle = sendAsyncPostRequest(
+        object, std::move(headers), params, data, replyTypeName, target, slot);
+
+    trace(handle, object);
+    return handle;
+}
+
 int QnMediaServerConnection::getThumbnailAsync(
     const QnNetworkResourcePtr& camera, qint64 timeUsec, const int rotation, const QSize& size,
     const QString& imageFormat, QnThumbnailRequestData::RoundMethod method, QObject* target,
@@ -392,7 +432,8 @@ int QnMediaServerConnection::getThumbnailAsync(
         params << QnRequestParam("rotate", rotation);
     params << QnRequestParam("format", imageFormat);
     params << QnRequestParam("method", QnLexical::serialized(method));
-    return sendAsyncGetRequest(ImageObject, params, QN_STRINGIZE_TYPE(QImage), target, slot);
+
+    return sendAsyncGetRequestLogged(ImageObject, params, QN_STRINGIZE_TYPE(QImage), target, slot);
 }
 
 int QnMediaServerConnection::checkCameraList(
@@ -405,7 +446,7 @@ int QnMediaServerConnection::checkCameraList(
     nx_http::HttpHeaders headers;
     headers.emplace(nx_http::header::kContentType, "application/json");
 
-    return sendAsyncPostRequest(checkCamerasObject,
+    return sendAsyncPostRequestLogged(checkCamerasObject,
         std::move(headers), QnRequestParamList(), QJson::serialized(camList),
         QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
 }
@@ -431,7 +472,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(
         qDebug() << "Requesting chunks" << path;
     #endif
 
-    return sendAsyncGetRequest(TimePeriodsObject,
+    return sendAsyncGetRequestLogged(TimePeriodsObject,
         params, QN_STRINGIZE_TYPE(QnTimePeriodList), target, slot);
 }
 
@@ -445,7 +486,7 @@ int QnMediaServerConnection::getParamsAsync(
     for(const QString &param: keys)
         params << QnRequestParam(param, QString());
 
-    return sendAsyncGetRequest(GetParamsObject,
+    return sendAsyncGetRequestLogged(GetParamsObject,
         params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
 }
 
@@ -460,7 +501,7 @@ int QnMediaServerConnection::setParamsAsync(
     for(const QnCameraAdvancedParamValue value: values)
         params << QnRequestParam(value.id, value.value);
 
-    return sendAsyncGetRequest(SetParamsObject,
+    return sendAsyncGetRequestLogged(SetParamsObject,
         params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
 }
 
@@ -476,7 +517,7 @@ int QnMediaServerConnection::searchCameraAsyncStart(
     params << QnRequestParam("password", password);
     params << QnRequestParam("port", QString::number(port));
 
-    return sendAsyncGetRequest(CameraSearchStartObject,
+    return sendAsyncGetRequestLogged(CameraSearchStartObject,
         params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
@@ -485,7 +526,7 @@ int QnMediaServerConnection::searchCameraAsyncStatus(
 {
     QnRequestParamList params;
     params << QnRequestParam("uuid", processUuid.toString());
-    return sendAsyncGetRequest(CameraSearchStatusObject,
+    return sendAsyncGetRequestLogged(CameraSearchStatusObject,
         params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
@@ -494,7 +535,7 @@ int QnMediaServerConnection::searchCameraAsyncStop(
 {
     QnRequestParamList params;
     params << QnRequestParam("uuid", processUuid.toString());
-    return sendAsyncGetRequest(CameraSearchStopObject,
+    return sendAsyncGetRequestLogged(CameraSearchStopObject,
         params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
@@ -510,7 +551,7 @@ int QnMediaServerConnection::addCameraAsync(
     params << QnRequestParam("user", username);
     params << QnRequestParam("password", password);
 
-    return sendAsyncGetRequest(CameraAddObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(CameraAddObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzContinuousMoveAsync(
@@ -526,7 +567,7 @@ int QnMediaServerConnection::ptzContinuousMoveAsync(
     params << QnRequestParam("sequenceId", sequenceId);
     params << QnRequestParam("sequenceNumber", sequenceNumber);
 
-    return sendAsyncGetRequest(PtzContinuousMoveObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzContinuousMoveObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzContinuousFocusAsync(
@@ -537,7 +578,7 @@ int QnMediaServerConnection::ptzContinuousFocusAsync(
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("speed", QnLexical::serialized(speed));
 
-    return sendAsyncGetRequest(PtzContinuousFocusObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzContinuousFocusObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzAbsoluteMoveAsync(
@@ -557,7 +598,7 @@ int QnMediaServerConnection::ptzAbsoluteMoveAsync(
     params << QnRequestParam("sequenceId", sequenceId);
     params << QnRequestParam("sequenceNumber", sequenceNumber);
 
-    return sendAsyncGetRequest(PtzAbsoluteMoveObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzAbsoluteMoveObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzViewportMoveAsync(
@@ -576,7 +617,7 @@ int QnMediaServerConnection::ptzViewportMoveAsync(
     params << QnRequestParam("sequenceId", sequenceId);
     params << QnRequestParam("sequenceNumber", sequenceNumber);
 
-    return sendAsyncGetRequest(PtzViewportMoveObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzViewportMoveObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzGetPositionAsync(
@@ -590,7 +631,7 @@ int QnMediaServerConnection::ptzGetPositionAsync(
         : Qn::GetLogicalPositionPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
 
-    return sendAsyncGetRequest(
+    return sendAsyncGetRequestLogged(
         PtzGetPositionObject, params, QN_STRINGIZE_TYPE(QVector3D), target, slot);
 }
 
@@ -604,7 +645,7 @@ int QnMediaServerConnection::ptzCreatePresetAsync(
     params << QnRequestParam("presetName", preset.name);
     params << QnRequestParam("presetId", preset.id);
 
-    return sendAsyncGetRequest(PtzCreatePresetObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzCreatePresetObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzUpdatePresetAsync(
@@ -617,7 +658,7 @@ int QnMediaServerConnection::ptzUpdatePresetAsync(
     params << QnRequestParam("presetName", preset.name);
     params << QnRequestParam("presetId", preset.id);
 
-    return sendAsyncGetRequest(PtzUpdatePresetObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzUpdatePresetObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzRemovePresetAsync(
@@ -628,7 +669,7 @@ int QnMediaServerConnection::ptzRemovePresetAsync(
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("presetId", presetId);
 
-    return sendAsyncGetRequest(PtzRemovePresetObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzRemovePresetObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzActivatePresetAsync(
@@ -651,7 +692,7 @@ int QnMediaServerConnection::ptzGetPresetsAsync(
     params << QnRequestParam("command", QnLexical::serialized(Qn::GetPresetsPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
 
-    return sendAsyncGetRequest(PtzGetPresetsObject,
+    return sendAsyncGetRequestLogged(PtzGetPresetsObject,
         params, QN_STRINGIZE_TYPE(QnPtzPresetList), target, slot);
 }
 
@@ -665,7 +706,7 @@ int QnMediaServerConnection::ptzCreateTourAsync(
     nx_http::HttpHeaders headers;
     headers.emplace(nx_http::header::kContentType, "application/json");
 
-    return sendAsyncPostRequest(PtzCreateTourObject,
+    return sendAsyncPostRequestLogged(PtzCreateTourObject,
         std::move(headers), params, QJson::serialized(tour), nullptr, target, slot);
 }
 
@@ -677,7 +718,7 @@ int QnMediaServerConnection::ptzRemoveTourAsync(
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("tourId", tourId);
 
-    return sendAsyncGetRequest(PtzRemoveTourObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzRemoveTourObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzActivateTourAsync(
@@ -688,7 +729,7 @@ int QnMediaServerConnection::ptzActivateTourAsync(
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("tourId", tourId);
 
-    return sendAsyncGetRequest(PtzActivateTourObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzActivateTourObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzGetToursAsync(
@@ -698,7 +739,7 @@ int QnMediaServerConnection::ptzGetToursAsync(
     params << QnRequestParam("command", QnLexical::serialized(Qn::GetToursPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
 
-    return sendAsyncGetRequest(PtzGetToursObject,
+    return sendAsyncGetRequestLogged(PtzGetToursObject,
         params, QN_STRINGIZE_TYPE(QnPtzTourList), target, slot);
 }
 
@@ -709,7 +750,7 @@ int QnMediaServerConnection::ptzGetActiveObjectAsync(
     params << QnRequestParam("command", QnLexical::serialized(Qn::GetActiveObjectPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
 
-    return sendAsyncGetRequest(PtzGetActiveObjectObject,
+    return sendAsyncGetRequestLogged(PtzGetActiveObjectObject,
         params, QN_STRINGIZE_TYPE(QnPtzObject), target, slot);
 }
 
@@ -723,7 +764,7 @@ int QnMediaServerConnection::ptzUpdateHomeObjectAsync(
     params << QnRequestParam("objectType", QnLexical::serialized(homePosition.type));
     params << QnRequestParam("objectId", homePosition.id);
 
-    return sendAsyncGetRequest(PtzUpdateHomeObjectObject,
+    return sendAsyncGetRequestLogged(PtzUpdateHomeObjectObject,
         params, QN_STRINGIZE_TYPE(QnPtzObject), target, slot);
 }
 
@@ -734,7 +775,7 @@ int QnMediaServerConnection::ptzGetHomeObjectAsync(
     params << QnRequestParam("command", QnLexical::serialized(Qn::GetHomeObjectPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
 
-    return sendAsyncGetRequest(PtzGetHomeObjectObject,
+    return sendAsyncGetRequestLogged(PtzGetHomeObjectObject,
         params, QN_STRINGIZE_TYPE(QnPtzObject), target, slot);
 }
 
@@ -745,7 +786,7 @@ int QnMediaServerConnection::ptzGetAuxilaryTraitsAsync(
     params << QnRequestParam("command", QnLexical::serialized(Qn::GetAuxilaryTraitsPtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
 
-    return sendAsyncGetRequest(PtzGetAuxilaryTraitsObject,
+    return sendAsyncGetRequestLogged(PtzGetAuxilaryTraitsObject,
         params, QN_STRINGIZE_TYPE(QnPtzAuxilaryTraitList), target, slot);
 }
 
@@ -759,7 +800,7 @@ int QnMediaServerConnection::ptzRunAuxilaryCommandAsync(
     params << QnRequestParam("trait", QnLexical::serialized(trait));
     params << QnRequestParam("data", data);
 
-    return sendAsyncGetRequest(PtzRunAuxilaryCommandObject, params, nullptr, target, slot);
+    return sendAsyncGetRequestLogged(PtzRunAuxilaryCommandObject, params, nullptr, target, slot);
 }
 
 int QnMediaServerConnection::ptzGetDataAsync(
@@ -770,25 +811,25 @@ int QnMediaServerConnection::ptzGetDataAsync(
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("query", QnLexical::serialized(query));
 
-    return sendAsyncGetRequest(PtzGetDataObject,
+    return sendAsyncGetRequestLogged(PtzGetDataObject,
         params, QN_STRINGIZE_TYPE(QnPtzData), target, slot);
 }
 
 int QnMediaServerConnection::getTimeAsync(QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(TimeObject,
+    return sendAsyncGetRequestLogged(TimeObject,
         QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
 }
 
 int QnMediaServerConnection::mergeLdapUsersAsync(QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(MergeLdapUsersObject,
+    return sendAsyncGetRequestLogged(MergeLdapUsersObject,
         QnRequestParamList(), nullptr, target, slot);
 }
 
 int QnMediaServerConnection::getSystemNameAsync(QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(GetSystemNameObject,
+    return sendAsyncGetRequestLogged(GetSystemNameObject,
         QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
 }
 
@@ -800,7 +841,7 @@ int QnMediaServerConnection::testEmailSettingsAsync(
 
     ec2::ApiEmailSettingsData data;
     ec2::fromResourceToApi(settings, data);
-    return sendAsyncPostRequest(TestEmailSettingsObject,
+    return sendAsyncPostRequestLogged(TestEmailSettingsObject,
         std::move(headers), QnRequestParamList(), QJson::serialized(data),
         QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
 }
@@ -810,7 +851,7 @@ int QnMediaServerConnection::testLdapSettingsAsync(
 {
     nx_http::HttpHeaders headers;
     headers.emplace(nx_http::header::kContentType, "application/json");
-    return sendAsyncPostRequest(TestLdapSettingsObject, std::move(headers),
+    return sendAsyncPostRequestLogged(TestLdapSettingsObject, std::move(headers),
         QnRequestParamList(), QJson::serialized(settings),
         QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
 }
@@ -822,7 +863,7 @@ int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
     QnRequestParamList params;
     params << QnRequestParam("cameraId", cameraId);
     params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
-    return sendAsyncGetRequest(CameraDiagnosticsObject,
+    return sendAsyncGetRequestLogged(CameraDiagnosticsObject,
         params, QN_STRINGIZE_TYPE(QnCameraDiagnosticsReply), target, slot);
 }
 
@@ -832,7 +873,7 @@ int QnMediaServerConnection::doRebuildArchiveAsync(
     QnRequestParamList params;
     params << QnRequestParam("action", QnLexical::serialized(action));
     params << QnRequestParam("mainPool", isMainPool);
-    return sendAsyncGetRequest(RebuildArchiveObject,
+    return sendAsyncGetRequestLogged(RebuildArchiveObject,
         params, QN_STRINGIZE_TYPE(QnStorageScanData), target, slot);
 }
 
@@ -841,7 +882,7 @@ int QnMediaServerConnection::backupControlActionAsync(
 {
     QnRequestParamList params;
     params << QnRequestParam("action", QnLexical::serialized(action));
-    return sendAsyncGetRequest(BackupControlObject,
+    return sendAsyncGetRequestLogged(BackupControlObject,
         params, QN_STRINGIZE_TYPE(QnBackupStatusData), target, slot);
 }
 
@@ -851,7 +892,7 @@ int QnMediaServerConnection::getStorageSpaceAsync(
     QnRequestParamList params;
     if (fastRequest)
         params << QnRequestParam("fast", QnLexical::serialized(true));
-    return sendAsyncGetRequest(StorageSpaceObject,
+    return sendAsyncGetRequestLogged(StorageSpaceObject,
         params, QN_STRINGIZE_TYPE(QnStorageSpaceReply), target, slot);
 }
 
@@ -860,13 +901,13 @@ int QnMediaServerConnection::getStorageStatusAsync(
 {
     QnRequestParamList params;
     params << QnRequestParam("path", storageUrl);
-    return sendAsyncGetRequest(StorageStatusObject,
+    return sendAsyncGetRequestLogged(StorageStatusObject,
         params, QN_STRINGIZE_TYPE(QnStorageStatusReply), target, slot);
 }
 
 int QnMediaServerConnection::getStatisticsAsync(QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(StatisticsObject,
+    return sendAsyncGetRequestLogged(StatisticsObject,
         QnRequestParamList(), QN_STRINGIZE_TYPE(QnStatisticsReply), target, slot);
 }
 
@@ -891,7 +932,7 @@ int QnMediaServerConnection::getEventLogAsync(
     if (actionType != QnBusiness::UndefinedAction)
         params << QnRequestParam("action", (int) actionType);
 
-    return sendAsyncGetRequest(EventLogObject,
+    return sendAsyncGetRequestLogged(EventLogObject,
         params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);
 }
 
@@ -902,7 +943,7 @@ int QnMediaServerConnection::installUpdate(
     params << QnRequestParam("updateId", updateId);
     params << QnRequestParam("delayed", delayed);
 
-    return sendAsyncGetRequest(InstallUpdateObject,
+    return sendAsyncGetRequestLogged(InstallUpdateObject,
         params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
@@ -917,13 +958,13 @@ int QnMediaServerConnection::uploadUpdateChunk(
     nx_http::HttpHeaders headers;
     headers.emplace(nx_http::header::kContentType, "text/xml");
 
-    return sendAsyncPostRequest(InstallUpdateObject,
+    return sendAsyncPostRequestLogged(InstallUpdateObject,
         std::move(headers), params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
 int QnMediaServerConnection::restart(QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(Restart, QnRequestParamList(), nullptr, target, slot);
+    return sendAsyncGetRequestLogged(Restart, QnRequestParamList(), nullptr, target, slot);
 }
 
 int QnMediaServerConnection::configureAsync(
@@ -940,7 +981,7 @@ int QnMediaServerConnection::configureAsync(
     params << QnRequestParam("cryptSha512Hash", QString::fromLatin1(cryptSha512Hash));
     params << QnRequestParam("port", port);
 
-    return sendAsyncGetRequest(ConfigureObject,
+    return sendAsyncGetRequestLogged(ConfigureObject,
         params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
 }
 
@@ -951,7 +992,7 @@ int QnMediaServerConnection::pingSystemAsync(
     params << QnRequestParam("url", url.toString());
     params << QnRequestParam("getKey", getKey);
 
-    return sendAsyncGetRequest(PingSystemObject,
+    return sendAsyncGetRequestLogged(PingSystemObject,
         params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }
 
@@ -969,7 +1010,7 @@ int QnMediaServerConnection::getRecordingStatisticsAsync(
 {
     QnRequestParamList params;
     params << QnRequestParam("bitrateAnalizePeriodMs", bitrateAnalizePeriodMs);
-    return sendAsyncGetRequest(RecordingStatsObject,
+    return sendAsyncGetRequestLogged(RecordingStatsObject,
         params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }
 
@@ -979,7 +1020,7 @@ int QnMediaServerConnection::getAuditLogAsync(
     QnRequestParamList params;
     params << QnRequestParam("from", startTimeMs * 1000ll);
     params << QnRequestParam("to", endTimeMs * 1000ll);
-    params << QnRequestParam("format", "ubjson");
+    params << QnRequestParam("Loggedformat", "ubjson");
     return sendAsyncGetRequest(AuditLogObject,
         params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
@@ -997,7 +1038,7 @@ int QnMediaServerConnection::mergeSystemAsync(
     params << QnRequestParam("ignoreIncompatible",
         ignoreIncompatible ? lit("true") : lit("false"));
 
-    return sendAsyncGetRequest(MergeSystemsObject,
+    return sendAsyncGetRequestLogged(MergeSystemsObject,
         params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
 }
 
@@ -1005,14 +1046,14 @@ int QnMediaServerConnection::modulesInformation(QObject* target, const char* slo
 {
     QnRequestParamList params;
     params << QnRequestParam("allModules", lit("true"));
-    return sendAsyncGetRequest(ModulesInformationObject,
+    return sendAsyncGetRequestLogged(ModulesInformationObject,
         params, QN_STRINGIZE_TYPE(QList<QnModuleInformation>), target, slot);
 }
 
 int QnMediaServerConnection::cameraHistory(
     const QnChunksRequestData& request, QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(ec2CameraHistoryObject,
+    return sendAsyncGetRequestLogged(ec2CameraHistoryObject,
         request.toParams(), QN_STRINGIZE_TYPE(ec2::ApiCameraHistoryDataList) ,target, slot);
 }
 
@@ -1021,7 +1062,7 @@ int QnMediaServerConnection::recordedTimePeriods(
 {
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
-    return sendAsyncGetRequest(ec2RecordedTimePeriodsObject,
+    return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
 
@@ -1029,33 +1070,33 @@ int QnMediaServerConnection::addBookmarkAsync(
     const QnCameraBookmark& bookmark, QObject* target, const char* slot)
 {
     QnUpdateBookmarkRequestData request(bookmark);
-    return sendAsyncGetRequest(ec2BookmarkAddObject, request.toParams(), nullptr ,target, slot);
+    return sendAsyncGetRequestLogged(ec2BookmarkAddObject, request.toParams(), nullptr ,target, slot);
 }
 
 int QnMediaServerConnection::updateBookmarkAsync(
     const QnCameraBookmark& bookmark, QObject* target, const char* slot)
 {
     QnUpdateBookmarkRequestData request(bookmark);
-    return sendAsyncGetRequest(ec2BookmarkUpdateObject, request.toParams(), nullptr ,target, slot);
+    return sendAsyncGetRequestLogged(ec2BookmarkUpdateObject, request.toParams(), nullptr ,target, slot);
 }
 
 int QnMediaServerConnection::deleteBookmarkAsync(
     const QnUuid& bookmarkId, QObject* target, const char* slot)
 {
     QnDeleteBookmarkRequestData request(bookmarkId);
-    return sendAsyncGetRequest(ec2BookmarkDeleteObject, request.toParams(), nullptr ,target, slot);
+    return sendAsyncGetRequestLogged(ec2BookmarkDeleteObject, request.toParams(), nullptr ,target, slot);
 }
 
 int QnMediaServerConnection::getBookmarksAsync(
     const QnGetBookmarksRequestData& request, QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(ec2BookmarksObject,
+    return sendAsyncGetRequestLogged(ec2BookmarksObject,
         request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
 }
 
 int QnMediaServerConnection::getBookmarkTagsAsync(
     const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot)
 {
-    return sendAsyncGetRequest(ec2BookmarkTagsObject,
+    return sendAsyncGetRequestLogged(ec2BookmarkTagsObject,
         request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkTagList), target, slot);
 }

@@ -255,15 +255,17 @@ void QnTransactionMessageBus::start()
 
 void QnTransactionMessageBus::stop()
 {
-    NX_ASSERT(m_thread->isRunning());
     dropConnections();
 
-    /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
-    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(m_thread, 7);
-    waitingForObjectsToBeFreed.join();
+    if (m_thread->isRunning())
+    {
+        /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
+        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(m_thread, 7);
+        waitingForObjectsToBeFreed.join();
 
-    m_thread->exit();
-    m_thread->wait();
+        m_thread->exit();
+        m_thread->wait();
+    }
 
     m_aliveSendTimer.invalidate();
 }
@@ -1208,7 +1210,7 @@ QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModul
 {
     QnTransaction<ApiDiscoveredServerDataList> transaction(ApiCommand::discoveredServersList);
 
-    QnModuleFinder *moduleFinder = QnModuleFinder::instance();
+    QnModuleFinder *moduleFinder = qnModuleFinder;
     for (const QnModuleInformation &moduleInformation : moduleFinder->foundModules())
     {
         ApiDiscoveredServerData serverData(moduleInformation);

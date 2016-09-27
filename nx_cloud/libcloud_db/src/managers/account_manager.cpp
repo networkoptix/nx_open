@@ -696,7 +696,13 @@ nx::db::DBResult AccountManager::updateAccountInDB(
         return db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    if (!accountData.passwordHa1)
+        return db::DBResult::ok;
+
+    // Removing account's temporary passwords.
+    return m_tempPasswordManager->removeTemporaryPasswordsFromDbByAccountEmail(
+        connection,
+        accountData.email);
 }
 
 void AccountManager::accountUpdated(
@@ -721,6 +727,14 @@ void AccountManager::accountUpdated(
                 if (activateAccountIfNotActive)
                     account.statusCode = api::AccountStatus::activated;
             });
+
+        if (accountData.passwordHa1)
+        {
+            // Removing account's temporary passwords.
+            m_tempPasswordManager->
+                removeTemporaryPasswordsFromCacheByAccountEmail(
+                    accountData.email);
+        }
     }
 
     completionHandler(fromDbResultCode(resultCode));

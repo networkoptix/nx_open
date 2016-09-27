@@ -4,14 +4,12 @@
 
 class QnSearchBookmarksDialogPrivate;
 
-class QnSearchBookmarksDialog: public QnSessionAwareButtonBoxDialog
+class QnSearchBookmarksDialog: public QnSessionAwareDialog
 {
-    typedef QnSessionAwareButtonBoxDialog base_type;
+    using base_type = QnSessionAwareDialog;
 public:
-    QnSearchBookmarksDialog(const QString &filterText
-        , qint64 utcStartTimeMs
-        , qint64 utcFinishTimeMs
-        , QWidget *parent = nullptr);
+    QnSearchBookmarksDialog(const QString& filterText, qint64 utcStartTimeMs,
+        qint64 utcFinishTimeMs, QWidget* parent = nullptr);
 
     virtual ~QnSearchBookmarksDialog();
 

@@ -559,9 +559,9 @@
 
     "QnGraphicsMessageBox": {
         "colors": {
-            "frame": "#007ed4ff",
-            "window": "#004b80cc",
-            "text": "#ccccccff"
+            "frame": "brand_d2",
+            "window": "brand_d2.setAlpha(204)",
+            "text": "brand_contrast"
         }
     },
 

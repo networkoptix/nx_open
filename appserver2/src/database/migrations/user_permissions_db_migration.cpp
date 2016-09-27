@@ -40,42 +40,6 @@ namespace ec2
         Q_DECLARE_FLAGS(GlobalPermissionsV25, GlobalPermissionV25)
         Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissionsV25)
 
-        QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(GlobalPermissionV25,
-            (GlobalPermissionV25::V25OwnerPermission, "v25_owner")
-            (GlobalPermissionV25::V25AdminPermission, "v25_admin")
-            (GlobalPermissionV25::V25EditLayoutsPermission, "v25_editLayouts")
-            (GlobalPermissionV25::V25EditServersPermissions, "v25_editServers")
-            (GlobalPermissionV25::V25ViewLivePermission, "v25_viewLive")
-            (GlobalPermissionV25::V25ViewArchivePermission, "v25_viewArchive")
-            (GlobalPermissionV25::V25ExportPermission, "v25_export")
-            (GlobalPermissionV25::V25EditCamerasPermission, "v25_editCameras")
-            (GlobalPermissionV25::V25PtzControlPermission, "v25_ptzControl")
-            (GlobalPermissionV25::V25EditVideoWallPermission, "v25_editVideowall")
-            (GlobalPermissionV25::V20EditUsersPermission, "v20_editUsers")
-            (GlobalPermissionV25::V20EditCamerasPermission, "v20_editCameras")
-            (GlobalPermissionV25::V20ViewExportArchivePermission, "v20_viewArchive")
-            (GlobalPermissionV25::V20PanicPermission, "v20_panic")
-            );
-
-        QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(GlobalPermissionsV25,
-            (GlobalPermissionV25::V25OwnerPermission, "v25_owner")
-            (GlobalPermissionV25::V25AdminPermission, "v25_admin")
-            (GlobalPermissionV25::V25EditLayoutsPermission, "v25_editLayouts")
-            (GlobalPermissionV25::V25EditServersPermissions, "v25_editServers")
-            (GlobalPermissionV25::V25ViewLivePermission, "v25_viewLive")
-            (GlobalPermissionV25::V25ViewArchivePermission, "v25_viewArchive")
-            (GlobalPermissionV25::V25ExportPermission, "v25_export")
-            (GlobalPermissionV25::V25EditCamerasPermission, "v25_editCameras")
-            (GlobalPermissionV25::V25PtzControlPermission, "v25_ptzControl")
-            (GlobalPermissionV25::V25EditVideoWallPermission, "v25_editVideowall")
-            (GlobalPermissionV25::V20EditUsersPermission, "v20_editUsers")
-            (GlobalPermissionV25::V20EditCamerasPermission, "v20_editCameras")
-            (GlobalPermissionV25::V20ViewExportArchivePermission, "v20_viewArchive")
-            (GlobalPermissionV25::V20PanicPermission, "v20_panic")
-        );
-
-        QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((GlobalPermissionV25)(GlobalPermissionsV25), (lexical))
-
         struct UserPermissionsRemapData
         {
             UserPermissionsRemapData() : id(0), permissions(0) {}
@@ -171,5 +135,44 @@ namespace ec2
             return true;
         }
 
-    }
-}
+    } // namespace db
+
+} // namespace ec2
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ec2::db, GlobalPermissionV25,
+    (ec2::db::GlobalPermissionV25::V25OwnerPermission, "v25_owner")
+    (ec2::db::GlobalPermissionV25::V25AdminPermission, "v25_admin")
+    (ec2::db::GlobalPermissionV25::V25EditLayoutsPermission, "v25_editLayouts")
+    (ec2::db::GlobalPermissionV25::V25EditServersPermissions, "v25_editServers")
+    (ec2::db::GlobalPermissionV25::V25ViewLivePermission, "v25_viewLive")
+    (ec2::db::GlobalPermissionV25::V25ViewArchivePermission, "v25_viewArchive")
+    (ec2::db::GlobalPermissionV25::V25ExportPermission, "v25_export")
+    (ec2::db::GlobalPermissionV25::V25EditCamerasPermission, "v25_editCameras")
+    (ec2::db::GlobalPermissionV25::V25PtzControlPermission, "v25_ptzControl")
+    (ec2::db::GlobalPermissionV25::V25EditVideoWallPermission, "v25_editVideowall")
+    (ec2::db::GlobalPermissionV25::V20EditUsersPermission, "v20_editUsers")
+    (ec2::db::GlobalPermissionV25::V20EditCamerasPermission, "v20_editCameras")
+    (ec2::db::GlobalPermissionV25::V20ViewExportArchivePermission, "v20_viewArchive")
+    (ec2::db::GlobalPermissionV25::V20PanicPermission, "v20_panic")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ec2::db, GlobalPermissionsV25,
+    (ec2::db::GlobalPermissionV25::V25OwnerPermission, "v25_owner")
+    (ec2::db::GlobalPermissionV25::V25AdminPermission, "v25_admin")
+    (ec2::db::GlobalPermissionV25::V25EditLayoutsPermission, "v25_editLayouts")
+    (ec2::db::GlobalPermissionV25::V25EditServersPermissions, "v25_editServers")
+    (ec2::db::GlobalPermissionV25::V25ViewLivePermission, "v25_viewLive")
+    (ec2::db::GlobalPermissionV25::V25ViewArchivePermission, "v25_viewArchive")
+    (ec2::db::GlobalPermissionV25::V25ExportPermission, "v25_export")
+    (ec2::db::GlobalPermissionV25::V25EditCamerasPermission, "v25_editCameras")
+    (ec2::db::GlobalPermissionV25::V25PtzControlPermission, "v25_ptzControl")
+    (ec2::db::GlobalPermissionV25::V25EditVideoWallPermission, "v25_editVideowall")
+    (ec2::db::GlobalPermissionV25::V20EditUsersPermission, "v20_editUsers")
+    (ec2::db::GlobalPermissionV25::V20EditCamerasPermission, "v20_editCameras")
+    (ec2::db::GlobalPermissionV25::V20ViewExportArchivePermission, "v20_viewArchive")
+    (ec2::db::GlobalPermissionV25::V20PanicPermission, "v20_panic")
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (ec2::db::GlobalPermissionV25)(ec2::db::GlobalPermissionsV25),
+    (lexical))

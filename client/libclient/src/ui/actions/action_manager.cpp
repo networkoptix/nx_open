@@ -558,7 +558,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Alarm/Event Rules..."));
+        text(tr("Event Rules..."));
 
     factory(QnActions::OpenFailoverPriorityAction).
         mode(QnActionTypes::DesktopMode).
@@ -969,7 +969,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
-        text(tr("Login to Cloud..."));
+        text(tr("Login to %1...").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
@@ -977,7 +977,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
-        text(tr("Go to %1...").arg(QnAppInfo::cloudName()));
+        text(tr("Open %1 Portal...", "Open Nx Cloud Portal").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudManagementUrl).
         flags(Qn::NoTarget).
@@ -995,7 +995,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        text(tr("Alarm/Event Rules...")).
+        text(tr("Event Rules...")).
         icon(qnSkin->icon("events/settings.png")).
         shortcut(lit("Ctrl+E")).
         autoRepeat(false);

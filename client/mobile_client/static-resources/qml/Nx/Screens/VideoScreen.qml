@@ -172,23 +172,10 @@ PageBase
     Loader
     {
         id: dummyLoader
-
+        anchors.fill: parent
         visible: active
         sourceComponent: dummyComponent
-        active:
-        {
-            d.cameraWarningVisible
-        }
-
-        y:
-        {
-            var minY = (parent.height - height) / 6
-            var maxY = navigationLoader.y - height - 56
-            var y = (parent.height - height) / 2
-
-            return Math.max(minY, Math.min(maxY, y))
-        }
-        anchors.horizontalCenter: parent.horizontalCenter
+        active: d.cameraWarningVisible
     }
 
     Component

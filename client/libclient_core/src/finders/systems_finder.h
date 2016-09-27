@@ -21,7 +21,7 @@ public:
 
     // TODO: #ynikitenkov Think about finder types.
     void addSystemsFinder(QnAbstractSystemsFinder *finder,
-        bool isCloudFinder);
+        int priority);
 
 public: //overrides
     SystemDescriptionList systems() const override;
@@ -29,9 +29,11 @@ public: //overrides
     QnSystemDescriptionPtr getSystem(const QString& id) const override;
 
 private:
-    void onSystemDiscovered(const QnSystemDescriptionPtr& systemDescription);
+    void onSystemDiscovered(const QnSystemDescriptionPtr& system,
+        int priority);
 
-    void onSystemLost(const QString& systemId, bool isCloudSystem);
+    void onSystemLost(const QString& systemId,
+        int priority);
 
 private:
     typedef QMap<QnAbstractSystemsFinder *, QnDisconnectHelperPtr> SystemsFinderList;

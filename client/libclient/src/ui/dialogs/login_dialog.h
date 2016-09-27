@@ -74,11 +74,12 @@ protected:
 
 private:
     QUrl currentUrl() const;
-    QString currentName() const;
 
-    QString gatherSystemName(const QUrl& url);
+    QnLocalConnectionData gatherSystemConnectionData(const QUrl& url,
+        const QString& name,
+        bool savePassword);
 
-    QStandardItem* newConnectionItem(const QnUserRecentConnectionData& connection);
+    QStandardItem* newConnectionItem(const QnLocalConnectionData& connection);
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;

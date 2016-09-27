@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import NetworkOptix.Qml 1.0;
+import com.networkoptix.qml 1.0;
 
 import "."
 
@@ -12,6 +13,11 @@ Rectangle
     height: context.pageSize.height;
 
     color: Style.colors.window;
+    
+    QnAppInfo 
+    {
+        id: appInfo
+    }
 
     Item
     {
@@ -40,12 +46,12 @@ Rectangle
 
         NxSearchEdit
         {
-            visible: (pageSwitcher.pagesCount > 1);
-            visualParent: screenHolder;
+            visible: grid.totalItemsCount > grid.itemsPerPage
+            visualParent: screenHolder
 
-            anchors.bottom: gridHolder.top;
-            anchors.bottomMargin: 8;
-            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.bottom: gridHolder.top
+            anchors.bottomMargin: 8
+            anchors.horizontalCenter: parent.horizontalCenter
 
             onQueryChanged: { grid.model.setFilterWildcard(query); }
         }
@@ -85,9 +91,11 @@ Rectangle
                         return 4;
                 }
 
-                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount);
-                readonly property int rowsCount: (grid.count < 3 ? 1 : 2);
-                readonly property int pagesCount: Math.ceil(grid.count / (colsCount * rowsCount));
+                readonly property int colsCount: Math.min(maxColsCount, desiredColsCount)
+                readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
+                readonly property int itemsPerPage: colsCount * rowsCount
+                readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
+                readonly property int totalItemsCount: model.totalCount
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -141,22 +149,12 @@ Rectangle
                     deactivateFunc: function(item) { item.toggle(); };
                 }
 
-
-                Connections
-                {
-                    target: context;
-                    onIsVisibleChanged:
-                    {
-                        if (!context.isVisible)
-                            grid.watcher.resetCurrentItem();
-                    }
-                }
-
                 model: QnQmlSortFilterProxyModel
                 {
                     model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
+                    readonly property int totalCount: model.rowCount()
                 }
 
                 delegate: Item
@@ -254,7 +252,7 @@ Rectangle
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no Internet access. Some cloud features could be unavailable.");
+            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(appInfo.cloudName());
         }
     }
 
@@ -313,5 +311,15 @@ Rectangle
         text: context.softwareVersion;
         standardColor: Style.darkerColor(Style.colors.windowText, 1);
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
+    }
+
+    Connections
+    {
+        target: context;
+        onIsVisibleChanged:
+        {
+            grid.watcher.resetCurrentItem();
+            pageSwitcher.setPage(0);
+        }
     }
 }

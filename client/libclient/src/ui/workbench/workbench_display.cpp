@@ -625,7 +625,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget)
     animator->setRelativeMovementSpeed(8.0);
     animator->setScalingSpeed(128.0);
     animator->setRotationSpeed(270.0);
-    animator->setEasingCurve(QEasingCurve::InOutCubic);
+    animator->setEasingCurve(QEasingCurve::InOutQuad);
     animator->setTimer(m_instrumentManager->animationTimer());
     animator->setTimeLimit(kWidgetAnimationDurationMs);
     widget->setData(ITEM_ANIMATOR_KEY, QVariant::fromValue<WidgetAnimator *>(animator));

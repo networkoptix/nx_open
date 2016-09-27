@@ -29,8 +29,8 @@ public:
     enum Columns
     {
         UrlColumn,
-        StoragePoolColumn,
         TypeColumn,
+        StoragePoolColumn,
         TotalSpaceColumn,
         RemoveActionColumn,
         CheckBoxColumn,

@@ -8,6 +8,9 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#include <utils/common/app_info.h>
+
 #include <nx/utils/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject>

@@ -248,7 +248,7 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     case kStartTime:
         return context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(bookmark.startTimeMs);
     case kLength:
-        enum { kNoApproximation = 0};   /// Don't use approximation, because bookmark could have short lifetime
+        enum { kNoApproximation = -1};   /// Don't use approximation, because bookmark could have short lifetime
         return QTimeSpan(bookmark.durationMs).normalized().toApproximateString(kNoApproximation);
     case kTags:
         return QnCameraBookmark::tagsToString(bookmark.tags);

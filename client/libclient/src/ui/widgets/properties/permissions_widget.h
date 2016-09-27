@@ -31,6 +31,10 @@ public:
 
 private:
     void updateDependentPermissions();
+    void addCheckBox(
+        Qn::GlobalPermission permission,
+        const QString& text,
+        const QString& description = QString());
 
 private:
     QScopedPointer<Ui::PermissionsWidget> ui;

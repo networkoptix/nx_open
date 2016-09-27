@@ -11,6 +11,7 @@
 #include <QtCore/QString>
 #include <QtSql/QSqlDatabase>
 
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace db {
@@ -26,10 +27,19 @@ enum class DBResult
 };
 
 
+enum class RdbmsDriverType
+{
+    unknown,
+    sqlite,
+    mysql,
+    postgresql,
+    oracle
+};
+
 class ConnectionOptions
 {
 public:
-    QString driverName;
+    RdbmsDriverType driverType;
     QString hostName;
     int port;
     QString dbName;
@@ -40,8 +50,8 @@ public:
     /** connection is closed if not used for this interval */
     std::chrono::seconds inactivityTimeout;
 
-    ConnectionOptions()
-    :
+    ConnectionOptions():
+        driverType(RdbmsDriverType::sqlite),
         port(0),
         maxConnectionCount(1),
         inactivityTimeout(std::chrono::minutes(10))
@@ -49,7 +59,11 @@ public:
     }
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::RdbmsDriverType)
+
 }   //db
 }   //nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::db::RdbmsDriverType), (lexical))
 
 #endif  //NX_CLOUD_DB_DB_TYPES_H

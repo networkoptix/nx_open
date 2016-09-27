@@ -23,6 +23,20 @@ public:
     //!Calls \a start
     CdbFunctionalTest();
     ~CdbFunctionalTest();
+
+    /**
+     * Convenience functions.
+     * Most methods do assert on failure.
+     */
+    
+    AccountWithPassword addActivatedAccount2();
+    api::SystemData addRandomSystemToAccount(
+        const AccountWithPassword& account);
+    void shareSystem2(
+        const AccountWithPassword& from,
+        const api::SystemData& what,
+        const AccountWithPassword& to,
+        api::SystemAccessRole targetRole);
 };
 
 }   //cdb

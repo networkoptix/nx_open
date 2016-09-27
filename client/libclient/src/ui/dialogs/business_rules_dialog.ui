@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Alarm/Event Rules</string>
+   <string>Event Rules</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
    <property name="spacing">
@@ -98,11 +98,6 @@
          <property name="text">
           <string>Event log</string>
          </property>
-         <property name="icon">
-          <iconset>
-           <normalon>:/skin/tree/layout.png</normalon>
-          </iconset>
-         </property>
         </widget>
        </item>
        <item>
@@ -112,7 +107,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normalon>:/skin/titlebar/dropdown_hovered.png</normalon>
+           <normalon></normalon>
           </iconset>
          </property>
         </widget>
@@ -190,8 +185,5 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../x64/build/client.qrc"/>
- </resources>
  <connections/>
 </ui>

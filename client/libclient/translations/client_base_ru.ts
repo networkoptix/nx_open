@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -2038,6 +2038,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>QnCameraAdvancedSettingsWidget</name>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Загрузка...</translation>
+    </message>
+</context>
+<context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
@@ -2047,8 +2054,8 @@ to view more bookmarks</source>
         <source>%1 doesn&apos;t support two-way audio</source>
         <translation>
             <numerusform>%1 не поддерживает двусторонний звук</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 не поддерживают двусторонний звук</numerusform>
+            <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         </translation>
     </message>
 </context>
@@ -2959,17 +2966,17 @@ to view more bookmarks</source>
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation>
-            <numerusform>%1 из (%n раза)</numerusform>
             <numerusform>%1 из (%n раз)</numerusform>
+            <numerusform>%1 из (%n раза)</numerusform>
             <numerusform>%1 из (%n раз)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
+        <source>and %n user(s) more...</source>
         <translation>
-            <numerusform>и %1 пользовалел(и)...</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>и ещё %n пользователь...</numerusform>
+            <numerusform>и ещё %n пользователя...</numerusform>
+            <numerusform>и ещё %n пользователей...</numerusform>
         </translation>
     </message>
 </context>
@@ -3021,45 +3028,30 @@ to view more bookmarks</source>
         <source>days</source>
         <translation>д</translation>
     </message>
-    <message numerus="yes">
-        <source>%nms</source>
-        <translation>
-            <numerusform>%nмс</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
+        <translation>мс</translation>
     </message>
-    <message numerus="yes">
-        <source>%ns</source>
-        <translation>
-            <numerusform>%nс</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds in rapid review dialog</comment>
+        <translation>с</translation>
     </message>
-    <message numerus="yes">
-        <source>%nm</source>
-        <translation>
-            <numerusform>%nм</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes in rapid review dialog</comment>
+        <translation>м</translation>
     </message>
-    <message numerus="yes">
-        <source>%nh</source>
-        <translation>
-            <numerusform>%nч</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours in rapid review dialog</comment>
+        <translation>ч</translation>
     </message>
-    <message numerus="yes">
-        <source>%nd</source>
-        <translation>
-            <numerusform>%nд</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days in rapid review dialog</comment>
+        <translation>д</translation>
     </message>
 </context>
 <context>

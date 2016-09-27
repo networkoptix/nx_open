@@ -52,6 +52,9 @@ private:
     nx::utils::promise<DBResult> m_dbUpdatePromise;
 
     DBResult updateDbInternal(QSqlDatabase* const dbConnection);
+    bool execSQLScript(
+        QByteArray script,
+        QSqlDatabase* const dbConnection);
 };
 
 }   //db

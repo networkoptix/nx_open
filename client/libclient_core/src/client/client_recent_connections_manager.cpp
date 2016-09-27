@@ -2,7 +2,7 @@
 
 #include <client_core/client_core_settings.h>
 
-#include <ui/models/recent_user_connections_model.h>
+#include <ui/models/recent_local_connections_model.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -16,7 +16,7 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager():
 
     const auto coreSettingsHandler = [this](int id)
         {
-            if (id == QnClientCoreSettings::RecentUserConnections)
+            if (id == QnClientCoreSettings::RecentLocalConnections)
                 updateModelsData();
         };
 
@@ -28,12 +28,12 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager():
 QnClientRecentConnectionsManager::~QnClientRecentConnectionsManager()
 {}
 
-void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* model)
+void QnClientRecentConnectionsManager::addModel(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
 
-    connect(model, &QnRecentUserConnectionsModel::systemNameChanged, this,
+    connect(model, &QnRecentLocalConnectionsModel::systemNameChanged, this,
         [this, model]()
         {
             updateModelBinding(model);
@@ -45,7 +45,7 @@ void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* mo
         updateModelBinding(model);
 }
 
-void QnClientRecentConnectionsManager::removeModel(QnRecentUserConnectionsModel* model)
+void QnClientRecentConnectionsManager::removeModel(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
@@ -58,7 +58,7 @@ void QnClientRecentConnectionsManager::removeModel(QnRecentUserConnectionsModel*
     m_models.removeOne(model);
 }
 
-void QnClientRecentConnectionsManager::updateModelBinding(QnRecentUserConnectionsModel* model)
+void QnClientRecentConnectionsManager::updateModelBinding(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
@@ -79,10 +79,10 @@ void QnClientRecentConnectionsManager::updateModelsData()
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     m_dataCache.clear();
-    const auto lastConnectionsData = qnClientCoreSettings->recentUserConnections();
+    const auto lastConnectionsData = qnClientCoreSettings->recentLocalConnections();
     for (const auto connectionDesc : lastConnectionsData)
     {
-        m_dataCache[connectionDesc.systemName].append(connectionDesc);
+        m_dataCache[connectionDesc.systemId].append(connectionDesc);
     }
     for (const auto model : m_models)
     {

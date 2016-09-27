@@ -14,6 +14,11 @@ Row
 
     signal currentPageChanged(int index, bool byClick);
 
+    function setPage(index)
+    {
+        impl.updateCurrentPage(index, false);
+    }
+
     onPagesCountChanged:
     {
         if (impl.currentPage >= pagesCount)

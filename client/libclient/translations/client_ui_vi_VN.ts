@@ -509,6 +509,11 @@
         <source>This camera has no advanced settings</source>
         <translation>máy ảnh này không có cài đặt nâng cao</translation>
     </message>
+    <message>
+        <location/>
+        <source>Advanced settings are unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraExpertSettingsWidget</name>
@@ -893,32 +898,32 @@
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP Nội dung</translation>
     </message>
     <message>
         <location/>
         <source>HTTP url</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP url</translation>
     </message>
     <message>
         <location/>
         <source>Login to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Đăng nhập vào xác thực (tùy chọn)</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Đăng nhập</translation>
     </message>
     <message>
         <location/>
         <source>Password to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mật khẩu để xác thực (tùy chọn)</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mật khẩu</translation>
     </message>
 </context>
 <context>
@@ -934,27 +939,27 @@
     <message>
         <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
         <source>Export Rapid Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Xuất nhanh Xem lại</translation>
     </message>
     <message>
         <location/>
         <source>Initial Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Thời lượng video ban đầu</translation>
     </message>
     <message>
         <location/>
         <source>Exported Video Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Thời lượng video xuất khẩu</translation>
     </message>
     <message>
         <location/>
         <source>Rapid Review speed</source>
-        <translation type="unfinished"></translation>
+        <translation>tốc độ Xem nhanh</translation>
     </message>
     <message>
         <location/>
         <source>Frames Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>khoảng thời gian khung hình</translation>
     </message>
 </context>
 <context>
@@ -1676,7 +1681,7 @@
     <message>
         <location/>
         <source>Play to user</source>
-        <translation type="unfinished"></translation>
+        <translation>chơi để người sử dụng</translation>
     </message>
 </context>
 <context>
@@ -2458,7 +2463,7 @@
     <message>
         <location/>
         <source>Speak to user</source>
-        <translation type="unfinished"></translation>
+        <translation>Nói chuyện với người sử dụng</translation>
     </message>
 </context>
 <context>

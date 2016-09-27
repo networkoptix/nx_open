@@ -11,7 +11,7 @@
 
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
-#include <client_core/user_recent_connection_data.h>
+#include <client_core/local_connection_data.h>
 
 #include <ui/workbench/workbench_pane_settings.h>
 
@@ -156,6 +156,8 @@ public:
 
         TIMELAPSE_SPEED,
 
+        SHOW_HIDPI_WARNING,
+
         VARIABLE_COUNT
     };
 
@@ -197,7 +199,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateHash,        userWorkbenchStates,    setUserWorkbenchStates,     USER_WORKBENCH_STATES,      QnWorkbenchStateHash())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
-        QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionData,  lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnUserRecentConnectionData())
+        QN_DECLARE_RW_PROPERTY(QnLocalConnectionData,       lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnLocalConnectionData())
         QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/common_en_US.qm"))
@@ -243,6 +245,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
         QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)
+        QN_DECLARE_RW_PROPERTY(bool,                        showHiDpiWarning,       setShowHiDpiWarning,        SHOW_HIDPI_WARNING,         true)
     QN_END_PROPERTY_STORAGE()
 
 private:

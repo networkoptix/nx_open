@@ -119,3 +119,5 @@ private:
     qint64 m_lastSelfConflict;
     int m_selfConflictCount;
 };
+
+#define qnModuleFinder QnModuleFinder::instance()

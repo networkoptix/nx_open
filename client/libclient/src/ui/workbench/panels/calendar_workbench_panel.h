@@ -29,7 +29,7 @@ public:
     HoverFocusProcessor* hidingProcessor;
 public:
     bool isEnabled() const;
-    void setEnabled(bool enabled);
+    void setEnabled(bool enabled, bool animated);
 
     QPointF origin() const;
     void setOrigin(const QPointF& position);

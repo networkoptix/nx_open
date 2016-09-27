@@ -13,7 +13,7 @@ public:
 
     virtual ~QnButtonsOverlay();
 
-    void setSimpleMode(bool isSimpleMode);
+    void setSimpleMode(bool isSimpleMode, bool animate);
 
     QnImageButtonBar *leftButtonsBar();
 

@@ -42,6 +42,7 @@
 #include "nx_ec/managers/abstract_videowall_manager.h"
 
 #include "ec_api_fwd.h"
+#include "transaction_timestamp.h"
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
@@ -573,19 +574,19 @@ class ECConnectionNotificationManager;
         Q_OBJECT
     public:
     signals:
-        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
+        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime);
     };
 
     typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
 
     class AbstractMiscManager {
     public:
-        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime, TargetType *target, HandlerType handler) {
             return changeSystemName(systemName, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        ErrorCode changeSystemNameSync(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) {
+        ErrorCode changeSystemNameSync(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime) {
             return impl::doSyncCall<impl::SimpleHandler>(
                 [=](const impl::SimpleHandlerPtr &handler) {
                     return this->changeSystemName(systemName, sysIdTime, tranLogTime, handler);
@@ -611,7 +612,7 @@ class ECConnectionNotificationManager;
 
 
     protected:
-        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
+        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
         virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) = 0;
     };
@@ -643,8 +644,8 @@ class ECConnectionNotificationManager;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
-        virtual qint64 getTransactionLogTime() const = 0;
-        virtual void setTransactionLogTime(qint64 value) = 0;
+        virtual Timestamp getTransactionLogTime() const = 0;
+        virtual void setTransactionLogTime(Timestamp value) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) = 0;

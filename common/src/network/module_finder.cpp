@@ -371,17 +371,26 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
     m_lastResponse[endpoint] = currentTime;
 
-    if (item.moduleInformation != moduleInformation) {
+    if (item.moduleInformation != moduleInformation)
+    {
         NX_LOGX(lit("Module %1 has been changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+        const auto prevModuleInfo = item.moduleInformation;
+        {
+            const QnMutexLocker lock(&m_itemsMutex);
+            item.moduleInformation = moduleInformation;
+        }
+
         emit moduleChanged(moduleInformation);
 
-        if (item.moduleInformation.port != moduleInformation.port) {
-            QnMutexLocker lk(&m_itemsMutex);
-            updatePrimaryAddress(item, SocketAddress());
-            lk.unlock();
+        if (prevModuleInfo.port != moduleInformation.port)
+        {
+            {
+                QnMutexLocker lk(&m_itemsMutex);
+                updatePrimaryAddress(item, SocketAddress());
+            }
 
             foreach (const SocketAddress &endpoint, item.addresses) {
-                if (endpoint.port == item.moduleInformation.port)
+                if (endpoint.port == prevModuleInfo.port)
                 {
                     NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 due to module information change")
                         .arg(endpoint.toString()), cl_logDEBUG2);
@@ -390,17 +399,14 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             }
         }
 
+
         QnMutexLocker lk(&m_itemsMutex);
-
-        item.moduleInformation = moduleInformation;
-
         if (item.primaryAddress.port == 0 && !ignoredAddress)
             updatePrimaryAddress(item, endpoint);
 
         SocketAddress addressToSend = item.primaryAddress;
         item.status = calculateModuleStatus(item.moduleInformation, item.status);
         Qn::ResourceStatus statusToSend = item.status;
-
         lk.unlock();
 
         if (item.primaryAddress.port > 0)

@@ -256,7 +256,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket)
         return true;
 
     auto connectionResult = QnConnectionValidator::validateConnection(*response);
-    if (connectionResult == Qn::ConnectionResult::IncompatibleInternal)
+    if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
         NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 or cloud host %4 on local address %5")
             .arg(response->type)

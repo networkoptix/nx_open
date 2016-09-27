@@ -18,8 +18,8 @@ public:
         const QString &systemName);
 
     static PointerType createCloudSystem(
-        const QString &systemId, 
-        const QString &systemName, 
+        const QString &systemId,
+        const QString &systemName,
         const QString &ownerAccountEmail,
         const QString &ownerFullName);
 

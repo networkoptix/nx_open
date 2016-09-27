@@ -816,17 +816,17 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LiveViewer,
     };
 
-    enum class ConnectionResult
+    enum ConnectionResult
     {
-        Success,                    /*< Connection available. */
-        NetworkError,               /*< Connection could not be established. */
-        Unauthorized,               /*< Invalid login/password. */
-        LdapTemporaryUnauthorized,  /*< LDAP server is not accessible. */
-        CloudTemporaryUnauthorized, /*< CLOUD server is not accessible. */
-        IncompatibleInternal,       /*< Server has incompatible customization or cloud host. */
-        IncompatibleCloudHost,      /*< Server has different cloud host. */
-        IncompatibleVersion,        /*< Server version is too low. */
-        IncompatibleProtocol        /*< Ec2 protocol versions differs.*/
+        SuccessConnectionResult,                    /*< Connection available. */
+        NetworkErrorConnectionResult,               /*< Connection could not be established. */
+        UnauthorizedConnectionResult,               /*< Invalid login/password. */
+        LdapTemporaryUnauthorizedConnectionResult,  /*< LDAP server is not accessible. */
+        CloudTemporaryUnauthorizedConnectionResult, /*< CLOUD server is not accessible. */
+        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
+        IncompatibleVersionConnectionResult,        /*< Server version is too low. */
+        IncompatibleProtocolConnectionResult        /*< Ec2 protocol versions differs.*/
     };
 
     /**

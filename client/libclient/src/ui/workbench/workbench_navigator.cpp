@@ -86,7 +86,7 @@ namespace {
 
 const int kCameraHistoryRetryTimeoutMs = 5 * 1000;
 
-const int kDiscardCacheIntervalMs = 10 * 60 * 1000;
+const int kDiscardCacheIntervalMs = 60 * 60 * 1000;
 
 /** Size of timeline window near live when there is no recorded periods on cameras. */
 const int kTimelineWindowNearLive = 10 * 1000;
@@ -724,10 +724,10 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
 
     connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource, false))
-	{
+    if(auto loader = m_cameraDataManager->loader(syncedResource))
         loader->setEnabled(true);
-    }
+    else
+        NX_EXPECT(false);
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())

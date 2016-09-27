@@ -380,8 +380,8 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 
     bool wasLoggedIn = !context()->user().isNull();
 
-    QScopedPointer<QnCustomFileDialog> dialog(
-        new QnSessionAwareDialog<QnCustomFileDialog> (
+    QScopedPointer<QnSessionAwareFileDialog> dialog(
+        new QnSessionAwareFileDialog (
         mainWindow(),
         tr("Save Screenshot As..."),
         suggestion,
@@ -524,7 +524,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
     if (!m_screenshotProgressDialog) {
-        m_screenshotProgressDialog = new QnSessionAwareDialog<QnProgressDialog>(mainWindow());
+        m_screenshotProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindow());
         m_screenshotProgressDialog->setWindowTitle(tr("Saving Screenshot..."));
         m_screenshotProgressDialog->setInfiniteProgress();
         // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality
@@ -595,7 +595,13 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
         if (camera)
-            imageProvider = new QnSingleThumbnailLoader(camera, localParameters.utcTimestampMsec, 0);
+        {
+            auto provider = new QnSingleThumbnailLoader(camera, localParameters.utcTimestampMsec, 0);
+            auto params = provider->requestData();
+            params.roundMethod = QnThumbnailRequestData::PreciseMethod;
+            provider->setRequestData(params);
+            imageProvider = provider;
+        }
         else
             imageProvider = getLocalScreenshotProvider(widget, localParameters, true);
     }

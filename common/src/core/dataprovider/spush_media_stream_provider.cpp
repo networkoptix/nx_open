@@ -9,7 +9,10 @@
 
 #include <core/resource/camera_resource.h>
 
+namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
+static const int kErrorDelayTimeoutMs = 100;
+} // namespace
 
 CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
@@ -77,7 +80,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 
     if (!isStreamOpened())
     {
-        QnSleep::msleep(100); // to avoid large CPU usage
+        QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
 
         closeStream(); // to release resources
 
@@ -155,7 +158,8 @@ void CLServerPushStreamReader::run()
                     m_resource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
                 m_stat[0].onLostConnection();
             }
-
+            if (mFramesLost > MAX_LOST_FRAME)
+                QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
             continue;
         }
         m_FrameCnt++;

@@ -36,7 +36,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 
     for (const api::SystemDataEx &systemData : systemsList.systems)
     {
-        if (systemData.status != api::ssActivated)
+        if (systemData.status != api::SystemStatus::ssActivated)
             continue;
 
         QnCloudSystem system;

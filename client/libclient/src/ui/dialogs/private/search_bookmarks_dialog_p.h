@@ -52,6 +52,8 @@ private:
 
     void applyModelChanges();
 
+    void reset();
+
 private:
     typedef QScopedPointer<Ui::BookmarksLog> UiImpl;
 

@@ -426,5 +426,47 @@ TEST_F(System, updateSystemName)
         updateSystemName(system1.id, system1.authKey, system1.id, std::string(4096, 'z')));
 }
 
+TEST_F(System, persistentSequence)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    api::SystemData system2;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system2));
+
+    ASSERT_EQ(system1.systemSequence+1, system2.systemSequence);
+
+    restart();
+
+    api::SystemDataEx systemData;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystem(account1.email, account1Password, system1.id, &systemData));
+    ASSERT_EQ(system1.systemSequence, systemData.systemSequence);
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystem(account1.email, account1Password, system2.id, &systemData));
+    ASSERT_EQ(system2.systemSequence, systemData.systemSequence);
+
+    api::SystemData system3;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system3));
+    ASSERT_EQ(system2.systemSequence + 1, system3.systemSequence);
+}
+
 }   //cdb
 }   //nx
