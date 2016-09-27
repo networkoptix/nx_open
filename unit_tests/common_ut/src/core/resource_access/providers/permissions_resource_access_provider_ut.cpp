@@ -333,3 +333,11 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitNewCameraAccess)
     qnResPool->addResource(camera);
 }
 
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedCameraAccess)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = createCamera();
+    awaitAccess(user, camera, false);
+    qnResPool->removeResource(camera);
+}
+

@@ -16,6 +16,12 @@ QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject
             for (const auto& user: qnResPool->getResources<QnUserResource>())
                 emit accessChanged(user, resource, hasAccess(user, resource));
         });
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            for (const auto& user : qnResPool->getResources<QnUserResource>())
+                emit accessChanged(user, resource, hasAccess(user, resource));
+        });
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
