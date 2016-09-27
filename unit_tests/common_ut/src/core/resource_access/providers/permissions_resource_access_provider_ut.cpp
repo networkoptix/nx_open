@@ -317,3 +317,11 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkVideoWallAccess)
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitNewCameraAccess)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    QnVirtualCameraResourcePtr camera(new QnCameraResourceStub());
+    awaitAccess(user, camera);
+    qnResPool->addResource(camera);
+}
