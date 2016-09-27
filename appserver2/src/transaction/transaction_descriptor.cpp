@@ -893,7 +893,7 @@ struct SaveUserTransactionType
     }
 };
 
-struct setResourceParamTransactionType
+struct SetResourceParamTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiResourceParamWithRefData& param)
     {

@@ -228,7 +228,7 @@ APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadResourceParamAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       setResourceParamTransactionType()) /* regular transaction type */ \
+                       SetResourceParamTransactionType()) /* regular transaction type */ \
 APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
