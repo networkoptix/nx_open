@@ -231,6 +231,9 @@ angular.module('cloudApp')
                         var isOwner = self.isOwner(user);
                         var isAdmin = self.isAdmin(user);
 
+                        if(user.accountFullName && !user.fullName){
+                            user.fullName = user.accountFullName;
+                        }
                         user.canBeDeleted = !isOwner && (!isAdmin || self.isMine);
                         user.canBeEdited = !isOwner && !isMe && (!isAdmin || self.isMine);
 
