@@ -109,6 +109,8 @@ var Config = {
         cloudAuthKey: {label: 'Cloud auth key', type: 'static'},
         cloudSystemID: {label: 'Cloud system id', type: 'static'},
 
+        systemName: {label: 'System name', type: 'text'},
+
         newSystem: {label: 'Server is "New"', type: 'static'},
         proxyConnectTimeoutSec: {label: 'Proxy connection timeout (seconds)', type: 'number'},
         crossdomainEnabled: {label: 'Enable web client', type: 'checkbox'},
