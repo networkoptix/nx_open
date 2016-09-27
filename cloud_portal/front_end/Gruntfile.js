@@ -603,6 +603,9 @@ module.exports = function (grunt) {
         },
 
         shell:{
+            updateTest:{
+                command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
+            },
             version: {
                 command: 'hg parent > dist/version.txt'
             },
@@ -807,5 +810,10 @@ module.exports = function (grunt) {
 
     grunt.registerTask('pub', [
         'publish'
+    ]);
+
+
+    grunt.registerTask('update', [
+        'shell:updateTest'
     ]);
 };
