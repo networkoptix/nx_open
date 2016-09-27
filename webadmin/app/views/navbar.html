@@ -4,8 +4,15 @@
             <a class="navbar-brand" href="#/settings/">
                 <img src="customization/webadmin_logo.png" height="40" style="margin-top:5px"/>
             </a>
+
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
         </div>
-        <nav ng-if="!noPanel" class="collapse navbar-collapse bs-navbar-collapse" id="bs-example-navbar-collapse" role="navigation">
+        <nav ng-if="!noPanel" class="collapse navbar-collapse" id="navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
                 <li ng-class="{active:isActive('/view')}"><a ng-href="#/view/">Web Client</a></li>
                 <li ng-hide="!user.isAdmin" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Settings</a></li>
