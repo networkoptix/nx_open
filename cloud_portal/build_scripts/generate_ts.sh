@@ -48,7 +48,10 @@ echo "------------------------------"
 echo "Generate localization files"
 
 echo "Copy branding and translation files"
-python generate_ts.py
+pushd $TARGET_DIR
+python ../generate_ts.py
+cp *.ts ..
+popd
 
 echo "Generate localization files finished"
 

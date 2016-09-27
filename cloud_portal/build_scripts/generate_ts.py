@@ -170,12 +170,12 @@ def format_ts(strings, file_name):
         xml_file.write(xml_content)
 
 
-js_strings = extract_strings('localization/static/scripts', 'language.js', mode='js')
-js_strings1 = extract_strings('localization/static/', 'apple-app-site-association', mode='js')
-html_strings = extract_strings('localization/static/views', '.html')  # , dir_exclude='static'
+js_strings = extract_strings('static/scripts', 'language.js', mode='js')
+js_strings1 = extract_strings('static/', 'apple-app-site-association', mode='js')
+html_strings = extract_strings('static/views', '.html')  # , dir_exclude='static'
 # html_strings1 = extract_strings('localization/static/', '.html', recursive=False)  # , dir_exclude='static'
 
 format_ts(js_strings + js_strings1 + html_strings, "cloud_portal.ts")
 
-template_strings = extract_strings('localization/templates', '.mustache')
+template_strings = extract_strings('templates', '.mustache')
 format_ts(template_strings, "templates.ts")

@@ -84,7 +84,7 @@ do
     popd
 
     echo "clean branding files"
-    rm -rf $TARGET_DIR/$CUSTOMIZATION/*.ts
+    # rm -rf $TARGET_DIR/$CUSTOMIZATION/*.ts
 
     echo "Localization success"
 
