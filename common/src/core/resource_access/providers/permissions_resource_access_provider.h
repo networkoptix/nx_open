@@ -13,4 +13,8 @@ public:
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
+
+private:
+    bool hasAccessToDesktopCamera(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource) const;
 };

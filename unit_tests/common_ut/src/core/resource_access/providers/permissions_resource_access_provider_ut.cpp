@@ -158,9 +158,37 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessServer)
     auto target = createServer();
     ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
 }
+
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessStorage)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = createStorage();
     ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByName)
+{
+    auto camera = createCamera();
+    camera->setFlags(Qn::desktop_camera);
+    camera->setName(kUserName2);
+
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user2 = addUser(Qn::GlobalAdminPermission, kUserName2);
+
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, camera));
+    ASSERT_TRUE(m_accessProvider->hasAccess(user2, camera));
+}
+
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkDesktopCameraAccessByPermissions)
+{
+    auto camera = createCamera();
+    camera->setFlags(Qn::desktop_camera);
+    camera->setName(kUserName);
+
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, camera));
+
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, camera));
 }
