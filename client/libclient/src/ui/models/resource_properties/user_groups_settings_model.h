@@ -57,7 +57,7 @@ public:
     virtual QnIndirectAccessProviders accessibleLayouts() const override;
 
     /** Get accessible resources for the given group - just for convenience. */
-    QSet<QnUuid> accessibleResources(const QnUuid& groupId) const;
+    QSet<QnUuid> accessibleResources(const ec2::ApiUserGroupData& group) const;
 
     /** Get list of users for given group. */
     QnUserResourceList users(const QnUuid& groupId, bool withCandidates) const;

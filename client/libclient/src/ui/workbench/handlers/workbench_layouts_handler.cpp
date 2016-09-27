@@ -452,7 +452,7 @@ void QnWorkbenchLayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layou
     if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         return;
 
-    auto accessible = qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
+    auto accessible = qnResourceAccessManager->accessibleResources(subject);
     if (accessible.contains(layout->getId()))
         return;
 
@@ -1042,7 +1042,7 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     if (!confirmStopSharingLayouts(subject, layouts))
         return;
 
-    auto accessible = qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
+    auto accessible = qnResourceAccessManager->accessibleResources(subject);
     for (const auto& layout : layouts)
     {
         NX_ASSERT(!layout->isFile());

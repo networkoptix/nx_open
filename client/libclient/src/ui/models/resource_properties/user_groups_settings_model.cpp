@@ -43,15 +43,16 @@ void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
     beginResetModel();
 
     m_groups = value;
-    std::sort(m_groups.begin(), m_groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
-    {
-        /* Case Insensitive sort. */
-        return nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive) < 0;
-    });
+    std::sort(m_groups.begin(), m_groups.end(),
+        [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
+        {
+            /* Case Insensitive sort. */
+            return nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive) < 0;
+        });
 
     m_accessibleResources.clear();
     for (const auto& group : m_groups)
-        m_accessibleResources[group.id] = qnResourceAccessManager->accessibleResources(group.id);
+        m_accessibleResources[group.id] = qnResourceAccessManager->accessibleResources(group);
 
     m_replacements.clear();
 
@@ -137,9 +138,9 @@ QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources() const
     return m_accessibleResources.value(m_currentGroupId);
 }
 
-QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources(const QnUuid& groupId) const
+QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources(const ec2::ApiUserGroupData& group) const
 {
-    return m_accessibleResources.value(groupId);
+    return m_accessibleResources.value(group.id);
 }
 
 int QnUserGroupSettingsModel::rowCount(const QModelIndex& parent) const

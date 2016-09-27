@@ -18,7 +18,7 @@ public:
         return user || !role.isNull();
     }
 
-    QnUuid sharedResourcesKey() const
+    QnUuid effectiveId() const
     {
         if (!isValid())
             return QnUuid();
@@ -73,7 +73,7 @@ bool QnResourceAccessSubject::isValid() const
     return d_ptr->isValid();
 }
 
-QnUuid QnResourceAccessSubject::sharedResourcesKey() const
+QnUuid QnResourceAccessSubject::effectiveId() const
 {
-    return d_ptr->sharedResourcesKey();
+    return d_ptr->effectiveId();
 }

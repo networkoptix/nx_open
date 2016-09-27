@@ -22,7 +22,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/raii_guard.h>
 
-//#define DEBUG_PERMISSIONS
+#define DEBUG_PERMISSIONS
 #ifdef DEBUG_PERMISSIONS
 #define TRACE(...) qDebug() << "QnResourceAccessManager: " << __VA_ARGS__;
 #else
@@ -91,9 +91,12 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
 
         if (const auto& videowall = resource.dynamicCast<QnVideoWallResource>())
         {
-            connect(videowall, &QnVideoWallResource::itemAdded,   this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
-            connect(videowall, &QnVideoWallResource::itemChanged, this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
-            connect(videowall, &QnVideoWallResource::itemRemoved, this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
+            connect(videowall, &QnVideoWallResource::itemAdded,   this,
+                &QnResourceAccessManager::invalidateCacheForVideowallItem);
+            connect(videowall, &QnVideoWallResource::itemChanged, this,
+                &QnResourceAccessManager::invalidateCacheForVideowallItem);
+            connect(videowall, &QnVideoWallResource::itemRemoved, this,
+                &QnResourceAccessManager::invalidateCacheForVideowallItem);
         }
     };
 
@@ -229,44 +232,46 @@ void QnResourceAccessManager::removeUserGroup(const QnUuid& groupId)
     emit userGroupRemoved(groupId);
 }
 
-QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userOrGroupId) const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_accessibleResources[userOrGroupId];
-}
-
-/*
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnResourceAccessSubject& subject) const
 {
+    if (!subject.isValid())
+        return QSet<QnUuid>();
 
-}*/
+    QnMutexLocker lk(&m_mutex);
+    return m_accessibleResources[subject.effectiveId()];
+}
 
-void QnResourceAccessManager::setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources)
+void QnResourceAccessManager::setAccessibleResources(const QnResourceAccessSubject& subject,
+    const QSet<QnUuid>& resources)
 {
+    if (!subject.isValid())
+        return;
+
     {
+        auto id = subject.effectiveId();
         UpdateCacheGuard guard(this);
         {
             QnMutexLocker lk(&m_mutex);
-            if (m_accessibleResources[userOrGroupId] == resources)
+            if (m_accessibleResources[id] == resources)
                 return;
 
-            auto removed = m_accessibleResources[userOrGroupId] - resources;
-            auto added = resources - m_accessibleResources[userOrGroupId];
-            m_accessibleResources[userOrGroupId] = resources;
+            auto removed = m_accessibleResources[id] - resources;
+            auto added = resources - m_accessibleResources[id];
+            m_accessibleResources[id] = resources;
 
             m_invalidatedResources += removed;
             m_invalidatedResources += added;
         }
 
-        invalidateResourceCacheInternal(userOrGroupId);
+        invalidateResourceCacheInternal(id);
         for (const auto& user : qnResPool->getResources<QnUserResource>())
         {
-            if (user->userGroup() == userOrGroupId)
+            if (user->userGroup() == id)
                 invalidateResourceCache(user);
         }
     }
 
-    emit accessibleResourcesChanged(userOrGroupId);
+    emit accessibleResourcesChanged(subject);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnResourceAccessSubject& subject) const
@@ -516,10 +521,32 @@ void QnResourceAccessManager::invalidateCacheForLayoutItems(const QnResourcePtr&
     }
 }
 
-void QnResourceAccessManager::invalidateCacheForVideowallItem(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item)
+void QnResourceAccessManager::invalidateCacheForVideowallItem(
+    const QnVideoWallResourcePtr &resource,
+    const QnVideoWallItem &item)
 {
     Q_UNUSED(resource);
     UpdateCacheGuard guard(this);
+    for (auto user : qnResPool->getResources().filtered<QnUserResource>(
+        [this](const QnUserResourcePtr& user)
+        {
+            return hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission);
+        }))
+    {
+        invalidateResourceCacheInternal(user->getId());
+    }
+
+    QSet<QnUuid> modifiedGroups;
+    {
+        QnMutexLocker lk(&m_mutex);
+        for (auto group : m_userGroups)
+        {
+            if (hasGlobalPermission(group, Qn::GlobalControlVideoWallPermission))
+                modifiedGroups << group.id;
+        }
+    }
+    for (auto groupId: modifiedGroups)
+        invalidateResourceCacheInternal(groupId);
     invalidateResourceCacheInternal(item.layout);
     invalidateCacheForLayoutItems(qnResPool->getResourceById(item.layout));
 }

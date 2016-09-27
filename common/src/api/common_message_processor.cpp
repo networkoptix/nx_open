@@ -274,7 +274,16 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
     QSet<QnUuid> accessibleResources;
     for (const QnUuid& id : accessRights.resourceIds)
         accessibleResources << id;
-    qnResourceAccessManager->setAccessibleResources(accessRights.userId, accessibleResources);
+    if (auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId))
+    {
+        qnResourceAccessManager->setAccessibleResources(user, accessibleResources);
+    }
+    else
+    {
+        auto role = qnResourceAccessManager->userGroup(accessRights.userId);
+        if (!role.isNull())
+            qnResourceAccessManager->setAccessibleResources(role, accessibleResources);
+    }
 }
 
 void QnCommonMessageProcessor::on_userGroupChanged(const ec2::ApiUserGroupData& userGroup)

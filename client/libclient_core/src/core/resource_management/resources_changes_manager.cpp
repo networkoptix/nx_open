@@ -344,20 +344,19 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
     if (!connection)
         return;
 
-    auto key = subject.sharedResourcesKey();
     auto sessionGuid = qnCommon->runningInstanceGUID();
-    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(key);
+    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(subject);
     if (accessibleResourcesBackup == accessibleResources)
         return;
 
-    qnResourceAccessManager->setAccessibleResources(key, accessibleResources);
+    qnResourceAccessManager->setAccessibleResources(subject, accessibleResources);
 
     ec2::ApiAccessRightsData accessRights;
-    accessRights.userId = key;
+    accessRights.userId = subject.effectiveId();
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
-        [this, key, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
+        [this, subject, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -369,7 +368,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->setAccessibleResources(key, accessibleResourcesBackup);
+        qnResourceAccessManager->setAccessibleResources(subject, accessibleResourcesBackup);
     });
 }
 

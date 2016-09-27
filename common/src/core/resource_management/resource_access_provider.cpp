@@ -85,9 +85,8 @@ QnIndirectAccessProviders QnResourceAccessProvider::indirectlyAccessibleLayouts(
 
 QSet<QnUuid> QnResourceAccessProvider::sharedResources(const QnResourceAccessSubject& subject)
 {
-    if (!subject.isValid())
-        return QSet<QnUuid>();
-    return qnResourceAccessManager->accessibleResources(subject.sharedResourcesKey());
+
+    return qnResourceAccessManager->accessibleResources(subject);
 }
 
 bool QnResourceAccessProvider::isAccessibleViaVideowall(const QnResourceAccessSubject& subject, const QnResourcePtr& resource)

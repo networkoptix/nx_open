@@ -162,7 +162,7 @@ bool QnUserGroupsDialog::hasChanges() const
         if (existing != group)
             return true;
 
-        if (qnResourceAccessManager->accessibleResources(group.id) != m_model->accessibleResources(group.id))
+        if (qnResourceAccessManager->accessibleResources(group) != m_model->accessibleResources(group))
             return true;
 
         continue;
@@ -190,7 +190,7 @@ void QnUserGroupsDialog::applyChanges()
         if (existing != group)
             qnResourcesChangesManager->saveUserGroup(group);
 
-        auto resources = m_model->accessibleResources(group.id);
+        auto resources = m_model->accessibleResources(group);
         QnLayoutResourceList layoutsToShare = qnResPool->getResources(resources)
             .filtered<QnLayoutResource>(
                 [](const QnLayoutResourcePtr& layout)

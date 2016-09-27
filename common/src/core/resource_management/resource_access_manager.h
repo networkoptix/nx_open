@@ -52,8 +52,8 @@ public:
     void removeUserGroup(const QnUuid& groupId);
 
     /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> accessibleResources(const QnUuid& userOrGroupId) const;
-    void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
+    QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const;
+    void setAccessibleResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& resources);
 
     /**
     * \param user                      User or role to get global permissions for.
@@ -155,7 +155,7 @@ public:
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
 signals:
-    void accessibleResourcesChanged(const QnUuid& userId);
+    void accessibleResourcesChanged(const QnResourceAccessSubject& subject);
 
     void userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
     void userGroupRemoved(const QnUuid& groupId);

@@ -160,9 +160,9 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this,
         &QnResourceTreeModel::updateRoleNodes);
     connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this,
-        [this](const QnUuid& id)
+        [this](const QnResourceAccessSubject& subject)
         {
-            if (!qnResourceAccessManager->userGroup(id).isNull())
+            if (!subject.user())
                 updateRoleNodes();
         }
     );
@@ -1031,7 +1031,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForRole(const QnUuid& id)
     if (role.isNull())
         return;
 
-    auto resources = qnResourceAccessManager->accessibleResources(id);
+    auto resources = qnResourceAccessManager->accessibleResources(role);
 
     /* Copy of the list before all changes. */
     auto sharedLayoutNodes = m_sharedLayoutNodesByOwner[id].values();
