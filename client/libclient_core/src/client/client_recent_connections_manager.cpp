@@ -33,15 +33,15 @@ void QnClientRecentConnectionsManager::addModel(QnRecentLocalConnectionsModel* m
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
 
-    connect(model, &QnRecentLocalConnectionsModel::systemNameChanged, this,
+    connect(model, &QnRecentLocalConnectionsModel::systemIdChanged, this,
         [this, model]()
         {
             updateModelBinding(model);
         });
 
-    const auto systemName = model->systemName();
+    const auto systemId = model->systemId();
     m_models << model;
-    if (!systemName.isEmpty())
+    if (!systemId.isEmpty())
         updateModelBinding(model);
 }
 
@@ -52,9 +52,6 @@ void QnClientRecentConnectionsManager::removeModel(QnRecentLocalConnectionsModel
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     NX_ASSERT(m_models.contains(model));
-
-    const auto systemName = model->systemName();
-    qDebug() << "Removing model for " << systemName;
     m_models.removeOne(model);
 }
 
@@ -64,13 +61,7 @@ void QnClientRecentConnectionsManager::updateModelBinding(QnRecentLocalConnectio
     NX_ASSERT(!m_updating);
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    const auto systemName = model->systemName();
-    const bool isCorrectSystemName = !systemName.isEmpty();
-    NX_ASSERT(isCorrectSystemName, Q_FUNC_INFO, "System name for model can't be empty");
-    if (!isCorrectSystemName)
-        return;
-
-    model->updateData(m_dataCache.value(systemName));
+    model->updateData(m_dataCache.value(model->systemId()));
 }
 
 void QnClientRecentConnectionsManager::updateModelsData()
@@ -87,9 +78,9 @@ void QnClientRecentConnectionsManager::updateModelsData()
     for (const auto model : m_models)
     {
         NX_ASSERT(model);
-        if (!model || model->systemName().isEmpty())
+        if (!model || model->systemId().isEmpty())
             continue;
-        const auto systemName = model->systemName();
-        model->updateData(m_dataCache.value(systemName));
+
+        model->updateData(m_dataCache.value(model->systemId()));
     }
 }

@@ -8,8 +8,7 @@ class QnRecentLocalConnectionsModel : public QAbstractListModel
     Q_OBJECT
     typedef QAbstractListModel base_type;
 
-    // TODO: #ynikitenkov use systemId instead of systemName
-    Q_PROPERTY(QString systemName READ systemName WRITE setSystemName NOTIFY systemNameChanged)
+    Q_PROPERTY(QString systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
     Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)
 
@@ -30,9 +29,9 @@ public:
     virtual ~QnRecentLocalConnectionsModel();
 
 public: // properties
-    QString systemName() const;
+    QString systemId() const;
 
-    void setSystemName(const QString &systemName);
+    void setSystemId(const QString &id);
 
     bool hasConnections() const;
 
@@ -51,12 +50,12 @@ public slots:
     QVariant getData(const QString &dataRole, int row);
 
 signals:
-    void systemNameChanged();
+    void systemIdChanged();
     void hasConnectionsChanged();
     void connectionDataChanged(int index);
     void firstUserChanged();
 
 private:
-    QString m_systemName;
+    QString m_systemId;
     QnLocalConnectionDataList m_data;
 };

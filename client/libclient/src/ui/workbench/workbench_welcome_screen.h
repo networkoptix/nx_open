@@ -140,7 +140,6 @@ private:
         const QnCredentials& credentials,
         bool storePassword,
         bool autoLogin,
-        bool isConnectionToCloud,
         const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());
 
 private:
