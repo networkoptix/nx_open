@@ -132,15 +132,7 @@ void QnQmlSortFilterProxyModel::handleCloudSystemsChanged(const QnCloudSystemLis
 void QnQmlSortFilterProxyModel::handleLocalConnectionsChanged()
 {
     const auto recentConnections = qnClientCoreSettings->recentLocalConnections();
-    const auto newWeights =
-        [recentConnections]() -> IdWeightHash
-        {
-            IdWeightHash result;
-            for (const auto connection : recentConnections)
-                result.insert(connection.systemId, connection.weight);
-            return result;
-        }();
-
+    const auto newWeights = recentConnections.getWeights();
     if (newWeights == m_localSystemWeight)
         return;
 

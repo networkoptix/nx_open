@@ -55,7 +55,7 @@ void writerecentLocalConnections(QSettings* settings,
     writeListData(settings, connections, kUserConnectionsSectionTag,
         [](QSettings* settings, const QnLocalConnectionData& data)
         {
-            QnLocalConnectionData::writeToSettings(settings, data);
+            data.writeToSettings(settings);
         });
 }
 

@@ -47,19 +47,19 @@ QnLocalConnectionData::QnLocalConnectionData(const QString& name,
     lastConnectedUtcMs(0)
 {}
 
-void QnLocalConnectionData::writeToSettings(QSettings* settings
-    , QnLocalConnectionData data)
+void QnLocalConnectionData::writeToSettings(QSettings* settings) const
 {
-    const auto encryptedPass = nx::utils::xorEncrypt(data.url.password(), kXorKey);
-    data.url.setPassword(QString());
-    settings->setValue(kUrlNameTag, data.url.toString());
+    QUrl fixedUrl = url;
+    const auto encryptedPass = nx::utils::xorEncrypt(url.password(), kXorKey);
+    fixedUrl.setPassword(QString());
+    settings->setValue(kUrlNameTag, fixedUrl.toString());
     settings->setValue(kPasswordTag, encryptedPass);
-    settings->setValue(kSystemNameTag, data.systemName);
-    settings->setValue(kSystemIdTag, data.systemId);
-    settings->setValue(kStoredPasswordTag, data.isStoredPassword);
-    settings->setValue(kNameTag, data.name);
-    settings->setValue(kWeight, data.weight);
-    settings->setValue(kLastConnected, data.lastConnectedUtcMs);
+    settings->setValue(kSystemNameTag, systemName);
+    settings->setValue(kSystemIdTag, systemId);
+    settings->setValue(kStoredPasswordTag, isStoredPassword);
+    settings->setValue(kNameTag, name);
+    settings->setValue(kWeight, weight);
+    settings->setValue(kLastConnected, lastConnectedUtcMs);
 }
 
 QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
@@ -78,6 +78,20 @@ QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
         data.url.setPassword(nx::utils::xorDecrypt(encryptedPass, kXorKey));
 
     return data;
+}
+
+qreal QnLocalConnectionData::calcWeight() const
+{
+    static const auto getDays =
+        [](qint64 utcMsSinceEpoch)
+    {
+        const qint64 kMsInDay = 60 * 60 * 24 * 1000;
+        return utcMsSinceEpoch / kMsInDay;
+    };
+
+    const auto currentTime = QDateTime::currentMSecsSinceEpoch();
+    const auto penality = (getDays(currentTime) - getDays(lastConnectedUtcMs)) / 30.0;
+    return std::max<qreal>((1.0 - penality) * weight, 0);
 }
 
 ///
@@ -132,4 +146,12 @@ bool QnLocalConnectionDataList::remove(const QString &name)
     const bool removed = (newEnd != end());
     erase(newEnd, end());
     return removed;
+}
+
+QnLocalConnectionDataList::WeightHash QnLocalConnectionDataList::getWeights() const
+{
+    WeightHash result;
+    for (const auto connection : *this)
+        result.insert(connection.systemId, connection.weight);
+    return result;
 }

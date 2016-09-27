@@ -28,10 +28,11 @@ struct QnLocalConnectionData
     qreal weight;
     qint64 lastConnectedUtcMs;
 
-    static void writeToSettings(QSettings* settings
-        , QnLocalConnectionData data);
-
     static QnLocalConnectionData fromSettings(QSettings* settings);
+
+    void writeToSettings(QSettings* settings) const;
+
+    qreal calcWeight() const;
 };
 
 #define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)\
@@ -59,6 +60,9 @@ public:
     QString generateUniqueName(const QString &base) const;
 
     bool remove(const QString &name);
+
+    typedef QHash<QString, qreal> WeightHash;
+    WeightHash getWeights() const;
 };
 
 Q_DECLARE_METATYPE(QnLocalConnectionDataList)
