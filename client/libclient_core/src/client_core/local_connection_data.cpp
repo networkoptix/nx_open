@@ -16,6 +16,8 @@ namespace
     const auto kSystemIdTag = lit("systemId");
     const auto kStoredPasswordTag = lit("storedPassword");
     const auto kNameTag = lit("name");
+    const auto kLastConnected = lit("lastConnectedUtcMs");
+    const auto kWeight = lit("weight");
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (QnLocalConnectionData), (datastream)(eq), _Fields)
@@ -25,7 +27,9 @@ QnLocalConnectionData::QnLocalConnectionData() :
     systemName(),
     systemId(),
     url(),
-    isStoredPassword(false)
+    isStoredPassword(false),
+    weight(0),
+    lastConnectedUtcMs(0)
 {}
 
 QnLocalConnectionData::QnLocalConnectionData(const QString& name,
@@ -38,7 +42,9 @@ QnLocalConnectionData::QnLocalConnectionData(const QString& name,
     systemName(systemName),
     systemId(systemId),
     url(url),
-    isStoredPassword(isStoredPassword)
+    isStoredPassword(isStoredPassword),
+    weight(0),
+    lastConnectedUtcMs(0)
 {}
 
 void QnLocalConnectionData::writeToSettings(QSettings* settings
@@ -52,6 +58,8 @@ void QnLocalConnectionData::writeToSettings(QSettings* settings
     settings->setValue(kSystemIdTag, data.systemId);
     settings->setValue(kStoredPasswordTag, data.isStoredPassword);
     settings->setValue(kNameTag, data.name);
+    settings->setValue(kWeight, data.weight);
+    settings->setValue(kLastConnected, data.lastConnectedUtcMs);
 }
 
 QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
@@ -63,7 +71,8 @@ QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
     data.systemId = settings->value(kSystemIdTag).toString();
     data.isStoredPassword = settings->value(kStoredPasswordTag).toBool();
     data.name = settings->value(kNameTag).toString();
-
+    data.weight = settings->value(kWeight, QVariant::fromValue<qreal>(0)).toReal();
+    data.lastConnectedUtcMs = settings->value(kLastConnected, QVariant::fromValue<qint64>(0)).toLongLong();
     const auto encryptedPass = settings->value(kPasswordTag).toString();
     if (!encryptedPass.isEmpty())
         data.url.setPassword(nx::utils::xorDecrypt(encryptedPass, kXorKey));

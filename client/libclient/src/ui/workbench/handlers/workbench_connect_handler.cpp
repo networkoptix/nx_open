@@ -81,6 +81,20 @@ namespace {
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 
+qreal calcWeight(const QnLocalConnectionData& data)
+{
+    static const auto getDays =
+        [](qint64 utcMsSinceEpoch)
+        {
+            const qint64 kMsInDay = 60 * 60 * 24 * 1000;
+            return utcMsSinceEpoch / kMsInDay;
+        };
+
+    const auto currentTime = QDateTime::currentMSecsSinceEpoch();
+    const auto penality = (getDays(currentTime) - getDays(data.lastConnectedUtcMs)) / 30.0;
+    return std::max<qreal>((1.0 - penality) * data.weight, 0);
+}
+
 void storeLocalSystemConnection(const QString& systemName, const QString& systemId, QUrl url,
     bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
 {
@@ -101,9 +115,11 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
         });
 
     QnLocalConnectionData targetConnection(QString(), systemName, systemId, url, storePassword);
-
     if (itFoundConnection != recentConnections.end())
     {
+        targetConnection.weight = itFoundConnection->weight;
+        targetConnection.lastConnectedUtcMs = itFoundConnection->lastConnectedUtcMs;
+
         if (forceRemoveOldConnection)
         {
             if (!itFoundConnection->name.isEmpty())
@@ -126,6 +142,12 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
         }
         recentConnections.erase(itFoundConnection);
     }
+
+
+    targetConnection.weight = calcWeight(targetConnection) + 1;
+    qDebug() << targetConnection.weight << targetConnection.systemName;
+    targetConnection.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
+
     recentConnections.prepend(targetConnection);
 
     qnSettings->setLastUsedConnection(targetConnection);

@@ -25,13 +25,18 @@ struct QnLocalConnectionData
     QUrl url;
     bool isStoredPassword;
 
+    qreal weight;
+    qint64 lastConnectedUtcMs;
+
     static void writeToSettings(QSettings* settings
         , QnLocalConnectionData data);
 
     static QnLocalConnectionData fromSettings(QSettings* settings);
 };
 
-#define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)
+#define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)\
+    (weight)(lastConnectedUtcMs)
+
 QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq))
 
 

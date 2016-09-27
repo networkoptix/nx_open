@@ -151,10 +151,9 @@ Rectangle
 
                 model: QnQmlSortFilterProxyModel
                 {
-                    model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
-                    readonly property int totalCount: model.rowCount()
+                    readonly property int totalCount: rowCount();
                 }
 
                 delegate: Item
