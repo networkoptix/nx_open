@@ -1660,6 +1660,18 @@ void QnNxStyle::drawControl(
                 QRect textRect = tab->rect;
                 QRect focusRect = tab->rect;
 
+                int iconWithPadding = 0;
+                if (!tab->icon.isNull())
+                {
+                    QSize iconSize = QnSkin::maximumSize(tab->icon);
+                    iconWithPadding = iconSize.width() + Metrics::kStandardPadding;
+
+                    QRect iconRect = textRect;
+                    iconRect.setWidth(iconWithPadding);
+                    iconRect = aligned(iconSize, iconRect);
+                    tab->icon.paint(painter, iconRect);
+                }
+
                 if (shape == TabShape::Rectangular)
                 {
                     textFlags |= Qt::AlignLeft | Qt::AlignVCenter;
@@ -1670,12 +1682,13 @@ void QnNxStyle::drawControl(
                         color = tab->palette.light().color();
 
                     int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
-                    textRect.adjust(hspace, 0, -hspace, 0);
+                    textRect.adjust(qMax(iconWithPadding, hspace), 0, -hspace, 0);
                     focusRect.adjust(0, 2, 0, -2);
                 }
                 else
                 {
                     textFlags |= Qt::AlignCenter;
+                    textRect.setLeft(textRect.left() + iconWithPadding);
 
                     QnPaletteColor mainColor = findColor(tab->palette.light().color()).darker(2);
                     color = mainColor;
@@ -1725,17 +1738,6 @@ void QnNxStyle::drawControl(
                     tab->palette,
                     tab->state.testFlag(QStyle::State_Enabled),
                     tab->text);
-
-                if (!tab->icon.isNull())
-                {
-                    QFontMetrics fm(painter->font());
-                    QRect rect = fm.boundingRect(textRect, textFlags, tab->text);
-
-                    QSize iconSize = tab->icon.actualSize(tab->iconSize);
-                    QRect iconRect = aligned(iconSize, textRect);
-                    iconRect.moveLeft(rect.right() + Metrics::kStandardPadding);
-                    tab->icon.paint(painter, iconRect);
-                }
 
                 if (tab->state.testFlag(State_HasFocus))
                 {
