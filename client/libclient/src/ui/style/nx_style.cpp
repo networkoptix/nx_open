@@ -2063,48 +2063,102 @@ void QnNxStyle::drawControl(
         {
             if (auto buttonOption = static_cast<const QStyleOptionButton*>(option))
             {
-                bool customForeground = widget && widget->foregroundRole() != QPalette::ButtonText;
-                QStyleOptionButton newOpt(*buttonOption);
-
                 /* Support for custom foreground role for buttons: */
-                if (customForeground)
-                    newOpt.palette.setBrush(QPalette::ButtonText, newOpt.palette.brush(widget->foregroundRole()));
+                QPalette::ColorRole foregroundRole = widget
+                    ? widget->foregroundRole()
+                    : QPalette::ButtonText;
 
+                /* Draw text button: */
                 if (isTextButton(option))
                 {
-                    if (!customForeground)
-                        newOpt.palette.setBrush(QPalette::ButtonText, newOpt.palette.windowText());
+                    /* Foreground role override: */
+                    if (foregroundRole == QPalette::ButtonText)
+                        foregroundRole = QPalette::WindowText;
 
-                    d->drawTextButton(painter, &newOpt, widget);
+                    d->drawTextButton(painter, buttonOption, foregroundRole, widget);
                     return;
                 }
 
-                bool checkable = isCheckableButton(option);
-                bool leftAligned = checkable
-                    || widget && widget->property(Properties::kButtonMarginProperty).canConvert<int>();
+                int margin = pixelMetric(PM_ButtonMargin, option, widget);
+                QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
+                Qt::Alignment textHorizontalAlignment = Qt::AlignHCenter;
 
-                if (leftAligned)
+                /* Draw icon left-aligned: */
+                if (!buttonOption->icon.isNull())
                 {
-                    /* Calculate minimal label width: */
-                    int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
-                    if (!buttonOption->icon.isNull())
-                        minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
-                    if (!buttonOption->text.isEmpty())
-                        minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
+                    QIcon::Mode mode;
+                    if (!buttonOption->state.testFlag(State_Enabled))
+                        mode = QIcon::Disabled;
+                    else if (buttonOption->state.testFlag(State_Sunken))
+                        mode = QnIcon::Pressed;
+                    else if (buttonOption->state.testFlag(State_MouseOver))
+                        mode = QnIcon::Active;
 
-                    /* Draw standard button content left-aligned: */
-                    newOpt.rect.setWidth(minLabelWidth);
+                    QIcon::State state = buttonOption->state.testFlag(State_On)
+                        ? QIcon::On : QIcon::Off;
+
+                    QRect iconRect = buttonOption->rect;
+                    iconRect.setWidth(buttonOption->iconSize.width() + margin);
+
+                    if (buttonOption->direction == Qt::RightToLeft)
+                    {
+                        iconRect.moveRight(buttonOption->rect.right());
+                        textRect.setRight(iconRect.left() - 1);
+                    }
+                    else
+                    {
+                        textRect.setLeft(option->rect.left() + iconRect.width());
+                    }
+
+                    buttonOption->icon.paint(painter, iconRect, Qt::AlignCenter, mode, state);
+                    textHorizontalAlignment = Qt::AlignLeft;
                 }
 
-                base_type::drawControl(element, &newOpt, painter, widget);
-
                 /* Draw switch right-aligned: */
-                if (checkable)
+                if (isCheckableButton(option))
                 {
+                    QStyleOptionButton newOpt(*buttonOption);
                     newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
-                    newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
                     newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
+
+                    if (buttonOption->direction == Qt::RightToLeft)
+                    {
+                        newOpt.rect.moveLeft(option->rect.left() + Metrics::kSwitchMargin);
+                        textRect.setLeft(newOpt.rect.right() + Metrics::kSwitchMargin + 1);
+                    }
+                    else
+                    {
+                        newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                        textRect.setRight(newOpt.rect.left() - Metrics::kSwitchMargin - 1);
+                    }
+
                     drawSwitch(painter, &newOpt, widget);
+                    textHorizontalAlignment = Qt::AlignLeft;
+                }
+
+                /* Subtract menu indicator area: */
+                if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu))
+                {
+                    int indicatorSize = proxy()->pixelMetric(PM_MenuButtonIndicator, option, widget);
+                    if (buttonOption->direction == Qt::RightToLeft)
+                        textRect.setLeft(textRect.left() + indicatorSize);
+                    else
+                        textRect.setRight(textRect.right() - indicatorSize);
+                }
+
+                /* Draw text: */
+                if (!buttonOption->text.isEmpty())
+                {
+                    const int textFlags = textHorizontalAlignment
+                        | Qt::AlignVCenter
+                        | Qt::TextSingleLine
+                        | Qt::TextHideMnemonic;
+
+                    QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
+                        Qt::ElideRight, textRect.width() + margin, textFlags);
+
+                    proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,
+                        buttonOption->state.testFlag(State_Enabled), text, foregroundRole);
                 }
 
                 return;
@@ -2525,7 +2579,11 @@ QRect QnNxStyle::subElementRect(
         }
 
         case SE_PushButtonFocusRect:
-            return QnGeometry::eroded(option->rect, 1);
+        {
+            return isTextButton(option)
+                ? option->rect
+                : QnGeometry::eroded(option->rect, 1);
+        }
 
         case SE_ProgressBarGroove:
         {
@@ -2722,10 +2780,10 @@ QRect QnNxStyle::subElementRect(
 }
 
 QSize QnNxStyle::sizeFromContents(
-        ContentsType type,
-        const QStyleOption *option,
-        const QSize &size,
-        const QWidget *widget) const
+    ContentsType type,
+    const QStyleOption* option,
+    const QSize& size,
+    const QWidget* widget) const
 {
     if (type == CT_CheckBox && isSwitchButtonCheckbox(widget))
         type = CT_PushButton;
@@ -2746,20 +2804,29 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_PushButton:
         {
-            QSize switchSize;
+            QSize result(size.width(), qMax(size.height(), Metrics::kButtonHeight));
+            result.rwidth() += pixelMetric(PM_ButtonMargin, option, widget) * 2;
+
+            if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+            {
+                if (!button->icon.isNull())
+                    result.rwidth() -= 4; // Compensate for QPushButton::sizeHint magic
+            }
+
+            if (isTextButton(option))
+                result.rwidth() += Metrics::kTextButtonIconMargin;
+            else
+                result.rwidth() = qMax(result.rwidth(), Metrics::kMinimumButtonWidth);
+
             if (isCheckableButton(option))
-                switchSize = Metrics::kButtonSwitchSize + QSize(Metrics::kSwitchMargin, 0);
+            {
+                result.rwidth() += Metrics::kButtonSwitchSize.width() +
+                    Metrics::kStandardPadding * 2 - Metrics::kSwitchMargin;
 
-            int minButtonWidth = isTextButton(option) ? 0 : Metrics::kMinimumButtonWidth;
+                result.rheight() = qMax(result.rheight(), Metrics::kButtonSwitchSize.height());
+            }
 
-            return QSize(
-                qMax(
-                    minButtonWidth,
-                    size.width() + switchSize.width() +
-                        2 * pixelMetric(PM_ButtonMargin, option, widget)),
-                qMax(
-                    qMax(size.height(), switchSize.height()),
-                    Metrics::kButtonHeight));
+            return result;
         }
 
         case CT_LineEdit:
@@ -2932,17 +2999,19 @@ int QnNxStyle::pixelMetric(
     {
         case PM_ButtonMargin:
         {
-            int margin = widget ? widget->property(Properties::kButtonMarginProperty).toInt() : 0;
-            if (margin)
-                return margin;
-
             if (isCheckableButton(option))
-                return Metrics::kStandardPadding;
+                return Metrics::kSwitchMargin * 2;
 
             if (isTextButton(option))
                 return 0;
 
-            return dp(16);
+            if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+            {
+                if (!button->icon.isNull())
+                    return Metrics::kPushButtonIconMargin * 2;
+            }
+
+            return Metrics::kStandardPadding * 2;
         }
 
         case PM_ButtonShiftVertical:

@@ -30,7 +30,7 @@ void paintLabelIcon(
     if (labelRect->left() == iconRect.left())
         labelRect->setLeft(iconRect.right() + padding + 1);
     else
-        labelRect->setRight(iconRect.left() - padding + 1);
+        labelRect->setRight(iconRect.left() - padding - 1);
 }
 
 } // namespace
@@ -358,18 +358,19 @@ void QnNxStylePrivate::drawCross(
 void QnNxStylePrivate::drawTextButton(
     QPainter* painter,
     const QStyleOptionButton* option,
+    QPalette::ColorRole foregroundRole,
     const QWidget* widget) const
 {
     bool enabled = option->state.testFlag(QStyle::State_Enabled);
     bool hovered = option->state.testFlag(QStyle::State_MouseOver);
     bool pressed = option->state.testFlag(QStyle::State_Sunken);
 
-    QBrush brush = option->palette.buttonText();
+    QBrush brush = option->palette.brush(foregroundRole);
     QIcon::Mode iconMode = enabled ? QIcon::Normal : QIcon::Disabled;
 
     if (hovered && enabled && !pressed)
     {
-        QnPaletteColor color = findColor(option->palette.color(QPalette::ButtonText));
+        QnPaletteColor color = findColor(option->palette.color(foregroundRole));
         brush.setColor(color.lighter(2));
         iconMode = QIcon::Active;
     }

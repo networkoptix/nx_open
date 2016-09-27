@@ -13,8 +13,6 @@ QnSelectDevicesButton::QnSelectDevicesButton(QWidget* parent) :
     m_mode(Selected),
     m_singleDeviceParameters()
 {
-    //TODO: #vkutin Refactor this property to something else in the future
-    setProperty(style::Properties::kButtonMarginProperty, style::Metrics::kStandardPadding);
 }
 
 const QnVirtualCameraResourceList& QnSelectDevicesButton::selectedDevices() const
