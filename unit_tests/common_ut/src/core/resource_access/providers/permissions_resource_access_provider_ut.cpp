@@ -213,3 +213,25 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkWebPageAccess)
     user->setRawPermissions(Qn::GlobalEditCamerasPermission);
     ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkServerAccess)
+{
+    auto target = createServer();
+
+    auto user = addUser(Qn::GlobalAdminPermission);
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkStorageAccess)
+{
+    auto target = createStorage();
+
+    auto user = addUser(Qn::GlobalAdminPermission);
+    ASSERT_TRUE(m_accessProvider->hasAccess(user, target));
+
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_FALSE(m_accessProvider->hasAccess(user, target));
+}

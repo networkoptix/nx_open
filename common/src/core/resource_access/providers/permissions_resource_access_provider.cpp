@@ -1,6 +1,8 @@
 #include "permissions_resource_access_provider.h"
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <core/resource_access/resource_access_manager.h>
 
@@ -22,7 +24,15 @@ bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubjec
     if (resource->hasFlags(Qn::desktop_camera))
         return hasAccessToDesktopCamera(subject, resource);
 
-    return qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission);
+    /* Web Pages behave totally like cameras. */
+    bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
+        || resource.dynamicCast<QnWebPageResource>();
+
+    auto requiredPermission = isMediaResource
+        ? Qn::GlobalAccessAllMediaPermission
+        : Qn::GlobalAdminPermission;
+
+    return qnResourceAccessManager->hasGlobalPermission(subject, requiredPermission);
 }
 
 bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
