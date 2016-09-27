@@ -180,14 +180,16 @@ QMovie* QnSkin::newMovie(const char* name, QObject* parent)
     return newMovie(QLatin1String(name), parent);
 }
 
-QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode, QIcon::State state, QWindow* window)
+QSize QnSkin::maximumSize(const QIcon& icon, QIcon::Mode mode,
+    QIcon::State state, const QWindow* window)
 {
     static const QSize huge(32768, 32768);
     qreal pixelRatio = window ? window->devicePixelRatio() : qApp->devicePixelRatio();
     return icon.actualSize(huge, mode, state) / pixelRatio;
 }
 
-QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode, QIcon::State state, QWindow* window)
+QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode,
+    QIcon::State state, const QWindow* window)
 {
     return icon.pixmap(maximumSize(icon, mode, state, window), mode, state);
 }
