@@ -327,6 +327,19 @@ namespace
         return false;
     }
 
+    QGraphicsProxyWidget* findProxyWidget(QWidget* widget)
+    {
+        while (widget)
+        {
+            if (auto proxy = widget->graphicsProxyWidget())
+                return proxy;
+
+            widget = widget->parentWidget();
+        }
+
+        return nullptr;
+    }
+
     enum ScrollBarStyle
     {
         CommonScrollBar,
@@ -362,7 +375,8 @@ QnNxStylePrivate::QnNxStylePrivate() :
     QCommonStylePrivate(),
     palette(),
     idleAnimator(nullptr),
-    stateAnimator(nullptr)
+    stateAnimator(nullptr),
+    lastProxiedWidgetUnderMouse(nullptr)
 {
     Q_Q(QnNxStyle);
 
@@ -3231,6 +3245,11 @@ void QnNxStyle::polish(QWidget *widget)
 {
     base_type::polish(widget);
 
+    /* #QTBUG 18838 */
+    /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
+    if (findProxyWidget(widget))
+        widget->installEventFilter(this);
+
     if (qobject_cast<QAbstractSpinBox*>(widget) ||
         qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QAbstractSlider*>(widget) ||
@@ -3564,6 +3583,54 @@ QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
 
 bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
 {
+    /* #QTBUG 18838 */
+    /* Workaround for incorrectly updated hover state inside QGraphicsProxyWidget. */
+    if (auto widget = qobject_cast<QWidget*>(object))
+    {
+        if (auto proxy = findProxyWidget(widget))
+        {
+            Q_D(QnNxStyle);
+
+            switch (event->type())
+            {
+                case QEvent::Leave:
+                case QEvent::HoverLeave:
+                case QEvent::Destroy:
+                {
+                    if (d->lastProxiedWidgetUnderMouse == widget)
+                        d->lastProxiedWidgetUnderMouse = nullptr;
+
+                    break;
+                }
+
+                case QEvent::HoverMove:
+                {
+                    auto pos = static_cast<QHoverEvent*>(event)->pos();
+                    auto child = proxy->widget()->childAt(widget->mapTo(proxy->widget(), pos));
+                    if (child)
+                        widget = child;
+                    /* FALL THROUGH */
+                }
+                case QEvent::Enter:
+                case QEvent::HoverEnter:
+                {
+                    if (d->lastProxiedWidgetUnderMouse == widget)
+                        break;
+
+                    if (d->lastProxiedWidgetUnderMouse)
+                        d->lastProxiedWidgetUnderMouse->setAttribute(Qt::WA_UnderMouse, false);
+
+                    widget->setAttribute(Qt::WA_UnderMouse, true);
+                    d->lastProxiedWidgetUnderMouse = widget;
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+    }
+
     /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
      * To overcome this problem we process hover events and track hovered children: */
     if (auto tabBar = qobject_cast<QTabBar*>(object))
@@ -3582,8 +3649,10 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                     tabBar->setProperty(kHoveredChildProperty, QVariant::fromValue(hoveredChild));
                     tabBar->update();
                 }
+
                 break;
             }
+
             default:
                 break;
         }
