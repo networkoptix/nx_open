@@ -175,7 +175,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
         if (!bookmark.isValid())
             return QnCameraBookmark();
 
-        if (!availableCameraByUniqueId(bookmark.cameraId))
+        if (!availableCameraById(bookmark.cameraId))
             return QnCameraBookmark();
 
         return bookmark;
@@ -231,7 +231,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
 
     params.setArgument(Qn::CameraBookmarkRole, currentBookmark);
 
-    auto camera = availableCameraByUniqueId(currentBookmark.cameraId);
+    auto camera = availableCameraById(currentBookmark.cameraId);
     if (camera)
         params.setResources(QnResourceList() << camera);
 
@@ -310,17 +310,18 @@ QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() c
     );
 }
 
-QnVirtualCameraResourcePtr QnSearchBookmarksDialogPrivate::availableCameraByUniqueId(const QString &uniqueId) const
+QnVirtualCameraResourcePtr QnSearchBookmarksDialogPrivate::availableCameraById(
+    const QnUuid& cameraId) const
 {
     const auto cameras = availableCameras();
 
-    const auto it = std::find_if(cameras.begin(), cameras.end()
-        , [this, uniqueId](const QnVirtualCameraResourcePtr &camera)
-    {
-        return (camera->getUniqueId() == uniqueId);
-    });
+    const auto it = std::find_if(cameras.begin(), cameras.end(),
+        [this, cameraId](const QnVirtualCameraResourcePtr& camera)
+        {
+            return camera->getId() == cameraId;
+        });
 
-    return (it == cameras.end() ? QnVirtualCameraResourcePtr() : *it);
+    return it == cameras.end() ? QnVirtualCameraResourcePtr() : *it;
 }
 
 void QnSearchBookmarksDialogPrivate::resetToAllAvailableCameras()
