@@ -40,3 +40,19 @@ TEST_F(QnSharedLayoutAccessProviderTest, checkDefaultCamera)
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
+
+TEST_F(QnSharedLayoutAccessProviderTest, checkSharedCamera)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto layout = addLayout();
+    ASSERT_TRUE(layout->isShared());
+
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    layout->addItem(item);
+
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}

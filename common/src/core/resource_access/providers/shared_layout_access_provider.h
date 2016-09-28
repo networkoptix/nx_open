@@ -13,4 +13,8 @@ public:
 protected:
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
+
+private:
+    void handleAccessibleResourcesChanged(const QnResourceAccessSubject& subject,
+        const QSet<QnUuid>& resourceIds);
 };
