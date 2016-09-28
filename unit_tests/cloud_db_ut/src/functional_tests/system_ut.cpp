@@ -499,25 +499,39 @@ TEST_F(System, sortingOrder)
     for (int i = 0; i < 1; ++i)
         ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
 
-    std::vector<api::SystemDataEx> systems;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+    std::list<std::string> systemIdsInSortOrder;
+    systemIdsInSortOrder.push_front(system1.id);
+    systemIdsInSortOrder.push_front(system2.id);
+    systemIdsInSortOrder.push_front(system3.id);
 
-    ASSERT_EQ(3, systems.size());
-    std::sort(
-        systems.begin(), systems.end(),
-        [](const api::SystemDataEx& one, const api::SystemDataEx& two)
-        {
-            return one.sortingOrder > two.sortingOrder; //< Descending sort.
-        });
+    //for (int i = 0; i < 2; ++i)
+    {
+        std::vector<api::SystemDataEx> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(account.data.email, account.password, &systems));
 
-    ASSERT_GT(systems[0].sortingOrder, systems[1].sortingOrder);
-    ASSERT_GT(systems[1].sortingOrder, systems[2].sortingOrder);
+        ASSERT_EQ(3, systems.size());
+        std::sort(
+            systems.begin(), systems.end(),
+            [](const api::SystemDataEx& one, const api::SystemDataEx& two)
+            {
+                return one.sortingOrder > two.sortingOrder; //< Descending sort.
+            });
 
-    ASSERT_EQ(system1.id, systems[0].id);
-    ASSERT_EQ(system2.id, systems[1].id);
-    ASSERT_EQ(system3.id, systems[2].id);
+        // TODO: #ak: comparing with systemIdsInSortOrder
+
+        ASSERT_GT(systems[0].sortingOrder, systems[1].sortingOrder);
+        ASSERT_GT(systems[1].sortingOrder, systems[2].sortingOrder);
+
+        ASSERT_EQ(system1.id, systems[0].id);
+        ASSERT_EQ(system2.id, systems[1].id);
+        ASSERT_EQ(system3.id, systems[2].id);
+
+        // TODO: #ak: shifting time and testing for access history expiration
+
+        ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
+    }
 }
 
 }   //cdb
