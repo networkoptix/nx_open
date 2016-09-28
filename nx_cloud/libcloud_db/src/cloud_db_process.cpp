@@ -222,7 +222,7 @@ int CloudDBProcess::exec()
         SystemManager systemManager(
             settings,
             &timerManager,
-            accountManager,
+            &accountManager,
             systemHealthInfoProvider,
             &dbManager,
             &transactionLog,

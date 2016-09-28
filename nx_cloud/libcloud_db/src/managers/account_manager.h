@@ -96,6 +96,15 @@ public:
     boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const;
     
+    nx::db::DBResult fetchExistingAccountOrCreateNewOneByEmail(
+        QSqlDatabase* connection,
+        const std::string& accountEmail,
+        data::AccountData* const accountData);
+    nx::db::DBResult fetchExistingAccountByEmail(
+        QSqlDatabase* connection,
+        const std::string& accountEmail,
+        data::AccountData* const accountData);
+
 private:
     const conf::Settings& m_settings;
     const StreeManager& m_streeManager;

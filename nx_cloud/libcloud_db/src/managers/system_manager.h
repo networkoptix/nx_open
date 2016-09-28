@@ -29,6 +29,7 @@
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
+#include "data/account_data.h"
 #include "data/data_filter.h"
 #include "data/system_data.h"
 #include "data_view.h"
@@ -67,7 +68,7 @@ public:
     SystemManager(
         const conf::Settings& settings,
         nx::utils::TimerManager* const timerManager,
-        const AccountManager& accountManager,
+        AccountManager* const accountManager,
         const SystemHealthInfoProvider& systemHealthInfoProvider,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         ec2::TransactionLog* const transactionLog,
@@ -217,7 +218,7 @@ private:
 
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
-    const AccountManager& m_accountManager;
+    AccountManager* const m_accountManager;
     const SystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     ec2::TransactionLog* const m_transactionLog;
@@ -281,9 +282,13 @@ private:
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
+    /**
+     * @param targetAccountData Filled with attributes of account \a sharing.accountEmail
+     */
     nx::db::DBResult updateSharingInDb(
         QSqlDatabase* const connection,
-        const data::SystemSharing& sharing);
+        const data::SystemSharing& sharing,
+        data::AccountData* const targetAccountData);
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         QSqlDatabase* const connection,
         const data::SystemSharing& sharing);

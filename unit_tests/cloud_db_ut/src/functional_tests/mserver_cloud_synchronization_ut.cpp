@@ -15,6 +15,7 @@
 #include <utils/common/id.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
+#include "email_manager_mocked.h"
 #include "transaction_transport.h"
 
 namespace nx {
@@ -526,6 +527,39 @@ TEST_F(Ec2MserverCloudSynchronization2, renameSystem)
         // Checking that system name has been updated in mediaserver.
         waitForCloudAndVmsToSyncSystemData();
     }
+}
+
+TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
+{
+    EmailManagerMocked mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(2);    //< One for owner account, another one - for user account
+
+    // Expecting send email call when adding unknown user.
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/)
+        {
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
+        });
+
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+    ::ec2::ApiUserData accountVmsData;
+    const std::string testEmail = "test_123@mail.ru";
+    addCloudUserLocally(testEmail, &accountVmsData);
+
+    waitForCloudAndVmsToSyncUsers();
+
+    // Checking that new account is actually there.
+    std::string confirmationCode;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->resetAccountPassword(testEmail, &confirmationCode));
 }
 
 } // namespace cdb

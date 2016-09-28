@@ -47,7 +47,7 @@ static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
 SystemManager::SystemManager(
     const conf::Settings& settings,
     nx::utils::TimerManager* const timerManager,
-    const AccountManager& accountManager,
+    AccountManager* const accountManager,
     const SystemHealthInfoProvider& systemHealthInfoProvider,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
     ec2::TransactionLog* const transactionLog,
@@ -313,7 +313,7 @@ void SystemManager::getSystems(
         for (auto& systemDataEx: resultData.systems)
         {
             const auto accountData = 
-                m_accountManager.findAccountByUserName(systemDataEx.ownerAccountEmail);
+                m_accountManager->findAccountByUserName(systemDataEx.ownerAccountEmail);
             if (accountData)
                 systemDataEx.ownerFullName = accountData->fullName;
             const auto sharingData = getSystemSharingData(
@@ -426,9 +426,7 @@ void SystemManager::getCloudUsersOfSystem(
         const auto systemSharingsRange = systemIndex.equal_range(systemID.get());
         for (auto it = systemSharingsRange.first; it != systemSharingsRange.second; ++it)
         {
-            api::SystemSharingEx sharingEx;
-            sharingEx.api::SystemSharing::operator=(*it);
-            resultData.sharing.emplace_back(std::move(sharingEx));
+            resultData.sharing.emplace_back(*it);
         }
     }
     else
@@ -456,9 +454,7 @@ void SystemManager::getCloudUsersOfSystem(
                  sharingIter != systemSharingRange.second;
                  ++sharingIter)
             {
-                api::SystemSharingEx sharingEx;
-                sharingEx.api::SystemSharing::operator=(*sharingIter);
-                resultData.sharing.emplace_back(std::move(sharingEx));
+                resultData.sharing.emplace_back(*sharingIter);
             }
         }
     }
@@ -467,7 +463,7 @@ void SystemManager::getCloudUsersOfSystem(
     for (api::SystemSharingEx& sharingEx: resultData.sharing)
     {
         const auto account = 
-            m_accountManager.findAccountByUserName(sharingEx.accountEmail);
+            m_accountManager->findAccountByUserName(sharingEx.accountEmail);
         if (static_cast<bool>(account))
         {
             sharingEx.accountFullName = account->fullName;
@@ -659,7 +655,7 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     api::SystemSharingEx resultData = *it;
     //resultData.api::SystemSharing::operator=(*it);
 
-    const auto account = m_accountManager.findAccountByUserName(accountEmail);
+    const auto account = m_accountManager->findAccountByUserName(accountEmail);
     if (!account)
         return boost::none;
 
@@ -711,7 +707,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
     const data::SystemRegistrationDataWithAccount& newSystem,
     InsertNewSystemToDbResult* const result)
 {
-    const auto account = m_accountManager.findAccountByUserName(newSystem.accountEmail);
+    const auto account = m_accountManager->findAccountByUserName(newSystem.accountEmail);
     if (!account)
     {
         NX_LOG(lm("Failed to add system %1 (%2) to account %3. Account not found")
@@ -983,14 +979,42 @@ void SystemManager::systemDeleted(
 
 nx::db::DBResult SystemManager::updateSharingInDb(
     QSqlDatabase* const connection,
-    const data::SystemSharing& sharing)
+    const data::SystemSharing& sharing,
+    data::AccountData* const targetAccountData)
 {
-    const auto account = m_accountManager.findAccountByUserName(sharing.accountEmail);
-    if (!account)
+    nx::db::DBResult result = nx::db::DBResult::ok;
+
     {
-        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2. Account not found").
-            arg(sharing.systemID).arg(sharing.accountEmail), cl_logDEBUG1);
-        return db::DBResult::notFound;
+        // Initializing account customization for case if account has to be created.
+        QnMutexLocker lk(&m_mutex);
+        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
+        const auto systemIter = systemByIdIndex.find(sharing.systemID);
+        if (systemIter != systemByIdIndex.end())
+            targetAccountData->customization = systemIter->customization;
+    }
+
+    if (sharing.accessRole == api::SystemAccessRole::none)
+    {
+        //< Removing sharing. No sense to create account
+        result = m_accountManager->fetchExistingAccountByEmail(
+            connection,
+            sharing.accountEmail,
+            targetAccountData);
+    }
+    else
+    {
+        result = m_accountManager->fetchExistingAccountOrCreateNewOneByEmail(
+            connection,
+            sharing.accountEmail,
+            targetAccountData);
+    }
+
+    if (result != nx::db::DBResult::ok)
+    {
+        NX_LOGX(lm("Error fetching account by email %1. %2")
+            .arg(sharing.accountEmail).arg(QnLexical::serialized(result)),
+            cl_logDEBUG1);
+        return result;
     }
 
     QSqlQuery updateRemoveSharingQuery(*connection);
@@ -1008,7 +1032,7 @@ nx::db::DBResult SystemManager::updateSharingInDb(
     QnSql::bind(sharing, &updateRemoveSharingQuery);
     updateRemoveSharingQuery.bindValue(
         ":accountID",
-        QnSql::serialized_field(account->id));
+        QnSql::serialized_field(targetAccountData->id));
     if (!updateRemoveSharingQuery.exec())
     {
         NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4")
@@ -1026,18 +1050,24 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
     QSqlDatabase* const connection,
     const data::SystemSharing& sharing)
 {
-    const auto account = m_accountManager.findAccountByUserName(sharing.accountEmail);
-    if (!account)
-        return nx::db::DBResult::notFound;
+    data::AccountData account;
+    nx::db::DBResult result = updateSharingInDb(connection, sharing, &account);
+    if (result != nx::db::DBResult::ok)
+    {
+        NX_LOGX(lm("Error sharing/unsharing system %1 with account %2. %3")
+            .arg(sharing.systemID).arg(sharing.accountEmail)
+            .arg(QnLexical::serialized(result)),
+            cl_logDEBUG1);
+        return result;
+    }
 
-    nx::db::DBResult result = nx::db::DBResult::ok;
     if (sharing.accessRole != api::SystemAccessRole::none)
     {
         //generating saveUser transaction
         ::ec2::ApiUserData userData;
         ec2::convert(sharing, &userData);
         userData.isCloud = true;
-        userData.fullName = QString::fromStdString(account->fullName);
+        userData.fullName = QString::fromStdString(account.fullName);
         result = m_transactionLog->generateTransactionAndSaveToLog<
             ::ec2::ApiCommand::saveUser>(
                 connection,
@@ -1048,7 +1078,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
         ::ec2::ApiResourceParamWithRefData fullNameData;
         fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
         fullNameData.name = Qn::USER_FULL_NAME;
-        fullNameData.value = QString::fromStdString(account->fullName);
+        fullNameData.value = QString::fromStdString(account.fullName);
         result = m_transactionLog->generateTransactionAndSaveToLog<
             ::ec2::ApiCommand::setResourceParam>(
                 connection,
@@ -1077,10 +1107,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
                 std::move(fullNameParam));
     }
 
-    if (result != nx::db::DBResult::ok)
-        return result;
-
-    return updateSharingInDb(connection, sharing);
+    return result;
 }
 
 void SystemManager::sharingUpdated(
@@ -1596,24 +1623,17 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     ec2::convert(data, systemSharingData);
 
     // Updating db.
+    data::AccountData account;
     const nx::db::DBResult result = 
-        updateSharingInDb(dbConnection, *systemSharingData);
+        updateSharingInDb(dbConnection, *systemSharingData, &account);
     if (result != nx::db::DBResult::ok)
         return result;
 
     // Generating "save full name" transaction.
-    const auto account = m_accountManager.findAccountByUserName(
-        data.email.toStdString());
-    if (!account)
-    {
-        // TODO: #ak Creating new account and sending invite email.
-        return nx::db::DBResult::notFound;
-    }
-
     ::ec2::ApiResourceParamWithRefData fullNameData;
     fullNameData.resourceId = data.id;
     fullNameData.name = Qn::USER_FULL_NAME;
-    fullNameData.value = QString::fromStdString(account->fullName);
+    fullNameData.value = QString::fromStdString(account.fullName);
     return m_transactionLog->generateTransactionAndSaveToLog<
         ::ec2::ApiCommand::setResourceParam>(
             dbConnection,

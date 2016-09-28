@@ -372,6 +372,79 @@ boost::optional<data::AccountData> AccountManager::findAccountByUserName(
     return m_cache.find(userName);
 }
 
+db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
+    QSqlDatabase* connection,
+    const std::string& accountEmail,
+    data::AccountData* const accountData)
+{
+    auto result = fetchExistingAccountByEmail(
+        connection,
+        accountEmail,
+        accountData);
+    if (result != db::DBResult::notFound)
+        return result;
+
+    // Creating new account.
+
+    accountData->id = QnUuid::createUuid().toSimpleByteArray().toStdString();
+    accountData->email = accountEmail;
+    accountData->statusCode = api::AccountStatus::awaitingActivation;
+
+    NX_LOGX(lm("Creating new account %1").arg(accountEmail), cl_logDEBUG1);
+
+    // Creating new account.
+    data::AccountConfirmationCode accountConfirmationCode;
+    const auto dbResult = insertAccount(connection, *accountData, &accountConfirmationCode);
+    if (dbResult != db::DBResult::ok)
+        return dbResult;
+    //connection->addAfterCommitHandler(
+    //    [this, 
+    //        accountData = *accountData, 
+    //        locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+    //            nx::db::DBResult resultCode)
+    //        {
+    //            if (resultCode != db::DBResult::ok)
+    //                return;
+    //            auto email = accountData.email;
+    //            m_cache.insert(std::move(email), std::move(accountData));
+    //        });
+    return db::DBResult::ok;
+}
+
+nx::db::DBResult AccountManager::fetchExistingAccountByEmail(
+    QSqlDatabase* connection,
+    const std::string& accountEmail,
+    data::AccountData* const accountData)
+{
+    QSqlQuery fetchAccountQuery(*connection);
+    fetchAccountQuery.setForwardOnly(true);
+    fetchAccountQuery.prepare(
+        R"sql(
+        SELECT id, email, password_ha1 as passwordHa1, full_name as fullName,
+               customization, status_code as statusCode
+        FROM account
+        WHERE email=:email
+        )sql");
+    fetchAccountQuery.bindValue(":email", QnSql::serialized_field(accountEmail));
+    if (!fetchAccountQuery.exec())
+    {
+        NX_LOGX(lm("Error fetching account %1 from DB. %2")
+            .arg(accountEmail).arg(fetchAccountQuery.lastError().text()),
+            cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    if (!fetchAccountQuery.next())
+        return nx::db::DBResult::notFound;
+
+    // Account exists.
+    QnSql::fetch(
+        QnSql::mapping<data::AccountData>(fetchAccountQuery),
+        fetchAccountQuery.record(),
+        accountData);
+    return db::DBResult::ok;
+}
+
 db::DBResult AccountManager::fillCache()
 {
     std::promise<db::DBResult> cacheFilledPromise;
