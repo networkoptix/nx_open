@@ -87,7 +87,7 @@ const QString getDevicePath(const QString& path)
     FILE* pipe;
     char buf[BUFSIZ];
 
-    if (( pipe = popen(command.toLatin1().constData(), "r")) == NULL)
+    if ((pipe = popen(command.toLatin1().constData(), "r")) == NULL)
     {
         NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
         return QString();
@@ -115,7 +115,7 @@ const QString getDevicePath(const QString& path)
 
 const QString& sysDrivePath()
 {
-    static QString devicePath = getDevicePath(lit("/root"));
+    static QString devicePath = getDevicePath(lit("/"));
     return devicePath;
 }
 
