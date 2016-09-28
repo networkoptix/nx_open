@@ -18,7 +18,7 @@ public:
         const QString& name = kTestUserName,
         QnUserType userType = QnUserType::Local);
 
-    QnLayoutResourcePtr createLayout();
+    QnLayoutResourcePtr addLayout();
 
     QnVirtualCameraResourcePtr createCamera();
 

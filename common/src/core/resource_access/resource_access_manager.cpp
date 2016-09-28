@@ -217,7 +217,7 @@ void QnResourceAccessManager::setAccessibleResources(const QnResourceAccessSubje
         }
     }
 
-    emit accessibleResourcesChanged(subject);
+    emit accessibleResourcesChanged(subject, resources);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnResourceAccessSubject& subject) const

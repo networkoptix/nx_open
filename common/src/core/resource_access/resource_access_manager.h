@@ -134,7 +134,8 @@ public:
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
 signals:
-    void accessibleResourcesChanged(const QnResourceAccessSubject& subject);
+    void accessibleResourcesChanged(const QnResourceAccessSubject& subject,
+        const QSet<QnUuid>& resourceIds);
 
     /** Notify listeners that permissions possibly changed (not necessarily). */
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);

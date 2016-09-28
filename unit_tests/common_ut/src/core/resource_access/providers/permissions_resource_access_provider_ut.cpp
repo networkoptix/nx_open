@@ -136,7 +136,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessUser)
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessLayout)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
-    auto target = createLayout();
+    auto target = addLayout();
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -240,7 +240,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkStorageAccess)
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkLayoutAccess)
 {
-    auto target = createLayout();
+    auto target = addLayout();
 
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));

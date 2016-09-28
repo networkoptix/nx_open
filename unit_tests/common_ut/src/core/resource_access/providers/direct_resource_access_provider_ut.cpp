@@ -119,9 +119,25 @@ TEST_F(QnDirectResourceAccessProviderTest, checkAccessToInvalidResource)
     ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
+TEST_F(QnDirectResourceAccessProviderTest, checkDefaultCamera)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::GlobalAdminPermission);
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessCamera)
 {
-    auto camera = addCamera();
+    auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
-    ASSERT_TRUE(accessProvider()->hasAccess(user, camera));
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessLayout)
+{
+    auto target = addLayout();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }

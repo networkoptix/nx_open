@@ -20,6 +20,9 @@ QnDirectResourceAccessProvider::QnDirectResourceAccessProvider(QObject* parent):
         &QnDirectResourceAccessProvider::handleRoleAddedOrUpdated);
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
         &QnDirectResourceAccessProvider::handleRoleRemoved);
+
+    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this,
+        &QnDirectResourceAccessProvider::handleAccessibleResourcesChanged);
 }
 
 QnDirectResourceAccessProvider::~QnDirectResourceAccessProvider()
@@ -49,7 +52,7 @@ bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
     if (!acceptable(subject, resource))
         return false;
 
-    return true;
+    return qnResourceAccessManager->accessibleResources(subject).contains(resource->getId());
 }
 
 void QnDirectResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
@@ -168,4 +171,22 @@ void QnDirectResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupDa
     }
     NX_ASSERT(accessible.isEmpty());
     m_accessibleResources.remove(id);
+}
+
+void QnDirectResourceAccessProvider::handleAccessibleResourcesChanged(
+    const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
+{
+    NX_ASSERT(subject.isValid());
+    if (!subject.isValid())
+        return;
+
+    auto accessible = m_accessibleResources[subject.id()];
+    auto added = resourceIds - accessible;
+    auto removed = accessible - resourceIds;
+
+    auto changed = (resourceIds | accessible) - (resourceIds & accessible);
+    NX_ASSERT(changed == (added + removed));
+
+    for (auto resource: qnResPool->getResources(added + removed))
+        updateAccess(subject, resource);
 }
