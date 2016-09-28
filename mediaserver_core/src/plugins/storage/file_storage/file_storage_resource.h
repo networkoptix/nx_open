@@ -47,6 +47,8 @@ public:
 
     virtual void setUrl(const QString& url) override;
 
+    virtual bool isSystem() const override;
+
     QString getLocalPath() const
     {
         return m_localPath.isEmpty() ? getPath() : m_localPath;
@@ -99,6 +101,7 @@ private:
     mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
+    mutable bool m_isSystem;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 
