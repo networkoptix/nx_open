@@ -1352,7 +1352,7 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
 }
 
 void SystemManager::systemAccessWeightUpdatedInDb(
-    QnCounter::ScopedIncrement asyncCallLocker,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::UserSessionDescriptor userSessionDescriptor,
