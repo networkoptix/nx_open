@@ -41,16 +41,10 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     if (resource->hasFlags(Qn::desktop_camera))
         return hasAccessToDesktopCamera(subject, resource);
 
-    /* Web Pages behave totally like cameras. */
-    bool isMediaResource = resource.dynamicCast<QnVirtualCameraResource>()
-        || resource->hasFlags(Qn::web_page);
-
-    bool isVideoWall = resource->hasFlags(Qn::videowall);
-
     auto requiredPermission = Qn::GlobalAdminPermission;
-    if (isMediaResource)
+    if (isMediaResource(resource))
         requiredPermission = Qn::GlobalAccessAllMediaPermission;
-    else if (isVideoWall)
+    else if (resource->hasFlags(Qn::videowall))
         requiredPermission = Qn::GlobalControlVideoWallPermission;
 
     return qnResourceAccessManager->hasGlobalPermission(subject, requiredPermission);

@@ -32,6 +32,8 @@ protected:
 
     QSet<QnUuid> accessible(const QnResourceAccessSubject& subject) const;
 
+    bool isMediaResource(const QnResourcePtr& resource) const;
+
 private:
     /** Hash of accessible resources by subject id. */
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;

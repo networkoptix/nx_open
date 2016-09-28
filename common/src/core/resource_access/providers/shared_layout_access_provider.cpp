@@ -21,6 +21,9 @@ QnSharedLayoutAccessProvider::~QnSharedLayoutAccessProvider()
 bool QnSharedLayoutAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
+    if (!isMediaResource(resource))
+        return false;
+
     auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
         qnResourceAccessManager->accessibleResources(subject));
 

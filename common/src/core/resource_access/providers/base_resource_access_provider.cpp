@@ -160,3 +160,10 @@ QSet<QnUuid> QnBaseResourceAccessProvider::accessible(const QnResourceAccessSubj
 {
     return m_accessibleResources.value(subject.id());
 }
+
+bool QnBaseResourceAccessProvider::isMediaResource(const QnResourcePtr& resource) const
+{
+    /* Web Pages behave totally like cameras. */
+    return resource->hasFlags(Qn::live_cam)
+        || resource->hasFlags(Qn::web_page);
+}
