@@ -249,6 +249,18 @@ namespace
         return false;
     }
 
+    QIcon::Mode buttonIconMode(const QStyleOption& option)
+    {
+        if (!option.state.testFlag(QStyle::State_Enabled))
+            return QIcon::Disabled;
+        if (option.state.testFlag(QStyle::State_Sunken))
+            return QnIcon::Pressed;
+        if (option.state.testFlag(QStyle::State_MouseOver))
+            return QIcon::Active;
+
+        return QIcon::Normal;
+    }
+
     bool isNonEditableComboBox(const QWidget* widget)
     {
         auto comboBox = qobject_cast<const QComboBox*>(widget);
@@ -897,6 +909,24 @@ void QnNxStyle::drawPrimitive(
         case PE_IndicatorTabClose:
         {
             bool selected = option->state.testFlag(QStyle::State_Selected);
+
+            /* Main window tabs draw icons: */
+            if (const QTabBar* tabBar = qobject_cast<const QTabBar*>(widget->parent()))
+            {
+                if (tabShape(tabBar) == TabShape::Rectangular)
+                {
+                    QIcon icon = qnSkin->icon(selected
+                        ? lit("tab_bar/tab_close_current.png")
+                        : lit("tab_bar/tab_close.png"));
+
+                    QIcon::Mode mode = buttonIconMode(*option);
+                    icon.paint(painter, option->rect, Qt::AlignCenter, mode);
+                    return;
+                }
+            }
+
+            /* Other tabs normally don't have close buttons, but if
+             * they ever do, fall back to vector drawing of the cross: */
 
             QColor color = option->palette.color(
                     selected ? QPalette::Text : QPalette::Light);
@@ -2118,13 +2148,7 @@ void QnNxStyle::drawControl(
                 /* Draw icon left-aligned: */
                 if (!buttonOption->icon.isNull())
                 {
-                    QIcon::Mode mode;
-                    if (!buttonOption->state.testFlag(State_Enabled))
-                        mode = QIcon::Disabled;
-                    else if (buttonOption->state.testFlag(State_Sunken))
-                        mode = QnIcon::Pressed;
-                    else if (buttonOption->state.testFlag(State_MouseOver))
-                        mode = QnIcon::Active;
+                    QIcon::Mode mode = buttonIconMode(*option);
 
                     QIcon::State state = buttonOption->state.testFlag(State_On)
                         ? QIcon::On : QIcon::Off;
