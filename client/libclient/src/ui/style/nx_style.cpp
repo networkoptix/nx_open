@@ -1630,7 +1630,7 @@ void QnNxStyle::drawControl(
                     case TabShape::Rectangular:
                     {
                         QnPaletteColor mainColor = findColor(
-                            option->palette.color(QPalette::Mid)).lighter(1);
+                            option->palette.color(QPalette::Base)).lighter(1);
 
                         QColor color = mainColor;
 
