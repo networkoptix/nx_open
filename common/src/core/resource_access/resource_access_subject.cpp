@@ -92,6 +92,5 @@ QnUuid QnResourceAccessSubject::effectiveId() const
 
 bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) const
 {
-    return d_ptr->user == other.user()
-        && d_ptr->role == other.role();
+    return d_ptr->id() == other.id();
 }

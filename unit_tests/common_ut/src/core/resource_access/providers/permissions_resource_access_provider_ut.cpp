@@ -53,10 +53,10 @@ protected:
         return m_accessProvider.data();
     }
 
-    ec2::ApiUserGroupData createRole() const
+    ec2::ApiUserGroupData createRole(Qn::GlobalPermissions permissions) const
     {
         return ec2::ApiUserGroupData(QnUuid::createUuid(), QStringLiteral("test_role"),
-            Qn::GlobalAccessAllMediaPermission);
+            permissions);
     }
 
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
@@ -332,21 +332,56 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkRoleCameraAccess)
 {
     auto target = addCamera();
 
-    auto role = createRole();
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
     qnUserRolesManager->addOrUpdateUserRole(role);
     ASSERT_TRUE(accessProvider()->hasAccess(role, target));
 }
 
-// check permissions changing
+TEST_F(QnPermissionsResourceAccessProviderTest, checkRolePermissionsChange)
+{
+    auto target = addCamera();
 
-// await get access
+    auto role = createRole(Qn::NoGlobalPermissions);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    ASSERT_FALSE(accessProvider()->hasAccess(role, target));
+
+    role.permissions = Qn::GlobalAccessAllMediaPermission;
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    ASSERT_TRUE(accessProvider()->hasAccess(role, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitAddedRoleAccess)
+{
+    auto target = addCamera();
+
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    awaitAccess(role, target, true);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+}
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedRoleAccess)
 {
     auto target = addCamera();
 
-    auto role = createRole();
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
     qnUserRolesManager->addOrUpdateUserRole(role);
     awaitAccess(role, target, false);
+
+    qnUserRolesManager->removeUserRole(role.id);
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, suppressDuplicatedRoleSignals)
+{
+    auto target = addCamera();
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    awaitAccess(role, target, false);
+
+    /* Here we should NOT receive the signal */
+    role.permissions = Qn::GlobalAccessAllMediaPermission | Qn::GlobalExportPermission;
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    /* Here we should receive the 'false' value. */
     qnUserRolesManager->removeUserRole(role.id);
 }
