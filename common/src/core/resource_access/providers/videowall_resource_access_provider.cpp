@@ -32,7 +32,7 @@ bool QnVideoWallResourceAccessProvider::calculateAccess(const QnResourceAccessSu
     auto resourceId = resource->getId();
     if (layoutIds.contains(resourceId))
         return true;
-/*
+
     auto layouts = qnResPool->getResources<QnLayoutResource>(layoutIds);
 
     for (const auto& layout : layouts)
@@ -43,7 +43,6 @@ bool QnVideoWallResourceAccessProvider::calculateAccess(const QnResourceAccessSu
                 return true;
         }
     }
-    */
 
     return false;
 }
@@ -93,5 +92,9 @@ void QnVideoWallResourceAccessProvider::updateByLayoutId(const QnUuid& id)
         return;
 
     if (auto layout = qnResPool->getResourceById<QnLayoutResource>(id))
+    {
         updateAccessToResource(layout);
+        for (const auto& resource: layout->layoutResources())
+            updateAccessToResource(resource);
+    }
 }
