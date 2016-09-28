@@ -1,5 +1,7 @@
 #include "videowall_resource_access_provider.h"
 
+#include <core/resource_access/resource_access_manager.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <core/resource/layout_resource.h>
@@ -17,6 +19,9 @@ QnVideoWallResourceAccessProvider::~QnVideoWallResourceAccessProvider()
 bool QnVideoWallResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
+    if (!qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+        return false;
+
     QSet<QnUuid> layoutIds = accessibleLayouts();
     auto resourceId = resource->getId();
     if (layoutIds.contains(resourceId))
