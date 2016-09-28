@@ -48,7 +48,7 @@ namespace
     const char* kViewportMarginsBackupId = "viewportMargins";
     const char* kContentsMarginsBackupId = "contentsMargins";
 
-    const char* kHoveredChildProperty = "_qn_hoveredChild";
+    const char* kHoveredWidgetProperty = "_qn_hoveredWidget";
 
     const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
 
@@ -229,12 +229,24 @@ namespace
         if (!option->state.testFlag(QStyle::State_MouseOver))
             return false;
 
+        if (!widget)
+            return true;
+
         /* QTabBar marks a tab as hovered even if a child widget is hovered above that tab.
          * To overcome this problem we process hover events and track hovered children: */
-        if (widget && widget->property(kHoveredChildProperty).value<QWidget*>())
+        auto hoveredWidget = widget->property(kHoveredWidgetProperty).value<QWidget*>();
+        if (!hoveredWidget)
             return false;
 
-        return true;
+        if (hoveredWidget == widget)
+            return true;
+
+        /* Make exception for close buttons: */
+        static const QByteArray kQTabBarCloseButtonClassName = "CloseButton";
+        if (hoveredWidget->metaObject()->className() == kQTabBarCloseButtonClassName)
+            return true;
+
+        return false;
     }
 
     bool isNonEditableComboBox(const QWidget* widget)
@@ -3532,7 +3544,7 @@ void QnNxStyle::unpolish(QWidget* widget)
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {
         /* Remove hover events tracking: */
-        tabBar->setProperty(kHoveredChildProperty, QVariant());
+        tabBar->setProperty(kHoveredWidgetProperty, QVariant());
         tabBar->removeEventFilter(this);
     }
 
@@ -3635,21 +3647,27 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
      * To overcome this problem we process hover events and track hovered children: */
     if (auto tabBar = qobject_cast<QTabBar*>(object))
     {
-        QWidget* hoveredChild = nullptr;
+        QWidget* hoveredWidget = nullptr;
         switch (event->type())
         {
-            case QEvent::HoverEnter:
             case QEvent::HoverMove:
-                hoveredChild = tabBar->childAt(static_cast<QHoverEvent*>(event)->pos());
+            case QEvent::HoverEnter:
+            {
+                if (tabBar->rect().contains(static_cast<QHoverEvent*>(event)->pos()))
+                {
+                    hoveredWidget = tabBar->childAt(static_cast<QHoverEvent*>(event)->pos());
+                    if (!hoveredWidget)
+                        hoveredWidget = tabBar;
+                }
                 /* FALL THROUGH */
+            }
             case QEvent::HoverLeave:
             {
-                if (tabBar->property(kHoveredChildProperty).value<QWidget*>() != hoveredChild)
+                if (tabBar->property(kHoveredWidgetProperty).value<QWidget*>() != hoveredWidget)
                 {
-                    tabBar->setProperty(kHoveredChildProperty, QVariant::fromValue(hoveredChild));
+                    tabBar->setProperty(kHoveredWidgetProperty, QVariant::fromValue(hoveredWidget));
                     tabBar->update();
                 }
-
                 break;
             }
 
