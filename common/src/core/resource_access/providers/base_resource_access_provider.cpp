@@ -45,6 +45,9 @@ void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& r
 {
     for (const auto& user : qnResPool->getResources<QnUserResource>())
         updateAccess(user, resource);
+
+    for (const auto& role: qnUserRolesManager->userRoles())
+        updateAccess(role, resource);
 }
 
 void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
@@ -127,6 +130,17 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
             continue;
 
         QnResourceAccessSubject subject(user);
+        auto& accessible = m_accessibleResources[subject.id()];
+        if (!accessible.contains(resourceId))
+            continue;
+
+        accessible.remove(resourceId);
+        emit accessChanged(subject, resource, false);
+    }
+
+    for (const auto& role : qnUserRolesManager->userRoles())
+    {
+        QnResourceAccessSubject subject(role);
         auto& accessible = m_accessibleResources[subject.id()];
         if (!accessible.contains(resourceId))
             continue;

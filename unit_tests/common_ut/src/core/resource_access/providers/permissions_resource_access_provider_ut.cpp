@@ -304,3 +304,23 @@ TEST_F(QnPermissionsResourceAccessProviderTest, suppressDuplicatedRoleSignals)
     /* Here we should receive the 'false' value. */
     qnUserRolesManager->removeUserRole(role.id);
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitRoleAccessToAddedCamera)
+{
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    auto target = createCamera();
+    awaitAccess(role, target, true);
+    qnResPool->addResource(target);
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitRoleAccessToRemovedCamera)
+{
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    auto target = addCamera();
+    awaitAccess(role, target, false);
+    qnResPool->removeResource(target);
+}
