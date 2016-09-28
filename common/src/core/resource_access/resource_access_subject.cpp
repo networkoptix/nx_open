@@ -18,6 +18,13 @@ public:
         return user || !role.isNull();
     }
 
+    QnUuid id() const
+    {
+        return user
+            ? user->getId()
+            : role.id;
+    }
+
     QnUuid effectiveId() const
     {
         if (!isValid())
@@ -71,6 +78,11 @@ const ec2::ApiUserGroupData& QnResourceAccessSubject::role() const
 bool QnResourceAccessSubject::isValid() const
 {
     return d_ptr->isValid();
+}
+
+QnUuid QnResourceAccessSubject::id() const
+{
+    return d_ptr->id();
 }
 
 QnUuid QnResourceAccessSubject::effectiveId() const

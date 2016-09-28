@@ -48,8 +48,8 @@ bool QnPermissionsResourceAccessProvider::hasAccess(const QnResourceAccessSubjec
     if (!acceptable(subject, resource))
         return false;
 
-    NX_ASSERT(m_accessibleResources.contains(subject.effectiveId()));
-    return m_accessibleResources[subject.effectiveId()].contains(resource->getId());
+    NX_ASSERT(m_accessibleResources.contains(subject.id()));
+    return m_accessibleResources[subject.id()].contains(resource->getId());
 }
 
 bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
@@ -104,7 +104,7 @@ void QnPermissionsResourceAccessProvider::updateAccess(const QnResourceAccessSub
     if (!acceptable(subject, resource))
         return;
 
-    auto& accessible = m_accessibleResources[subject.effectiveId()];
+    auto& accessible = m_accessibleResources[subject.id()];
     auto targetId = resource->getId();
 
     bool oldValue = accessible.contains(targetId);
@@ -129,10 +129,10 @@ void QnPermissionsResourceAccessProvider::cleanAccess(const QnResourcePtr& resou
         disconnect(user, nullptr, this, nullptr);
 
         QnResourceAccessSubject subject(user);
-        auto effectiveId = subject.effectiveId();
+        auto id = subject.id();
 
-        NX_ASSERT(m_accessibleResources.contains(effectiveId));
-        auto& accessible = m_accessibleResources[effectiveId];
+        NX_ASSERT(m_accessibleResources.contains(id));
+        auto& accessible = m_accessibleResources[id];
 
         for (const auto& targetResource : qnResPool->getResources(accessible.values()))
         {
@@ -147,7 +147,7 @@ void QnPermissionsResourceAccessProvider::cleanAccess(const QnResourcePtr& resou
         accessible.remove(resourceId);
         NX_ASSERT(accessible.isEmpty());
 
-        m_accessibleResources.remove(effectiveId);
+        m_accessibleResources.remove(id);
     }
 
     for (const auto& user : qnResPool->getResources<QnUserResource>())
@@ -156,7 +156,7 @@ void QnPermissionsResourceAccessProvider::cleanAccess(const QnResourcePtr& resou
             continue;
 
         QnResourceAccessSubject subject(user);
-        auto& accessible = m_accessibleResources[subject.effectiveId()];
+        auto& accessible = m_accessibleResources[subject.id()];
         if (!accessible.contains(resourceId))
             continue;
 
