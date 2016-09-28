@@ -141,3 +141,21 @@ TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessLayout)
     qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
+
+TEST_F(QnDirectResourceAccessProviderTest, checkAccessAdded)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+
+    awaitAccess(user, target, true);
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
+}
+
+TEST_F(QnDirectResourceAccessProviderTest, checkAccessRemoved)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
+    awaitAccess(user, target, false);
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>());
+}
