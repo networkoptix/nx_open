@@ -64,6 +64,13 @@ bool QnQmlSortFilterProxyModel::lessThan(const QModelIndex& left,
 {
     const auto leftIsFactory = left.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
     const auto rightIsFactory = right.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
+    if (leftIsFactory && rightIsFactory)
+    {
+        const auto leftSystemId = left.data(QnSystemsModel::SystemIdRoleId).toString();
+        const auto rightSystemId = right.data(QnSystemsModel::SystemIdRoleId).toString();
+        return (leftSystemId < rightSystemId);
+    }
+
     if (leftIsFactory || rightIsFactory)
         return leftIsFactory;
 
