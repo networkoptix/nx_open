@@ -50,10 +50,10 @@ private:
     std::vector<QByteArray> m_updateScripts;
     nx::utils::promise<DBResult> m_dbUpdatePromise;
 
-    DBResult updateDbInternal(db::QueryContext* const dbConnection);
+    DBResult updateDbInternal(nx::db::QueryContext* const dbConnection);
     bool execSQLScript(
         QByteArray script,
-        db::QueryContext* const dbConnection);
+        nx::db::QueryContext* const dbConnection);
 };
 
 }   //db

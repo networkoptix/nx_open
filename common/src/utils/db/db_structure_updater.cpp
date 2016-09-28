@@ -96,7 +96,7 @@ bool DBStructureUpdater::updateStructSync()
     //starting async operation
     m_dbManager->executeUpdate(
         std::bind(&DBStructureUpdater::updateDbInternal, this, std::placeholders::_1),
-        [this](db::QueryContext* /*connection*/, DBResult dbResult)
+        [this](nx::db::QueryContext* /*connection*/, DBResult dbResult)
         {
             m_dbUpdatePromise.set_value(dbResult);
         });
@@ -106,7 +106,7 @@ bool DBStructureUpdater::updateStructSync()
     return future.get() == DBResult::ok;
 }
 
-DBResult DBStructureUpdater::updateDbInternal( db::QueryContext* const queryContext )
+DBResult DBStructureUpdater::updateDbInternal( nx::db::QueryContext* const queryContext )
 {
     //reading current DB version
     QSqlQuery fetchDbVersionQuery(*queryContext->connection());
@@ -174,7 +174,7 @@ DBResult DBStructureUpdater::updateDbInternal( db::QueryContext* const queryCont
 
 bool DBStructureUpdater::execSQLScript(
     QByteArray script,
-    db::QueryContext* const queryContext)
+    nx::db::QueryContext* const queryContext)
 {
     const auto driverType = m_dbManager->connectionOptions().driverType;
 

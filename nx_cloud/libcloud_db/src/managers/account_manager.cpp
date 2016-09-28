@@ -373,7 +373,7 @@ boost::optional<data::AccountData> AccountManager::findAccountByUserName(
 }
 
 db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
-    db::QueryContext* queryContext,
+    nx::db::QueryContext* queryContext,
     const std::string& accountEmail,
     data::AccountData* const accountData)
 {
@@ -417,7 +417,7 @@ db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
 }
 
 nx::db::DBResult AccountManager::fetchExistingAccountByEmail(
-    db::QueryContext* queryContext,
+    nx::db::QueryContext* queryContext,
     const std::string& accountEmail,
     data::AccountData* const accountData)
 {
@@ -460,7 +460,7 @@ db::DBResult AccountManager::fillCache()
     m_dbManager->executeSelect<int>(
         std::bind(&AccountManager::fetchAccounts, this, _1, _2),
         [&cacheFilledPromise](
-            db::QueryContext* /*queryContext*/,
+            nx::db::QueryContext* /*queryContext*/,
             db::DBResult dbResult,
             int /*dummyResult*/ )
         {
@@ -473,7 +473,7 @@ db::DBResult AccountManager::fillCache()
 }
 
 db::DBResult AccountManager::fetchAccounts( 
-    db::QueryContext* queryContext,
+    nx::db::QueryContext* queryContext,
     int* const /*dummyResult*/ )
 {
     QSqlQuery readAccountsQuery(*queryContext->connection());
@@ -505,7 +505,7 @@ db::DBResult AccountManager::fetchAccounts(
 }
 
 db::DBResult AccountManager::insertAccount(
-    db::QueryContext* const queryContext,
+    nx::db::QueryContext* const queryContext,
     const data::AccountData& accountData,
     data::AccountConfirmationCode* const resultData)
 {
@@ -534,7 +534,7 @@ db::DBResult AccountManager::insertAccount(
 }
 
 db::DBResult AccountManager::issueAccountActivationCode(
-    db::QueryContext* const queryContext,
+    nx::db::QueryContext* const queryContext,
     const std::string& accountEmail,
     data::AccountConfirmationCode* const resultData)
 {
@@ -604,7 +604,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 void AccountManager::accountAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
-    db::QueryContext* /*queryContext*/,
+    nx::db::QueryContext* /*queryContext*/,
     db::DBResult resultCode,
     data::AccountData accountData,
     data::AccountConfirmationCode resultData,
@@ -632,7 +632,7 @@ void AccountManager::accountAdded(
 void AccountManager::accountReactivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
-    db::QueryContext* /*queryContext*/,
+    nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     std::string /*email*/,
     data::AccountConfirmationCode resultData,
@@ -649,7 +649,7 @@ void AccountManager::accountReactivated(
 }
 
 nx::db::DBResult AccountManager::verifyAccount(
-    db::QueryContext* const queryContext,
+    nx::db::QueryContext* const queryContext,
     const data::AccountConfirmationCode& verificationCode,
     std::string* const resultAccountEmail )
 {
@@ -704,7 +704,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 
 void AccountManager::accountVerified(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    db::QueryContext* /*queryContext*/,
+    nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -727,7 +727,7 @@ void AccountManager::accountVerified(
 
 nx::db::DBResult AccountManager::updateAccountInDB(
     bool activateAccountIfNotActive,
-    db::QueryContext* const queryContext,
+    nx::db::QueryContext* const queryContext,
     const data::AccountUpdateDataWithEmail& accountData)
 {
     NX_ASSERT(static_cast<bool>(accountData.passwordHa1) ||
@@ -786,7 +786,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 void AccountManager::accountUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool activateAccountIfNotActive,
-    db::QueryContext* /*queryContext*/,
+    nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)

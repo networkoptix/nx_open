@@ -179,10 +179,10 @@ public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
     typedef nx::utils::MoveOnlyFunc<
         nx::db::DBResult(
-            db::QueryContext*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
+            nx::db::QueryContext*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
     > ProcessEc2TransactionFunc;
     typedef nx::utils::MoveOnlyFunc<
-        void(db::QueryContext*, nx::db::DBResult, AuxiliaryArgType)
+        void(nx::db::QueryContext*, nx::db::DBResult, AuxiliaryArgType)
     > OnTranProcessedFunc;
 
     /**
@@ -228,7 +228,7 @@ private:
                 TransactionContext{ std::move(transportHeader), std::move(transaction) },
                 auxiliaryArgPtr),
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
-                db::QueryContext* queryContext,
+                nx::db::QueryContext* queryContext,
                 nx::db::DBResult dbResult) mutable
             {
                 dbProcessingCompleted(
@@ -240,7 +240,7 @@ private:
     }
 
     nx::db::DBResult processTransactionInDbConnectionThread(
-        db::QueryContext* queryContext,
+        nx::db::QueryContext* queryContext,
         const TransactionContext& transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
@@ -293,7 +293,7 @@ private:
     }
 
     void dbProcessingCompleted(
-        db::QueryContext* queryContext,
+        nx::db::QueryContext* queryContext,
         nx::db::DBResult dbResult,
         AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
