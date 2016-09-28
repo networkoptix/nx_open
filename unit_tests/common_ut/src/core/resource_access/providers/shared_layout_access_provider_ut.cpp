@@ -71,6 +71,6 @@ TEST_F(QnSharedLayoutAccessProviderTest, checkSharedServer)
 
     qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
 
-    /* User should not get access to statistics via shared layouts. */
-    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+    /* User should get access to statistics via shared layouts. */
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }

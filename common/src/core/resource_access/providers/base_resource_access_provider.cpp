@@ -189,5 +189,6 @@ bool QnBaseResourceAccessProvider::isMediaResource(const QnResourcePtr& resource
 {
     /* Web Pages behave totally like cameras. */
     return resource->hasFlags(Qn::live_cam)
-        || resource->hasFlags(Qn::web_page);
+        || resource->hasFlags(Qn::web_page)
+        || resource->hasFlags(Qn::server);
 }

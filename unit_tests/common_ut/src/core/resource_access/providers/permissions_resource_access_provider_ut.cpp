@@ -139,10 +139,11 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkServerAccess)
 {
     auto target = addServer();
 
-    auto user = addUser(Qn::GlobalAdminPermission);
+    /* Servers are now controlled via the same 'All Media' flag. */
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 
-    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+    user->setRawPermissions(Qn::GlobalEditCamerasPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
