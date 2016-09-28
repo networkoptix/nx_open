@@ -68,7 +68,7 @@ DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
         if (!toCatalog)
             continue;
 
-        if (toCatalog->getLastSyncTime() < resultChunk.startTimeMs) {
+        if (toCatalog->lastChunkStartTime() < resultChunk.startTimeMs) {
             resultChunk = prevResultChunk;
             break;
         }
@@ -179,7 +179,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
     if (!toCatalog)
         return CopyError::GetCatalogError;
 
-    if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
+    if (toCatalog->lastChunkStartTime() < chunkKey.chunk.startTimeMs) {
         {   // update sync data
             QnMutexLocker lk(&m_syncDataMutex);
             SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
@@ -353,7 +353,7 @@ void QnScheduleSync::addSyncDataKey(
     ChunkKey tmp = getOldestChunk(
         cameraId, 
         quality, 
-        catalog->getLastSyncTime(), 
+        catalog->lastChunkStartTime(),
         &syncData
     );
     m_syncData.emplace(tmp, syncData);

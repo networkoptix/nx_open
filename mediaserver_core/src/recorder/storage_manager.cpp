@@ -67,89 +67,7 @@ struct TasksQueueInfo {
     bool isEmpty() const { return tasksCount == 0; }
 };
 
-#if defined(Q_OS_WIN)
-const QString& getDevicePath(const QString& path)
-{
-    return path;
-}
-
-const QString& sysDrivePath()
-{
-    static QString deviceString;
-
-    if (!deviceString.isNull())
-        return deviceString;
-
-    const DWORD bufSize = MAX_PATH + 1;
-    TCHAR buf[bufSize];
-    GetWindowsDirectory(buf, bufSize);
-
-    deviceString = QString::fromWCharArray(buf, bufSize).left(2);
-
-    return deviceString;
-}
-
-#elif defined(Q_OS_LINUX)
-
-const QString getDevicePath(const QString& path)
-{
-    QString command = lit("df '") + path + lit("'");
-    FILE* pipe;
-    char buf[BUFSIZ];
-
-    if (( pipe = popen(command.toLatin1().constData(), "r")) == NULL)
-    {
-        NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
-        return QString();
-    }
-
-    if (fgets(buf, BUFSIZ, pipe) == NULL) // header line
-    {
-        pclose(pipe);
-        return QString();
-    }
-
-    if (fgets(buf, BUFSIZ, pipe) == NULL) // data
-    {
-        pclose(pipe);
-        return QString();
-    }
-
-    auto dataString = QString::fromUtf8(buf);
-    QString deviceString = dataString.section(QRegularExpression("\\s+"), 0, 0);
-
-    pclose(pipe);
-
-    return deviceString;
-}
-
-const QString& sysDrivePath()
-{
-    static QString devicePath = getDevicePath(lit("/root"));
-    return devicePath;
-}
-
-#else // Unsupported OS so far
-
-const QString& getDevicePath(const QString& path)
-{
-    return path;
-}
-
-const QString& sysDrivePath()
-{
-    return QString();
-}
-
-#endif
-
-bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
-{
-    QString sysPath = sysDrivePath();
-    return sysPath.isNull() ? false : getDevicePath(storage->getUrl()).startsWith(sysDrivePath());
-}
 } // namespace <anonymous>
-
 class ArchiveScanPosition
 {
 public:
@@ -341,11 +259,12 @@ public:
                 partialScanProcessed = true;
                 QMap<DeviceFileCatalogPtr, qint64> catalogToScan; // key - catalog, value - start scan time;
                 {
+                    int storageIndex = qnStorageDbPool->getStorageIndex(scanData.storage);
                     QnMutexLocker lock(&m_owner->m_mutexCatalog);
                     for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
-                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime(storageIndex));
                     for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::HiQualityCatalog])
-                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime(storageIndex));
                 }
                 int totalStorageStep = catalogToScan.size();
                 int currentStorageStep = 0;
@@ -1691,7 +1610,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
 
     for (auto it = result.begin(); it != result.end(); ++it)
     {
-        if (!isStorageOnSystemDrive(*it))
+        if (!(*it)->isSystem())
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
@@ -2193,7 +2112,6 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         (qint16) timeZone
     );
     catalog->addRecord(chunk);
-    catalog->setLastSyncTime(startDateMs);
     return true;
 }
 

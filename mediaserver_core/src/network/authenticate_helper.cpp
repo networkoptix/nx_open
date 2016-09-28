@@ -542,8 +542,8 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Re
 
 QByteArray QnAuthHelper::getNonce()
 {
-    QnMutexLocker lock(&m_cookieNonceCacheMutex);
     const qint64 nonce = qnSyncTime->currentUSecsSinceEpoch();
+    QnMutexLocker lock(&m_cookieNonceCacheMutex);
     m_cookieNonceCache.insert(nonce, nonce);
     return QByteArray::number(nonce, 16);
 }
@@ -554,12 +554,11 @@ bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
         return false;
     static const qint64 USEC_IN_SEC = 1000000ll;
 
-    QnMutexLocker lock( &m_cookieNonceCacheMutex );
-
     const qint64 intNonce = nonce.toLongLong(0, 16);
     const qint64 curTimeUSec = qnSyncTime->currentUSecsSinceEpoch();
 
     bool rez;
+    QnMutexLocker lock( &m_cookieNonceCacheMutex );
     auto itr = m_cookieNonceCache.find(intNonce);
     if (itr == m_cookieNonceCache.end()) {
         rez = qAbs(curTimeUSec - intNonce) < NONCE_TIMEOUT;
