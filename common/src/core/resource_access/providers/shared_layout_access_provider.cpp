@@ -75,6 +75,18 @@ void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& reso
                 for (auto resource : qnResPool->getResources(layoutItems(layout)))
                     updateAccessToResource(resource);
             });
+
+        auto handleItemChanged =
+            [this](const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
+            {
+                /* Only remote resources with correct id can be accessed. */
+                if (item.resource.id.isNull())
+                    return;
+                if (auto resource = qnResPool->getResourceById(item.resource.id))
+                    updateAccessToResource(resource);
+            };
+        connect(layout, &QnLayoutResource::itemAdded, this, handleItemChanged);
+        connect(layout, &QnLayoutResource::itemRemoved, this, handleItemChanged);
     }
 }
 
