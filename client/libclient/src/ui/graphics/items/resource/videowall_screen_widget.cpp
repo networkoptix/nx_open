@@ -200,7 +200,10 @@ void QnVideowallScreenWidget::at_thumbnailReady(const QnUuid &resourceId, const 
     update();
 }
 
-void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+    const QnVideoWallItem& oldItem,
+    const QnVideoWallItem& item)
+{
     Q_UNUSED(videoWall)
 
     int idx = qnIndexOf(m_items, [&item](const QnVideoWallItem &i) {return item.uuid == i.uuid; });

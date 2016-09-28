@@ -120,7 +120,10 @@ private slots:
     void at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
     void at_layout_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
 
-    void at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+            const QnVideoWallItem& oldItem,
+            const QnVideoWallItem& item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
     void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);

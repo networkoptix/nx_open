@@ -1533,8 +1533,8 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
     if (videoWall)
     {
-        connect(videoWall,  &QnVideoWallResource::itemAdded,            this,   &QnResourceTreeModel::at_videoWall_itemAddedOrChanged);
-        connect(videoWall,  &QnVideoWallResource::itemChanged,          this,   &QnResourceTreeModel::at_videoWall_itemAddedOrChanged);
+        connect(videoWall,  &QnVideoWallResource::itemAdded,            this,   &QnResourceTreeModel::at_videoWall_itemAdded);
+        connect(videoWall,  &QnVideoWallResource::itemChanged,          this,   &QnResourceTreeModel::at_videoWall_itemChanged);
         connect(videoWall,  &QnVideoWallResource::itemRemoved,          this,   &QnResourceTreeModel::at_videoWall_itemRemoved);
 
         connect(videoWall,  &QnVideoWallResource::matrixAdded,          this,   &QnResourceTreeModel::at_videoWall_matrixAddedOrChanged);
@@ -1603,7 +1603,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (videoWall)
     {
         for (const QnVideoWallItem &item : videoWall->items()->getItems())
-            at_videoWall_itemAddedOrChanged(videoWall, item);
+            at_videoWall_itemAdded(videoWall, item);
         for (const QnVideoWallMatrix &matrix : videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
     }
@@ -1874,7 +1874,7 @@ void QnResourceTreeModel::at_layout_itemRemoved(const QnLayoutResourcePtr &layou
     }
 }
 
-void QnResourceTreeModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
+void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
 {
     auto parentNode = ensureResourceNode(videoWall);
     auto node = ensureItemNode(parentNode, item.uuid, Qn::VideoWallItemNode);
@@ -1887,6 +1887,13 @@ void QnResourceTreeModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResou
         updateNodeResource(node, resource);
     else
         node->update(); // in case of _changed method call, where setResource will exit instantly
+}
+
+void QnResourceTreeModel::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+    const QnVideoWallItem& oldItem,
+    const QnVideoWallItem& item)
+{
+    at_videoWall_itemAdded(videoWall, item);
 }
 
 void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)

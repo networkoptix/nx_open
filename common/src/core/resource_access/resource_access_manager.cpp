@@ -93,8 +93,8 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         {
             connect(videowall, &QnVideoWallResource::itemAdded,   this,
                 &QnResourceAccessManager::invalidateCacheForVideowallItem);
-            connect(videowall, &QnVideoWallResource::itemChanged, this,
-                &QnResourceAccessManager::invalidateCacheForVideowallItem);
+//             connect(videowall, &QnVideoWallResource::itemChanged, this,
+//                 &QnResourceAccessManager::invalidateCacheForVideowallItem);
             connect(videowall, &QnVideoWallResource::itemRemoved, this,
                 &QnResourceAccessManager::invalidateCacheForVideowallItem);
         }

@@ -6,7 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/webpage_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <nx_ec/data/api_user_group_data.h>
 
@@ -40,4 +40,17 @@ TEST_F(QnVideoWallResourceAccessProviderTest, checkDefaultCamera)
     auto target = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnVideoWallResourceAccessProviderTest, checkLayoutOnVideoWall)
+{
+    auto target = addLayout();
+    auto videoWall = addVideoWall();
+    auto user = addUser(Qn::GlobalAdminPermission);
+
+    QnVideoWallItem item;
+    item.layout = target->getId();
+    videoWall->items()->addItem(item);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
