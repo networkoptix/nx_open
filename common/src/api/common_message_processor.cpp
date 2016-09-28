@@ -20,6 +20,7 @@
 
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
@@ -280,7 +281,7 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
     }
     else
     {
-        auto role = qnResourceAccessManager->userGroup(accessRights.userId);
+        auto role = qnUserRolesManager->userRole(accessRights.userId);
         if (!role.isNull())
             qnResourceAccessManager->setAccessibleResources(role, accessibleResources);
     }
@@ -288,12 +289,12 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
 
 void QnCommonMessageProcessor::on_userGroupChanged(const ec2::ApiUserGroupData& userGroup)
 {
-    qnResourceAccessManager->addOrUpdateUserGroup(userGroup);
+    qnUserRolesManager->addOrUpdateUserRole(userGroup);
 }
 
 void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& groupId)
 {
-    qnResourceAccessManager->removeUserGroup(groupId);
+    qnUserRolesManager->removeUserRole(groupId);
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)
@@ -496,7 +497,7 @@ void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataL
 
 void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserGroupDataList& roles)
 {
-    qnResourceAccessManager->resetUserGroups(roles);
+    qnUserRolesManager->resetUserRoles(roles);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)

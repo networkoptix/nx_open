@@ -9,7 +9,7 @@
 
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/data/api_user_group_data.h>
+
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
@@ -29,27 +29,6 @@ public:
     static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
 
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
-
-    ec2::ApiUserGroupDataList userGroups() const;
-    void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
-
-    template <class IDList>
-    ec2::ApiUserGroupDataList userGroups(IDList idList) const
-    {
-        QnMutexLocker lk(&m_mutex);
-        ec2::ApiUserGroupDataList result;
-        for (const auto& id : idList)
-        {
-            const auto itr = m_userGroups.find(id);
-            if (itr != m_userGroups.end())
-                result.push_back(itr.value());
-        }
-        return result;
-    }
-
-    ec2::ApiUserGroupData userGroup(const QnUuid& groupId) const;
-    void addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup);
-    void removeUserGroup(const QnUuid& groupId);
 
     /** List of resources ids, the given user has access to (only given directly). */
     QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const;
@@ -157,9 +136,6 @@ public:
 signals:
     void accessibleResourcesChanged(const QnResourceAccessSubject& subject);
 
-    void userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
-    void userGroupRemoved(const QnUuid& groupId);
-
     /** Notify listeners that permissions possibly changed (not necessarily). */
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
 
@@ -190,7 +166,6 @@ private:
     mutable QnMutex m_mutex;
 
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
-    QHash<QnUuid, ec2::ApiUserGroupData> m_userGroups;
 
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 
