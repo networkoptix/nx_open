@@ -77,6 +77,20 @@ TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessOwnedLayout)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnDirectResourceAccessProviderTest, checkLayoutMadeShared)
+{
+    auto target = addLayout();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    target->setParentId(user->getId());
+    ASSERT_FALSE(target->isShared());
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
+
+    /* Here layout became shared. */
+    target->setParentId(QnUuid());
+    ASSERT_TRUE(target->isShared());
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnDirectResourceAccessProviderTest, checkAccessAdded)
 {
     auto target = addCamera();

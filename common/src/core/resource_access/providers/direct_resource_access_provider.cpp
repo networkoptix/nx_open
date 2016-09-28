@@ -37,6 +37,17 @@ bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
     return qnResourceAccessManager->accessibleResources(subject).contains(resource->getId());
 }
 
+void QnDirectResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
+{
+    base_type::handleResourceAdded(resource);
+
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        connect(layout, &QnResource::parentIdChanged, this,
+            &QnDirectResourceAccessProvider::updateAccessToResource);
+    }
+}
+
 void QnDirectResourceAccessProvider::handleAccessibleResourcesChanged(
     const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
 {

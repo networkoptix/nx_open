@@ -41,6 +41,12 @@ bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& sub
     return resource && resource->resourcePool() && subject.isValid();
 }
 
+void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& resource)
+{
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+        updateAccess(user, resource);
+}
+
 void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
@@ -66,8 +72,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
 void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
-        updateAccess(user, resource);
+    updateAccessToResource(resource);
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
     {
@@ -89,12 +94,12 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
 void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
+    disconnect(resource, nullptr, this, nullptr);
+
     auto resourceId = resource->getId();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
     {
-        disconnect(user, nullptr, this, nullptr);
-
         QnResourceAccessSubject subject(user);
 
         NX_ASSERT(m_accessibleResources.contains(resourceId));

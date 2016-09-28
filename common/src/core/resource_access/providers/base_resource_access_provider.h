@@ -22,10 +22,10 @@ protected:
     bool acceptable(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;
 
+    void updateAccessToResource(const QnResourcePtr& resource);
     void updateAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
-
-    void handleResourceAdded(const QnResourcePtr& resource);
-    void handleResourceRemoved(const QnResourcePtr& resource);
+    virtual void handleResourceAdded(const QnResourcePtr& resource);
+    virtual void handleResourceRemoved(const QnResourcePtr& resource);
 
     void handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole);
     void handleRoleRemoved(const ec2::ApiUserGroupData& userRole);
