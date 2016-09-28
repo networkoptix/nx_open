@@ -17,18 +17,7 @@ QnVideoWallResourceAccessProvider::~QnVideoWallResourceAccessProvider()
 bool QnVideoWallResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-
-    QSet<QnUuid> layoutIds;
-    for (const auto& videoWall : qnResPool->getResources<QnVideoWallResource>())
-    {
-        for (const auto& item : videoWall->items()->getItems())
-        {
-            if (item.layout.isNull())
-                continue;
-            layoutIds << item.layout;
-        }
-    }
-
+    QSet<QnUuid> layoutIds = accessibleLayouts();
     auto resourceId = resource->getId();
     if (layoutIds.contains(resourceId))
         return true;
@@ -59,6 +48,26 @@ void QnVideoWallResourceAccessProvider::handleResourceAdded(const QnResourcePtr&
             &QnVideoWallResourceAccessProvider::handleVideoWallItemChanged);
         connect(videoWall, &QnVideoWallResource::itemRemoved, this,
             &QnVideoWallResourceAccessProvider::handleVideoWallItemRemoved);
+    }
+    else if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        auto handleItemChanged =
+            [this](const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
+        {
+            /* Check only layouts that belong to videowall. */
+            if (!accessibleLayouts().contains(layout->getId()))
+                return;
+
+            /* Only remote resources with correct id can be accessed. */
+            if (item.resource.id.isNull())
+                return;
+
+            if (auto resource = qnResPool->getResourceById(item.resource.id))
+                updateAccessToResource(resource);
+        };
+
+        connect(layout, &QnLayoutResource::itemAdded, this, handleItemChanged);
+        connect(layout, &QnLayoutResource::itemRemoved, this, handleItemChanged);
     }
 }
 
@@ -97,4 +106,20 @@ void QnVideoWallResourceAccessProvider::updateByLayoutId(const QnUuid& id)
         for (const auto& resource: layout->layoutResources())
             updateAccessToResource(resource);
     }
+}
+
+QSet<QnUuid> QnVideoWallResourceAccessProvider::accessibleLayouts() const
+{
+    QSet<QnUuid> result;
+    for (const auto& videoWall : qnResPool->getResources<QnVideoWallResource>())
+    {
+        for (const auto& item : videoWall->items()->getItems())
+        {
+            if (item.layout.isNull())
+                continue;
+            result << item.layout;
+        }
+    }
+
+    return result;
 }

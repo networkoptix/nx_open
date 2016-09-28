@@ -72,3 +72,21 @@ TEST_F(QnVideoWallResourceAccessProviderTest, checkCameraOnVideoWall)
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
+
+TEST_F(QnVideoWallResourceAccessProviderTest, checkCameraAddedOnVideoWall)
+{
+    auto target = addCamera();
+    auto layout = addLayout();
+    auto videoWall = addVideoWall();
+    auto user = addUser(Qn::GlobalAdminPermission);
+
+    QnVideoWallItem item;
+    item.layout = layout->getId();
+    videoWall->items()->addItem(item);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = target->getId();
+    layout->addItem(layoutItem);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}

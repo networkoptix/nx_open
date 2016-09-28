@@ -25,4 +25,6 @@ private:
         const QnVideoWallItem &item);
 
     void updateByLayoutId(const QnUuid& id);
+
+    QSet<QnUuid> accessibleLayouts() const;
 };
