@@ -86,7 +86,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     m_frameColorAnimator = new VariantAnimator(this);
     m_frameColorAnimator->setTargetObject(this);
     m_frameColorAnimator->setAccessor(new QnVideowallItemWidgetHoverProgressAccessor());
-    m_frameColorAnimator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
+    m_frameColorAnimator->setTimeLimit(200); //TODO: #GDM check value
     registerAnimation(m_frameColorAnimator);
 
     m_hoverProcessor = new HoverFocusProcessor(this);

@@ -63,7 +63,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</string>
+                <string>Only further recording will be backed up. Backup process will ignore existing footage.</string>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>
@@ -119,7 +119,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QPushButton" name="backupResourcesButton">
+          <widget class="QnSelectDevicesButton" name="backupResourcesButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -182,6 +182,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnSelectDevicesButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">ui/widgets/select_devices_button.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

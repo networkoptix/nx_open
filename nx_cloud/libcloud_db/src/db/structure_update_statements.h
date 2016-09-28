@@ -19,7 +19,7 @@ CREATE TABLE account_status(                                                    
     description         TEXT                                                    \
 );                                                                              \
                                                                                 \
-INSERT INTO account_status VALUES(1,'awaiting email confirmation');             \
+INSERT INTO account_status VALUES(1, 'awaiting email confirmation');            \
 INSERT INTO account_status VALUES(2, 'activated');                              \
 INSERT INTO account_status VALUES(3, 'blocked');                                \
                                                                                 \
@@ -28,7 +28,7 @@ CREATE TABLE system_status(                                                     
     description         TEXT                                                    \
 );                                                                              \
                                                                                 \
-INSERT INTO system_status VALUES(1,'not activated');                            \
+INSERT INTO system_status VALUES(1, 'not activated');                           \
 INSERT INTO system_status VALUES(2, 'activated');                               \
 INSERT INTO system_status VALUES(3, 'deleted');                                 \
                                                                                 \
@@ -37,7 +37,7 @@ CREATE TABLE access_role(                                                       
     description         TEXT NOT NULL                                           \
 );                                                                              \
                                                                                 \
-INSERT INTO access_role VALUES(1,'liveViewer');                                 \
+INSERT INTO access_role VALUES(1, 'liveViewer');                                \
 INSERT INTO access_role VALUES(2, 'viewer');                                    \
 INSERT INTO access_role VALUES(3, 'advancedViewer');                            \
 INSERT INTO access_role VALUES(4, 'localAdmin');                                \
@@ -515,6 +515,108 @@ CREATE TABLE cloud_db_transaction_sequence (
 );
 
 INSERT INTO cloud_db_transaction_sequence(max_sequence) VALUES(1000);
+
+)sql";
+
+/**
+ * #CLOUD-545. Adding persistent system sequence for transaction timestamp
+ */
+static const char kAddSystemSequence[] =
+R"sql(
+
+ALTER TABLE system_to_account RENAME TO system_to_account_old;
+ALTER TABLE system RENAME TO system_old;
+
+CREATE TABLE system(
+    seq                         %bigint_primary_key_auto_increment%,
+    id                          VARCHAR(64) NOT NULL UNIQUE,
+    name                        VARCHAR(1024) NOT NULL,
+    auth_key                    VARCHAR(255) NOT NULL,
+    owner_account_id            VARCHAR(64) NOT NULL,
+    status_code                 INTEGER NOT NULL,
+    customization               VARCHAR(255),
+    expiration_utc_timestamp    INTEGER DEFAULT 0,
+    FOREIGN KEY(owner_account_id) REFERENCES account(id) ON DELETE CASCADE,
+    FOREIGN KEY(status_code) REFERENCES system_status(code)
+);
+
+CREATE TABLE system_to_account(
+    account_id                  VARCHAR(64) NOT NULL,
+    system_id                   VARCHAR(64) NOT NULL,
+    access_role_id              INTEGER NOT NULL,
+    group_id                    VARCHAR(64) NULL,
+    custom_permissions          VARCHAR(1024) NULL,
+    is_enabled                  INTEGER NULL,
+    vms_user_id                 VARCHAR(64) NULL,
+    FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE,
+    FOREIGN KEY(access_role_id) REFERENCES access_role(id)
+);
+
+INSERT INTO system(
+    id, name, auth_key, owner_account_id, status_code, customization, expiration_utc_timestamp)
+SELECT
+    id, name, auth_key, owner_account_id, status_code, customization, expiration_utc_timestamp
+FROM system_old;
+
+INSERT INTO system_to_account(account_id, system_id, access_role_id, group_id, custom_permissions, is_enabled, vms_user_id)
+                       SELECT account_id, system_id, access_role_id, group_id, custom_permissions, is_enabled, vms_user_id
+                       FROM system_to_account_old;
+
+DELETE FROM system_to_account_old;
+DELETE FROM system_old;
+
+DROP TABLE system_to_account_old;
+
+DROP TABLE transaction_log;
+
+DROP TABLE system_old;
+
+CREATE TABLE transaction_log (
+    system_id   VARCHAR(64) NOT NULL,
+    peer_guid   VARCHAR(64) NOT NULL,
+    db_guid     VARCHAR(64) NOT NULL,
+    sequence    BIGINT NOT NULL,
+    timestamp   BIGINT NOT NULL,
+    tran_hash   VARCHAR(64) NOT NULL,
+    tran_data   BLOB NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX idx_transaction_log_key
+    ON transaction_log(system_id, peer_guid, db_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_log_hash
+    ON transaction_log(system_id, tran_hash);
+CREATE INDEX idx_transaction_log_time
+    ON transaction_log(system_id, timestamp);
+
+)sql";
+
+/**
+ * #CLOUD-546. Making transaction timestamp 128-bit.
+ */
+static const char kMakeTransactionTimestamp128Bit[] =
+R"sql(
+
+ALTER TABLE transaction_log ADD COLUMN timestamp_hi BIGINT NOT NULL DEFAULT 0;
+
+CREATE TABLE transaction_source_settings (
+    system_id       VARCHAR(64) NOT NULL,
+    timestamp_hi    BIGINT NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+)sql";
+
+/**
+ * CLOUD-441. Adding system ordering.
+ * For usage_frequency calculation see https://networkoptix.atlassian.net/wiki/display/PM/Systems+List.
+ */
+static const char kAddSystemUsageFrequency[] =
+R"sql(
+
+ALTER TABLE system_to_account ADD COLUMN last_login_time_utc BIGINT;
+ALTER TABLE system_to_account ADD COLUMN usage_frequency FLOAT;
 
 )sql";
 

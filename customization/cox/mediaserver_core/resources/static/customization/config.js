@@ -17,12 +17,12 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/us/app/dw-spectrum/id648577856?mt=8",
+            url: "https://itunes.apple.com/us/app/cox-business-security/id904940952?mt=8",
             button: "iOS Client",
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.digitalwatchdog.dwspectrum",
+            url: "https://play.google.com/store/apps/details?id=com.cox.hdsec",
             class:'googleplay',
             button: "Android Client"
         }

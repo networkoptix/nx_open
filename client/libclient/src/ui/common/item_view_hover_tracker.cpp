@@ -1,5 +1,6 @@
 #include "item_view_hover_tracker.h"
 
+#include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
 #include <ui/style/helper.h>
 #include <utils/common/event_processors.h>
@@ -8,7 +9,8 @@
 QnItemViewHoverTracker::QnItemViewHoverTracker(QAbstractItemView* parent) :
     QObject(parent),
     m_itemView(parent),
-    m_hoveredIndex()
+    m_hoveredIndex(),
+    m_automaticMouseCursor(false)
 {
     NX_ASSERT(m_itemView);
     m_itemView->setMouseTracking(true);
@@ -59,6 +61,40 @@ const QModelIndex& QnItemViewHoverTracker::hoveredIndex() const
     return m_hoveredIndex;
 }
 
+bool QnItemViewHoverTracker::automaticMouseCursor() const
+{
+    return m_automaticMouseCursor;
+}
+
+void QnItemViewHoverTracker::setAutomaticMouseCursor(bool value)
+{
+    if (value == m_automaticMouseCursor)
+        return;
+
+    m_automaticMouseCursor = value;
+
+    if (m_automaticMouseCursor)
+        updateMouseCursor();
+    else
+        m_itemView->unsetCursor();
+}
+
+void QnItemViewHoverTracker::updateMouseCursor()
+{
+    if (m_hoveredIndex.isValid())
+    {
+        bool ok;
+        auto shape = static_cast<Qt::CursorShape>(m_hoveredIndex.data(Qn::ItemMouseCursorRole).toInt(&ok));
+        if (ok)
+        {
+            m_itemView->setCursor(shape);
+            return;
+        }
+    }
+
+    m_itemView->unsetCursor();
+}
+
 void QnItemViewHoverTracker::changeHover(const QModelIndex& index)
 {
     bool selectRows = m_itemView->selectionBehavior() == QAbstractItemView::SelectRows;
@@ -92,6 +128,9 @@ void QnItemViewHoverTracker::changeHover(const QModelIndex& index)
 
         m_hoveredIndex = index;
         m_itemView->setProperty(style::Properties::kHoveredIndexProperty, QVariant::fromValue(m_hoveredIndex));
+
+        if (m_automaticMouseCursor)
+            updateMouseCursor();
 
         if (index.isValid())
         {

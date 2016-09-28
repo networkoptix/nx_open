@@ -18,17 +18,50 @@
 #include <utils/update/zip_utils.h>
 #include <utils/applauncher_utils.h>
 #include <nx/network/http/async_http_client_reply.h>
+#include <nx/fusion/model_functions.h>
 
 #include <utils/common/app_info.h>
 #include <nx/utils/log/log.h>
-
-#define QnNetworkReplyError static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error)
 
 namespace {
     const QString buildInformationSuffix = lit("update.json");
     const QString updateInformationFileName = (lit("update.json"));
 
     const int httpResponseTimeoutMs = 30000;
+
+    struct CustomizationInfo
+    {
+        QString current_release;
+        QString updates_prefix;
+        QString release_notes;
+        QMap<QString, QnSoftwareVersion> releases;
+    };
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+        CustomizationInfo, (json),
+        (current_release)(updates_prefix)(release_notes)(releases))
+
+    struct UpdateFileInformation
+    {
+        QString md5;
+        QString file;
+        qint64 size;
+    };
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+        UpdateFileInformation, (json),
+        (md5)(file)(size))
+
+    struct BuildInformation
+    {
+        using PackagesHash = QHash<QString, QHash<QString, UpdateFileInformation>>;
+        PackagesHash packages;
+        PackagesHash clientPackages;
+        QnSoftwareVersion version;
+        QString cloudHost;
+        QnSoftwareVersion minimalClientVersion;
+    };
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+        BuildInformation, (json),
+        (packages)(clientPackages)(version)(cloudHost)(minimalClientVersion))
 
     QnSoftwareVersion minimalVersionForUpdatePackage(const QString &fileName) {
         QuaZipFile infoFile(fileName, updateInformationFileName);
@@ -52,7 +85,7 @@ namespace {
 
         return *std::max_element(versions.begin(), versions.end());
     }
-}
+} // namespace
 
 QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent) :
     QnNetworkPeerTask(parent),
@@ -76,62 +109,95 @@ void QnCheckForUpdatesPeerTask::doStart() {
         checkOnlineUpdates();
 }
 
-bool QnCheckForUpdatesPeerTask::needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const {
-    return (m_targetMustBeNewer && updateVersion > version) || (!m_targetMustBeNewer && updateVersion != version);
+bool QnCheckForUpdatesPeerTask::isUpdateNeed(
+    const QnSoftwareVersion& version,
+    const QnSoftwareVersion& updateVersion) const
+{
+    return (m_targetMustBeNewer && updateVersion > version)
+        || (!m_targetMustBeNewer && updateVersion != version);
 }
 
-void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
-    if (m_updateFiles.isEmpty() && m_clientUpdateFile.isNull()) {
-        finishTask(QnCheckForUpdateResult::BadUpdateFile);
+void QnCheckForUpdatesPeerTask::checkUpdate()
+{
+    if (!checkCloudHost())
+    {
+        finishTask(QnCheckForUpdateResult::IncompatibleCloudHost);
         return;
     }
 
+    finishTask(checkUpdateCoverage());
+}
+
+bool QnCheckForUpdatesPeerTask::checkCloudHost()
+{
+    /* Update is allowed if either target version has the same cloud host or
+       there are no servers linked to the cloud in the system. */
+    if (m_cloudHost == QnAppInfo::defaultCloudHost())
+        return true;
+
+    const auto serversLnkedToCloud = QnUpdateUtils::getServersLinkedToCloud(peers());
+    return serversLnkedToCloud.isEmpty();
+}
+
+QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
+{
+    if (m_updateFiles.isEmpty() && m_clientUpdateFile.isNull())
+        return QnCheckForUpdateResult::BadUpdateFile;
+
     bool needUpdate = false;
-    foreach (const QnUuid &peerId, peers()) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
+    for (const auto& peerId: peers())
+    {
+        const auto server = qnResPool->getIncompatibleResourceById(peerId, true)
+            .dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
-        bool updateServer = this->needUpdate(server->getVersion(), m_target.version);
-        if (updateServer && !m_updateFiles.value(server->getSystemInfo())) {
-            finishTask(QnCheckForUpdateResult::ServerUpdateImpossible);
+        bool updateServer = isUpdateNeed(server->getVersion(), m_target.version);
+        if (updateServer && !m_updateFiles.value(server->getSystemInfo()))
+        {
             NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No update file for server [%1 : %2]")
                    .arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG2);
-            return;
+            return QnCheckForUpdateResult::ServerUpdateImpossible;
         }
         needUpdate |= updateServer;
     }
 
-    if (!m_target.denyClientUpdates && !m_clientRequiresInstaller) {
-        bool updateClient = this->needUpdate(qnCommon->engineVersion(), m_target.version);
+    if (!m_target.denyClientUpdates && !m_clientRequiresInstaller)
+    {
+        bool updateClient = isUpdateNeed(qnCommon->engineVersion(), m_target.version);
 
-        if (updateClient && !m_clientUpdateFile) {
-            finishTask(QnCheckForUpdateResult::ClientUpdateImpossible);
+        if (updateClient && !m_clientUpdateFile)
+        {
             NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No update file for client."), cl_logDEBUG2);
-            return;
+            return QnCheckForUpdateResult::ClientUpdateImpossible;
         }
 
         needUpdate |= updateClient;
     }
 
-    finishTask(needUpdate ? QnCheckForUpdateResult::UpdateFound : QnCheckForUpdateResult::NoNewerVersion);
-    return;
+    return needUpdate
+        ? QnCheckForUpdateResult::UpdateFound
+        : QnCheckForUpdateResult::NoNewerVersion;
 }
 
-void QnCheckForUpdatesPeerTask::checkBuildOnline() {
-    QUrl url(m_updateLocationPrefix + lit("/") + QString::number(m_target.version.build()) + lit("/") + buildInformationSuffix);
+void QnCheckForUpdatesPeerTask::checkBuildOnline()
+{
+    QUrl url(lit("%1/%2/%3")
+        .arg(m_updateLocationPrefix).arg(m_target.version.build()).arg(buildInformationSuffix));
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx_http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
-    connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
+    auto reply = new QnAsyncHttpClientReply(httpClient);
+    connect(reply, &QnAsyncHttpClientReply::finished,
+        this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG2);
     httpClient->doGet(url);
 
     m_runningRequests.insert(reply);
 }
 
-void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
+void QnCheckForUpdatesPeerTask::checkOnlineUpdates()
+{
     m_updateFiles.clear();
     m_clientUpdateFile.clear();
     m_releaseNotesUrl.clear();
@@ -144,38 +210,46 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
     m_targetMustBeNewer = m_target.version.isNull();
     m_checkLatestVersion = m_target.version.isNull();
 
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking online updates [%1]").arg(m_target.version.toString()), cl_logDEBUG1);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking online updates [%1]")
+        .arg(m_target.version.toString()), cl_logDEBUG1);
 
     if (!tryNextServer())
         finishTask(QnCheckForUpdateResult::InternetProblem);
 }
 
-void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
+void QnCheckForUpdatesPeerTask::checkLocalUpdates()
+{
     m_updateFiles.clear();
     m_clientUpdateFile.clear();
     m_targetMustBeNewer = false;
     m_releaseNotesUrl.clear();
 
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking local update [%1]").arg(m_target.fileName), cl_logDEBUG1);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking local update [%1]")
+        .arg(m_target.fileName), cl_logDEBUG1);
 
-    if (!QFile::exists(m_target.fileName)) {
+    if (!QFile::exists(m_target.fileName))
+    {
         finishTask(QnCheckForUpdateResult::BadUpdateFile);
         return;
     }
 
-    QnZipExtractor *extractor(new QnZipExtractor(m_target.fileName, updatesCacheDir()));
-    connect(extractor, &QnZipExtractor::finished, this, &QnCheckForUpdatesPeerTask::at_zipExtractor_finished);
+    auto extractor = new QnZipExtractor(m_target.fileName, updatesCacheDir());
+    connect(extractor, &QnZipExtractor::finished,
+        this, &QnCheckForUpdatesPeerTask::at_zipExtractor_finished);
     extractor->start();
 }
 
-void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *reply) {
+void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* reply)
+{
     if (!m_runningRequests.remove(reply))
         return;
 
     reply->deleteLater();
 
-    if (reply->isFailed()) {
-        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.").arg(reply->url().toString()), cl_logDEBUG2);
+    if (reply->isFailed())
+    {
+        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.")
+            .arg(reply->url().toString()), cl_logDEBUG2);
 
         if (!tryNextServer())
             finishTask(QnCheckForUpdateResult::InternetProblem);
@@ -183,55 +257,70 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
         return;
     }
 
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.").arg(reply->url().toString()), cl_logDEBUG2);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.")
+        .arg(reply->url().toString()), cl_logDEBUG2);
 
-    QByteArray data = reply->data();
+    const auto json = QJsonDocument::fromJson(reply->data()).object();
 
-    QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
-
-    if (m_currentUpdateUrl == m_mainUpdateUrl) {
-        auto infoIt = map.find(lit("__info"));
-        if (infoIt != map.end()) {
-            qnSettings->setAlternativeUpdateServers(infoIt->toList());
+    if (m_currentUpdateUrl == m_mainUpdateUrl)
+    {
+        const auto it = json.find(lit("__info"));
+        if (it != json.end())
+        {
+            qnSettings->setAlternativeUpdateServers(it.value().toArray().toVariantList());
             loadServersFromSettings();
         }
     }
 
-    map = map.value(QnAppInfo::customizationName()).toMap();
-    QVariantMap releasesMap = map.value(lit("releases")).toMap();
-
-    QString currentRelease = map.value(lit("current_release")).toString();
-    if (QnSoftwareVersion(currentRelease) < qnCommon->engineVersion())
-        currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
-
-    QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
-    QString updatesPrefix = map.value(lit("updates_prefix")).toString();
-    if (latestVersion.isNull() || updatesPrefix.isEmpty()) {
+    CustomizationInfo customizationInfo;
+    if (!QJson::deserialize(json, QnAppInfo::customizationName(), &customizationInfo))
+    {
         if (!tryNextServer())
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
 
+    QString currentRelease = customizationInfo.current_release;
+    if (QnSoftwareVersion(currentRelease) < qnCommon->engineVersion())
+        currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
+
+    const auto latestVersion = customizationInfo.releases[currentRelease];
+    const QString updatesPrefix = customizationInfo.updates_prefix;
+
+    if (latestVersion.isNull() || updatesPrefix.isEmpty())
+    {
+        if (!tryNextServer())
+            finishTask(QnCheckForUpdateResult::NoSuchBuild);
+        return;
+    }
 
     if (m_target.version.isNull())
+    {
         m_target.version = latestVersion;
+    }
     else if (m_target.version.build() == 0)
-        m_target.version = QnSoftwareVersion(releasesMap.value(m_target.version.toString(QnSoftwareVersion::MinorFormat)).toString());
+    {
+        m_target.version = customizationInfo.releases[
+            m_target.version.toString(QnSoftwareVersion::MinorFormat)];
+    }
 
     m_updateLocationPrefix = updatesPrefix;
-    m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
+    m_releaseNotesUrl = customizationInfo.release_notes;
 
     checkBuildOnline();
 }
 
-void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *reply) {
+void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* reply)
+{
     if (!m_runningRequests.remove(reply))
         return;
 
     reply->deleteLater();
 
-    if (reply->isFailed()  || (reply->response().statusLine.statusCode != nx_http::StatusCode::ok)) {
-        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.").arg(reply->url().toString()), cl_logDEBUG2);
+    if (reply->isFailed() || (reply->response().statusLine.statusCode != nx_http::StatusCode::ok))
+    {
+        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.")
+            .arg(reply->url().toString()), cl_logDEBUG2);
 
         if (!tryNextServer())
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
@@ -239,116 +328,142 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
         return;
     }
 
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.").arg(reply->url().toString()), cl_logDEBUG2);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.")
+        .arg(reply->url().toString()), cl_logDEBUG2);
 
-    QByteArray data = reply->data();
-    QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
-
-    m_target.version = QnSoftwareVersion(map.value(lit("version")).toString());
-
-    if (m_target.version.isNull()) {
-        if (!tryNextServer()) {
+    BuildInformation buildInformation;
+    if (!QJson::deserialize(reply->data(), &buildInformation) || buildInformation.version.isNull())
+    {
+        if (!tryNextServer())
+        {
             NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
         }
         return;
     }
 
-    QnSoftwareVersion currentRelease = qnCommon->engineVersion();
-    currentRelease = QnSoftwareVersion(currentRelease.major(), currentRelease.minor(), currentRelease.bugfix());
-    /* Server downgrade should be allowed to another builds of the same release only.
+    m_target.version = buildInformation.version;
+
+    if (m_target.version.isNull())
+    {
+        if (!tryNextServer())
+        {
+            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
+            finishTask(QnCheckForUpdateResult::NoSuchBuild);
+        }
+        return;
+    }
+
+    m_cloudHost = buildInformation.cloudHost;
+
+    auto currentRelease = qnCommon->engineVersion();
+    currentRelease = QnSoftwareVersion(
+        currentRelease.major(), currentRelease.minor(), currentRelease.bugfix());
+    /* Server downgrade is allowed to another builds of the same release only.
        E.g. 2.3.1.9300 -> 2.3.1.9200 is ok, but 2.3.1.9300 -> 2.3.0.9000 is not.
        Client could be downgraded with no limits.
      */
-    if (!m_target.targets.isEmpty() && m_target.version < currentRelease) {
+    if (!m_target.targets.isEmpty() && m_target.version < currentRelease)
+    {
         finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
         return;
     }
 
-    QString urlPrefix = m_updateLocationPrefix + lit("/") + QString::number(m_target.version.build()) + lit("/");
+    const auto urlPrefix = lit("%1/%2/").arg(m_updateLocationPrefix).arg(m_target.version.build());
 
-    QVariantMap packages = map.value(lit("packages")).toMap();
-    for (auto platform = packages.begin(); platform != packages.end(); ++platform) {
-        QVariantMap architectures = platform.value().toMap();
-        for (auto arch = architectures.begin(); arch != architectures.end(); ++arch) {
-            // We suppose arch name does not contain '_' char. E.g. arm_isd_s2 will be split to "arm" and "isd_s2"
-            QString architecture = arch.key();
-            QString modification;
-            int i = architecture.indexOf(QChar::fromLatin1('_'));
-            if (i != -1) {
-                modification = architecture.mid(i + 1);
-                architecture = architecture.left(i);
-            }
+    for (auto platform = buildInformation.packages.begin();
+        platform != buildInformation.packages.end();
+        ++platform)
+    {
+        const auto& variants = platform.value();
+        for (auto variant = variants.begin(); variant != variants.end(); ++variant)
+        {
+            // We suppose arch name does not contain '_' char.
+            // E.g. arm_isd_s2 will be split to "arm" and "isd_s2"
+            const auto arch = variant.key().section(L'_', 0, 0);
+            const auto modification = variant.key().mid(arch.size() + 1);
 
-            QVariantMap package = arch.value().toMap();
-            QString fileName = package.value(lit("file")).toString();
-            QnUpdateFileInformationPtr info(new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + fileName)));
-            info->baseFileName = fileName;
-            info->fileSize = package.value(lit("size")).toLongLong();
-            info->md5 = package.value(lit("md5")).toString();
-            QnSystemInformation systemInformation(platform.key(), architecture, modification);
+            QnUpdateFileInformationPtr info(
+                new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + variant->file)));
+            info->baseFileName = variant->file;
+            info->fileSize = variant->size;
+            info->md5 = variant->md5;
+            QnSystemInformation systemInformation(platform.key(), arch, modification);
             m_updateFiles.insert(systemInformation, info);
 
-            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Server update file [%1, %2, %3].")
+            NX_LOG(
+                lit("Update: QnCheckForUpdatesPeerTask: Server update file [%1, %2, %3].")
                    .arg(systemInformation.toString())
                    .arg(info->baseFileName)
-                   .arg(info->fileSize)
-                   , cl_logDEBUG1);
+                   .arg(info->fileSize),
+                cl_logDEBUG1);
         }
     }
 
-    if (!m_target.denyClientUpdates) {
-        packages = map.value(lit("clientPackages")).toMap();
-        QString arch = QnAppInfo::applicationArch();
-        QString modification = QnAppInfo::applicationPlatformModification();
+    if (!m_target.denyClientUpdates)
+    {
+        const auto modification = QnAppInfo::applicationPlatformModification();
+        auto variantKey = QnAppInfo::applicationArch();
         if (!modification.isEmpty())
-            arch += lit("_") + modification;
-        QVariantMap package = packages.value(QnAppInfo::applicationPlatform()).toMap().value(arch).toMap();
+            variantKey += L'_' + modification;
+        const auto variant =
+            buildInformation.clientPackages[QnAppInfo::applicationPlatform()][variantKey];
 
-        if (!package.isEmpty()) {
-            QString fileName = package.value(lit("file")).toString();
-            m_clientUpdateFile.reset(new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + fileName)));
-            m_clientUpdateFile->baseFileName = fileName;
-            m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
-            m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
+        if (!variant.file.isEmpty())
+        {
+            m_clientUpdateFile.reset(
+                new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + variant.file)));
+            m_clientUpdateFile->baseFileName = variant.file;
+            m_clientUpdateFile->fileSize = variant.size;
+            m_clientUpdateFile->md5 = variant.md5;
 
-            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Client update file [%2, %3].")
+            NX_LOG(
+                lit("Update: QnCheckForUpdatesPeerTask: Client update file [%2, %3].")
                    .arg(m_clientUpdateFile->baseFileName)
-                   .arg(m_clientUpdateFile->fileSize)
-                   , cl_logDEBUG1);
+                   .arg(m_clientUpdateFile->fileSize),
+                cl_logDEBUG1);
         }
 
-        QnSoftwareVersion minimalVersionToUpdate(map.value(lit("minimalClientVersion")).toString());
-        m_clientRequiresInstaller = !minimalVersionToUpdate.isNull() && minimalVersionToUpdate > maximumAvailableVersion();
-    } else {
+        QnSoftwareVersion minimalVersionToUpdate = buildInformation.minimalClientVersion;
+        m_clientRequiresInstaller = !minimalVersionToUpdate.isNull()
+            && minimalVersionToUpdate > maximumAvailableVersion();
+    }
+    else
+    {
         m_clientRequiresInstaller = true;
     }
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Client requires installer [%1].").arg(m_clientRequiresInstaller), cl_logDEBUG1);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Client requires installer [%1].")
+        .arg(m_clientRequiresInstaller), cl_logDEBUG1);
 
-    checkUpdateCoverage();
+    checkUpdate();
 }
 
-void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
-    QnZipExtractor *zipExtractor = qobject_cast<QnZipExtractor*>(sender());
+void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
+{
+    auto zipExtractor = qobject_cast<QnZipExtractor*>(sender());
     if (!zipExtractor)
         return;
 
     zipExtractor->deleteLater();
 
-    if (error != QnZipExtractor::Ok) {
-        finishTask(error == QnZipExtractor::NoFreeSpace ? QnCheckForUpdateResult::NoFreeSpace : QnCheckForUpdateResult::BadUpdateFile);
+    if (error != QnZipExtractor::Ok)
+    {
+        finishTask(error == QnZipExtractor::NoFreeSpace
+            ? QnCheckForUpdateResult::NoFreeSpace
+            : QnCheckForUpdateResult::BadUpdateFile);
         return;
     }
 
-    QDir dir = zipExtractor->dir();
-    QStringList entries = zipExtractor->fileList();
-    foreach (const QString &entry, entries) {
+    const auto dir = zipExtractor->dir();
+    for (const auto& entry: zipExtractor->fileList())
+    {
         QString fileName = dir.absoluteFilePath(entry);
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
+        QString cloudHost;
         bool isClient;
 
-        if (!verifyUpdatePackage(fileName, &version, &sysInfo, &isClient))
+        if (!verifyUpdatePackage(fileName, &version, &sysInfo, &cloudHost, &isClient))
             continue;
 
         if (m_updateFiles.contains(sysInfo))
@@ -357,12 +472,16 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
         if (m_target.version.isNull())
             m_target.version = version;
 
-        if (m_target.version != version) {
+        if (m_target.version != version)
+        {
             finishTask(QnCheckForUpdateResult::BadUpdateFile);
             return;
         }
 
-        if (isClient) {
+        m_cloudHost = cloudHost;
+
+        if (isClient)
+        {
             if (m_target.denyClientUpdates)
                 continue;
 
@@ -370,17 +489,26 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
                 continue;
         }
 
-        QnUpdateFileInformationPtr updateFileInformation(new QnUpdateFileInformation(version, fileName));
         QFile file(fileName);
+
+        QnUpdateFileInformationPtr updateFileInformation(
+            new QnUpdateFileInformation(version, fileName));
         updateFileInformation->fileSize = file.size();
         updateFileInformation->md5 = makeMd5(&file);
-        if (isClient) {
-            if (!m_target.denyClientUpdates) {
+
+        if (isClient)
+        {
+            if (!m_target.denyClientUpdates)
+            {
                 m_clientUpdateFile = updateFileInformation;
-                QnSoftwareVersion minimalVersion = minimalVersionForUpdatePackage(updateFileInformation->fileName);
-                m_clientRequiresInstaller = !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
+                const auto minimalVersion =
+                    minimalVersionForUpdatePackage(updateFileInformation->fileName);
+                m_clientRequiresInstaller =
+                    !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
             }
-        } else {
+        }
+        else
+        {
             m_updateFiles.insert(sysInfo, updateFileInformation);
         }
     }
@@ -388,11 +516,13 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
     if (!m_clientUpdateFile)
         m_clientRequiresInstaller = true;
 
-    checkUpdateCoverage();
+    checkUpdate();
 }
 
-void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) {
-    if (m_checkLatestVersion && value == QnCheckForUpdateResult::NoSuchBuild) {
+void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value)
+{
+    if (m_checkLatestVersion && value == QnCheckForUpdateResult::NoSuchBuild)
+    {
         m_target.version = QnSoftwareVersion();
         value = QnCheckForUpdateResult::NoNewerVersion;
     }
@@ -402,19 +532,22 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) 
     result.systems = m_updateFiles.keys().toSet();
     result.clientInstallerRequired = m_clientRequiresInstaller;
     result.releaseNotesUrl = m_releaseNotesUrl;
+    result.cloudHost = m_cloudHost;
 
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Check finished [%1, %2].")
-           .arg(value).arg(result.version.toString()), cl_logDEBUG1);
+       .arg(value).arg(result.version.toString()), cl_logDEBUG1);
 
     emit checkFinished(result);
     finish(static_cast<int>(value));
 }
 
-void QnCheckForUpdatesPeerTask::loadServersFromSettings() {
+void QnCheckForUpdatesPeerTask::loadServersFromSettings()
+{
     m_updateServers.clear();
 
-    for (const QVariant &alternative : qnSettings->alternativeUpdateServers()) {
-        QVariantMap infoMap = alternative.toMap();
+    for (const auto& alternative: qnSettings->alternativeUpdateServers())
+    {
+        const auto infoMap = alternative.toMap();
 
         UpdateServerInfo serverInfo;
         serverInfo.url = infoMap.value(lit("url")).toUrl();
@@ -425,27 +558,32 @@ void QnCheckForUpdatesPeerTask::loadServersFromSettings() {
     }
 }
 
-bool QnCheckForUpdatesPeerTask::tryNextServer() {
+bool QnCheckForUpdatesPeerTask::tryNextServer()
+{
     if (m_updateServers.isEmpty())
         return false;
 
-    UpdateServerInfo serverInfo = m_updateServers.takeFirst();
+    const auto serverInfo = m_updateServers.takeFirst();
     m_currentUpdateUrl = serverInfo.url;
 
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx_http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
-    connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
-    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(m_currentUpdateUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+    auto reply = new QnAsyncHttpClientReply(httpClient);
+    connect(reply, &QnAsyncHttpClientReply::finished,
+        this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]")
+        .arg(m_currentUpdateUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
     httpClient->doGet(m_currentUpdateUrl);
     m_runningRequests.insert(reply);
     return true;
 }
 
-void QnCheckForUpdatesPeerTask::start() {
+void QnCheckForUpdatesPeerTask::start()
+{
     base_type::start(m_target.targets);
 }
 
-QnUpdateTarget QnCheckForUpdatesPeerTask::target() const {
+QnUpdateTarget QnCheckForUpdatesPeerTask::target() const
+{
     return m_target;
 }

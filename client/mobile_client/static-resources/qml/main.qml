@@ -53,10 +53,11 @@ ApplicationWindow
             Workflow.openResourcesScreen(getLastUsedSystemId())
             connectionManager.connectToServer(lastUsedUrl)
         }
-        else if (cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
-        {
-            Workflow.openCloudWelcomeScreen()
-        }
+        // TODO: #dklychkov Check if need it in #3.1 and uncomment.
+        // else if (cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
+        // {
+        //     Workflow.openCloudWelcomeScreen()
+        // }
         else
         {
             Workflow.openSessionsScreen()

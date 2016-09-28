@@ -53,15 +53,6 @@ public:
     (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
     (separator)(dateBarBackgrounds)(dateBarText)(tickmarkLines)(tickmarkText)
 
-struct QnTimeScrollBarColors {
-    QnTimeScrollBarColors();
-
-    QColor indicator;
-    QColor border;
-    QColor handle;
-};
-#define QnTimeScrollBarColors_Fields (indicator)(border)(handle)
-
 
 struct QnBackgroundColors {
     QnBackgroundColors();
@@ -349,7 +340,7 @@ struct QnPasswordStrengthColors
 #define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
 
 #define QN_CLIENT_COLOR_TYPES                                                   \
-    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
+    (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
     (QnTwoWayAudioWidgetColors) \

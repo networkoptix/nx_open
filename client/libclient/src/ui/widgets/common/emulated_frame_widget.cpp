@@ -67,16 +67,32 @@ void QnEmulatedFrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     m_dragProcessor->widgetMouseReleaseEvent(this, event);
 }
 
-void QnEmulatedFrameWidget::startDragProcess(DragInfo *) {
+void QnEmulatedFrameWidget::startDragProcess(DragInfo *)
+{
     m_timer.stop();
+#if defined(Q_OS_WIN)
+    if (m_section == Qt::TitleBarArea)
+    {
+        QWidget* parent = this;
+        while (parent->parentWidget())
+            parent = parent->parentWidget();
+
+        auto hwnd = reinterpret_cast<HWND>(parent->window()->windowHandle()->winId());
+        ReleaseCapture();
+        static const int SC_DRAGMOVE = SC_MOVE | 0x02;
+        SendMessage(hwnd, WM_SYSCOMMAND, SC_DRAGMOVE, 0);
+    }
+#endif
 }
 
 void QnEmulatedFrameWidget::dragMove(DragInfo *info)
 {
     if(m_section == Qt::TitleBarArea)
     {
+#if !defined(Q_OS_WIN)
         const auto diff = (info->mouseScreenPos() - info->mousePressScreenPos());
         move(m_startPosition + diff);
+#endif
     }
     else
     {

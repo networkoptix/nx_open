@@ -583,7 +583,7 @@ void QnAuditItemDelegate::paintUserActivity(const QStyle* style, QPainter* paint
     if (option.state.testFlag(QStyle::State_MouseOver))
     {
         QnScopedPainterFontRollback fontRollback(painter, option.font);
-        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Text));
+        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::ButtonText));
         QRect labelRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
         painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
     }

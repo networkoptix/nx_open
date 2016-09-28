@@ -88,6 +88,7 @@ public:
         std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
 
     api::VmsConnectionDataList getVmsConnections() const;
+    bool isSystemConnected(const std::string& systemId) const;
 
 private:
     struct ConnectionContext
@@ -128,7 +129,7 @@ private:
     QnCounter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
 
-    void addNewConnection(ConnectionContext connectionContext);
+    bool addNewConnection(ConnectionContext connectionContext);
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
             QnMutexLockerBase* const /*lock*/,

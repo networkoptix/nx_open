@@ -45,6 +45,7 @@ namespace NxUi {
 class ResourceTreeWorkbenchPanel;
 class NotificationsWorkbenchPanel;
 class TimelineWorkbenchPanel;
+class CalendarWorkbenchPanel;
 
 }
 
@@ -78,7 +79,7 @@ public:
         NoPanel = 0x0,
         TreePanel = 0x1,
         TitlePanel = 0x2,
-        SliderPanel = 0x4,
+        TimelinePanel = 0x4,
         NotificationsPanel = 0x8
     };
     Q_DECLARE_FLAGS(Panels, Panel)
@@ -105,9 +106,9 @@ public:
     bool isTreePinned() const;
 
     /** Whether navigation slider is opened. */
-    bool isSliderOpened() const;
+    bool isTimelineOpened() const;
 
-    bool isSliderPinned() const;
+    bool isTimelinePinned() const;
 
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
@@ -125,7 +126,7 @@ public:
     bool isCalendarOpened() const;
 
     bool isTreeVisible() const;
-    bool isSliderVisible() const;
+    bool isTimelineVisible() const;
     bool isTitleVisible() const;
     bool isNotificationsVisible() const;
     bool isCalendarVisible() const;
@@ -135,17 +136,16 @@ public slots:
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
-    void setSliderVisible(bool visible = true, bool animate = true);
+    void setTimelineVisible(bool visible = true, bool animate = true);
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
-    void setCalendarVisible(bool visible = true, bool animate = true);
 
     void setTreeOpened(bool opened = true, bool animate = true);
-    void setSliderOpened(bool opened = true, bool animate = true);
+    void setTimelineOpened(bool opened = true, bool animate = true);
     void setTitleOpened(bool opened = true, bool animate = true);
     void setNotificationsOpened(bool opened = true, bool animate = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
-    void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+
 
 protected:
     virtual void tick(int deltaMSecs) override;
@@ -158,16 +158,12 @@ protected:
     Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
-    void updateDayTimeWidgetGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
-    QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry);
     void updateActivityInstrumentState();
 
     void setTitleOpacity(qreal opacity, bool animate);
-    void setCalendarOpacity(qreal opacity, bool animate);
 
     bool isHovered() const;
 
@@ -178,7 +174,7 @@ private:
     void createTitleWidget(const QnPaneSettings& settings);
     void createNotificationsWidget(const QnPaneSettings& settings);
     void createCalendarWidget(const QnPaneSettings& settings);
-    void createSliderWidget(const QnPaneSettings& settings);
+    void createTimelineWidget(const QnPaneSettings& settings);
 
 #ifdef _DEBUG
     void createDebugWidget();
@@ -187,7 +183,7 @@ private:
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true);
 
-    void initGraphicsMessageBox();
+    void initGraphicsMessageBoxHolder();
 
     /** Make sure animation is allowed, set animate to false otherwise. */
     void ensureAnimationAllowed(bool &animate);
@@ -198,17 +194,13 @@ private:
 
 private slots:
     void updateTitleOpacity(bool animate = true);
-    void updateCalendarOpacity(bool animate = true);
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
-    void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
-    void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
-    void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
-    void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
-
-    void setCalendarShowButtonUsed(bool used);
+    void updateTitleOpacityAnimated();
+    void updateCalendarVisibilityAnimated();
+    void updateControlsVisibilityAnimated();
 
     void at_freespaceAction_triggered();
     void at_activityStopped();
@@ -219,12 +211,6 @@ private slots:
     void at_controlsWidget_geometryChanged();
 
     void at_titleItem_geometryChanged();
-
-    void at_calendarShowingProcessor_hoverEntered();
-    void at_calendarItem_paintGeometryChanged();
-    void at_dayTimeItem_paintGeometryChanged();
-
-    void at_calendarWidget_dateClicked(const QDate &date);
 
 private:
     /* Global state. */
@@ -254,10 +240,6 @@ private:
 
     bool m_titleVisible;
 
-    bool m_calendarVisible;
-
-    bool m_dayTimeOpened;
-
     bool m_ignoreClickEvent;
 
     bool m_inactive;
@@ -270,7 +252,7 @@ private:
 
     Panels m_unzoomedOpenedPanels;
 
-    /* Slider-related state. */
+    /* Timeline-related state. */
 
     /** Timeline. */
     NxUi::TimelineWorkbenchPanel* m_timeline;
@@ -296,35 +278,7 @@ private:
     NxUi::NotificationsWorkbenchPanel* m_notifications;
 
     /* Calendar window-related state. */
-
-    QnMaskedProxyWidget *m_calendarItem;
-
-    QnImageButtonWidget *m_calendarPinButton;
-
-    QnImageButtonWidget *m_dayTimeMinimizeButton;
-
-    VariantAnimator *m_calendarSizeAnimator;
-
-    AnimatorGroup *m_calendarOpacityAnimatorGroup;
-
-    HoverFocusProcessor *m_calendarOpacityProcessor;
-
-    HoverFocusProcessor *m_calendarHidingProcessor;
-
-    HoverFocusProcessor *m_calendarShowingProcessor;
-
-    bool m_inCalendarGeometryUpdate;
-
-    bool m_inDayTimeGeometryUpdate;
-
-    QnMaskedProxyWidget *m_dayTimeItem;
-
-    QnDayTimeWidget *m_dayTimeWidget;
-
-    VariantAnimator *m_dayTimeSizeAnimator;
-
-    QPoint m_calendarPinOffset;
-    QPoint m_dayTimeOffset;
+    NxUi::CalendarWorkbenchPanel* m_calendar;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

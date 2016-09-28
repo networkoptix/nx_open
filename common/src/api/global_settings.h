@@ -105,9 +105,11 @@ public:
     QString statisticsReportServerApi() const;
     void setStatisticsReportServerApi(const QString &value);
 
+    static const QString kConnectionKeepAliveTimeoutKey;
     std::chrono::seconds connectionKeepAliveTimeout() const;
     void setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout);
 
+    static const QString kKeepAliveProbeCountKey;
     int keepAliveProbeCount() const;
     void setKeepAliveProbeCount(int newProbeCount);
 
@@ -134,6 +136,10 @@ public:
     static const QString kNameCloudAuthKey;
     QString cloudAuthKey() const;
     void setCloudAuthKey(const QString& value);
+
+    static const QString kNameSystemName;
+    QString systemName() const;
+    void setSystemName(const QString& value);
 
     void resetCloudParams();
 
@@ -166,6 +172,7 @@ public:
 signals:
     void initialized();
 
+    void systemNameChanged();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
@@ -175,7 +182,7 @@ signals:
     void statisticsAllowedChanged();
     void updateNotificationsChanged();
     void upnpPortMappingEnabledChanged();
-    void ec2ConnectionSettingsChanged();
+    void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
     void newSystemChanged();
 
@@ -249,6 +256,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
 
     // misc adaptors
+    QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;

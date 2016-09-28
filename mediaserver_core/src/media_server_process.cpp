@@ -230,7 +230,6 @@
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
 #include "cloud/cloud_connection_manager.h"
-#include "cloud/cloud_system_name_updater.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
@@ -1355,6 +1354,11 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         m_mediaServer->setPanicMode(Qn::PM_None);
         propertyDictionary->saveParams(m_mediaServer->getId());
     }
+
+    // Start receiving local notifications
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto processor = dynamic_cast<QnServerMessageProcessor*> (QnServerMessageProcessor::instance());
+    processor->startReceivingLocalNotifications(connection);
 }
 
 void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudConnectionManager)
@@ -1362,7 +1366,7 @@ void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudCon
     while (1)
     {
         auto adminUser = qnResPool->getAdministrator();
-        if (adminUser && !adminUser->isEnabled())
+        if (adminUser)
         {
             PasswordData data;
             data.password = QnServer::kDefaultAdminPassword;
@@ -1804,7 +1808,6 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
-    CloudSystemNameUpdater cloudSystemNameUpdater(&cloudConnectionManager);
     auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
@@ -1961,7 +1964,7 @@ void MediaServerProcess::run()
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
-    runtimeData.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
+    runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
@@ -2001,24 +2004,27 @@ void MediaServerProcess::run()
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
             QnAppServerConnectionFactory::url(), ec2::ApiClientInfoData(), &ec2Connection );
-
-        connectInfo = ec2Connection->connectionInfo();
-        auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
-        if (connectionResult == Qn::ConnectionResult::Success)
+        if (ec2Connection)
         {
-            NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
-            break;
-        }
+            connectInfo = ec2Connection->connectionInfo();
+            auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
+            if (connectionResult == Qn::SuccessConnectionResult)
+            {
+                NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
+                break;
+            }
 
-        switch (connectionResult)
-        {
-            case Qn::ConnectionResult::IncompatibleInternal:
-            case Qn::ConnectionResult::IncompatibleVersion:
-            case Qn::ConnectionResult::IncompatibleProtocol:
+            switch (connectionResult)
+            {
+            case Qn::IncompatibleInternalConnectionResult:
+            case Qn::IncompatibleCloudHostConnectionResult:
+            case Qn::IncompatibleVersionConnectionResult:
+            case Qn::IncompatibleProtocolConnectionResult:
                 NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
                 return;
             default:
                 break;
+            }
         }
 
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1")
@@ -2364,30 +2370,35 @@ void MediaServerProcess::run()
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
-    bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
-        qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
-    if (!QnPermissionsHelper::isSafeMode() &&
-        (isNewServerInstance || systemName.isDefault() || isCloudInstanceChanged))
+    if (!QnPermissionsHelper::isSafeMode())
     {
-        resetCloudParams(&cloudConnectionManager);
-        qnGlobalSettings->setNewSystem(true);
-    }
-    if (isCloudInstanceChanged)
-    {
-        ec2::ErrorCode errCode;
-        do
+        bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
+            qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
+        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemID().isEmpty();
+        if (isNewServerInstance ||
+            systemName.isDefault() ||
+            (isCloudInstanceChanged && isConnectedToCloud))
         {
-            errCode = QnAppServerConnectionFactory::getConnection2()->
-                getMiscManager(Qn::kSystemAccess)->rebuildTransactionLogSync();
-            if (errCode != ec2::ErrorCode::ok)
+            resetCloudParams(&cloudConnectionManager);
+            qnGlobalSettings->setNewSystem(true);
+        }
+        if (isCloudInstanceChanged)
+        {
+            ec2::ErrorCode errCode;
+            do
             {
-                qWarning() << "Error while rebuild transaction log. Traying again...";
-                msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            }
-        } while (errCode != ec2::ErrorCode::ok && !m_needStop);
+                errCode = QnAppServerConnectionFactory::getConnection2()->
+                    getMiscManager(Qn::kSystemAccess)->rebuildTransactionLogSync();
+                if (errCode != ec2::ErrorCode::ok)
+                {
+                    qWarning() << "Error while rebuild transaction log. Traying again...";
+                    msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+                }
+            } while (errCode != ec2::ErrorCode::ok && !m_needStop);
+        }
+        qnGlobalSettings->setCloudHost(QnAppInfo::defaultCloudHost());
+        qnGlobalSettings->synchronizeNow();
     }
-    qnGlobalSettings->setCloudHost(QnAppInfo::defaultCloudHost());
-    qnGlobalSettings->synchronizeNow();
 
     auto upnpPortMapper = initializeUpnpPortMapper();
     updateAddressesList();

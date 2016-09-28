@@ -13,6 +13,7 @@
 #include <utils/common/credentials.h>
 
 class QnCloudStatusWatcher;
+class QQuickView;
 typedef QList<QUrl> UrlsList;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
@@ -62,6 +63,8 @@ public: // Properties
 
     QString connectingToSystem() const;
 
+    void resetConnectingToSystem();
+
     void setConnectingToSystem(const QString& value);
 
     bool globalPreloaderVisible() const;
@@ -99,6 +102,8 @@ public slots:
     void loginToCloud();
 
     void createAccount();
+
+    void forceActiveFocus();
 
 public slots:
     QColor getPaletteColor(const QString& group, int index);
@@ -154,6 +159,7 @@ private:
     bool m_visible;
     QString m_connectingSystemName;
     const QnGenericPalette m_palette;
+    QQuickView* m_quickView;
     const WidgetPtr m_widget;
     QSize m_pageSize;
 };

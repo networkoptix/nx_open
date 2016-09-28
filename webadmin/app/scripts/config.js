@@ -104,10 +104,12 @@ var Config = {
         backupQualities: {label: 'Backup qualities', type: 'text'},
         serverDiscoveryPingTimeoutSec: {label: 'Server discovery timeout', type: 'number'},
 
-
         cloudAccountName: {label: 'Cloud owner account', type: 'static'},
+        cloudHost: {label: 'Cloud host', type: 'static'},
         cloudAuthKey: {label: 'Cloud auth key', type: 'static'},
-        cloudSystemID: {label: 'Cloud portal url', type: 'static'},
+        cloudSystemID: {label: 'Cloud system id', type: 'static'},
+
+        systemName: {label: 'System name', type: 'text'},
 
         newSystem: {label: 'Server is "New"', type: 'static'},
         proxyConnectTimeoutSec: {label: 'Proxy connection timeout (seconds)', type: 'number'},

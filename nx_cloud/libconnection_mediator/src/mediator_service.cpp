@@ -85,7 +85,9 @@ int MediatorProcess::executeApplication()
         return 0;
     }
 
-    initializeLogging(settings);
+    initializeQnLog(
+        settings.logging(), settings.general().dataDir,
+        QnLibConnectionMediatorAppInfo::applicationDisplayName());
 
     if (settings.stun().addrToListenList.empty())
     {
@@ -207,28 +209,6 @@ void MediatorProcess::start()
 void MediatorProcess::stop()
 {
     application()->quit();
-}
-
-void MediatorProcess::initializeLogging(const conf::Settings& settings)
-{
-    //logging
-    if (settings.logging().logLevel != QString::fromLatin1("none"))
-    {
-        const QString& logDir = settings.logging().logDir;
-
-        QDir().mkpath(logDir);
-        const QString& logFileName = logDir + lit("/log_file");
-        if (!cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
-        {
-            std::wcerr << L"Failed to create log file "
-                       << logFileName.toStdWString() << std::endl;
-        }
-
-        QnLog::initLog(settings.logging().logLevel);
-        NX_LOGX(lit("================================================================================="), cl_logALWAYS);
-        NX_LOGX(lit("%1 started").arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()), cl_logALWAYS);
-        NX_LOGX(lit("Software version: %1").arg(QnAppInfo::applicationFullVersion()), cl_logALWAYS);
-    }
 }
 
 bool MediatorProcess::launchHttpServerIfNeeded(

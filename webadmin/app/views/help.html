@@ -1,8 +1,7 @@
 <div class="container">
-    <p>Tools and links to help you better understand/interact with your VMS system</p>
     <div class="col-xs-12" ng-repeat="(key, link) in config.helpLinks">
-        <h2>{{link.title}}</h2>
-        <p>
+        <h3>{{link.title}}</h3>
+        <p ng-if="link.description">
             {{link.description}}
         </p>
 

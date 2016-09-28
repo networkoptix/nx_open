@@ -1,4 +1,5 @@
 #include "widget_animator.h"
+
 #include <cmath>
 #include <limits>
 #include <QtWidgets/QGraphicsWidget>
@@ -9,21 +10,23 @@
 #include "variant_animator.h"
 #include "rect_animator.h"
 
-WidgetAnimator::WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent):
+WidgetAnimator::WidgetAnimator(
+    QGraphicsWidget* widget, 
+    const QByteArray& geometryPropertyName, 
+    const QByteArray& rotationPropertyName, 
+    QObject* parent)
+    :
     AnimatorGroup(parent),
-    m_geometryAnimator(NULL),
-    m_rotationAnimator(NULL)
+    m_geometryAnimator(new RectAnimator(this)),
+    m_rotationAnimator(new VariantAnimator(this))
 {
-    if(widget == NULL) {
-        qnNullWarning(widget);
+    NX_ASSERT(widget);
+    if (!widget)
         return;
-    }
 
-    m_geometryAnimator = new RectAnimator(this);
     m_geometryAnimator->setTargetObject(widget);
     m_geometryAnimator->setAccessor(new PropertyAccessor(geometryPropertyName));
 
-    m_rotationAnimator = new VariantAnimator(this);
     m_rotationAnimator->setTargetObject(widget);
     m_rotationAnimator->setAccessor(new PropertyAccessor(rotationPropertyName));
 
@@ -31,64 +34,77 @@ WidgetAnimator::WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geomet
     addAnimator(m_geometryAnimator);
 }
 
-WidgetAnimator::~WidgetAnimator() {
+WidgetAnimator::~WidgetAnimator()
+{
     stop();
 }
 
-void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasingCurve &curve) {
-    if(widget() == NULL) {
-        qnWarning("Cannot move a NULL widget.");
+void WidgetAnimator::moveTo(const QRectF& geometry, qreal rotation)
+{
+    NX_ASSERT(widget());
+    if (!widget())
         return;
-    }
 
     pause();
 
     m_geometryAnimator->setTargetValue(geometry);
-    m_geometryAnimator->setEasingCurve(curve);
-
     m_rotationAnimator->setTargetValue(rotation);
-    m_rotationAnimator->setEasingCurve(curve);
 
     start();
 }
 
-void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
-    moveTo(geometry, rotation, QEasingCurve::Linear);
+QGraphicsWidget* WidgetAnimator::widget() const
+{
+    return checked_cast<QGraphicsWidget*>(m_geometryAnimator->targetObject());
 }
 
-QGraphicsWidget *WidgetAnimator::widget() const {
-    return checked_cast<QGraphicsWidget *>(m_geometryAnimator->targetObject());
-}
-
-qreal WidgetAnimator::scalingSpeed() const {
+qreal WidgetAnimator::scalingSpeed() const
+{
     return m_geometryAnimator->scalingSpeed();
 }
 
-qreal WidgetAnimator::relativeMovementSpeed() const {
+qreal WidgetAnimator::relativeMovementSpeed() const
+{
     return m_geometryAnimator->relativeMovementSpeed();
 }
 
-qreal WidgetAnimator::absoluteMovementSpeed() const {
+qreal WidgetAnimator::absoluteMovementSpeed() const
+{
     return m_geometryAnimator->absoluteMovementSpeed();
 }
 
-qreal WidgetAnimator::rotationSpeed() const {
+qreal WidgetAnimator::rotationSpeed() const
+{
     return m_rotationAnimator->speed();
 }
 
-void WidgetAnimator::setScalingSpeed(qreal scalingSpeed) {
+void WidgetAnimator::setScalingSpeed(qreal scalingSpeed)
+{
     m_geometryAnimator->setScalingSpeed(scalingSpeed);
 }
 
-void WidgetAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed) {
+void WidgetAnimator::setRelativeMovementSpeed(qreal relativeMovementSpeed)
+{
     m_geometryAnimator->setRelativeMovementSpeed(relativeMovementSpeed);
 }
 
-void WidgetAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed) {
+void WidgetAnimator::setAbsoluteMovementSpeed(qreal absoluteMovementSpeed)
+{
     m_geometryAnimator->setAbsoluteMovementSpeed(absoluteMovementSpeed);
 }
 
-void WidgetAnimator::setRotationSpeed(qreal degrees) {
+void WidgetAnimator::setRotationSpeed(qreal degrees)
+{
     m_rotationAnimator->setSpeed(degrees);
+}
+
+const QEasingCurve& WidgetAnimator::easingCurve() const
+{
+    return m_geometryAnimator->easingCurve();
+}
+
+void WidgetAnimator::setEasingCurve(const QEasingCurve& easingCurve)
+{
+    m_geometryAnimator->setEasingCurve(easingCurve);
 }
 

@@ -483,18 +483,21 @@ bool QnSystemsModelPrivate::systemLess(
 QString QnSystemsModelPrivate::getCompatibleVersion(
     const QnSystemDescriptionPtr& systemDescription) const
 {
-    const auto servers = systemDescription->servers();
-    if (servers.isEmpty())
-        return QString();
-
-    const auto predicate = [this](const QnModuleInformation& serverInfo)
+    for (const auto& serverInfo: systemDescription->servers())
     {
-        return serverInfo.protoVersion != QnAppInfo::ec2ProtoVersion();
-    };
+        const auto result = QnConnectionValidator::validateConnection(serverInfo);
+        switch (result)
+        {
+            case Qn::IncompatibleProtocolConnectionResult:
+                return serverInfo.version.toString(QnSoftwareVersion::BugfixFormat);
+            case Qn::IncompatibleCloudHostConnectionResult:
+                return serverInfo.version.toString();
+            default:
+                break;
+        }
+    }
 
-    const auto compatibleIt = std::find_if(servers.begin(), servers.end(), predicate);
-    return (compatibleIt == servers.end() ? QString() :
-        compatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
+    return QString();
 }
 
 QString QnSystemsModelPrivate::getIncompatibleVersion(
@@ -507,7 +510,7 @@ QString QnSystemsModelPrivate::getIncompatibleVersion(
     const auto predicate = [this](const QnModuleInformation& serverInfo)
     {
         auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-        return connectionResult == Qn::ConnectionResult::IncompatibleVersion;
+        return connectionResult == Qn::IncompatibleVersionConnectionResult;
     };
 
     const auto incompatibleIt =
@@ -530,7 +533,7 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
         [](const QnModuleInformation& serverInfo)
         {
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult == Qn::ConnectionResult::Success;
+            return connectionResult == Qn::SuccessConnectionResult;
         });
 }
 
@@ -542,7 +545,7 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
         [](const QnModuleInformation& serverInfo)
         {
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult != Qn::ConnectionResult::IncompatibleInternal;
+            return connectionResult != Qn::IncompatibleInternalConnectionResult;
         });
 }
 

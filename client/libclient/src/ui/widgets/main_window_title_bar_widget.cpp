@@ -3,6 +3,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
+#include <utils/math/math.h>
 
 #include <ui/actions/actions.h>
 #include <ui/common/geometry.h>
@@ -102,10 +103,12 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QnHiDpiWorkarounds::showMenu(menu.data(),
                 QnHiDpiWorkarounds::safeMapToGlobal(d->mainMenuButton,
                     d->mainMenuButton->rect().bottomLeft()));
+
+            d->mainMenuButton->setDown(false);
     });
 
-
     d->tabBar = new QnLayoutTabBar(this);
+    d->tabBar->setFocusPolicy(Qt::NoFocus);
     d->tabBar->setFixedHeight(kTitleBarHeight);
     connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested, d,
         &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
@@ -152,6 +155,8 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QnHiDpiWorkarounds::showMenu(menu.data(),
                 QnHiDpiWorkarounds::safeMapToGlobal(d->currentLayoutsButton,
                     d->currentLayoutsButton->rect().bottomLeft()));
+
+            d->currentLayoutsButton->setDown(false);
         });
 
     layout->addWidget(d->newTabButton);

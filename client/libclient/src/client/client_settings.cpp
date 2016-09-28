@@ -89,10 +89,10 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
     case LAST_USED_CONNECTION: {
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
-        auto result = QnUserRecentConnectionData::fromSettings(settings);
+        auto result = QnLocalConnectionData::fromSettings(settings);
         settings->endGroup();
         settings->endGroup();
-        return QVariant::fromValue<QnUserRecentConnectionData>(result);
+        return QVariant::fromValue<QnLocalConnectionData>(result);
     }
     case AUDIO_VOLUME: {
         settings->beginGroup(QLatin1String("audioControl"));
@@ -146,7 +146,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
-        QnUserRecentConnectionData::writeToSettings(settings, value.value<QnUserRecentConnectionData>());
+        QnLocalConnectionData::writeToSettings(settings, value.value<QnLocalConnectionData>());
         settings->endGroup();
         settings->endGroup();
         break;

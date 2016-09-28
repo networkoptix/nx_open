@@ -18,6 +18,7 @@
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/resource_property_adaptors.h>
 #include <utils/app_server_notification_cache.h>
@@ -33,6 +34,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
+
+    auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
 
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,
         this, &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
@@ -111,10 +114,28 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
     {
+        //TODO: #GDM code duplication
+        auto allowedForUser =
+            [this](const std::vector<QnUuid>& ids)
+            {
+                if (ids.empty())
+                    return true;
+
+                auto user = context()->user();
+                if (!user)
+                    return false;
+
+                if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
+                    return true;
+
+                auto roleId = user->userGroup();
+                return !roleId.isNull()
+                    && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
+            };
+
+
         /* Skip action if it contains list of users, and we are not on the list. */
-        auto ids = businessAction->getParams().additionalResources;
-        if (!ids.empty()
-            && std::find(ids.cbegin(), ids.cend(), context()->user()->getId()) == ids.cend())
+        if (!allowedForUser(businessAction->getParams().additionalResources))
             return;
     }
 
@@ -151,6 +172,20 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
         return;
 
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(businessAction), true);
+}
+
+bool QnWorkbenchNotificationsHandler::tryClose(bool force)
+{
+    clear();
+    return true;
+}
+
+void QnWorkbenchNotificationsHandler::forcedUpdate()
+{
+    checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message)
@@ -238,9 +273,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
 {
     m_adaptor->setResource(context()->user());
 
-    checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
-    checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
-    checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
+    forcedUpdate();
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message)

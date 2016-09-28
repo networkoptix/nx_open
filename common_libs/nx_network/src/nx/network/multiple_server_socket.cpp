@@ -1,4 +1,3 @@
-
 #include "multiple_server_socket.h"
 
 #include <boost/optional.hpp>
@@ -6,6 +5,14 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
+
+#include "socket_global.h"
+
+#define DEBUG_LOG(MESSAGE) do \
+    { \
+        if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+            NX_LOGX(MESSAGE, cl_logDEBUG1); \
+    } while(0)
 
 namespace nx {
 namespace network {
@@ -169,7 +176,7 @@ MultipleServerSocket_FORWARD_SET(listen, int);
 
 AbstractStreamSocket* MultipleServerSocket::accept()
 {
-    //NX_LOGX(lm("accept() begin"), cl_logDEBUG2);
+    DEBUG_LOG(lm("accept()"));
     if (m_nonBlockingMode)
     {
         for (auto& server : m_serverSockets)
@@ -184,14 +191,13 @@ AbstractStreamSocket* MultipleServerSocket::accept()
         [this, &promise](SystemError::ErrorCode code, AbstractStreamSocket* rawSocket)
         {
             std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
-            //NX_LOGX(lm("accept() post %1").arg(socket), cl_logDEBUG2);
 
             // Here we have to post, to make all of m_serverSockets good to remove
             // right after sync accept is returned.
             post(
                 [this, &promise, code, socket = std::move(socket)]() mutable
                 {
-                    //NX_LOGX(lm("accept() returns %1").arg(socket), cl_logDEBUG2);
+                    DEBUG_LOG(lm("accept() returns %1").arg(socket));
                     promise.set_value(std::make_pair(code, socket.release()));
                 });
         });
@@ -239,10 +245,8 @@ void MultipleServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
-    //NX_LOGX(lm("acceptAsync() begin"), cl_logDEBUG2);
     dispatch([this, handler = std::move(handler)]() mutable
     {
-        //NX_LOGX(lm("acceptAsync() dispatch"), cl_logDEBUG2);
         NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "concurrent accept call");
         m_acceptHandler = std::move(handler);
 
@@ -260,7 +264,7 @@ void MultipleServerSocket::acceptAsync(
             if (!source.isAccepting)
             {
                 source.isAccepting = true;
-                NX_LOGX(lm("Accept on source(%1)").arg(&source), cl_logDEBUG2);
+                DEBUG_LOG(lm("Accept on source(%1)").arg(&source));
 
                 using namespace std::placeholders;
                 source->acceptAsync(std::bind(
@@ -272,7 +276,7 @@ void MultipleServerSocket::acceptAsync(
 
 void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    NX_LOGX(lm("Cancel async IO async..."), cl_logDEBUG2);
+    DEBUG_LOG(lm("Cancel async IO async..."));
     post(
         [this, handler = std::move(handler)]() mutable
         {
@@ -287,7 +291,7 @@ void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler
 
 void MultipleServerSocket::cancelIOSync()
 {
-    NX_LOGX(lm("Cancel async IO sync..."), cl_logDEBUG2);
+    DEBUG_LOG(lm("Cancel async IO sync..."));
     nx::utils::promise<void> ioCancelledPromise;
     //TODO #ak deal with copy-paste
     dispatch(
@@ -329,7 +333,7 @@ void MultipleServerSocket::ServerSocketHandle::stopAccepting()
 bool MultipleServerSocket::addSocket(
     std::unique_ptr<AbstractStreamServerSocket> socket)
 {
-    NX_LOGX(lm("Add socket(%1)").arg(socket), cl_logDEBUG1);
+    DEBUG_LOG(lm("Add socket(%1)").arg(socket));
     if (!socket->setNonBlockingMode(true))
         return false;
 
@@ -348,7 +352,7 @@ bool MultipleServerSocket::addSocket(
             {
                 ServerSocketHandle& source = m_serverSockets.back();
                 source.isAccepting = true;
-                NX_LOGX(lm("Accept on source(%1) when added").arg(&source), cl_logDEBUG2);
+                DEBUG_LOG(lm("Accept on source(%1) when added").arg(&source));
 
                 using namespace std::placeholders;
                 source->acceptAsync(std::bind(
@@ -364,7 +368,7 @@ bool MultipleServerSocket::addSocket(
 
 void MultipleServerSocket::removeSocket(size_t pos)
 {
-    NX_LOGX(lm("Remove socket(%1)").arg(pos), cl_logDEBUG2);
+    DEBUG_LOG(lm("Remove socket(%1)").arg(pos));
     nx::utils::promise<void> socketRemovedPromise;
     dispatch(
         [this, &socketRemovedPromise, pos]()
@@ -391,10 +395,8 @@ void MultipleServerSocket::accepted(
     AbstractStreamSocket* rawSocket)
 {
     std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
-
-    NX_LOGX(lm("Accepted socket(%1) (%2) from source(%3)")
-            .arg(rawSocket).arg(SystemError::toString(code)).arg(source),
-            cl_logDEBUG2);
+    DEBUG_LOG(lm("Accepted socket(%1) (%2) from source(%3)")
+        .arg(rawSocket).arg(SystemError::toString(code)).arg(source));
 
     if (source)
     {
@@ -412,7 +414,7 @@ void MultipleServerSocket::accepted(
     //            is handled, so we can not take any decisions afterhand.
     //            Consider using condition variables!
 
-    NX_LOGX(lm("Cancel all other accepts"), cl_logDEBUG2);
+    DEBUG_LOG(lm("Cancel all other accepts"));
     for (auto& socketContext : m_serverSockets)
         socketContext.stopAccepting();
 

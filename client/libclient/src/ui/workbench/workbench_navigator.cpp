@@ -38,6 +38,8 @@ extern "C"
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
+#include <nx/utils/raii_guard.h>
+
 #include <plugins/resource/avi/avi_resource.h>
 
 #include <redass/redass_controller.h>
@@ -84,7 +86,7 @@ namespace {
 
 const int kCameraHistoryRetryTimeoutMs = 5 * 1000;
 
-const int kDiscardCacheIntervalMs = 10 * 60 * 1000;
+const int kDiscardCacheIntervalMs = 60 * 60 * 1000;
 
 /** Size of timeline window near live when there is no recorded periods on cameras. */
 const int kTimelineWindowNearLive = 10 * 1000;
@@ -137,6 +139,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
     m_lastAdjustTimelineToPosition(false),
+    m_timelineRelevant(false),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -474,12 +477,12 @@ void QnWorkbenchNavigator::deinitialize()
 
 Qn::ActionScope QnWorkbenchNavigator::currentScope() const
 {
-    return Qn::SliderScope;
+    return Qn::TimelineScope;
 }
 
 QnActionParameters QnWorkbenchNavigator::currentParameters(Qn::ActionScope scope) const
 {
-    if (scope != Qn::SliderScope)
+    if (scope != Qn::TimelineScope)
         return QnActionParameters();
 
     QnResourceWidgetList result;
@@ -531,7 +534,7 @@ bool QnWorkbenchNavigator::isPlayingSupported() const
 
 bool QnWorkbenchNavigator::isTimelineRelevant() const
 {
-    if (!currentWidget())
+    if (!currentWidget() || !m_currentWidgetLoaded)
         return false;
 
     if (!isPlayingSupported())
@@ -721,10 +724,10 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
 
     connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource, false))
-	{
+    if(auto loader = m_cameraDataManager->loader(syncedResource))
         loader->setEnabled(true);
-    }
+    else
+        NX_EXPECT(false);
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
@@ -1260,7 +1263,21 @@ bool QnWorkbenchNavigator::isTimelineCatchingUp() const
 
 void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 {
-    if (!m_currentMediaWidget || !m_timeSlider)
+    if (!m_timeSlider)
+        return;
+
+    QnRaiiGuard timelineRelevancyUpdater(QnRaiiGuard::Handler(),
+        [this]()
+        {
+            bool timelineRelevant = isTimelineRelevant();
+            if (m_timelineRelevant == timelineRelevant)
+                return;
+
+            m_timelineRelevant = timelineRelevant;
+            emit timelineRelevancyChanged(timelineRelevant);
+        });
+
+    if (!m_currentMediaWidget)
         return;
 
     if (m_timeSlider->isSliderDown())
@@ -1303,7 +1320,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         {
             startTimeMSec = m_timeSlider->minimum();
             endTimeMSec = m_timeSlider->maximum();
-
         }
         else if (noRecordedPeriodsFound)
         {
@@ -1326,7 +1342,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                     }
                 }
             }
-
         }
         else
         {
@@ -1338,7 +1353,12 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         }
     }
 
+    bool brandNewRange = m_timeSlider->minimum() != startTimeMSec;
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
+
+    if (brandNewRange)
+        m_timeSlider->finishAnimations();
+
     if (m_calendar)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
     if (m_dayTimeWidget)
@@ -1346,14 +1366,18 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 
     if (!m_pausedOverride)
     {
-
-        //TODO: #GDM #refactor logic in 3.0
-        auto usecTimeForWidget = [isSearch](QnMediaResourceWidget *mediaWidget) -> qint64
+        //TODO: #GDM #vkutin #refactor logic in 3.1
+        auto usecTimeForWidget = [isSearch, this](QnMediaResourceWidget *mediaWidget) -> qint64
         {
             if (mediaWidget->display()->camDisplay()->isRealTimeSource())
                 return DATETIME_NOW;
 
-            qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+            qint64 timeUSec;
+            if (m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync))
+                timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
+            else
+                timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+
             if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
 
@@ -1363,6 +1387,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 if (timeUSec != DATETIME_NOW && timeUSec >= 0)
                     timeUSec *= 1000;
             }
+
             return timeUSec;
         };
 
@@ -1373,10 +1398,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
         };
 
-        qint64 timeUSec = usecTimeForWidget(m_currentMediaWidget);
+        qint64 timeUSec = widgetLoaded
+            ? usecTimeForWidget(m_currentMediaWidget)
+            : isLiveSupported() ? DATETIME_NOW : startTimeMSec;
+
         qint64 timeMSec = usecToMsec(timeUSec);
 
-        if (!keepInWindow)
+        if (!keepInWindow || m_sliderDataInvalid)
         {
             /* Position was reset: */
             m_animatedPosition = timeMSec;
@@ -1878,7 +1906,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     qint64 position = m_timeSlider->valueFromPosition(pos);
 
-    QnActionParameters parameters = currentParameters(Qn::SliderScope);
+    QnActionParameters parameters = currentParameters(Qn::TimelineScope);
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
@@ -1889,7 +1917,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::SliderScope, nullptr, parameters));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TimelineScope, nullptr, parameters));
     if (menu->isEmpty())
         return;
 

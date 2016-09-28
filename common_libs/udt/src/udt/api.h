@@ -264,7 +264,9 @@ private:
    std::map<UDTSOCKET, CUDTSocket*> m_ClosedSockets;   // temporarily store closed sockets
 
    void checkBrokenSockets();
-   void removeSocket(const UDTSOCKET u);
+   void removeSocket(
+       const UDTSOCKET u,
+       std::vector<CMultiplexer>* const multiplexersToRemove);
 
 private:
    CEPoll m_EPoll;                                     // handling epoll data structures and events

@@ -151,13 +151,16 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
 {
     NX_LOGX(lm("Trying to fetch new cloud nonce"), cl_logDEBUG2);
 
+    std::unique_ptr<nx::cdb::api::Connection> newConnection;
+
     QnMutexLocker lk(&m_mutex);
     m_timerID.release();
 
     if (!m_boundToCloud)
         return;
 
-    m_connection = m_cloudConnectionManager->getCloudConnection();
+    newConnection = m_cloudConnectionManager->getCloudConnection();
+    std::swap(m_connection, newConnection);
     if (!m_connection)
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);

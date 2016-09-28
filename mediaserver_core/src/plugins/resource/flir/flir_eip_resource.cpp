@@ -3,14 +3,17 @@
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <nx/utils/log/log.h>
 
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
 namespace {
-    constexpr const std::chrono::milliseconds kIOCheckTimeout = std::chrono::milliseconds(3000);
-    constexpr const std::chrono::milliseconds kAlarmCheckTimeout = std::chrono::milliseconds(300);
-    const QString kAlarmsCountParamName("alarmsCount");
-}
+
+const std::chrono::milliseconds kIOCheckTimeout = std::chrono::seconds(1);
+const std::chrono::milliseconds kAlarmCheckTimeout(300);
+const QString kAlarmsCountParamName("alarmsCount");
+
+} //namespace
 
 QnFlirEIPResource::QnFlirEIPResource() :
     m_inputPortMonitored(false),
@@ -25,7 +28,7 @@ QnFlirEIPResource::~QnFlirEIPResource()
 }
 
 QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
-{
+{    
     return MessageRouterRequest::buildEPath(
         FlirEIPClass::kPassThrough,
         0x01);
@@ -35,13 +38,14 @@ CameraDiagnostics::Result QnFlirEIPResource::initInternal()
 {
     QnSecurityCamResource::initInternal();
 
-    m_eipClient = std::make_shared<SimpleEIPClient>(QHostAddress(getHostAddress()));
-    m_eipAsyncClient = std::make_shared<EIPAsyncClient>(QHostAddress(getHostAddress()));
-    m_outputEipAsyncClient = std::make_shared<EIPAsyncClient>(QHostAddress(getHostAddress()));
-    m_alarmsEipAsyncClient = std::make_shared<EIPAsyncClient>(QHostAddress(getHostAddress()));
+    m_eipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
+    m_outputEipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
+    m_alarmsEipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
 
-    m_eipClient->connect();
-    m_eipClient->registerSession();
+    // Just to ensure that the camera is alive
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
+    if (!client->registerSession())
+        return CameraDiagnostics::CannotEstablishConnectionResult(kDefaultEipPort);
 
     setCameraCapabilities(
         Qn::PrimaryStreamSoftMotionCapability |
@@ -325,7 +329,7 @@ QString QnFlirEIPResource::parseEIPResponse(const MessageRouterResponse &respons
     return data;
 }
 
-bool QnFlirEIPResource::commitParam(const QnCameraAdvancedParameter &param)
+bool QnFlirEIPResource::commitParam(const QnCameraAdvancedParameter &param, SimpleEIPClient* eipClient)
 {
     const auto commitCmd = param.writeCmd;
     if(commitCmd.isEmpty())
@@ -338,11 +342,13 @@ bool QnFlirEIPResource::commitParam(const QnCameraAdvancedParameter &param)
     request.data[0] = commitCmd.size();
     request.data.append(commitCmd.toLatin1());
     request.data[request.data.size()] = 0x01;
-    auto response = m_eipClient->doServiceRequest(request);
+    auto response = eipClient->doServiceRequest(request);
     return true;
 }
 
-bool  QnFlirEIPResource::handleButtonParam(const QnCameraAdvancedParameter &param)
+bool  QnFlirEIPResource::handleButtonParam(
+    const QnCameraAdvancedParameter &param,
+    SimpleEIPClient* eipClient)
 {
     CIPPath path = parseParamCIPPath(param);
     QByteArray data;
@@ -363,7 +369,7 @@ bool  QnFlirEIPResource::handleButtonParam(const QnCameraAdvancedParameter &para
     request.data = data;
     request.pathSize = (path.attributeId == 0 ? 2 : 3);
 
-    auto response = m_eipClient->doServiceRequest(request);
+    auto response = eipClient->doServiceRequest(request);
     return (response.generalStatus == CIPGeneralStatus::kSuccess);
 }
 
@@ -375,7 +381,12 @@ bool QnFlirEIPResource::getParamPhysical(const QString &id, QString &value)
         return false;
 
     const auto eipRequest = buildEIPGetRequest(param);
-    const auto response = m_eipClient->doServiceRequest(eipRequest);
+
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
+    if (!client->registerSession())
+        return false;    
+
+    const auto response = client->doServiceRequest(eipRequest);
 
     if(response.generalStatus != CIPGeneralStatus::kSuccess)
         return false;
@@ -390,11 +401,15 @@ bool QnFlirEIPResource::setParamPhysical(const QString &id, const QString &value
     bool res = false;
     const auto param  =  m_advancedParameters.getParameterById(id);
 
-    if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
-        return handleButtonParam(param);
+    auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
+    if (!client->registerSession())
+        return false;
 
-    const auto eipRequest = buildEIPSetRequest(param, value);
-    const auto response = m_eipClient->doServiceRequest(eipRequest);
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
+        return handleButtonParam(param, client.get());
+
+    const auto response = client
+        ->doServiceRequest(buildEIPSetRequest(param, value));
 
     res = (response.generalStatus == CIPGeneralStatus::kSuccess);
 
@@ -402,7 +417,7 @@ bool QnFlirEIPResource::setParamPhysical(const QString &id, const QString &value
         return res;
 
     if(!param.writeCmd.isEmpty())
-        res = commitParam(param);
+        res = commitParam(param, client.get());
 
     return res;
 }
@@ -440,10 +455,12 @@ bool QnFlirEIPResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedP
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
-#ifdef _DEBUG
+
     if (!result)
-        qWarning() << "Error while parsing xml" << templateFilename;
-#endif
+    {
+        NX_LOG(lit("Error while parsing xml (flir) %1").arg(templateFilename), cl_logWARNING);
+    }
+
     return result;
 }
 
@@ -455,7 +472,6 @@ QSet<QString> QnFlirEIPResource::calculateSupportedAdvancedParameters(const QnCa
 bool QnFlirEIPResource::startInputPortMonitoringAsync(std::function<void (bool)> &&completionHandler)
 {
     QnMutexLocker lock(&m_ioMutex);
-    qDebug() << "Starting  input port monitoring";
 
     if(m_inputPortMonitored)
         return false;
@@ -480,7 +496,6 @@ bool QnFlirEIPResource::startAlarmMonitoringAsync()
     if (m_alarmStates.empty())
         return false;
 
-    qDebug() << "Starting alarm monitoring";
     m_currentAlarmMonitoringState = FlirAlarmMonitoringState::ReadyToCheckAlarm;
     m_currentCheckingAlarmNumber = 0;
 
@@ -533,6 +548,11 @@ void QnFlirEIPResource::initializeIO()
     auto portList = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
     auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
 
+    m_inputPorts.clear();
+    m_outputPorts.clear();
+    m_inputPortStates.clear();
+    m_alarmStates.clear();
+
     for (const auto& port: portList)
         if (port.portType == Qn::PT_Input)
         {
@@ -545,8 +565,8 @@ void QnFlirEIPResource::initializeIO()
         {
             m_outputPorts.push_back(port);
         }
-
-    for (size_t i=0; i<alarmsCount; i++)
+    
+    for (size_t i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 
     setIOPorts(portList);
@@ -567,6 +587,9 @@ QnIOPortDataList QnFlirEIPResource::getInputPortList() const
 void QnFlirEIPResource::stopInputPortMonitoringAsync()
 {
     QnMutexLocker lock(&m_ioMutex);
+
+    if (!m_inputPortMonitored)
+        return;
 
     QObject::disconnect(
         m_eipAsyncClient.get(), &EIPAsyncClient::done,

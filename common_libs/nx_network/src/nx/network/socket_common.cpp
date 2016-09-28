@@ -166,11 +166,21 @@ const boost::optional<in6_addr>& HostAddress::ipV6() const
     if (m_ipV6)
         return m_ipV6;
 
+    boost::optional<QString>* string = &m_string;
+    boost::optional<QString> tmpString;
+
     if (m_string)
     {
         m_ipV6 = ipV6from(*m_string);
         if (m_ipV6)
             return m_ipV6;
+
+        if (m_ipV4)
+        {
+            // it look's like m_string is DNS, so save ip for conversion
+            tmpString = ipToString(*m_ipV4);
+            string = &tmpString;
+        }
     }
     else
     {
@@ -178,16 +188,16 @@ const boost::optional<in6_addr>& HostAddress::ipV6() const
         m_string = ipToString(*m_ipV4);
     }
 
-    Q_ASSERT(m_string);
+    Q_ASSERT((bool) *string);
 
     // TODO: Remove this hack when IPv6 is properly supported!
     //  Try to map it from IPv4 as v4 format is preferable
-    if (*m_string == QLatin1String("0.0.0.0"))
+    if (string->get() == QLatin1String("0.0.0.0"))
         m_ipV6 = ipV6from(QLatin1String("::"));
-    else if (*m_string == QLatin1String("127.0.0.1"))
+    else if (string->get() == QLatin1String("127.0.0.1"))
         m_ipV6 = ipV6from(QLatin1String("::1"));
     else
-        m_ipV6 = ipV6from(kIpVersionConvertPart + *m_string);
+        m_ipV6 = ipV6from(kIpVersionConvertPart + string->get());
 
     return m_ipV6;
 }

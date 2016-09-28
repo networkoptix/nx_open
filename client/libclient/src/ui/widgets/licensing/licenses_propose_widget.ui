@@ -59,7 +59,7 @@
         <item>
          <widget class="QPushButton" name="moreLicensesButton">
           <property name="text">
-           <string>Get More Licenses...</string>
+           <string>Activate License...</string>
           </property>
          </widget>
         </item>

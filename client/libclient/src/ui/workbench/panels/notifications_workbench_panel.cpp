@@ -27,7 +27,7 @@
 namespace {
 
 static const int kShowAnimationDurationMs = 300;
-static const int kHideAnimationDurationMs = 200;
+static const int kHideAnimationDurationMs = 300;
 
 }
 
@@ -43,12 +43,12 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     item(new QnNotificationsCollectionWidget(parentWidget, 0, context())),
     pinButton(NxUi::newPinButton(parentWidget, context(),
         action(QnActions::PinNotificationsAction))),
-    showButton(NxUi::newBlinkingShowHideButton(parentWidget, context(),
-        action(QnActions::ToggleNotificationsAction))),
     xAnimator(new VariantAnimator(this)),
 
     m_ignoreClickEvent(false),
     m_visible(false),
+    m_showButton(NxUi::newBlinkingShowHideButton(parentWidget, context(),
+        action(QnActions::ToggleNotificationsAction))),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -76,11 +76,11 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
         });
 
     action(QnActions::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
-    showButton->setTransform(QTransform::fromScale(-1, 1));
-    showButton->setFocusProxy(item);
-    showButton->setZValue(ControlItemZOrder);
-    setHelpTopic(showButton, Qn::MainWindow_Pin_Help);
-    item->setBlinker(showButton);
+    m_showButton->setTransform(QTransform::fromScale(-1, 1));
+    m_showButton->setFocusProxy(item);
+    m_showButton->setZValue(ControlItemZOrder);
+    setHelpTopic(m_showButton, Qn::MainWindow_Pin_Help);
+    item->setBlinker(m_showButton);
     connect(action(QnActions::ToggleNotificationsAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -89,14 +89,14 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
         });
 
     m_opacityProcessor->addTargetItem(item);
-    m_opacityProcessor->addTargetItem(showButton);
+    m_opacityProcessor->addTargetItem(m_showButton);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &AbstractWorkbenchPanel::hoverEntered);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
         &AbstractWorkbenchPanel::hoverLeft);
 
     m_hidingProcessor->addTargetItem(item);
-    m_hidingProcessor->addTargetItem(showButton);
+    m_hidingProcessor->addTargetItem(m_showButton);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
@@ -106,7 +106,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
                 setOpened(false);
         });
 
-    m_showingProcessor->addTargetItem(showButton);
+    m_showingProcessor->addTargetItem(m_showButton);
     m_showingProcessor->setHoverEnterDelay(NxUi::kOpenPanelTimeoutMs);
     connect(m_showingProcessor, &HoverFocusProcessor::hoverEntered, this,
         &NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered);
@@ -118,7 +118,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_opacityAnimatorGroup->setTimer(animationTimer());
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(backgroundItem));
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(showButton));
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(pinButton));
 
     /* Create a shadow: */
@@ -149,9 +149,9 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 
     xAnimator->stop();
     if (opened)
-        xAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::InOutQuad);
     else
-        xAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::OutQuad);
     xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
 
     qreal width = item->size().width();
@@ -199,7 +199,7 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
         opacityAnimator(item)->setTargetValue(opacity);
         opacityAnimator(pinButton)->setTargetValue(opacity);
         opacityAnimator(backgroundItem)->setTargetValue(opacity);
-        opacityAnimator(showButton)->setTargetValue(opacity);
+        opacityAnimator(m_showButton)->setTargetValue(opacity);
         m_opacityAnimatorGroup->start();
     }
     else
@@ -208,7 +208,7 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
         item->setOpacity(opacity);
         pinButton->setOpacity(opacity);
         backgroundItem->setOpacity(opacity);
-        showButton->setOpacity(opacity);
+        m_showButton->setOpacity(opacity);
     }
 }
 
@@ -217,9 +217,17 @@ bool NotificationsWorkbenchPanel::isHovered() const
     return m_opacityProcessor->isHovered();
 }
 
+QRectF NotificationsWorkbenchPanel::effectiveGeometry() const
+{
+    QRectF geometry = item->geometry();
+    if (xAnimator->isRunning())
+        geometry.moveLeft(xAnimator->targetValue().toReal());
+    return geometry;
+}
+
 void NotificationsWorkbenchPanel::setShowButtonUsed(bool used)
 {
-    showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+    m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
 void NotificationsWorkbenchPanel::updateControlsGeometry()
@@ -230,9 +238,9 @@ void NotificationsWorkbenchPanel::updateControlsGeometry()
 
     QRectF paintGeometry = item->geometry();
     backgroundItem->setGeometry(paintGeometry);
-    showButton->setPos(QPointF(
+    m_showButton->setPos(QPointF(
         qMin(parentWidgetRect.right(), paintGeometry.left()),
-        (parentWidgetRect.top() + parentWidgetRect.bottom() - showButton->size().height()) / 2
+        (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height()) / 2
     ));
     pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
 

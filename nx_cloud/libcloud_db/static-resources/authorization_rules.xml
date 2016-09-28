@@ -139,8 +139,18 @@
                                 </condition>
                             </sequence>
                         </condition>
+                        <condition resName="data.accountRightsOnSystem">
+                            <!-- owner sharing cannot be modified by anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
+                        <condition resName="systemAccessRole">
+                            <!-- "owner" role cannot be assigned to anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
                         <condition resName="auth.selfAccountAccessRequested">
                             <sequence value="true">
+                                <!-- It is forbidden to change own access role (even downgrade). Only remove -->
+                                <set resName="authorized" resValue="false"/>
                                 <condition resName="systemAccessRole">
                                     <sequence value="none">  <!-- sharing removal... -->
                                         <!-- any account can remove non-owner sharing to itself -->
@@ -152,14 +162,6 @@
                                     </sequence>
                                 </condition>
                             </sequence>
-                        </condition>
-                        <condition resName="data.accountRightsOnSystem">
-                            <!-- owner sharing cannot be modified by anyone -->
-                            <set value="owner" resName="authorized" resValue="false"/>
-                        </condition>
-                        <condition resName="systemAccessRole">
-                            <!-- "owner" role cannot be assigned to anyone -->
-                            <set value="owner" resName="authorized" resValue="false"/>
                         </condition>
                     </sequence>
                     <sequence value="/cdb/system/bind">
@@ -199,11 +201,11 @@
                     <condition value="/cdb/event/subscribe" resName="auth.systemID" matchType="presence">
                         <set value="false" resName="authorized" resValue="false"/>
                     </condition>
-                    <!-- only system can update self system name -->
-                    <sequence value="/cdb/system/update_system_name">
+                    <!-- only system owner can rename the system -->
+                    <sequence value="/cdb/system/rename">
                         <set resName="authorized" resValue="false"/>
-                        <condition value="/cdb/system/update_system_name" resName="auth.selfSystemAccessRequested">
-                            <set value="true" resName="authorized" resValue="true"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
                     <condition value="/cdb/account/create_temporary_credentials" resName="auth.accountEmail" matchType="presence">

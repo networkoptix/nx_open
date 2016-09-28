@@ -7,21 +7,21 @@
 #include <nx/utils/string.h>
 #include <api/helpers/camera_id_helper.h>
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData::RoundMethod,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData, RoundMethod,
     (QnThumbnailRequestData::KeyFrameBeforeMethod, "before")
     (QnThumbnailRequestData::PreciseMethod, "precise")
     (QnThumbnailRequestData::PreciseMethod, "exact")
     (QnThumbnailRequestData::KeyFrameAfterMethod, "after")
-);
+)
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData::ThumbnailFormat,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData, ThumbnailFormat,
     (QnThumbnailRequestData::JpgFormat, "jpeg")
     (QnThumbnailRequestData::JpgFormat, "jpg")
     (QnThumbnailRequestData::TiffFormat, "tiff")
     (QnThumbnailRequestData::TiffFormat, "tif")
     (QnThumbnailRequestData::PngFormat, "png")
     (QnThumbnailRequestData::RawFormat, "raw")
-);
+)
 
 namespace {
 

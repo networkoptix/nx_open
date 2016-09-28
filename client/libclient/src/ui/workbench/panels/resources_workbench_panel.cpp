@@ -23,7 +23,7 @@
 namespace {
 
 static const int kShowAnimationDurationMs = 300;
-static const int kHideAnimationDurationMs = 200;
+static const int kHideAnimationDurationMs = 300;
 
 }
 
@@ -168,9 +168,9 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 
     xAnimator->stop();
     if (opened)
-        xAnimator->setEasingCurve(QEasingCurve::InOutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::InOutQuad);
     else
-        xAnimator->setEasingCurve(QEasingCurve::OutCubic);
+        xAnimator->setEasingCurve(QEasingCurve::OutQuad);
 
     qreal width = item->size().width();
     xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
@@ -237,6 +237,14 @@ void ResourceTreeWorkbenchPanel::setOpacity(qreal opacity, bool animate)
 bool ResourceTreeWorkbenchPanel::isHovered() const
 {
     return m_opacityProcessor->isHovered();
+}
+
+QRectF ResourceTreeWorkbenchPanel::effectiveGeometry() const
+{
+    QRectF geometry = item->geometry();
+    if (xAnimator->isRunning())
+        geometry.moveLeft(xAnimator->targetValue().toReal());
+    return geometry;
 }
 
 void ResourceTreeWorkbenchPanel::updateResizerGeometry()

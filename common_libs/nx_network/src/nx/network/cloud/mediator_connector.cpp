@@ -151,7 +151,7 @@ void MediatorConnector::fetchEndpoint()
         if( status != nx_http::StatusCode::ok )
         {
             NX_LOGX( lit( "Can not fetch mediator address: HTTP %1" )
-                     .arg( status ), cl_logERROR );
+                     .arg( status ), cl_logDEBUG1 );
 
             if (!isReady(*m_future))
                 m_promise->set_value( false );
@@ -166,7 +166,7 @@ void MediatorConnector::fetchEndpoint()
         else
         {
             NX_LOGX( lit( "Fetched mediator address: %1" )
-                     .arg( address.toString() ), cl_logALWAYS );
+                     .arg( address.toString() ), cl_logDEBUG1 );
 
             {
                 QnMutexLocker lk(&m_mutex);

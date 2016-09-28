@@ -45,16 +45,7 @@ class Settings
 public:
     Settings()
     :
-#ifdef _WIN32
-        m_settings(
-            QSettings::SystemScope,
-            QnAppInfo::organizationName(),
-            "Nx Appserver2"),
-#else
-        m_settings(lit("/opt/%1/%2/etc/%2.conf")
-            .arg("NetworkOptix").arg("appserver2"),
-            QSettings::IniFormat),
-#endif
+        m_settings("Nx Appserver2", "appserver2"),
         m_showHelp(false)
     {
     }
@@ -160,6 +151,7 @@ Appserver2Process::Appserver2Process(int argc, char** argv)
     m_argv(argv),
     m_terminated(false),
     m_ecConnection(nullptr),
+    m_tcpListener(nullptr),
     m_application(nullptr)
 {
 }
@@ -291,6 +283,11 @@ int Appserver2Process::exec()
         return 1;
     }
 
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_tcpListener = &tcpListener;
+    }
+
     tcpListener.addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
 
     tcpListener.start();
@@ -303,6 +300,13 @@ int Appserver2Process::exec()
 
     m_ecConnection = ec2Connection.get();
     application.exec();
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_tcpListener = nullptr;
+    }
+
+    tcpListener.pleaseStop();
 
     ec2Connection->stopReceivingNotifications();
     appServerConnectionFactory.setEc2Connection(nullptr);
@@ -325,6 +329,15 @@ int Appserver2Process::exec()
 ec2::AbstractECConnection* Appserver2Process::ecConnection()
 {
     return m_ecConnection.load();
+}
+
+SocketAddress Appserver2Process::endpoint() const
+{
+    QnMutexLocker lk(&m_mutex);
+    auto endpoint = m_tcpListener->getLocalEndpoint();
+    if (endpoint.address == HostAddress::anyHost)
+        endpoint.address = HostAddress::localhost;
+    return endpoint;
 }
 
 
@@ -368,6 +381,11 @@ const Appserver2Process* Appserver2ProcessPublic::impl() const
 ec2::AbstractECConnection* Appserver2ProcessPublic::ecConnection()
 {
     return m_impl->ecConnection();
+}
+
+SocketAddress Appserver2ProcessPublic::endpoint() const
+{
+    return m_impl->endpoint();
 }
 
 }   // namespace ec2

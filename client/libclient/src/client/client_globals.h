@@ -204,8 +204,6 @@ namespace Qn
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
-        CompletionWatcherRole,                      /**< Role for guard that calls specified handler after action was processed.
-                                                         Used in QnActions::ConnectAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction. */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
@@ -231,9 +229,9 @@ namespace Qn
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
         EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
-        EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
+        EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
         ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
-        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
+        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 

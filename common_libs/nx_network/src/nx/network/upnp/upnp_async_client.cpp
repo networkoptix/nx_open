@@ -383,9 +383,9 @@ void AsyncClient::getAllMappings(
     } );
 }
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( AsyncClient::Protocol,
-    ( AsyncClient::Protocol::TCP, "tcp" )
-    ( AsyncClient::Protocol::UDP, "udp" )
-)
-
 } // namespace nx_upnp
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( nx_upnp::AsyncClient, Protocol,
+    ( nx_upnp::AsyncClient::Protocol::TCP, "tcp" )
+    ( nx_upnp::AsyncClient::Protocol::UDP, "udp" )
+)

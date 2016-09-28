@@ -22,12 +22,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemHealth)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemHealth), (lexical))
-
 #define SystemRegistrationData_Fields (name)(customization)
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
@@ -38,7 +32,8 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
-#define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail)(status)(cloudConnectionSubscriptionStatus)
+#define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
+                          (status)(cloudConnectionSubscriptionStatus)(systemSequence)
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
@@ -57,25 +52,25 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
 #define SystemID_Fields (systemID)
 
 
+/**
+ * Input arguments for "rename system" request
+ */
 class SystemNameUpdate
 {
 public:
-    std::string id;
+    std::string systemID;
     std::string name;
 };
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data);
 void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery);
 
-#define SystemNameUpdate_Fields (id)(name)
+#define SystemNameUpdate_Fields (systemID)(name)
 
 
 ////////////////////////////////////////////////////////////
 //// system sharing data
 ////////////////////////////////////////////////////////////
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemAccessRole)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemAccessRole), (lexical))
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
@@ -91,8 +86,21 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 #define SystemAccessRoleData_Fields (accessRole)
 #define SystemAccessRoleList_Fields (accessRoles)
 
-#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth)
+#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth)(sortingOrder)
 #define SystemDataExList_Fields (systems)
+
+
+//-----------------------------------------------------
+// UserSessionDescriptor
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, UserSessionDescriptor* const data);
+void serializeToUrlQuery(const UserSessionDescriptor&, QUrlQuery* const urlQuery);
+
+void serialize(QnJsonContext*, const UserSessionDescriptor&, QJsonValue*);
+bool deserialize(QnJsonContext*, const QJsonValue&, UserSessionDescriptor*);
+
+//-----------------------------------------------------
+// common functions
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),
@@ -103,8 +111,16 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json));
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
+
 }   //api
 }   //cdb
 }   //nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
 
 #endif //CLOUD_DB_CL_SYSTEM_DATA_H

@@ -58,7 +58,6 @@ private:
     class DataIndex;
 
     QnResourcePtr getResource(const Column &column, const QnBusinessActionData &action) const;
-    QVariant fontData(const Column& column, const QnBusinessActionData &action) const;
     QVariant foregroundData(const Column& column, const QnBusinessActionData &action) const;
 
     static QVariant iconData(const Column& column, const QnBusinessActionData &action);
@@ -78,7 +77,6 @@ private:
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
-    QFont m_linkFont;
     QScopedPointer<DataIndex> m_index;
     static QHash<QnUuid, QnResourcePtr> m_resourcesHash;
 };

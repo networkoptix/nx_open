@@ -416,7 +416,7 @@
     </message>
     <message>
         <source>Do HTTP request</source>
-        <translation type="unfinished"></translation>
+        <translation>發送一則HTTP命令</translation>
     </message>
 </context>
 <context>

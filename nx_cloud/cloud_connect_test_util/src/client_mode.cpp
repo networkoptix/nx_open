@@ -28,7 +28,54 @@ void printConnectOptions(std::ostream* const outStream)
         "                       Bytes to receive before closing connection\n"
         "  --bytes-to-send={N}  Bytes to send before closing connection\n"
         "  --udt                Force using udt socket. Disables cloud connect\n"
-        "  --ssl                 Use SSL on top of client sockets\n";
+        "  --ssl                Use SSL on top of client sockets\n";
+}
+
+std::vector<SocketAddress> resolveTargets(
+    SocketAddress targetAddress,
+    const nx::utils::ArgumentParser& args)
+{
+    std::vector<SocketAddress> targetList;
+    if (targetAddress.address.toString().contains('.'))
+    {
+        targetList.push_back(std::move(targetAddress));
+        return targetList;
+    }
+
+    // it's likelly a system id, add server IDs if avaliable
+    QString serverId;
+    size_t serverCount;
+    if (args.read("server-id", &serverId) && args.read("server-count", &serverCount))
+    {
+        const auto systemSuffix = '.' + targetAddress.address.toString().toUtf8();
+        targetList.push_back(SocketAddress(serverId + systemSuffix, 0));
+        for (std::size_t i = 1; i < serverCount; ++i)
+        {
+            targetList.push_back(SocketAddress(
+                serverId + QString::number(i).toUtf8() + systemSuffix, 0));
+        }
+
+        return targetList;
+    }
+
+    // or resolve it
+    std::promise<void> promise;
+    nx::network::SocketGlobals::addressResolver().resolveDomain(
+        std::move(targetAddress.address),
+        [&targetAddress, &targetList, &promise](
+            std::vector<nx::network::cloud::TypedAddress> list)
+        {
+            for (auto& it : list)
+            {
+                targetList.push_back(SocketAddress(
+                    std::move(it.address), targetAddress.port));
+            }
+
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
+    return targetList;
 }
 
 int runInConnectMode(const nx::utils::ArgumentParser& args)
@@ -75,34 +122,14 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         SocketFactory::enforceSsl(true);
     }
 
-    SocketAddress targetAddress(target);
-    std::vector<SocketAddress> targetList;
-    if (targetAddress.address.toString().contains('.'))
+    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
     {
-        // looks like normal address, just use it
-        targetList.push_back(std::move(targetAddress));
-    }
-    else
-    {
-        // it's likelly a system id, so resolve it
-        std::promise<void> promise;
-        nx::network::SocketGlobals::addressResolver().resolveDomain(
-            std::move(targetAddress.address),
-            [&targetAddress, &targetList, &promise](
-                std::vector<nx::network::cloud::TypedAddress> list)
-            {
-                for (auto& it : list)
-                {
-                    targetList.push_back(SocketAddress(
-                        std::move(it.address), targetAddress.port));
-                }
-
-                promise.set_value();
-            });
-
-        promise.get_future().wait();
+        QString value;
+        if (args.read("rw-timeout", &value))
+            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
     }
 
+    const auto targetList = resolveTargets(target, args);
     if (targetList.empty())
     {
         std::cerr << "error. There are no targets to connect to!" << std::endl;
@@ -137,7 +164,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         [&finishedPromise]{ finishedPromise.set_value(); });
 
     const auto startTime = std::chrono::steady_clock::now();
-    connectionsGenerator.start();
+    connectionsGenerator.start(rwTimeout);
 
     auto finishedFuture = finishedPromise.get_future();
     printStatsAndWaitForCompletion(

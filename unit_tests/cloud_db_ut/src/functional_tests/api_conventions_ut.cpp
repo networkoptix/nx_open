@@ -67,7 +67,7 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
             QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
 
         ASSERT_TRUE(httpClient.response() != nullptr);
-        ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+        ASSERT_EQ(nx_http::StatusCode::notFound, httpClient.response()->statusLine.statusCode);
         ASSERT_EQ(nx_http::FusionRequestErrorClass::unauthorized, requestResult.errorClass);
         ASSERT_EQ(
             QnLexical::serialized(api::ResultCode::accountNotActivated),
@@ -82,7 +82,7 @@ TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
 {
     const QByteArray testData =
         "{\"fullName\": \"a k\", \"passwordHa1\": \"5f6291102209098cf5432a415e26d002\", "
-        "\"email\": \"andreyk07@gmail.com\", \"customization\": \"default\"}";
+        "\"email\": \"abrakadabra@gmail.com\", \"customization\": \"default\"}";
 
     bool success = false;
     auto accountData = QJson::deserialized<api::AccountData>(

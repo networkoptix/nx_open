@@ -1018,6 +1018,10 @@ TEST_F(SystemSharing, remove_sharing_unknown_account)
             api::SystemAccessRole::none));
 }
 
+/**
+ * Disabled since cloud_db returns forbidden when trying to share with non-existent system.
+ * This is a minor problem, so leaving it as-is for now.
+ */
 TEST_F(SystemSharing, DISABLED_remove_sharing_unknown_system)
 {
     //waiting for cloud_db initialization
@@ -1055,6 +1059,53 @@ TEST_F(SystemSharing, DISABLED_remove_sharing_unknown_system)
             system1.id,
             std::string(),
             api::SystemAccessRole::none));
+}
+
+TEST_F(SystemSharing, changingOwnRightsOnSystem)
+{
+    //waiting for cloud_db initialization
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const api::SystemAccessRole targetRoles[] = {
+        api::SystemAccessRole::cloudAdmin,
+        api::SystemAccessRole::maintenance
+    };
+
+    const api::SystemAccessRole allRoles[] = {
+        api::SystemAccessRole::disabled,
+        api::SystemAccessRole::custom,
+        api::SystemAccessRole::liveViewer,
+        api::SystemAccessRole::viewer,
+        api::SystemAccessRole::advancedViewer,
+        api::SystemAccessRole::localAdmin,
+        api::SystemAccessRole::cloudAdmin,
+        api::SystemAccessRole::maintenance,
+        api::SystemAccessRole::owner
+    };
+
+    for (const auto targetRole: targetRoles)
+    {
+        const auto account1 = addActivatedAccount2();
+        const auto account2 = addActivatedAccount2();
+        const auto system1 = addRandomSystemToAccount(account1);
+        shareSystem2(account1, system1, account2, targetRole);
+
+        for (const auto role: allRoles)
+        {
+            // Changing own role in system. Failure is expected
+            ASSERT_EQ(
+                api::ResultCode::forbidden,
+                updateSystemSharing(
+                    account2.data.email,
+                    account2.password,
+                    system1.id,
+                    account2.data.email,
+                    role));
+        }
+
+        // Removing myself from system's uses
+        shareSystem2(account2, system1, account2, api::SystemAccessRole::none);
+    }
 }
 
 }   //cdb

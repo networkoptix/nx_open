@@ -255,15 +255,17 @@ void QnTransactionMessageBus::start()
 
 void QnTransactionMessageBus::stop()
 {
-    NX_ASSERT(m_thread->isRunning());
     dropConnections();
 
-    /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
-    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(m_thread, 7);
-    waitingForObjectsToBeFreed.join();
+    if (m_thread->isRunning())
+    {
+        /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
+        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(m_thread, 7);
+        waitingForObjectsToBeFreed.join();
 
-    m_thread->exit();
-    m_thread->wait();
+        m_thread->exit();
+        m_thread->wait();
+    }
 
     m_aliveSendTimer.invalidate();
 }
@@ -1070,14 +1072,14 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiMediaServerDataExList> tranServers;
         tranServers.command = ApiCommand::getMediaServersEx;
         tranServers.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tranServers.params) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranServers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
 
         ec2::ApiCameraDataExList cameras;
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, cameras) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), cameras) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1105,7 +1107,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiUserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
         tranUsers.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tranUsers.params) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranUsers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1114,7 +1116,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiLayoutDataList> tranLayouts;
         tranLayouts.command = ApiCommand::getLayouts;
         tranLayouts.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tranLayouts.params) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranLayouts.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1208,7 +1210,7 @@ QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModul
 {
     QnTransaction<ApiDiscoveredServerDataList> transaction(ApiCommand::discoveredServersList);
 
-    QnModuleFinder *moduleFinder = QnModuleFinder::instance();
+    QnModuleFinder *moduleFinder = qnModuleFinder;
     for (const QnModuleInformation &moduleInformation : moduleFinder->foundModules())
     {
         ApiDiscoveredServerData serverData(moduleInformation);
@@ -1368,7 +1370,11 @@ void QnTransactionMessageBus::doPeriodicTasks()
             {
                 if (transport->isHttpKeepAliveTimeout())
                 {
-                    qWarning() << "Transaction Transport HTTP keep-alive timeout for connection" << transport->remotePeer().id;
+                    NX_LOGX(
+                        QnLog::EC2_TRAN_LOG,
+                        lm("Transaction Transport HTTP keep-alive timeout for connection %1 to %2")
+                            .arg(transport->remotePeer().id).arg(transport->remoteAddr().toString()),
+                        cl_logWARNING);
                     transport->setState(QnTransactionTransport::Error);
                 }
                 else if (transport->isNeedResync())
@@ -1826,25 +1832,31 @@ void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
         emit remotePeerUnauthorized(id);
 }
 
-void QnTransactionMessageBus::onEc2ConnectionSettingsChanged()
+void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
 {
     //we need break connection only if following settings have been changed:
     //  connectionKeepAliveTimeout
     //  keepAliveProbeCount
-    const auto connectionKeepAliveTimeout =
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout();
-    const auto keepAliveProbeCount =
-        QnGlobalSettings::instance()->keepAliveProbeCount();
-
-    QnMutexLocker lock(&m_mutex);
-
-    for (QnTransactionTransport* transport : m_connections)
+    if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
     {
-        if (transport->connectionKeepAliveTimeout() != connectionKeepAliveTimeout ||
-            transport->keepAliveProbeCount() != keepAliveProbeCount)
+        const auto timeout = qnGlobalSettings->connectionKeepAliveTimeout();
+        QnMutexLocker lock(&m_mutex);
+        //resetting connection
+        for (auto* transport : m_connections)
         {
-            //resetting connection
-            transport->setState(ec2::QnTransactionTransport::Error);
+            if (transport->connectionKeepAliveTimeout() != timeout)
+                transport->setState(ec2::QnTransactionTransport::Error);
+        }
+    }
+    else if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    {
+        const auto probeCount = qnGlobalSettings->keepAliveProbeCount();
+        QnMutexLocker lock(&m_mutex);
+        //resetting connection
+        for (auto* transport : m_connections)
+        {
+            if (transport->keepAliveProbeCount() != probeCount)
+                transport->setState(ec2::QnTransactionTransport::Error);
         }
     }
 }

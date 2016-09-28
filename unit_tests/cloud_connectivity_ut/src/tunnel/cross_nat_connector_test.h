@@ -51,10 +51,6 @@ protected:
     void generalTest();
     void cancellationTest();
 
-private:
-    boost::optional<ConnectorFactory::FactoryFunc> m_oldFactoryFunc;
-    nx::hpm::MediatorFunctionalTest m_mediator;
-
     void doSimpleConnectTest(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
@@ -62,6 +58,10 @@ private:
         const std::unique_ptr<nx::hpm::MediaServerEmulator>& server,
         boost::optional<SocketAddress> mediatorAddressForConnector,
         ConnectResult* const connectResult);
+
+private:
+    boost::optional<ConnectorFactory::FactoryFunc> m_oldFactoryFunc;
+    nx::hpm::MediatorFunctionalTest m_mediator;
 };
 
 }   //namespace test

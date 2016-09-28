@@ -253,8 +253,9 @@ int QnMergeSystemsRestHandler::execute(
     }
 
     auto connectionResult = QnConnectionValidator::validateConnection(remoteModuleInformation);
-    if (connectionResult == Qn::ConnectionResult::IncompatibleInternal
-        || connectionResult == Qn::ConnectionResult::IncompatibleVersion)
+    if (connectionResult == Qn::IncompatibleInternalConnectionResult
+        || connectionResult == Qn::IncompatibleCloudHostConnectionResult
+        || connectionResult == Qn::IncompatibleVersionConnectionResult)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. "
             "Local customization %1, cloud host %2, "
@@ -269,7 +270,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (connectionResult == Qn::ConnectionResult::IncompatibleProtocol
+    if (connectionResult == Qn::IncompatibleProtocolConnectionResult
         && !data.ignoreIncompatible)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems protocol. "
@@ -341,7 +342,7 @@ int QnMergeSystemsRestHandler::execute(
     QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
     /* Connect to server if it is compatible */
-    if (connectionResult == Qn::ConnectionResult::Success && QnServerConnector::instance())
+    if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())
         QnServerConnector::instance()->addConnection(remoteModuleInformation, SocketAddress(url.host(), remoteModuleInformation.port));
 
     result.setReply(remoteModuleInformation);

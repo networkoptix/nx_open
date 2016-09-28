@@ -8,6 +8,7 @@
 #include <utils/common/id.h>
 #include <nx/fusion/model_functions_fwd.h>
 
+struct QnConnectionInfo;
 
 struct QnModuleInformation
 {
@@ -38,7 +39,20 @@ struct QnModuleInformation
     static QString nxMediaServerId();
     static QString nxECId();
     static QString nxClientId();
+
 };
+
+namespace helpers {
+    /*
+     * Extracts system id. Result is:
+     * - identifier of server if it is in "new state"
+     * - cloud id if server in cloud
+     * - system name in other cases
+     */
+    QString getTargetSystemId(const QnConnectionInfo& info);
+    QString getTargetSystemId(const QnModuleInformation& info);
+
+} // helpers namespace
 
 struct QnModuleInformationWithAddresses : QnModuleInformation
 {

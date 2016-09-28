@@ -5,17 +5,39 @@
 #include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
 #include <nx_ec/ec_proto_version.h>
-
+#include <api/model/connection_info.h>
 #include <utils/common/app_info.h>
 
 namespace {
-    /*!
-    This string represents client during search with NetworkOptixModuleFinder class.
-    It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
-    */
-    const QString nxClientId = lit("client.exe");
-    const QString nxECId = lit("Enterprise Controller");
-    const QString nxMediaServerId = lit("Media Server");
+/*!
+This string represents client during search with NetworkOptixModuleFinder class.
+It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
+*/
+const QString nxClientId = lit("client.exe");
+const QString nxECId = lit("Enterprise Controller");
+const QString nxMediaServerId = lit("Media Server");
+
+QString getTargetSystemIdImpl(const QString& cloudId, const QString&systemName, bool isNewSystem)
+{
+    if (isNewSystem)
+        return QUuid::createUuid().toString();
+    else if (!cloudId.isEmpty())
+        return cloudId;
+    else
+        return systemName;
+}
+
+}
+
+QString helpers::getTargetSystemId(const QnConnectionInfo& info)
+{
+    return ::getTargetSystemIdImpl(info.cloudSystemId, info.systemName, info.newSystem);
+}
+
+QString helpers::getTargetSystemId(const QnModuleInformation& info)
+{
+    return ::getTargetSystemIdImpl(info.cloudSystemId,
+        info.systemName, info.serverFlags.testFlag(Qn::SF_NewSystem));
 }
 
 QnModuleInformation::QnModuleInformation():

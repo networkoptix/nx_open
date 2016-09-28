@@ -64,15 +64,15 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 {
     using namespace Qn;
     if (networkError == ec2::ErrorCode::unauthorized)
-        return ConnectionResult::Unauthorized;
+        return Qn::UnauthorizedConnectionResult;
 
     if (networkError == ec2::ErrorCode::ldap_temporary_unauthorized)
-        return ConnectionResult::LdapTemporaryUnauthorized;
+        return Qn::LdapTemporaryUnauthorizedConnectionResult;
     else if (networkError == ec2::ErrorCode::cloud_temporary_unauthorized)
-        return ConnectionResult::CloudTemporaryUnauthorized;
+        return Qn::CloudTemporaryUnauthorizedConnectionResult;
 
     if (networkError != ec2::ErrorCode::ok)
-        return ConnectionResult::NetworkError;
+        return Qn::NetworkErrorConnectionResult;
 
     return validateConnectionInternal(
         connectionInfo.brand,
@@ -85,7 +85,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
 {
     return info.systemName == qnCommon->localSystemName()
-        && validateConnection(info) == Qn::ConnectionResult::Success;
+        && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
@@ -95,26 +95,24 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QnSoftwareVersion& version,
     const QString& cloudHost)
 {
-    using namespace Qn;
-
     if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
-        return ConnectionResult::IncompatibleInternal;
+        return Qn::IncompatibleCloudHostConnectionResult;
 
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
     bool isMobile = localInfo.peer.isMobileClient();
 
     if (!compatibleCustomization(brand, localInfo.brand, isMobile))
-        return ConnectionResult::IncompatibleInternal;
+        return Qn::IncompatibleInternalConnectionResult;
 
     if (!compatibleCustomization(customization, localInfo.customization, isMobile))
-        return ConnectionResult::IncompatibleInternal;
+        return Qn::IncompatibleInternalConnectionResult;
 
     if (version < minSupportedVersion())
-        return ConnectionResult::IncompatibleVersion;
+        return Qn::IncompatibleVersionConnectionResult;
 
     // Mobile client can connect to servers with any protocol version.
     if (!isMobile && protoVersion != QnAppInfo::ec2ProtoVersion())
-        return ConnectionResult::IncompatibleProtocol;
+        return Qn::IncompatibleProtocolConnectionResult;
 
-    return ConnectionResult::Success;
+    return Qn::SuccessConnectionResult;
 }

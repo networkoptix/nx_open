@@ -10,6 +10,7 @@
 #include <nx/network/buffer.h>
 #include <utils/preprocessor/field_name.h>
 
+#include "url_query_parse_helper.h"
 
 namespace nx {
 namespace cdb {
@@ -18,14 +19,6 @@ namespace api {
 ////////////////////////////////////////////////////////////
 //// class AccountData
 ////////////////////////////////////////////////////////////
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(AccountStatus,
-    (AccountStatus::invalid, "invalid")
-    (AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
-    (AccountStatus::activated, "activated")
-    (AccountStatus::blocked, "blocked")
-    )
-
 
 MAKE_FIELD_NAME_STR_CONST(AccountData, id)
 MAKE_FIELD_NAME_STR_CONST(AccountData, email)
@@ -112,29 +105,17 @@ MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, customization)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data)
 {
-    if (urlQuery.hasQueryItem(AccountUpdateData_passwordHa1_field))
-        data->passwordHa1 = urlQuery.queryItemValue(AccountUpdateData_passwordHa1_field).toStdString();
-    if (urlQuery.hasQueryItem(AccountUpdateData_fullName_field))
-        data->fullName = urlQuery.queryItemValue(AccountUpdateData_fullName_field).toStdString();
-    if (urlQuery.hasQueryItem(AccountUpdateData_customization_field))
-        data->customization = urlQuery.queryItemValue(AccountUpdateData_customization_field).toStdString();
+    deserializeFromUrl(urlQuery, AccountUpdateData_passwordHa1_field, &data->passwordHa1);
+    deserializeFromUrl(urlQuery, AccountUpdateData_fullName_field, &data->fullName);
+    deserializeFromUrl(urlQuery, AccountUpdateData_customization_field, &data->customization);
     return true;
 }
 
 void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuery)
 {
-    if (data.passwordHa1)
-        urlQuery->addQueryItem(
-            AccountUpdateData_passwordHa1_field,
-            QString::fromStdString(data.passwordHa1.get()));
-    if (data.fullName)
-        urlQuery->addQueryItem(
-            AccountUpdateData_fullName_field,
-            QString::fromStdString(data.fullName.get()));
-    if (data.customization)
-        urlQuery->addQueryItem(
-            AccountUpdateData_customization_field,
-            QString::fromStdString(data.customization.get()));
+    serializeToUrl(urlQuery, AccountUpdateData_passwordHa1_field, data.passwordHa1);
+    serializeToUrl(urlQuery, AccountUpdateData_fullName_field, data.fullName);
+    serializeToUrl(urlQuery, AccountUpdateData_customization_field, data.customization);
 }
 
 void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonValue)
@@ -280,3 +261,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 }   //api
 }   //cdb
 }   //nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, AccountStatus,
+    (nx::cdb::api::AccountStatus::invalid, "invalid")
+    (nx::cdb::api::AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
+    (nx::cdb::api::AccountStatus::activated, "activated")
+    (nx::cdb::api::AccountStatus::blocked, "blocked")
+)

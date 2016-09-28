@@ -100,6 +100,7 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/style/globals.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/widgets/views/resource_list_view.h>
 
@@ -1095,7 +1096,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered()
         url.setPath(lit("/static/index.html"));
 
         url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
-        if (url.host() != server->getApiUrl().host())
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
             return;
 
         QDesktopServices::openUrl(url);
@@ -1230,16 +1231,20 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnBusiness::EventType eventType = parameters.argument(Qn::EventTypeRole, QnBusiness::AnyBusinessEvent);
-    QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+    QSet<QnUuid> ids;
+    for (auto camera: cameras)
+        ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != QnBusiness::AnyBusinessEvent || !cameras.isEmpty()) {
+    if (eventType != QnBusiness::AnyBusinessEvent || !ids.isEmpty())
+    {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
         businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
-        QDate date = QDateTime::currentDateTime().date();
-        businessEventsLogDialog()->setDateRange(date, date);
-        businessEventsLogDialog()->setCameraList(cameras);
+        auto now = QDateTime::currentMSecsSinceEpoch();
+        businessEventsLogDialog()->setDateRange(now, now);
+        businessEventsLogDialog()->setCameraList(ids);
         businessEventsLogDialog()->enableUpdateData();
     }
 }
@@ -1471,7 +1476,7 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
 
     QScopedPointer<QnMediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnSessionAwareDialog<QnMediaFileSettingsDialog>(mainWindow()));
+        dialog.reset(new QnSessionAware<QnMediaFileSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
 
@@ -2176,7 +2181,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
         mainWindow(),
         tr("Anonymous Usage Statistics"),
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
-            "If you would like to disable this feature you can do so in the System Settings dialog.")
+            "If you would like to disable this feature you can do so in the System Administration dialog.")
         );
 
     qnGlobalSettings->setStatisticsAllowed(true);

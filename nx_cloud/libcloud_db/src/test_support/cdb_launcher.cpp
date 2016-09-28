@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include <cdb/account_manager.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
@@ -42,15 +43,13 @@ CdbLauncher::CdbLauncher(QString tmpDir)
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
-    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-log/level"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
-    addArg("-syncroLog/logLevel"); addArg("DEBUG2");
+    addArg("-syncroLog/level"); addArg("DEBUG2");
 
     addArg("-db/driverName");
-    if (!sConnectionOptions.driverName.isEmpty())
-        addArg(sConnectionOptions.driverName.toLatin1().constData());
-    else
-        addArg("QSQLITE");
+    addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(
+        sConnectionOptions.driverType).toLatin1().constData());
 
     if (!sConnectionOptions.hostName.isEmpty())
     {
@@ -453,6 +452,24 @@ api::ResultCode CdbLauncher::getSystem(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    api::SystemDataEx* const system)
+{
+    std::vector<api::SystemDataEx> systems;
+    const auto res = getSystem(email, password, systemID, &systems);
+    if (res != api::ResultCode::ok)
+        return res;
+
+    if (systems.size() != 1)
+        return api::ResultCode::unknownError;
+
+    *system = systems[0];
+    return api::ResultCode::ok;
+}
+
 api::ResultCode CdbLauncher::shareSystem(
     const std::string& email,
     const std::string& password,
@@ -566,7 +583,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
     return resCode;
 }
 
-api::ResultCode CdbLauncher::updateSystemName(
+api::ResultCode CdbLauncher::renameSystem(
     const std::string& login,
     const std::string& password,
     const std::string& systemID,
@@ -579,7 +596,7 @@ api::ResultCode CdbLauncher::updateSystemName(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::updateSystemName,
+                &nx::cdb::api::SystemManager::rename,
                 connection->systemManager(),
                 systemID,
                 newSystemName,
@@ -719,6 +736,24 @@ api::ResultCode CdbLauncher::fetchSystemData(
         }
     }
     return api::ResultCode::notFound;
+}
+
+api::ResultCode CdbLauncher::recordUserSessionStart(
+    const AccountWithPassword& account,
+    const std::string& systemId)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(account.data.email, account.password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<nx::cdb::api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::recordUserSessionStart,
+                connection->systemManager(),
+                systemId,
+                std::placeholders::_1));
+    return resCode;
 }
 
 api::ResultCode CdbLauncher::getVmsConnections(

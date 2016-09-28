@@ -403,11 +403,13 @@
     },
 
     "QnTimeScrollBar": {
-        "colors": {
-            "indicator": "light4",
-            "handle": "dark12"
-        },
-        "palette": { "default": { "window": "dark4" } }
+        "palette": {
+            "default": {
+                "dark": "dark4",
+                "midlight": "dark12",
+                "text": "light4"
+            }
+        }
     },
 
     "QnGraphicsView": {
@@ -474,7 +476,7 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "dark4.setAlpha(77)",
+            "window": "dark5.setAlpha(230)",
             "windowText": "#801010c0"
         }}
     },
@@ -557,9 +559,9 @@
 
     "QnGraphicsMessageBox": {
         "colors": {
-            "frame": "#007ed4ff",
-            "window": "#004b80cc",
-            "text": "#ccccccff"
+            "frame": "brand_d2",
+            "window": "brand_d2.setAlpha(204)",
+            "text": "brand_contrast"
         }
     },
 

@@ -53,10 +53,18 @@ protected:
     void verifyThatUsersMatchInCloudAndVms(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+    void verifyThatSystemDataMatchInCloudAndVms(
+        bool assertOnFailure = true,
+        bool* const result = nullptr);
     void waitForCloudAndVmsToSyncUsers(
         bool assertOnFailure = true,
         bool* const result = nullptr);
+    void waitForCloudAndVmsToSyncSystemData(
+        bool assertOnFailure = true,
+        bool* const result = nullptr);
     api::ResultCode fetchCloudTransactionLog(
+        ::ec2::ApiTransactionDataList* const transactionList);
+    api::ResultCode fetchCloudTransactionLogFromMediaserver(
         ::ec2::ApiTransactionDataList* const transactionList);
 
 private:
@@ -66,6 +74,9 @@ private:
     std::string m_accountPassword;
     api::SystemData m_system;
 
+    api::ResultCode fetchTransactionLog(
+        const QUrl& url,
+        ::ec2::ApiTransactionDataList* const transactionList);
     bool findAdminUserId(QnUuid* const id);
 };
 

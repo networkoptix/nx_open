@@ -29,13 +29,6 @@ public:
     QString dataDir;
 };
 
-class Logging
-{
-public:
-    QString logLevel;
-    QString logDir;
-};
-
 class CloudDB
 {
 public:
@@ -76,7 +69,7 @@ public:
     bool showHelp() const;
 
     const General& general() const;
-    const Logging& logging() const;
+    const QnLogSettings& logging() const;
     const CloudDB& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
@@ -94,7 +87,7 @@ private:
     bool m_showHelp;
 
     General m_general;
-    Logging m_logging;
+    QnLogSettings m_logging;
     CloudDB m_cloudDB;
     Stun m_stun;
     Http m_http;

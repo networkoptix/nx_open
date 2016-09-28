@@ -39,14 +39,20 @@ class QnScrollableOverlayWidget;
 class QnButtonsOverlay;
 class GraphicsLabel;
 
-class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: 
+    public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
+    public QnWorkbenchContextAware, 
+    public ConstrainedResizable, 
+    public HelpTopicQueryable, 
+    protected QnGeometry 
+{
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
+    using base_type = Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>;
 
 public:
     enum Option {
@@ -113,16 +119,12 @@ public:
     /**
      * \returns                         Frame opacity of this widget.
      */
-    qreal frameOpacity() const {
-        return m_frameOpacity;
-    }
+    qreal frameOpacity() const;
 
     /**
      * \param frameOpacity              New frame opacity for this widget.
      */
-    void setFrameOpacity(qreal frameOpacity) {
-        m_frameOpacity = frameOpacity;
-    }
+    void setFrameOpacity(qreal frameOpacity);
 
     QColor frameDistinctionColor() const;
     void setFrameDistinctionColor(const QColor &frameColor);
@@ -132,18 +134,14 @@ public:
      *                                  Negative value will be returned if this
      *                                  widget does not have aspect ratio.
      */
-    float aspectRatio() const {
-        return m_aspectRatio;
-    }
+    float aspectRatio() const;
 
     void setAspectRatio(float aspectRatio);
 
     /**
      * \returns                         Whether this widget has an aspect ratio.
      */
-    bool hasAspectRatio() const {
-        return m_aspectRatio > 0.0;
-    }
+    bool hasAspectRatio() const;
 
     /**
      * \returns                         Aspect ratio of this widget taking its rotation into account.
@@ -191,9 +189,7 @@ public:
      * \param option                    Affected option.
      * \param value                     New value for the affected option.
      */
-    void setOption(Option option, bool value = true) {
-        setOptions(value ? m_options | option : m_options & ~option);
-    }
+    void setOption(Option option, bool value = true);
 
     /**
      * \param options                   New options for this widget.
@@ -268,7 +264,8 @@ protected:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter* painter, int channel,
+        const QRectF& channelRect, const QRectF& paintRect);
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
 
     void paintSelection(QPainter *painter, const QRectF &rect);

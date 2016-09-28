@@ -2,7 +2,7 @@
 
 #include <client_core/client_core_settings.h>
 
-#include <ui/models/recent_user_connections_model.h>
+#include <ui/models/recent_local_connections_model.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -16,7 +16,7 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager():
 
     const auto coreSettingsHandler = [this](int id)
         {
-            if (id == QnClientCoreSettings::RecentUserConnections)
+            if (id == QnClientCoreSettings::RecentLocalConnections)
                 updateModelsData();
         };
 
@@ -28,49 +28,40 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager():
 QnClientRecentConnectionsManager::~QnClientRecentConnectionsManager()
 {}
 
-void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* model)
+void QnClientRecentConnectionsManager::addModel(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
 
-    connect(model, &QnRecentUserConnectionsModel::systemNameChanged, this,
+    connect(model, &QnRecentLocalConnectionsModel::systemIdChanged, this,
         [this, model]()
         {
             updateModelBinding(model);
         });
 
-    const auto systemName = model->systemName();
+    const auto systemId = model->systemId();
     m_models << model;
-    if (!systemName.isEmpty())
+    if (!systemId.isEmpty())
         updateModelBinding(model);
 }
 
-void QnClientRecentConnectionsManager::removeModel(QnRecentUserConnectionsModel* model)
+void QnClientRecentConnectionsManager::removeModel(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     NX_ASSERT(m_models.contains(model));
-
-    const auto systemName = model->systemName();
-    qDebug() << "Removing model for " << systemName;
     m_models.removeOne(model);
 }
 
-void QnClientRecentConnectionsManager::updateModelBinding(QnRecentUserConnectionsModel* model)
+void QnClientRecentConnectionsManager::updateModelBinding(QnRecentLocalConnectionsModel* model)
 {
     NX_ASSERT(model);
     NX_ASSERT(!m_updating);
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    const auto systemName = model->systemName();
-    const bool isCorrectSystemName = !systemName.isEmpty();
-    NX_ASSERT(isCorrectSystemName, Q_FUNC_INFO, "System name for model can't be empty");
-    if (!isCorrectSystemName)
-        return;
-
-    model->updateData(m_dataCache.value(systemName));
+    model->updateData(m_dataCache.value(model->systemId()));
 }
 
 void QnClientRecentConnectionsManager::updateModelsData()
@@ -79,17 +70,17 @@ void QnClientRecentConnectionsManager::updateModelsData()
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     m_dataCache.clear();
-    const auto lastConnectionsData = qnClientCoreSettings->recentUserConnections();
+    const auto lastConnectionsData = qnClientCoreSettings->recentLocalConnections();
     for (const auto connectionDesc : lastConnectionsData)
     {
-        m_dataCache[connectionDesc.systemName].append(connectionDesc);
+        m_dataCache[connectionDesc.systemId].append(connectionDesc);
     }
     for (const auto model : m_models)
     {
         NX_ASSERT(model);
-        if (!model || model->systemName().isEmpty())
+        if (!model || model->systemId().isEmpty())
             continue;
-        const auto systemName = model->systemName();
-        model->updateData(m_dataCache.value(systemName));
+
+        model->updateData(m_dataCache.value(model->systemId()));
     }
 }

@@ -302,15 +302,14 @@ TEST_F(Account, badRegistration)
     auto doneFuture = donePromise.get_future();
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,
-        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) {
-            donePromise.set_value();
-        },
+        client.get(),
+        [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) { donePromise.set_value(); }, 
         Qt::DirectConnection);
     client->doPost(url, "application/json", QJson::serialized(account1));
 
     doneFuture.wait();
     ASSERT_TRUE(client->response() != nullptr);
-    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+    ASSERT_EQ(nx_http::StatusCode::notFound, client->response()->statusLine.statusCode);
 
     bool success = false;
     nx_http::FusionRequestResult requestResult =
@@ -417,7 +416,7 @@ TEST_F(Account, update)
     ASSERT_EQ(newAccount, account1);
 }
 
-TEST_F(Account, resetPassword_general)
+TEST_F(Account, reset_password_general)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -535,8 +534,69 @@ TEST_F(Account, resetPassword_expiration)
     }
 }
 
+TEST_F(Account, reset_password_links_expiration_after_changing_password)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+    auto account1 = addActivatedAccount2();
+
+    // Password has been lost.
+    account1.password.clear();
+
+    // Resetting passsword.
+    std::string confirmationCode1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        resetAccountPassword(account1.data.email, &confirmationCode1));
+
+    std::string confirmationCode2;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        resetAccountPassword(account1.data.email, &confirmationCode2));
+
+    for (int i = 0; i < 3; ++i)
+    {
+        // First run - changing password using confirmationCode2.
+        // Second run - testing confirmationCode1 does not work anymore.
+        // Third run - same as the second one, but with restart
+        const auto& confirmationCode = i == 0 ? confirmationCode2 : confirmationCode1;
+
+        // Confirmation code has format base64(tmp_password:email).
+        const auto tmpPasswordAndEmail = QByteArray::fromBase64(
+            QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
+        const std::string tmpPassword =
+            tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
+
+        // Setting new account password.
+        account1.password = "new_password";
+
+        api::AccountUpdateData update;
+        update.passwordHa1 = nx_http::calcHa1(
+            account1.data.email.c_str(),
+            moduleInfo().realm.c_str(),
+            account1.password.c_str()).constData();
+        const auto result = updateAccount(account1.data.email, tmpPassword, update);
+        if (i == 0)
+        {
+            ASSERT_EQ(api::ResultCode::ok, result);
+            // Checking new password works fine
+            api::AccountData accountData;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getAccount(account1.data.email, account1.password, &accountData));
+        }
+        else
+        {
+            // Checking that confirmation code 1 cannot be used anymore
+            ASSERT_NE(api::ResultCode::ok, result);
+        }
+
+        if (i == 1)
+            restart();
+    }
+}
+
 //checks that password reset code is valid for changing password only
-TEST_F(Account, resetPassword_authorization)
+TEST_F(Account, reset_password_authorization)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 

@@ -2,13 +2,14 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnRestResult::Error,
-                                          (QnRestResult::NoError,               "OK")
-                                          (QnRestResult::MissingParameter,      "Required parameter is missing")
-                                          (QnRestResult::InvalidParameter,      "Invalid parameter value")
-                                          (QnRestResult::CantProcessRequest,    "Internal server error")
-                                          (QnRestResult::Forbidden,             "Access denied")
-                                          );
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    QnRestResult, Error,
+    (QnRestResult::NoError,               "OK")
+    (QnRestResult::MissingParameter,      "Required parameter is missing")
+    (QnRestResult::InvalidParameter,      "Invalid parameter value")
+    (QnRestResult::CantProcessRequest,    "Internal server error")
+    (QnRestResult::Forbidden,             "Access denied")
+)
 
 QN_FUSION_DEFINE_FUNCTIONS(QnRestResult::Error, (numeric))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

@@ -652,6 +652,9 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 {
     QnWriteLocker lock(&m_mutex);
 
+    if (action->isReceivedFromRemoteHost())
+        return false; //< server should save action before proxing localy
+
     if (!m_sdb.isOpen())
         return false;
 
@@ -827,13 +830,14 @@ void QnServerDb::getAndSerializeActions(
     {
         int flags = 0;
         QnBusiness::EventType eventType = (QnBusiness::EventType) actionsQuery.value(eventTypeIdx).toInt();
-        if (eventType == QnBusiness::CameraMotionEvent)
+        if (eventType == QnBusiness::CameraMotionEvent ||
+            eventType == QnBusiness::CameraInputEvent)
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes = qnResPool->getResourceById<QnNetworkResource>(eventResId);
             if (camRes) {
                 if (QnStorageManager::isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
-                    flags |= QnBusinessActionData::MotionExists;
+                    flags |= QnBusinessActionData::VideoLinkExists;
 
             }
         }

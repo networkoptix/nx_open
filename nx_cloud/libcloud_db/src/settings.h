@@ -21,13 +21,6 @@ namespace nx {
 namespace cdb {
 namespace conf {
 
-class Logging
-{
-public:
-    QString logLevel;
-    QString logDir;
-};
-
 class Auth
 {
 public:
@@ -97,8 +90,8 @@ public:
     std::list<SocketAddress> endpointsToListen() const;
     QString dataDir() const;
     
-    const Logging& logging() const;
-    const Logging& vmsSynchronizationLogging() const;
+    const QnLogSettings& logging() const;
+    const QnLogSettings& vmsSynchronizationLogging() const;
     const db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
     const Notification& notification() const;
@@ -117,8 +110,8 @@ private:
     QnSettings m_settings;
     bool m_showHelp;
 
-    Logging m_logging;
-    Logging m_vmsSynchronizationLogging;
+    QnLogSettings m_logging;
+    QnLogSettings m_vmsSynchronizationLogging;
     db::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
     Notification m_notification;

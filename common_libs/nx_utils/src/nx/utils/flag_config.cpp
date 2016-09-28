@@ -180,7 +180,9 @@ void FlagConfig::Impl::FlagParam::reload()
                 note = " [.ini: invalid value]";
             }
         }
-        printLine(std::to_string(*pValue), " ", note, error, *pValue == defaultValue);
+
+        if (s_isOutputAllowed)
+            printLine(std::to_string(*pValue), " ", note, error, *pValue == defaultValue);
     }
     else
     {
@@ -202,7 +204,9 @@ void FlagConfig::Impl::FlagParam::reload()
         {
             note = " [.flag]";
         }
-        printLine(std::to_string(*pValue), "_", note, error, *pValue == defaultValue);
+
+        if (s_isOutputAllowed)
+            printLine(std::to_string(*pValue), "_", note, error, *pValue == defaultValue);
     }
 }
 
@@ -264,7 +268,9 @@ void FlagConfig::Impl::IntParam::reload()
                 note = " [.ini: invalid value]";
             }
         }
-        printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
+
+        if (s_isOutputAllowed)
+            printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
     }
     else
     {
@@ -280,8 +286,12 @@ void FlagConfig::Impl::IntParam::reload()
                 error = true;
             }
         }
-        const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
-        printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
+
+        if (s_isOutputAllowed)
+        {
+            const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
+            printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
+        }
     }
 }
 
@@ -329,8 +339,12 @@ void FlagConfig::Impl::StringParam::reload()
             strValue = owner->m_paramsMap[name];
             *pValue = strValue.c_str();
         }
-        std::string valueString(*pValue);
-        printLine("\"" + valueString + "\"", " = ", note, error, valueString == defaultValue);
+
+        if (s_isOutputAllowed)
+        {
+            std::string valueString(*pValue);
+            printLine("\"" + valueString + "\"", " = ", note, error, valueString == defaultValue);
+        }
     }
     else
     {
@@ -350,8 +364,12 @@ void FlagConfig::Impl::StringParam::reload()
                 *pValue = strValue.c_str();
             }
         }
-        const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
-        printLine(*pValue, " = ", note, error, std::string(*pValue) == defaultValue);
+
+        if (s_isOutputAllowed)
+        {
+            const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
+            printLine(*pValue, " = ", note, error, std::string(*pValue) == defaultValue);
+        }
     }
 }
 
@@ -370,7 +388,8 @@ FlagConfig::Impl::Impl(const char* moduleName):
     if (!std::tmpnam(m_tempPath))
     {
         m_tempPath[0] = '\0';
-        std::cerr << m_moduleName << " configuration WARNING: Unable to get temp path.\n";
+        if (s_isOutputAllowed)
+            std::cerr << m_moduleName << " configuration WARNING: Unable to get temp path.\n";
     }
     else
     {
@@ -415,21 +434,28 @@ bool FlagConfig::Impl::parseIniFile()
         std::string name;
         if (!parseNameValue(lineStr.c_str(), &name, &value))
         {
-            std::cerr << m_moduleName << " configuration WARNING: "
-                << "Unable to parse .ini: line " << line << ", file: " << filename << "\n";
+            if (s_isOutputAllowed)
+            {
+                std::cerr << m_moduleName << " configuration WARNING: "
+                    << "Unable to parse .ini: line " << line << ", file: " << filename << "\n";
+            }
+
             continue;
         }
+
         if (!name.empty())
             m_paramsMap[name] = value;
     }
     if (line == 0) //< .ini file is empty: create the file with default values.
     {
-        std::cerr << "    ATTENTION: .ini file is empty; filling with defaults.\n";
+        if (s_isOutputAllowed)
+            std::cerr << "    ATTENTION: .ini file is empty; filling with defaults.\n";
 
         std::ofstream file(filename);
         if (!file.good())
         {
-            std::cerr << "    ERRPR: Unable to rewrite .ini file.\n";
+            if (s_isOutputAllowed)
+                std::cerr << "    ERRPR: Unable to rewrite .ini file.\n";
         }
         else
         {
@@ -480,8 +506,12 @@ void FlagConfig::Impl::reload()
     if (kUseIniFile)
     {
         bool iniExists = fileExists(iniFilename().c_str());
-        std::cerr << m_moduleName << " config (" << iniFilename()
-            << (iniExists ? "" : " not found; touch to fill with defaults") << "):\n";
+        if (s_isOutputAllowed)
+        {
+            std::cerr << m_moduleName << " config (" << iniFilename()
+                << (iniExists ? "" : " not found; touch to fill with defaults") << "):\n";
+        }
+
         if (iniExists)
             parseIniFile();
         else
@@ -489,7 +519,8 @@ void FlagConfig::Impl::reload()
     }
     else
     {
-        printFlagFileHeader();
+        if (s_isOutputAllowed)
+            printFlagFileHeader();
     }
 
     for (const auto& param: m_params)
@@ -524,6 +555,13 @@ const char* FlagConfig::moduleName() const
 {
     return d->moduleName();
 }
+
+void FlagConfig::setOutputAllowed(bool isAllowed)
+{
+    s_isOutputAllowed = isAllowed;
+}
+
+bool FlagConfig::s_isOutputAllowed = true;
 
 bool FlagConfig::regFlagParam(
     bool* pValue, bool defaultValue, const char* paramName, const char* descr)

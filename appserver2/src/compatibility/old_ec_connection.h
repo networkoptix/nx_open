@@ -56,8 +56,8 @@ namespace ec2
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
-        virtual qint64 getTransactionLogTime() const override;
-        virtual void setTransactionLogTime(qint64 value) override;
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
 
 
         virtual void startReceivingNotifications() override;

@@ -1,10 +1,12 @@
+UT_USE_VAGRANT = True
+
 BOX_NAMES = {
     "Box1": "box1j",
     "Box2": "box2j",
     "Nat": "natj",
     "Behind": "behindj",
 }
-UT_VAG_UT_SUBDIR = "utj"
+UT_BOX_NAME = "utj"
 
 BOX_IP = {
     'Box1': '192.168.99.8',

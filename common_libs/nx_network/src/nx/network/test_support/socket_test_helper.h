@@ -44,6 +44,7 @@ class NX_NETWORK_API TestConnection
     public QnStoppableAsync
 {
 public:
+    static constexpr std::chrono::milliseconds kDefaultRwTimeout = std::chrono::seconds(17);
     static constexpr size_t kReadBufferSize = 4 * 1024;
 
     /*!
@@ -71,7 +72,7 @@ public:
     int id() const;
     void setLocalAddress(SocketAddress addr);
     SocketAddress getLocalAddress() const;
-    void start();
+    void start(std::chrono::milliseconds rwTimeout = kDefaultRwTimeout);
 
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
@@ -166,7 +167,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setLocalAddress(SocketAddress addr);
-    bool start();
+    bool start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
 
     SocketAddress addressBeingListened() const;
     virtual ConnectionTestStatistics statistics() const override;
@@ -182,6 +183,7 @@ private:
     size_t m_totalConnectionsAccepted;
     uint64_t m_totalBytesReceivedByClosedConnections;
     uint64_t m_totalBytesSentByClosedConnections;
+    std::chrono::milliseconds m_rwTimeout;
 
     void onNewConnection(
         SystemError::ErrorCode errorCode,
@@ -228,7 +230,7 @@ public:
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
     void resetRemoteAddresses(std::vector<SocketAddress> remoteAddress);
-    void start();
+    void start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
 
     virtual ConnectionTestStatistics statistics() const override;
 
@@ -266,6 +268,7 @@ private:
     int m_errorEmulationPercent;
     boost::optional<SocketAddress> m_localAddress;
     nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
+    std::chrono::milliseconds m_rwTimeout;
 
     void onConnectionFinished(
         int id,

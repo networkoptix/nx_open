@@ -27,20 +27,27 @@ class ApiModuleInformationHandler:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
-    ApiModuleInformationHandler(nx::String cloudSystemId):
-        m_cloudSystemId(std::move(cloudSystemId))
+    ApiModuleInformationHandler(
+        boost::optional<nx::String> cloudSystemId,
+        boost::optional<nx::String> serverIdForModuleInformation)
+        :
+        m_cloudSystemId(std::move(cloudSystemId)),
+        m_serverIdForModuleInformation(std::move(serverIdForModuleInformation))
     {
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
         nx_http::HttpRequestProcessedHandler handler) override
     {
         QnModuleInformation moduleInformation;
-        moduleInformation.cloudSystemId = m_cloudSystemId;
+        if (m_serverIdForModuleInformation)
+            moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
+        if (m_cloudSystemId)
+            moduleInformation.cloudSystemId = m_cloudSystemId.get();
         handler(
             nx_http::StatusCode::ok,
             std::make_unique<nx_http::BufferSource>(
@@ -50,7 +57,8 @@ public:
     }
 
 private:
-    nx::String m_cloudSystemId;
+    boost::optional<nx::String> m_cloudSystemId;
+    boost::optional<nx::String> m_serverIdForModuleInformation;
 };
 
 MediaServerEmulator::MediaServerEmulator(
@@ -74,14 +82,18 @@ MediaServerEmulator::MediaServerEmulator(
             mediatorEndpoint,
             m_mediatorConnector.get())),
     m_action(ActionToTake::proceedWithConnection),
-    m_cloudConnectionMethodMask((int)network::cloud::CloudConnectType::all)
+    m_cloudConnectionMethodMask((int)network::cloud::CloudConnectType::all),
+    m_cloudSystemIdForModuleInformation(m_systemData.id),
+    m_serverIdForModuleInformation(m_serverId)
 {
     // Registering /api/moduleInformation handler.
     m_httpMessageDispatcher.registerRequestProcessor<ApiModuleInformationHandler>(
         "/api/moduleInformation",
-        [systemId = m_systemData.id]()
+        [this]()
         {
-            return std::make_unique<ApiModuleInformationHandler>(systemId);
+            return std::make_unique<ApiModuleInformationHandler>(
+                m_cloudSystemIdForModuleInformation,
+                m_serverIdForModuleInformation);
         });
 
     m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
@@ -132,6 +144,11 @@ bool MediaServerEmulator::start()
 nx::String MediaServerEmulator::serverId() const
 {
     return m_serverId;
+}
+
+void MediaServerEmulator::setServerId(nx::String serverId)
+{
+    m_serverId = serverId;
 }
 
 nx::String MediaServerEmulator::fullName() const
@@ -187,7 +204,20 @@ void MediaServerEmulator::setConnectionAckResponseHandler(
     m_connectionAckResponseHandler = std::move(handler);
 }
 
-nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(std::list<SocketAddress> addresses)
+void MediaServerEmulator::setCloudSystemIdForModuleInformation(
+    boost::optional<nx::String> cloudSystemId)
+{
+    m_cloudSystemIdForModuleInformation = cloudSystemId;
+}
+
+void MediaServerEmulator::setServerIdForModuleInformation(
+    boost::optional<nx::String> serverId)
+{
+    m_serverIdForModuleInformation = serverId;
+}
+
+nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
+    std::list<SocketAddress> addresses)
 {
     utils::promise<nx::hpm::api::ResultCode> promise;
     m_mediatorAddressPublisher->updateAddresses(

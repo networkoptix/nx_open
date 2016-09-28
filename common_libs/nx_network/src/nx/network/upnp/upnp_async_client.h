@@ -108,8 +108,8 @@ private:
     std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS( AsyncClient::Protocol, ( lexical ) );
-
 } // namespace nx_upnp
+
+QN_FUSION_DECLARE_FUNCTIONS( nx_upnp::AsyncClient::Protocol, ( lexical ) );
 
 #endif // UPNP_ASYNC_CLIENT_H

@@ -43,16 +43,10 @@ public:
 
     void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
 
-    //event subscription
-    void subscribeToSystemAccessListUpdatedEvent(
-        nx::utils::MoveOnlyFunc<void(nx::cdb::api::SystemAccessListModifiedEvent)> handler,
-        nx::utils::SubscriptionId* const subscriptionId);
-    void unsubscribeFromSystemAccessListUpdatedEvent(
-        nx::utils::SubscriptionId subscriptionId);
-
     bool cleanUpCloudDataInLocalDb();
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
+
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
     void connectedToCloud();
@@ -66,15 +60,8 @@ private:
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
-    std::unique_ptr<nx::cdb::api::EventConnection> m_eventConnection;
-    nx::utils::Subscription<nx::cdb::api::SystemAccessListModifiedEvent>
-        m_systemAccessListUpdatedEventSubscription;
-    std::unique_ptr<nx::network::RetryTimer> m_eventConnectionRetryTimer;
 
     bool boundToCloud(QnMutexLockerBase* const lk) const;
-    void monitorForCloudEvents();
-    void stopMonitoringCloudEvents();
-    void onSystemAccessListUpdated(nx::cdb::api::SystemAccessListModifiedEvent);
     void startEventConnection();
     void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);
 

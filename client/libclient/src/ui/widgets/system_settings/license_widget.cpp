@@ -42,7 +42,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
 
     ui->manualActivationTextWidget->resize(this->width(), ui->manualActivationTextWidget->height());
     ui->manualActivationTextWidget->setText(
-        tr("Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.").arg(emailAddress)
+        tr("Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.").arg(emailAddress)
     ); // TODO: #Elric move to product features?
 
     setWarningStyle(ui->licenseKeyWarningLabel);

@@ -64,6 +64,20 @@ ConnectionManager::~ConnectionManager()
         ->removeSubscription(m_onNewTransactionSubscriptionId);
 
     m_startedAsyncCallsCounter.wait();
+
+    ConnectionDict localConnections;
+    decltype(m_connectionsToRemove) localConnectionsToRemove;
+    {
+        QnMutexLocker lk(&m_mutex);
+        localConnections = std::move(m_connections);
+        localConnectionsToRemove = std::move(m_connectionsToRemove);
+    }
+
+    for (auto& connectionContext: localConnections)
+        connectionContext.connection->pleaseStopSync();
+
+    for (auto& elem: localConnectionsToRemove)
+        elem.second->pleaseStopSync();
 }
 
 void ConnectionManager::createTransactionConnection(
@@ -142,7 +156,18 @@ void ConnectionManager::createTransactionConnection(
         connectionId,
         std::make_pair(systemIdLocal, remotePeer.id.toByteArray()) };
 
-    addNewConnection(std::move(context));
+    if (!addNewConnection(std::move(context)))
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
+            .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress())
+            .arg(connectionId),
+            cl_logDEBUG1);
+        return completionHandler(
+            nx_http::StatusCode::forbidden,
+            nullptr,
+            nx_http::ConnectionEvents());
+    }
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent = 
@@ -322,7 +347,21 @@ api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
     return result;
 }
 
-void ConnectionManager::addNewConnection(ConnectionContext context)
+bool ConnectionManager::isSystemConnected(const std::string& systemId) const
+{
+    QnMutexLocker lk(&m_mutex);
+
+    const auto& connectionBySystemIdAndPeerIdIndex =
+        m_connections.get<kConnectionBySystemIdAndPeerIdIndex>();
+    const auto systemIter = connectionBySystemIdAndPeerIdIndex.lower_bound(
+        std::make_pair(nx::String(systemId.c_str()), nx::String()));
+
+    return 
+        systemIter != connectionBySystemIdAndPeerIdIndex.end() &&
+        systemIter->systemIdAndPeerId.first == systemId;
+}
+
+bool ConnectionManager::addNewConnection(ConnectionContext context)
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -346,8 +385,13 @@ void ConnectionManager::addNewConnection(ConnectionContext context)
 
     if (!m_connections.insert(std::move(context)).second)
     {
-        NX_CRITICAL(false);
+        NX_ASSERT(false);
+        return false;
     }
+
+    // TODO: later this method will return false in real cases
+
+    return true;
 }
 
 template<int connectionIndexNumber, typename ConnectionKeyType>
@@ -360,58 +404,41 @@ void ConnectionManager::removeExistingConnection(
     if (existingConnectionIter == connectionIndex.end())
         return;
 
-    existingConnectionIter->connection->post(
-        [this,
-            connectionKey = std::move(connectionKey),
-            locker = m_startedAsyncCallsCounter.getScopedIncrement()]()
+    // Removing existing connection.
+    std::unique_ptr<TransactionTransport> existingConnection;
+    connectionIndex.modify(
+        existingConnectionIter,
+        [&existingConnection](ConnectionContext& data)
         {
-            auto& connectionIndex = m_connections.get<connectionIndexNumber>();
-            auto existingConnectionIter = connectionIndex.find(connectionKey);
-            if (existingConnectionIter == connectionIndex.end())
-                return;
-
-            // Removing existing connection.
-            std::unique_ptr<TransactionTransport> existingConnection;
-            connectionIndex.modify(
-                existingConnectionIter,
-                [&existingConnection](ConnectionContext& data)
-                {
-                    existingConnection = std::move(data.connection);
-                });
-
-            existingConnection.reset();
-            connectionIndex.erase(existingConnectionIter);
+            existingConnection = std::move(data.connection);
         });
-}
+    connectionIndex.erase(existingConnectionIter);
 
-void ConnectionManager::removeConnection(const nx::String& connectionId)
-{
-    // Always called within transport's aio thread.
-    NX_LOGX(QnLog::EC2_TRAN_LOG, 
-        lm("Removing transaction connection %1").arg(connectionId), cl_logDEBUG1);
-
-    QnMutexLocker lk(&m_mutex);
-    auto& index = m_connections.get<kConnectionByIdIndex>();
-    auto iter = index.find(connectionId);
-    if (iter == index.end())
-        return; //assert?
-    ConnectionContext connectionContext;
-    index.modify(
-        iter,
-        [&connectionContext](ConnectionContext& value){ connectionContext = std::move(value); });
-    index.erase(iter);
-    lk.unlock();
+    TransactionTransport* existingConnectionPtr = existingConnection.get();
+    
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
+        lm("Removing transaction connection %1 from %2")
+            .arg(existingConnectionPtr->connectionGuid())
+            .str(existingConnectionPtr->commonTransportHeaderOfRemoteTransaction()),
+        cl_logDEBUG1);
 
     // ::ec2::TransactionTransportBase does not support its removal 
     //  in signal handler, so have to remove it delayed.
     // TODO: #ak have to ensure somehow that no events from 
     //  connectionContext.connection are delivered.
-    auto connectionPtr = connectionContext.connection.get();
-    connectionPtr->pleaseStop(
-        [connection = std::move(connectionContext.connection)]() mutable
+
+    existingConnectionPtr->post(
+        [existingConnection = std::move(existingConnection),
+            locker = m_startedAsyncCallsCounter.getScopedIncrement()]() mutable
         {
-            connection.reset();
+            existingConnection.reset();
         });
+}
+
+void ConnectionManager::removeConnection(const nx::String& connectionId)
+{
+    QnMutexLocker lk(&m_mutex);
+    removeExistingConnection<kConnectionByIdIndex>(&lk, connectionId);
 }
 
 void ConnectionManager::onGotTransaction(
@@ -437,6 +464,12 @@ void ConnectionManager::onTransactionDone(
 {
     if (resultCode != api::ResultCode::ok)
     {
+        NX_LOGX(
+            QnLog::EC2_TRAN_LOG,
+            lm("Closing connection %1 due to failed transaction (result code %2)")
+                .arg(connectionId).arg(api::toString(resultCode)),
+            cl_logDEBUG1);
+
         // Closing connection in case of failure.
         QnMutexLocker lk(&m_mutex);
         removeExistingConnection<kConnectionByIdIndex, nx::String>(&lk, connectionId);
@@ -497,7 +530,9 @@ void ConnectionManager::processSpecialTransaction(
     QnMutexLocker lk(&m_mutex);
     const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
     auto connectionIter = connectionByIdIndex.find(transportHeader.connectionId);
-    NX_ASSERT(connectionIter != connectionByIdIndex.end());
+    if (connectionIter == connectionByIdIndex.end())
+        return; //< This can happen since connection destruction happens with some 
+                //  delay after connection has been removed from m_connections.
     lk.unlock();
 
     connectionIter->connection->processSpecialTransaction(

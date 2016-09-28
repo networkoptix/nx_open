@@ -50,6 +50,9 @@ namespace style
 
     const int Metrics::kToolTipHeight = 24;
 
+    const int Metrics::kMenuButtonIndicatorMargin = 2;
+    const int Metrics::kTextButtonIconMargin = 2;
+
     const qreal Hints::kDisabledItemOpacity = 0.3;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
@@ -62,8 +65,11 @@ namespace style
     const char* Properties::kSuppressHoverPropery = "_qn_suppressHover";
     const char* Properties::kSideIndentation = "_qn_sideIndentation";
     const char* Properties::kCheckBoxAsButton = "_qn_checkBoxAsButton";
-    const char* Properties::kButtonMarginProperty = "_qn_buttonMargin";
+    const char* Properties::kMenuAsDropdown = "_qn_menuAsDropdown";
     const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
+
+    //TODO: #vkutin Refactor this property to something else in the future
+    const char* Properties::kButtonMarginProperty = "_qn_buttonMargin";
 
     qreal dpr(qreal value)
     {

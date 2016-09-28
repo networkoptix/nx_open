@@ -172,7 +172,9 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
 
 	QDomElement root = xmlDom.documentElement();
 	if (root.tagName() != QnXmlTag::plugin) {
-		qWarning() << "Parse xml error: could not find tag" << QnXmlTag::plugin;
+        NX_LOG(lit("Parse xml error: could not find tag %1. Got %2 instead.")
+            .arg(QnXmlTag::plugin)
+            .arg(root.tagName()), cl_logWARNING);
 		return false;
 	}
 
