@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_pool_test_helper.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -322,3 +323,14 @@ TEST_F(QnPermissionsResourceAccessProviderTest, suppressDuplicatedSignals)
     /* Here we should receive the 'false' value. */
     qnResPool->removeResource(user);
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkRoleCameraAccess)
+{
+    auto target = addCamera();
+
+    ec2::ApiUserGroupData role(QnUuid::createUuid(), QStringLiteral("test_role"),
+        Qn::GlobalAccessAllMediaPermission);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    ASSERT_TRUE(accessProvider()->hasAccess(role, target));
+}
+

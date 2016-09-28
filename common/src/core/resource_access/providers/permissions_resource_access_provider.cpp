@@ -1,11 +1,12 @@
 #include "permissions_resource_access_provider.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <core/resource_access/resource_access_manager.h>
 
 QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject* parent):
     base_type(parent)
@@ -36,6 +37,9 @@ QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         &QnPermissionsResourceAccessProvider::cleanAccess);
+
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        &QnPermissionsResourceAccessProvider::handleRoleAddedOrUpdated);
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
@@ -164,4 +168,14 @@ void QnPermissionsResourceAccessProvider::cleanAccess(const QnResourcePtr& resou
         emit accessChanged(subject, resource, false);
     }
 
+}
+
+void QnPermissionsResourceAccessProvider::handleRoleAddedOrUpdated(
+    const ec2::ApiUserGroupData& userRole)
+{
+    for (const auto& resource : qnResPool->getResources())
+    {
+        /* We have already update access to ourselves before */
+        updateAccess(userRole, resource);
+    }
 }

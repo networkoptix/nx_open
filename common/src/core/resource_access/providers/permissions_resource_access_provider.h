@@ -26,6 +26,7 @@ private:
     void updateAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
     void cleanAccess(const QnResourcePtr& resource);
 
+    void handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole);
 private:
     /** Hash of accessible resources by subject effective id. */
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
