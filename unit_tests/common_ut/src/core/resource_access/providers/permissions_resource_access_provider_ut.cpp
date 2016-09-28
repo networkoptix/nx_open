@@ -32,7 +32,7 @@ protected:
         m_module.reset(new QnCommonModule());
         m_accessProvider.reset(new QnPermissionsResourceAccessProvider());
         QObject::connect(accessProvider(),
-            &QnPermissionsResourceAccessProvider::accessChanged,
+            &QnAbstractResourceAccessProvider::accessChanged,
             [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
                 bool value)
             {
@@ -83,7 +83,7 @@ protected:
 
 private:
     QSharedPointer<QnCommonModule> m_module;
-    QSharedPointer<QnPermissionsResourceAccessProvider> m_accessProvider;
+    QSharedPointer<QnAbstractResourceAccessProvider> m_accessProvider;
 
     struct AwaitedAccess
     {
