@@ -81,7 +81,7 @@ public:
     void addRandomCredentials(data::TemporaryAccountCredentials* const data);
 
     nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         std::string accountEmail);
     void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail);
@@ -100,25 +100,25 @@ private:
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchTemporaryPasswords(
-        QSqlDatabase* connection,
+        db::QueryContext* queryContext,
         int* const /*dummyResult*/);
 
     nx::db::DBResult insertTempPassword(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         TemporaryAccountCredentialsEx tempPasswordData);
     void tempPasswordAddedToDb(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*connection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         TemporaryAccountCredentialsEx tempPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult deleteTempPassword(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         std::string tempPasswordID);
     void tempPasswordDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*connection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         std::string tempPasswordID,
         std::function<void(api::ResultCode)> completionHandler);

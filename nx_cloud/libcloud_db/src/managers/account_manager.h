@@ -97,11 +97,11 @@ public:
         const std::string& userName) const;
     
     nx::db::DBResult fetchExistingAccountOrCreateNewOneByEmail(
-        QSqlDatabase* connection,
+        db::QueryContext* queryContext,
         const std::string& accountEmail,
         data::AccountData* const accountData);
     nx::db::DBResult fetchExistingAccountByEmail(
-        QSqlDatabase* connection,
+        db::QueryContext* queryContext,
         const std::string& accountEmail,
         data::AccountData* const accountData);
 
@@ -119,21 +119,21 @@ private:
     QnCounter m_startedAsyncCallsCounter;
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchAccounts(QSqlDatabase* connection, int* const dummyResult);
+    nx::db::DBResult fetchAccounts(db::QueryContext* queryContext, int* const dummyResult);
 
     //add_account DB operations
     nx::db::DBResult insertAccount(
-        QSqlDatabase* const tran,
+        db::QueryContext* const tran,
         const data::AccountData& accountData,
         data::AccountConfirmationCode* const resultData);
     nx::db::DBResult issueAccountActivationCode(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const std::string& accountEmail,
         data::AccountConfirmationCode* const resultData);
     void accountAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
-        QSqlDatabase* /*connection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         data::AccountData accountData,
         data::AccountConfirmationCode resultData,
@@ -141,7 +141,7 @@ private:
     void accountReactivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
-        QSqlDatabase* /*connection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         std::string email,
         data::AccountConfirmationCode resultData,
@@ -149,12 +149,12 @@ private:
 
     //verify_account DB operations
     nx::db::DBResult verifyAccount(
-        QSqlDatabase* const tran,
+        db::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
     void accountVerified(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*connection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         const std::string accountEmail,
@@ -162,12 +162,12 @@ private:
 
     nx::db::DBResult updateAccountInDB(
         bool activateAccountIfNotActive,
-        QSqlDatabase* const tran,
+        db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     void accountUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool authenticatedByEmailCode,
-        QSqlDatabase* /*connection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler);

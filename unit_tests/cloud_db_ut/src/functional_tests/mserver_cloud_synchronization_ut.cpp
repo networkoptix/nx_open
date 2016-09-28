@@ -410,7 +410,8 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(2);    //< One for owner account, another one - for user account
+        sendAsyncMocked(QByteArray())).Times(3);    
+    //< One for owner account, another one - for user account, third one - password reset
 
     // Expecting send email call when adding unknown user.
     EMailManagerFactory::setFactory(

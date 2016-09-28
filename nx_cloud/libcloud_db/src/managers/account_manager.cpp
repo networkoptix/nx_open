@@ -373,12 +373,12 @@ boost::optional<data::AccountData> AccountManager::findAccountByUserName(
 }
 
 db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
-    QSqlDatabase* connection,
+    db::QueryContext* queryContext,
     const std::string& accountEmail,
     data::AccountData* const accountData)
 {
     auto result = fetchExistingAccountByEmail(
-        connection,
+        queryContext,
         accountEmail,
         accountData);
     if (result != db::DBResult::notFound)
@@ -394,29 +394,34 @@ db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
 
     // Creating new account.
     data::AccountConfirmationCode accountConfirmationCode;
-    const auto dbResult = insertAccount(connection, *accountData, &accountConfirmationCode);
+    const auto dbResult = insertAccount(queryContext, *accountData, &accountConfirmationCode);
     if (dbResult != db::DBResult::ok)
         return dbResult;
-    //connection->addAfterCommitHandler(
-    //    [this, 
-    //        accountData = *accountData, 
-    //        locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-    //            nx::db::DBResult resultCode)
-    //        {
-    //            if (resultCode != db::DBResult::ok)
-    //                return;
-    //            auto email = accountData.email;
-    //            m_cache.insert(std::move(email), std::move(accountData));
-    //        });
+
+    NX_ASSERT(queryContext->transaction());
+    if (!queryContext->transaction())
+        return db::DBResult::ioError;
+
+    queryContext->transaction()->addAfterCommitHandler(
+        [this, 
+            accountData = *accountData, 
+            locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+                nx::db::DBResult resultCode)
+            {
+                if (resultCode != db::DBResult::ok)
+                    return;
+                auto email = accountData.email;
+                m_cache.insert(std::move(email), std::move(accountData));
+            });
     return db::DBResult::ok;
 }
 
 nx::db::DBResult AccountManager::fetchExistingAccountByEmail(
-    QSqlDatabase* connection,
+    db::QueryContext* queryContext,
     const std::string& accountEmail,
     data::AccountData* const accountData)
 {
-    QSqlQuery fetchAccountQuery(*connection);
+    QSqlQuery fetchAccountQuery(*queryContext->connection());
     fetchAccountQuery.setForwardOnly(true);
     fetchAccountQuery.prepare(
         R"sql(
@@ -455,7 +460,7 @@ db::DBResult AccountManager::fillCache()
     m_dbManager->executeSelect<int>(
         std::bind(&AccountManager::fetchAccounts, this, _1, _2),
         [&cacheFilledPromise](
-            QSqlDatabase* /*connection*/,
+            db::QueryContext* /*queryContext*/,
             db::DBResult dbResult,
             int /*dummyResult*/ )
         {
@@ -468,10 +473,10 @@ db::DBResult AccountManager::fillCache()
 }
 
 db::DBResult AccountManager::fetchAccounts( 
-    QSqlDatabase* connection,
+    db::QueryContext* queryContext,
     int* const /*dummyResult*/ )
 {
-    QSqlQuery readAccountsQuery(*connection);
+    QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);
     readAccountsQuery.prepare(
         "SELECT id, email, password_ha1 as passwordHa1, "
@@ -500,14 +505,14 @@ db::DBResult AccountManager::fetchAccounts(
 }
 
 db::DBResult AccountManager::insertAccount(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::AccountData& accountData,
     data::AccountConfirmationCode* const resultData)
 {
     //TODO #ak should return specific error if email address already used for account
 
     //inserting account
-    QSqlQuery insertAccountQuery( *connection );
+    QSqlQuery insertAccountQuery(*queryContext->connection());
     insertAccountQuery.prepare(
         "INSERT INTO account (id, email, password_ha1, full_name, customization, status_code) "
                     "VALUES  (:id, :email, :passwordHa1, :fullName, :customization, :statusCode)");
@@ -523,18 +528,18 @@ db::DBResult AccountManager::insertAccount(
     }
 
     return issueAccountActivationCode(
-        connection,
+        queryContext,
         accountData.email,
         resultData);
 }
 
 db::DBResult AccountManager::issueAccountActivationCode(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const std::string& accountEmail,
     data::AccountConfirmationCode* const resultData)
 {
     //removing already-existing activation codes
-    QSqlQuery fetchActivationCodesQuery(*connection);
+    QSqlQuery fetchActivationCodesQuery(*queryContext->connection());
     fetchActivationCodesQuery.setForwardOnly(true);
     fetchActivationCodesQuery.prepare(
         "SELECT verification_code "
@@ -560,7 +565,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
     {
         //inserting email verification code
         const auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex();
-        QSqlQuery insertEmailVerificationQuery( *connection );
+        QSqlQuery insertEmailVerificationQuery(*queryContext->connection());
         insertEmailVerificationQuery.prepare(
             "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
                                    "VALUES ( (SELECT id FROM account WHERE email=?), ?, ? )" );
@@ -599,7 +604,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 void AccountManager::accountAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
-    QSqlDatabase* /*connection*/,
+    db::QueryContext* /*queryContext*/,
     db::DBResult resultCode,
     data::AccountData accountData,
     data::AccountConfirmationCode resultData,
@@ -627,7 +632,7 @@ void AccountManager::accountAdded(
 void AccountManager::accountReactivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
-    QSqlDatabase* /*connection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     std::string /*email*/,
     data::AccountConfirmationCode resultData,
@@ -644,11 +649,11 @@ void AccountManager::accountReactivated(
 }
 
 nx::db::DBResult AccountManager::verifyAccount(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::AccountConfirmationCode& verificationCode,
     std::string* const resultAccountEmail )
 {
-    QSqlQuery getAccountByVerificationCode( *connection );
+    QSqlQuery getAccountByVerificationCode(*queryContext->connection());
     getAccountByVerificationCode.setForwardOnly(true);
     getAccountByVerificationCode.prepare(
         "SELECT a.email "
@@ -666,7 +671,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     const std::string accountEmail = QnSql::deserialized_field<QString>(
         getAccountByVerificationCode.value(0)).toStdString();
 
-    QSqlQuery removeVerificationCode( *connection );
+    QSqlQuery removeVerificationCode(*queryContext->connection());
     removeVerificationCode.prepare(
         "DELETE FROM email_verification WHERE verification_code LIKE :code" );
     QnSql::bind( verificationCode, &removeVerificationCode );
@@ -679,7 +684,7 @@ nx::db::DBResult AccountManager::verifyAccount(
         return db::DBResult::ioError;
     }
 
-    QSqlQuery updateAccountStatus( *connection );
+    QSqlQuery updateAccountStatus(*queryContext->connection());
     updateAccountStatus.prepare(
         "UPDATE account SET status_code = ? WHERE email = ?" );
     updateAccountStatus.bindValue( 0, static_cast<int>(api::AccountStatus::activated) );
@@ -699,7 +704,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 
 void AccountManager::accountVerified(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*connection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -722,14 +727,14 @@ void AccountManager::accountVerified(
 
 nx::db::DBResult AccountManager::updateAccountInDB(
     bool activateAccountIfNotActive,
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::AccountUpdateDataWithEmail& accountData)
 {
     NX_ASSERT(static_cast<bool>(accountData.passwordHa1) ||
            static_cast<bool>(accountData.fullName) ||
            static_cast<bool>(accountData.customization));
 
-    QSqlQuery updateAccountQuery( *connection );
+    QSqlQuery updateAccountQuery(*queryContext->connection());
     QStringList accountUpdateFieldsSql;
     if (accountData.passwordHa1)
         accountUpdateFieldsSql << lit("password_ha1=:passwordHa1");
@@ -774,14 +779,14 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 
     // Removing account's temporary passwords.
     return m_tempPasswordManager->removeTemporaryPasswordsFromDbByAccountEmail(
-        connection,
+        queryContext,
         accountData.email);
 }
 
 void AccountManager::accountUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool activateAccountIfNotActive,
-    QSqlDatabase* /*connection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)

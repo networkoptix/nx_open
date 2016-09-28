@@ -184,10 +184,10 @@ void SystemManager::bindSystemToAccount(
 
     auto dbUpdateFunc = 
         [this, registrationDataWithAccountPtr, newSystemDataPtr](
-            QSqlDatabase* const connection) -> nx::db::DBResult
+            db::QueryContext* const queryContext) -> nx::db::DBResult
         {
             return insertSystemToDB(
-                connection,
+                queryContext,
                 *registrationDataWithAccountPtr,
                 newSystemDataPtr);
         };
@@ -198,12 +198,12 @@ void SystemManager::bindSystemToAccount(
             registrationDataWithAccount = std::move(registrationDataWithAccount),
             newSystemData = std::move(newSystemData),
             completionHandler = std::move(completionHandler)](
-                QSqlDatabase* dbConnection,
+                db::QueryContext* queryContext,
                 nx::db::DBResult dbResult)
         {
             systemAdded(
                 std::move(locker),
-                dbConnection,
+                queryContext,
                 dbResult,
                 std::move(*registrationDataWithAccount),
                 std::move(*newSystemData),
@@ -368,10 +368,10 @@ void SystemManager::shareSystem(
     data::SystemSharing* sharingOHeapPtr = sharingOHeap.get();
 
     auto dbUpdateFunc = 
-        [this, sharingOHeapPtr](QSqlDatabase* const connection) -> nx::db::DBResult
+        [this, sharingOHeapPtr](db::QueryContext* const queryContext) -> nx::db::DBResult
         {
             return updateSharingInDbAndGenerateTransaction(
-                connection,
+                queryContext,
                 *sharingOHeapPtr);
         };
 
@@ -380,12 +380,12 @@ void SystemManager::shareSystem(
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             sharingOHeap = std::move(sharingOHeap),
             completionHandler = std::move(completionHandler)](
-                QSqlDatabase* dbConnection,
+                db::QueryContext* queryContext,
                 nx::db::DBResult dbResult)
         {
             sharingUpdated(
                 std::move(locker),
-                dbConnection,
+                queryContext,
                 dbResult,
                 std::move(*sharingOHeap),
                 std::move(completionHandler));
@@ -541,10 +541,10 @@ void SystemManager::rename(
 
     auto dbUpdateFunc =
         [this, systemNameDataOnHeapPtr](
-            QSqlDatabase* const connection) -> nx::db::DBResult
+            db::QueryContext* const queryContext) -> nx::db::DBResult
     {
         return updateSystemNameInDB(
-            connection,
+            queryContext,
             *systemNameDataOnHeapPtr);
     };
 
@@ -553,12 +553,12 @@ void SystemManager::rename(
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             systemNameData = std::move(systemNameDataOnHeap),
             completionHandler = std::move(completionHandler)](
-                QSqlDatabase* dbConnection,
+                db::QueryContext* queryContext,
                 nx::db::DBResult dbResult) mutable
         {
             systemNameUpdated(
                 std::move(locker),
-                dbConnection,
+                queryContext,
                 dbResult,
                 std::move(*systemNameData),
                 std::move(completionHandler));
@@ -677,25 +677,25 @@ std::pair<std::string, std::string> SystemManager::extractSystemIdAndAccountEmai
 }
 
 nx::db::DBResult SystemManager::insertSystemToDB(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::SystemRegistrationDataWithAccount& newSystem,
     InsertNewSystemToDbResult* const result)
 {
     nx::db::DBResult dbResult = nx::db::DBResult::ok;
 
-    dbResult = insertNewSystemDataToDb(connection, newSystem, result);
+    dbResult = insertNewSystemDataToDb(queryContext, newSystem, result);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
     dbResult = m_transactionLog->updateTimestampHiForSystem(
-        connection,
+        queryContext,
         result->systemData.id.c_str(),
         result->systemData.systemSequence);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
     dbResult = insertOwnerSharingToDb(
-        connection, result->systemData.id, newSystem, &result->ownerSharing);
+        queryContext, result->systemData.id, newSystem, &result->ownerSharing);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
@@ -703,7 +703,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 }
 
 nx::db::DBResult SystemManager::insertNewSystemDataToDb(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::SystemRegistrationDataWithAccount& newSystem,
     InsertNewSystemToDbResult* const result)
 {
@@ -716,7 +716,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         return db::DBResult::notFound;
     }
 
-    QSqlQuery insertSystemQuery(*connection);
+    QSqlQuery insertSystemQuery(*queryContext->connection());
     insertSystemQuery.prepare(
         "INSERT INTO system(id, name, customization, auth_key, owner_account_id, "
                            "status_code, expiration_utc_timestamp) "
@@ -749,7 +749,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
     }
 
     // Selecting generated system sequence
-    QSqlQuery selectSystemSequence(*connection);
+    QSqlQuery selectSystemSequence(*queryContext->connection());
     selectSystemSequence.setForwardOnly(true);
     selectSystemSequence.prepare(
         R"sql(
@@ -771,7 +771,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
 }
 
 nx::db::DBResult SystemManager::insertOwnerSharingToDb(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const std::string& systemId,
     const data::SystemRegistrationDataWithAccount& newSystem,
     nx::cdb::data::SystemSharing* const ownerSharing)
@@ -786,12 +786,13 @@ nx::db::DBResult SystemManager::insertOwnerSharingToDb(
     ownerSharing->customPermissions = QnLexical::serialized(
         static_cast<Qn::GlobalPermissions>(Qn::GlobalAdminPermissionSet)).toStdString();
     const auto resultCode =
-        updateSharingInDbAndGenerateTransaction(connection, *ownerSharing);
+        updateSharingInDbAndGenerateTransaction(queryContext, *ownerSharing);
     if (resultCode != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
             arg(newSystem.name).arg(newSystem.accountEmail).
-            arg(connection->lastError().text()), cl_logDEBUG1);
+            arg(queryContext->connection()->lastError().text()),
+            cl_logDEBUG1);
         return resultCode;
     }
 
@@ -800,7 +801,7 @@ nx::db::DBResult SystemManager::insertOwnerSharingToDb(
 
 void SystemManager::systemAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount /*systemRegistrationData*/,
     InsertNewSystemToDbResult resultData,
@@ -823,7 +824,7 @@ void SystemManager::systemAdded(
 
 void SystemManager::systemSharingAdded(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemSharing systemSharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -842,11 +843,11 @@ void SystemManager::systemSharingAdded(
 }
 
 nx::db::DBResult SystemManager::markSystemAsDeleted(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const std::string& systemId)
 {
     //marking system as "deleted"
-    QSqlQuery markSystemAsRemoved(*connection);
+    QSqlQuery markSystemAsRemoved(*queryContext->connection());
     markSystemAsRemoved.prepare(
         "UPDATE system "
         "SET status_code=:statusCode, "
@@ -872,7 +873,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
     }
 
     //removing system-to-account
-    QSqlQuery removeSystemToAccountBinding(*connection);
+    QSqlQuery removeSystemToAccountBinding(*queryContext->connection());
     removeSystemToAccountBinding.prepare(
         "DELETE FROM system_to_account WHERE system_id=:systemID");
     removeSystemToAccountBinding.bindValue(
@@ -890,7 +891,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
 
 void SystemManager::systemMarkedAsDeleted(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
@@ -926,10 +927,10 @@ void SystemManager::systemMarkedAsDeleted(
 }
 
 nx::db::DBResult SystemManager::deleteSystemFromDB(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::SystemID& systemID)
 {
-    QSqlQuery removeSystemToAccountBinding(*connection);
+    QSqlQuery removeSystemToAccountBinding(*queryContext->connection());
     removeSystemToAccountBinding.prepare(
         "DELETE FROM system_to_account WHERE system_id=:systemID");
     QnSql::bind(systemID, &removeSystemToAccountBinding);
@@ -941,7 +942,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
         return db::DBResult::ioError;
     }
 
-    QSqlQuery removeSystem(*connection);
+    QSqlQuery removeSystem(*queryContext->connection());
     removeSystem.prepare(
         "DELETE FROM system WHERE id=:systemID");
     QnSql::bind(systemID, &removeSystem);
@@ -958,7 +959,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 
 void SystemManager::systemDeleted(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemID systemID,
     std::function<void(api::ResultCode)> completionHandler)
@@ -978,7 +979,7 @@ void SystemManager::systemDeleted(
 }
 
 nx::db::DBResult SystemManager::updateSharingInDb(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::SystemSharing& sharing,
     data::AccountData* const targetAccountData)
 {
@@ -997,14 +998,14 @@ nx::db::DBResult SystemManager::updateSharingInDb(
     {
         //< Removing sharing. No sense to create account
         result = m_accountManager->fetchExistingAccountByEmail(
-            connection,
+            queryContext,
             sharing.accountEmail,
             targetAccountData);
     }
     else
     {
         result = m_accountManager->fetchExistingAccountOrCreateNewOneByEmail(
-            connection,
+            queryContext,
             sharing.accountEmail,
             targetAccountData);
     }
@@ -1017,7 +1018,7 @@ nx::db::DBResult SystemManager::updateSharingInDb(
         return result;
     }
 
-    QSqlQuery updateRemoveSharingQuery(*connection);
+    QSqlQuery updateRemoveSharingQuery(*queryContext->connection());
     if (sharing.accessRole == api::SystemAccessRole::none)
         updateRemoveSharingQuery.prepare(
             "DELETE FROM system_to_account "
@@ -1047,11 +1048,11 @@ nx::db::DBResult SystemManager::updateSharingInDb(
 }
 
 nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::SystemSharing& sharing)
 {
     data::AccountData account;
-    nx::db::DBResult result = updateSharingInDb(connection, sharing, &account);
+    nx::db::DBResult result = updateSharingInDb(queryContext, sharing, &account);
     if (result != nx::db::DBResult::ok)
     {
         NX_LOGX(lm("Error sharing/unsharing system %1 with account %2. %3")
@@ -1070,7 +1071,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
         userData.fullName = QString::fromStdString(account.fullName);
         result = m_transactionLog->generateTransactionAndSaveToLog<
             ::ec2::ApiCommand::saveUser>(
-                connection,
+                queryContext,
                 sharing.systemID.c_str(),
                 std::move(userData));
 
@@ -1081,7 +1082,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
         fullNameData.value = QString::fromStdString(account.fullName);
         result = m_transactionLog->generateTransactionAndSaveToLog<
             ::ec2::ApiCommand::setResourceParam>(
-                connection,
+                queryContext,
                 sharing.systemID.c_str(),
                 std::move(fullNameData));
     }
@@ -1092,7 +1093,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
         ec2::convert(sharing, &userId);
         result = m_transactionLog->generateTransactionAndSaveToLog<
             ::ec2::ApiCommand::removeUser>(
-                connection,
+                queryContext,
                 sharing.systemID.c_str(),
                 std::move(userId));
 
@@ -1102,7 +1103,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
         fullNameParam.name = Qn::USER_FULL_NAME;
         result = m_transactionLog->generateTransactionAndSaveToLog<
             ::ec2::ApiCommand::removeResourceParam>(
-                connection,
+                queryContext,
                 sharing.systemID.c_str(),
                 std::move(fullNameParam));
     }
@@ -1112,7 +1113,7 @@ nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
 
 void SystemManager::sharingUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -1140,10 +1141,10 @@ void SystemManager::sharingUpdated(
 }
 
 nx::db::DBResult SystemManager::updateSystemNameInDB(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::SystemNameUpdate& data)
 {
-    const auto result = execSystemNameUpdate(connection, data);
+    const auto result = execSystemNameUpdate(queryContext, data);
     if (result != db::DBResult::ok)
         return result;
 
@@ -1155,16 +1156,16 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
 
     return m_transactionLog->generateTransactionAndSaveToLog<
         ::ec2::ApiCommand::setResourceParam>(
-            connection,
+            queryContext,
             data.systemID.c_str(),
             std::move(systemNameData));
 }
 
 nx::db::DBResult SystemManager::execSystemNameUpdate(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const data::SystemNameUpdate& data)
 {
-    QSqlQuery updateSystemNameQuery(*connection);
+    QSqlQuery updateSystemNameQuery(*queryContext->connection());
     updateSystemNameQuery.prepare(
         "UPDATE system "
         "SET name=:name "
@@ -1198,7 +1199,7 @@ void SystemManager::updateSystemNameInCache(
 
 void SystemManager::systemNameUpdated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemNameUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
@@ -1215,10 +1216,10 @@ void SystemManager::systemNameUpdated(
 }
 
 nx::db::DBResult SystemManager::activateSystem(
-    QSqlDatabase* const connection,
+    db::QueryContext* const queryContext,
     const std::string& systemID)
 {
-    QSqlQuery updateSystemStatusQuery(*connection);
+    QSqlQuery updateSystemStatusQuery(*queryContext->connection());
     updateSystemStatusQuery.prepare(
         "UPDATE system "
         "SET status_code=:statusCode, expiration_utc_timestamp=:expirationTimeUtc "
@@ -1244,7 +1245,7 @@ nx::db::DBResult SystemManager::activateSystem(
 
 void SystemManager::systemActivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
@@ -1275,13 +1276,13 @@ void SystemManager::systemActivated(
 constexpr const int kSecondsPerDay = 60*60*24;
 
 nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
-    QSqlDatabase* dbConnection,
+    db::QueryContext* queryContext,
     const data::UserSessionDescriptor& userSessionDescriptor,
     double* const systemAccessWeight)
 {
     NX_ASSERT(userSessionDescriptor.accountEmail && userSessionDescriptor.systemId);
 
-    QSqlQuery selectUsageStatisticsQuery(*dbConnection);
+    QSqlQuery selectUsageStatisticsQuery(*queryContext->connection());
     selectUsageStatisticsQuery.setForwardOnly(true);
     selectUsageStatisticsQuery.prepare(
         R"sql(
@@ -1325,7 +1326,7 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
         0);
     const auto newUsageFrequency = *systemAccessWeight + 1;
 
-    QSqlQuery updateUsageStatisticsQuery(*dbConnection);
+    QSqlQuery updateUsageStatisticsQuery(*queryContext->connection());
     updateUsageStatisticsQuery.prepare(
         R"sql(
         UPDATE system_to_account
@@ -1352,7 +1353,7 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
 
 void SystemManager::systemAccessWeightUpdatedInDb(
     QnCounter::ScopedIncrement asyncCallLocker,
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::UserSessionDescriptor userSessionDescriptor,
     double systemAccessWeight,
@@ -1435,7 +1436,7 @@ nx::db::DBResult SystemManager::fillCache()
         m_dbManager->executeSelect<int>(
             std::bind(&SystemManager::fetchSystems, this, _1, _2),
             [&cacheFilledPromise](
-                QSqlDatabase* /*connection*/,
+                db::QueryContext* /*queryContext*/,
                 db::DBResult dbResult,
                 int /*dummy*/)
             {
@@ -1457,7 +1458,7 @@ nx::db::DBResult SystemManager::fillCache()
         m_dbManager->executeSelect<int>(
             std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2),
             [&cacheFilledPromise](
-                QSqlDatabase* /*connection*/,
+                db::QueryContext* /*queryContext*/,
                 db::DBResult dbResult,
                 int /*dummy*/)
             {
@@ -1472,9 +1473,9 @@ nx::db::DBResult SystemManager::fillCache()
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* const /*dummy*/)
+nx::db::DBResult SystemManager::fetchSystems(db::QueryContext* queryContext, int* const /*dummy*/)
 {
-    QSqlQuery readSystemsQuery(*connection);
+    QSqlQuery readSystemsQuery(*queryContext->connection());
     readSystemsQuery.setForwardOnly(true);
     readSystemsQuery.prepare(
         "SELECT s.id, s.name, s.customization, s.auth_key as authKey, "
@@ -1505,10 +1506,10 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
 }
 
 nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
-    QSqlDatabase* connection,
+    db::QueryContext* queryContext,
     int* const /*dummy*/)
 {
-    QSqlQuery readSystemToAccountQuery(*connection);
+    QSqlQuery readSystemToAccountQuery(*queryContext->connection());
     readSystemToAccountQuery.setForwardOnly(true);
     readSystemToAccountQuery.prepare(
         "SELECT a.email as accountEmail, "
@@ -1553,10 +1554,10 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
             _1, _2));
 }
 
-nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(QSqlDatabase* connection)
+nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(db::QueryContext* queryContext)
 {
     //dropping expired not-activated systems and expired marked-for-removal systems
-    QSqlQuery dropExpiredSystems(*connection);
+    QSqlQuery dropExpiredSystems(*queryContext->connection());
     dropExpiredSystems.prepare(
         "DELETE FROM system "
         "WHERE (status_code=:notActivatedStatusCode OR status_code=:deletedStatusCode) "
@@ -1582,7 +1583,7 @@ nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(QSqlDatabase* connect
 
 void SystemManager::expiredSystemsDeletedFromDb(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    QSqlDatabase* /*connection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult)
 {
     if (dbResult == nx::db::DBResult::ok)
@@ -1607,7 +1608,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
 }
 
 nx::db::DBResult SystemManager::processEc2SaveUser(
-    QSqlDatabase* dbConnection,
+    db::QueryContext* queryContext,
     const nx::String& systemId,
     ::ec2::ApiUserData data,
     data::SystemSharing* const systemSharingData)
@@ -1625,7 +1626,7 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     // Updating db.
     data::AccountData account;
     const nx::db::DBResult result = 
-        updateSharingInDb(dbConnection, *systemSharingData, &account);
+        updateSharingInDb(queryContext, *systemSharingData, &account);
     if (result != nx::db::DBResult::ok)
         return result;
 
@@ -1636,13 +1637,13 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     fullNameData.value = QString::fromStdString(account.fullName);
     return m_transactionLog->generateTransactionAndSaveToLog<
         ::ec2::ApiCommand::setResourceParam>(
-            dbConnection,
+            queryContext,
             systemId,
             std::move(fullNameData));
 }
 
 void SystemManager::onEc2SaveUserDone(
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing)
 {
@@ -1662,7 +1663,7 @@ void SystemManager::onEc2SaveUserDone(
 }
 
 nx::db::DBResult SystemManager::processEc2RemoveUser(
-    QSqlDatabase* dbConnection,
+    db::QueryContext* queryContext,
     const nx::String& systemId,
     ::ec2::ApiIdData data,
     data::SystemSharing* const systemSharingData)
@@ -1676,7 +1677,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     systemSharingData->systemID = systemId.toStdString();
     systemSharingData->vmsUserId = data.id.toSimpleString().toStdString();
 
-    QSqlQuery removeSharingQuery(*dbConnection);
+    QSqlQuery removeSharingQuery(*queryContext->connection());
     removeSharingQuery.prepare(
         "DELETE FROM system_to_account "
         "  WHERE system_id=:systemId AND vms_user_id=:vmsUserId");
@@ -1691,7 +1692,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
-                .arg(systemId).str(data.id).arg(dbConnection->lastError().text()),
+                .arg(systemId).str(data.id).arg(removeSharingQuery.lastError().text()),
             cl_logDEBUG1);
         return db::DBResult::ioError;
     }
@@ -1700,7 +1701,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
 }
 
 void SystemManager::onEc2RemoveUserDone(
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing)
 {
@@ -1716,7 +1717,7 @@ void SystemManager::onEc2RemoveUserDone(
 }
 
 nx::db::DBResult SystemManager::processSetResourceParam(
-    QSqlDatabase* dbConnection,
+    db::QueryContext* queryContext,
     const nx::String& systemId,
     ::ec2::ApiResourceParamWithRefData data,
     data::SystemNameUpdate* const systemNameUpdate)
@@ -1735,11 +1736,11 @@ nx::db::DBResult SystemManager::processSetResourceParam(
 
     systemNameUpdate->systemID = systemId.toStdString();
     systemNameUpdate->name = data.value.toStdString();
-    return execSystemNameUpdate(dbConnection, *systemNameUpdate);
+    return execSystemNameUpdate(queryContext, *systemNameUpdate);
 }
 
 void SystemManager::onEc2SetResourceParamDone(
-    QSqlDatabase* /*dbConnection*/,
+    db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemNameUpdate systemNameUpdate)
 {

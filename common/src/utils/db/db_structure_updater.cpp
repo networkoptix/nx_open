@@ -96,7 +96,7 @@ bool DBStructureUpdater::updateStructSync()
     //starting async operation
     m_dbManager->executeUpdate(
         std::bind(&DBStructureUpdater::updateDbInternal, this, std::placeholders::_1),
-        [this](QSqlDatabase* /*connection*/, DBResult dbResult)
+        [this](db::QueryContext* /*connection*/, DBResult dbResult)
         {
             m_dbUpdatePromise.set_value(dbResult);
         });
@@ -106,10 +106,10 @@ bool DBStructureUpdater::updateStructSync()
     return future.get() == DBResult::ok;
 }
 
-DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection )
+DBResult DBStructureUpdater::updateDbInternal( db::QueryContext* const queryContext )
 {
     //reading current DB version
-    QSqlQuery fetchDbVersionQuery( *dbConnection );
+    QSqlQuery fetchDbVersionQuery(*queryContext->connection());
     fetchDbVersionQuery.prepare( lit("SELECT db_version FROM db_version_data") );
     qint64 dbVersion = m_initialVersion;
     //absense of table db_version_data is normal: DB is just empty
@@ -130,10 +130,10 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
 
     if (!someSchemaExists)
     {
-        if (!execSQLScript(kCreateDbVersionTable, dbConnection))
+        if (!execSQLScript(kCreateDbVersionTable, queryContext))
         {
             NX_LOG(lit("DBStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
-                .arg(dbConnection->lastError().text()), cl_logWARNING);
+                .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
             return DBResult::ioError;
         }
         dbVersion = 1;
@@ -141,11 +141,11 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
         if (!m_fullSchemaScriptByVersion.empty())
         {
             //applying full schema
-            if (!execSQLScript(m_fullSchemaScriptByVersion.rbegin()->second, dbConnection))
+            if (!execSQLScript(m_fullSchemaScriptByVersion.rbegin()->second, queryContext))
             {
                 NX_LOG(lit("DBStructureUpdater. Failed to create schema of version %1: %2").
                     arg(m_fullSchemaScriptByVersion.rbegin()->first)
-                    .arg(dbConnection->lastError().text()), cl_logWARNING);
+                    .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
                 return DBResult::ioError;
             }
             dbVersion = m_fullSchemaScriptByVersion.rbegin()->first;
@@ -157,16 +157,16 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
         static_cast< size_t >( dbVersion ) < (m_initialVersion+m_updateScripts.size());
         ++dbVersion )
     {
-        if( !execSQLScript( m_updateScripts[dbVersion-m_initialVersion], dbConnection ) )
+        if( !execSQLScript( m_updateScripts[dbVersion-m_initialVersion], queryContext ) )
         {
             NX_LOG( lit("DBStructureUpdater. Failure updating to version %1: %2").
-                arg( dbVersion ).arg( dbConnection->lastError().text() ), cl_logWARNING );
+                arg( dbVersion ).arg( queryContext->connection()->lastError().text() ), cl_logWARNING );
             return DBResult::ioError;
         }
     }
 
     //updating db version
-    QSqlQuery updateDbVersion( *dbConnection );
+    QSqlQuery updateDbVersion(*queryContext->connection());
     updateDbVersion.prepare( lit("UPDATE db_version_data SET db_version = :dbVersion") );
     updateDbVersion.bindValue( lit(":dbVersion"), dbVersion );
     return updateDbVersion.exec() ? DBResult::ok : DBResult::ioError;
@@ -174,7 +174,7 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
 
 bool DBStructureUpdater::execSQLScript(
     QByteArray script,
-    QSqlDatabase* const dbConnection)
+    db::QueryContext* const queryContext)
 {
     const auto driverType = m_dbManager->connectionOptions().driverType;
 
@@ -188,7 +188,7 @@ bool DBStructureUpdater::execSQLScript(
             script.replace(replacementCtx.key, replacementCtx.defaultValue);
     }
 
-    return QnDbHelper::execSQLScript(script, *dbConnection);
+    return QnDbHelper::execSQLScript(script, *queryContext->connection());
 }
 
 }   //db

@@ -179,10 +179,10 @@ public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
     typedef nx::utils::MoveOnlyFunc<
         nx::db::DBResult(
-            QSqlDatabase*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
+            db::QueryContext*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
     > ProcessEc2TransactionFunc;
     typedef nx::utils::MoveOnlyFunc<
-        void(QSqlDatabase*, nx::db::DBResult, AuxiliaryArgType)
+        void(db::QueryContext*, nx::db::DBResult, AuxiliaryArgType)
     > OnTranProcessedFunc;
 
     /**
@@ -228,11 +228,11 @@ private:
                 TransactionContext{ std::move(transportHeader), std::move(transaction) },
                 auxiliaryArgPtr),
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
-                QSqlDatabase* connection,
+                db::QueryContext* queryContext,
                 nx::db::DBResult dbResult) mutable
             {
                 dbProcessingCompleted(
-                    connection,
+                    queryContext,
                     dbResult, 
                     std::move(*auxiliaryArg),
                     std::move(handler));
@@ -240,7 +240,7 @@ private:
     }
 
     nx::db::DBResult processTransactionInDbConnectionThread(
-        QSqlDatabase* connection,
+        db::QueryContext* queryContext,
         const TransactionContext& transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
@@ -248,7 +248,7 @@ private:
 
         auto dbResultCode =
             m_transactionLog->checkIfNeededAndSaveToLog(
-                connection,
+                queryContext,
                 transactionContext.transportHeader.systemId,
                 transactionContext.transaction,
                 transactionContext.transportHeader);
@@ -270,13 +270,13 @@ private:
                 .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
                 .arg(transactionContext.transportHeader.systemId)
                 .str(transactionContext.transportHeader.endpoint)
-                .arg(connection->lastError().text()),
+                .arg(queryContext->connection()->lastError().text()),
                 cl_logWARNING);
             return dbResultCode;
         }
 
         dbResultCode = m_processTranFunc(
-            connection,
+            queryContext,
             transactionContext.transportHeader.systemId,
             std::move(transactionContext.transaction.params),
             auxiliaryArg);
@@ -286,20 +286,20 @@ private:
                 lm("Error processing transaction %1 received from %2. %3")
                 .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
                 .str(transactionContext.transportHeader)
-                .arg(connection->lastError().text()),
+                .arg(queryContext->connection()->lastError().text()),
                 cl_logWARNING);
         }
         return dbResultCode;
     }
 
     void dbProcessingCompleted(
-        QSqlDatabase* connection,
+        db::QueryContext* queryContext,
         nx::db::DBResult dbResult,
         AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
         if (m_onTranProcessedFunc)
-            m_onTranProcessedFunc(connection, dbResult, std::move(auxiliaryArg));
+            m_onTranProcessedFunc(queryContext, dbResult, std::move(auxiliaryArg));
 
         switch (dbResult)
         {

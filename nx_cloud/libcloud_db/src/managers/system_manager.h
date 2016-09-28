@@ -232,52 +232,52 @@ private:
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
 
     nx::db::DBResult insertSystemToDB(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const data::SystemRegistrationDataWithAccount& newSystem,
         InsertNewSystemToDbResult* const result);
     nx::db::DBResult insertNewSystemDataToDb(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const data::SystemRegistrationDataWithAccount& newSystem,
         InsertNewSystemToDbResult* const result);
     nx::db::DBResult insertOwnerSharingToDb(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const std::string& systemId,
         const data::SystemRegistrationDataWithAccount& newSystem,
         nx::cdb::data::SystemSharing* const ownerSharing);
     void systemAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
         InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
     //nx::db::DBResult insertSystemSharingToDB(
-    //    QSqlDatabase* const connection,
+    //    db::QueryContext* const queryContext,
     //    const data::SystemSharing& systemSharing);
     void systemSharingAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sytemSharing,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult markSystemAsDeleted(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const std::string& systemId);
     void systemMarkedAsDeleted(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult deleteSystemFromDB(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const data::SystemID& systemID);
     void systemDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
@@ -286,51 +286,51 @@ private:
      * @param targetAccountData Filled with attributes of account \a sharing.accountEmail
      */
     nx::db::DBResult updateSharingInDb(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const data::SystemSharing& sharing);
     void sharingUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult updateSystemNameInDB(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const data::SystemNameUpdate& data);
     nx::db::DBResult execSystemNameUpdate(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const data::SystemNameUpdate& data);
     void updateSystemNameInCache(
         data::SystemNameUpdate data);
     void systemNameUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult activateSystem(
-        QSqlDatabase* const connection,
+        db::QueryContext* const queryContext,
         const std::string& systemId);
     void systemActivated(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult updateSystemAccessWeightInDb(
-        QSqlDatabase* dbConnection,
+        db::QueryContext* queryContext,
         const data::UserSessionDescriptor& userSessionDescriptor,
         double* const systemAccessWeight);
     void systemAccessWeightUpdatedInDb(
         QnCounter::ScopedIncrement asyncCallLocker,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::UserSessionDescriptor userSessionDescriptor,
         double systemAccessWeight,
@@ -341,46 +341,46 @@ private:
         api::SystemAccessRole accessRole) const;
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchSystems(QSqlDatabase* connection, int* const /*dummy*/);
+    nx::db::DBResult fetchSystems(db::QueryContext* queryContext, int* const /*dummy*/);
     nx::db::DBResult fetchSystemToAccountBinder(
-        QSqlDatabase* connection,
+        db::QueryContext* queryContext,
         int* const /*dummy*/);
 
     void dropExpiredSystems(uint64_t timerId);
-    nx::db::DBResult deleteExpiredSystemsFromDb(QSqlDatabase* connection);
+    nx::db::DBResult deleteExpiredSystemsFromDb(db::QueryContext* queryContext);
     void expiredSystemsDeletedFromDb(
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
 
     /** Processes saveUser transaction received from mediaserver */
     nx::db::DBResult processEc2SaveUser(
-        QSqlDatabase* dbConnection,
+        db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiUserData data,
         data::SystemSharing* const systemSharingData);
     void onEc2SaveUserDone(
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
 
     nx::db::DBResult processEc2RemoveUser(
-        QSqlDatabase* dbConnection,
+        db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiIdData data,
         data::SystemSharing* const systemSharingData);
     void onEc2RemoveUserDone(
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing);
 
     nx::db::DBResult processSetResourceParam(
-        QSqlDatabase* dbConnection,
+        db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiResourceParamWithRefData data,
         data::SystemNameUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
-        QSqlDatabase* /*dbConnection*/,
+        db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 };
