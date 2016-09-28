@@ -901,7 +901,13 @@ void QnNxStyle::drawPrimitive(
             QColor color = option->palette.color(
                     selected ? QPalette::Text : QPalette::Light);
 
-            if (option->state.testFlag(State_MouseOver))
+            if (option->state.testFlag(State_Sunken))
+            {
+                QnPaletteColor background = findColor(
+                    option->palette.color(selected ? QPalette::Midlight : QPalette::Dark)).darker(1);
+                painter->fillRect(option->rect, background);
+            }
+            else if (option->state.testFlag(State_MouseOver))
             {
                 QnPaletteColor background = findColor(
                         option->palette.color(selected ? QPalette::Midlight : QPalette::Dark)).lighter(1);
@@ -2702,7 +2708,7 @@ QRect QnNxStyle::subElementRect(
             {
                 QSize size = tabBar->rightButtonSize;
                 size.setHeight(std::min(size.height(), tabBar->rect.height()));
-                return aligned(size, tabBar->rect.adjusted(0, 0, -1, 0), Qt::AlignRight | Qt::AlignVCenter);
+                return aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
             }
             break;
         }
