@@ -44,9 +44,9 @@ void QnFileDeletor::run()
         int thresholdSecs = (SPACE_CLEARANCE_INTERVAL - RAND_RANGE) + rand() % (RAND_RANGE*2 + 1);
         if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
+            m_storagesTimer.restart();
             qnNormalStorageMan->clearSpace();
             qnBackupStorageMan->clearSpace();
-            m_storagesTimer.restart();
         }
         msleep(500);
     }
