@@ -16,8 +16,9 @@ extern "C" {
 
 namespace
 {
-    static const int MAX_AUDIO_JITTER = 1000 * 200;
-    static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192000; // 1 second of 48khz 32bit audio
+    const std::chrono::microseconds kMaxAudioJitterUs = std::chrono::milliseconds(200);
+    const int kAvcodecMaxAudioFrameSize = 192000; // 1 second of 48khz 32bit audio
+    const int kDefaultFrameSize = 1536;
 
     int calcBits(quint64 value)
     {
@@ -45,16 +46,15 @@ namespace
     int getDefaultDstSampleRate(int srcSampleRate, AVCodec* avCodec)
     {
         int result = srcSampleRate;
-        if (avCodec->id == AV_CODEC_ID_ADPCM_G726 ||
-            avCodec->id == AV_CODEC_ID_PCM_MULAW ||
-            avCodec->id == AV_CODEC_ID_PCM_ALAW)
-        {
+        bool isPcmCodec = avCodec->id == AV_CODEC_ID_ADPCM_G726
+            || avCodec->id == AV_CODEC_ID_PCM_MULAW
+            || avCodec->id == AV_CODEC_ID_PCM_ALAW;
+
+        if (isPcmCodec)
             result = 8000;
-        }
         else
-        {
-            result = qMax(result, 16000);
-        }
+            result = std::max(result, 16000);
+
         return result;
     }
 }
@@ -88,6 +88,10 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     
     av_frame_free(&m_frameDecodeTo);
     av_frame_free(&m_frameToEncode);
+
+    //Segfault here, need to free it properly
+    /*av_freep(m_sampleBuffers);
+    delete[] m_sampleBuffersWithOffset;*/
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -167,7 +171,8 @@ bool QnFfmpegAudioTranscoder::isOpened() const
 bool QnFfmpegAudioTranscoder::existMoreData() const
 {
     //int encoderFrameSize = m_encoderCtx->frame_size * QnFfmpegHelper::audioSampleSize(m_encoderCtx);
-    return m_currentSampleCount > m_encoderCtx->frame_size;
+    qDebug() << "Checking if more data exists" << m_currentSampleCount << m_encoderCtx->frame_size;
+    return m_currentSampleCount >= m_encoderCtx->frame_size;
 }
 
 /*int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
@@ -304,7 +309,6 @@ bool QnFfmpegAudioTranscoder::existMoreData() const
 
 int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
-
     if (result)
         result->reset();
 
@@ -314,11 +318,38 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         if (media->dataType != QnAbstractMediaData::DataType::AUDIO)
             return 0;
 
+        const std::chrono::microseconds kTimestampDiffUs(media->timestamp - m_lastTimestamp);
+        const bool tooBigJitter = std::abs(kTimestampDiffUs.count()) > kMaxAudioJitterUs.count()
+            || m_lastTimestamp == AV_NOPTS_VALUE;
+
+        if (tooBigJitter)
+        {
+            m_frameNum = 0;
+            m_firstEncodedPts = media->timestamp;
+        }
+
+        m_lastTimestamp = media->timestamp;
+
         AVPacket packetToDecode;
         av_init_packet(&packetToDecode);
 
         packetToDecode.data = const_cast<quint8*>((const quint8*)media->data());
         packetToDecode.size = static_cast<int>(media->dataSize());
+
+        {
+            //LOGGING
+
+            static QFile* preDecodedFile = nullptr;
+
+            if (!preDecodedFile)
+            {
+                preDecodedFile = new QFile(lit("C:\\media_logs\\axis.raw"));
+                preDecodedFile->open(QIODevice::WriteOnly | QIODevice::Truncate);
+            }
+
+            QByteArray preDecodedData((char*)packetToDecode.data, packetToDecode.size);
+            preDecodedFile->write(preDecodedData);
+        }
 
         qDebug() << lit("GOT MEDIA DATA! SIZE: %1").arg(packetToDecode.size);
 
@@ -332,6 +363,13 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             return resultOfSend;
     }
 
+    //These're very important lines, don't touch it
+    if (m_decoderCtx->frame_size == 0)
+        m_decoderCtx->frame_size = kDefaultFrameSize;
+
+    if (!m_decoderCtx->channel_layout)
+        m_decoderCtx->channel_layout = AV_CH_LAYOUT_MONO;
+
     if (m_encoderCtx->frame_size == 0)
         m_encoderCtx->frame_size = m_decoderCtx->frame_size;
 
@@ -339,9 +377,21 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         m_encoderCtx->channels = 1;
 
     if (m_encoderCtx->channel_layout == 0)
-        m_encoderCtx->channel_layout = AV_CH_LAYOUT_MONO;
+    {
+        if (media->context)
+            m_encoderCtx->channel_layout = media->context->getChannelLayout();
+    }
 
-    // It's total bullshit, fix it
+    if (m_encoderCtx->channel_layout == 0)
+    {
+        if (m_encoderCtx->channels == 2)
+            m_encoderCtx->channel_layout = AV_CH_LAYOUT_STEREO;
+        else
+            m_encoderCtx->channel_layout = AV_CH_LAYOUT_MONO;
+    }
+        
+
+    // It's wrong, fix it
     static bool reinitialized = false;
     if (!reinitialized)
     {
@@ -381,6 +431,20 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             if (resultOfReceive != 0)
                 return resultOfReceive;
 
+            {
+                //LOGGING
+                static QFile* encodedFile = nullptr;
+
+                if (!encodedFile)
+                {
+                    encodedFile = new QFile(lit("C:\\media_logs\\encoded.vorbis"));
+                    encodedFile->open(QIODevice::WriteOnly | QIODevice::Truncate);
+                }
+
+                QByteArray encodedData((char*)packetEncodeTo.data, packetEncodeTo.size);
+                encodedFile->write(encodedData);
+            }
+
             *result = createMediaDataFromAVPacket(packetEncodeTo);
             return 0;
         }
@@ -394,6 +458,35 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         m_currentSampleBufferOffset = 0;
 
         auto resultOfReceive = avcodec_receive_frame(m_decoderCtx, m_frameDecodeTo);
+
+        qDebug() << "Result of receive" << resultOfReceive << m_frameDecodeTo->nb_samples;
+
+        /*if (resultOfReceive == 0)
+        {
+            //LOGGING
+            static QFile* decodedFile = nullptr; 
+            static QFile* decodedFile2 = nullptr; 
+            
+            if (!decodedFile)
+            {
+                decodedFile = new QFile(lit("C:\\media_logs\\decoded.raw"));
+                decodedFile->open(QIODevice::WriteOnly | QIODevice::Truncate);
+            }
+
+            if (!decodedFile2)
+            {
+                decodedFile2 = new QFile(lit("C:\\media_logs\\decoded2.raw"));
+                decodedFile2->open(QIODevice::WriteOnly | QIODevice::Truncate);
+            }
+            
+            QByteArray decodedData((char*)m_frameDecodeTo->extended_data[0], m_frameDecodeTo->nb_samples * av_get_bytes_per_sample(m_decoderCtx->sample_fmt));
+            QByteArray decodedData2((char*)m_frameDecodeTo->extended_data[1], m_frameDecodeTo->nb_samples * av_get_bytes_per_sample(m_decoderCtx->sample_fmt));
+            decodedFile->write(decodedData);
+            decodedFile2->write(decodedData2);
+            decodedFile->flush();
+            decodedFile2->flush();
+        }*/
+
 
         // There is not enough data to decode
         if (resultOfReceive == AVERROR(EAGAIN))
@@ -559,7 +652,7 @@ void QnFfmpegAudioTranscoder::shiftSamplesResidue(
 
     for (std::size_t bufferNum = 0; bufferNum < buffersCount; bufferNum++)
     {
-        memmove(buffersBase[bufferNum], buffersBase[bufferNum] + samplesOffset, bytesNumberToCopy);
+        memmove(buffersBase[bufferNum], buffersBase[bufferNum] + samplesOffset * av_get_bytes_per_sample(ctx->sample_fmt), bytesNumberToCopy);
         m_sampleBuffersWithOffset[bufferNum] = buffersBase[bufferNum] + bytesNumberToCopy;
     }
 
@@ -581,31 +674,90 @@ void QnFfmpegAudioTranscoder::fillFrameWithSamples(
             offset 
                 * av_get_bytes_per_sample(encoderCtx->sample_fmt)
                 * (isPlanar ? 1 : encoderCtx->channels);
-
-        frame->extended_data = frame->data;
     }
 
+    frame->extended_data = frame->data;
     frame->nb_samples = encoderCtx->frame_size;
     frame->sample_rate = encoderCtx->sample_rate;
+
+   /* qDebug() << "Frame number of samples" << frame->nb_samples << encoderCtx->frame_size;
+
+    {
+        //LOGGING
+        static QFile* resampledFile = nullptr;
+        static QFile* resampledFile2 = nullptr;
+
+        if (!resampledFile)
+        {
+            resampledFile = new QFile(lit("C:\\media_logs\\resampled.raw"));
+            resampledFile->open(QIODevice::WriteOnly | QIODevice::Truncate);
+        }
+
+        if (!resampledFile2)
+        {
+            resampledFile2 = new QFile(lit("C:\\media_logs\\resampled2.raw"));
+            resampledFile2->open(QIODevice::WriteOnly | QIODevice::Truncate);
+        }
+
+        QByteArray preDecodedData((char*)frame->extended_data[0], frame->nb_samples * av_get_bytes_per_sample(m_encoderCtx->sample_fmt));
+        QByteArray preDecodedData2((char*)frame->extended_data[1], frame->nb_samples * av_get_bytes_per_sample(m_encoderCtx->sample_fmt));
+        resampledFile->write(preDecodedData);
+        resampledFile2->write(preDecodedData2);
+    }*/
 }
 
 int QnFfmpegAudioTranscoder::doResample()
 {
     const auto kLinesize = 3200;
-    NX_ASSERT(
+    //TODO: #dmishin restore assert then
+    /*NX_ASSERT(
         m_sampleBuffersWithOffset[0] - m_sampleBuffers[0] + 418 * 2 <= kLinesize, 
-        lit("ASSERT OVERFLOW %1").arg(m_sampleBuffersWithOffset[0] - m_sampleBuffers[0] + 418 * 2));
+        lit("ASSERT OVERFLOW %1").arg(m_sampleBuffersWithOffset[0] - m_sampleBuffers[0] + 418 * 2));*/
+
+    auto outSampleCount = av_rescale_rnd(
+        swr_get_delay(
+            const_cast<SwrContext*>(m_resampleCtx),
+            m_decoderCtx->sample_rate) + m_decoderCtx->frame_size,
+        m_encoderCtx->sample_rate,
+        m_decoderCtx->sample_rate,
+        AV_ROUND_UP);
+
     auto outSamplesPerChannel = swr_convert(
         m_resampleCtx,
-        m_sampleBuffersWithOffset,
-        m_encoderCtx->frame_size,
-        const_cast<const uint8_t**>(m_frameDecodeTo->extended_data),
-        m_decoderCtx->frame_size); //<  More info: linesize in bytes, frame_size in samples
+        m_sampleBuffersWithOffset, //out bufs
+        outSampleCount,//m_encoderCtx->frame_size, //out size in sample
+        const_cast<const uint8_t**>(m_frameDecodeTo->extended_data), //in bufs
+        m_frameDecodeTo->nb_samples); // in size in samples
+
+    
 
     qDebug() << "Audio transcoder, resampled samples per channel" << outSamplesPerChannel;
 
     if (outSamplesPerChannel < 0)
         return outSamplesPerChannel;
+
+    /*{
+        //LOGGING
+        static QFile* AresampledFile = nullptr;
+        static QFile* AresampledFile2 = nullptr;
+
+        if (!AresampledFile)
+        {
+            AresampledFile = new QFile(lit("C:\\media_logs\\Aresampled.raw"));
+            AresampledFile->open(QIODevice::WriteOnly | QIODevice::Truncate);
+        }
+
+        if (!AresampledFile2)
+        {
+            AresampledFile2 = new QFile(lit("C:\\media_logs\\Aresampled2.raw"));
+            AresampledFile2->open(QIODevice::WriteOnly | QIODevice::Truncate);
+        }
+
+        QByteArray ApreDecodedData((char*)m_sampleBuffersWithOffset[0], outSamplesPerChannel * av_get_bytes_per_sample(m_encoderCtx->sample_fmt));
+        QByteArray ApreDecodedData2((char*)m_sampleBuffersWithOffset[1], outSamplesPerChannel * av_get_bytes_per_sample(m_encoderCtx->sample_fmt));
+        AresampledFile->write(ApreDecodedData);
+        AresampledFile2->write(ApreDecodedData2);
+    }*/
 
     m_currentSampleCount += outSamplesPerChannel;
 
