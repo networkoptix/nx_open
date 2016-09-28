@@ -22,9 +22,10 @@ private:
 
     bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;
-
     void updateAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
-    void cleanAccess(const QnResourcePtr& resource);
+
+    void handleResourceAdded(const QnResourcePtr& resource);
+    void handleResourceRemoved(const QnResourcePtr& resource);
 
     void handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole);
 private:

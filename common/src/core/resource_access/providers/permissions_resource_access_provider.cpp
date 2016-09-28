@@ -12,31 +12,9 @@ QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject
     base_type(parent)
 {
     connect(qnResPool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            for (const auto& user: qnResPool->getResources<QnUserResource>())
-                updateAccess(user, resource);
-
-            if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-            {
-                for (const auto& resource: qnResPool->getResources())
-                {
-                    /* We have already update access to ourselves before */
-                    if (user != resource)
-                        updateAccess(user, resource);
-                }
-
-                connect(user, &QnUserResource::permissionsChanged, this,
-                    [this, user]
-                    {
-                        for (const auto& resource : qnResPool->getResources())
-                            updateAccess(user, resource);
-                    });
-            }
-        });
-
+        &QnPermissionsResourceAccessProvider::handleResourceAdded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
-        &QnPermissionsResourceAccessProvider::cleanAccess);
+        &QnPermissionsResourceAccessProvider::handleResourceRemoved);
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnPermissionsResourceAccessProvider::handleRoleAddedOrUpdated);
@@ -124,7 +102,30 @@ void QnPermissionsResourceAccessProvider::updateAccess(const QnResourceAccessSub
     emit accessChanged(subject, resource, newValue);
 }
 
-void QnPermissionsResourceAccessProvider::cleanAccess(const QnResourcePtr& resource)
+void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
+{
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+        updateAccess(user, resource);
+
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+    {
+        for (const auto& resource : qnResPool->getResources())
+        {
+            /* We have already update access to ourselves before */
+            if (user != resource)
+                updateAccess(user, resource);
+        }
+
+        connect(user, &QnUserResource::permissionsChanged, this,
+            [this, user]
+            {
+                for (const auto& resource : qnResPool->getResources())
+                    updateAccess(user, resource);
+            });
+    }
+}
+
+void QnPermissionsResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
     auto resourceId = resource->getId();
 
@@ -167,7 +168,6 @@ void QnPermissionsResourceAccessProvider::cleanAccess(const QnResourcePtr& resou
         accessible.remove(resourceId);
         emit accessChanged(subject, resource, false);
     }
-
 }
 
 void QnPermissionsResourceAccessProvider::handleRoleAddedOrUpdated(
