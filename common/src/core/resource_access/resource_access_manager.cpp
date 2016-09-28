@@ -23,7 +23,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/raii_guard.h>
 
-#define DEBUG_PERMISSIONS
+//#define DEBUG_PERMISSIONS
 #ifdef DEBUG_PERMISSIONS
 #define TRACE(...) qDebug() << "QnResourceAccessManager: " << __VA_ARGS__;
 #else
