@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
 QnVideoWallResourceAccessProvider::QnVideoWallResourceAccessProvider(QObject* parent):
@@ -73,6 +74,15 @@ void QnVideoWallResourceAccessProvider::handleResourceAdded(const QnResourcePtr&
 
         connect(layout, &QnLayoutResource::itemAdded, this, handleItemChanged);
         connect(layout, &QnLayoutResource::itemRemoved, this, handleItemChanged);
+    }
+    else if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+    {
+        connect(user, &QnUserResource::permissionsChanged, this,
+            [this, user]
+            {
+                for (const auto& resource : qnResPool->getResources())
+                    updateAccess(user, resource);
+            });
     }
 }
 

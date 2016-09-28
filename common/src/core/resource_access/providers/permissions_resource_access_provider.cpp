@@ -49,3 +49,18 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
 
     return qnResourceAccessManager->hasGlobalPermission(subject, requiredPermission);
 }
+
+void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
+{
+    base_type::handleResourceAdded(resource);
+
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+    {
+        connect(user, &QnUserResource::permissionsChanged, this,
+            [this, user]
+            {
+                for (const auto& resource : qnResPool->getResources())
+                    updateAccess(user, resource);
+            });
+    }
+}
