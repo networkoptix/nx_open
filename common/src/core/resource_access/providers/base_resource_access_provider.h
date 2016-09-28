@@ -32,6 +32,7 @@ protected:
 
     QSet<QnUuid> accessible(const QnResourceAccessSubject& subject) const;
 
+    bool isLayout(const QnResourcePtr& resource) const;
     bool isMediaResource(const QnResourcePtr& resource) const;
 
 private:

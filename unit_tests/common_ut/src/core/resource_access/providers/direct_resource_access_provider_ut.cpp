@@ -48,12 +48,33 @@ TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessCamera)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessUser)
+{
+    auto user = addUser(Qn::NoGlobalPermissions);
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << user->getId());
+
+    /* We can share only layout and media resources. */
+    ASSERT_FALSE(accessProvider()->hasAccess(user, user));
+}
+
 TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessLayout)
 {
     auto target = addLayout();
     auto user = addUser(Qn::NoGlobalPermissions);
     qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessOwnedLayout)
+{
+    auto target = addLayout();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    target->setParentId(user->getId());
+    ASSERT_FALSE(target->isShared());
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << target->getId());
+
+    /* Only shared layouts may be accessible through sharing. */
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnDirectResourceAccessProviderTest, checkAccessAdded)

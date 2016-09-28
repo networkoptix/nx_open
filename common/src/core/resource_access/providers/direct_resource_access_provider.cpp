@@ -4,7 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
 
 QnDirectResourceAccessProvider::QnDirectResourceAccessProvider(QObject* parent):
     base_type(parent)
@@ -23,6 +23,16 @@ bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
     NX_ASSERT(acceptable(subject, resource));
     if (!acceptable(subject, resource))
         return false;
+
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        if (!layout->isShared())
+            return false;
+    }
+    else if (!isMediaResource(resource))
+    {
+        return false;
+    }
 
     return qnResourceAccessManager->accessibleResources(subject).contains(resource->getId());
 }
