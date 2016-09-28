@@ -3,6 +3,8 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_pool_test_helper.h>
+
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -10,17 +12,12 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace {
-const QString userName1 = QStringLiteral("unit_test_user_1");
-const QString userName2 = QStringLiteral("unit_test_user_2");
-}
-
 void PrintTo(const Qn::Permissions& val, ::std::ostream* os)
 {
     *os << QnLexical::serialized(val).toStdString();
 }
 
-class QnResourceAccessManagerTest: public testing::Test
+class QnResourceAccessManagerTest: public testing::Test, protected QnResourcePoolTestHelper
 {
 protected:
 
@@ -35,18 +32,6 @@ protected:
     {
         m_currentUser.clear();
         m_module.clear();
-    }
-
-    QnUserResourcePtr addUser(const QString &name, Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
-    {
-        QnUserResourcePtr user(new QnUserResource(userType));
-        user->setId(QnUuid::createUuid());
-        user->setName(name);
-        user->setRawPermissions(globalPermissions);
-        user->addFlags(Qn::remote);
-        qnResPool->addResource(user);
-
-        return user;
     }
 
     QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, const QnUuid &parentId = QnUuid())
@@ -64,12 +49,6 @@ protected:
         return layout;
     }
 
-    QnVirtualCameraResourcePtr createCamera()
-    {
-        QnVirtualCameraResourcePtr camera(new QnCameraResourceStub());
-        return camera;
-    }
-
     void logout()
     {
         qnResPool->removeResources(qnResPool->getResourcesWithFlag(Qn::remote));
@@ -79,7 +58,7 @@ protected:
     void loginAsOwner()
     {
         logout();
-        auto user = addUser(userName1, Qn::NoGlobalPermissions);
+        auto user = addUser(Qn::NoGlobalPermissions);
         user->setOwner(true);
         m_currentUser = user;
     }
@@ -87,7 +66,7 @@ protected:
     void loginAs(Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
     {
         logout();
-        auto user = addUser(userName1, globalPermissions, userType);
+        auto user = addUser(globalPermissions, QnResourcePoolTestHelper::kTestUserName, userType);
         ASSERT_FALSE(user->isOwner());
         m_currentUser = user;
     }
@@ -248,7 +227,8 @@ TEST_F(QnResourceAccessManagerTest, checkNonOwnViewersLayoutAsViewer)
 {
     loginAs(Qn::GlobalLiveViewerPermissionSet);
 
-    auto anotherUser = addUser(userName2, Qn::GlobalLiveViewerPermissionSet);
+    auto anotherUser = addUser(Qn::GlobalLiveViewerPermissionSet,
+        QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     qnResPool->addResource(layout);
 
@@ -262,7 +242,8 @@ TEST_F(QnResourceAccessManagerTest, checkNonOwnViewersLayoutAsAdmin)
 {
     loginAs(Qn::GlobalAdminPermission);
 
-    auto anotherUser = addUser(userName2, Qn::GlobalLiveViewerPermissionSet);
+    auto anotherUser = addUser(Qn::GlobalLiveViewerPermissionSet,
+        QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     qnResPool->addResource(layout);
 
@@ -276,7 +257,7 @@ TEST_F(QnResourceAccessManagerTest, checkNonOwnAdminsLayoutAsAdmin)
 {
     loginAs(Qn::GlobalAdminPermission);
 
-    auto anotherUser = addUser(userName2, Qn::GlobalAdminPermission);
+    auto anotherUser = addUser(Qn::GlobalAdminPermission, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     qnResPool->addResource(layout);
 
@@ -292,7 +273,7 @@ TEST_F(QnResourceAccessManagerTest, checkNonOwnAdminsLayoutAsOwner)
 {
     loginAsOwner();
 
-    auto anotherUser = addUser(userName2, Qn::GlobalAdminPermission);
+    auto anotherUser = addUser(Qn::GlobalAdminPermission, QnResourcePoolTestHelper::kTestUserName2);
     auto layout = createLayout(Qn::remote, false, anotherUser->getId());
     qnResPool->addResource(layout);
 

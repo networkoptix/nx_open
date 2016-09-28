@@ -13,9 +13,10 @@ QString QnResourcePoolTestHelper::kTestUserName = QStringLiteral("unit_test_user
 QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("unit_test_user_2");
 
 QnUserResourcePtr QnResourcePoolTestHelper::createUser(Qn::GlobalPermissions globalPermissions,
-    const QString& name)
+    const QString& name,
+    QnUserType userType)
 {
-    QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
+    QnUserResourcePtr user(new QnUserResource(userType));
     user->setId(QnUuid::createUuid());
     user->setName(name);
     user->setRawPermissions(globalPermissions);
@@ -24,9 +25,10 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(Qn::GlobalPermissions glo
 }
 
 QnUserResourcePtr QnResourcePoolTestHelper::addUser(Qn::GlobalPermissions globalPermissions,
-    const QString& name)
+    const QString& name,
+    QnUserType userType)
 {
-    auto user = createUser(globalPermissions, name);
+    auto user = createUser(globalPermissions, name, userType);
     qnResPool->addResource(user);
     return user;
 }
