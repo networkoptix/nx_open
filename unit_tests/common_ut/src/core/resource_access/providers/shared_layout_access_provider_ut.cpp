@@ -2,6 +2,7 @@
 #include <core/resource_access/providers/shared_layout_access_provider.h>
 
 #include <core/resource_access/resource_access_manager.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -72,5 +73,25 @@ TEST_F(QnSharedLayoutAccessProviderTest, checkSharedServer)
     qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
 
     /* User should get access to statistics via shared layouts. */
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnSharedLayoutAccessProviderTest, layoutMadeShared)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto layout = addLayout();
+    layout->setParentId(user->getId());
+    ASSERT_FALSE(layout->isShared());
+
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    layout->addItem(item);
+
+    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+
+    layout->setParentId(QnUuid());
+    ASSERT_TRUE(layout->isShared());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }

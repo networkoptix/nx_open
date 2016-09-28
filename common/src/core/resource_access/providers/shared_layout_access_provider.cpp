@@ -6,6 +6,25 @@
 
 #include <core/resource/layout_resource.h>
 
+namespace {
+
+QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
+{
+    QSet<QnUuid> result;
+    for (const auto& item : layout->getItems())
+    {
+        /* Only remote resources with correct id can be accessed. */
+        auto id = item.resource.id;
+        if (id.isNull())
+            continue;
+
+        result << id;
+    }
+    return result;
+}
+
+}
+
 QnSharedLayoutAccessProvider::QnSharedLayoutAccessProvider(QObject* parent):
     base_type(parent)
 {
@@ -44,6 +63,21 @@ bool QnSharedLayoutAccessProvider::calculateAccess(const QnResourceAccessSubject
     return false;
 }
 
+void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
+{
+    base_type::handleResourceAdded(resource);
+
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        connect(layout, &QnResource::parentIdChanged, this,
+            [this, layout]
+            {
+                for (auto resource : qnResPool->getResources(layoutItems(layout)))
+                    updateAccessToResource(resource);
+            });
+    }
+}
+
 void QnSharedLayoutAccessProvider::handleAccessibleResourcesChanged(
     const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
 {
@@ -62,22 +96,13 @@ void QnSharedLayoutAccessProvider::handleAccessibleResourcesChanged(
     auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(added + removed);
     for (const auto& layout : sharedLayouts)
     {
-        NX_ASSERT(layout->isShared());
         if (!layout->isShared())
             continue;
 
-        for (const auto& item : layout->getItems())
-        {
-            /* Only remote resources with correct id can be accessed. */
-            auto id = item.resource.id;
-            NX_ASSERT(!id.isNull());
-            if (id.isNull())
-                continue;
-
-            changedResources << id;
-        }
+        changedResources += layoutItems(layout);
     }
 
     for (auto resource: qnResPool->getResources(changedResources))
         updateAccess(subject, resource);
 }
+
