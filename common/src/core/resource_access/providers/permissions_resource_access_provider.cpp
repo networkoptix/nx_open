@@ -18,6 +18,8 @@ QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnPermissionsResourceAccessProvider::handleRoleAddedOrUpdated);
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+        &QnPermissionsResourceAccessProvider::handleRoleRemoved);
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
@@ -134,10 +136,9 @@ void QnPermissionsResourceAccessProvider::handleResourceRemoved(const QnResource
         disconnect(user, nullptr, this, nullptr);
 
         QnResourceAccessSubject subject(user);
-        auto id = subject.id();
 
-        NX_ASSERT(m_accessibleResources.contains(id));
-        auto& accessible = m_accessibleResources[id];
+        NX_ASSERT(m_accessibleResources.contains(resourceId));
+        auto& accessible = m_accessibleResources[resourceId];
 
         for (const auto& targetResource : qnResPool->getResources(accessible.values()))
         {
@@ -152,7 +153,7 @@ void QnPermissionsResourceAccessProvider::handleResourceRemoved(const QnResource
         accessible.remove(resourceId);
         NX_ASSERT(accessible.isEmpty());
 
-        m_accessibleResources.remove(id);
+        m_accessibleResources.remove(resourceId);
     }
 
     for (const auto& user : qnResPool->getResources<QnUserResource>())
@@ -178,4 +179,22 @@ void QnPermissionsResourceAccessProvider::handleRoleAddedOrUpdated(
         /* We have already update access to ourselves before */
         updateAccess(userRole, resource);
     }
+}
+
+void QnPermissionsResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
+{
+    QnResourceAccessSubject subject(userRole);
+    auto id = subject.id();
+
+    NX_ASSERT(m_accessibleResources.contains(id));
+    auto& accessible = m_accessibleResources[id];
+
+    for (const auto& targetResource : qnResPool->getResources(accessible.values()))
+    {
+        QnUuid targetId = targetResource->getId();
+        accessible.remove(targetId);
+        emit accessChanged(subject, targetResource, false);
+    }
+    NX_ASSERT(accessible.isEmpty());
+    m_accessibleResources.remove(id);
 }

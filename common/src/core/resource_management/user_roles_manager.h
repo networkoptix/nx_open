@@ -38,7 +38,7 @@ public:
 
 signals:
     void userRoleAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
-    void userRoleRemoved(const QnUuid& groupId);
+    void userRoleRemoved(const ec2::ApiUserGroupData& userRole);
 
 private:
     mutable QnMutex m_mutex;

@@ -56,15 +56,17 @@ void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserGroupData& role)
 void QnUserRolesManager::removeUserRole(const QnUuid& id)
 {
     NX_ASSERT(!id.isNull());
+    ec2::ApiUserGroupData role;
     {
         QnMutexLocker lk(&m_mutex);
         NX_ASSERT(m_roles.contains(id));
         if (!m_roles.contains(id))
             return;
-        m_roles.remove(id);
+
+        role = m_roles.take(id);
     }
 
-    emit userRoleRemoved(id);
+    emit userRoleRemoved(role);
 }
 
 

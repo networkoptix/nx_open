@@ -53,7 +53,11 @@ protected:
         return m_accessProvider.data();
     }
 
-
+    ec2::ApiUserGroupData createRole() const
+    {
+        return ec2::ApiUserGroupData(QnUuid::createUuid(), QStringLiteral("test_role"),
+            Qn::GlobalAccessAllMediaPermission);
+    }
 
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         bool value = true)
@@ -328,9 +332,21 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkRoleCameraAccess)
 {
     auto target = addCamera();
 
-    ec2::ApiUserGroupData role(QnUuid::createUuid(), QStringLiteral("test_role"),
-        Qn::GlobalAccessAllMediaPermission);
+    auto role = createRole();
     qnUserRolesManager->addOrUpdateUserRole(role);
     ASSERT_TRUE(accessProvider()->hasAccess(role, target));
 }
 
+// check permissions changing
+
+// await get access
+
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedRoleAccess)
+{
+    auto target = addCamera();
+
+    auto role = createRole();
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    awaitAccess(role, target, false);
+    qnUserRolesManager->removeUserRole(role.id);
+}

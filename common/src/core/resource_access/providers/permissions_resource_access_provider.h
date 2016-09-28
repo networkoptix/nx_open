@@ -28,6 +28,7 @@ private:
     void handleResourceRemoved(const QnResourcePtr& resource);
 
     void handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole);
+    void handleRoleRemoved(const ec2::ApiUserGroupData& userRole);
 private:
     /** Hash of accessible resources by subject effective id. */
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
