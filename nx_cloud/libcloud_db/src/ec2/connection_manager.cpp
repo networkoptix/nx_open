@@ -63,21 +63,16 @@ ConnectionManager::~ConnectionManager()
     m_outgoingTransactionDispatcher->onNewTransactionSubscription()
         ->removeSubscription(m_onNewTransactionSubscriptionId);
 
-    m_startedAsyncCallsCounter.wait();
-
     ConnectionDict localConnections;
-    decltype(m_connectionsToRemove) localConnectionsToRemove;
     {
         QnMutexLocker lk(&m_mutex);
         localConnections = std::move(m_connections);
-        localConnectionsToRemove = std::move(m_connectionsToRemove);
     }
 
     for (auto& connectionContext: localConnections)
         connectionContext.connection->pleaseStopSync();
 
-    for (auto& elem: localConnectionsToRemove)
-        elem.second->pleaseStopSync();
+    m_startedAsyncCallsCounter.wait();
 }
 
 void ConnectionManager::createTransactionConnection(
