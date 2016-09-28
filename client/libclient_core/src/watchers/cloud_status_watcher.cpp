@@ -77,7 +77,6 @@ public:
     std::unique_ptr<api::Connection> temporaryConnection;
 
     QnCloudStatusWatcher::Status status;
-    bool loggedIn;
 
     QnCloudSystemList cloudSystems;
     QnCloudSystemList recentCloudSystems;
@@ -87,6 +86,8 @@ public:
 public:
     void updateConnection(bool initial = false);
 
+    void setCloudEnabled(bool enabled);
+    bool cloudIsEnabled() const;
 private:
     void setStatus(QnCloudStatusWatcher::Status newStatus,
         QnCloudStatusWatcher::ErrorCode error);
@@ -99,12 +100,15 @@ private:
 
 private:
     QTimer* m_pingTimer;
+    bool m_cloudIsEnabled;
 };
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
     base_type(parent),
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
+    setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+
     const auto correctOfflineState = [this]()
         {
             Q_D(QnCloudStatusWatcher);
@@ -134,7 +138,6 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
             qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
         });
 
-    setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
     setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
     //TODO: #GDM store temporary credentials
     setCloudCredentials(QnCredentials(
@@ -285,6 +288,12 @@ QnCloudStatusWatcher::Status QnCloudStatusWatcher::status() const
     return d->status;
 }
 
+bool QnCloudStatusWatcher::isCloudEnabled() const
+{
+    Q_D(const QnCloudStatusWatcher);
+    return d->cloudIsEnabled();
+}
+
 void QnCloudStatusWatcher::updateSystems()
 {
     Q_D(QnCloudStatusWatcher);
@@ -312,6 +321,9 @@ void QnCloudStatusWatcher::updateSystems()
 
                     Q_D(QnCloudStatusWatcher);
 
+                    d->setCloudEnabled((result != api::ResultCode::networkError)
+                        && (result != api::ResultCode::serviceUnavailable));
+
                     switch (result)
                     {
                         case api::ResultCode::ok:
@@ -328,7 +340,7 @@ void QnCloudStatusWatcher::updateSystems()
                                 QnCloudStatusWatcher::UnknownError);
                             break;
                     }
-                };
+            };
 
             executeDelayed(handler, 0, thread());
         }
@@ -362,7 +374,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     recentCloudSystems(qnClientCoreSettings->recentCloudSystems()),
     currentSystem(),
     temporaryCredentials(),
-    m_pingTimer(new QTimer(this))
+    m_pingTimer(new QTimer(this)),
+    m_cloudIsEnabled(true)
 {
     Q_Q(QnCloudStatusWatcher);
 
@@ -374,6 +387,23 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
 
     connect(m_pingTimer, &QTimer::timeout, this, &QnCloudStatusWatcherPrivate::prolongTemporaryCredentials);
 }
+
+bool QnCloudStatusWatcherPrivate::cloudIsEnabled() const
+{
+    return m_cloudIsEnabled;
+}
+
+void QnCloudStatusWatcherPrivate::setCloudEnabled(bool enabled)
+{
+    Q_Q(QnCloudStatusWatcher);
+
+    if (m_cloudIsEnabled == enabled)
+        return;
+
+    m_cloudIsEnabled = enabled;
+    emit q->isCloudEnabledChanged();
+}
+
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 {

@@ -52,7 +52,7 @@ QnQmlSortFilterProxyModel::QnQmlSortFilterProxyModel(QObject* parent) :
 
     setSourceModel(new QnSystemsModel(this));
 
-    handleCloudSystemsChanged(qnCloudStatusWatcher->cloudSystems());
+    handleCloudSystemsChanged();
     handleLocalConnectionsChanged();
 
     setDynamicSortFilter(true);
@@ -111,17 +111,24 @@ bool QnQmlSortFilterProxyModel::filterAcceptsRow(int row,
     return (itLocalSystemWeight.value() > kMinWeight);
 }
 
-void QnQmlSortFilterProxyModel::handleCloudSystemsChanged(const QnCloudSystemList& systems)
+void QnQmlSortFilterProxyModel::handleCloudSystemsChanged()
 {
-    const auto newCloudSystemsOrder =
-        [systems]()
-    {
-        IdWeightHash result;
-        int index = systems.count();
-        for (const auto system : systems)
-            result.insert(system.id, --index);
-        return result;
-    }();
+    const auto onlineSystems = qnCloudStatusWatcher->cloudSystems();
+    const auto recentSystems = qnClientCoreSettings->recentCloudSystems();
+
+    int index = onlineSystems.size() + recentSystems.size();
+
+    auto getCloudSystemsOrder =
+        [&index](const QnCloudSystemList& systems) -> IdWeightHash
+        {
+            IdWeightHash result;
+            for (const auto system : systems)
+                result.insert(system.id, --index);
+            return result;
+        };
+
+    const auto newCloudSystemsOrder = getCloudSystemsOrder(onlineSystems).unite(
+        getCloudSystemsOrder(recentSystems));
 
     if (newCloudSystemsOrder == m_cloudSystemWeight)
         return;

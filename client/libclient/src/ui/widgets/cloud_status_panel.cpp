@@ -154,12 +154,12 @@ void QnCloudStatusPanelPrivate::updateUi()
             palette.setColor(QPalette::ButtonText, palette.color(QPalette::Light));
             break;
         case QnCloudStatusWatcher::Online:
-            q->setText(effectiveUserName);
+            q->setText(qnCloudStatusWatcher->cloudLogin());
             q->setIcon(loggedInIcon);
             font.setWeight(QFont::Bold);
             break;
         case QnCloudStatusWatcher::Offline:
-            q->setText(effectiveUserName);
+            q->setText(qnCloudStatusWatcher->cloudLogin());
             q->setIcon(offlineIcon);
             font.setWeight(QFont::Bold);
             break;

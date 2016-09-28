@@ -101,12 +101,12 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_pageSize(m_widget->size())
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::effectiveUserNameChanged,
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
         this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
         this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
-        this, &QnWorkbenchWelcomeScreen::isOfflineConnectionChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::isCloudEnabledChanged,
+        this, &QnWorkbenchWelcomeScreen::isCloudEnabledChanged);
 
     //
     m_widget->installEventFilter(this);
@@ -156,7 +156,7 @@ void QnWorkbenchWelcomeScreen::setVisible(bool isVisible)
 
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
 {
-    return qnCloudStatusWatcher->effectiveUserName();
+    return qnCloudStatusWatcher->cloudLogin();
 }
 
 bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
@@ -164,9 +164,9 @@ bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
     return (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut);
 }
 
-bool QnWorkbenchWelcomeScreen::isOfflineConnection() const
+bool QnWorkbenchWelcomeScreen::isCloudEnabled() const
 {
-    return (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Offline);
+    return qnCloudStatusWatcher->isCloudEnabled();
 }
 
 QSize QnWorkbenchWelcomeScreen::pageSize() const

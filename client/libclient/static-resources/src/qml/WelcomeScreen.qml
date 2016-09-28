@@ -245,7 +245,7 @@ Rectangle
 
         NxBanner
         {
-            visible: context.isOfflineConnection;
+            visible: !context.isCloudEnabled;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;
