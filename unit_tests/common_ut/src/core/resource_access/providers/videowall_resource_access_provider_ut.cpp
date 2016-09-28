@@ -56,6 +56,22 @@ TEST_F(QnVideoWallResourceAccessProviderTest, checkByAccessRights)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnVideoWallResourceAccessProviderTest, checkAccessRightsChange)
+{
+    auto target = addLayout();
+    auto videoWall = addVideoWall();
+
+    QnVideoWallItem item;
+    item.layout = target->getId();
+    videoWall->items()->addItem(item);
+
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+
+    user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnVideoWallResourceAccessProviderTest, checkLayoutOnVideoWall)
 {
     auto target = addLayout();

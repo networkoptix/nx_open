@@ -88,10 +88,10 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
         connect(user, &QnUserResource::permissionsChanged, this,
             [this, user]
-        {
-            for (const auto& resource : qnResPool->getResources())
-                updateAccess(user, resource);
-        });
+            {
+                for (const auto& resource : qnResPool->getResources())
+                    updateAccess(user, resource);
+            });
     }
 }
 
