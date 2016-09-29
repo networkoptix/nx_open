@@ -21,10 +21,33 @@ ec2::ApiUserGroupDataList QnUserRolesManager::userRoles() const
 
 void QnUserRolesManager::resetUserRoles(const ec2::ApiUserGroupDataList& userRoles)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_roles.clear();
-    for (const auto& role : userRoles)
-        m_roles.insert(role.id, role);
+    ec2::ApiUserGroupDataList removed;
+    ec2::ApiUserGroupDataList updated;
+    {
+        QnMutexLocker lk(&m_mutex);
+
+        QSet<QnUuid> newRoles;
+        for (const auto& role : userRoles)
+        {
+            newRoles << role.id;
+            if (m_roles[role.id] != role)
+            {
+                m_roles[role.id] = role;
+                updated.push_back(role);
+            }
+        }
+
+        for (const QnUuid& id : m_roles.keys())
+        {
+            if (!newRoles.contains(id))
+                removed.push_back(m_roles.take(id));
+        }
+    }
+
+    for (auto role: removed)
+        emit userRoleRemoved(role);
+    for (auto role: updated)
+        emit userRoleAddedOrUpdated(role);
 }
 
 
