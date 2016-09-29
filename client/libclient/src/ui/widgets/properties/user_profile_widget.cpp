@@ -7,7 +7,8 @@
 #include <client_core/client_core_settings.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+
 #include <core/resource/user_resource.h>
 
 #include <ui/common/read_only.h>
@@ -36,7 +37,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 
     ::setReadOnly(ui->loginInputField, true);
     ::setReadOnly(ui->groupInputField, true);
-   
+
     ui->loginInputField->setTitle(tr("Login"));
     ui->nameInputField->setTitle(tr("Name"));
     ui->groupInputField->setTitle(tr("Role"));
@@ -79,7 +80,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     });
 
     //TODO: #GDM move this to style helper or stacked widget subclass
-    auto stackedWidgetCurrentChanged = 
+    auto stackedWidgetCurrentChanged =
         [this](int index)
         {
             auto stackedWidget = static_cast<QStackedWidget*>(sender());
@@ -130,7 +131,7 @@ void QnUserProfileWidget::loadDataToUi()
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->nameInputField->setText(m_model->user()->fullName());
-    ui->groupInputField->setText(qnResourceAccessManager->userRoleName(m_model->user()));
+    ui->groupInputField->setText(qnUserRolesManager->userRoleName(m_model->user()));
     ui->emailInputField->setText(m_model->user()->getEmail());
     m_newPassword.clear();
 

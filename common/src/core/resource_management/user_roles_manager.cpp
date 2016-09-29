@@ -1,5 +1,7 @@
 #include "user_roles_manager.h"
 
+#include <core/resource/user_resource.h>
+
 QnUserRolesManager::QnUserRolesManager(QObject* parent):
     base_type(parent)
 {
@@ -92,4 +94,127 @@ void QnUserRolesManager::removeUserRole(const QnUuid& id)
     emit userRoleRemoved(role);
 }
 
+
+const QList<Qn::UserRole>& QnUserRolesManager::predefinedRoles()
+{
+    static const QList<Qn::UserRole> predefinedRoleList({
+        Qn::UserRole::Owner,
+        Qn::UserRole::Administrator,
+        Qn::UserRole::AdvancedViewer,
+        Qn::UserRole::Viewer,
+        Qn::UserRole::LiveViewer});
+
+    return predefinedRoleList;
+}
+
+QString QnUserRolesManager::userRoleName(Qn::UserRole userRole)
+{
+    switch (userRole)
+    {
+        case Qn::UserRole::Owner:
+            return tr("Owner");
+
+        case Qn::UserRole::Administrator:
+            return tr("Administrator");
+
+        case Qn::UserRole::AdvancedViewer:
+            return tr("Advanced Viewer");
+
+        case Qn::UserRole::Viewer:
+            return tr("Viewer");
+
+        case Qn::UserRole::LiveViewer:
+            return tr("Live Viewer");
+
+        case Qn::UserRole::CustomUserGroup:
+            return tr("Custom Role");
+
+        case Qn::UserRole::CustomPermissions:
+            return tr("Custom");
+    }
+
+    return QString();
+}
+
+QString QnUserRolesManager::userRoleDescription(Qn::UserRole userRole)
+{
+    switch (userRole)
+    {
+        case Qn::UserRole::Owner:
+            return tr("Has access to whole system and can do everything.");
+
+        case Qn::UserRole::Administrator:
+            return tr("Has access to whole system and can manage it. Can create users.");
+
+        case Qn::UserRole::AdvancedViewer:
+            return tr("Can manage all cameras and bookmarks.");
+
+        case Qn::UserRole::Viewer:
+            return tr("Can view all cameras and export video.");
+
+        case Qn::UserRole::LiveViewer:
+            return tr("Can view live video from all cameras.");
+
+        case Qn::UserRole::CustomUserGroup:
+            return tr("Custom user role.");
+
+        case Qn::UserRole::CustomPermissions:
+            return tr("Custom permissions.");
+    }
+
+    return QString();
+}
+
+Qn::GlobalPermissions QnUserRolesManager::userRolePermissions(Qn::UserRole userRole)
+{
+    switch (userRole)
+    {
+        case Qn::UserRole::Owner:
+        case Qn::UserRole::Administrator:
+            return Qn::GlobalAdminPermissionSet;
+
+        case Qn::UserRole::AdvancedViewer:
+            return Qn::GlobalAdvancedViewerPermissionSet;
+
+        case Qn::UserRole::Viewer:
+            return Qn::GlobalViewerPermissionSet;
+
+        case Qn::UserRole::LiveViewer:
+            return Qn::GlobalLiveViewerPermissionSet;
+
+        case Qn::UserRole::CustomUserGroup:
+        case Qn::UserRole::CustomPermissions:
+            return Qn::NoGlobalPermissions;
+    }
+
+    return Qn::NoGlobalPermissions;
+}
+
+QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
+{
+    NX_ASSERT(user);
+    if (!user)
+        return QString();
+    Qn::UserRole roleType = user->role();
+    if (roleType == Qn::UserRole::CustomUserGroup)
+        return qnUserRolesManager->userRole(user->userGroup()).name;
+
+    return userRoleName(roleType);
+}
+
+ec2::ApiPredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
+{
+    static ec2::ApiPredefinedRoleDataList kPredefinedRoles;
+    if (kPredefinedRoles.empty())
+    {
+        for (auto role : predefinedRoles())
+        {
+            kPredefinedRoles.emplace_back(
+                userRoleName(role),
+                userRolePermissions(role),
+                role == Qn::UserRole::Owner);
+        }
+    }
+    return kPredefinedRoles;
+}
 

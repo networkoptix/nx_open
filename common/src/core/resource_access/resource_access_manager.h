@@ -117,17 +117,6 @@ public:
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,        const ec2::ApiUserData& update) const;
     bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,   const ec2::ApiVideowallData& update) const;
 
-    static const QList<Qn::UserRole>& predefinedRoles();
-
-    //TODO: #GDM #move to roles manager
-    static QString userRoleName(Qn::UserRole userRole);
-    static QString userRoleDescription(Qn::UserRole userRole);
-    static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
-
-    QString userRoleName(const QnUserResourcePtr& user) const;
-
-    static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
-
 signals:
     /** Notify listeners that permissions possibly changed (not necessarily). */
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);

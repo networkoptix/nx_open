@@ -201,7 +201,7 @@ void QnUserSettingsDialog::permissionsChanged()
     if (isPageVisible(ProfilePage))
     {
         Qn::UserRole roleType = m_user->role();
-        QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
+        QString permissionsText = QnUserRolesManager::userRoleDescription(roleType);
         QnResourceAccessSubject subject(m_user);
 
         permissionsText += kHtmlTableTemplate.arg(
@@ -213,7 +213,7 @@ void QnUserSettingsDialog::permissionsChanged()
     else
     {
         Qn::UserRole roleType = m_settingsPage->selectedRole();
-        QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
+        QString permissionsText = QnUserRolesManager::userRoleDescription(roleType);
 
         if (roleType == Qn::UserRole::CustomUserGroup)
         {

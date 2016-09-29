@@ -28,9 +28,9 @@ namespace
             const QString& name = QString(),
             const QnUuid& roleUuid = QnUuid()) :
                 roleType(roleType),
-                name(name.isEmpty() ? QnResourceAccessManager::userRoleName(roleType) : name),
-                description(QnResourceAccessManager::userRoleDescription(roleType)),
-                permissions(QnResourceAccessManager::userRolePermissions(roleType)),
+                name(name.isEmpty() ? QnUserRolesManager::userRoleName(roleType) : name),
+                description(QnUserRolesManager::userRoleDescription(roleType)),
+                permissions(QnUserRolesManager::userRolePermissions(roleType)),
                 roleUuid(roleUuid)
         {
         }
@@ -142,7 +142,7 @@ public:
         for (auto role : standardRoles)
         {
             if (qnResourceAccessManager->canCreateUser(context()->user(),
-                qnResourceAccessManager->userRolePermissions(role), false))
+                QnUserRolesManager::userRolePermissions(role), false))
                 roles << RoleDescription(role);
         }
 
@@ -271,7 +271,7 @@ public:
         static QList<Qn::UserRole> roles;
         if (roles.empty())
         {
-            for (auto role : QnResourceAccessManager::predefinedRoles())
+            for (auto role : QnUserRolesManager::predefinedRoles())
                 if (role != Qn::UserRole::Owner)
                     roles << role;
         }
