@@ -7,6 +7,7 @@
 #define cloud_db_system_manager_h
 
 #include <atomic>
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <stdexcept>
@@ -210,6 +211,12 @@ private:
         data::SystemSharing ownerSharing;
     };
 
+    struct SaveUserSessionResult
+    {
+        float systemAccessWeight;
+        std::chrono::system_clock::time_point lastloginTime;
+    };
+
     constexpr static const int kSharingUniqueIndex = 0;
     constexpr static const int kSharingByAccountEmail = 1;
     constexpr static const int kSharingBySystemId = 2;
@@ -324,16 +331,16 @@ private:
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
-    nx::db::DBResult updateSystemAccessWeightInDb(
+    nx::db::DBResult saveUserSessionStartToDb(
         nx::db::QueryContext* queryContext,
         const data::UserSessionDescriptor& userSessionDescriptor,
-        double* const systemAccessWeight);
-    void systemAccessWeightUpdatedInDb(
+        SaveUserSessionResult* const result);
+    void userSessionStartSavedToDb(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::UserSessionDescriptor userSessionDescriptor,
-        double systemAccessWeight,
+        SaveUserSessionResult result,
         std::function<void(api::ResultCode)> completionHandler);
 
     /** returns sharing permissions depending on current access role */
@@ -383,6 +390,10 @@ private:
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
+
+    static float calculateSystemAccessWeight(
+        std::chrono::system_clock::time_point lastLoginTime,
+        float currentUsageFrequency);
 };
 
 }   //cdb
