@@ -532,7 +532,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::WhatsThisAction).
         flags(Qn::NoTarget).
         text(tr("Help")).
-        icon(qnSkin->icon("titlebar/whats_this.png"));
+        icon(qnSkin->icon("titlebar/window_question.png"));
 
     factory(QnActions::CameraDiagnosticsAction).
         mode(QnActionTypes::DesktopMode).
@@ -632,7 +632,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         shortcut(lit("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).
-        icon(qnSkin->icon("main_menu/main_menu.png"));
+        icon(qnSkin->icon("titlebar/main_menu.png"));
 
     factory(QnActions::OpenLoginDialogAction).
         flags(Qn::Main | Qn::GlobalHotkey).
@@ -866,20 +866,20 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
+        icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
 
 
     factory(QnActions::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
-        icon(qnSkin->icon("titlebar/minimize.png"));
+        icon(qnSkin->icon("titlebar/window_minimize.png"));
 
     factory(QnActions::MaximizeAction).
         flags(Qn::NoTarget).
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
+        icon(qnSkin->icon("titlebar/window_maximize.png", "titlebar/window_restore.png"));
 
 
     factory(QnActions::FullscreenMaximizeHotkeyAction).
@@ -1045,7 +1045,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/exit.png"));
+        icon(qnSkin->icon("titlebar/window_close.png"));
 
     factory(QnActions::DelayedForcedExitAction).
         flags(Qn::NoTarget);

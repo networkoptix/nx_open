@@ -360,4 +360,8 @@ void QnStatusOverlayWidget::updateAreasSizes()
     m_imageItem.setScale(imageSceneSize.width() / imageSize.width());
     m_imageItem.setPos((rect.width() - imageSceneSize.width()) / 2,
         (rect.height() - imageSceneSize.height()) / 2);
+
+    m_extrasHolder->updateScale();
+    m_preloaderHolder->updateScale();
+    m_centralHolder->updateScale();
 }

@@ -1,7 +1,7 @@
 #include "tool_button.h"
+#include <ui/style/skin.h>
 
-QnToolButton::QnToolButton(QWidget* parent)
-    : base_type(parent)
+QnToolButton::QnToolButton(QWidget* parent): base_type(parent)
 {
 }
 
@@ -11,7 +11,7 @@ void QnToolButton::adjustIconSize()
     if (icon.isNull())
         return;
 
-    setIconSize(icon.actualSize(QSize(1024, 1024)));
+    setIconSize(QnSkin::maximumSize(icon));
 }
 
 void QnToolButton::mousePressEvent(QMouseEvent* event)

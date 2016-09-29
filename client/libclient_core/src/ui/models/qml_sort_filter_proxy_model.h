@@ -1,26 +1,33 @@
 #pragma once
 
 #include <QtCore/QSortFilterProxyModel>
+#include <watchers/cloud_status_watcher.h>
 
 class QnQmlSortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
     typedef QSortFilterProxyModel base_type;
 
-    Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel NOTIFY modelChanged)
-
 public:
-    QnQmlSortFilterProxyModel();
-
-    QnQmlSortFilterProxyModel(QObject* parent);
+    QnQmlSortFilterProxyModel(QObject* parent = nullptr);
 
     virtual ~QnQmlSortFilterProxyModel() = default;
 
-public:
-    QAbstractItemModel* model() const;
+protected: // overrides
+    virtual bool lessThan(const QModelIndex& left,
+        const QModelIndex& right) const override;
 
-    void setModel(QAbstractItemModel* targetModel);
+    virtual bool filterAcceptsRow(int row,
+        const QModelIndex &parent) const override;
 
-signals:
-    void modelChanged();
+private:
+    void handleCloudSystemsChanged();
+
+    void handleLocalConnectionsChanged();
+
+private:
+    typedef QHash<QString, qreal> IdWeightHash;
+
+    IdWeightHash m_cloudSystemWeight;
+    IdWeightHash m_localSystemWeight;
 };

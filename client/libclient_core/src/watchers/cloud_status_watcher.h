@@ -41,6 +41,7 @@ class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatch
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool stayConnected READ stayConnected WRITE setStayConnected NOTIFY stayConnectedChanged)
+    Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
 
     using base_type = QObject;
 
@@ -91,6 +92,8 @@ public:
 
     ErrorCode error() const;
 
+    bool isCloudEnabled() const;
+
     void updateSystems();
 
     QnCloudSystemList cloudSystems() const;
@@ -107,6 +110,7 @@ signals:
     void currentSystemChanged(const QnCloudSystem& system);
     void errorChanged();
     void stayConnectedChanged();
+    void isCloudEnabledChanged();
 
 private:
     QScopedPointer<QnCloudStatusWatcherPrivate> d_ptr;

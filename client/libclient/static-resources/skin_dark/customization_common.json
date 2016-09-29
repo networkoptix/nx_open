@@ -44,21 +44,21 @@
         "blue13":       "#117297",
         "blue14":       "#076281",
 
-        "green_l4":     "#66ef52",
-        "green_l3":     "#59dc2e",
-        "green_l2":     "#4fc527",
-        "green_l1":     "#41aa22",
+        "green_l4":     "#56e829",
+        "green_l3":     "#51d22a",
+        "green_l2":     "#4cbc28",
+        "green_l1":     "#44a624",
         "green_core":   "#3a911e",
         "green_d1":     "#32731e",
         "green_d2":     "#2a551e",
         "green_d3":     "#22391e",
 
         "yellow_core":  "#fbbc05",
-        "yellow_d1":    "#e0a30a",
-        "yellow_d2":    "#c68a0f",
+        "yellow_d1":    "#e1a700",
+        "yellow_d2":    "#c79200",
 
-        "red_l2":       "#e34545",
-        "red_l1":       "#d53232",
+        "red_l2":       "#f02c2c",
+        "red_l1":       "#d92a2a",
         "red_core":     "#c22626",
         "red_d1":       "#aa1e1e",
         "red_d2":       "#8e1717",
@@ -93,7 +93,8 @@
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
         "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
         "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
-        "businessRuleInvalidHighlightColor": "opaqueSelection"
+        "businessRuleInvalidHighlightColor": "opaqueSelection",
+        "errorTextColor": "red_l2"
     },
 
     "QApplication": {

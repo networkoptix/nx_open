@@ -6,7 +6,7 @@ Config.helpLinks.push({
 
 Config.helpLinks.push({
     url: "http://networkoptix.com/calculator/#/",
-    title: "Hardware calculator",
+    title: "System calculator",
     target: "new" // new|frame
 });
 
@@ -30,7 +30,6 @@ Config.helpLinks.push({
         }
     ],
     title: "Mobile Apps",
-    description:"View live and recorded video from your VMS system on your iOs or Android mobile device",
     target: "new" // new|frame
 });
 

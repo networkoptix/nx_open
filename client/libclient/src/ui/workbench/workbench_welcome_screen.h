@@ -23,11 +23,11 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
 
     Q_PROPERTY(bool isVisible READ isVisible WRITE setVisible NOTIFY visibleChanged)
 
-    Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged);
+    Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged)
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
-    Q_PROPERTY(bool isOfflineConnection READ isOfflineConnection NOTIFY isOfflineConnectionChanged)
+    Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
 
-    Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
+    Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged)
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
@@ -51,7 +51,7 @@ public: // Properties
 
     bool isLoggedInToCloud() const;
 
-    bool isOfflineConnection() const;
+    bool isCloudEnabled() const;
 
     QSize pageSize() const;
 
@@ -121,7 +121,7 @@ signals:
 
     void isLoggedInToCloudChanged();
 
-    void isOfflineConnectionChanged();
+    void isCloudEnabledChanged();
 
     void pageSizeChanged();
 

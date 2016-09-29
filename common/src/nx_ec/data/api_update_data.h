@@ -1,26 +1,27 @@
-#ifndef EC2_UPDATE_DATA_H
-#define EC2_UPDATE_DATA_H
+#pragma once
 
 #include "api_data.h"
 
 namespace ec2 {
 
-struct ApiUpdateUploadData : public ApiData {
+struct ApiUpdateUploadData: ApiData
+{
     QString updateId;
     QByteArray data;
     qint64 offset;
 };
 #define ApiUpdateUploadData_Fields (updateId)(data)(offset)
 
-struct ApiUpdateUploadResponceData : public ApiIdData {
+struct ApiUpdateUploadResponceData: ApiIdData
+{
 public:
     QString updateId;
     int chunks;
 };
 #define ApiUpdateUploadResponceData_Fields ApiIdData_Fields (updateId)(chunks)
 
-struct ApiUpdateInstallData: public ApiData {
-
+struct ApiUpdateInstallData: ApiData
+{
     ApiUpdateInstallData() {}
     ApiUpdateInstallData(const QString &updateId): updateId(updateId) {}
 
@@ -28,6 +29,4 @@ struct ApiUpdateInstallData: public ApiData {
 };
 #define ApiUpdateInstallData_Fields (updateId)
 
-}
-
-#endif // EC2_UPDATE_DATA_H
+} // namespace ec2

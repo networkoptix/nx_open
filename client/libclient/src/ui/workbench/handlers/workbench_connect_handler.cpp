@@ -101,9 +101,11 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
         });
 
     QnLocalConnectionData targetConnection(QString(), systemName, systemId, url, storePassword);
-
     if (itFoundConnection != recentConnections.end())
     {
+        targetConnection.weight = itFoundConnection->weight;
+        targetConnection.lastConnectedUtcMs = itFoundConnection->lastConnectedUtcMs;
+
         if (forceRemoveOldConnection)
         {
             if (!itFoundConnection->name.isEmpty())
@@ -126,6 +128,10 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
         }
         recentConnections.erase(itFoundConnection);
     }
+
+    targetConnection.weight = targetConnection.calcWeight() + 1;
+    targetConnection.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
+
     recentConnections.prepend(targetConnection);
 
     qnSettings->setLastUsedConnection(targetConnection);

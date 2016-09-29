@@ -25,13 +25,19 @@ struct QnLocalConnectionData
     QUrl url;
     bool isStoredPassword;
 
-    static void writeToSettings(QSettings* settings
-        , QnLocalConnectionData data);
+    qreal weight;
+    qint64 lastConnectedUtcMs;
 
     static QnLocalConnectionData fromSettings(QSettings* settings);
+
+    void writeToSettings(QSettings* settings) const;
+
+    qreal calcWeight() const;
 };
 
-#define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)
+#define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)\
+    (weight)(lastConnectedUtcMs)
+
 QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq))
 
 
@@ -54,6 +60,9 @@ public:
     QString generateUniqueName(const QString &base) const;
 
     bool remove(const QString &name);
+
+    typedef QHash<QString, qreal> WeightHash;
+    WeightHash getWeights() const;
 };
 
 Q_DECLARE_METATYPE(QnLocalConnectionDataList)

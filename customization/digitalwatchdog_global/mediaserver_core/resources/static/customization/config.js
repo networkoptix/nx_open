@@ -2,15 +2,15 @@ Config.helpLinks.push({
     url: "http://digital-watchdog.com/support/contact-tech-support/",
     title: "Support",
     description:"Have a question about specific features of your VMS system?",
-    button:"get support",
+    button:"Get support",
     target: "new" // new|frame
 });
 
 Config.helpLinks.push({
     url: "http://digital-watchdog.com/support/tools/ip-configurator/",
-    title: "Hardware calculator",
-    description:"Building a new VMS system or expanding your current system? Use the Hardware Calculator to calculate suggested storage and network requirements.",
-    button:"calculate",
+    title: "System calculator",
+    description:"Building a new VMS system or expanding your current system? Use the System Calculator to calculate suggested storage and network requirements.",
+    button: "Go to the calculator",
     target: "new" // new|frame
 });
 
@@ -28,7 +28,6 @@ Config.helpLinks.push({
         }
     ],
     title: "Mobile Apps",
-    description:"View live and recorded video from your VMS system on your iOs or Android mobile device",
     target: "new" // new|frame
 });
 

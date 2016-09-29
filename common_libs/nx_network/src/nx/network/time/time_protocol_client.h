@@ -15,6 +15,9 @@
 #include <nx/network/abstract_socket.h>
 
 
+constexpr const unsigned int SECONDS_FROM_1900_01_01_TO_1970_01_01 = 2208988800UL;
+constexpr const unsigned short kTimeProtocolDefaultPort = 37;     //time protocol
+
 //!Fetches time using Time (rfc868) protocol
 /*!
     Result time is accurate to second boundary only

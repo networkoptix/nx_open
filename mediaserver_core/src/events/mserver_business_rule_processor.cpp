@@ -501,7 +501,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.startTimeMs = startTimeMs - recordBeforeMs;
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
-    bookmark.cameraId = camera->getUniqueId();
+    bookmark.cameraId = camera->getId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();

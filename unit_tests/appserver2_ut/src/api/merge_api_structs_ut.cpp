@@ -17,7 +17,7 @@ static const struct
 {
     const bool enableHangOnFinish = false;
     const bool forceLog = false;
-    const bool logRequestJson = true;
+    const bool logRequestJson = false;
 } conf;
 #include <nx/utils/test_support/test_utils.h>
 
@@ -67,7 +67,7 @@ struct ApiMockData: ApiIdData
     ApiMockInnerData inner;
     ApiMockInnerDataList array;
 };
-#define ApiMockData_Fields (id)(i)(array)(inner)
+#define ApiMockData_Fields ApiIdData_Fields (i)(array)(inner)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiMockData), (ubjson)(json), _Fields)
 typedef std::vector<ApiMockData> ApiMockDataList;
 
@@ -206,7 +206,11 @@ public:
 
         ASSERT_EQ("application/json", contentType);
         ASSERT_EQ(nx_http::StatusCode::ok, httpStatusCode);
-        ASSERT_TRUE(resultBody.isEmpty()) << resultBody.toStdString();
+
+        bool success = false;
+        ApiIdData apiIdData = QJson::deserialized(resultBody, ApiIdData(), &success);
+        ASSERT_TRUE(success) << resultBody.toStdString();
+        ASSERT_EQ(expectedData.id, apiIdData.id);
 
         if (m_requestJson.id && m_requestJson.isIncomplete)
             ASSERT_TRUE(m_wasHandleQueryCalled);

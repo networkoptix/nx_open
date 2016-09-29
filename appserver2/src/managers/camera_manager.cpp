@@ -76,8 +76,8 @@ namespace ec2
         {
             handler->done(reqID, errorCode, cameras);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiCameraDataList, decltype(queryDoneHandler)>
-            (ApiCommand::getCameras, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiCameraDataList, decltype(queryDoneHandler)>
+            (ApiCommand::getCameras, QnUuid(), queryDoneHandler);
         return reqID;
     }
 

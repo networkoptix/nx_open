@@ -992,7 +992,8 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         }
     }
     using namespace std::placeholders;
-    NX_LOG( lit("Sending data buffer (%1 bytes) to the peer %2").
+    NX_LOG( QnLog::EC2_TRAN_LOG,
+        lit("Sending data buffer (%1 bytes) to the peer %2").
         arg(dataCtx.encodedSourceData.size()).arg(m_remotePeer.id.toString()), cl_logDEBUG2 );
 
     if( m_outgoingDataSocket )

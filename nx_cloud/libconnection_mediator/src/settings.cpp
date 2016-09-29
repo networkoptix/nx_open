@@ -28,16 +28,6 @@ namespace
     const QLatin1String kDataDir("general/dataDir");
     const QLatin1String kDefaultDataDir("");
 
-    //log settings
-    const QLatin1String kLogLevel("log/logLevel");
-#ifdef _DEBUG
-    const QLatin1String kDefaultLogLevel("DEBUG");
-#else
-    const QLatin1String kDefaultLogLevel("INFO");
-#endif
-    const QLatin1String kLogDir("log/logDir");
-    const QLatin1String kDefaultLogDir("");
-
     //CloudDB settings
     const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
     const QLatin1String kDefaultRunWithCloud("true");
@@ -99,17 +89,8 @@ namespace conf {
 
 Settings::Settings()
 :
-#ifdef _WIN32
-    m_settings(
-        QSettings::SystemScope,
-        QnAppInfo::organizationName(),
-        QnLibConnectionMediatorAppInfo::applicationName()),
-#else
-    m_settings( lit("/opt/%1/%2/etc/%2.conf" )
-                .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName ),
-                QSettings::IniFormat ),
-#endif
-    m_showHelp( false )
+    m_settings(QnLibConnectionMediatorAppInfo::applicationName(), kModuleName),
+    m_showHelp(false)
 {
     fillSupportedCmdParameters();
 }
@@ -144,7 +125,7 @@ const api::ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const Logging& Settings::logging() const
+const QnLogSettings& Settings::logging() const
 {
     return m_logging;
 }
@@ -180,8 +161,7 @@ void Settings::loadConfiguration()
         kDefaultDataDir).toString();
 
     //log
-    m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
-    m_logging.logDir = m_settings.value(kLogDir, kDefaultLogDir).toString();
+    m_logging.load(m_settings);
 
     m_cloudDB.runWithCloud = m_settings.value(kRunWithCloud, kDefaultRunWithCloud).toBool();
     m_cloudDB.endpoint = m_settings.value(kCdbEndpoint, kDefaultCdbEndpoint).toString();
@@ -251,9 +231,6 @@ void Settings::loadConfiguration()
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
     }
-
-    if (m_logging.logDir.isEmpty())
-        m_logging.logDir = m_general.dataDir + lit("/log/");
 }
 
 void Settings::readEndpointList(

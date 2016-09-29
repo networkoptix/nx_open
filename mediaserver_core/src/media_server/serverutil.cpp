@@ -31,7 +31,6 @@
 #include <nx/fusion/model_functions.h>
 #include "server_connector.h"
 #include <transaction/transaction_message_bus.h>
-#include "cloud/cloud_system_name_updater.h"
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
@@ -282,8 +281,6 @@ bool changeSystemName(const ConfigureSystemData& data)
             NX_LOG("Failed to add foreign server while configuring system", cl_logWARNING);
         }
     }
-
-    CloudSystemNameUpdater::instance()->update();
 
     return true;
 }

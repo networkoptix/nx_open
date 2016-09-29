@@ -1,3 +1,5 @@
+UT_USE_VAGRANT = True
+
 BOX_NAMES = {
     "Box1": "box1j",
     "Box2": "box2j",

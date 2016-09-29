@@ -1010,6 +1010,7 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
 {
     ArchiveCameraData newCamera;
     newCamera.coreData.physicalId = fileInfo.fileName();
+    // ATTENTION: This logic is similar to ApiCameraData::fillId().
     auto cameraGuid = guidFromArbitraryData(newCamera.coreData.physicalId.toUtf8());
     newCamera.coreData.id = cameraGuid;
     newCamera.coreData.parentId = qnCommon->moduleGUID();

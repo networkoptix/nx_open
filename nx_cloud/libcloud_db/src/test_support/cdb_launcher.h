@@ -132,7 +132,7 @@ public:
         const std::string& password,
         const std::string& systemID,
         std::set<api::SystemAccessRole>* const accessRoles);
-    api::ResultCode updateSystemName(
+    api::ResultCode renameSystem(
         const std::string& login,
         const std::string& password,
         const std::string& systemID,
@@ -169,6 +169,10 @@ public:
         const std::string& accountPassword,
         const std::string& systemId,
         api::SystemDataEx* const systemData);
+
+    api::ResultCode recordUserSessionStart(
+        const AccountWithPassword& account,
+        const std::string& systemId);
 
     api::ResultCode getVmsConnections(
         api::VmsConnectionDataList* const vmsConnections);
