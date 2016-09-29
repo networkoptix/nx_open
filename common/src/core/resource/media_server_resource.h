@@ -97,7 +97,6 @@ public:
     QnSystemInformation getSystemInfo() const;
     void setSystemInfo(const QnSystemInformation &systemInfo);
     virtual QnModuleInformation getModuleInformation() const;
-    void setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation);
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
