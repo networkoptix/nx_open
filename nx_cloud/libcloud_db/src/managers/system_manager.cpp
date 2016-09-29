@@ -324,7 +324,7 @@ void SystemManager::getSystems(
             {
                 systemDataEx.accessRole = sharingData->accessRole;
                 // Calculating system weight.
-                systemDataEx.sortingOrder = calculateSystemAccessWeight(
+                systemDataEx.usageFrequency = calculateSystemAccessWeight(
                     sharingData->lastLoginTime,
                     sharingData->systemAccessWeight + 1);
             }

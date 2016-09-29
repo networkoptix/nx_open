@@ -228,13 +228,13 @@ public:
      * This number shows how often user, performing request, 
      * uses this system in comparision to other systems.
      */
-    float sortingOrder;
+    float usageFrequency;
 
     SystemDataEx()
     :
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
-        sortingOrder(0)
+        usageFrequency(0)
     {
     }
 
@@ -243,7 +243,7 @@ public:
         SystemData(std::move(systemData)),
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
-        sortingOrder(0)
+        usageFrequency(0)
     {
     }
 };

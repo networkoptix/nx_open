@@ -500,8 +500,8 @@ static void validateSystemsOrder(
     {
         ASSERT_EQ(systemId, systems[i].id);
         if (prevSortingOrder)
-            ASSERT_GT(prevSortingOrder, systems[i].sortingOrder);
-        prevSortingOrder = systems[i].sortingOrder;
+            ASSERT_GT(prevSortingOrder, systems[i].usageFrequency);
+        prevSortingOrder = systems[i].usageFrequency;
         ++i;
     }
 }
@@ -534,7 +534,7 @@ TEST_F(System, sortingOrderWeightExpiration)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
-    const auto weight1 = systems[0].sortingOrder;
+    const auto usageFrequency1 = systems[0].usageFrequency;
 
     // Second access.
     ASSERT_EQ(
@@ -545,9 +545,9 @@ TEST_F(System, sortingOrderWeightExpiration)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
-    const auto weight2 = systems[0].sortingOrder;
+    const auto usageFrequency2 = systems[0].usageFrequency;
 
-    ASSERT_GT(weight2, weight1);
+    ASSERT_GT(usageFrequency2, usageFrequency1);
 
     // A week has passed. No access.
     timeShift.applyRelativeShift(7 * std::chrono::hours(24));
@@ -556,8 +556,8 @@ TEST_F(System, sortingOrderWeightExpiration)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
-    const auto weight3 = systems[0].sortingOrder;
-    ASSERT_LT(weight3, weight2);
+    const auto usageFrequency3 = systems[0].usageFrequency;
+    ASSERT_LT(usageFrequency3, usageFrequency2);
 
     // Half year passed. Still no access.
     timeShift.applyRelativeShift(6 * 30 * std::chrono::hours(24));
@@ -566,8 +566,8 @@ TEST_F(System, sortingOrderWeightExpiration)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
-    const auto weight4 = systems[0].sortingOrder;
-    ASSERT_LT(weight4, weight3);
+    const auto usageFrequency4 = systems[0].usageFrequency;
+    ASSERT_LT(usageFrequency4, usageFrequency3);
 }
 
 TEST_F(System, sortingOrderMultipleSystems)
@@ -616,7 +616,7 @@ TEST_F(System, sortingOrderMultipleSystems)
             systems.begin(), systems.end(),
             [](const api::SystemDataEx& one, const api::SystemDataEx& two)
             {
-                return one.sortingOrder > two.sortingOrder; //< Descending sort.
+                return one.usageFrequency > two.usageFrequency; //< Descending sort.
             });
 
         // TODO: #ak: comparing with systemIdsInSortOrder
