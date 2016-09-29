@@ -92,13 +92,9 @@ public:
     bool isUpnpPortMappingEnabled() const;
     void setUpnpPortMappingEnabled(bool value);
 
-    /** System id for the statistics server */
-    QnUuid systemId() const;
-    void setSystemId(const QnUuid &value);
-
-    /** System name, bound to the current system id */
-    QString systemNameForId() const;
-    void setSystemNameForId(const QString &value);
+    static const QString kNameLocalSystemID;
+    QnUuid localSystemID() const;
+    void setLocalSystemID(const QnUuid &value);
 
     QString clientStatisticsSettingsUrl() const;
 
@@ -173,6 +169,7 @@ signals:
     void initialized();
 
     void systemNameChanged();
+    void localSystemIdChanged();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
@@ -217,8 +214,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor;
     QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
-    QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;
+    QnResourcePropertyAdaptor<QnUuid> *m_localSystemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;
     QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor;
 

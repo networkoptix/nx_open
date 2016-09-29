@@ -86,44 +86,32 @@ int QnSetupLocalSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    ConfigureSystemData configSystemData;
-    configSystemData.systemName = data.systemName;
-    configSystemData.wholeSystem = false;
-
-    const auto systemNameBak = qnCommon->localSystemName();
-    if (!changeSystemName(configSystemData))
+    if (data.systemName.isEmpty())
     {
-        result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
+        result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
+
+    const auto systemNameBak = qnGlobalSettings->systemName();
 
     qnGlobalSettings->resetCloudParams();
     qnGlobalSettings->setNewSystem(false);
+    qnGlobalSettings->setSystemName(data.systemName);
 
-    configSystemData.systemName = systemNameBak;
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         //changing system name back
-        changeSystemName(configSystemData);
+        qnGlobalSettings->setSystemName(systemNameBak);
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
-        return nx_http::StatusCode::ok;
-    }
-    qnCommon->updateModuleInformation();
-
-    if (data.systemName.isEmpty())
-    {
-        //changing system name back
-        changeSystemName(configSystemData);
-        result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
 
     if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
         //changing system name back
-        changeSystemName(configSystemData);
+        qnGlobalSettings->setSystemName(systemNameBak);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }

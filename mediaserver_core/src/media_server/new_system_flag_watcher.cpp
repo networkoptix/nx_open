@@ -59,9 +59,7 @@ void QnNewSystemServerFlagWatcher::update()
 
     auto newSystemMustBeCleaned = [this]
     {
-        nx::SystemName systemName;
-        systemName.loadFromConfig();
-        if (systemName.isDefault())
+        if (qnGlobalSettings->localSystemID().isNull())
             return false;
 
         if (!qnGlobalSettings->cloudSystemID().isEmpty())
@@ -95,7 +93,6 @@ void QnNewSystemServerFlagWatcher::update()
             qnGlobalSettings->setNewSystem(true);
     }
     qnGlobalSettings->synchronizeNow();
-    qnCommon->updateModuleInformation();
 
     Qn::ServerFlags serverFlags = m_server->getServerFlags();
 

@@ -406,8 +406,9 @@ void QnUpdateProcess::installIncompatiblePeers() {
     restUpdatePeerTask->start(m_incompatiblePeerIds);
 }
 
-void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id) {
-    QnPeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
+void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &id)
+{
+    QnPeerUpdateInformation info = m_updateInformationById.take(id);
     info.stage = QnPeerUpdateStage::Init;
     info.server = qnResPool->getResourceById<QnMediaServerResource>(id);
     m_updateInformationById.insert(id, info);

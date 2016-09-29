@@ -160,7 +160,6 @@ bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
         }
     }
 
-    qnCommon->updateModuleInformation();
     MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
 
     return true;
@@ -188,13 +187,6 @@ void CloudConnectionManager::cloudSettingsChanged()
     const bool boundToCloud = !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 
     lk.unlock();
-
-    QnModuleInformation info = qnCommon->moduleInformation();
-    if (info.cloudSystemId != cloudSystemId)
-    {
-        info.cloudSystemId = cloudSystemId;
-        qnCommon->setModuleInformation(info);
-    }
 
     if (boundToCloud)
     {

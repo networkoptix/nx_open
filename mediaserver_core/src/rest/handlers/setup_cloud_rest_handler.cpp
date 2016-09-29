@@ -95,31 +95,28 @@ int QnSetupCloudSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    const auto systemNameBak = qnCommon->localSystemName();
+    const auto systemNameBak = qnGlobalSettings->systemName();
 
-    ConfigureSystemData configSystemData;
-    configSystemData.systemName = newSystemName;
-    configSystemData.wholeSystem = false;
-
-    if (!changeSystemName(configSystemData))
+    qnGlobalSettings->setSystemName(data.systemName);
+    if (!qnGlobalSettings->synchronizeNowSync())
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot change system name"));
+        //changing system name back
+        qnGlobalSettings->setSystemName(systemNameBak);
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
-
 
     QnSaveCloudSystemCredentialsHandler subHandler(m_cloudConnectionManager);
     int httpResult = subHandler.execute(data, result, owner);
     if (result.error != QnJsonRestResult::NoError)
     {
         //changing system name back
-        configSystemData.systemName = systemNameBak;
-        changeSystemName(configSystemData);
+        qnGlobalSettings->setSystemName(systemNameBak);
         qnGlobalSettings->setNewSystem(true); //< revert
         return httpResult;
     }
-    if (qnGlobalSettings->synchronizeNowSync())
-        qnCommon->updateModuleInformation();
 
 
     QString errStr;

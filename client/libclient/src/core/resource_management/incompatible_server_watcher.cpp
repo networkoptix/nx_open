@@ -8,6 +8,7 @@
 
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
+#include <core/resource/fake_media_server.h>
 
 namespace
 {
@@ -258,15 +259,14 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
     else
     {
         // update the resource
-        QnMediaServerResourcePtr server =
-                qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        auto server =
+                qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnFakeMediaServerResource>();
 
         NX_ASSERT(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
 
         if (!server)
             return;
 
-        server->setStatus(serverData.status);
         server->setFakeServerModuleInformation(serverData);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
@@ -297,9 +297,8 @@ void QnIncompatibleServerWatcherPrivate::removeResource(const QnUuid &id)
 
     if (server)
     {
-        NX_LOG(lit("QnIncompatibleServerWatcher: Remove incompatible server %1 at %2")
-            .arg(serverId.toString())
-            .arg(server->getSystemName()),
+        NX_LOG(lit("QnIncompatibleServerWatcher: Remove incompatible server %1")
+            .arg(serverId.toString()),
             cl_logDEBUG1);
 
         qnResPool->removeResource(server);
@@ -315,11 +314,7 @@ QnUuid QnIncompatibleServerWatcherPrivate::getFakeId(const QnUuid &realId) const
 QnMediaServerResourcePtr QnIncompatibleServerWatcherPrivate::makeResource(
         const ec2::ApiDiscoveredServerData &serverData)
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
-
-    server->setId(QnUuid::createUuid());
-    server->setStatus(serverData.status, true);
-    server->setOriginalGuid(serverData.id);
+    QnMediaServerResourcePtr server(new QnFakeMediaServerResource());
     server->setFakeServerModuleInformation(serverData);
     return server;
 }

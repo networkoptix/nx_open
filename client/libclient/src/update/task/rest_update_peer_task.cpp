@@ -7,6 +7,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <api/model/upload_update_reply.h>
 #include <nx/utils/log/log.h>
+#include <core/resource/fake_media_server.h>
 
 namespace {
     const int checkTimeout = 5 * 60 * 1000;
@@ -49,7 +50,7 @@ void QnRestUpdatePeerTask::doStart()
     {
         const auto server =
             qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(QnMediaServerResource::isFakeServer(server),
+        NX_ASSERT(server.dynamicCast<QnFakeMediaServerResource>(),
             Q_FUNC_INFO, "An incompatible server resource is expected here.");
 
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
@@ -59,13 +60,12 @@ void QnRestUpdatePeerTask::doStart()
             m_updateId, true, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
 
-        const auto originalId = server->getOriginalGuid();
-        m_serverByRealId.insert(originalId, server);
+        m_serverByRealId.insert(server->getId(), server);
 
         connect(server.data(), &QnMediaServerResource::versionChanged,
             this, &QnRestUpdatePeerTask::at_resourceChanged);
 
-        const auto originalServer = qnResPool->getResourceById<QnMediaServerResource>(originalId);
+        const auto originalServer = qnResPool->getResourceById<QnMediaServerResource>(server->getId());
         if (originalServer)
         {
             connect(originalServer.data(), &QnMediaServerResource::versionChanged,
@@ -86,7 +86,7 @@ void QnRestUpdatePeerTask::doStart()
             if (!server)
                 return;
 
-            if (!m_serverByRealId.contains(server->getOriginalGuid()))
+            if (!m_serverByRealId.contains(server->getId()))
                 return;
 
             connect(server.data(), &QnMediaServerResource::versionChanged,
@@ -122,7 +122,7 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
            .arg(server->getName()).arg(server->getApiUrl().toString()), cl_logDEBUG1);
 
     emit peerFinished(server->getId());
-    emit peerUpdateFinished(server->getId(), server->getOriginalGuid());
+    emit peerUpdateFinished(server->getId());
 
     if (m_serverByRealId.isEmpty()) {
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Installation finished."), cl_logDEBUG1);
@@ -161,17 +161,14 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr& resource)
     if (!server)
         return;
 
-    auto id = server->getOriginalGuid();
-    if (id.isNull())
-        id = server->getId();
 
-    if (!m_serverByRealId.contains(id))
+    if (!m_serverByRealId.contains(server->getId()))
         return;
 
     if (server->getVersion() != m_version)
         return;
 
-    finishPeer(id);
+    finishPeer(server->getId());
 }
 
 void QnRestUpdatePeerTask::at_timer_timeout()

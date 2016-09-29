@@ -32,14 +32,15 @@
 #include <common/common_module.h>
 
 namespace {
-    const QString protoVersionPropertyName = lit("protoVersion");
-    const QString safeModePropertyName = lit("ecDbReadOnly");
+    //const QString protoVersionPropertyName = lit("protoVersion");
+    //const QString safeModePropertyName = lit("ecDbReadOnly");
     const QString kUrlScheme = lit("rtsp");
 
-    QString apiUrlScheme(bool sslAllowed)
-    {
-        return sslAllowed ? lit("https") : lit("http");
-    }
+}
+
+QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
+{
+    return sslAllowed ? lit("https") : lit("http");
 }
 
 QnMediaServerResource::QnMediaServerResource():
@@ -401,7 +402,6 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
         m_systemInfo = localOther->m_systemInfo;
-        m_systemName = localOther->m_systemName;
         m_authKey = localOther->m_authKey;
 
     }
@@ -489,82 +489,9 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 
     m_systemInfo = systemInfo;
 }
-
-QString QnMediaServerResource::getSystemName() const {
-    QnMutexLocker lock( &m_mutex );
-
-    return m_systemName;
-}
-
-void QnMediaServerResource::setSystemName(const QString &systemName) {
-    {
-        QnMutexLocker lock( &m_mutex );
-
-        if (m_systemName == systemName)
-            return;
-
-        m_systemName = systemName;
-    }
-    emit systemNameChanged(toSharedPointer(this));
-}
-
-QnModuleInformation QnMediaServerResource::getModuleInformation() const {
-    QnModuleInformation moduleInformation;
-    moduleInformation.type = QnModuleInformation::nxMediaServerId();
-    moduleInformation.brand = QnAppInfo::productName();
-    moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
-    moduleInformation.name = getName();
-    if (moduleInformation.protoVersion == 0)
-        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-
-    if (hasProperty(safeModePropertyName))
-    {
-        moduleInformation.ecDbReadOnly = QnLexical::deserialized(
-            getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
-    }
-
-    QnMutexLocker lock( &m_mutex );
-
-    moduleInformation.version = m_version;
-    moduleInformation.systemInformation = m_systemInfo;
-    moduleInformation.systemName = m_systemName;
-    moduleInformation.sslAllowed = m_sslAllowed;
-    moduleInformation.port = getPort();
-    moduleInformation.id = getId();
-    moduleInformation.serverFlags = getServerFlags();
-
-    if (const auto credentials = nx::network::SocketGlobals::mediatorConnector().getSystemCredentials())
-        moduleInformation.cloudSystemId = QString::fromUtf8(credentials->systemId);
-    return moduleInformation;
-}
-
-void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
-    NX_ASSERT(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
-
-    QList<SocketAddress> addressList;
-    for (const QString &address: moduleInformation.remoteAddresses)
-        addressList.append(SocketAddress(address));
-    setNetAddrList(addressList);
-
-    if (!addressList.isEmpty()) {
-        const SocketAddress address(addressList.first().toString(), moduleInformation.port);
-        const auto url = address.toUrl(apiUrlScheme(moduleInformation.sslAllowed)).toString();
-        setUrl(url);
-    }
-    if (!moduleInformation.name.isEmpty())
-        setName(moduleInformation.name);
-    setVersion(moduleInformation.version);
-    setSystemInfo(moduleInformation.systemInformation);
-    setSystemName(moduleInformation.systemName);
-    setSslAllowed(moduleInformation.sslAllowed);
-    setProperty(protoVersionPropertyName, QString::number(moduleInformation.protoVersion));
-    setProperty(safeModePropertyName, QnLexical::serialized(moduleInformation.ecDbReadOnly));
-
-    if (moduleInformation.ecDbReadOnly)
-        addFlags(Qn::read_only);
-    else
-        removeFlags(Qn::read_only);
+QnModuleInformation QnMediaServerResource::getModuleInformation() const
+{
+    return qnCommon->moduleInformation();
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
@@ -579,27 +506,6 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     return false;
 }
 
-QnUuid QnMediaServerResource::getOriginalGuid() const {
-    QnMutexLocker lock(&m_mutex);
-    return m_originalGuid;
-}
-
-void QnMediaServerResource::setOriginalGuid(const QnUuid &guid)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_originalGuid = guid;
-    NX_ASSERT(m_originalGuid.isNull() ||
-        getStatus() == Qn::Incompatible || getStatus() == Qn::Unauthorized || getStatus() == Qn::NotDefined,
-        Q_FUNC_INFO,
-        "Incompatible servers should not take any status but incompatible or unauthorized");
-}
-
-bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return !server->getOriginalGuid().isNull();
-    return false;
-}
-
 void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     if (getStatus() != newStatus)
@@ -607,9 +513,6 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         {
             QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
-            NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
-                       Q_FUNC_INFO,
-                       "Incompatible servers should not take any status but incompatible or unauthorized");
         }
 
         QnResource::setStatus(newStatus, silenceMode);

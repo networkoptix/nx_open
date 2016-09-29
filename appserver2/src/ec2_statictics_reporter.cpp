@@ -98,14 +98,14 @@ namespace ec2
 
         #undef dbManager_queryOrReturn
 
-        outData->systemId = getOrCreateSystemId();
+        outData->systemId = qnGlobalSettings->localSystemID();
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = getOrCreateSystemId();
+        outData->systemId = qnGlobalSettings->localSystemID();
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
     }
@@ -269,27 +269,6 @@ namespace ec2
             *reportApi = url.toString();
 
         return ErrorCode::ok;
-    }
-
-    QnUuid Ec2StaticticsReporter::getOrCreateSystemId()
-    {
-        const auto systemName = qnCommon->localSystemName();
-        const auto systemNameForId = qnGlobalSettings->systemNameForId();
-        const auto systemId = qnGlobalSettings->systemId();
-        qDebug() << "system id" << systemId.toString();
-
-        if (systemNameForId == systemName // system name was not changed
-            && !systemId.isNull())       // and systemId is already generated
-        {
-            return QnUuid(systemId);
-        }
-
-        const auto newId = QnUuid::createUuid();
-        qnGlobalSettings->setSystemId(newId);
-        qnGlobalSettings->setSystemNameForId(systemName);
-        qnGlobalSettings->synchronizeNow();
-
-        return newId;
     }
 
     void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)

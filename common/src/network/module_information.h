@@ -28,6 +28,7 @@ struct QnModuleInformation
     QString cloudSystemId;
     QString cloudPortalUrl;
     QString cloudHost;
+    QnUuid localSystemId;
 
     QnModuleInformation();
 
@@ -66,7 +67,7 @@ struct QnModuleInformationWithAddresses : QnModuleInformation
 
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation) \
     (systemName)(name)(port)(id)(sslAllowed)(protoVersion)(runtimeId) \
-    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)(cloudHost)(brand)
+    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)(cloudHost)(brand)(localSystemId)
 
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 

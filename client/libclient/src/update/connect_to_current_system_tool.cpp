@@ -115,7 +115,7 @@ void QnConnectToCurrentSystemTool::waitPeers()
     emit progressChanged(configureProgress);
 
     connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_waitTask_finished);
-    task->start(QSet<QnUuid>::fromList(m_waitTargets.values()));
+    task->start(m_waitTargets);
 }
 
 void QnConnectToCurrentSystemTool::updatePeers()
@@ -163,9 +163,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         }
         else
         {
-            QnUuid originalId = server->getOriginalGuid();
-            if (!originalId.isNull())
-                m_waitTargets.insert(server->getId(), originalId);
+            m_waitTargets.insert(server->getId());
         }
     }
 

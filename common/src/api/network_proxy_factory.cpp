@@ -102,10 +102,9 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         server = resource.dynamicCast<QnMediaServerResource>();
     }
 
-    if (server) {
-        QnUuid id = server->getOriginalGuid();
-		if (id.isNull())
-			id = server->getId();
+    if (server)
+    {
+        QnUuid id = server->getId();
         QnRoute route = QnRouter::instance()->routeTo(id);
         if (!route.gatewayId.isNull() || camera) {
             NX_ASSERT(!route.addr.isNull() || route.reverseConnect);

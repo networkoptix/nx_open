@@ -27,6 +27,7 @@
 #include <media_server/serverutil.h>
 
 #include <rest/helpers/permissions_helper.h>
+#include <api/global_settings.h>
 
 
 namespace
@@ -80,9 +81,9 @@ int QnConfigureRestHandler::execute(
         return CODE_OK;
     }
 
-    /* set system name */
-    QString oldSystemName = qnCommon->localSystemName();
-    if (!data.systemName.isEmpty() && data.systemName != qnCommon->localSystemName())
+    /* set system id */
+    const auto oldSystemId = qnGlobalSettings->localSystemID();
+    if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemID())
     {
         if (!backupDatabase())
         {
@@ -90,7 +91,7 @@ int QnConfigureRestHandler::execute(
             return CODE_OK;
         }
 
-        if (!changeSystemName(data))
+        if (!changeLocalSystemId(data))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;
@@ -99,19 +100,13 @@ int QnConfigureRestHandler::execute(
         {
             auto connection = QnAppServerConnectionFactory::getConnection2();
             auto manager = connection->getMiscManager(owner->accessRights());
-            manager->changeSystemName(
-                data.systemName,
+            manager->changeSystemId(
+                data.localSystemId,
                 data.sysIdTime,
                 data.tranLogTime,
                 ec2::DummyHandler::instance(),
                 &ec2::DummyHandler::onRequestDone);
         }
-
-        /* reset connections if systemName is changed */
-        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemNameChanged);
-        QString description = lit("%1 -> %2").arg(oldSystemName).arg(data.systemName);
-        auditRecord.addParam("description", description.toUtf8());
-        qnAuditManager->addAuditRecord(auditRecord);
     }
 
     /* set port */

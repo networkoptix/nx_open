@@ -84,7 +84,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (ImageObject, "image")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
-    (GetSystemNameObject, "getSystemName")
+    (GetSystemIdObject, "getSystemId")
     (RebuildArchiveObject, "rebuildArchive")
     (BackupControlObject, "backupControl")
     (BookmarkAddObject, "cameraBookmarks/add")
@@ -256,7 +256,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case CameraDiagnosticsObject:
             processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
             break;
-        case GetSystemNameObject:
+        case GetSystemIdObject:
             emitFinished(this, response.status, QString::fromUtf8(response.msgBody), handle);
             break;
         case RebuildArchiveObject:
@@ -341,15 +341,13 @@ QnMediaServerConnection::QnMediaServerConnection(
     {
         setUrl(mserver->getApiUrl());
 
-        QnUuid guid = mserver->getOriginalGuid();
-
         QnRequestParamList queryParameters;
         queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME),
             mserver->getId().toString());
         setExtraQueryParameters(std::move(queryParameters));
 
         extraHeaders.emplace(Qn::SERVER_GUID_HEADER_NAME,
-            guid.isNull() ? mserver->getId().toByteArray() : guid.toByteArray());
+            mserver->getId().toByteArray());
     }
 
     if (!videowallGuid.isNull())
@@ -827,9 +825,9 @@ int QnMediaServerConnection::mergeLdapUsersAsync(QObject* target, const char* sl
         QnRequestParamList(), nullptr, target, slot);
 }
 
-int QnMediaServerConnection::getSystemNameAsync(QObject* target, const char* slot)
+int QnMediaServerConnection::getSystemIdAsync(QObject* target, const char* slot)
 {
-    return sendAsyncGetRequestLogged(GetSystemNameObject,
+    return sendAsyncGetRequestLogged(GetSystemIdObject,
         QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
 }
 

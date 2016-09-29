@@ -27,7 +27,7 @@ public:
     void setVersion(const QnSoftwareVersion& version);
 
 signals:
-    void peerUpdateFinished(const QnUuid& incompatibleId, const QnUuid& id);
+    void peerUpdateFinished(const QnUuid& incompatibleId);
 
 protected:
     virtual void doCancel() override;

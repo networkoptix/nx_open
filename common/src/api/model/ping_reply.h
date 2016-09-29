@@ -19,12 +19,12 @@ public:
     QnPingReply(): sysIdTime(0) {}
 
     QnUuid moduleGuid;
-    QString systemName;
+    QnUuid localSystemId;
     qint64 sysIdTime;
     ec2::Timestamp tranLogTime;
 };
 
-#define QnPingReply_Fields (moduleGuid)(systemName)(sysIdTime)(tranLogTime)
+#define QnPingReply_Fields (moduleGuid)(localSystemId)(sysIdTime)(tranLogTime)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnPingReply, (json))
 

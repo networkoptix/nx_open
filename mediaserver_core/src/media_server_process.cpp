@@ -1602,7 +1602,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // deprecated
     QnRestProcessorPool::instance()->registerHandler("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getSystemId", new QnGetSystemIdRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), Qn::GlobalAdminPermission);
@@ -1953,7 +1953,9 @@ void MediaServerProcess::run()
         systemName.saveToConfig();
     }
 
-    qnCommon->setLocalSystemName(systemName.value());
+    qnGlobalSettings->setSystemName(systemName.value());
+    qnGlobalSettings->setLocalSystemID(guidFromArbitraryData(systemName.value()));
+
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
@@ -2159,7 +2161,6 @@ void MediaServerProcess::run()
             if (!noSetupWizardFlag)
                 isNewServerInstance = true;
         }
-        server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
         server->setServerFlags((Qn::ServerFlags) serverFlags);
 
@@ -2189,6 +2190,13 @@ void MediaServerProcess::run()
         for (const auto& host : m_localAddresses )
             serverAddresses << SocketAddress(host.toString(), port);
 
+        // used for statistics reported
+        if (server->getSystemInfo() != QnSystemInformation::currentSystemInformation())
+        {
+            server->setSystemInfo(QnSystemInformation::currentSystemInformation());
+            isModified = true;
+        }
+
         if (server->getNetAddrList() != serverAddresses) {
             server->setNetAddrList(serverAddresses);
             isModified = true;
@@ -2196,14 +2204,6 @@ void MediaServerProcess::run()
                    .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
         }
 
-        bool needUpdateAuthKey = false;
-        if (server->getSystemName() != qnCommon->localSystemName())
-        {
-            if (!server->getSystemName().isEmpty())
-                needUpdateAuthKey = true;
-            server->setSystemName(qnCommon->localSystemName());
-            isModified = true;
-        }
         if (server->getVersion() != qnCommon->engineVersion()) {
             server->setVersion(qnCommon->engineVersion());
             isModified = true;
@@ -2213,7 +2213,7 @@ void MediaServerProcess::run()
         QByteArray authKey = settingsAuthKey;
         if (authKey.isEmpty())
             authKey = server->getAuthKey().toLatin1();
-        if (authKey.isEmpty() || needUpdateAuthKey)
+        if (authKey.isEmpty())
             authKey = QnUuid::createUuid().toString().toLatin1();
 
         if (server->getAuthKey().toLatin1() != authKey) {
@@ -2298,7 +2298,12 @@ void MediaServerProcess::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation = m_mediaServer->getModuleInformation();
+    QnModuleInformation selfInformation;
+    selfInformation.id = qnCommon->moduleGUID();
+    selfInformation.type = QnModuleInformation::nxMediaServerId();
+    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+
     selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
     selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
@@ -2404,7 +2409,6 @@ void MediaServerProcess::run()
     updateAddressesList();
 
     qnGlobalSettings->takeFromSettings(MSSettings::roSettings(), m_mediaServer);
-    qnCommon->updateModuleInformation();
 
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {

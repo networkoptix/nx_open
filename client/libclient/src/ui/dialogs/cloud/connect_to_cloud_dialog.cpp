@@ -25,6 +25,7 @@
 #include <ui/widgets/common/input_field.h>
 
 #include <utils/common/app_info.h>
+#include <api/global_settings.h>
 
 using namespace nx::cdb;
 
@@ -240,8 +241,9 @@ void QnConnectToCloudDialogPrivate::bindSystem()
         q->ui->loginInputField->text().trimmed().toStdString(),
         q->ui->passwordInputField->text().trimmed().toStdString());
 
+    //todo: akolesnikov. probably we need update it
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
-    sysRegistrationData.name = qnCommon->localSystemName().toStdString();
+    sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
 
     cloudConnection->systemManager()->bindSystem(
                 sysRegistrationData,

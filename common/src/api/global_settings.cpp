@@ -62,8 +62,6 @@ namespace
     const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
     const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
     const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
-    const QString kNameSystemId(lit("systemId"));
-    const QString kNameSystemNameForId(lit("systemNameForId"));
     const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
     const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
 
@@ -96,6 +94,7 @@ namespace
 }
 
 const QString QnGlobalSettings::kNameCloudAccountName(lit("cloudAccountName"));
+const QString QnGlobalSettings::kNameLocalSystemID(lit("localSystemID"));
 const QString QnGlobalSettings::kNameCloudSystemID(lit("cloudSystemID"));
 const QString QnGlobalSettings::kNameCloudAuthKey(lit("cloudAuthKey"));
 const QString QnGlobalSettings::kNameSystemName(lit("systemName"));
@@ -201,8 +200,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
     m_statisticsReportLastNumberAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNameStatisticsReportLastNumber, 0, this);
     m_statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportTimeCycle, QString(), this);
     m_statisticsReportUpdateDelayAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportUpdateDelay, QString(), this);
-    m_systemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameSystemId, QnUuid(), this);
-    m_systemNameForIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemNameForId, QString(), this);
+    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameLocalSystemID, QnUuid(), this);
     m_statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportServerApi, QString(), this);
     m_clientStatisticsSettingsUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSettingsUrlParam, QString(), this);
 
@@ -216,8 +214,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
         << m_statisticsReportLastNumberAdaptor
         << m_statisticsReportTimeCycleAdaptor
         << m_statisticsReportUpdateDelayAdaptor
-        << m_systemIdAdaptor
-        << m_systemNameForIdAdaptor
+        << m_localSystemIdAdaptor
         << m_statisticsReportServerApiAdaptor
         << m_clientStatisticsSettingsUrlAdaptor
         ;
@@ -325,6 +322,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         this);
 
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
+    connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,    &QnGlobalSettings::localSystemIdChanged,               Qt::QueuedConnection);
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
@@ -662,24 +660,14 @@ void QnGlobalSettings::setUpnpPortMappingEnabled(bool value)
     m_upnpPortMappingEnabledAdaptor->setValue(value);
 }
 
-QnUuid QnGlobalSettings::systemId() const
+QnUuid QnGlobalSettings::localSystemID() const
 {
-    return m_systemIdAdaptor->value();
+    return m_localSystemIdAdaptor->value();
 }
 
-void QnGlobalSettings::setSystemId(const QnUuid &value)
+void QnGlobalSettings::setLocalSystemID(const QnUuid &value)
 {
-    m_systemIdAdaptor->setValue(value);
-}
-
-QString QnGlobalSettings::systemNameForId() const
-{
-    return m_systemNameForIdAdaptor->value();
-}
-
-void QnGlobalSettings::setSystemNameForId(const QString &value)
-{
-    m_systemNameForIdAdaptor->setValue(value);
+    m_localSystemIdAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::clientStatisticsSettingsUrl() const

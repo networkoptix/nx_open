@@ -73,10 +73,10 @@ namespace CameraDiagnostics
         return m_errorMessage;
     }
 
-    void DiagnoseTool::onGetServerSystemNameResponse( int status, QString serverSystemName, int /*handle*/ )
+    void DiagnoseTool::onGetServerSystemIdResponse( int status, QString serverSystemId, int /*handle*/ )
     {
         const ec2::AbstractECConnectionPtr& ecConnection = QnAppServerConnectionFactory::getConnection2();
-        if( (status != 0) || !ecConnection || (serverSystemName != ecConnection->connectionInfo().systemName) )
+        if( (status != 0) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().systemId) )
         {
             m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
 
@@ -175,9 +175,9 @@ namespace CameraDiagnostics
         emit diagnosticsStepStarted( m_step );
 
         if( !m_server || !m_server->apiConnection() ||
-            m_server->apiConnection()->getSystemNameAsync(
+            m_server->apiConnection()->getSystemIdAsync(
                 this,
-                SLOT(onGetServerSystemNameResponse(int, QString, int)) ) == -1 )
+                SLOT(onGetServerSystemIdResponse(int, QString, int)) ) == -1 )
         {
             m_errorMessage = tr("No connection to Server %1.").arg(m_serverHostAddress);
             m_result = false;

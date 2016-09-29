@@ -11,6 +11,7 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -84,7 +85,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 
 bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
 {
-    return info.systemName == qnCommon->localSystemName()
+    return info.localSystemId == qnGlobalSettings->localSystemID()
         && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 

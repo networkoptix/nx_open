@@ -56,11 +56,11 @@ namespace ec2
         Qn::ServerFlags flags;
         Qn::PanicMode   not_used;
         QString         version;
-        QString         systemInfo;
+        QString         systemInfo; //! < depracated field
         QString         authKey;
-        QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.
+        QString         unused2; //! < depracated field
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (networkAddresses)(flags)(not_used)(version)(systemInfo)(authKey)(systemName)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (networkAddresses)(flags)(not_used)(version)(systemInfo)(authKey)(unused2)
 
     QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (eq))
 

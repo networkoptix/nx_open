@@ -19,6 +19,8 @@
 #include <client/desktop_client_message_processor.h>
 
 #include <utils/common/app_info.h>
+#include <core/resource/fake_media_server.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -135,9 +137,13 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
             result.append(server);
     }
 
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>()) {
-        if (server->getSystemName() == qnCommon->localSystemName() && QnMediaServerResource::isFakeServer(server))
+    foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>())
+    {
+        if (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemID() &&
+            server.dynamicCast<QnFakeMediaServerResource>())
+        {
             result.append(server);
+        }
     }
     return result;
 }
@@ -272,12 +278,8 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
             if (!server)
                 continue;
 
-            const auto realId = server->getOriginalGuid();
-            if (realId.isNull())
-                continue;
-
-            incompatibleTargets.insert(realId);
-            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
+            incompatibleTargets.insert(server->getId());
+            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(server->getId(), true);
         }
     }
 

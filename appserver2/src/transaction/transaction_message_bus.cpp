@@ -796,7 +796,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             {
                 case ApiCommand::installUpdate:
                 case ApiCommand::uploadUpdate:
-                case ApiCommand::changeSystemName:
+                case ApiCommand::changeSystemId:
                 {	// Transactions listed here should not go to the DbManager.
                     // We are only interested in relevant notifications triggered.
                     // Also they are allowed only if sender is Admin.

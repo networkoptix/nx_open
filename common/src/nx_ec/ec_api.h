@@ -574,22 +574,22 @@ class ECConnectionNotificationManager;
         Q_OBJECT
     public:
     signals:
-        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime);
+        void systemIdChangeRequested(const QnUuid systemId, qint64 sysIdTime, Timestamp tranLogTime);
     };
 
     typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
 
     class AbstractMiscManager {
     public:
-        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime, TargetType *target, HandlerType handler) {
-            return changeSystemName(systemName, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, TargetType *target, HandlerType handler) {
+            return changeSystemId(systemId, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        ErrorCode changeSystemNameSync(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime) {
+        ErrorCode changeSystemIdSync(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime) {
             return impl::doSyncCall<impl::SimpleHandler>(
                 [=](const impl::SimpleHandlerPtr &handler) {
-                    return this->changeSystemName(systemName, sysIdTime, tranLogTime, handler);
+                    return this->changeSystemId(systemId, sysIdTime, tranLogTime, handler);
                 }
             );
         }
@@ -612,7 +612,7 @@ class ECConnectionNotificationManager;
 
 
     protected:
-        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
+        virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
         virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) = 0;
     };

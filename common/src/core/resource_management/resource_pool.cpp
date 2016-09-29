@@ -93,7 +93,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                        << "url=" << resource->getUrl();
             continue;
         }
-        bool fakeServer = QnMediaServerResource::isFakeServer(resource);
+        bool fakeServer = resource.dynamicCast<QnMediaServerResource>();
 
         if( insertOrUpdateResource(
                 resource,
