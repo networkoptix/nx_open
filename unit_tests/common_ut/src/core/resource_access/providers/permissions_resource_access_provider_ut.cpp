@@ -12,10 +12,24 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
+namespace {
+
+static const auto kSource = QnAbstractResourceAccessProvider::Source::direct;
+
+}
 
 class QnPermissionsResourceAccessProviderTest: public QnAccessProviderTestFixture
 {
 protected:
+    void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        bool value = true)
+    {
+        if (value)
+            awaitAccessValue(subject, resource, kSource);
+        else
+            awaitAccessValue(subject, resource, QnAbstractResourceAccessProvider::Source::none);
+    }
+
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
         return new QnPermissionsResourceAccessProvider();
@@ -42,8 +56,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkSource)
 {
     auto camera = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
-    ASSERT_EQ(accessProvider()->accessibleVia(user, camera),
-        QnAbstractResourceAccessProvider::Source::direct);
+    ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kSource);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessCamera)

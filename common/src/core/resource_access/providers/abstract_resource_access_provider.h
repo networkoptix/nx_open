@@ -16,10 +16,10 @@ public:
     enum class Source
     {
         none,
-        direct,
-        shared,
-        layout,
-        videowall
+        direct,     /* Accessible by permissions. */
+        shared,     /* Accessible by direct sharing. */
+        layout,     /* Accessible by placing on shared layout. */
+        videowall   /* Accessible by placing on videowall. */
     };
 
     QnAbstractResourceAccessProvider(QObject* parent = nullptr);

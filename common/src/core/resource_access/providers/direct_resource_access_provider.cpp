@@ -19,7 +19,7 @@ QnDirectResourceAccessProvider::~QnDirectResourceAccessProvider()
 
 QnAbstractResourceAccessProvider::Source QnDirectResourceAccessProvider::baseSource() const
 {
-    return Source::direct;
+    return Source::shared;
 }
 
 bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,

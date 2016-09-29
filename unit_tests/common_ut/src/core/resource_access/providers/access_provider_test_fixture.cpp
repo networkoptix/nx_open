@@ -15,10 +15,9 @@ void QnAccessProviderTestFixture::SetUp()
         &QnAbstractResourceAccessProvider::accessChanged,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
             QnAbstractResourceAccessProvider::Source value)
-    {
-        at_accessChanged(subject, resource,
-            value != QnAbstractResourceAccessProvider::Source::none);
-    });
+        {
+            at_accessChanged(subject, resource, value);
+        });
 }
 
 void QnAccessProviderTestFixture::TearDown()
@@ -39,16 +38,18 @@ ec2::ApiUserGroupData QnAccessProviderTestFixture::createRole(Qn::GlobalPermissi
         permissions);
 }
 
-void QnAccessProviderTestFixture::awaitAccess(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource, bool value)
+void QnAccessProviderTestFixture::awaitAccessValue(const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource, QnAbstractResourceAccessProvider::Source value)
 {
     m_awaitedAccessQueue.emplace_back(subject, resource, value);
 }
 
 void QnAccessProviderTestFixture::at_accessChanged(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource, bool value)
+    const QnResourcePtr& resource, QnAbstractResourceAccessProvider::Source value)
 {
-    ASSERT_EQ(value, accessProvider()->hasAccess(subject, resource));
+    ASSERT_EQ(value, accessProvider()->accessibleVia(subject, resource));
+    ASSERT_EQ(value != QnAbstractResourceAccessProvider::Source::none,
+        accessProvider()->hasAccess(subject, resource));
 
     if (m_awaitedAccessQueue.empty())
         return;
@@ -60,3 +61,4 @@ void QnAccessProviderTestFixture::at_accessChanged(const QnResourceAccessSubject
         ASSERT_EQ(value, awaited.value);
     }
 }
+

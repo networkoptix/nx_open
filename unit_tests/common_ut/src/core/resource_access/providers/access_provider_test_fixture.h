@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool_test_helper.h>
 
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/providers/abstract_resource_access_provider.h>
 
 class QnCommonModule;
 class QnAbstractResourceAccessProvider;
@@ -22,11 +23,11 @@ protected:
 
     ec2::ApiUserGroupData createRole(Qn::GlobalPermissions permissions) const;
 
-    void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        bool value = true);
+    void awaitAccessValue(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        QnAbstractResourceAccessProvider::Source value);
 
     void at_accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        bool value);
+        QnAbstractResourceAccessProvider::Source value);
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const = 0;
 
@@ -37,7 +38,7 @@ private:
     struct AwaitedAccess
     {
         AwaitedAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            bool value)
+            QnAbstractResourceAccessProvider::Source value)
             :
             subject(subject),
             resource(resource),
@@ -47,7 +48,7 @@ private:
 
         QnResourceAccessSubject subject;
         QnResourcePtr resource;
-        bool value;
+        QnAbstractResourceAccessProvider::Source value;
     };
     std::deque<AwaitedAccess> m_awaitedAccessQueue;
 };

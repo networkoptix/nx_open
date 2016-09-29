@@ -60,10 +60,46 @@ void QnResourceAccessProvider::handleBaseProviderAccessChanged(
 {
     auto source = qobject_cast<QnAbstractResourceAccessProvider*>(sender());
 
-    /* Check if access was granted */
+    QList<QnAbstractResourceAccessProvider*> moreImportant;
+    QList<QnAbstractResourceAccessProvider*> lessImportant;
+
+    auto current = &moreImportant;
+    for (auto provider : m_providers)
+    {
+        if (provider == source)
+        {
+            current = &lessImportant;
+            continue;
+        }
+        *current << provider;
+    }
+
+    /* If we already have access from more important provider just ignore signal. */
+    for (auto provider : moreImportant)
+    {
+        if (provider->accessibleVia(subject, resource) != Source::none)
+            return;
+    }
+
+    /* Check if access was granted. Just notify. */
     if (value != Source::none)
     {
-
+        emit accessChanged(subject, resource, value);
+        return;
     }
+
+    /* Access was removed. Check if we still have access through less important provider. */
+    for (auto provider : lessImportant)
+    {
+        auto result = provider->accessibleVia(subject, resource);
+        if (result != Source::none)
+        {
+            emit accessChanged(subject, resource, result);
+            return;
+        }
+    }
+
+    /* No access left at all. */
+    emit accessChanged(subject, resource, value);
 }
 

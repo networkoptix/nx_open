@@ -8,9 +8,24 @@
 
 #include <nx_ec/data/api_user_group_data.h>
 
+namespace {
+
+static const auto kSource = QnAbstractResourceAccessProvider::Source::shared;
+
+}
+
 class QnDirectResourceAccessProviderTest: public QnAccessProviderTestFixture
 {
 protected:
+    void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        bool value = true)
+    {
+        if (value)
+            awaitAccessValue(subject, resource, kSource);
+        else
+            awaitAccessValue(subject, resource, QnAbstractResourceAccessProvider::Source::none);
+    }
+
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
         return new QnDirectResourceAccessProvider();
@@ -45,8 +60,7 @@ TEST_F(QnDirectResourceAccessProviderTest, checkSource)
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
     qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
-    ASSERT_EQ(accessProvider()->accessibleVia(user, target),
-        QnAbstractResourceAccessProvider::Source::direct);
+    ASSERT_EQ(accessProvider()->accessibleVia(user, target), kSource);
 }
 
 TEST_F(QnDirectResourceAccessProviderTest, checkDirectAccessCamera)
@@ -105,7 +119,7 @@ TEST_F(QnDirectResourceAccessProviderTest, checkAccessAdded)
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
 
-    awaitAccess(user, target, true);
+    awaitAccess(user, target);
     qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
 }
 
