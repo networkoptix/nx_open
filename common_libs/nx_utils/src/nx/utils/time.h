@@ -11,6 +11,10 @@ NX_UTILS_API std::chrono::seconds timeSinceEpoch();
 
 namespace test {
 
+/** 
+ * Test-only class!
+ * Provides a way to shift result of \a utcTime() by some value.
+ */
 class ScopedTimeShift
 {
 public:
