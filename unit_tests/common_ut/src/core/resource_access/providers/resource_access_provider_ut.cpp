@@ -17,6 +17,13 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
+namespace {
+
+static const auto kPermissions = QnAbstractResourceAccessProvider::Source::permissions;
+static const auto kShared = QnAbstractResourceAccessProvider::Source::shared;
+static const auto kNone = QnAbstractResourceAccessProvider::Source::none;
+
+}
 
 class QnResourceAccessProviderTest: public QnAccessProviderTestFixture
 {
@@ -53,7 +60,7 @@ TEST_F(QnResourceAccessProviderTest, checkAccessThroughChild)
 {
     auto camera = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
-    ASSERT_TRUE(accessProvider()->hasAccess(user, camera));
+    ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
 }
 
 TEST_F(QnResourceAccessProviderTest, checkAccessThroughSecondChild)
@@ -61,7 +68,7 @@ TEST_F(QnResourceAccessProviderTest, checkAccessThroughSecondChild)
     auto camera = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
     qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
-    ASSERT_TRUE(accessProvider()->hasAccess(user, camera));
+    ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kShared);
 }
 
 TEST_F(QnResourceAccessProviderTest, checkAccessThroughBothChildren)
@@ -69,5 +76,41 @@ TEST_F(QnResourceAccessProviderTest, checkAccessThroughBothChildren)
     auto camera = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
     qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
-    ASSERT_TRUE(accessProvider()->hasAccess(user, camera));
+    ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
+}
+
+TEST_F(QnResourceAccessProviderTest, checkAccessAdding)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    awaitAccessValue(user, camera, kShared);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
+    awaitAccessValue(user, camera, kPermissions);
+    user->setRawPermissions(Qn::GlobalAdminPermission);
+}
+
+TEST_F(QnResourceAccessProviderTest, checkAccessRemoving)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::GlobalAdminPermission);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
+    ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
+    awaitAccessValue(user, camera, kShared);
+    user->setRawPermissions(Qn::NoGlobalPermissions);
+    awaitAccessValue(user, camera, kNone);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>());
+}
+
+TEST_F(QnResourceAccessProviderTest, checkDuplicatedSignals)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::GlobalAdminPermission);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
+    awaitAccessValue(user, camera, kNone);
+
+    /* Here we should not receive the signal. */
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>());
+
+    /* And here - should. */
+    user->setRawPermissions(Qn::NoGlobalPermissions);
 }
