@@ -1,7 +1,8 @@
 #include "user_groups_settings_model.h"
 
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/style/resource_icon_cache.h>
@@ -52,11 +53,9 @@ void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
 
     m_accessibleResources.clear();
     for (const auto& group : m_groups)
-        m_accessibleResources[group.id] = qnResourceAccessManager->accessibleResources(group);
+        m_accessibleResources[group.id] = qnSharedResourcesManager->sharedResources(group);
 
     m_replacements.clear();
-
-    m_accessibleLayoutsPreviews.clear();
 
     endResetModel();
 }
@@ -186,6 +185,11 @@ void QnUserGroupSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
     m_accessibleResources[m_currentGroupId] = value;
 }
 
+QnResourceAccessSubject QnUserGroupSettingsModel::subject() const
+{
+    return qnUserRolesManager->userRole(m_currentGroupId);
+}
+
 ec2::ApiUserGroupDataList::iterator QnUserGroupSettingsModel::currentGroup()
 {
     if (m_currentGroupId.isNull())
@@ -243,20 +247,4 @@ QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::replacement(
 QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::directReplacement(const QnUuid& source) const
 {
     return m_replacements[source];
-}
-
-void QnUserGroupSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& value)
-{
-    m_accessibleLayoutsPreviews[m_currentGroupId] = value;
-}
-
-QnIndirectAccessProviders QnUserGroupSettingsModel::accessibleLayouts() const
-{
-    auto role = qnResourceAccessManager->userGroup(m_currentGroupId);
-    auto layouts = QnResourceAccessProvider::indirectlyAccessibleLayouts(role);
-
-    for (auto layoutPreview : m_accessibleLayoutsPreviews[m_currentGroupId])
-        layouts.insert(layoutPreview, QSet<QnResourcePtr>());
-
-    return layouts;
 }

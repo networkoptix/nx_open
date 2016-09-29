@@ -18,13 +18,15 @@ class QnResourceListSortedModel;
 class QnAccessibleResourcesModel;
 
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
-class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef QnAbstractPreferencesWidget base_type;
 public:
-    QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent = 0);
+    QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel,
+        QnResourceAccessFilter::Filter filter, QWidget* parent = 0);
     virtual ~QnAccessibleResourcesWidget();
 
     virtual bool hasChanges() const override;
@@ -38,10 +40,8 @@ public:
     QSet<QnUuid> checkedResources() const;
 
     bool resourcePassFilter(const QnResourcePtr& resource) const;
-    static bool resourcePassFilter(const QnResourcePtr& resource, const QnUserResourcePtr& currentUser, QnResourceAccessFilter::Filter filter);
-
-public slots:
-    void indirectAccessChanged();
+    static bool resourcePassFilter(const QnResourcePtr& resource,
+        const QnUserResourcePtr& currentUser, QnResourceAccessFilter::Filter filter);
 
 private:
     void initControlsModel();

@@ -1,7 +1,8 @@
 #pragma once
 
 #include <QtCore/QSortFilterProxyModel>
-#include <core/resource_access/resource_access_provider.h>
+
+#include <core/resource_access/resource_access_subject.h>
 
 /*
 * Proxy model that works with QnResourceListModel (or its proxy) as a source
@@ -23,12 +24,11 @@ public:
     };
 
     explicit QnAccessibleResourcesModel(QObject* parent = nullptr);
-
     virtual ~QnAccessibleResourcesModel();
 
-    using IndirectAccessFunction = std::function<QnIndirectAccessProviders()>;
-    IndirectAccessFunction indirectAccessFunction() const;
-    void setIndirectAccessFunction(IndirectAccessFunction function);
+    QnResourceAccessSubject subject() const;
+    void setSubject(const QnResourceAccessSubject& subject);
+
 
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
@@ -44,18 +44,10 @@ public:
     bool allChecked() const;
     void setAllChecked(bool value);
 
-public slots:
-    void indirectAccessChanged();
-
 private:
-    using IndirectAccessInfo = QPair<QIcon, QString>;
-    IndirectAccessInfo indirectAccessInfo(const QnResourcePtr& resource) const;
+    void accessChanged();
 
 private:
     bool m_allChecked;
-    IndirectAccessFunction m_indirectAccessFunction;
-
-    mutable QHash<QnResourcePtr, IndirectAccessInfo> m_indirectAccessInfoCache;
-    mutable QnIndirectAccessProviders m_indirectlyAccessibleResources;
-    mutable bool m_indirectlyAccessibleDirty;
+    QnResourceAccessSubject m_subject;
 };

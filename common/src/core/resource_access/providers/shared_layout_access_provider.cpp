@@ -82,7 +82,7 @@ void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& reso
             });
 
         auto handleItemChanged =
-            [this](const QnLayoutResourcePtr& layout, const QnLayoutItemData& item)
+            [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
             {
                 /* Only remote resources with correct id can be accessed. */
                 if (item.resource.id.isNull())

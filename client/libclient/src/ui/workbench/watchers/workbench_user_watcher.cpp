@@ -8,7 +8,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <ui/actions/action_manager.h>
 
@@ -29,8 +29,8 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this, &QnWorkbenchUserWatcher::at_userGroupAddedOrUpdated);
-    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this, &QnWorkbenchUserWatcher::at_userGroupRemoved);
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this, &QnWorkbenchUserWatcher::at_userGroupAddedOrUpdated);
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this, &QnWorkbenchUserWatcher::at_userGroupRemoved);
 }
 
 QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {}
@@ -64,7 +64,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     {
         m_userDigest = m_user->getDigest();
         if (!m_user->userGroup().isNull())
-            m_group = qnResourceAccessManager->userGroup(m_user->userGroup());
+            m_group = qnUserRolesManager->userRole(m_user->userGroup());
         connect(m_user, &QnResource::resourceChanged,           this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
         connect(m_user, &QnUserResource::permissionsChanged,    this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
         connect(m_user, &QnUserResource::userGroupChanged,      this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
@@ -188,9 +188,9 @@ void QnWorkbenchUserWatcher::at_userGroupAddedOrUpdated(const ec2::ApiUserGroupD
     reconnect();
 }
 
-void QnWorkbenchUserWatcher::at_userGroupRemoved(const QnUuid& groupId)
+void QnWorkbenchUserWatcher::at_userGroupRemoved(const ec2::ApiUserGroupData& userGroup)
 {
-    if (!m_user || m_user->userGroup() != groupId)
+    if (!m_user || m_user->userGroup() != userGroup.id)
         return;
 
     m_group = ec2::ApiUserGroupData();

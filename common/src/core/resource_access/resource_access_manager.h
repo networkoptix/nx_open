@@ -119,6 +119,7 @@ public:
 
     static const QList<Qn::UserRole>& predefinedRoles();
 
+    //TODO: #GDM #move to roles manager
     static QString userRoleName(Qn::UserRole userRole);
     static QString userRoleDescription(Qn::UserRole userRole);
     static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);

@@ -3,7 +3,9 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
@@ -169,7 +171,7 @@ void QnUserSettingsDialog::permissionsChanged()
             QnResourceAccessSubject subject, bool currentUserIsAdmin)
         {
             auto allResources = qnResPool->getResources();
-            auto accessibleResources = qnResourceAccessManager->accessibleResources(subject);
+            auto accessibleResources = qnSharedResourcesManager->sharedResources(subject);
             auto permissions = qnResourceAccessManager->globalPermissions(subject);
 
             std::pair<int, int> counts(0, currentUserIsAdmin ? 0 : -1);
@@ -217,7 +219,7 @@ void QnUserSettingsDialog::permissionsChanged()
         {
             /* Handle custom user role: */
             QnUuid groupId = m_settingsPage->selectedUserGroup();
-            QnResourceAccessSubject subject(qnResourceAccessManager->userGroup(groupId));
+            QnResourceAccessSubject subject(qnUserRolesManager->userRole(groupId));
 
             permissionsText += kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, true)) +
@@ -234,11 +236,6 @@ void QnUserSettingsDialog::permissionsChanged()
             permissionsText += kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_camerasPage)) +
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_layoutsPage)));
-
-            m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
-
-            m_layoutsPage->indirectAccessChanged();
-            m_camerasPage->indirectAccessChanged();
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);

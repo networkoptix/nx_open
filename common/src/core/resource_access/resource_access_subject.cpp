@@ -61,6 +61,11 @@ QnResourceAccessSubject::QnResourceAccessSubject(const QnResourceAccessSubject& 
 {
 }
 
+QnResourceAccessSubject::QnResourceAccessSubject():
+    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), ec2::ApiUserGroupData()))
+{
+}
+
 QnResourceAccessSubject::~QnResourceAccessSubject()
 {
 }
@@ -88,6 +93,12 @@ QnUuid QnResourceAccessSubject::id() const
 QnUuid QnResourceAccessSubject::effectiveId() const
 {
     return d_ptr->effectiveId();
+}
+
+void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
+{
+    d_ptr->user = other.d_ptr->user;
+    d_ptr->role = other.d_ptr->role;
 }
 
 bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) const

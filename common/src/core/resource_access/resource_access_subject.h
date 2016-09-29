@@ -11,6 +11,7 @@ struct QnResourceAccessSubjectPrivate;
 class QnResourceAccessSubject
 {
 public:
+    QnResourceAccessSubject();
     QnResourceAccessSubject(const QnUserResourcePtr& user);
     QnResourceAccessSubject(const ec2::ApiUserGroupData& role);
     QnResourceAccessSubject(const QnResourceAccessSubject& other);
@@ -27,6 +28,7 @@ public:
     /** Key value in the shared resources map. */
     QnUuid effectiveId() const;
 
+    void operator=(const QnResourceAccessSubject& other);
     bool operator==(const QnResourceAccessSubject& other) const;
 private:
     QScopedPointer<QnResourceAccessSubjectPrivate> d_ptr;

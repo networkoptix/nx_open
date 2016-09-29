@@ -3,7 +3,10 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
+
+#include <nx_ec/data/api_user_group_data.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -34,7 +37,7 @@ public:
         connect(qnResPool, &QnResourcePool::resourceAdded,   this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
 
-        connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
+        connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
             [this](const ec2::ApiUserGroupData& group)
             {
                 auto isUserAffected = [&group](const QnUserResourcePtr& user)

@@ -1,7 +1,7 @@
 #include "user_settings_model.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -65,7 +65,7 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
     };
 
     m_mode = calculateMode();
-    m_accessibleResources = qnResourceAccessManager->accessibleResources(m_user);
+    m_accessibleResources = qnSharedResourcesManager->sharedResources(m_user);
     emit userChanged(m_user);
 }
 
@@ -101,20 +101,7 @@ void QnUserSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
     m_accessibleResources = value;
 }
 
-void QnUserSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& value)
+QnResourceAccessSubject QnUserSettingsModel::subject() const
 {
-    m_accessibleLayoutsPreview = value;
-}
-
-QnIndirectAccessProviders QnUserSettingsModel::accessibleLayouts() const
-{
-    if (!m_user)
-        return QnIndirectAccessProviders();
-
-    auto layouts = QnResourceAccessProvider::indirectlyAccessibleLayouts(m_user);
-
-    for (auto layoutPreview : m_accessibleLayoutsPreview)
-        layouts.insert(layoutPreview, QSet<QnResourcePtr>());
-
-    return layouts;
+    return m_user;
 }

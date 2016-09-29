@@ -15,6 +15,10 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/providers/permissions_resource_access_provider.h>
+#include <core/resource_access/providers/shared_resource_access_provider.h>
+#include <core/resource_access/providers/shared_layout_access_provider.h>
+#include <core/resource_access/providers/videowall_resource_access_provider.h>
 
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -106,6 +110,11 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent)
     instance<QnSharedResourcesManager>();   /*< Depends on nothing. */
     instance<QnUserRolesManager>();         /*< Depends on nothing. */
     instance<QnResourceAccessProvider>();   /*< Depends on respool, roles and shared resources. */
+    qnResourceAccessProvider->addBaseProvider(new QnPermissionsResourceAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnSharedResourceAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnSharedLayoutAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnVideoWallResourceAccessProvider());
+
     instance<QnResourceAccessManager>();    /*< Depends on access provider. */
 
     instance<QnGlobalSettings>();

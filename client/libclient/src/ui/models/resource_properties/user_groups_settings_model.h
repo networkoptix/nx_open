@@ -54,7 +54,7 @@ public:
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;
 
-    virtual QnIndirectAccessProviders accessibleLayouts() const override;
+    virtual QnResourceAccessSubject subject() const override;
 
     /** Get accessible resources for the given group - just for convenience. */
     QSet<QnUuid> accessibleResources(const ec2::ApiUserGroupData& group) const;
@@ -65,10 +65,7 @@ public:
     /** Get list of users for selected group. */
     QnUserResourceList users(bool withCandidates) const;
 
-    void setAccessibleLayoutsPreview(const QSet<QnUuid>& value);
-
     /* Methods of QAbstractItemModel */
-
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
 
@@ -80,6 +77,5 @@ private:
     QnUuid m_currentGroupId;
     ec2::ApiUserGroupDataList m_groups;
     QHash<QnUuid, QSet<QnUuid>> m_accessibleResources;
-    QHash<QnUuid, QSet<QnUuid>> m_accessibleLayoutsPreviews;
     QHash<QnUuid, RoleReplacement> m_replacements;
 };

@@ -9,8 +9,10 @@
 #include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/resource_access_provider.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -155,11 +157,11 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
             }
         });
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnResourceTreeModel::updateRoleNodes);
-    connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved, this,
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
         &QnResourceTreeModel::updateRoleNodes);
-    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this,
+    connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
         [this](const QnResourceAccessSubject& subject)
         {
             if (!subject.user())
@@ -331,7 +333,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRoleNode(const QnUuid& rol
     auto pos = m_roleNodeById.find(roleId);
     if (pos == m_roleNodeById.end())
     {
-        NX_ASSERT(!qnResourceAccessManager->userGroup(roleId).id.isNull());
+        NX_ASSERT(!qnUserRolesManager->userRole(roleId).id.isNull());
 
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, roleId, Qn::RoleNode));
         node->setParent(m_rootNodes[Qn::NodeType::UsersNode]);
@@ -763,7 +765,7 @@ void QnResourceTreeModel::updatePlaceholderNodesForUserOrRole(const QnUuid& id)
     }
     else
     {
-        auto role = qnResourceAccessManager->userGroup(id);
+        auto role = qnUserRolesManager->userRole(id);
         NX_ASSERT(!role.isNull());
         if (role.isNull())
             return;
@@ -951,7 +953,6 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
 
 void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourcePtr& user)
 {
-    QnResourceAccessProvider accessProvider;
     TRACE("Updating accesible resources nodes for user " << user->getName());
 
     auto iter = m_resourceNodeByResource.find(user);
@@ -987,7 +988,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             TRACE("Checking node " << resource->getName() << " under user " << user->getName());
-            if (accessProvider.isAccessibleResource(user, resource))
+            if (qnResourceAccessProvider->hasAccess(user, resource))
             {
                 auto node = ensureAccessibleResourceNode(user->getId(), resource);
                 node->update();
@@ -1012,7 +1013,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
                 continue;
 
             if (!existingNode->resource()
-                || !accessProvider.isAccessibleResource(user, existingNode->resource()))
+                || !qnResourceAccessProvider->hasAccess(user, existingNode->resource()))
                 nodesToDelete << existingNode;
         }
     }
@@ -1025,13 +1026,13 @@ void QnResourceTreeModel::updateAccessibleResourcesForUser(const QnUserResourceP
 
 void QnResourceTreeModel::updateSharedLayoutNodesForRole(const QnUuid& id)
 {
-    auto role = qnResourceAccessManager->userGroup(id);
+    auto role = qnUserRolesManager->userRole(id);
     TRACE("Updating shared layout nodes for role " << role.name);
     NX_ASSERT(!role.isNull());
     if (role.isNull())
         return;
 
-    auto resources = qnResourceAccessManager->accessibleResources(role);
+    auto resources = qnSharedResourcesManager->sharedResources(role);
 
     /* Copy of the list before all changes. */
     auto sharedLayoutNodes = m_sharedLayoutNodesByOwner[id].values();
@@ -1075,8 +1076,7 @@ void QnResourceTreeModel::updateSharedLayoutNodesForRole(const QnUuid& id)
 
 void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
 {
-    QnResourceAccessProvider accessProvider;
-    auto role = qnResourceAccessManager->userGroup(id);
+    auto role = qnUserRolesManager->userRole(id);
     TRACE("Updating accesible resources nodes for role " << role.name);
     NX_ASSERT(!role.isNull());
     if (role.isNull())
@@ -1098,7 +1098,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
             continue;
 
         TRACE("Checking node " << resource->getName() << " under role " << role.name);
-        if (accessProvider.isAccessibleResource(role, resource))
+        if (qnResourceAccessProvider->hasAccess(role, resource))
         {
             auto node = ensureAccessibleResourceNode(id, resource);
             node->update();
@@ -1123,7 +1123,7 @@ void QnResourceTreeModel::updateAccessibleResourcesForRole(const QnUuid& id)
             continue;
 
         if (!existingNode->resource()
-            || !accessProvider.isAccessibleResource(role, existingNode->resource()))
+            || !qnResourceAccessProvider->hasAccess(role, existingNode->resource()))
             nodesToDelete << existingNode;
     }
 
@@ -1147,7 +1147,7 @@ void QnResourceTreeModel::updateRoleNodes()
         return;
     }
 
-    auto roles = qnResourceAccessManager->userGroups();
+    auto roles = qnUserRolesManager->userRoles();
 
     QSet<QnUuid> roleIds;
     for (const auto& role: roles)
@@ -1890,7 +1890,7 @@ void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &v
 }
 
 void QnResourceTreeModel::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallItem& oldItem,
+    const QnVideoWallItem& /*oldItem*/,
     const QnVideoWallItem& item)
 {
     at_videoWall_itemAdded(videoWall, item);
