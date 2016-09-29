@@ -30,7 +30,7 @@ Pane
     QnRecentLocalConnectionsModel
     {
         id: connectionsModel
-        systemName: control.systemName
+        systemId: control.systemId
     }
 
     background: Rectangle

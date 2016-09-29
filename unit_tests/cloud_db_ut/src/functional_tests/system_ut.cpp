@@ -535,6 +535,7 @@ TEST_F(System, sortingOrderWeightExpiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency1 = systems[0].usageFrequency;
+    const auto lastLoginTime1 = systems[0].lastLoginTime;
 
     // Second access.
     ASSERT_EQ(
@@ -546,6 +547,7 @@ TEST_F(System, sortingOrderWeightExpiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency2 = systems[0].usageFrequency;
+    const auto lastLoginTime2 = systems[0].lastLoginTime;
 
     ASSERT_GT(usageFrequency2, usageFrequency1);
 
@@ -557,6 +559,8 @@ TEST_F(System, sortingOrderWeightExpiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency3 = systems[0].usageFrequency;
+    const auto lastLoginTime3 = systems[0].lastLoginTime;
+
     ASSERT_LT(usageFrequency3, usageFrequency2);
 
     // Half year passed. Still no access.
@@ -567,6 +571,8 @@ TEST_F(System, sortingOrderWeightExpiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency4 = systems[0].usageFrequency;
+    const auto lastLoginTime4 = systems[0].lastLoginTime;
+
     ASSERT_LT(usageFrequency4, usageFrequency3);
 
     // Repeating previous check but after restart.
@@ -577,6 +583,8 @@ TEST_F(System, sortingOrderWeightExpiration)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency5 = systems[0].usageFrequency;
+    const auto lastLoginTime5 = systems[0].lastLoginTime;
+
     ASSERT_EQ(usageFrequency4, usageFrequency5);
 }
 
@@ -633,10 +641,50 @@ TEST_F(System, sortingOrderMultipleSystems)
                 return one.usageFrequency > two.usageFrequency; //< Descending sort.
             });
 
-        // TODO: #ak: comparing with systemIdsInSortOrder
-
+        // Comparing with systemIdsInSortOrder.
         validateSystemsOrder(systemIdsInSortOrder, systems);
     }
+}
+
+TEST_F(System, sortingOrderLastLoginTime)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account);
+
+    std::vector<api::SystemDataEx> systems;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto lastLoginTime1 = systems[0].lastLoginTime;
+    ASSERT_EQ(std::chrono::system_clock::time_point(), systems[0].lastLoginTime);
+
+    ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
+
+    systems.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto lastLoginTime2 = systems[0].lastLoginTime;
+    ASSERT_GT(lastLoginTime2, lastLoginTime1);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
+
+    systems.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto lastLoginTime3 = systems[0].lastLoginTime;
+
+    ASSERT_GT(lastLoginTime3, lastLoginTime2);
+    ASSERT_GE(lastLoginTime3-lastLoginTime2, std::chrono::seconds(1));
+
+    // Checking that lastLoginTime is close to real current time.
+    ASSERT_GT(lastLoginTime3, nx::utils::utcTime() - std::chrono::seconds(10));
+    ASSERT_LT(lastLoginTime3, nx::utils::utcTime() + std::chrono::seconds(10));
 }
 
 }   //cdb

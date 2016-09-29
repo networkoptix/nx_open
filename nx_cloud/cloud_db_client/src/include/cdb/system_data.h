@@ -229,6 +229,11 @@ public:
      * uses this system in comparision to other systems.
      */
     float usageFrequency;
+    /**
+     * Time of last reported login of authenticated user to this system.
+     * \note Fact of login is reported by \a SystemManager::recordUserSessionStart()
+     */
+    std::chrono::system_clock::time_point lastLoginTime;
 
     SystemDataEx()
     :

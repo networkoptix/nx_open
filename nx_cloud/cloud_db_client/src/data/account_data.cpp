@@ -8,13 +8,14 @@
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/buffer.h>
+#include <nx/network/url/query_parse_helper.h>
 #include <utils/preprocessor/field_name.h>
-
-#include "url_query_parse_helper.h"
 
 namespace nx {
 namespace cdb {
 namespace api {
+
+using namespace nx::network;
 
 ////////////////////////////////////////////////////////////
 //// class AccountData
@@ -105,17 +106,17 @@ MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, customization)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data)
 {
-    deserializeFromUrl(urlQuery, AccountUpdateData_passwordHa1_field, &data->passwordHa1);
-    deserializeFromUrl(urlQuery, AccountUpdateData_fullName_field, &data->fullName);
-    deserializeFromUrl(urlQuery, AccountUpdateData_customization_field, &data->customization);
+    url::deserializeField(urlQuery, AccountUpdateData_passwordHa1_field, &data->passwordHa1);
+    url::deserializeField(urlQuery, AccountUpdateData_fullName_field, &data->fullName);
+    url::deserializeField(urlQuery, AccountUpdateData_customization_field, &data->customization);
     return true;
 }
 
 void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuery)
 {
-    serializeToUrl(urlQuery, AccountUpdateData_passwordHa1_field, data.passwordHa1);
-    serializeToUrl(urlQuery, AccountUpdateData_fullName_field, data.fullName);
-    serializeToUrl(urlQuery, AccountUpdateData_customization_field, data.customization);
+    url::serializeField(urlQuery, AccountUpdateData_passwordHa1_field, data.passwordHa1);
+    url::serializeField(urlQuery, AccountUpdateData_fullName_field, data.fullName);
+    url::serializeField(urlQuery, AccountUpdateData_customization_field, data.customization);
 }
 
 void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonValue)
