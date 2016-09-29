@@ -92,7 +92,6 @@
 #endif
 
 #include <watchers/cloud_status_watcher.h>
-#include <watchers/system_weight_updater.h>
 
 static QtMessageHandler defaultMsgHandler = 0;
 
@@ -296,7 +295,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Just to feel safe */
     common->store<QnCloudStatusWatcher>(new QnCloudStatusWatcher());
-    common->store<QnSystemsWeightUpadater>(new QnSystemsWeightUpadater());
+
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
