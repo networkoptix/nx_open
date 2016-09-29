@@ -19,22 +19,34 @@ extern "C" {
 class QnFfmpegAudioTranscoder: public QnAudioTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegAudioTranscoder)
+
 public:
     QnFfmpegAudioTranscoder(AVCodecID codecId);
     ~QnFfmpegAudioTranscoder();
 
-    //virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
-    virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result);
+    virtual int transcodePacket(
+        const QnConstAbstractMediaDataPtr& media,
+        QnAbstractMediaDataPtr* const result);
+
     virtual bool open(const QnConstCompressedAudioDataPtr& audio) override;
     bool open(const QnConstMediaContextPtr& context);
     bool isOpened() const;
+
     AVCodecContext* getCodecContext();
     virtual bool existMoreData() const override;
     void setSampleRate(int value);
 
 private:
-    void initResampleCtx(const AVCodecContext* inCtx, const AVCodecContext* outCtx);
-    void allocSampleBuffers(
+    void tuneContextsWithMedia(
+        AVCodecContext* inCtx,
+        AVCodecContext* outCtx,
+        const QnConstAbstractMediaDataPtr& media);
+
+    int initResampleCtx(
+        const AVCodecContext* inCtx,
+        const AVCodecContext* outCtx);
+
+    int allocSampleBuffers(
         const AVCodecContext* inCtx,
         const AVCodecContext* outCtx,
         const SwrContext* resampleCtx);
@@ -58,32 +70,28 @@ private:
 private:
     AVCodecContext* m_encoderCtx;
     AVCodecContext* m_decoderCtx;
-    qint64 m_firstEncodedPts;
-
-    qint64 m_lastTimestamp;
+    SwrContext* m_resampleCtx;
     QnConstMediaContextPtr m_context;
 
-    bool m_downmixAudio;
+    qint64 m_firstEncodedPts;
+    qint64 m_lastTimestamp;
     int m_frameNum;
-    SwrContext* m_resampleCtx;
 
     uint8_t** m_sampleBuffers;
     uint8_t** m_sampleBuffersWithOffset;
-
     std::size_t m_currentSampleCount;
     std::size_t m_currentSampleBufferOffset;
 
     int m_dstSampleRate;
-    
-    std::unique_ptr<QnFfmpegAudioHelper> m_audioHelper;
 
     AVFrame* m_frameDecodeTo;
     AVFrame* m_frameToEncode;
+
+    bool m_isOpened;
 };
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
-
 #endif // __FFMPEG_AUDIO_TRANSCODER_H__
 

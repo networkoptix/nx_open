@@ -115,6 +115,7 @@ void QnDesktopAudioOnlyDataProvider::run()
 
     exec();
 
+    directDisconnectAll();
     m_audioSourcesInfo.clear();
 }
 

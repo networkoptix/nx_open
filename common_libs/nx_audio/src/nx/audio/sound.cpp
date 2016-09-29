@@ -30,14 +30,15 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_numChannels = audioFormat.channelCount();
     m_frequency = audioFormat.sampleRate();
     m_bitsPerSample = audioFormat.sampleSize();
-    /*
-    m_size = bitRate() / 32; // use 30+ ms buffers
-    // Multiply by 2 to align OpenAL buffer
-    int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
-    if (m_size % sampleSize)
-        m_size += sampleSize - (m_size % sampleSize);
-    */
     m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
+    if (!m_size)
+    {
+        m_size = bitRate() / 32; // use 30+ ms buffers
+        // Multiply by 2 to align OpenAL buffer
+        int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
+        if (m_size % sampleSize)
+            m_size += sampleSize - (m_size % sampleSize);
+    }
 
 
     m_proxyBuffer = new quint8[m_size];
@@ -68,7 +69,7 @@ Sound::~Sound()
 
 bool Sound::setup()
 {
-    NX_ASSERT(m_bitsPerSample && m_numChannels && m_size);
+    //NX_ASSERT(m_bitsPerSample && m_numChannels && m_size);
     if (!m_bitsPerSample || !m_numChannels || !m_size )
         return false;
 
