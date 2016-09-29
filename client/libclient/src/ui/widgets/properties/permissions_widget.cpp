@@ -1,7 +1,7 @@
 #include "permissions_widget.h"
 #include "ui_permissions_widget.h"
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 
 #include <ui/models/abstract_permissions_model.h>
 

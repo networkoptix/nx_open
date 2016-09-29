@@ -5,8 +5,11 @@
 
 #include <common/common_globals.h>
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
+
+#include <nx_ec/data/api_user_group_data.h>
 
 #include <nx/utils/string.h>
 #include <nx/utils/raii_guard.h>
@@ -138,7 +141,8 @@ public:
 
         for (auto role : standardRoles)
         {
-            if (qnResourceAccessManager->canCreateUser(context()->user(), qnResourceAccessManager->userRolePermissions(role), false))
+            if (qnResourceAccessManager->canCreateUser(context()->user(),
+                qnResourceAccessManager->userRolePermissions(role), false))
                 roles << RoleDescription(role);
         }
 
@@ -223,12 +227,12 @@ public:
         return false;
     }
 
-    bool removeUserRole(const QnUuid& id)
+    bool removeUserRole(const ec2::ApiUserGroupData& userGroup)
     {
         auto roleIterator = std::find_if(userRoles.begin(), userRoles.end(),
-            [&id](const ec2::ApiUserGroupData& role)
+            [&userGroup](const ec2::ApiUserGroupData& role)
             {
-                return role.id == id;
+                return role.id == userGroup.id;
             });
 
         if (roleIterator == userRoles.end())
@@ -248,11 +252,11 @@ public:
         if (watch)
         {
             addOrUpdateRoleConnection = connect(
-                qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated,
+                qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated,
                 this, &QnUserRolesModelPrivate::updateUserRole);
 
             removeRoleConnection = connect(
-                qnResourceAccessManager, &QnResourceAccessManager::userGroupRemoved,
+                qnUserRolesManager, &QnUserRolesManager::userRoleRemoved,
                 this, &QnUserRolesModelPrivate::removeUserRole);
         }
         else
@@ -277,7 +281,7 @@ public:
 
     static ec2::ApiUserGroupDataList allUserRoles()
     {
-        return qnResourceAccessManager->userGroups();
+        return qnUserRolesManager->userRoles();
     }
 
     static bool lessRoleByName(const ec2::ApiUserGroupData& r1, const ec2::ApiUserGroupData& r2)
@@ -346,10 +350,15 @@ bool QnUserRolesModel::updateUserRole(const ec2::ApiUserGroupData& role)
     return d->updateUserRole(role);
 }
 
-bool QnUserRolesModel::removeUserRole(const QnUuid& id)
+bool QnUserRolesModel::removeUserRole(const QnUuid& roleId)
 {
     Q_D(QnUserRolesModel);
-    return d->removeUserRole(id);
+    for (auto role: d->userRoles)
+    {
+        if (role.id == roleId)
+            return d->removeUserRole(role);
+    }
+    return false;
 }
 
 QModelIndex QnUserRolesModel::index(int row, int column, const QModelIndex& parent) const

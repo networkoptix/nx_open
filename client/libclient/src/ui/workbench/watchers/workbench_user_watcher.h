@@ -54,7 +54,7 @@ private:
     void at_user_permissionsChanged(const QnResourcePtr &user);
 
     void at_userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
-    void at_userGroupRemoved(const QnUuid& groupId);
+    void at_userGroupRemoved(const ec2::ApiUserGroupData& userGroup);
 private:
 
     void setCurrentUser(const QnUserResourcePtr &currentUser);

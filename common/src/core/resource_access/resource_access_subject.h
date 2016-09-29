@@ -11,6 +11,7 @@ struct QnResourceAccessSubjectPrivate;
 class QnResourceAccessSubject
 {
 public:
+    QnResourceAccessSubject();
     QnResourceAccessSubject(const QnUserResourcePtr& user);
     QnResourceAccessSubject(const ec2::ApiUserGroupData& role);
     QnResourceAccessSubject(const QnResourceAccessSubject& other);
@@ -21,10 +22,14 @@ public:
 
     bool isValid() const;
 
+    QnUuid id() const;
+
     //TODO: #GDM logical dependency hack. Change ResourceAccessManager interface to work with subj.
     /** Key value in the shared resources map. */
-    QnUuid sharedResourcesKey() const;
+    QnUuid effectiveId() const;
 
+    void operator=(const QnResourceAccessSubject& other);
+    bool operator==(const QnResourceAccessSubject& other) const;
 private:
     QScopedPointer<QnResourceAccessSubjectPrivate> d_ptr;
 };

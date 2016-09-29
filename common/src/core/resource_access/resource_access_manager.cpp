@@ -3,7 +3,8 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_provider.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -40,8 +41,6 @@ public:
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_mutex(QnMutex::NonRecursive),
-    m_accessibleResources(),
-    m_userGroups(),
     m_globalPermissionsCache(),
     m_cacheUpdateCounter(0),
     m_invalidatedResources(),
@@ -91,9 +90,12 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
 
         if (const auto& videowall = resource.dynamicCast<QnVideoWallResource>())
         {
-            connect(videowall, &QnVideoWallResource::itemAdded,   this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
-            connect(videowall, &QnVideoWallResource::itemChanged, this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
-            connect(videowall, &QnVideoWallResource::itemRemoved, this, &QnResourceAccessManager::invalidateCacheForVideowallItem);
+            connect(videowall, &QnVideoWallResource::itemAdded,   this,
+                &QnResourceAccessManager::invalidateCacheForVideowallItem);
+//             connect(videowall, &QnVideoWallResource::itemChanged, this,
+//                 &QnResourceAccessManager::invalidateCacheForVideowallItem);
+            connect(videowall, &QnVideoWallResource::itemRemoved, this,
+                &QnResourceAccessManager::invalidateCacheForVideowallItem);
         }
     };
 
@@ -152,123 +154,6 @@ Qn::GlobalPermissions QnResourceAccessManager::filterDependentPermissions(Qn::Gl
     return result;
 }
 
-void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
-{
-    UpdateCacheGuard guard(this);
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_accessibleResources.clear();
-        for (const auto& item : accessibleResourcesList)
-        {
-            QSet<QnUuid>& accessibleResources = m_accessibleResources[item.userId];
-            for (const auto& id : item.resourceIds)
-                accessibleResources << id;
-        }
-        m_permissionsCache.clear();
-    }
-}
-
-ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
-{
-    QnMutexLocker lk(&m_mutex);
-    ec2::ApiUserGroupDataList result;
-    result.reserve(m_userGroups.size());
-    for (const auto& group: m_userGroups)
-        result.push_back(group);
-    return result;
-}
-
-void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& userGroups)
-{
-    UpdateCacheGuard guard(this);
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_permissionsCache.clear();
-        m_globalPermissionsCache.clear();
-        m_userGroups.clear();
-        for (const auto& group : userGroups)
-            m_userGroups.insert(group.id, group);
-    }
-}
-
-ec2::ApiUserGroupData QnResourceAccessManager::userGroup(const QnUuid& groupId) const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_userGroups.value(groupId);
-}
-
-void QnResourceAccessManager::addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup)
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_userGroups[userGroup.id] = userGroup;
-    }
-
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
-    {
-        if (user->userGroup() == userGroup.id)
-            invalidateResourceCache(user);
-    }
-
-    emit userGroupAddedOrUpdated(userGroup);
-}
-
-void QnResourceAccessManager::removeUserGroup(const QnUuid& groupId)
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_userGroups.remove(groupId);
-    }
-
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
-    {
-        if (user->userGroup() == groupId)
-            invalidateResourceCache(user);
-    }
-
-    emit userGroupRemoved(groupId);
-}
-
-QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userOrGroupId) const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_accessibleResources[userOrGroupId];
-}
-
-/*
-QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnResourceAccessSubject& subject) const
-{
-
-}*/
-
-void QnResourceAccessManager::setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources)
-{
-    {
-        UpdateCacheGuard guard(this);
-        {
-            QnMutexLocker lk(&m_mutex);
-            if (m_accessibleResources[userOrGroupId] == resources)
-                return;
-
-            auto removed = m_accessibleResources[userOrGroupId] - resources;
-            auto added = resources - m_accessibleResources[userOrGroupId];
-            m_accessibleResources[userOrGroupId] = resources;
-
-            m_invalidatedResources += removed;
-            m_invalidatedResources += added;
-        }
-
-        invalidateResourceCacheInternal(userOrGroupId);
-        for (const auto& user : qnResPool->getResources<QnUserResource>())
-        {
-            if (user->userGroup() == userOrGroupId)
-                invalidateResourceCache(user);
-        }
-    }
-
-    emit accessibleResourcesChanged(userOrGroupId);
-}
-
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnResourceAccessSubject& subject) const
 {
     Qn::GlobalPermissions result = Qn::NoGlobalPermissions;
@@ -302,7 +187,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnResourc
         switch (user->role())
         {
             case Qn::UserRole::CustomUserGroup:
-                result = globalPermissions(userGroup(user->userGroup()));
+                result = globalPermissions(qnUserRolesManager->userRole(user->userGroup()));
                 break;
             case Qn::UserRole::Owner:
             case Qn::UserRole::Administrator:
@@ -450,7 +335,7 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
-    if (!data.groupId.isNull() && !m_userGroups.contains(data.groupId))
+    if (!data.groupId.isNull() && !qnUserRolesManager->hasRole(data.groupId))
         return false;
 
     return canCreateUser(user, data.permissions, data.isAdmin);
@@ -516,10 +401,32 @@ void QnResourceAccessManager::invalidateCacheForLayoutItems(const QnResourcePtr&
     }
 }
 
-void QnResourceAccessManager::invalidateCacheForVideowallItem(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item)
+void QnResourceAccessManager::invalidateCacheForVideowallItem(
+    const QnVideoWallResourcePtr &resource,
+    const QnVideoWallItem &item)
 {
     Q_UNUSED(resource);
     UpdateCacheGuard guard(this);
+    for (auto user : qnResPool->getResources().filtered<QnUserResource>(
+        [this](const QnUserResourcePtr& user)
+        {
+            return hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission);
+        }))
+    {
+        invalidateResourceCacheInternal(user->getId());
+    }
+
+    QSet<QnUuid> modifiedGroups;
+    {
+        QnMutexLocker lk(&m_mutex);
+        for (auto group : qnUserRolesManager->userRoles())
+        {
+            if (hasGlobalPermission(group, Qn::GlobalControlVideoWallPermission))
+                modifiedGroups << group.id;
+        }
+    }
+    for (auto groupId: modifiedGroups)
+        invalidateResourceCacheInternal(groupId);
     invalidateResourceCacheInternal(item.layout);
     invalidateCacheForLayoutItems(qnResPool->getResourceById(item.layout));
 }
@@ -567,7 +474,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
         result |= Qn::RemovePermission;
 
-    if (!QnResourceAccessProvider::isAccessibleResource(user, camera))
+    if (!qnResourceAccessProvider->hasAccess(user, camera))
         return result;
 
     result |= Qn::ReadPermission;
@@ -636,7 +543,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     NX_ASSERT(webPage);
 
-    if (!QnResourceAccessProvider::isAccessibleResource(user, webPage))
+    if (!qnResourceAccessProvider->hasAccess(user, webPage))
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::ReadPermission;
@@ -697,7 +604,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (layout->isShared())
         {
-            if (!QnResourceAccessProvider::isAccessibleResource(user, layout))
+            if (!qnResourceAccessProvider->hasAccess(user, layout))
                 return Qn::NoPermissions;
 
             /* Global layouts editor. */
@@ -943,7 +850,7 @@ bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canModifyResource(const QnUserResourcePtr& user, const QnResourcePtr& target, const ec2::ApiUserData& update) const
 {
-    if (!update.groupId.isNull() && !m_userGroups.contains(update.groupId))
+    if (!update.groupId.isNull() && !qnUserRolesManager->hasRole(update.groupId))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();
@@ -1113,7 +1020,7 @@ QString QnResourceAccessManager::userRoleName(const QnUserResourcePtr& user) con
         return QString();
     Qn::UserRole roleType = user->role();
     if (roleType == Qn::UserRole::CustomUserGroup)
-        return userGroup(user->userGroup()).name;
+        return qnUserRolesManager->userRole(user->userGroup()).name;
 
     return userRoleName(roleType);
 }

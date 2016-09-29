@@ -117,10 +117,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << initMiscAdaptors()
         ;
 
-    connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
-    connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
-    for(const QnResourcePtr &resource: qnResPool->getResources())
-        at_resourcePool_resourceAdded(resource);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnGlobalSettings::at_resourcePool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnGlobalSettings::at_resourcePool_resourceRemoved);
+    initialize();
 }
 
 QnGlobalSettings::~QnGlobalSettings() {
@@ -129,6 +130,13 @@ QnGlobalSettings::~QnGlobalSettings() {
         at_resourcePool_resourceRemoved(m_admin);
 }
 
+void QnGlobalSettings::initialize()
+{
+    if (isInitialized())
+        return;
+    for (const QnResourcePtr &resource : qnResPool->getResources())
+        at_resourcePool_resourceAdded(resource);
+}
 
 bool QnGlobalSettings::isInitialized() const
 {

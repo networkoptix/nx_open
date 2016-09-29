@@ -18,9 +18,12 @@
 
 #include <common/common_module.h>
 
-#include <core/resource/device_dependent_strings.h>
+#include <core/resource_access/resource_access_manager.h>
+
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
@@ -113,7 +116,7 @@ namespace {
                     auto resource = qnResPool->getResourceById(id);
                     if (resource)
                         return resourcePassText(resource);
-                    auto role = qnResourceAccessManager->userGroup(id);
+                    auto role = qnUserRolesManager->userRole(id);
                     return role.name.contains(m_filterText, Qt::CaseInsensitive);
                 };
 

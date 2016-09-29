@@ -1,6 +1,6 @@
 #include "resource_access_subject.h"
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx_ec/data/api_user_group_data.h>
 
@@ -18,7 +18,14 @@ public:
         return user || !role.isNull();
     }
 
-    QnUuid sharedResourcesKey() const
+    QnUuid id() const
+    {
+        return user
+            ? user->getId()
+            : role.id;
+    }
+
+    QnUuid effectiveId() const
     {
         if (!isValid())
             return QnUuid();
@@ -54,6 +61,11 @@ QnResourceAccessSubject::QnResourceAccessSubject(const QnResourceAccessSubject& 
 {
 }
 
+QnResourceAccessSubject::QnResourceAccessSubject():
+    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), ec2::ApiUserGroupData()))
+{
+}
+
 QnResourceAccessSubject::~QnResourceAccessSubject()
 {
 }
@@ -73,7 +85,23 @@ bool QnResourceAccessSubject::isValid() const
     return d_ptr->isValid();
 }
 
-QnUuid QnResourceAccessSubject::sharedResourcesKey() const
+QnUuid QnResourceAccessSubject::id() const
 {
-    return d_ptr->sharedResourcesKey();
+    return d_ptr->id();
+}
+
+QnUuid QnResourceAccessSubject::effectiveId() const
+{
+    return d_ptr->effectiveId();
+}
+
+void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
+{
+    d_ptr->user = other.d_ptr->user;
+    d_ptr->role = other.d_ptr->role;
+}
+
+bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) const
+{
+    return d_ptr->id() == other.id();
 }

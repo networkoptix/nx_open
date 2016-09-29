@@ -3,7 +3,9 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
@@ -164,58 +166,47 @@ void QnUserSettingsDialog::permissionsChanged()
         return lit("<td><b>%1</b> / %2&nbsp;</td><td>%3</td>").arg(counts.first).arg(counts.second).arg(name);
     };
 
-    auto descriptionById = [this, descriptionHtml](QnResourceAccessFilter::Filter filter, QnUuid id, Qn::GlobalPermissions permissions, bool currentUserIsAdmin)
-    {
-        auto allResources = qnResPool->getResources();
-        auto accessibleResources = qnResourceAccessManager->accessibleResources(id);
-
-        std::pair<int, int> counts(0, currentUserIsAdmin ? 0 : -1);
-
-        if (filter == QnResourceAccessFilter::MediaFilter &&
-            permissions.testFlag(Qn::GlobalAccessAllMediaPermission))
+    auto descriptionById =
+        [this, descriptionHtml](QnResourceAccessFilter::Filter filter,
+            QnResourceAccessSubject subject, bool currentUserIsAdmin)
         {
-            return descriptionHtml(filter, true, counts);
-        }
+            auto allResources = qnResPool->getResources();
+            auto accessibleResources = qnSharedResourcesManager->sharedResources(subject);
+            auto permissions = qnResourceAccessManager->globalPermissions(subject);
 
-        for (QnResourcePtr resource : allResources)
-        {
-            if (QnAccessibleResourcesWidget::resourcePassFilter(resource, context()->user(), filter))
+            std::pair<int, int> counts(0, currentUserIsAdmin ? 0 : -1);
+
+            if (filter == QnResourceAccessFilter::MediaFilter &&
+                permissions.testFlag(Qn::GlobalAccessAllMediaPermission))
             {
-                if (currentUserIsAdmin)
-                    ++counts.second;
-
-                if (accessibleResources.contains(resource->getId()))
-                    ++counts.first;
+                return descriptionHtml(filter, true, counts);
             }
-        }
 
-        return descriptionHtml(filter, false, counts);
-    };
+            auto currentUser = context()->user();
+            for (QnResourcePtr resource : allResources)
+            {
+                if (QnAccessibleResourcesWidget::resourcePassFilter(resource, currentUser, filter))
+                {
+                    if (currentUserIsAdmin)
+                        ++counts.second;
+
+                    if (accessibleResources.contains(resource->getId()))
+                        ++counts.first;
+                }
+            }
+
+            return descriptionHtml(filter, false, counts);
+        };
 
     if (isPageVisible(ProfilePage))
     {
         Qn::UserRole roleType = m_user->role();
         QString permissionsText = qnResourceAccessManager->userRoleDescription(roleType);
+        QnResourceAccessSubject subject(m_user);
 
-        if (roleType == Qn::UserRole::CustomUserGroup)
-        {
-            /* Handle custom user role: */
-            QnUuid groupId = m_user->userGroup();
-            Qn::GlobalPermissions groupPermissions = qnResourceAccessManager->userGroup(groupId).permissions;
-
-            permissionsText += kHtmlTableTemplate.arg(
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, false)) +
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, false)));
-        }
-        else if (roleType == Qn::UserRole::CustomPermissions)
-        {
-            QnUuid userId = m_user->getId();
-            Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
-
-            permissionsText += kHtmlTableTemplate.arg(
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, userId, permissions, false)) +
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, userId, permissions, false)));
-        }
+        permissionsText += kHtmlTableTemplate.arg(
+            kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, false)) +
+            kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, false)));
 
         m_profilePage->updatePermissionsLabel(permissionsText);
     }
@@ -228,11 +219,11 @@ void QnUserSettingsDialog::permissionsChanged()
         {
             /* Handle custom user role: */
             QnUuid groupId = m_settingsPage->selectedUserGroup();
-            Qn::GlobalPermissions groupPermissions = qnResourceAccessManager->userGroup(groupId).permissions;
+            QnResourceAccessSubject subject(qnUserRolesManager->userRole(groupId));
 
             permissionsText += kHtmlTableTemplate.arg(
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, groupId, groupPermissions, true)) +
-                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, groupId, groupPermissions, true)));
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, true)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, true)));
         }
         else if (roleType == Qn::UserRole::CustomPermissions)
         {
@@ -245,11 +236,6 @@ void QnUserSettingsDialog::permissionsChanged()
             permissionsText += kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_camerasPage)) +
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_layoutsPage)));
-
-            m_model->setAccessibleLayoutsPreview(m_layoutsPage->checkedResources());
-
-            m_layoutsPage->indirectAccessChanged();
-            m_camerasPage->indirectAccessChanged();
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);

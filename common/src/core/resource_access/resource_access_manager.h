@@ -5,11 +5,11 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject.h>
 
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/data/api_user_group_data.h>
+
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
@@ -27,33 +27,6 @@ public:
 
     /** Get a set of global permissions that will not work without the given one. */
     static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
-
-    void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
-
-    ec2::ApiUserGroupDataList userGroups() const;
-    void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
-
-    template <class IDList>
-    ec2::ApiUserGroupDataList userGroups(IDList idList) const
-    {
-        QnMutexLocker lk(&m_mutex);
-        ec2::ApiUserGroupDataList result;
-        for (const auto& id : idList)
-        {
-            const auto itr = m_userGroups.find(id);
-            if (itr != m_userGroups.end())
-                result.push_back(itr.value());
-        }
-        return result;
-    }
-
-    ec2::ApiUserGroupData userGroup(const QnUuid& groupId) const;
-    void addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup);
-    void removeUserGroup(const QnUuid& groupId);
-
-    /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> accessibleResources(const QnUuid& userOrGroupId) const;
-    void setAccessibleResources(const QnUuid& userOrGroupId, const QSet<QnUuid>& resources);
 
     /**
     * \param user                      User or role to get global permissions for.
@@ -146,6 +119,7 @@ public:
 
     static const QList<Qn::UserRole>& predefinedRoles();
 
+    //TODO: #GDM #move to roles manager
     static QString userRoleName(Qn::UserRole userRole);
     static QString userRoleDescription(Qn::UserRole userRole);
     static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
@@ -155,11 +129,6 @@ public:
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
 signals:
-    void accessibleResourcesChanged(const QnUuid& userId);
-
-    void userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
-    void userGroupRemoved(const QnUuid& groupId);
-
     /** Notify listeners that permissions possibly changed (not necessarily). */
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
 
@@ -188,9 +157,6 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-
-    QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
-    QHash<QnUuid, ec2::ApiUserGroupData> m_userGroups;
 
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 

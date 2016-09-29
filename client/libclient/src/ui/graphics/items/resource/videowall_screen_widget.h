@@ -46,7 +46,9 @@ private:
 private slots:
     void at_thumbnailReady(const QnUuid &resourceId, const QPixmap &thumbnail);
 
-    void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+        const QnVideoWallItem& oldItem,
+        const QnVideoWallItem& item);
 private:
     friend class QnVideowallItemWidget;
 

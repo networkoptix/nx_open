@@ -8,7 +8,7 @@
 
 #include <rest/helpers/permissions_helper.h>
 #include <rest/handlers/private/multiserver_bookmarks_rest_handler_p.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 
 namespace {
 

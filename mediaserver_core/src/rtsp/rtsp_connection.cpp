@@ -20,7 +20,7 @@ extern "C"
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_media_layout.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/network/http/httptypes.h>
