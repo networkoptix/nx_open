@@ -229,11 +229,9 @@ public:
 
         const auto parentWindow = getParentWindow(properWidget);
         const auto geometry = properWidget->geometry();
-        qDebug() << "1" << parentWindow->screen();
         const auto fixedPos = screenRelatedToGlobal(
             parentWindow->geometry().topLeft(), parentWindow->screen());
         parentWindow->setScreen(getScreen(fixedPos));
-        qDebug() << "2" << parentWindow->screen();
         parentWindow->setPosition(fixedPos);
         return QObject::eventFilter(watched, event);
     }
