@@ -77,8 +77,7 @@ void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& reso
         connect(layout, &QnResource::parentIdChanged, this,
             [this, layout]
             {
-                for (auto resource : qnResPool->getResources(layoutItems(layout)))
-                    updateAccessToResource(resource);
+                updateAccessToLayoutItems(layout);
             });
 
         auto handleItemChanged =
@@ -92,7 +91,16 @@ void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& reso
             };
         connect(layout, &QnLayoutResource::itemAdded, this, handleItemChanged);
         connect(layout, &QnLayoutResource::itemRemoved, this, handleItemChanged);
+
+        updateAccessToLayoutItems(layout);
     }
+}
+
+void QnSharedLayoutAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
+{
+    base_type::handleResourceRemoved(resource);
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+        updateAccessToLayoutItems(layout);
 }
 
 void QnSharedLayoutAccessProvider::handleSharedResourcesChanged(
@@ -121,5 +129,11 @@ void QnSharedLayoutAccessProvider::handleSharedResourcesChanged(
 
     for (auto resource: qnResPool->getResources(changedResources))
         updateAccess(subject, resource);
+}
+
+void QnSharedLayoutAccessProvider::updateAccessToLayoutItems(const QnLayoutResourcePtr& layout)
+{
+    for (auto resource : qnResPool->getResources(layoutItems(layout)))
+        updateAccessToResource(resource);
 }
 

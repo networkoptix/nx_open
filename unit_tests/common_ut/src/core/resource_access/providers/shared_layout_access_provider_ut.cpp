@@ -3,6 +3,8 @@
 
 #include <core/resource_access/shared_resources_manager.h>
 
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -147,5 +149,35 @@ TEST_F(QnSharedLayoutAccessProviderTest, layoutItemRemoved)
 
     layout->removeItem(item);
 
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnSharedLayoutAccessProviderTest, layoutAdded)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto layout = createLayout();
+    ASSERT_TRUE(layout->isShared());
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    layout->addItem(item);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
+
+    qnResPool->addResource(layout);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnSharedLayoutAccessProviderTest, layoutRemoved)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto layout = addLayout();
+    ASSERT_TRUE(layout->isShared());
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    layout->addItem(item);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
+
+    qnResPool->removeResource(layout);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }

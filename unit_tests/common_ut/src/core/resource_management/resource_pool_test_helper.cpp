@@ -33,10 +33,16 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(Qn::GlobalPermissions global
     return user;
 }
 
-QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
+QnLayoutResourcePtr QnResourcePoolTestHelper::createLayout()
 {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
+    return layout;
+}
+
+QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
+{
+    auto layout = createLayout();
     qnResPool->addResource(layout);
     return layout;
 }

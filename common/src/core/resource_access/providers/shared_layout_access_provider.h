@@ -16,9 +16,12 @@ protected:
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
-    virtual void handleResourceAdded(const QnResourcePtr& resource);
+    virtual void handleResourceAdded(const QnResourcePtr& resource) override;
+    virtual void handleResourceRemoved(const QnResourcePtr& resource) override;
 
 private:
     void handleSharedResourcesChanged(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& resourceIds);
+
+    void updateAccessToLayoutItems(const QnLayoutResourcePtr& layout);
 };
