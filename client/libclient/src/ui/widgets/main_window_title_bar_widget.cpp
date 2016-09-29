@@ -3,6 +3,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
+#include <utils/math/math.h>
 
 #include <ui/actions/actions.h>
 #include <ui/common/geometry.h>

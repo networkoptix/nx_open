@@ -487,6 +487,24 @@ uint64_t stringToBytes(const QString& str, bool* isOk)
     return str.toULongLong(isOk);
 }
 
+uint64_t stringToBytes(const QString& str, uint64_t defaultValue)
+{
+    bool isOk = false;
+    uint64_t value = stringToBytes(str, &isOk);
+    if (isOk)
+        return value;
+    else
+        return defaultValue;
+}
+
+uint64_t stringToBytesConst(const char* str)
+{
+    bool isOk = false;
+    uint64_t value = stringToBytes(QString::fromUtf8(str), &isOk);
+    NX_CRITICAL(isOk);
+    return value;
+}
+
 } // namespace utils
 } // namespace nx
 

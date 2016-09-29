@@ -101,9 +101,6 @@ private:
         nx_http::HttpHeaders* const responseHeaders,
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authorizationHeader) const;
-    QnUserResourcePtr createCloudUser(
-        const QString& userName,
-        nx::cdb::api::SystemAccessRole cloudAccessRole) const;
 
 private slots:
     void cloudBindingStatusChanged(bool boundToCloud);

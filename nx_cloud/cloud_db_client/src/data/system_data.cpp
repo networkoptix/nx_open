@@ -9,6 +9,7 @@
 #include <nx/fusion/model_functions.h>
 #include <utils/preprocessor/field_name.h>
 
+#include "url_query_parse_helper.h"
 
 namespace nx {
 namespace cdb {
@@ -21,28 +22,24 @@ namespace api {
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, name)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, customization)
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData)
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
-    if (!urlQuery.hasQueryItem(SystemRegistrationData_name_field) ||
-        !urlQuery.hasQueryItem(SystemRegistrationData_customization_field))
-    {
-        return false;
-    }
-    systemData->name =
-        urlQuery.queryItemValue(SystemRegistrationData_name_field).toStdString();
-    systemData->customization =
-        urlQuery.queryItemValue(SystemRegistrationData_customization_field).toStdString();
-    return true;
+    return 
+        deserializeFromUrl(
+            urlQuery,
+            SystemRegistrationData_name_field,
+            &data->name)
+        &&
+        deserializeFromUrl(
+            urlQuery,
+            SystemRegistrationData_customization_field,
+            &data->customization);
 }
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
 {
-    urlQuery->addQueryItem(
-        SystemRegistrationData_name_field,
-        data.name.c_str());
-    urlQuery->addQueryItem(
-        SystemRegistrationData_customization_field,
-        data.customization.c_str());
+    serializeToUrl(urlQuery, SystemRegistrationData_name_field, data.name);
+    serializeToUrl(urlQuery, SystemRegistrationData_customization_field, data.customization);
 }
 
 ////////////////////////////////////////////////////////////
@@ -149,30 +146,70 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 //// class SystemNameUpdate
 ////////////////////////////////////////////////////////////
 
-MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, id)
+MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, systemID)
 MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, name)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data)
 {
-    if (!urlQuery.hasQueryItem(SystemNameUpdate_id_field) ||
-        !urlQuery.hasQueryItem(SystemNameUpdate_name_field))
-    {
-        return false;
-    }
-    data->id = urlQuery.queryItemValue(SystemNameUpdate_id_field).toStdString();
-    data->name = urlQuery.queryItemValue(SystemNameUpdate_name_field).toStdString();
-    return true;
+    return deserializeFromUrl(urlQuery, SystemNameUpdate_systemID_field, &data->systemID)
+        && deserializeFromUrl(urlQuery, SystemNameUpdate_name_field, &data->name);
 }
 
 void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery)
 {
-    urlQuery->addQueryItem(
-        SystemNameUpdate_id_field,
-        QString::fromStdString(data.id));
-    urlQuery->addQueryItem(
-        SystemNameUpdate_name_field,
-        QString::fromStdString(data.name));
+    serializeToUrl(urlQuery, SystemNameUpdate_systemID_field, data.systemID);
+    serializeToUrl(urlQuery, SystemNameUpdate_name_field, data.name);
 }
+
+//-----------------------------------------------------
+// UserSessionDescriptor
+
+MAKE_FIELD_NAME_STR_CONST(UserSessionDescriptor, accountEmail)
+MAKE_FIELD_NAME_STR_CONST(UserSessionDescriptor, systemId)
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, UserSessionDescriptor* const data)
+{
+    deserializeFromUrl(urlQuery, UserSessionDescriptor_accountEmail_field, &data->accountEmail);
+    deserializeFromUrl(urlQuery, UserSessionDescriptor_systemId_field, &data->systemId);
+    return data->accountEmail || data->systemId;
+}
+
+void serializeToUrlQuery(const UserSessionDescriptor& data, QUrlQuery* const urlQuery)
+{
+    serializeToUrl(urlQuery, UserSessionDescriptor_accountEmail_field, data.accountEmail);
+    serializeToUrl(urlQuery, UserSessionDescriptor_systemId_field, data.systemId);
+}
+
+void serialize(QnJsonContext*, const UserSessionDescriptor& data, QJsonValue* jsonValue)
+{
+    QJsonObject jsonObject;
+    if (data.accountEmail)
+        jsonObject.insert(
+            UserSessionDescriptor_accountEmail_field,
+            QString::fromStdString(data.accountEmail.get()));
+    if (data.systemId)
+        jsonObject.insert(
+            UserSessionDescriptor_systemId_field,
+            QString::fromStdString(data.systemId.get()));
+    *jsonValue = jsonObject;
+}
+
+bool deserialize(QnJsonContext*, const QJsonValue& value, UserSessionDescriptor* data)
+{
+    if (value.type() != QJsonValue::Object)
+        return false;
+    const QJsonObject map = value.toObject();
+
+    auto accountEmailIter = map.find(UserSessionDescriptor_accountEmail_field);
+    if (accountEmailIter != map.constEnd())
+        data->accountEmail = accountEmailIter.value().toString().toStdString();
+    auto systemIdIter = map.find(UserSessionDescriptor_systemId_field);
+    if (systemIdIter != map.constEnd())
+        data->systemId = systemIdIter.value().toString().toStdString();
+
+    return data->accountEmail || data->systemId;
+}
+
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),

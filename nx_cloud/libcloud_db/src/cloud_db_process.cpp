@@ -144,8 +144,13 @@ int CloudDBProcess::exec()
             return 0;
         }
 
-        initializeLogging(settings.logging(), "log_file", QnLog::MAIN_LOG_ID);
-        initializeLogging(settings.vmsSynchronizationLogging(), "sync_log", QnLog::EC2_TRAN_LOG);
+        initializeQnLog(
+            settings.logging(), settings.dataDir(),
+            QnLibCloudDbAppInfo::applicationDisplayName(), "log_file", QnLog::MAIN_LOG_ID);
+
+        initializeQnLog(
+            settings.vmsSynchronizationLogging(), settings.dataDir(),
+            QnLibCloudDbAppInfo::applicationDisplayName(), "sync_log", QnLog::EC2_TRAN_LOG);
 
         const auto& httpAddrToListenList = settings.endpointsToListen();
         m_settings = &settings;
@@ -217,7 +222,7 @@ int CloudDBProcess::exec()
         SystemManager systemManager(
             settings,
             &timerManager,
-            accountManager,
+            &accountManager,
             systemHealthInfoProvider,
             &dbManager,
             &transactionLog,
@@ -354,34 +359,6 @@ bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
 }
 #endif
 
-void CloudDBProcess::initializeLogging(
-    const conf::Logging& logSettings,
-    const QString& logFileNameBase,
-    int logInstanceId)
-{
-    if (logSettings.logLevel == QString::fromLatin1("none"))
-        return;
-
-    const QString& logDir = logSettings.logDir;
-
-    QDir().mkpath(logDir);
-    const QString& logFileName = logDir + lit("/") + logFileNameBase;
-
-    if (!QnLog::instance(logInstanceId)->create(
-            logFileName,
-            1024 * 1024 * 10,
-            5,
-            QnLog::logLevelFromString(logSettings.logLevel)))
-    {
-        std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
-    }
-
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-}
-
 void CloudDBProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
     const AuthorizationManager& authorizationManager,
@@ -469,9 +446,14 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::system, DataActionType::fetch);
 
     registerHttpHandler(
-        kSystemUpdateSystemNamePath,
-        &SystemManager::updateSystemName, systemManager,
+        kSystemRenamePath,
+        &SystemManager::rename, systemManager,
         EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemRecordUserSessionStartPath,
+        &SystemManager::recordUserSessionStart, systemManager,
+        EntityType::account, DataActionType::update);   //< TODO: #ak: current entity:action is not suitable for this request
 
     //------------------------------------------
     // AuthenticationProvider
@@ -548,9 +530,9 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
     //starting async operation
     using namespace std::placeholders;
     dbManager->executeUpdateWithoutTran(
-        [](QSqlDatabase* connection) ->nx::db::DBResult
+        [](nx::db::QueryContext* queryContext) ->nx::db::DBResult
         {
-            QSqlQuery enableWalQuery(*connection);
+            QSqlQuery enableWalQuery(*queryContext->connection());
             enableWalQuery.prepare("PRAGMA journal_mode = WAL");
             if (!enableWalQuery.exec())
             {
@@ -560,7 +542,7 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
                 return nx::db::DBResult::ioError;
             }
 
-            QSqlQuery enableFKQuery(*connection);
+            QSqlQuery enableFKQuery(*queryContext->connection());
             enableFKQuery.prepare("PRAGMA foreign_keys = ON");
             if (!enableFKQuery.exec())
             {
@@ -581,7 +563,7 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
 
             return nx::db::DBResult::ok;
         },
-        [&](QSqlDatabase* /*connection*/, nx::db::DBResult dbResult)
+        [&](nx::db::QueryContext* /*queryContext*/, nx::db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -619,6 +601,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
     dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
     dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
+    dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     return dbStructureUpdater.updateStructSync();
 }
 

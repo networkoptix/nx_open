@@ -22,6 +22,7 @@
 #include <utils/common/guard.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/time.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -246,7 +247,7 @@ void AuthenticationManager::addWWWAuthenticateHeader(
 
 nx::Buffer AuthenticationManager::generateNonce()
 {
-    const size_t nonce = m_dist(m_rd) | ::time(NULL);
+    const size_t nonce = m_dist(m_rd) | nx::utils::timeSinceEpoch().count();
     return nx::Buffer::number((qulonglong)nonce);
 }
 

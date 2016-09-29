@@ -23,6 +23,7 @@
 #include "request_execution_thread.h"
 #include "request_executor.h"
 #include "types.h"
+#include "query_context.h"
 
 
 namespace nx {
@@ -50,9 +51,9 @@ public:
     */
     template<typename InputData, typename OutputData>
     void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, const InputData&, OutputData* const)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData input,
-        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, InputData, OutputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult, InputData, OutputData)> completionHandler)
     {
         openOneMoreConnectionIfNeeded();
 
@@ -68,9 +69,9 @@ public:
     /** Overload for updates with no output data. */
     template<typename InputData>
     void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, const InputData&)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*, const InputData&)> dbUpdateFunc,
         InputData input,
-        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, InputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult, InputData)> completionHandler)
     {
         openOneMoreConnectionIfNeeded();
 
@@ -85,8 +86,8 @@ public:
 
     /** Overload for updates with no input data. */
     void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult)> completionHandler)
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
     {
         openOneMoreConnectionIfNeeded();
 
@@ -99,8 +100,8 @@ public:
     }
 
     void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult)> completionHandler)
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
     {
         openOneMoreConnectionIfNeeded();
 
@@ -114,8 +115,8 @@ public:
 
     template<typename OutputData>
     void executeSelect(
-        nx::utils::MoveOnlyFunc<DBResult(QSqlDatabase*, OutputData* const)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, DBResult, OutputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*, OutputData* const)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult, OutputData)> completionHandler)
     {
         openOneMoreConnectionIfNeeded();
 

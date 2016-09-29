@@ -9,6 +9,7 @@
 
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <http/custom_headers.h>
+#include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
 

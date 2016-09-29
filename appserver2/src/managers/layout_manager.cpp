@@ -41,8 +41,8 @@ namespace ec2
         {
             handler->done( reqID, errorCode, layouts);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getLayouts, nullptr, queryDoneHandler );
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<const QnUuid&, ApiLayoutDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getLayouts, QnUuid(), queryDoneHandler );
         return reqID;
     }
 

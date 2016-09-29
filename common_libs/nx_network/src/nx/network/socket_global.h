@@ -24,45 +24,37 @@ namespace network {
 class NX_NETWORK_API SocketGlobals
 {
 public:
-    struct NX_NETWORK_API DebugFlags: nx::utils::FlagConfig
+    struct NX_NETWORK_API DebugConfiguration: nx::utils::FlagConfig
     {
-        DebugFlags(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
+        DebugConfiguration(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
 
         NX_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
         NX_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
         NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
     };
 
-    inline static
-    DebugFlags& debugFlags()
-    { return s_instance->m_debugFlags; }
+    static DebugConfiguration& debugConfiguration()
+    { return s_instance->m_debugConfiguration; }
 
-    inline static
-    aio::AIOService& aioService()
+    static aio::AIOService& aioService()
     { return s_instance->m_aioService; }
 
-    inline static
-    cloud::AddressResolver& addressResolver()
+    static cloud::AddressResolver& addressResolver()
     { return s_instance->m_addressResolver; }
 
-    inline static
-    cloud::MediatorAddressPublisher& addressPublisher()
+    static cloud::MediatorAddressPublisher& addressPublisher()
     { return s_instance->m_addressPublisher; }
 
-    inline static
-    hpm::api::MediatorConnector& mediatorConnector()
+    static hpm::api::MediatorConnector& mediatorConnector()
     { return *s_instance->m_mediatorConnector; }
 
-    inline static
-    cloud::OutgoingTunnelPool& outgoingTunnelPool()
+    static cloud::OutgoingTunnelPool& outgoingTunnelPool()
     { return s_instance->m_outgoingTunnelPool; }
 
-    inline static
-    cloud::CloudConnectSettings& cloudConnectSettings()
+    static cloud::CloudConnectSettings& cloudConnectSettings()
     { return s_instance->m_cloudConnectSettings; }
 
-    inline static
-    cloud::tcp::ReverseConnectionPool& tcpReversePool()
+    static cloud::tcp::ReverseConnectionPool& tcpReversePool()
     { return s_instance->m_tcpReversePool; }
 
     static void init(); /**< Should be called before any socket use */
@@ -99,7 +91,7 @@ private:
     static SocketGlobals* s_instance;
 
 private:
-    DebugFlags m_debugFlags;
+    DebugConfiguration m_debugConfiguration;
     std::shared_ptr< QnLog::Logs > m_log;
     aio::AIOService m_aioService;
 
