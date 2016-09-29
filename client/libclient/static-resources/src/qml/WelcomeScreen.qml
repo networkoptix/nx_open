@@ -13,8 +13,8 @@ Rectangle
     height: context.pageSize.height;
 
     color: Style.colors.window;
-    
-    QnAppInfo 
+
+    QnAppInfo
     {
         id: appInfo
     }
@@ -26,26 +26,21 @@ Rectangle
         anchors.fill: parent;
         visible: context.visibleControls && !context.globalPreloaderVisible;
 
-        CloudPanel
+        Image
         {
-            id: cloudPanel;
+            id: statusImage;
 
-            y: ((gridHolder.y - height) / 2);
+            width: 120;
+            height: 120;
+            y: ((searchEdit.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            userName: context.cloudUserName;
-            loggedIn: context.isLoggedInToCloud;
-
-
-            onLoginToCloud: context.loginToCloud();
-            onCreateAccount: context.createAccount();
-
-            onManageAccount: context.manageCloudAccount();
-            onLogout: context.logoutFromCloud();
+            source: "qrc:/skin/welcome_page/logo.png"
         }
 
         NxSearchEdit
         {
+            id: searchEdit;
             visible: grid.totalItemsCount > grid.itemsPerPage
             visualParent: screenHolder
 
