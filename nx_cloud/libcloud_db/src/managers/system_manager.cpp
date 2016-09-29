@@ -323,6 +323,7 @@ void SystemManager::getSystems(
                 systemDataEx.usageFrequency = calculateSystemUsageFrequency(
                     sharingData->lastLoginTime,
                     sharingData->usageFrequency + 1);
+                systemDataEx.lastLoginTime = sharingData->lastLoginTime;
             }
             else
             {
@@ -1313,14 +1314,15 @@ nx::db::DBResult SystemManager::saveUserSessionStartToDb(
     }
 
     const auto lastLoginTimeUtc = 
-        selectUsageStatisticsQuery.value("last_login_time_utc").toLongLong();
+        QnSql::deserialized_field<std::chrono::system_clock::time_point>(
+            selectUsageStatisticsQuery.value("last_login_time_utc"));
     const auto currentUsageFrequency =
         selectUsageStatisticsQuery.value("usage_frequency").toFloat();
     const auto accountId = selectUsageStatisticsQuery.value("account_id").toString();
 
     result->lastloginTime = nx::utils::utcTime();
     result->usageFrequency = calculateSystemUsageFrequency(
-        std::chrono::system_clock::from_time_t(lastLoginTimeUtc),
+        lastLoginTimeUtc,
         currentUsageFrequency);
     const auto newUsageFrequency = result->usageFrequency + 1;
 
@@ -1333,7 +1335,7 @@ nx::db::DBResult SystemManager::saveUserSessionStartToDb(
         )sql");
     updateUsageStatisticsQuery.bindValue(
         ":last_login_time_utc",
-        (quint64)duration_cast<seconds>(result->lastloginTime.time_since_epoch()).count());
+        QnSql::serialized_field(result->lastloginTime));
     updateUsageStatisticsQuery.bindValue(":usage_frequency", newUsageFrequency);
     updateUsageStatisticsQuery.bindValue(":account_id", accountId);
     updateUsageStatisticsQuery.bindValue(
@@ -1540,10 +1542,8 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
             QnSql::mapping<api::SystemSharingEx>(readSystemToAccountQuery),
             readSystemToAccountQuery.record(),
             &data);
+        // We store (value + 1) in DB by algorithm.
         data.usageFrequency -= 1.0;
-        data.lastLoginTime =
-            std::chrono::system_clock::from_time_t(
-                readSystemToAccountQuery.value("lastLoginTime").toLongLong());
         m_accountAccessRoleForSystem.emplace(std::move(data));
     }
 
