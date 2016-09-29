@@ -323,7 +323,11 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
 
         case Qt::CheckStateRole:
             if (column == Columns::CheckboxColumn)
-                return item.peerId == m_selectedServer ? Qt::Checked : Qt::Unchecked;
+            {
+                return item.peerId == m_selectedServer || m_items.size() == 1
+                    ? Qt::Checked
+                    : Qt::Unchecked;
+            }
             break;
 
         case Qn::ResourceRole:

@@ -9,6 +9,7 @@
 #include <nx_ec/data/api_runtime_data.h>
 
 #include <ui/delegates/resource_item_delegate.h>
+#include <ui/style/helper.h>
 #include <ui/models/time_server_selection_model.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -85,6 +86,7 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     sortModel->setSourceModel(m_model);
 
     ui->serversTable->setModel(sortModel);
+    ui->serversTable->setProperty(style::Properties::kItemViewRadioButtons, true);
     ui->serversTable->setItemDelegateForColumn(
         QnTimeServerSelectionModel::NameColumn, new QnResourceItemDelegate());
 
