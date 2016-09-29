@@ -35,6 +35,14 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
     return m_accessibleResources[subject.id()].contains(resource->getId());
 }
 
+QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibleVia(
+    const QnResourceAccessSubject& subject, const QnResourcePtr& resource) const
+{
+    if (hasAccess(subject, resource))
+        return baseSource();
+    return Source::none;
+}
+
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
@@ -70,7 +78,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
     else
         accessible.remove(targetId);
 
-    emit accessChanged(subject, resource, newValue);
+    emit accessChanged(subject, resource, newValue ? baseSource() : Source::none);
 }
 
 void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
@@ -105,12 +113,12 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
         {
             QnUuid targetId = targetResource->getId();
             accessible.remove(targetId);
-            emit accessChanged(subject, targetResource, false);
+            emit accessChanged(subject, targetResource, Source::none);
         }
 
         /* We should get only own user resource there. */
         NX_ASSERT(accessible.contains(resourceId));
-        emit accessChanged(subject, resource, false);
+        emit accessChanged(subject, resource, Source::none);
         accessible.remove(resourceId);
         NX_ASSERT(accessible.isEmpty());
 
@@ -128,7 +136,7 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
             continue;
 
         accessible.remove(resourceId);
-        emit accessChanged(subject, resource, false);
+        emit accessChanged(subject, resource, Source::none);
     }
 
     for (const auto& role : qnUserRolesManager->userRoles())
@@ -139,7 +147,7 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
             continue;
 
         accessible.remove(resourceId);
-        emit accessChanged(subject, resource, false);
+        emit accessChanged(subject, resource, Source::none);
     }
 }
 
@@ -162,7 +170,7 @@ void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData
     {
         QnUuid targetId = targetResource->getId();
         accessible.remove(targetId);
-        emit accessChanged(subject, targetResource, false);
+        emit accessChanged(subject, targetResource, Source::none);
     }
     NX_ASSERT(accessible.isEmpty());
     m_accessibleResources.remove(id);

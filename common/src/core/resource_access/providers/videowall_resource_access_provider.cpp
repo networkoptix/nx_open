@@ -17,6 +17,11 @@ QnVideoWallResourceAccessProvider::~QnVideoWallResourceAccessProvider()
 {
 }
 
+QnAbstractResourceAccessProvider::Source QnVideoWallResourceAccessProvider::baseSource() const
+{
+    return Source::videowall;
+}
+
 bool QnVideoWallResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {

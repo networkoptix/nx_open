@@ -1,6 +1,6 @@
 #include "direct_resource_access_provider.h"
 
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource_management/resource_pool.h>
 
@@ -9,12 +9,17 @@
 QnDirectResourceAccessProvider::QnDirectResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
-    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this,
-        &QnDirectResourceAccessProvider::handleAccessibleResourcesChanged);
+    connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
+        &QnDirectResourceAccessProvider::handleSharedResourcesChanged);
 }
 
 QnDirectResourceAccessProvider::~QnDirectResourceAccessProvider()
 {
+}
+
+QnAbstractResourceAccessProvider::Source QnDirectResourceAccessProvider::baseSource() const
+{
+    return Source::direct;
 }
 
 bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
@@ -34,7 +39,7 @@ bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
         return false;
     }
 
-    return qnResourceAccessManager->accessibleResources(subject).contains(resource->getId());
+    return qnSharedResourcesManager->sharedResources(subject).contains(resource->getId());
 }
 
 void QnDirectResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
@@ -48,7 +53,7 @@ void QnDirectResourceAccessProvider::handleResourceAdded(const QnResourcePtr& re
     }
 }
 
-void QnDirectResourceAccessProvider::handleAccessibleResourcesChanged(
+void QnDirectResourceAccessProvider::handleSharedResourcesChanged(
     const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
 {
     NX_ASSERT(subject.isValid());

@@ -28,12 +28,6 @@ public:
     /** Get a set of global permissions that will not work without the given one. */
     static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
 
-    void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
-
-    /** List of resources ids, the given user has access to (only given directly). */
-    QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const;
-    void setAccessibleResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& resources);
-
     /**
     * \param user                      User or role to get global permissions for.
     * \returns                         Global permissions of the given user,
@@ -134,9 +128,6 @@ public:
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
 signals:
-    void accessibleResourcesChanged(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& resourceIds);
-
     /** Notify listeners that permissions possibly changed (not necessarily). */
     void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
 
@@ -165,8 +156,6 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-
-    QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
 
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 

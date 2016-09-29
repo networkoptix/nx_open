@@ -4,7 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource_access/resource_access_provider.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -41,7 +41,6 @@ public:
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_mutex(QnMutex::NonRecursive),
-    m_accessibleResources(),
     m_globalPermissionsCache(),
     m_cacheUpdateCounter(0),
     m_invalidatedResources(),
@@ -153,71 +152,6 @@ Qn::GlobalPermissions QnResourceAccessManager::filterDependentPermissions(Qn::Gl
         result &= ~Qn::GlobalManageBookmarksPermission;
     }
     return result;
-}
-
-void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
-{
-    UpdateCacheGuard guard(this);
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_accessibleResources.clear();
-        for (const auto& item : accessibleResourcesList)
-        {
-            QSet<QnUuid>& accessibleResources = m_accessibleResources[item.userId];
-            for (const auto& id : item.resourceIds)
-                accessibleResources << id;
-        }
-        m_permissionsCache.clear();
-    }
-}
-
-QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnResourceAccessSubject& subject) const
-{
-    if (!subject.isValid())
-        return QSet<QnUuid>();
-
-    QnMutexLocker lk(&m_mutex);
-    return m_accessibleResources[subject.effectiveId()];
-}
-
-void QnResourceAccessManager::setAccessibleResources(const QnResourceAccessSubject& subject,
-    const QSet<QnUuid>& resources)
-{
-    NX_ASSERT(subject.isValid());
-    if (!subject.isValid())
-        return;
-
-    NX_ASSERT(!subject.user()
-        || subject.user()->role() == Qn::UserRole::CustomPermissions
-        || resources.empty(),
-        "Security check. We must not set custom accessible resources to non-custom user."
-    );
-
-    {
-        auto id = subject.effectiveId();
-        UpdateCacheGuard guard(this);
-        {
-            QnMutexLocker lk(&m_mutex);
-            if (m_accessibleResources[id] == resources)
-                return;
-
-            auto removed = m_accessibleResources[id] - resources;
-            auto added = resources - m_accessibleResources[id];
-            m_accessibleResources[id] = resources;
-
-            m_invalidatedResources += removed;
-            m_invalidatedResources += added;
-        }
-
-        invalidateResourceCacheInternal(id);
-        for (const auto& user : qnResPool->getResources<QnUserResource>())
-        {
-            if (user->userGroup() == id)
-                invalidateResourceCache(user);
-        }
-    }
-
-    emit accessibleResourcesChanged(subject, resources);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnResourceAccessSubject& subject) const
@@ -540,7 +474,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
         result |= Qn::RemovePermission;
 
-    if (!QnResourceAccessProvider::isAccessibleResource(user, camera))
+    if (!qnResourceAccessProvider->hasAccess(user, camera))
         return result;
 
     result |= Qn::ReadPermission;
@@ -609,7 +543,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     NX_ASSERT(webPage);
 
-    if (!QnResourceAccessProvider::isAccessibleResource(user, webPage))
+    if (!qnResourceAccessProvider->hasAccess(user, webPage))
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::ReadPermission;
@@ -670,7 +604,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (layout->isShared())
         {
-            if (!QnResourceAccessProvider::isAccessibleResource(user, layout))
+            if (!qnResourceAccessProvider->hasAccess(user, layout))
                 return Qn::NoPermissions;
 
             /* Global layouts editor. */

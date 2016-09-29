@@ -12,13 +12,26 @@ class QnAbstractResourceAccessProvider: public Connective<QObject>
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
+    /** Types of base providers, sorted by priority. */
+    enum class Source
+    {
+        none,
+        direct,
+        shared,
+        layout,
+        videowall
+    };
+
     QnAbstractResourceAccessProvider(QObject* parent = nullptr);
     virtual ~QnAbstractResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const = 0;
 
+    virtual Source accessibleVia(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource) const = 0;
+
 signals:
     void accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        bool value);
+        Source value);
 };

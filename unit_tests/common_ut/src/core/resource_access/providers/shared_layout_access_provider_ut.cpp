@@ -1,7 +1,7 @@
 #include <core/resource_access/providers/access_provider_test_fixture.h>
 #include <core/resource_access/providers/shared_layout_access_provider.h>
 
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -54,9 +54,26 @@ TEST_F(QnSharedLayoutAccessProviderTest, checkSharedCamera)
     item.resource.id = target->getId();
     layout->addItem(item);
 
-    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnSharedLayoutAccessProviderTest, checkSource)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto layout = addLayout();
+    ASSERT_TRUE(layout->isShared());
+
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    layout->addItem(item);
+
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
+
+    ASSERT_EQ(accessProvider()->accessibleVia(user, target),
+        QnAbstractResourceAccessProvider::Source::layout);
 }
 
 TEST_F(QnSharedLayoutAccessProviderTest, checkSharedServer)
@@ -70,7 +87,7 @@ TEST_F(QnSharedLayoutAccessProviderTest, checkSharedServer)
     item.resource.id = target->getId();
     layout->addItem(item);
 
-    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
 
     /* User should get access to statistics via shared layouts. */
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
@@ -88,7 +105,7 @@ TEST_F(QnSharedLayoutAccessProviderTest, layoutMadeShared)
     item.resource.id = target->getId();
     layout->addItem(item);
 
-    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 
     layout->setParentId(QnUuid());
@@ -103,7 +120,7 @@ TEST_F(QnSharedLayoutAccessProviderTest, layoutItemAdded)
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
 
-    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
 
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 
@@ -121,7 +138,7 @@ TEST_F(QnSharedLayoutAccessProviderTest, layoutItemRemoved)
     auto layout = addLayout();
     ASSERT_TRUE(layout->isShared());
 
-    qnResourceAccessManager->setAccessibleResources(user, QSet<QnUuid>() << layout->getId());
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
 
     QnLayoutItemData item;
     item.resource.id = target->getId();

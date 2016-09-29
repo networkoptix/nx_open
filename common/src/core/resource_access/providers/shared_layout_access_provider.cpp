@@ -2,7 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource/layout_resource.h>
 
@@ -28,13 +28,18 @@ QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
 QnSharedLayoutAccessProvider::QnSharedLayoutAccessProvider(QObject* parent):
     base_type(parent)
 {
-    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this,
-        &QnSharedLayoutAccessProvider::handleAccessibleResourcesChanged);
+    connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
+        &QnSharedLayoutAccessProvider::handleSharedResourcesChanged);
 }
 
 QnSharedLayoutAccessProvider::~QnSharedLayoutAccessProvider()
 {
 
+}
+
+QnAbstractResourceAccessProvider::Source QnSharedLayoutAccessProvider::baseSource() const
+{
+    return Source::layout;
 }
 
 bool QnSharedLayoutAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
@@ -44,7 +49,7 @@ bool QnSharedLayoutAccessProvider::calculateAccess(const QnResourceAccessSubject
         return false;
 
     auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
-        qnResourceAccessManager->accessibleResources(subject));
+        qnSharedResourcesManager->sharedResources(subject));
 
     auto resourceId = resource->getId();
     for (const auto& layout: sharedLayouts)
@@ -90,7 +95,7 @@ void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& reso
     }
 }
 
-void QnSharedLayoutAccessProvider::handleAccessibleResourcesChanged(
+void QnSharedLayoutAccessProvider::handleSharedResourcesChanged(
     const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
 {
     NX_ASSERT(subject.isValid());

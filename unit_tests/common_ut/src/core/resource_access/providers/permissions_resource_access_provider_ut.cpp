@@ -38,6 +38,14 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkAccessToInvalidResource)
     ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
+TEST_F(QnPermissionsResourceAccessProviderTest, checkSource)
+{
+    auto camera = addCamera();
+    auto user = addUser(Qn::GlobalAdminPermission);
+    ASSERT_EQ(accessProvider()->accessibleVia(user, camera),
+        QnAbstractResourceAccessProvider::Source::direct);
+}
+
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessCamera)
 {
     auto camera = addCamera();

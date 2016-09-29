@@ -14,9 +14,10 @@ void QnAccessProviderTestFixture::SetUp()
     QObject::connect(accessProvider(),
         &QnAbstractResourceAccessProvider::accessChanged,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            bool value)
+            QnAbstractResourceAccessProvider::Source value)
     {
-        at_accessChanged(subject, resource, value);
+        at_accessChanged(subject, resource,
+            value != QnAbstractResourceAccessProvider::Source::none);
     });
 }
 

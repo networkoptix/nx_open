@@ -11,12 +11,14 @@ public:
     virtual ~QnDirectResourceAccessProvider();
 
 protected:
+    virtual Source baseSource() const override;
+
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
     virtual void handleResourceAdded(const QnResourcePtr& resource);
 
 private:
-    void handleAccessibleResourcesChanged(const QnResourceAccessSubject& subject,
+    void handleSharedResourcesChanged(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& resourceIds);
 };

@@ -11,6 +11,8 @@ public:
     virtual ~QnPermissionsResourceAccessProvider();
 
 protected:
+    virtual Source baseSource() const override;
+
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 

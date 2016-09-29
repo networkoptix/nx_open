@@ -19,6 +19,20 @@ protected:
     }
 };
 
+TEST_F(QnVideoWallResourceAccessProviderTest, checkSource)
+{
+    auto target = addLayout();
+    auto videoWall = addVideoWall();
+    auto user = addUser(Qn::GlobalAdminPermission);
+
+    QnVideoWallItem item;
+    item.layout = target->getId();
+    videoWall->items()->addItem(item);
+
+    ASSERT_EQ(accessProvider()->accessibleVia(user, target),
+        QnAbstractResourceAccessProvider::Source::videowall);
+}
+
 TEST_F(QnVideoWallResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();

@@ -28,6 +28,11 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
             Qn::GlobalControlVideoWallPermission);
 }
 
+QnAbstractResourceAccessProvider::Source QnPermissionsResourceAccessProvider::baseSource() const
+{
+    return Source::direct;
+}
+
 bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {

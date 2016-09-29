@@ -19,12 +19,13 @@
 #include <api/app_server_connection.h>
 
 #include <core/resource_access/user_access_data.h>
+#include <core/resource_access/shared_resources_manager.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -277,13 +278,13 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
         accessibleResources << id;
     if (auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId))
     {
-        qnResourceAccessManager->setAccessibleResources(user, accessibleResources);
+        qnSharedResourcesManager->setSharedResources(user, accessibleResources);
     }
     else
     {
         auto role = qnUserRolesManager->userRole(accessRights.userId);
         if (!role.isNull())
-            qnResourceAccessManager->setAccessibleResources(role, accessibleResources);
+            qnSharedResourcesManager->setSharedResources(role, accessibleResources);
     }
 }
 
@@ -492,7 +493,7 @@ void QnCommonMessageProcessor::resetTime()
 
 void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)
 {
-    qnResourceAccessManager->resetAccessibleResources(accessRights);
+    qnSharedResourcesManager->reset(accessRights);
 }
 
 void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserGroupDataList& roles)

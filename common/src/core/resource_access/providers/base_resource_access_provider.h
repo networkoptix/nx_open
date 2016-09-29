@@ -15,7 +15,12 @@ public:
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
+    virtual Source accessibleVia(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource) const override;
+
 protected:
+    virtual Source baseSource() const = 0;
+
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const = 0;
 
