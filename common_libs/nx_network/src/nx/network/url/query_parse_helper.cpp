@@ -1,4 +1,10 @@
-#include "url_query_parse_helper.h"
+#include "query_parse_helper.h"
+
+namespace nx {
+namespace network {
+namespace url {
+
+namespace detail {
 
 bool convertTo(const QString& src, std::string* const dst)
 {
@@ -6,10 +12,16 @@ bool convertTo(const QString& src, std::string* const dst)
     return true;
 }
 
-void serializeToUrl(
+} // namespace detail
+
+void serializeField(
     QUrlQuery* const urlQuery,
     const QString& fieldName,
     const std::string& value)
 {
     urlQuery->addQueryItem(fieldName, QString::fromStdString(value));
 }
+
+} // namespace nx
+} // namespace network
+} // namespace url

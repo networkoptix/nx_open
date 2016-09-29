@@ -7,13 +7,14 @@
 
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/network/url/query_parse_helper.h>
 #include <utils/preprocessor/field_name.h>
-
-#include "url_query_parse_helper.h"
 
 namespace nx {
 namespace cdb {
 namespace api {
+
+using namespace nx::network;
 
 ////////////////////////////////////////////////////////////
 //// class SystemRegistrationData
@@ -25,12 +26,12 @@ MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, customization)
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
     return 
-        deserializeFromUrl(
+        url::deserializeField(
             urlQuery,
             SystemRegistrationData_name_field,
             &data->name)
         &&
-        deserializeFromUrl(
+        url::deserializeField(
             urlQuery,
             SystemRegistrationData_customization_field,
             &data->customization);
@@ -38,8 +39,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const d
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
 {
-    serializeToUrl(urlQuery, SystemRegistrationData_name_field, data.name);
-    serializeToUrl(urlQuery, SystemRegistrationData_customization_field, data.customization);
+    url::serializeField(urlQuery, SystemRegistrationData_name_field, data.name);
+    url::serializeField(urlQuery, SystemRegistrationData_customization_field, data.customization);
 }
 
 ////////////////////////////////////////////////////////////
@@ -151,14 +152,14 @@ MAKE_FIELD_NAME_STR_CONST(SystemNameUpdate, name)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data)
 {
-    return deserializeFromUrl(urlQuery, SystemNameUpdate_systemID_field, &data->systemID)
-        && deserializeFromUrl(urlQuery, SystemNameUpdate_name_field, &data->name);
+    return url::deserializeField(urlQuery, SystemNameUpdate_systemID_field, &data->systemID)
+        && url::deserializeField(urlQuery, SystemNameUpdate_name_field, &data->name);
 }
 
 void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery)
 {
-    serializeToUrl(urlQuery, SystemNameUpdate_systemID_field, data.systemID);
-    serializeToUrl(urlQuery, SystemNameUpdate_name_field, data.name);
+    url::serializeField(urlQuery, SystemNameUpdate_systemID_field, data.systemID);
+    url::serializeField(urlQuery, SystemNameUpdate_name_field, data.name);
 }
 
 //-----------------------------------------------------
@@ -169,15 +170,15 @@ MAKE_FIELD_NAME_STR_CONST(UserSessionDescriptor, systemId)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, UserSessionDescriptor* const data)
 {
-    deserializeFromUrl(urlQuery, UserSessionDescriptor_accountEmail_field, &data->accountEmail);
-    deserializeFromUrl(urlQuery, UserSessionDescriptor_systemId_field, &data->systemId);
+    url::deserializeField(urlQuery, UserSessionDescriptor_accountEmail_field, &data->accountEmail);
+    url::deserializeField(urlQuery, UserSessionDescriptor_systemId_field, &data->systemId);
     return data->accountEmail || data->systemId;
 }
 
 void serializeToUrlQuery(const UserSessionDescriptor& data, QUrlQuery* const urlQuery)
 {
-    serializeToUrl(urlQuery, UserSessionDescriptor_accountEmail_field, data.accountEmail);
-    serializeToUrl(urlQuery, UserSessionDescriptor_systemId_field, data.systemId);
+    url::serializeField(urlQuery, UserSessionDescriptor_accountEmail_field, data.accountEmail);
+    url::serializeField(urlQuery, UserSessionDescriptor_systemId_field, data.systemId);
 }
 
 void serialize(QnJsonContext*, const UserSessionDescriptor& data, QJsonValue* jsonValue)
