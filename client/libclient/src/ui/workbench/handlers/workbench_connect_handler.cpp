@@ -275,6 +275,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                 case QnConnectionState::Connecting:
                     // Does nothing. If welcome screen is shown it manages connecting state.
                     // If it is reconnecting state - we just see our scene.
+                    // If it is connection from caused by web page - it is processed by workbench context
                     break;
                 case QnConnectionState::Connected:
                     // If connection is successful we show global preloader while loading resources
@@ -587,7 +588,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         if (!disconnectFromServer(force))
             return;
     }
-    else
+    else if (m_state.state() == QnConnectionState::Connecting)
     {
         // break 'Connecting' state if any
         disconnectFromServer(true);
@@ -703,7 +704,6 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force)
     }
 
     clearConnection();
-    showWelcomeScreen();
     return true;
 }
 
@@ -714,26 +714,6 @@ void QnWorkbenchConnectHandler::showLoginDialog()
 
     const QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(context()->mainWindow()));
     dialog->exec();
-}
-
-void QnWorkbenchConnectHandler::showWelcomeScreen()
-{
-    if (!qnRuntime->isDesktopMode())
-        return;
-
-    if (context()->closingDown())
-        return;
-
-    if (m_state.state() != QnConnectionState::Disconnected)
-    {
-        showLoginDialog();
-    }
-    else
-    {
-        auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setGlobalPreloaderVisible(false);
-        action(QnActions::ResourcesModeAction)->setChecked(false); //< Show welcome screen
-    }
 }
 
 void QnWorkbenchConnectHandler::clearConnection()
