@@ -81,7 +81,7 @@ bool SystemSharing::getAsVariant(int resID, QVariant* const value) const
     }
 }
 
-bool SystemSharingList::getAsVariant(int resID, QVariant* const value) const
+bool SystemSharingList::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
 {
     return false;
 }
