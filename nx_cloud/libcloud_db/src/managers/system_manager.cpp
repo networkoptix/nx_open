@@ -1,8 +1,3 @@
-/**********************************************************
-* 3 may 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "system_manager.h"
 
 #include <limits>
@@ -15,6 +10,7 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/time.h>
 
 #include <api/global_settings.h>
 #include <core/resource/param.h>
@@ -37,6 +33,7 @@
 namespace nx {
 namespace cdb {
 
+// TODO: #ak should get rid of following function
 static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
 {
     api::SystemSharingEx result;
@@ -124,7 +121,7 @@ void SystemManager::authenticateByName(
 
     if (systemIter->status == api::SystemStatus::ssDeleted)
     {
-        if (systemIter->expirationTimeUtc > ::time(NULL) ||
+        if (systemIter->expirationTimeUtc > nx::utils::timeSinceEpoch().count() ||
             m_settings.systemManager().controlSystemStatusByDb) //system not expired yet
         {
             result = api::ResultCode::credentialsRemovedPermanently;
@@ -322,7 +319,10 @@ void SystemManager::getSystems(
             if (sharingData)
             {
                 systemDataEx.accessRole = sharingData->accessRole;
-                systemDataEx.sortingOrder = sharingData->systemAccessWeight;
+                // Calculating system weight.
+                systemDataEx.usageFrequency = calculateSystemUsageFrequency(
+                    sharingData->lastLoginTime,
+                    sharingData->usageFrequency + 1);
             }
             else
             {
@@ -605,10 +605,10 @@ void SystemManager::recordUserSessionStart(
     }
 
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::UserSessionDescriptor, double>(
-        std::bind(&SystemManager::updateSystemAccessWeightInDb, this, _1, _2, _3),
+    m_dbManager->executeUpdate<data::UserSessionDescriptor, SaveUserSessionResult>(
+        std::bind(&SystemManager::saveUserSessionStartToDb, this, _1, _2, _3),
         std::move(userSessionDescriptor),
-        std::bind(&SystemManager::systemAccessWeightUpdatedInDb, this,
+        std::bind(&SystemManager::userSessionStartSavedToDb, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             _1, _2, _3, _4, std::move(completionHandler)));
 }
@@ -729,7 +729,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
     result->systemData.ownerAccountEmail = account->email;
     result->systemData.status = api::SystemStatus::ssNotActivated;
     result->systemData.expirationTimeUtc =
-        ::time(NULL) +
+        nx::utils::timeSinceEpoch().count() +
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.systemManager().notActivatedSystemLivePeriod).count();
     QnSql::bind(result->systemData, &insertSystemQuery);
@@ -858,7 +858,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
         QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssDeleted)));
     markSystemAsRemoved.bindValue(
         ":expiration_utc_timestamp",
-        (int)(::time(NULL) +
+        (int)(nx::utils::timeSinceEpoch().count() +
             std::chrono::duration_cast<std::chrono::seconds>(
                 m_settings.systemManager().reportRemovedSystemPeriod).count()));
     markSystemAsRemoved.bindValue(
@@ -909,7 +909,7 @@ void SystemManager::systemMarkedAsDeleted(
                 { 
                     system.status = api::SystemStatus::ssDeleted;
                     system.expirationTimeUtc =
-                        ::time(NULL) +
+                        nx::utils::timeSinceEpoch().count() +
                         std::chrono::duration_cast<std::chrono::seconds>(
                             m_settings.systemManager().reportRemovedSystemPeriod).count();
                 });
@@ -1275,11 +1275,13 @@ void SystemManager::systemActivated(
 
 constexpr const int kSecondsPerDay = 60*60*24;
 
-nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
+nx::db::DBResult SystemManager::saveUserSessionStartToDb(
     nx::db::QueryContext* queryContext,
     const data::UserSessionDescriptor& userSessionDescriptor,
-    double* const systemAccessWeight)
+    SaveUserSessionResult* const result)
 {
+    using namespace std::chrono;
+
     NX_ASSERT(userSessionDescriptor.accountEmail && userSessionDescriptor.systemId);
 
     QSqlQuery selectUsageStatisticsQuery(*queryContext->connection());
@@ -1316,15 +1318,11 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
         selectUsageStatisticsQuery.value("usage_frequency").toFloat();
     const auto accountId = selectUsageStatisticsQuery.value("account_id").toString();
 
-    using namespace std::chrono;
-    const qint64 currentTimeUtc = 
-        duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
-    const auto fullDaysSinceLastLogin = 
-        (currentTimeUtc - lastLoginTimeUtc) / kSecondsPerDay;
-    *systemAccessWeight = std::max<float>(
-        (1 - fullDaysSinceLastLogin/30.0) * currentUsageFrequency,
-        0);
-    const auto newUsageFrequency = *systemAccessWeight + 1;
+    result->lastloginTime = nx::utils::utcTime();
+    result->usageFrequency = calculateSystemUsageFrequency(
+        std::chrono::system_clock::from_time_t(lastLoginTimeUtc),
+        currentUsageFrequency);
+    const auto newUsageFrequency = result->usageFrequency + 1;
 
     QSqlQuery updateUsageStatisticsQuery(*queryContext->connection());
     updateUsageStatisticsQuery.prepare(
@@ -1333,7 +1331,9 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
         SET last_login_time_utc=:last_login_time_utc, usage_frequency=:usage_frequency
         WHERE account_id=:account_id AND system_id=:system_id
         )sql");
-    updateUsageStatisticsQuery.bindValue(":last_login_time_utc", currentTimeUtc);
+    updateUsageStatisticsQuery.bindValue(
+        ":last_login_time_utc",
+        (quint64)duration_cast<seconds>(result->lastloginTime.time_since_epoch()).count());
     updateUsageStatisticsQuery.bindValue(":usage_frequency", newUsageFrequency);
     updateUsageStatisticsQuery.bindValue(":account_id", accountId);
     updateUsageStatisticsQuery.bindValue(
@@ -1351,12 +1351,12 @@ nx::db::DBResult SystemManager::updateSystemAccessWeightInDb(
     return nx::db::DBResult::ok;
 }
 
-void SystemManager::systemAccessWeightUpdatedInDb(
+void SystemManager::userSessionStartSavedToDb(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::UserSessionDescriptor userSessionDescriptor,
-    double systemAccessWeight,
+    SaveUserSessionResult result,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
@@ -1374,9 +1374,10 @@ void SystemManager::systemAccessWeightUpdatedInDb(
         {
             bySystemIdAndAccountEmailIndex.modify(
                 systemIter,
-                [systemAccessWeight](api::SystemSharingEx& systemSharing)
+                [&result](api::SystemSharingEx& systemSharing)
                 {
-                    systemSharing.systemAccessWeight = systemAccessWeight;
+                    systemSharing.usageFrequency = result.usageFrequency;
+                    systemSharing.lastLoginTime = result.lastloginTime;
                 });
         }
     }
@@ -1512,15 +1513,19 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     QSqlQuery readSystemToAccountQuery(*queryContext->connection());
     readSystemToAccountQuery.setForwardOnly(true);
     readSystemToAccountQuery.prepare(
-        "SELECT a.email as accountEmail, "
-               "sa.system_id as systemID, "
-               "sa.access_role_id as accessRole, "
-               "sa.group_id as groupID, "
-               "sa.custom_permissions as customPermissions, "
-               "sa.is_enabled as isEnabled, "
-               "sa.vms_user_id as vmsUserId "
-        "FROM system_to_account sa, account a "
-        "WHERE sa.account_id = a.id");
+        R"sql(
+        SELECT a.email as accountEmail,
+               sa.system_id as systemID,
+               sa.access_role_id as accessRole,
+               sa.group_id as groupID,
+               sa.custom_permissions as customPermissions,
+               sa.is_enabled as isEnabled,
+               sa.vms_user_id as vmsUserId,
+               sa.last_login_time_utc as lastLoginTime,
+               sa.usage_frequency as usageFrequency
+        FROM system_to_account sa, account a
+        WHERE sa.account_id = a.id
+        )sql");
     if (!readSystemToAccountQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
@@ -1528,10 +1533,19 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
         return db::DBResult::ioError;
     }
 
-    std::vector<data::SystemSharing> systemToAccount;
-    QnSql::fetch_many(readSystemToAccountQuery, &systemToAccount);
-    for (auto& sharing: systemToAccount)
-        m_accountAccessRoleForSystem.emplace(createDerivedFromBase(std::move(sharing)));
+    while (readSystemToAccountQuery.next())
+    {
+        api::SystemSharingEx data;
+        QnSql::fetch(
+            QnSql::mapping<api::SystemSharingEx>(readSystemToAccountQuery),
+            readSystemToAccountQuery.record(),
+            &data);
+        data.usageFrequency -= 1.0;
+        data.lastLoginTime =
+            std::chrono::system_clock::from_time_t(
+                readSystemToAccountQuery.value("lastLoginTime").toLongLong());
+        m_accountAccessRoleForSystem.emplace(std::move(data));
+    }
 
     return db::DBResult::ok;
 }
@@ -1570,7 +1584,7 @@ nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(nx::db::QueryContext*
         static_cast<int>(api::SystemStatus::ssDeleted));
     dropExpiredSystems.bindValue(
         ":currentTime",
-        (int)::time(NULL));
+        (int)nx::utils::timeSinceEpoch().count());
     if (!dropExpiredSystems.exec())
     {
         NX_LOGX(lit("Error deleting expired systems from DB. %1").
@@ -1591,7 +1605,8 @@ void SystemManager::expiredSystemsDeletedFromDb(
         //cleaning up systems cache
         QnMutexLocker lk(&m_mutex);
         auto& systemsByExpirationTime = m_systems.get<kSystemByExpirationTimeIndex>();
-        for (auto systemIter = systemsByExpirationTime.lower_bound(::time(NULL));
+        for (auto systemIter = systemsByExpirationTime
+                .lower_bound(nx::utils::timeSinceEpoch().count());
              systemIter != systemsByExpirationTime.end();
              )
         {
@@ -1748,6 +1763,18 @@ void SystemManager::onEc2SetResourceParamDone(
     {
         updateSystemNameInCache(std::move(systemNameUpdate));
     }
+}
+
+float SystemManager::calculateSystemUsageFrequency(
+    std::chrono::system_clock::time_point lastLoginTime,
+    float currentUsageFrequency)
+{
+    const auto fullDaysSinceLastLogin =
+        std::chrono::duration_cast<std::chrono::seconds>(
+            nx::utils::utcTime() - lastLoginTime).count() / kSecondsPerDay;
+    return std::max<float>(
+        (1 - fullDaysSinceLastLogin / 30.0) * currentUsageFrequency,
+        0);
 }
 
 }   //cdb

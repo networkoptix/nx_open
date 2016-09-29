@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <chrono>
 #include <string>
 #include <vector>
+
 #include <boost/optional.hpp>
 
 namespace nx {
@@ -148,7 +150,7 @@ public:
 };
 
 /**
- * Expands \a SystemSharing to contain account's full name.
+ * Expands \a SystemSharing to contain more data.
  */
 class SystemSharingEx
 :
@@ -157,7 +159,7 @@ class SystemSharingEx
 public:
     SystemSharingEx()
     :
-        systemAccessWeight(0.0)
+        usageFrequency(0.0)
     {
     }
 
@@ -165,7 +167,8 @@ public:
     std::string accountID;
     std::string accountFullName;
     /** Shows how often user accesses given system in comparison to other user's systems. */
-    float systemAccessWeight;
+    float usageFrequency;
+    std::chrono::system_clock::time_point lastLoginTime;
 
     bool operator==(const SystemSharingEx& rhs) const
     {
@@ -225,13 +228,13 @@ public:
      * This number shows how often user, performing request, 
      * uses this system in comparision to other systems.
      */
-    float sortingOrder;
+    float usageFrequency;
 
     SystemDataEx()
     :
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
-        sortingOrder(0)
+        usageFrequency(0)
     {
     }
 
@@ -240,7 +243,7 @@ public:
         SystemData(std::move(systemData)),
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
-        sortingOrder(0)
+        usageFrequency(0)
     {
     }
 };

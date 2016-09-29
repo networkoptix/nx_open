@@ -16,6 +16,7 @@
 #include <cloud_db_client/src/data/types.h>
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/time.h>
 #include <utils/common/guard.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/fusion/serialization/sql_functions.h>
@@ -230,7 +231,7 @@ void AccountManager::resetPassword(
     tempPasswordData.login = accountEmail.email;
     tempPasswordData.realm = AuthenticationManager::realm().constData();
     tempPasswordData.expirationTimestampUtc =
-        ::time(NULL) +
+        nx::utils::timeSinceEpoch().count() +
         m_settings.accountManager().passwordResetCodeExpirationTimeout.count();
     tempPasswordData.maxUseCount = 1;
     tempPasswordData.isEmailCode = true;
@@ -337,7 +338,7 @@ void AccountManager::createTemporaryCredentials(
     tempPasswordData.accountEmail = accountEmail;
     tempPasswordData.realm = AuthenticationManager::realm().constData();
     tempPasswordData.expirationTimestampUtc =
-        ::time(NULL) +
+        nx::utils::timeSinceEpoch().count() +
         params.timeouts.expirationPeriod.count();
     if (params.timeouts.autoProlongationEnabled)
         tempPasswordData.prolongationPeriodSec = 

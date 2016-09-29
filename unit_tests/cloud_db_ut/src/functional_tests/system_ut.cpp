@@ -10,6 +10,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/random.h>
+#include <nx/utils/time.h>
 
 #include "test_setup.h"
 
@@ -483,7 +484,103 @@ TEST_F(System, persistentSequence)
     ASSERT_EQ(system2.systemSequence + 1, system3.systemSequence);
 }
 
-TEST_F(System, sortingOrder)
+/**
+ * Validates order of elements in \a systems against \a systemIdsInSortOrder.
+ * @param systemIdsInSortOrder Sorted by descending priority
+ */
+static void validateSystemsOrder(
+    const std::list<std::string>& systemIdsInSortOrder,
+    const std::vector<api::SystemDataEx>& systems)
+{
+    ASSERT_EQ(systemIdsInSortOrder.size(), systems.size());
+
+    std::size_t i = 0;
+    boost::optional<float> prevSortingOrder;
+    for (const auto& systemId: systemIdsInSortOrder)
+    {
+        ASSERT_EQ(systemId, systems[i].id);
+        if (prevSortingOrder)
+            ASSERT_GT(prevSortingOrder, systems[i].usageFrequency);
+        prevSortingOrder = systems[i].usageFrequency;
+        ++i;
+    }
+}
+
+template<typename Container>
+void bringToTop(
+    Container& container,
+    typename Container::value_type value)
+{
+    const auto it = std::find(container.begin(), container.end(), value);
+    if (it != container.end())
+        container.erase(it);
+    container.push_front(std::move(value));
+}
+
+TEST_F(System, sortingOrderWeightExpiration)
+{
+    nx::utils::test::ScopedTimeShift timeShift;
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+    const auto account = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account);
+
+    // First access.
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        recordUserSessionStart(account, system1.id));
+
+    std::vector<api::SystemDataEx> systems;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto usageFrequency1 = systems[0].usageFrequency;
+
+    // Second access.
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        recordUserSessionStart(account, system1.id));
+
+    systems.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto usageFrequency2 = systems[0].usageFrequency;
+
+    ASSERT_GT(usageFrequency2, usageFrequency1);
+
+    // A week has passed. No access.
+    timeShift.applyRelativeShift(7 * std::chrono::hours(24));
+
+    systems.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto usageFrequency3 = systems[0].usageFrequency;
+    ASSERT_LT(usageFrequency3, usageFrequency2);
+
+    // Half year passed. Still no access.
+    timeShift.applyRelativeShift(6 * 30 * std::chrono::hours(24));
+
+    systems.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto usageFrequency4 = systems[0].usageFrequency;
+    ASSERT_LT(usageFrequency4, usageFrequency3);
+
+    // Repeating previous check but after restart.
+    restart();
+
+    systems.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto usageFrequency5 = systems[0].usageFrequency;
+    ASSERT_EQ(usageFrequency4, usageFrequency5);
+}
+
+TEST_F(System, sortingOrderMultipleSystems)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -499,13 +596,30 @@ TEST_F(System, sortingOrder)
     for (int i = 0; i < 1; ++i)
         ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
 
+    // First element has highest priority.
     std::list<std::string> systemIdsInSortOrder;
-    systemIdsInSortOrder.push_front(system1.id);
-    systemIdsInSortOrder.push_front(system2.id);
-    systemIdsInSortOrder.push_front(system3.id);
+    systemIdsInSortOrder.push_back(system1.id);
+    systemIdsInSortOrder.push_back(system2.id);
+    systemIdsInSortOrder.push_back(system3.id);
 
-    //for (int i = 0; i < 2; ++i)
+    nx::utils::test::ScopedTimeShift timeShift;
+
+    for (int i = 0; i < 3; ++i)
     {
+        if (i == 1)
+        {
+            // Shifting time and testing for access history expiration.
+            timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
+
+            ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
+
+            bringToTop(systemIdsInSortOrder, system3.id);
+        }
+        else if (i == 2)
+        {
+            restart();
+        }
+
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -516,21 +630,12 @@ TEST_F(System, sortingOrder)
             systems.begin(), systems.end(),
             [](const api::SystemDataEx& one, const api::SystemDataEx& two)
             {
-                return one.sortingOrder > two.sortingOrder; //< Descending sort.
+                return one.usageFrequency > two.usageFrequency; //< Descending sort.
             });
 
         // TODO: #ak: comparing with systemIdsInSortOrder
 
-        ASSERT_GT(systems[0].sortingOrder, systems[1].sortingOrder);
-        ASSERT_GT(systems[1].sortingOrder, systems[2].sortingOrder);
-
-        ASSERT_EQ(system1.id, systems[0].id);
-        ASSERT_EQ(system2.id, systems[1].id);
-        ASSERT_EQ(system3.id, systems[2].id);
-
-        // TODO: #ak: shifting time and testing for access history expiration
-
-        ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
+        validateSystemsOrder(systemIdsInSortOrder, systems);
     }
 }
 
