@@ -1333,7 +1333,7 @@ nx::db::DBResult SystemManager::saveUserSessionStartToDb(
         )sql");
     updateUsageStatisticsQuery.bindValue(
         ":last_login_time_utc",
-        duration_cast<seconds>(result->lastloginTime.time_since_epoch()).count());
+        (quint64)duration_cast<seconds>(result->lastloginTime.time_since_epoch()).count());
     updateUsageStatisticsQuery.bindValue(":usage_frequency", newUsageFrequency);
     updateUsageStatisticsQuery.bindValue(":account_id", accountId);
     updateUsageStatisticsQuery.bindValue(

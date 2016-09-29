@@ -511,8 +511,8 @@ void bringToTop(
     Container& container,
     typename Container::value_type value)
 {
-    const auto it = std::find(container.cbegin(), container.cend(), value);
-    if (it != container.cend())
+    const auto it = std::find(container.begin(), container.end(), value);
+    if (it != container.end())
         container.erase(it);
     container.push_front(std::move(value));
 }
