@@ -533,7 +533,8 @@ void QnNxStyle::drawPrimitive(
             }
 
             const bool pressed = option->state.testFlag(State_Sunken);
-            const bool hovered = option->state.testFlag(State_MouseOver);
+            const bool enabled = option->state.testFlag(State_Enabled);
+            const bool hovered = option->state.testFlag(State_MouseOver) && enabled;
 
             QRect rect = option->rect;
 
@@ -965,14 +966,40 @@ void QnNxStyle::drawPrimitive(
                 {
                     switch (tabShape(tabBar))
                     {
+                        /* Main window tabs draw icons: */
+                        case TabShape::Rectangular:
+                        {
+                            QIcon icon;
+                            switch (element)
+                            {
+                                case PE_IndicatorArrowLeft:
+                                    icon = qnSkin->icon(lit("tab_bar/tab_prev.png"));
+                                    break;
+                                case PE_IndicatorArrowRight:
+                                    icon = qnSkin->icon(lit("tab_bar/tab_next.png"));
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (icon.isNull())
+                            {
+                                /* Fall back to vector drawing: */
+                                width = 1.3;
+                                break;
+                            }
+
+                            QIcon::Mode mode = buttonIconMode(*option);
+                            icon.paint(painter, option->rect.adjusted(1, 0, 0, 0), Qt::AlignCenter, mode);
+                            return;
+                        }
+
+                        /* Other tabs fall back to vector drawing of the arrows: */
                         case TabShape::Default:
                         case TabShape::Compact:
                             size = dp(14);
                             color = findColor(option->palette.light().color()).darker(2);
                             width = 1.5;
-                            break;
-                        case TabShape::Rectangular:
-                            width = 1.3;
                             break;
                         default:
                             break;
@@ -3168,7 +3195,7 @@ int QnNxStyle::pixelMetric(
             return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
 
         case PM_TabBarScrollButtonWidth:
-            return dp(24);
+            return 24 + 1;
 
         case PM_TabCloseIndicatorWidth:
         case PM_TabCloseIndicatorHeight:
