@@ -576,7 +576,11 @@ void QnFfmpegAudioTranscoder::allocSampleBuffers(
     if (m_sampleBuffers)
         return;
 
-    auto buffersCount = av_sample_fmt_is_planar(outCtx->sample_fmt) ? outCtx->channels : 1;
+    auto outCtxBufferCount = av_sample_fmt_is_planar(outCtx->sample_fmt) ? outCtx->channels : 1;
+    auto inCtxBufferCount = av_sample_fmt_is_planar(inCtx->sample_fmt) ? inCtx->channels : 1;
+
+    // really I don't get why we can't just use outCtxBufferCount.
+    auto bufferCount = std::max(inCtxBufferCount, outCtxBufferCount);
 
     //get output sample count after resampling of a single frame
     auto outSampleCount = av_rescale_rnd(
@@ -599,13 +603,13 @@ void QnFfmpegAudioTranscoder::allocSampleBuffers(
     auto result = av_samples_alloc_array_and_samples(
         &m_sampleBuffers,
         &linesize,
-        outCtx->channels,
+        bufferCount,
         bufferSize,
         outCtx->sample_fmt,
         kDefaultAlign);
 
-    m_sampleBuffersWithOffset = new uint8_t*[buffersCount];
-    for (std::size_t i = 0; i < buffersCount; ++i)
+    m_sampleBuffersWithOffset = new uint8_t*[bufferCount];
+    for (std::size_t i = 0; i < bufferCount; ++i)
         m_sampleBuffersWithOffset[i] = m_sampleBuffers[i];
 
 

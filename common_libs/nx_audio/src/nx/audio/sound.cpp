@@ -105,8 +105,8 @@ void Sound::setVolumeLevel(float volumeLevel)
 
 int Sound::getOpenAlFormat(const QnAudioFormat &audioFormat)
 {
-    if (audioFormat.sampleType() == QnAudioFormat::Float)
-        return false;
+    /*if (audioFormat.sampleType() == QnAudioFormat::Float)
+        return false;*/
 
     QByteArray requestFormat;
     int bitsPerSample = audioFormat.sampleSize();
