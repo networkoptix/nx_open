@@ -18,6 +18,7 @@ struct QnCloudSystem
     QString ownerAccountEmail;
     QString ownerFullName;
     std::string authKey;
+    qreal weight;
 
     bool operator <(const QnCloudSystem &other) const;
     bool operator ==(const QnCloudSystem &other) const;

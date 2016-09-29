@@ -143,7 +143,13 @@ void QnCloudStatusPanelPrivate::updateUi()
 
     QString effectiveUserName = qnCloudStatusWatcher->effectiveUserName();
     if (effectiveUserName.isEmpty())
-        effectiveUserName = QnCloudStatusPanel::tr("Logging in...");
+    {
+        const auto cloudLogin = qnCloudStatusWatcher->cloudLogin();
+        if (cloudLogin.contains(L'@'))
+            effectiveUserName = cloudLogin;// Permanent login
+        else
+            effectiveUserName = QnCloudStatusPanel::tr("Logging in...");
+    }
 
     switch (qnCloudStatusWatcher->status())
     {
@@ -154,12 +160,12 @@ void QnCloudStatusPanelPrivate::updateUi()
             palette.setColor(QPalette::ButtonText, palette.color(QPalette::Light));
             break;
         case QnCloudStatusWatcher::Online:
-            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
             font.setWeight(QFont::Bold);
             break;
         case QnCloudStatusWatcher::Offline:
-            q->setText(qnCloudStatusWatcher->cloudLogin());
+            q->setText(effectiveUserName);
             q->setIcon(offlineIcon);
             font.setWeight(QFont::Bold);
             break;

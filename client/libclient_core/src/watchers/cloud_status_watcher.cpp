@@ -308,6 +308,10 @@ void QnCloudStatusWatcher::updateSystems()
             if (!guard)
                 return;
 
+            Q_D(QnCloudStatusWatcher);
+            if (!d->cloudConnection)
+                return;
+
             QnCloudSystemList cloudSystems;
 
             if (result == api::ResultCode::ok)
@@ -320,6 +324,8 @@ void QnCloudStatusWatcher::updateSystems()
                         return;
 
                     Q_D(QnCloudStatusWatcher);
+                    if (!d->cloudConnection)
+                        return;
 
                     d->setCloudEnabled((result != api::ResultCode::networkError)
                         && (result != api::ResultCode::serviceUnavailable));
