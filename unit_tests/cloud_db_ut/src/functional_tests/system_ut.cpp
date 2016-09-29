@@ -568,6 +568,16 @@ TEST_F(System, sortingOrderWeightExpiration)
         getSystems(account.data.email, account.password, &systems));
     const auto usageFrequency4 = systems[0].usageFrequency;
     ASSERT_LT(usageFrequency4, usageFrequency3);
+
+    // Repeating previous check but after restart.
+    restart();
+
+    systems.clear();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto usageFrequency5 = systems[0].usageFrequency;
+    ASSERT_EQ(usageFrequency4, usageFrequency5);
 }
 
 TEST_F(System, sortingOrderMultipleSystems)
@@ -594,7 +604,7 @@ TEST_F(System, sortingOrderMultipleSystems)
 
     nx::utils::test::ScopedTimeShift timeShift;
 
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         if (i == 1)
         {
@@ -604,6 +614,10 @@ TEST_F(System, sortingOrderMultipleSystems)
             ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
 
             bringToTop(systemIdsInSortOrder, system3.id);
+        }
+        else if (i == 2)
+        {
+            restart();
         }
 
         std::vector<api::SystemDataEx> systems;

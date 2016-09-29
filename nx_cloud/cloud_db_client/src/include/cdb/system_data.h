@@ -159,7 +159,7 @@ class SystemSharingEx
 public:
     SystemSharingEx()
     :
-        systemAccessWeight(0.0)
+        usageFrequency(0.0)
     {
     }
 
@@ -167,7 +167,7 @@ public:
     std::string accountID;
     std::string accountFullName;
     /** Shows how often user accesses given system in comparison to other user's systems. */
-    float systemAccessWeight;
+    float usageFrequency;
     std::chrono::system_clock::time_point lastLoginTime;
 
     bool operator==(const SystemSharingEx& rhs) const

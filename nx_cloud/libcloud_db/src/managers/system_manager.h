@@ -1,10 +1,4 @@
-/**********************************************************
-* 3 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef cloud_db_system_manager_h
-#define cloud_db_system_manager_h
+#pragma once
 
 #include <atomic>
 #include <chrono>
@@ -213,7 +207,7 @@ private:
 
     struct SaveUserSessionResult
     {
-        float systemAccessWeight;
+        float usageFrequency;
         std::chrono::system_clock::time_point lastloginTime;
     };
 
@@ -391,12 +385,10 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
-    static float calculateSystemAccessWeight(
+    static float calculateSystemUsageFrequency(
         std::chrono::system_clock::time_point lastLoginTime,
         float currentUsageFrequency);
 };
 
 }   //cdb
 }   //nx
-
-#endif

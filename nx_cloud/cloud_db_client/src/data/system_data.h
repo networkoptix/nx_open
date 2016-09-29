@@ -80,7 +80,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 #define SystemSharing_Fields (accountEmail)(systemID)(accessRole)(groupID)(customPermissions)(isEnabled)(vmsUserId)
 #define SystemSharingList_Fields (sharing)
 
-#define SystemSharingEx_Fields SystemSharing_Fields(accountID)(accountFullName)
+#define SystemSharingEx_Fields SystemSharing_Fields(accountID)(accountFullName)(usageFrequency)
 #define SystemSharingExList_Fields (sharing)
 
 #define SystemAccessRoleData_Fields (accessRole)

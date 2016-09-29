@@ -1,8 +1,3 @@
-/**********************************************************
-* 3 may 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "system_manager.h"
 
 #include <limits>
@@ -38,6 +33,7 @@
 namespace nx {
 namespace cdb {
 
+// TODO: #ak should get rid of following function
 static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
 {
     api::SystemSharingEx result;
@@ -324,9 +320,9 @@ void SystemManager::getSystems(
             {
                 systemDataEx.accessRole = sharingData->accessRole;
                 // Calculating system weight.
-                systemDataEx.usageFrequency = calculateSystemAccessWeight(
+                systemDataEx.usageFrequency = calculateSystemUsageFrequency(
                     sharingData->lastLoginTime,
-                    sharingData->systemAccessWeight + 1);
+                    sharingData->usageFrequency + 1);
             }
             else
             {
@@ -1323,10 +1319,10 @@ nx::db::DBResult SystemManager::saveUserSessionStartToDb(
     const auto accountId = selectUsageStatisticsQuery.value("account_id").toString();
 
     result->lastloginTime = nx::utils::utcTime();
-    result->systemAccessWeight = calculateSystemAccessWeight(
+    result->usageFrequency = calculateSystemUsageFrequency(
         std::chrono::system_clock::from_time_t(lastLoginTimeUtc),
         currentUsageFrequency);
-    const auto newUsageFrequency = result->systemAccessWeight + 1;
+    const auto newUsageFrequency = result->usageFrequency + 1;
 
     QSqlQuery updateUsageStatisticsQuery(*queryContext->connection());
     updateUsageStatisticsQuery.prepare(
@@ -1380,7 +1376,7 @@ void SystemManager::userSessionStartSavedToDb(
                 systemIter,
                 [&result](api::SystemSharingEx& systemSharing)
                 {
-                    systemSharing.systemAccessWeight = result.systemAccessWeight;
+                    systemSharing.usageFrequency = result.usageFrequency;
                     systemSharing.lastLoginTime = result.lastloginTime;
                 });
         }
@@ -1517,15 +1513,19 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     QSqlQuery readSystemToAccountQuery(*queryContext->connection());
     readSystemToAccountQuery.setForwardOnly(true);
     readSystemToAccountQuery.prepare(
-        "SELECT a.email as accountEmail, "
-               "sa.system_id as systemID, "
-               "sa.access_role_id as accessRole, "
-               "sa.group_id as groupID, "
-               "sa.custom_permissions as customPermissions, "
-               "sa.is_enabled as isEnabled, "
-               "sa.vms_user_id as vmsUserId "
-        "FROM system_to_account sa, account a "
-        "WHERE sa.account_id = a.id");
+        R"sql(
+        SELECT a.email as accountEmail,
+               sa.system_id as systemID,
+               sa.access_role_id as accessRole,
+               sa.group_id as groupID,
+               sa.custom_permissions as customPermissions,
+               sa.is_enabled as isEnabled,
+               sa.vms_user_id as vmsUserId,
+               sa.last_login_time_utc as lastLoginTime,
+               sa.usage_frequency as usageFrequency
+        FROM system_to_account sa, account a
+        WHERE sa.account_id = a.id
+        )sql");
     if (!readSystemToAccountQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
@@ -1533,10 +1533,19 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
         return db::DBResult::ioError;
     }
 
-    std::vector<data::SystemSharing> systemToAccount;
-    QnSql::fetch_many(readSystemToAccountQuery, &systemToAccount);
-    for (auto& sharing: systemToAccount)
-        m_accountAccessRoleForSystem.emplace(createDerivedFromBase(std::move(sharing)));
+    while (readSystemToAccountQuery.next())
+    {
+        api::SystemSharingEx data;
+        QnSql::fetch(
+            QnSql::mapping<api::SystemSharingEx>(readSystemToAccountQuery),
+            readSystemToAccountQuery.record(),
+            &data);
+        data.usageFrequency -= 1.0;
+        data.lastLoginTime =
+            std::chrono::system_clock::from_time_t(
+                readSystemToAccountQuery.value("lastLoginTime").toLongLong());
+        m_accountAccessRoleForSystem.emplace(std::move(data));
+    }
 
     return db::DBResult::ok;
 }
@@ -1756,7 +1765,7 @@ void SystemManager::onEc2SetResourceParamDone(
     }
 }
 
-float SystemManager::calculateSystemAccessWeight(
+float SystemManager::calculateSystemUsageFrequency(
     std::chrono::system_clock::time_point lastLoginTime,
     float currentUsageFrequency)
 {
