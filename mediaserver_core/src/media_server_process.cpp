@@ -2369,6 +2369,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
+    qnGlobalSettings->initialize();
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
