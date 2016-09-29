@@ -109,18 +109,14 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
         NX_ASSERT(m_accessibleResources.contains(resourceId));
         auto& accessible = m_accessibleResources[resourceId];
 
+        /* In the real world resource pool removes resources via batch, so selecting resources
+        * will not work here. Looks like we will not be notified about access lost to them. */
         for (const auto& targetResource : qnResPool->getResources(accessible.values()))
         {
             QnUuid targetId = targetResource->getId();
             accessible.remove(targetId);
             emit accessChanged(subject, targetResource, Source::none);
         }
-
-        /* We should get only own user resource there. */
-        NX_ASSERT(accessible.contains(resourceId));
-        emit accessChanged(subject, resource, Source::none);
-        accessible.remove(resourceId);
-        NX_ASSERT(accessible.isEmpty());
 
         m_accessibleResources.remove(resourceId);
     }

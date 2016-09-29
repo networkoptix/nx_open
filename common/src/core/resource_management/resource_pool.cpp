@@ -156,11 +156,15 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
 void QnResourcePool::removeResources(const QnResourceList& resources)
 {
-    QnResourceList removedLayoutResources, removedOtherResources;
+    QnResourceList removedLayoutResources;
+    QnResourceList removedUsers;
+    QnResourceList removedOtherResources;
     auto appendRemovedResource = [&](QnResourcePtr resource)
     {
-        if (resource.dynamicCast<QnLayoutResource>())
+        if (resource->hasFlags(Qn::layout))
             removedLayoutResources.push_back(resource);
+        else if (resource->hasFlags(Qn::user))
+            removedUsers.push_back(resource);
         else
             removedOtherResources.push_back(resource);
     };
@@ -250,11 +254,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     lk.unlock();
 
     /* Emit notifications. */
-    for (const QnResourcePtr& layoutResource: removedLayoutResources)
+    for (auto layoutResource: removedLayoutResources)
         emit resourceRemoved(layoutResource);
 
-    for (const QnResourcePtr& resource : removedOtherResources)
+    for (auto resource : removedOtherResources)
         emit resourceRemoved(resource);
+
+    for (auto user: removedUsers)
+        emit resourceRemoved(user);
 }
 
 QnResourceList QnResourcePool::getResources() const
