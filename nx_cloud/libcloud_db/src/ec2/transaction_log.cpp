@@ -2,6 +2,8 @@
 
 #include <QtSql/QSqlQuery>
 
+#include <nx/utils/time.h>
+
 #include "outgoing_transaction_dispatcher.h"
 #include "managers/managers_types.h"
 
@@ -528,8 +530,8 @@ int TransactionLog::generateNewTransactionSequence(
 
     ::ec2::Timestamp timestamp;
     timestamp.sequence = m_systemIdToTransactionLog[systemId].timestampSequence;
-    timestamp.ticks = duration_cast<milliseconds>(
-        system_clock::now().time_since_epoch()).count();
+    timestamp.ticks = 
+        duration_cast<milliseconds>(nx::utils::timeSinceEpoch()).count();
     return timestamp;
 }
 

@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <chrono>
 #include <string>
 #include <vector>
+
 #include <boost/optional.hpp>
 
 namespace nx {
@@ -148,7 +150,7 @@ public:
 };
 
 /**
- * Expands \a SystemSharing to contain account's full name.
+ * Expands \a SystemSharing to contain more data.
  */
 class SystemSharingEx
 :
@@ -166,6 +168,7 @@ public:
     std::string accountFullName;
     /** Shows how often user accesses given system in comparison to other user's systems. */
     float systemAccessWeight;
+    std::chrono::system_clock::time_point lastLoginTime;
 
     bool operator==(const SystemSharingEx& rhs) const
     {

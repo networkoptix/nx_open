@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/random.h>
+#include <nx/utils/time.h>
 #include <utils/common/guard.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql.h>
@@ -172,7 +173,7 @@ bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
 {
     if (passwordIter->second.useCount >= passwordIter->second.maxUseCount ||
         (passwordIter->second.expirationTimestampUtc > 0 &&
-            passwordIter->second.expirationTimestampUtc <= ::time(NULL)))
+            passwordIter->second.expirationTimestampUtc <= nx::utils::timeSinceEpoch().count()))
     {
         std::string tmpPasswordID = passwordIter->second.id;
         m_accountPassword.erase(passwordIter);
