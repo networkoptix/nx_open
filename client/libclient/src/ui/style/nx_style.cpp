@@ -874,10 +874,16 @@ void QnNxStyle::drawPrimitive(
         case PE_IndicatorViewItemCheck:
         {
             QStyleOptionViewItem adjustedOption;
+            bool exclusive = widget && widget->property(Properties::kItemViewRadioButtons).toBool();
+
+            auto drawFunction = exclusive
+                ? &QnNxStylePrivate::drawRadioButton
+                : &QnNxStylePrivate::drawCheckBox;
+
             if (viewItemHoverAdjusted(widget, option, adjustedOption))
-                d->drawCheckBox(painter, &adjustedOption, widget);
+                (d->*drawFunction)(painter, &adjustedOption, widget);
             else
-                d->drawCheckBox(painter, option, widget);
+                (d->*drawFunction)(painter, option, widget);
 
             return;
         }
