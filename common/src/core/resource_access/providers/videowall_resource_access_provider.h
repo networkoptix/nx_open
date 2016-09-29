@@ -16,7 +16,8 @@ protected:
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
-    virtual void handleResourceAdded(const QnResourcePtr& resource);
+    virtual void handleResourceAdded(const QnResourcePtr& resource) override;
+    virtual void handleResourceRemoved(const QnResourcePtr& resource) override;
 
 private:
     void handleVideoWallItemAdded(const QnVideoWallResourcePtr& resource,
@@ -27,6 +28,7 @@ private:
         const QnVideoWallItem &item);
 
     void updateByLayoutId(const QnUuid& id);
+    void updateAccessToVideoWallItems(const QnVideoWallResourcePtr& videoWall);
 
     QSet<QnUuid> accessibleLayouts() const;
 };

@@ -2,6 +2,9 @@
 #include <core/resource_access/providers/videowall_resource_access_provider.h>
 
 #include <core/resource_access/resource_access_manager.h>
+
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -133,4 +136,47 @@ TEST_F(QnVideoWallResourceAccessProviderTest, checkCameraAddedOnVideoWall)
     layout->addItem(layoutItem);
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnVideoWallResourceAccessProviderTest, checkVideoWallAdded)
+{
+    auto camera = addCamera();
+    auto layout = addLayout();
+    auto videoWall = createVideoWall();
+    auto user = addUser(Qn::GlobalAdminPermission);
+
+    QnVideoWallItem item;
+    item.layout = layout->getId();
+    videoWall->items()->addItem(item);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = camera->getId();
+    layout->addItem(layoutItem);
+
+    qnResPool->addResource(videoWall);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, layout));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, camera));
+}
+
+
+TEST_F(QnVideoWallResourceAccessProviderTest, checkVideoWallRemoved)
+{
+    auto camera = addCamera();
+    auto layout = addLayout();
+    auto videoWall = addVideoWall();
+    auto user = addUser(Qn::GlobalAdminPermission);
+
+    QnVideoWallItem item;
+    item.layout = layout->getId();
+    videoWall->items()->addItem(item);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = camera->getId();
+    layout->addItem(layoutItem);
+
+    qnResPool->removeResource(videoWall);
+
+    ASSERT_FALSE(accessProvider()->hasAccess(user, layout));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, camera));
 }

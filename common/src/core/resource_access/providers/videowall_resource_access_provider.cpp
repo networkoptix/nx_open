@@ -8,6 +8,22 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
+namespace {
+
+QSet<QnUuid> videoWallLayouts(const QnVideoWallResourcePtr& videoWall)
+{
+    QSet<QnUuid> result;
+    for (const auto& item : videoWall->items()->getItems())
+    {
+        if (item.layout.isNull())
+            continue;
+        result << item.layout;
+    }
+    return result;
+}
+
+} // namespace
+
 QnVideoWallResourceAccessProvider::QnVideoWallResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
@@ -59,6 +75,7 @@ void QnVideoWallResourceAccessProvider::handleResourceAdded(const QnResourcePtr&
             &QnVideoWallResourceAccessProvider::handleVideoWallItemChanged);
         connect(videoWall, &QnVideoWallResource::itemRemoved, this,
             &QnVideoWallResourceAccessProvider::handleVideoWallItemRemoved);
+        updateAccessToVideoWallItems(videoWall);
     }
     else if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
@@ -89,6 +106,13 @@ void QnVideoWallResourceAccessProvider::handleResourceAdded(const QnResourcePtr&
                     updateAccess(user, resource);
             });
     }
+}
+
+void QnVideoWallResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
+{
+    base_type::handleResourceRemoved(resource);
+    if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
+        updateAccessToVideoWallItems(videoWall);
 }
 
 void QnVideoWallResourceAccessProvider::handleVideoWallItemAdded(
@@ -128,18 +152,17 @@ void QnVideoWallResourceAccessProvider::updateByLayoutId(const QnUuid& id)
     }
 }
 
+void QnVideoWallResourceAccessProvider::updateAccessToVideoWallItems(
+    const QnVideoWallResourcePtr& videoWall)
+{
+    for (auto layoutId: videoWallLayouts(videoWall))
+        updateByLayoutId(layoutId);
+}
+
 QSet<QnUuid> QnVideoWallResourceAccessProvider::accessibleLayouts() const
 {
     QSet<QnUuid> result;
     for (const auto& videoWall : qnResPool->getResources<QnVideoWallResource>())
-    {
-        for (const auto& item : videoWall->items()->getItems())
-        {
-            if (item.layout.isNull())
-                continue;
-            result << item.layout;
-        }
-    }
-
+        result += videoWallLayouts(videoWall);
     return result;
 }

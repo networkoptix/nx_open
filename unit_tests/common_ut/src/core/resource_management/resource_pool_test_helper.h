@@ -27,6 +27,7 @@ public:
 
     QnWebPageResourcePtr addWebPage();
 
+    QnVideoWallResourcePtr createVideoWall();
     QnVideoWallResourcePtr addVideoWall();
 
     QnMediaServerResourcePtr addServer();

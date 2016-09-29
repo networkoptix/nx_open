@@ -67,10 +67,16 @@ QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
     return webPage;
 }
 
-QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
+QnVideoWallResourcePtr QnResourcePoolTestHelper::createVideoWall()
 {
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
     videoWall->setId(QnUuid::createUuid());
+    return videoWall;
+}
+
+QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
+{
+    auto videoWall = createVideoWall();
     qnResPool->addResource(videoWall);
     return videoWall;
 }
