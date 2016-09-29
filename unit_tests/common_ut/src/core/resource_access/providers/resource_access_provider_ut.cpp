@@ -1,7 +1,7 @@
 #include <core/resource_access/providers/access_provider_test_fixture.h>
 
 #include <core/resource_access/providers/resource_access_provider.h>
-#include <core/resource_access/providers/direct_resource_access_provider.h>
+#include <core/resource_access/providers/shared_resource_access_provider.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/shared_resources_manager.h>
 
@@ -25,7 +25,7 @@ protected:
     {
         QnAccessProviderTestFixture::SetUp();
         accessProvider()->addBaseProvider(new QnPermissionsResourceAccessProvider());
-        accessProvider()->addBaseProvider(new QnDirectResourceAccessProvider());
+        accessProvider()->addBaseProvider(new QnSharedResourceAccessProvider());
     }
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override

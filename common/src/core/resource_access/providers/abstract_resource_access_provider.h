@@ -16,7 +16,7 @@ public:
     enum class Source
     {
         none,
-        direct,     /* Accessible by permissions. */
+        permissions,/* Accessible by permissions. */
         shared,     /* Accessible by direct sharing. */
         layout,     /* Accessible by placing on shared layout. */
         videowall   /* Accessible by placing on videowall. */

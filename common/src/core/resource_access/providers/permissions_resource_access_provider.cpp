@@ -30,7 +30,7 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
 
 QnAbstractResourceAccessProvider::Source QnPermissionsResourceAccessProvider::baseSource() const
 {
-    return Source::direct;
+    return Source::permissions;
 }
 
 bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,

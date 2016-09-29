@@ -2,13 +2,13 @@
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
 
-/** Handles access via 'shared resources' db table. */
-class QnDirectResourceAccessProvider: public QnBaseResourceAccessProvider
+/** Provides access to directly shared resources. */
+class QnSharedResourceAccessProvider: public QnBaseResourceAccessProvider
 {
     using base_type = QnBaseResourceAccessProvider;
 public:
-    QnDirectResourceAccessProvider(QObject* parent = nullptr);
-    virtual ~QnDirectResourceAccessProvider();
+    QnSharedResourceAccessProvider(QObject* parent = nullptr);
+    virtual ~QnSharedResourceAccessProvider();
 
 protected:
     virtual Source baseSource() const override;

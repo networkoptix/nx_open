@@ -14,7 +14,7 @@
 
 namespace {
 
-static const auto kSource = QnAbstractResourceAccessProvider::Source::direct;
+static const auto kSource = QnAbstractResourceAccessProvider::Source::permissions;
 
 }
 

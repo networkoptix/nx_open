@@ -1,4 +1,4 @@
-#include "direct_resource_access_provider.h"
+#include "shared_resource_access_provider.h"
 
 #include <core/resource_access/shared_resources_manager.h>
 
@@ -6,23 +6,23 @@
 
 #include <core/resource/layout_resource.h>
 
-QnDirectResourceAccessProvider::QnDirectResourceAccessProvider(QObject* parent):
+QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
     connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
-        &QnDirectResourceAccessProvider::handleSharedResourcesChanged);
+        &QnSharedResourceAccessProvider::handleSharedResourcesChanged);
 }
 
-QnDirectResourceAccessProvider::~QnDirectResourceAccessProvider()
+QnSharedResourceAccessProvider::~QnSharedResourceAccessProvider()
 {
 }
 
-QnAbstractResourceAccessProvider::Source QnDirectResourceAccessProvider::baseSource() const
+QnAbstractResourceAccessProvider::Source QnSharedResourceAccessProvider::baseSource() const
 {
     return Source::shared;
 }
 
-bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
+bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
     NX_ASSERT(acceptable(subject, resource));
@@ -42,18 +42,18 @@ bool QnDirectResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
     return qnSharedResourcesManager->sharedResources(subject).contains(resource->getId());
 }
 
-void QnDirectResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
+void QnSharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
     base_type::handleResourceAdded(resource);
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         connect(layout, &QnResource::parentIdChanged, this,
-            &QnDirectResourceAccessProvider::updateAccessToResource);
+            &QnSharedResourceAccessProvider::updateAccessToResource);
     }
 }
 
-void QnDirectResourceAccessProvider::handleSharedResourcesChanged(
+void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
     const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
 {
     NX_ASSERT(subject.isValid());
