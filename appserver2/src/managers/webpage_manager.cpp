@@ -34,7 +34,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, webpages);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiWebPageDataList, decltype(queryDoneHandler)> ( ApiCommand::getWebPages, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiWebPageDataList, decltype(queryDoneHandler)> ( ApiCommand::getWebPages, QnUuid(), queryDoneHandler);
         return reqID;
     }
 

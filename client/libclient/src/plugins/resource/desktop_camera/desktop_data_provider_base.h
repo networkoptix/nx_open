@@ -9,6 +9,8 @@
 #include <core/dataprovider/live_stream_provider.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
+class QnAbstractDataConsumer;
+
 class QnDesktopDataProviderBase : public QnAbstractMediaStreamDataProvider
 {
 public:

@@ -124,7 +124,6 @@ private:
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     const ::ec2::ApiPeerData m_localPeerData;
     ConnectionDict m_connections;
-    std::map<TransactionTransport*, std::unique_ptr<TransactionTransport>> m_connectionsToRemove;
     mutable QnMutex m_mutex;
     QnCounter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;

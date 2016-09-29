@@ -52,17 +52,20 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
 #define SystemID_Fields (systemID)
 
 
+/**
+ * Input arguments for "rename system" request
+ */
 class SystemNameUpdate
 {
 public:
-    std::string id;
+    std::string systemID;
     std::string name;
 };
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemNameUpdate* const data);
 void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery);
 
-#define SystemNameUpdate_Fields (id)(name)
+#define SystemNameUpdate_Fields (systemID)(name)
 
 
 ////////////////////////////////////////////////////////////
@@ -83,8 +86,21 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 #define SystemAccessRoleData_Fields (accessRole)
 #define SystemAccessRoleList_Fields (accessRoles)
 
-#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth)
+#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth)(sortingOrder)
 #define SystemDataExList_Fields (systems)
+
+
+//-----------------------------------------------------
+// UserSessionDescriptor
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, UserSessionDescriptor* const data);
+void serializeToUrlQuery(const UserSessionDescriptor&, QUrlQuery* const urlQuery);
+
+void serialize(QnJsonContext*, const UserSessionDescriptor&, QJsonValue*);
+bool deserialize(QnJsonContext*, const QJsonValue&, UserSessionDescriptor*);
+
+//-----------------------------------------------------
+// common functions
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID)(SystemNameUpdate),

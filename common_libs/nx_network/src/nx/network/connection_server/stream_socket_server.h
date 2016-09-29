@@ -111,12 +111,7 @@ template<class CustomServerType, class ConnectionType>
     public QnStoppable
 {
     typedef StreamServerConnectionHolder<ConnectionType> BaseType;
-
-#if defined(_MSC_VER)
-    typedef typename StreamSocketServer<CustomServerType, ConnectionType> SelfType;
-#else
     typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
-#endif
 
 public:
     //!Initialization

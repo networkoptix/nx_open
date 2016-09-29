@@ -20,6 +20,8 @@ class QnUserResource : public QnResource
     typedef QnResource base_type;
 
 public:
+    static const QnUuid kAdminGuid;
+
     QnUserResource(QnUserType userType);
     QnUserResource(const QnUserResource& right);
 

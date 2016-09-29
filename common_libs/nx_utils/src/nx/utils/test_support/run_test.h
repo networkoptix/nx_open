@@ -17,7 +17,7 @@ inline int runTest(
     int argc, const char* argv[],
     std::function<void(const ArgumentParser& args)> extraInit = nullptr)
 {
-    nx::utils::FlagConfig::allowOutput(false);
+    nx::utils::FlagConfig::setOutputAllowed(false);
 
     #ifdef USE_GMOCK
         ::testing::InitGoogleMock(&argc, (char**)argv);

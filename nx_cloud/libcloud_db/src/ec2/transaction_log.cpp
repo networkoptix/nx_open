@@ -33,15 +33,15 @@ TransactionLog::TransactionLog(
 
 void TransactionLog::startDbTransaction(
     const nx::String& systemId,
-    nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbOperationsFunc,
-    nx::utils::MoveOnlyFunc<void(QSqlDatabase*, nx::db::DBResult)> onDbUpdateCompleted)
+    nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbOperationsFunc,
+    nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> onDbUpdateCompleted)
 {
     // TODO: execution of requests to the same system MUST be serialized
     // TODO: monitoring request queue size and returning api::ResultCode::retryLater if exceeded
 
     m_dbManager->executeUpdate(
         [this, systemId, dbOperationsFunc = std::move(dbOperationsFunc)](
-            QSqlDatabase* dbConnection) -> nx::db::DBResult
+            nx::db::QueryContext* dbConnection) -> nx::db::DBResult
         {
             {
                 QnMutexLocker lk(&m_mutex);
@@ -51,7 +51,7 @@ void TransactionLog::startDbTransaction(
             return dbOperationsFunc(dbConnection);
         },
         [this, onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
-            QSqlDatabase* dbConnection,
+            nx::db::QueryContext* dbConnection,
             nx::db::DBResult dbResult)
         {
             onDbUpdateCompleted(dbConnection, dbResult);
@@ -60,15 +60,15 @@ void TransactionLog::startDbTransaction(
 }
 
 nx::db::DBResult TransactionLog::updateTimestampHiForSystem(
-    QSqlDatabase* connection,
+    nx::db::QueryContext* queryContext,
     const nx::String& systemId,
     quint64 newValue)
 {
     QnMutexLocker lk(&m_mutex);
     m_systemIdToTransactionLog[systemId].timestampSequence = newValue;
-    m_dbTransactionContexts[connection].transactionLogUpdate.timestampSequence = newValue;
+    m_dbTransactionContexts[queryContext].transactionLogUpdate.timestampSequence = newValue;
 
-    QSqlQuery saveSystemTimestampSequence(*connection);
+    QSqlQuery saveSystemTimestampSequence(*queryContext->connection());
     saveSystemTimestampSequence.prepare(
         R"sql(
         REPLACE INTO transaction_source_settings(system_id, timestamp_hi) VALUES (?, ?)
@@ -110,7 +110,7 @@ void TransactionLog::readTransactions(
             &TransactionLog::fetchTransactions, this,
             _1, systemId, from, to, maxTransactionsToReturn, _2),
         [completionHandler = std::move(completionHandler)](
-            QSqlDatabase* /*connection*/,
+            nx::db::QueryContext* /*queryContext*/,
             nx::db::DBResult dbResult,
             TransactionReadResult outputData)
         {
@@ -133,7 +133,7 @@ nx::db::DBResult TransactionLog::fillCache()
     m_dbManager->executeSelect<int>(
         std::bind(&TransactionLog::fetchTransactionState, this, _1, _2),
         [&cacheFilledPromise](
-            QSqlDatabase* /*connection*/,
+            nx::db::QueryContext* /*queryContext*/,
             db::DBResult dbResult,
             int /*dummyResult*/)
         {
@@ -146,11 +146,11 @@ nx::db::DBResult TransactionLog::fillCache()
 }
 
 nx::db::DBResult TransactionLog::fetchTransactionState(
-    QSqlDatabase* connection,
+    nx::db::QueryContext* queryContext,
     int* const /*dummyResult*/)
 {
     // TODO: Filling in m_systemIdToTransactionLog.
-    QSqlQuery selectTransactionStateQuery(*connection);
+    QSqlQuery selectTransactionStateQuery(*queryContext->connection());
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(
         R"sql(
@@ -204,7 +204,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
     }
 
     //// Reading global transaction sequence from DB.
-    //QSqlQuery selectMaxTransactionSequence(*connection);
+    //QSqlQuery selectMaxTransactionSequence(*queryContext->connection());
     //selectMaxTransactionSequence.setForwardOnly(true);
     //selectMaxTransactionSequence.prepare(
     //    R"sql(
@@ -229,7 +229,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
 }
 
 nx::db::DBResult TransactionLog::fetchTransactions(
-    QSqlDatabase* connection,
+    nx::db::QueryContext* queryContext,
     const nx::String& systemId,
     const ::ec2::QnTranState& from,
     const ::ec2::QnTranState& to,
@@ -254,7 +254,7 @@ nx::db::DBResult TransactionLog::fetchTransactions(
          it != currentState.values.end();
          ++it)
     {
-        QSqlQuery fetchTransactionsOfAPeerQuery(*connection);
+        QSqlQuery fetchTransactionsOfAPeerQuery(*queryContext->connection());
         fetchTransactionsOfAPeerQuery.prepare(R"sql(
             SELECT tran_data, tran_hash, timestamp, sequence
             FROM transaction_log
@@ -297,7 +297,7 @@ nx::db::DBResult TransactionLog::fetchTransactions(
 }
 
 bool TransactionLog::isShouldBeIgnored(
-    QSqlDatabase* /*connection*/,
+    nx::db::QueryContext* /*queryContext*/,
     const nx::String& systemId,
     const ::ec2::QnAbstractTransaction& tran,
     const QByteArray& hash)
@@ -346,7 +346,7 @@ bool TransactionLog::isShouldBeIgnored(
 }
 
 //bool TransactionLog::checkTransactionSequence(
-//    QSqlDatabase* /*connection*/,
+//    nx::db::QueryContext* /*queryContext*/,
 //    const nx::String& systemId,
 //    const ::ec2::QnAbstractTransaction& transaction,
 //    const TransactionTransportHeader& cdbTransportHeader)
@@ -428,7 +428,7 @@ bool TransactionLog::isShouldBeIgnored(
 //}
 
 nx::db::DBResult TransactionLog::saveToDb(
-    QSqlDatabase* connection,
+    nx::db::QueryContext* queryContext,
     const nx::String& systemId,
     const ::ec2::QnAbstractTransaction& transaction,
     const QByteArray& transactionHash,
@@ -441,7 +441,7 @@ nx::db::DBResult TransactionLog::saveToDb(
             .str(transaction).arg(transactionHash),
         cl_logDEBUG1);
 
-    QSqlQuery saveTranQuery(*connection);
+    QSqlQuery saveTranQuery(*queryContext->connection());
     saveTranQuery.prepare(
         R"sql(
         REPLACE INTO transaction_log(system_id, peer_guid, db_guid, sequence,
@@ -469,7 +469,7 @@ nx::db::DBResult TransactionLog::saveToDb(
     if (transaction.peerID == m_peerId)
     {
         // Updating cloud_db sequence in DB
-        QSqlQuery updateCdbSequence(*connection);
+        QSqlQuery updateCdbSequence(*queryContext->connection());
         updateCdbSequence.prepare(
             R"sql(
             UPDATE cloud_db_transaction_sequence
@@ -491,7 +491,7 @@ nx::db::DBResult TransactionLog::saveToDb(
 
     // Modifying transaction log cache.
     QnMutexLocker lk(&m_mutex);
-    DbTransactionContext& dbTranContext = m_dbTransactionContexts[connection];
+    DbTransactionContext& dbTranContext = m_dbTransactionContexts[queryContext];
     const ::ec2::QnTranStateKey tranKey(transaction.peerID, transaction.persistentInfo.dbID);
     dbTranContext.transactionLogUpdate.transactionHashToUpdateAuthor[transactionHash] =
         UpdateHistoryData{
@@ -504,7 +504,7 @@ nx::db::DBResult TransactionLog::saveToDb(
 }
 
 int TransactionLog::generateNewTransactionSequence(
-    QSqlDatabase* /*connection*/,
+    nx::db::QueryContext* /*queryContext*/,
     const nx::String& systemId)
 {
     // global sequence
@@ -519,7 +519,7 @@ int TransactionLog::generateNewTransactionSequence(
 }
 
 ::ec2::Timestamp TransactionLog::generateNewTransactionTimestamp(
-    QSqlDatabase* /*connection*/,
+    nx::db::QueryContext* /*queryContext*/,
     const nx::String& systemId)
 {
     using namespace std::chrono;
@@ -534,7 +534,7 @@ int TransactionLog::generateNewTransactionSequence(
 }
 
 void TransactionLog::onDbTransactionCompleted(
-    QSqlDatabase* dbConnection,
+    nx::db::QueryContext* dbConnection,
     nx::db::DBResult dbResult)
 {
     DbTransactionContext currentDbTranContext;
