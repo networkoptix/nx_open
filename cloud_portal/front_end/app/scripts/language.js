@@ -23,9 +23,9 @@ var L = {
         activateSent: 'Activate account -',
         activateSuccess: 'Account activated -',
         activateCode: 'Activate account -',
-        restorePassword: 'Restore password -',
+        restorePassword: 'Reset password -',
         restorePasswordSuccess: 'Password saved -',
-        restorePasswordCode: 'Restore password -',
+        restorePasswordCode: 'Reset password -',
         contentPage: '',
         debug: 'Debug',
         login: 'Login -',
@@ -44,11 +44,11 @@ var L = {
     accessRoles: {
         disabled:{
             label: 'Disabled',
-            description: 'User is disabled in the system.'
+            description: 'User is disabled and cannot log in to the system.'
         },
         'Owner': {
             label: 'Owner',
-            description: 'Can do pretty much everything with his system.'
+            description: 'Unrestricted access including the ability to share and connect/disconnect system from cloud.'
         },
         'Viewer': {
             label: 'Viewer',
@@ -82,47 +82,47 @@ var L = {
     errorCodes:{
         ok: 'ok',
 
-        cloudInvalidResponse: 'Cloud DB returned an unexpected response',
-        notAuthorized: 'Login or password are incorrect',
-        wrongParameters: 'Some parameters on the form are incorrect',
-        wrongCode: 'Wrong confirmation code',
+        cloudInvalidResponse: 'Cloud DB returned an unexpected response.',
+        notAuthorized: 'Login or password are incorrect.',
+        wrongParameters: 'Some parameters on the form are incorrect.',
+        wrongCode: 'Wrong confirmation code.',
 
-        forbidden: 'You are not authorised for this action',
-        accountNotActivated: 'Your account wasn\'t confirmed yet. <a href="/activate">Send confirmation link again</a>',
-        accountBlocked: 'Your account was blocked',
+        forbidden: 'You do not have permissions to perform this action.',
+        accountNotActivated: 'This account hasn\'t been activated yet. <a href="/activate">Send activation link again</a>',
+        accountBlocked: 'This account has been blocked.',
 
         notFound: 'Not found', // Account not found, activation code not found and so on,
-        alreadyExists: 'Already Exists', // Account already exists
+        alreadyExists: 'Already exists', // Account already exists
 
-        unknownError: 'Some unexpected error has happened',
+        unknownError: 'Unexpected error occured.',
 
         // Internal error code for interface
-        accountAlreadyActivated: 'Your account was already activated',
-        emailNotFound: 'Email isn\'t registered in portal',
-        emailAlreadyExists: 'Email is already registered in portal',
-        oldPasswordMistmatch: 'Current password doesn\'t match',
+        accountAlreadyActivated: 'This account has been already activated.',
+        emailNotFound: 'This email has not been registered in portal.',
+        emailAlreadyExists: 'This email address has been already registered.',
+        oldPasswordMistmatch: 'Current password is incorrect.',
         passwordMismatch: 'Wrong password',
 
-        systemForbidden: 'You have no access to this system',
-        systemNotFound: 'This system wasn\'t found',
+        systemForbidden: 'You don't have access to this system.',
+        systemNotFound: 'System not found.',
 
-        cantEditYourself: 'You can\'t change your own permissions',
-        cantEditAdmin: 'This user already has administrator privileges'
+        cantEditYourself: 'Changing own permissions is not allowed.',
+        cantEditAdmin: 'This user already has administrator permissions.'
 
     },
     passwordRequirements:{
         minLengthMessage:'Password must contain at least 8 characters',
         requiredMessage: 'Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.',
-        weakMessage: 'Use numbers, symbols in different case and special symbols to make your password stronger',
+        weakMessage: 'Use numbers, upper and lower case letters and special characters to make your password stronger.',
         strongMessage: 'Strong password!',
         commonMessage: 'This password is in top most popular passwords in the world'
     },
     sharing:{
-        confirmOwner: 'You are going to change the owner of your system. You will not be able to return this power back!',
+        confirmOwner: 'You are about to change the owner of the system. You will lose owner permissions. This action is irreversible. Are you sure?',
 
         shareTitle: 'Share',
         shareConfirmButton: 'Share',
-        editShareTitle: 'Edit users permissions',
+        editShareTitle: 'Edit users' permissions',
         editShareConfirmButton: 'Save'
     },
     system:{
@@ -139,12 +139,12 @@ var L = {
         confirmDisconnectTitle: "Disconnect system from PRODUCT_NAME?",
         confirmDisconnectAction: "Disconnect",
 
-        confirmUnshareFromMe: "You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?",
+        confirmUnshareFromMe: "You are about to disconnect this system from your account. You will not be able to access this system via cloud anymore. Are you sure?",
         confirmUnshareFromMeTitle: "Delete system?",
         confirmUnshareFromMeAction: "Delete",
 
-        confirmUnshare: "You are going to debar user from the system. Are you sure?",
-        confirmUnshareTitle: "Delete User?",
+        confirmUnshare: "You are going to restrict the access to this user. Are you sure?",
+        confirmUnshareTitle: "Delete user?",
         confirmUnshareAction: "Delete",
 
         successDisconnected: 'System was successfully disconnected from PRODUCT_NAME',

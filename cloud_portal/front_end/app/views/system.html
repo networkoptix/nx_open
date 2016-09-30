@@ -7,7 +7,7 @@
         <div class="col-md-8 col-md-pull-4">
             <div class="no-access-panel" ng-if="!system.permissions.editUsers" >
                 <span class="no-access-panel-body">
-                    You have no access to view system information
+                    You do not have access to the system information.
                 </span>
             </div>
             <ng-include src="'static/views/components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>

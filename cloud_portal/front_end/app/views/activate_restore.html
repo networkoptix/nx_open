@@ -1,7 +1,7 @@
 <div>
     <div ng-if="data.activateCode">
         <h1 class="process-success" process-loading="activate">
-            Your account was successfully activated.<br>
+            Your account has been successfully activated.<br>
             <a ng-if="!session.fromClient" href="/login">Login</a>
             <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open VMS_NAME</button>
         </h1>
@@ -9,14 +9,14 @@
 
     <div ng-if="activationSuccess">
         <h1 class="process-success">
-            Your account was successfully activated.<br>
+            Your account has been successfully activated.<br>
             <a href="/login">Login</a>
         </h1>
     </div>
 
     <div ng-if="reactivatingSuccess">
         <h1 class="process-success">
-            Confirmation link was sent to your email. Check it to continue.
+            We've sent a password reset message to your email address.  Open it up to reset the password.
         </h1>
     </div>
     
@@ -33,8 +33,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required.</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please, enter a valid email.</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email address is required.</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid email address.</span>
                 </div>
             </div>
             <div class="form-group">
@@ -49,12 +49,12 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Confirmation link was sent to your email. Check it for creating a new password
+            We've sent a password reset message to your email address.  Open it up to reset the password.
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>Restore password</h1>
+        <h1>Reset Password</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-4 control-label">Email address</label>
@@ -66,21 +66,21 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required.</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please, enter a valid email.</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email address is required.</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid email address.</span>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="restore"
                                     form="restorePassword"
-                                    button-text="'Restore password'"></process-button>
+                                    button-text="'Reset Password'"></process-button>
                 </div>
             </div>
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1>Set new password</h1>
+        <h1>Set New Password</h1>
 
         <h2 class="process-success" ng-if="change.success || changeSuccess ">
             Password successfully saved.<br>

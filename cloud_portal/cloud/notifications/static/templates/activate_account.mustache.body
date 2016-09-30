@@ -1,10 +1,10 @@
 <h1>Welcome to PRODUCT_NAME</h1>
 
-<p>Thank you for registering in PRODUCT_NAME. Please, click the button below to confirm you e-mail address.</p>
+<p>Thank you for joining PRODUCT_NAME. Please click the button below to confirm you e-mail address and activate the account.</p>
 
 <a class="btn" href="{{config.portal_url}}/activate/{{message.code}}">Activate account</a>
 
 <p class='disclaimer'>
-If you haven't registered in PRODUCT_NAME, just ignore this letter.<br>
-Do not send this letter or link to account activation to anyone.
+If you didn't register in  PRODUCT_NAME, just ignore this email.<br>
+Please do not share this information with third parties.
 </p>
