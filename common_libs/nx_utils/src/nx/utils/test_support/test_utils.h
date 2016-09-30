@@ -16,8 +16,6 @@
 
 #include <QtCore/QSize>
 
-#include <gmock/gmock-matchers.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
 
@@ -51,9 +49,8 @@ static std::string qSizeToString(const QSize& size)
  */
 static void finishTest(bool hasFailure)
 {
-    // TODO: muskov: conf is undeclared
-    //if (!conf.enableHangOnFinish)
-    //    return;
+    if (!conf.enableHangOnFinish)
+        return;
 
     if (hasFailure)
         qWarning() << "\nFAILED; hanging...";
@@ -64,10 +61,3 @@ static void finishTest(bool hasFailure)
     {
     }
 }
-
-#ifdef _WIN32   //< Temporary solution until gmock on linux is updated.
-/** Creates gmock checker that verifies argument type with \a dynamic_cast. */
-#define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::WhenDynamicCastTo<T>(::testing::An<T>())
-#else
-#define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::_
-#endif
