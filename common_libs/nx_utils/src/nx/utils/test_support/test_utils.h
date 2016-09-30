@@ -49,8 +49,9 @@ static std::string qSizeToString(const QSize& size)
  */
 static void finishTest(bool hasFailure)
 {
-    if (!conf.enableHangOnFinish)
-        return;
+    // TODO: muskov: conf is undeclared
+    //if (!conf.enableHangOnFinish)
+    //    return;
 
     if (hasFailure)
         qWarning() << "\nFAILED; hanging...";
@@ -61,3 +62,6 @@ static void finishTest(bool hasFailure)
     {
     }
 }
+
+/** Creates gmock checker that verifies argument type with \a dynamic_cast. */
+#define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::WhenDynamicCastTo<T>(::testing::An<T>())
