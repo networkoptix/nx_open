@@ -157,7 +157,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
     m_statisticsReportLastNumberAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNameStatisticsReportLastNumber, 0, this);
     m_statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportTimeCycle, QString(), this);
     m_statisticsReportUpdateDelayAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportUpdateDelay, QString(), this);
-    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameLocalSystemID, QnUuid(), this);
     m_statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportServerApi, QString(), this);
     m_clientStatisticsSettingsUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSettingsUrlParam, QString(), this);
 
@@ -171,7 +170,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
         << m_statisticsReportLastNumberAdaptor
         << m_statisticsReportTimeCycleAdaptor
         << m_statisticsReportUpdateDelayAdaptor
-        << m_localSystemIdAdaptor
         << m_statisticsReportServerApiAdaptor
         << m_clientStatisticsSettingsUrlAdaptor
         ;
@@ -252,6 +250,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 {
     m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemName, QString(), this);
+    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameLocalSystemID, QString(), this);
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
@@ -279,7 +278,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         this);
 
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
-    connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,    &QnGlobalSettings::localSystemIdChanged,               Qt::QueuedConnection);
+    connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
@@ -291,6 +290,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     QnGlobalSettings::AdaptorList result;
     result
         << m_systemNameAdaptor
+        << m_localSystemIdAdaptor
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_auditTrailEnabledAdaptor
@@ -625,12 +625,12 @@ void QnGlobalSettings::setUpnpPortMappingEnabled(bool value)
 
 QnUuid QnGlobalSettings::localSystemID() const
 {
-    return m_localSystemIdAdaptor->value();
+    return QnUuid(m_localSystemIdAdaptor->value());
 }
 
-void QnGlobalSettings::setLocalSystemID(const QnUuid &value)
+void QnGlobalSettings::setLocalSystemID(const QnUuid& value)
 {
-    m_localSystemIdAdaptor->setValue(value);
+    m_localSystemIdAdaptor->setValue(value.toString());
 }
 
 QString QnGlobalSettings::clientStatisticsSettingsUrl() const

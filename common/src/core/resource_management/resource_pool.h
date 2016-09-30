@@ -49,11 +49,16 @@ public:
     QnResourcePool(QObject* parent = NULL);
     ~QnResourcePool();
 
-    // this function will add or update existing resources
-    // keeps database ID ( if possible )
-    void addResources(const QnResourceList &resources);
+    /**
+     * this function will add or update existing resources
+     * By default it add resources to the mainPool. if mainPoos parameter is false then resources are put to
+     * the incompatible resource pool
+     */
+
+    void addResources(const QnResourceList &resources, bool mainPool = true);
 
     void addResource(const QnResourcePtr &resource);
+    void addIncompatibleResource(const QnResourcePtr &resource);
 
     void beginTran();
     void commit();

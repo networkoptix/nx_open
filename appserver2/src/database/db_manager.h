@@ -619,11 +619,14 @@ namespace detail
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
+
+        // todo: move this variables to QFlag
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
         bool m_needResyncCameraUserAttributes;
         bool m_needResyncServerUserAttributes;
+        bool m_needResyncMediaServers;
         bool m_dbJustCreated;
         bool m_isBackupRestore;
         bool m_needResyncLayout;
@@ -631,6 +634,7 @@ namespace detail
         bool m_needResyncUsers;
         bool m_needResyncStorages;
         bool m_needResyncClientInfoData;
+
         bool m_dbReadOnly;
     };
 } // namespace detail

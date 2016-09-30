@@ -146,7 +146,7 @@ public:
     void setUpnpPortMappingEnabled(bool value);
 
     QnUuid localSystemID() const;
-    void setLocalSystemID(const QnUuid &value);
+    void setLocalSystemID(const QnUuid& value);
 
     QString clientStatisticsSettingsUrl() const;
 
@@ -260,7 +260,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor;
     QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
-    QnResourcePropertyAdaptor<QnUuid> *m_localSystemIdAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_localSystemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;
     QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor;
 

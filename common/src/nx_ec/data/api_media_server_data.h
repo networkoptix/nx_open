@@ -58,21 +58,18 @@ namespace ec2
     struct ApiMediaServerData: ApiResourceData
     {
         ApiMediaServerData():
-            flags(Qn::SF_None),
-            not_used(Qn::PM_None)
+            flags(Qn::SF_None)
         {
             typeId = QnResourceTypePool::kServerTypeUuid;
         }
 
         QString         networkAddresses;
         Qn::ServerFlags flags;
-        Qn::PanicMode   not_used;
         QString         version;
-        QString         systemInfo; //! < depracated field
+        QString         systemInfo;
         QString         authKey;
-        QString         unused2; //! < depracated field
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (networkAddresses)(flags)(not_used)(version)(systemInfo)(authKey)(unused2)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (networkAddresses)(flags)(version)(systemInfo)(authKey)
 
     QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (eq))
 

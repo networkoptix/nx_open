@@ -1962,7 +1962,6 @@ void MediaServerProcess::run()
     if (!m_publicAddress.isNull())
         serverFlags |= Qn::SF_HasPublicIP;
 
-    doMigrateSystemNameFromConfig(&cloudConnectionManager);
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
@@ -2380,6 +2379,8 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
+    doMigrateSystemNameFromConfig(&cloudConnectionManager);
+
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 

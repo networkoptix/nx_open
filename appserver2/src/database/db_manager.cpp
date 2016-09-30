@@ -228,6 +228,7 @@ QnDbManager::QnDbManager()
     m_needResyncFiles(false),
     m_needResyncCameraUserAttributes(false),
     m_needResyncServerUserAttributes(false),
+    m_needResyncMediaServers(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
     m_needResyncLayout(false),
@@ -517,6 +518,10 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
         if (m_needResyncServerUserAttributes) {
             if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
+                return false;
+        }
+        if (m_needResyncMediaServers) {
+            if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
                 return false;
         }
         if (m_needResyncLayout) {
@@ -1355,7 +1360,7 @@ bool QnDbManager::encryptKvPairs()
 
         bool allowed = ec2::access_helpers::kvSystemOnlyFilter(
             ec2::access_helpers::Mode::read,
-            Qn::UserAccessData(), 
+            Qn::UserAccessData(),
             name);
 
         if (!allowed) // need encrypt
@@ -1601,6 +1606,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/73_encrypt_kvpairs.sql"))
     {
         return encryptKvPairs();
+    }
+    else if (updateName == lit(":/updates/74_remove_server_deprecated_columns.sql"))
+    {
+        if (!m_dbJustCreated)
+            m_needResyncMediaServers = true;
     }
 
     return true;
@@ -1983,8 +1993,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, system_name, resource_ptr_id, panic_mode) \
-        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :systemName, :internalId, 0)\
+        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, resource_ptr_id) \
+        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :internalId)\
     ");
     QnSql::bind(data, &insQuery);
 
@@ -3709,7 +3719,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& s
     query.prepare(lit("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
-        s.flags, s.system_name as systemName \
+        s.flags \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_server s on s.resource_ptr_id = r.id %1 ORDER BY r.guid\
