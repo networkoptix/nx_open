@@ -3,7 +3,10 @@
 
 #include <QtCore/QAbstractTableModel>
 
+#include <client/client_color_types.h>
+
 #include <utils/common/connective.h>
+#include <ui/customization/customized.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
@@ -13,11 +16,12 @@
 struct QnPeerRuntimeInfo;
 
 class QnTimeServerSelectionModel :
-    public ScopedModelOperations<Connective<QAbstractTableModel>>,
+    public ScopedModelOperations<Customized<Connective<QAbstractTableModel>>>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef ScopedModelOperations<Connective<QAbstractTableModel>> base_type;
+    Q_PROPERTY(QVector<QColor> colors READ colors WRITE setColors)
+    using base_type = ScopedModelOperations<Customized<Connective<QAbstractTableModel>>>;
 
 public:
     enum Columns
@@ -47,9 +51,14 @@ public:
     void setSelectedServer(const QnUuid& serverId);
 
     static bool isSelected(quint64 priority);
-    static QString formattedOffset(qint64 offsetMSec);
+
+    static QString formattedOffset(qint64 offsetMs);
+    QVariant offsetForeground(qint64 offsetMs) const;
 
     bool sameTimezone() const;
+
+    const QVector<QColor>& colors() const;
+    void setColors(const QVector<QColor>& colors);
 
 private:
     void addItem(const QnPeerRuntimeInfo& info);
@@ -74,6 +83,8 @@ private:
 
     /** Store received values to avoid long 'Synchronizing' in some cases. */
     QHash<QnUuid, qint64> m_serverOffsetCache;
+
+    QVector<QColor> m_colors;
 
     mutable bool m_sameTimezone;
     mutable bool m_sameTimezoneValid;

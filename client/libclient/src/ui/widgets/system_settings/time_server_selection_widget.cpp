@@ -16,6 +16,14 @@
 
 #include <utils/common/synctime.h>
 
+//#define QN_TIME_SERVER_SELECTION_DEBUG
+
+#ifdef QN_TIME_SERVER_SELECTION_DEBUG
+#define PRINT_DEBUG(MSG) qDebug() << MSG
+#else
+#define PRINT_DEBUG(MSG)
+#endif
+
 namespace {
 
     static const int kTimeFontSizePixels = 40;
@@ -24,6 +32,7 @@ namespace {
     static const int kDateFontWeight = QFont::Bold;
     static const int kZoneFontSizePixels = 14;
     static const int kZoneFontWeight = QFont::Normal;
+    static const int kMinimumDateTimeWidth = 84;
 
     class QnSortServersByPriorityProxyModel: public QSortFilterProxyModel
     {
@@ -38,17 +47,33 @@ namespace {
         }
     };
 
+    class QnTimeServerDelegate : public QStyledItemDelegate
+    {
+        using base_type = QStyledItemDelegate;
+
+    public:
+        QnTimeServerDelegate(QObject* parent = nullptr) : base_type(parent) {}
+
+        virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+        {
+            QSize size = base_type::sizeHint(option, index);
+
+            switch (index.column())
+            {
+                case QnTimeServerSelectionModel::DateColumn:
+                case QnTimeServerSelectionModel::TimeColumn:
+                    size.setWidth(qMax(size.width(), kMinimumDateTimeWidth));
+                    break;
+
+                default:
+                    break;
+            }
+
+            return size;
+        }
+    };
+
 } // namespace
-
-#ifdef _DEBUG
-    #define QN_TIME_SERVER_SELECTION_DEBUG
-#endif
-
-#ifdef QN_TIME_SERVER_SELECTION_DEBUG
-#define PRINT_DEBUG(MSG) qDebug() << MSG
-#else
-#define PRINT_DEBUG(MSG)
-#endif
 
 QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NULL*/) :
     QnAbstractPreferencesWidget(parent),
@@ -87,8 +112,9 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
 
     ui->serversTable->setModel(sortModel);
     ui->serversTable->setProperty(style::Properties::kItemViewRadioButtons, true);
+    ui->serversTable->setItemDelegate(new QnTimeServerDelegate(this));
     ui->serversTable->setItemDelegateForColumn(
-        QnTimeServerSelectionModel::NameColumn, new QnResourceItemDelegate());
+        QnTimeServerSelectionModel::NameColumn, new QnResourceItemDelegate(this));
 
     auto header = ui->serversTable->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::ResizeToContents);

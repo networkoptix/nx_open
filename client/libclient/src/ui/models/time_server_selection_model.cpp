@@ -20,18 +20,34 @@
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>
 
-namespace {
-    QVector<int> textRoles = QVector<int>()
-        << Qt::DisplayRole
-        << Qt::StatusTipRole
-        << Qt::WhatsThisRole
-        << Qt::AccessibleTextRole
-        << Qt::AccessibleDescriptionRole
-        << Qt::ToolTipRole;
+#include <algorithm>
 
-    QVector<int> checkboxRoles = QVector<int>()
-        << Qt::DisplayRole
-        << Qt::CheckStateRole;
+namespace {
+    template<class T>
+    QVector<T> sortedVector(const QVector<T>& unsorted)
+    {
+        auto sorted = unsorted;
+        std::sort(sorted.begin(), sorted.end());
+        return sorted;
+    }
+
+    QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
+        { 3, 5, 10, 30, 60, 180, 300, 600 });
+
+    QVector<int> kTextRoles = {
+        Qt::DisplayRole,
+        Qt::StatusTipRole,
+        Qt::WhatsThisRole,
+        Qt::AccessibleTextRole,
+        Qt::AccessibleDescriptionRole,
+        Qt::ToolTipRole };
+
+    QVector<int> kCheckboxRoles = {
+        Qt::DisplayRole,
+        Qt::CheckStateRole };
+
+    QVector<int> kForegroundRole = {
+        Qt::ForegroundRole };
 
     QString serverName(const QnResourcePtr& server)
     {
@@ -52,7 +68,7 @@ namespace {
 #define PRINT_DEBUG(MSG)
 #endif
 
-QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL*/):
+QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_sameTimezone(false),
@@ -82,7 +98,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
             m_items[idx].offset = offset;
             m_items[idx].ready = true;
             PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
-            emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), textRoles);
+            emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
         });
 
     connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this,
@@ -169,7 +185,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
             emit dataChanged(
                 this->index(idx, Columns::NameColumn),
                 this->index(idx, Columns::NameColumn),
-                textRoles);
+                kTextRoles);
         });
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
@@ -336,6 +352,11 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
         case Qn::PriorityRole:
             return item.priority;
 
+        case Qt::ForegroundRole:
+            if (column == Columns::OffsetColumn)
+                return offsetForeground(item.offset);
+            break;
+
         default:
             break;
     }
@@ -452,9 +473,9 @@ void QnTimeServerSelectionModel::updateColumn(Columns column)
     if (m_items.isEmpty())
         return;
 
-    QVector<int> roles = column == Columns::CheckboxColumn
-        ? checkboxRoles
-        : textRoles;
+    const auto& roles = column == Columns::CheckboxColumn
+        ? kCheckboxRoles
+        : kTextRoles;
 
     emit dataChanged(index(0, column), index(m_items.size() - 1, column), roles);
 }
@@ -464,18 +485,74 @@ bool QnTimeServerSelectionModel::isSelected(quint64 priority)
     return (priority & ec2::ApiRuntimeData::tpfPeerTimeSetByUser) > 0;
 }
 
-QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec)
+QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
 {
     static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
     static const int kDoNotSuppress = -1;
     static const int kMinimalOffsetMs = 1000;
 
-    offsetMSec = qAbs(offsetMSec);
+    offsetMs = qAbs(offsetMs);
 
-    if (offsetMSec < kMinimalOffsetMs)
+    if (offsetMs < kMinimalOffsetMs)
         return QString();
 
-    return QTimeSpan(offsetMSec).toApproximateString(kDoNotSuppress, kFormat);
+    static const QString sSuffix = tr("s", "Suffix for displaying seconds of server time offset");
+    static const QString mSuffix = tr("m", "Suffix for displaying minutes of server time offset");
+    static const QString hSuffix = tr("h", "Suffix for displaying hours of server time offset");
+
+    auto unitStringsConverter =
+        [&](Qt::TimeSpanUnit unit, int num)
+        {
+            QString suffix;
+            switch (unit)
+            {
+                case::Qt::Seconds:
+                    suffix = sSuffix;
+                    break;
+                case::Qt::Minutes:
+                    suffix = mSuffix;
+                    break;
+                case::Qt::Hours:
+                    suffix = hSuffix;
+                    break;
+                default:
+                    break;
+            }
+
+            return QString::number(num) + suffix;
+        };
+
+    return QTimeSpan(offsetMs).toApproximateString(kDoNotSuppress, kFormat, unitStringsConverter, lit(" "));
+}
+
+QVariant QnTimeServerSelectionModel::offsetForeground(qint64 offsetMs) const
+{
+    if (m_colors.empty())
+        return QVariant();
+
+    unsigned int offsetSeconds = static_cast<unsigned int>(qMin<qint64>(
+        qAbs(offsetMs) / 1000, std::numeric_limits<unsigned int>::max()));
+
+    int index = std::upper_bound(kOffsetThresholdSeconds.begin(), kOffsetThresholdSeconds.end(), offsetSeconds)
+        - kOffsetThresholdSeconds.begin();
+
+    return QVariant::fromValue(QBrush(m_colors[qBound(0, index, m_colors.size() - 1)]));
+}
+
+const QVector<QColor>& QnTimeServerSelectionModel::colors() const
+{
+    return m_colors;
+}
+
+void QnTimeServerSelectionModel::setColors(const QVector<QColor>& colors)
+{
+    if (colors == m_colors)
+        return;
+
+    m_colors = colors;
+
+    if (!m_items.isEmpty())
+        emit dataChanged(index(0, OffsetColumn), index(m_items.size() - 1, OffsetColumn), kForegroundRole);
 }
 
 bool QnTimeServerSelectionModel::sameTimezone() const
