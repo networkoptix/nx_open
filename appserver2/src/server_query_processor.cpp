@@ -1,4 +1,6 @@
 #include  <base_ec2_connection.h>
+#include <transaction/transaction.h>
+
 #include "server_query_processor.h"
 
 namespace ec2
@@ -13,20 +15,33 @@ void detail::ServerQueryProcessor::setAuditData(
     m_authSession = authSession;
 }
 
+ErrorCode detail::ServerQueryProcessor::removeHelper(
+    const QnUuid& id,
+    ApiCommand::Value command,
+    const AbstractECConnectionPtr& connection,
+    std::list<std::function<void()>>* const transactionsToSend,
+    bool notificationNeeded,
+    TransactionType::Value transactionType)
+{
+    QnTransaction<ApiIdData> removeTran(command, ApiIdData(id));
+    removeTran.transactionType = transactionType;
+    ErrorCode errorCode = processUpdateSync(removeTran, transactionsToSend, 0);
+    if (errorCode != ErrorCode::ok)
+        return errorCode;
+
+    if (notificationNeeded)
+        triggerNotification(connection, removeTran);
+
+    return ErrorCode::ok;
+}
+
 ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
     const QnUuid& id,
     ApiCommand::Value command,
     const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend)
 {
-    QnTransaction<ApiIdData> removeObjAttrTran(command, ApiIdData(id));
-    ErrorCode errorCode = processUpdateSync(removeObjAttrTran, transactionsToSend, 0);
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    triggerNotification(connection, removeObjAttrTran);
-
-    return ErrorCode::ok;
+    return removeHelper(id, command, connection, transactionsToSend, true);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
@@ -57,32 +72,59 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     return errorCode;
 }
 
-ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
-    const QnUuid& id,
-    const AbstractECConnectionPtr& /*connection*/,
+ErrorCode detail::ServerQueryProcessor::removeLayoutsHelper(
+    const QnTransaction<ApiIdData>& tran,
+    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend)
 {
-    QnTransaction<ApiIdData> removeObjAccessRightsTran(ApiCommand::removeAccessRights, ApiIdData(id));
-    ErrorCode errorCode = processUpdateSync(removeObjAccessRightsTran, transactionsToSend, 0);
+    ApiObjectInfo userObjectInfo(ApiObjectType::ApiObject_User, tran.params.id);
+    ApiObjectInfoList userLayoutsObjInfoList =
+        dbManager(m_userAccessData)
+            .getNestedObjectsNoLock(userObjectInfo);
+
+    ApiIdDataList userLayouts;
+    for (const auto& objInfo : userLayoutsObjInfoList)
+        userLayouts.push_back(ApiIdData(objInfo.id));
+
+    ErrorCode errorCode = processMultiUpdateSync(
+        ApiCommand::removeLayout,
+        tran.transactionType,
+        userLayouts,
+        transactionsToSend);
+
     if (errorCode != ErrorCode::ok)
         return errorCode;
 
-    return ErrorCode::ok;
+    for (const auto& layout: userLayouts)
+    {
+        QnTransaction<ApiIdData> removeLayoutTran(ApiCommand::Value::removeLayout, layout);
+        triggerNotification(connection, removeLayoutTran);
+    }
+
+    return errorCode;
+}
+
+ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
+    const QnUuid& id,
+    const AbstractECConnectionPtr& connection,
+    std::list<std::function<void()>>* const transactionsToSend)
+{
+    return removeHelper(id, ApiCommand::removeAccessRights, connection, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& /*connection*/,
+    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend,
     TransactionType::Value transactionType)
 {
-    QnTransaction<ApiIdData> removeResourceStatusTran(ApiCommand::removeResourceStatus, ApiIdData(id));
-    removeResourceStatusTran.transactionType = transactionType;
-    ErrorCode errorCode = processUpdateSync(removeResourceStatusTran, transactionsToSend, 0);
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    return ErrorCode::ok;
+    return removeHelper(
+        id,
+        ApiCommand::removeResourceStatus,
+        connection,
+        transactionsToSend,
+        false,
+        transactionType);
 }
 
 } //namespace ec2

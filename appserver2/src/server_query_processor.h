@@ -328,6 +328,14 @@ private:
             std::bind(&ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2));
     }
 
+    ErrorCode removeHelper(
+        const QnUuid& id,
+        ApiCommand::Value command,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend,
+        bool notificationNeeded = false,
+        TransactionType::Value transactionType = TransactionType::Regular);
+
     ErrorCode removeObjAttrHelper(
         const QnUuid& id,
         ApiCommand::Value command,
@@ -335,6 +343,11 @@ private:
         std::list<std::function<void()>>* const transactionsToSend);
 
     ErrorCode removeObjParamsHelper(
+        const QnTransaction<ApiIdData>& tran,
+        const AbstractECConnectionPtr& connection,
+        std::list<std::function<void()>>* const transactionsToSend);
+
+    ErrorCode removeLayoutsHelper(
         const QnTransaction<ApiIdData>& tran,
         const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
@@ -446,6 +459,14 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeObjParamsHelper(tran, connection, transactionsToSend),
                     lit("Remove user params failed"));
+
+                RUN_AND_CHECK_ERROR(
+                    removeLayoutsHelper(
+                        tran,
+                        connection,
+                        transactionsToSend),
+                    lit("Remove resource status failed"));
+
                 break;
             }
 
