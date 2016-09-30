@@ -87,12 +87,14 @@ void EMailManager::sendAsync(
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         httpClient.get(),
-        [this, asyncOperationLocker, completionHandler](nx_http::AsyncHttpClientPtr client) {
-        onSendNotificationRequestDone(
-            std::move(asyncOperationLocker),
-            std::move(client),
-            std::move(completionHandler));
-    },
+        [this, asyncOperationLocker, completionHandler](
+            nx_http::AsyncHttpClientPtr client)
+        {
+            onSendNotificationRequestDone(
+                std::move(asyncOperationLocker),
+                std::move(client),
+                std::move(completionHandler));
+        },
         Qt::DirectConnection);
     {
         QnMutexLocker lk(&m_mutex);

@@ -836,7 +836,8 @@ bool QnDbManager::isInitialized() const
     return m_initialized;
 }
 
-QMap<int, QnUuid> QnDbManager::getGuidList( const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix )
+QMap<int, QnUuid> QnDbManager::getGuidList(
+    const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix )
 {
     QMap<int, QnUuid>  result;
     QSqlQuery query(m_sdb);

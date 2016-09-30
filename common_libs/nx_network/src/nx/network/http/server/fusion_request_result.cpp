@@ -61,7 +61,7 @@ nx_http::StatusCode::Value FusionRequestResult::httpStatusCode() const
             // This is authorization failure, not authentication! 
                 // "401 Unauthorized" is not applicable here since it 
                 // actually signals authentication error.
-            return nx_http::StatusCode::notFound;
+            return nx_http::StatusCode::forbidden;
         case FusionRequestErrorClass::logicError:
             // Using "404 Not Found" to signal any logic error. 
                 // It is allowed by HTTP. See [rfc2616, 10.4.5] for details

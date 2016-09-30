@@ -397,57 +397,6 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     }
 }
 
-QnUserResourcePtr CloudUserAuthenticator::createCloudUser(
-    const QString& userName,
-    nx::cdb::api::SystemAccessRole cloudAccessRole) const
-{
-    NX_LOGX(lit("Adding cloud user %1 to DB, accessRole %2")
-        .arg(userName).arg((int)cloudAccessRole), cl_logDEBUG1);
-
-    ec2::ApiUserData userData;
-    userData.id = QnUuid::createUuid();
-    userData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
-    userData.name = userName;
-    //TODO #ak isAdmin is used to find resource to fetch system settings from, so let there be only one...
-    userData.isAdmin = false;   //cloudAccessRole == nx::cdb::api::SystemAccessRole::owner;
-    switch (cloudAccessRole)
-    {
-        case nx::cdb::api::SystemAccessRole::liveViewer:
-            userData.permissions = Qn::GlobalLiveViewerPermissionSet;
-            break;
-        case nx::cdb::api::SystemAccessRole::viewer:
-            userData.permissions = Qn::GlobalViewerPermissionSet;
-            break;
-        case nx::cdb::api::SystemAccessRole::advancedViewer:
-            userData.permissions = Qn::GlobalAdvancedViewerPermissionSet;
-            break;
-        case nx::cdb::api::SystemAccessRole::cloudAdmin:
-        case nx::cdb::api::SystemAccessRole::maintenance:   //TODO #ak need a separate role for integrator
-        case nx::cdb::api::SystemAccessRole::owner:
-        case nx::cdb::api::SystemAccessRole::localAdmin:
-            userData.permissions = Qn::GlobalAdminPermissionSet;
-            break;
-    }
-
-    //userData.groupId = ;
-    userData.email = userName;
-    userData.realm = QnAppInfo::realm();
-    userData.isEnabled = true;
-    userData.isCloud = true;
-    userData.fullName = userName;
-    userData.digest = "invalid_digest";
-    userData.hash = "invalid_hash";
-    if (userName == qnGlobalSettings->cloudAccountName())
-        userData.isAdmin = true;
-    /*bool*/ QnAppServerConnectionFactory::getConnection2()
-        ->getUserManager(Qn::kSystemAccess)->save(
-            userData, QnUuid::createUuid().toString(),  //using random password because cloud account password is used to authenticate request
-            ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    auto resource = ec2::fromApiToResource(userData);
-    qnResPool->addResource(resource);
-    return resource;
-}
-
 void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*boundToCloud*/)
 {
     clear();

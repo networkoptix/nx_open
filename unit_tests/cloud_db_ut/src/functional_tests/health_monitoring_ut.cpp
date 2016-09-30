@@ -16,7 +16,7 @@ namespace cdb {
 
 class HealthMonitoring
     :
-    public Ec2MserverCloudSynchronization2
+    public Ec2MserverCloudSynchronization
 {
 };
 
