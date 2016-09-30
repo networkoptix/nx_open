@@ -146,8 +146,19 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
     const ec2::ApiUserGroupData& userRole)
 {
+    QList<QnResourceAccessSubject> subjects;
+    for (auto subject : allSubjects())
+    {
+        if (subject.effectiveId() == userRole.id)
+            subjects << subject;
+    }
+    NX_EXPECT(subjects.contains(userRole));
+
     for (const auto& resource : qnResPool->getResources())
-        updateAccess(userRole, resource);
+    {
+        for (const auto& subject: subjects)
+            updateAccess(subject, resource);
+    }
 }
 
 void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)

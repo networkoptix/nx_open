@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/common_globals.h>
+#include <nx_ec/data/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h> //not so good but we can allow it for test module
 
@@ -34,5 +35,5 @@ public:
 
     QnStorageResourcePtr addStorage();
 
-
+    ec2::ApiUserGroupData createRole(Qn::GlobalPermissions permissions);
 };

@@ -358,3 +358,20 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitRoleAccessToRemovedCamera)
     awaitAccess(role, target, false);
     qnResPool->removeResource(target);
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRolePermissionsChange)
+{
+    auto target = addCamera();
+
+    auto role = createRole(Qn::NoGlobalPermissions);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    auto user = addUser(Qn::GlobalAdminPermission);
+    user->setUserGroup(role.id);
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+
+    awaitAccess(user, target, true);
+    role.permissions = Qn::GlobalAccessAllMediaPermission;
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}

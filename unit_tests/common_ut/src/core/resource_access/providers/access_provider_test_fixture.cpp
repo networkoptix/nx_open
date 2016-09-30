@@ -32,12 +32,6 @@ QnAbstractResourceAccessProvider* QnAccessProviderTestFixture::accessProvider() 
     return m_accessProvider.data();
 }
 
-ec2::ApiUserGroupData QnAccessProviderTestFixture::createRole(Qn::GlobalPermissions permissions) const
-{
-    return ec2::ApiUserGroupData(QnUuid::createUuid(), QStringLiteral("test_role"),
-        permissions);
-}
-
 void QnAccessProviderTestFixture::awaitAccessValue(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource, QnAbstractResourceAccessProvider::Source value)
 {

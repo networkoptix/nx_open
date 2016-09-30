@@ -183,7 +183,7 @@ bool QnResourceAccessManager::hasPermission(
 
 bool QnResourceAccessManager::hasPermission(
     const Qn::UserAccessData& accessRights,
-    const QnResourcePtr& mediaResource,
+    const QnResourcePtr& resource,
     Qn::Permissions permissions) const
 {
     if (accessRights == Qn::kSystemAccess)
@@ -198,7 +198,7 @@ bool QnResourceAccessManager::hasPermission(
     if (!userResource)
         return false;
 
-    return hasPermission(userResource, mediaResource, permissions);
+    return hasPermission(userResource, resource, permissions);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
@@ -376,7 +376,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject,
     const QnVirtualCameraResourcePtr& camera) const
 {
-    TRACE("Calculate permissions of user " << user->getName() << " to camera " << camera->getName())
+    if (subject.user())
+    {
+        TRACE("Calculate permissions of " << subject.user()->getName() << " to camera " << camera->getName());
+    }
+    else
+    {
+        TRACE("Calculate permissions of role " << subject.role().name << " to camera " << camera->getName());
+    }
     NX_ASSERT(camera);
 
     Qn::Permissions result = Qn::NoPermissions;
@@ -475,7 +482,15 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnLayoutResourcePtr& layout) const
 {
-    TRACE("Calculate permissions of user " << user->getName() << " to layout " << layout->getName())
+    if (subject.user())
+    {
+        TRACE("Calculate permissions of " << subject.user()->getName() << " to layout " << layout->getName());
+    }
+    else
+    {
+        TRACE("Calculate permissions of role " << subject.role().name << " to layout " << layout->getName());
+    }
+
     NX_ASSERT(layout);
     if (!subject.isValid() || !layout)
         return Qn::NoPermissions;

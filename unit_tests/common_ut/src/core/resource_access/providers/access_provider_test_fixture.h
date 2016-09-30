@@ -21,8 +21,6 @@ protected:
 
     QnAbstractResourceAccessProvider* accessProvider() const;
 
-    ec2::ApiUserGroupData createRole(Qn::GlobalPermissions permissions) const;
-
     void awaitAccessValue(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         QnAbstractResourceAccessProvider::Source value);
 

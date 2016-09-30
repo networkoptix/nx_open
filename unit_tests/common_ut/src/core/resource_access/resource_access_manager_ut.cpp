@@ -4,8 +4,10 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_pool_test_helper.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource_access/resource_access_manager.h>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource_stub.h>
@@ -354,4 +356,44 @@ TEST_F(QnResourceAccessManagerTest, checkDesktopCameraRemove)
     desired &= ~forbidden;
 
     checkPermissions(camera, desired, forbidden);
+}
+
+TEST_F(QnResourceAccessManagerTest, checkUserRemoved)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, camera, Qn::RemovePermission));
+    qnResPool->removeResource(user);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, camera, Qn::RemovePermission));
+}
+
+TEST_F(QnResourceAccessManagerTest, checkUserGroupChange)
+{
+    auto target = addCamera();
+
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    user->setUserGroup(role.id);
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+}
+
+
+TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
+{
+    auto target = addCamera();
+
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto role = createRole(Qn::NoGlobalPermissions);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    user->setUserGroup(role.id);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+
+    role.permissions = Qn::GlobalAccessAllMediaPermission;
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
 }
