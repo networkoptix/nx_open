@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 RETVAL=0
 
@@ -50,17 +50,18 @@ stop() {
 }
 
 start_watchdog() {
-    WATCHDOG_PID="`/bin/ps aux | /bin/grep run_watchdog | /bin/grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+    WATCHDOG_PID="`/bin/ps aux | /bin/grep run_watchdog | /bin/grep -v grep | sed -r "s/ +/ /g" | cut -f 2 -d' ' | sort -r | head -n 1`"
     if [ ! -z "$WATCHDOG_PID" ]; then
         echo "$SERVICE_NAME watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
+
     /bin/sh -c "/etc/init.d/$SERVICE_NAME run_watchdog" 2>/dev/null 1>&2&
     echo "$SERVICE_NAME watchdog has been started"
 }
 
 stop_watchdog() {
-    WATCHDOG_PID="`/bin/ps aux | /bin/grep run_watchdog | /bin/grep -v grep | cut -b 1-5 | sort -r | head -n 1`"
+    WATCHDOG_PID="`/bin/ps aux | /bin/grep run_watchdog | /bin/grep -v grep | sed -r "s/ +/ /g" | cut -f 2 -d' ' | sort -r | head -n 1`"
     if [ -z "$WATCHDOG_PID" ]; then
         echo "$SERVICE_NAME watchdog is not running"
         return 0
