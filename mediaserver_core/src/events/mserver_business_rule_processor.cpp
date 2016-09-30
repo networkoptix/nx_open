@@ -1,5 +1,7 @@
 #include "mserver_business_rule_processor.h"
 
+#include <map>
+
 #include <QtCore/QList>
 
 #include "api/app_server_connection.h"
@@ -33,6 +35,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
 #include <nx/email/email_manager_impl.h>
+#include <nx/utils/std/algorithm.h>
 #include "nx_ec/data/api_email_data.h"
 #include <nx/utils/timer_manager.h>
 #include <core/resource/user_resource.h>
@@ -927,17 +930,75 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
     return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
 }
 
+namespace {
+
+struct Compare
+{
+    bool operator() (const QnUserResourcePtr& user, const QnUuid& id)
+    {
+        return user->getId() < id;
+    }
+
+    bool operator() (const QnUuid& id, const QnUserResourcePtr& user)
+    {
+        return id < user->getId();
+    }
+};
+
+template<typename F, typename G>
+void applyUserAction(const QnUuid& id, const QnUserResourceList& users, F userExistsAction, G userNotExistsAction)
+{
+    auto it = nx::utils::binary_find(users.cbegin(), users.cend(), id, Compare());
+    if (it != users.cend())
+        userExistsAction(*it);
+    else
+        userNotExistsAction();
+}
+
+using GroupIdToUsers = std::map<QnUuid, QnUserResourceList>;
+
+GroupIdToUsers buildGroupToUsersMap(const QnUserResourceList& users)
+{
+    GroupIdToUsers result;
+    for (const auto& u : users)
+        result[u->userGroup()].push_back(u);
+
+    return result;
+}
+}
+
 void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources()))
-        unfiltered << user->getEmail();
+    auto allUsers = qnResPool->getResources<QnUserResource>();
+    GroupIdToUsers groupsToUsers = buildGroupToUsersMap(allUsers);
+
+    std::sort(allUsers.begin(), allUsers.end(),
+        [] (const QnResourcePtr& lhs, const QnResourcePtr& rhs)
+        {
+            return lhs->getId() < rhs->getId();
+        });
+
+    auto addUserEmailToList = [&unfiltered](const QnUserResourcePtr& user) { unfiltered << user->getEmail(); };
+
+    for (const QnUuid& id: action->getResources())
+    {
+        applyUserAction(id, allUsers,
+            addUserEmailToList,
+            [&groupsToUsers, &id, &addUserEmailToList]
+            {
+                auto groupIt = groupsToUsers.find(id);
+                for (const auto& u : groupIt->second)
+                    addUserEmailToList(u);
+            });
+    }
 
     auto recipientsFilter = [](const QString& email)
     {
         QString trimmed = email.trimmed();
         return !trimmed.isEmpty() && QnEmailAddress::isValid(trimmed);
     };
+
     QStringList recipients;
     std::copy_if(unfiltered.cbegin(), unfiltered.cend(), std::back_inserter(recipients), recipientsFilter);
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
