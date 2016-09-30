@@ -21,6 +21,8 @@ start() {
     echo -n "Starting $BIN_NAME..... "
     $BIN_PATH -e --conf-file=$PREFIX/etc/$BIN_NAME.conf 2>/dev/null 1>&2&
 
+    sleep 1
+
     if [ `/bin/pidof $BIN_NAME` ]
     then
         echo "OK"
