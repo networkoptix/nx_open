@@ -254,7 +254,7 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) co
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnMediaServerResourcePtr& server) const
 {
-    return moduleInformation(server->getId());
+    return moduleInformation(server->getOriginalGuid());
 }
 
 QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const
