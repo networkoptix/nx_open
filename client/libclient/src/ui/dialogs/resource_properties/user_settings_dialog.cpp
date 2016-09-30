@@ -56,10 +56,11 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
-        [this](const QSet<QnUuid>& resourceIds)
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
+        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+            Qn::Permissions permissions)
         {
-            if (m_user && resourceIds.contains(m_user->getId()))
+            if (m_user && subject.user() == m_user)
                 permissionsChanged();
         });
 

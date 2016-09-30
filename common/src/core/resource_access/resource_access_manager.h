@@ -10,14 +10,14 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_access_rights_data.h>
 
-
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
 #include "user_access_data.h"
 
-class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
+class QnResourceAccessManager : public Connective<QObject>,
+    public Singleton<QnResourceAccessManager>
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -40,21 +40,24 @@ public:
     * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
-    bool hasGlobalPermission(const QnResourceAccessSubject& subject, Qn::GlobalPermission requiredPermission) const;
+    bool hasGlobalPermission(const QnResourceAccessSubject& subject,
+        Qn::GlobalPermission requiredPermission) const;
 
     /**
     * \param accessRights              Access rights descriptor
     * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
-    bool hasGlobalPermission(const Qn::UserAccessData& accessRights, Qn::GlobalPermission requiredPermission) const;
+    bool hasGlobalPermission(const Qn::UserAccessData& accessRights,
+        Qn::GlobalPermission requiredPermission) const;
 
     /**
     * \param user                      User that should have permissions.
     * \param resource                  Resource to get permissions for.
     * \returns                         Permissions that user have for the given resource.
     */
-    Qn::Permissions permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+    Qn::Permissions permissions(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource) const;
 
     /**
     * \param user                      User that should have permissions.
@@ -63,7 +66,7 @@ public:
     * \returns                         Whether actual permissions include required permission.
     */
     bool hasPermission(
-        const QnUserResourcePtr& user,
+        const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
         Qn::Permissions requiredPermissions) const;
 
@@ -84,99 +87,110 @@ public:
     * \param resource                  Resource to get permissions for.
     * \returns                         Whether user can create this resource.
     */
-    bool canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
+    bool canCreateResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target) const;
 
     template <typename ApiDataType>
-    bool canCreateResource(const QnUserResourcePtr& user, const ApiDataType& /*data*/) const
+    bool canCreateResource(const QnResourceAccessSubject& subject, const ApiDataType& /*data*/) const
     {
-        return hasGlobalPermission(user, Qn::GlobalAdminPermission);
+        return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
     }
 
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
-    bool canCreateResource  (const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
+    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiStorageData& data) const;
+    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiLayoutData& data) const;
+    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiUserData& data) const;
+    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiVideowallData& data) const;
+    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiWebPageData& data) const;
 
-    bool canCreateStorage   (const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
-    bool canCreateLayout    (const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
-    bool canCreateUser      (const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const;
-    bool canCreateVideoWall (const QnUserResourcePtr& user) const;
-    bool canCreateWebPage   (const QnUserResourcePtr& user) const;
+    bool canCreateStorage   (const QnResourceAccessSubject& subject, const QnUuid& storageParentId) const;
+    bool canCreateLayout    (const QnResourceAccessSubject& subject, const QnUuid& layoutParentId) const;
+    bool canCreateUser      (const QnResourceAccessSubject& subject,
+        Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateVideoWall (const QnResourceAccessSubject& subject) const;
+    bool canCreateWebPage   (const QnResourceAccessSubject& subject) const;
 
     template <typename ResourceSharedPointer, typename ApiDataType>
-    bool canModifyResource(const QnUserResourcePtr& user, const ResourceSharedPointer& target, const ApiDataType& update) const
+    bool canModifyResource(const QnResourceAccessSubject& subject,
+        const ResourceSharedPointer& target, const ApiDataType& update) const
     {
         /* By default we require only generic permissions to modify resource. */
         Q_UNUSED(update);
-        return hasPermission(user, target, Qn::ReadWriteSavePermission);
+        return hasPermission(subject, target, Qn::ReadWriteSavePermission);
     }
 
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,     const ec2::ApiStorageData& update) const;
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,      const ec2::ApiLayoutData& update) const;
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,        const ec2::ApiUserData& update) const;
-    bool canModifyResource  (const QnUserResourcePtr& user, const QnResourcePtr& target,   const ec2::ApiVideowallData& update) const;
+    bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
+        const ec2::ApiStorageData& update) const;
+    bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
+        const ec2::ApiLayoutData& update) const;
+    bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
+        const ec2::ApiUserData& update) const;
+    bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
+        const ec2::ApiVideowallData& update) const;
 
 signals:
-    /** Notify listeners that permissions possibly changed (not necessarily). */
-    void permissionsInvalidated(const QSet<QnUuid>& resourceIds);
+    void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+        Qn::Permissions permissions);
+
+    void globalPermissionsChanged(const QnResourceAccessSubject& subject,
+        Qn::GlobalPermissions permissions);
 
 private:
-    /** Clear all cache values, bound to the given resource. */
-    void invalidateResourceCache(const QnResourcePtr& resource);
-    void invalidateResourceCacheInternal(const QnUuid& resourceId);
-    void invalidateCacheForLayoutItem(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
-    void invalidateCacheForLayoutItems(const QnResourcePtr& resource);
-    void invalidateCacheForVideowallItem(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
+    void recalculateAllPermissions();
+    void updateGlobalPermissions(const QnResourceAccessSubject& subject);
+    void updatePermissions(const QnResourceAccessSubject& subject, const QnResourcePtr& target);
 
-    Qn::Permissions calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
+    Qn::GlobalPermissions calculateGlobalPermissions(const QnResourceAccessSubject& subject) const;
 
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVirtualCameraResourcePtr& camera)   const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnMediaServerResourcePtr& server)     const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnStorageResourcePtr& storage)        const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVideoWallResourcePtr& videoWall)    const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnWebPageResourcePtr& webPage)        const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
+    Qn::Permissions calculatePermissions(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& target) const;
+
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnVirtualCameraResourcePtr& camera) const;
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnMediaServerResourcePtr& server) const;
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnStorageResourcePtr& storage) const;
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnVideoWallResourcePtr& videoWall) const;
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnWebPageResourcePtr& webPage) const;
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnLayoutResourcePtr& layout) const;
+    Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnUserResourcePtr& targetUser) const;
 
     Qn::GlobalPermissions filterDependentPermissions(Qn::GlobalPermissions source) const;
 
-    void beginUpdateCache();
-    void endUpdateCache();
+    void setGlobalPermissionsInternal(const QnResourceAccessSubject& subject,
+        Qn::GlobalPermissions permissions);
+
+    void setPermissionsInternal(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource, Qn::Permissions permissions);
 
 private:
     mutable QnMutex m_mutex;
 
-    mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
-
-    /** Counter which is used to avoid repeating signals during one update process.  */
-    QAtomicInt m_cacheUpdateCounter;
-
-    /** Set of resources that were invalidated during current update process. */
-    QSet<QnUuid> m_invalidatedResources;
+    QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 
     struct PermissionKey
     {
-        QnUuid userId;
+        QnUuid subjectId;
         QnUuid resourceId;
         PermissionKey() {}
-        PermissionKey(const QnUuid& userId, const QnUuid& resourceId) :
-            userId(userId), resourceId(resourceId) {}
+        PermissionKey(const QnUuid& subjectId, const QnUuid& resourceId) :
+            subjectId(subjectId), resourceId(resourceId) {}
 
         bool operator==(const PermissionKey& other) const
         {
-            return userId == other.userId && resourceId == other.resourceId;
+            return subjectId == other.subjectId && resourceId == other.resourceId;
         }
 
         friend uint qHash(const PermissionKey& key)
         {
-            return qHash(key.userId) ^ qHash(key.resourceId);
+            return qHash(key.subjectId) ^ qHash(key.resourceId);
         }
     };
 
-    mutable QHash<PermissionKey, Qn::Permissions> m_permissionsCache;
-
-    class UpdateCacheGuard;
+    QHash<PermissionKey, Qn::Permissions> m_permissionsCache;
 };
 
 #define qnResourceAccessManager QnResourceAccessManager::instance()

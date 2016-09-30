@@ -27,20 +27,20 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     m_user(),
     m_globalPermissions(Qn::NoGlobalPermissions)
 {
-    connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
-    connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this, [this](const QSet<QnUuid>& resourceIds)
-    {
-        if (m_user && resourceIds.contains(m_user->getId()))
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
+        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+            Qn::Permissions permissions)
         {
-            recalculateAllPermissions();
-            return;
-        }
+            if (!m_user || subject.user() != m_user)
+                return;
 
-        for (const QnResourcePtr& resource : qnResPool->getResources(resourceIds))
             updatePermissions(resource);
-    });
+        });
 
 
     recalculateAllPermissions();
@@ -235,11 +235,14 @@ Qn::GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() 
     return qnResourceAccessManager->globalPermissions(m_user);
 }
 
-void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource) {
+void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource)
+{
     setPermissionsInternal(resource, calculatePermissions(resource));
 }
 
-void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& resource, Qn::Permissions permissions) {
+void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& resource,
+    Qn::Permissions permissions)
+{
     if (m_dataByResource.contains(resource) &&
         permissions == this->permissions(resource))
         return;

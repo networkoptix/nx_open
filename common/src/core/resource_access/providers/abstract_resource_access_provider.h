@@ -31,6 +31,9 @@ public:
     virtual Source accessibleVia(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const = 0;
 
+    //TODO: #GDM Think if we have a better place for this method
+    static QList<QnResourceAccessSubject> allSubjects();
+
 signals:
     void accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Source value);

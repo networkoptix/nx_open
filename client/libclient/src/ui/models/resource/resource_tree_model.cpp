@@ -124,6 +124,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
             m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
         });
 
+    /*
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
         [this](const QSet<QnUuid>& resourceIds)
         {
@@ -155,7 +156,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
                     updateRoleNodes();
                 }
             }
-        });
+        });*/
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnResourceTreeModel::updateRoleNodes);
