@@ -36,6 +36,7 @@ namespace nx
 
         void resetToDefault();
         bool isDefault() const;
+        void clear();
 
         bool saveToConfig();
         void loadFromConfig();

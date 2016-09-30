@@ -961,6 +961,8 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     if (sender != qnCommon->moduleGUID())
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
+        // If system Id has been changed, reset 'database restore time' variable
+        nx::ServerSetting::setSysIdTime(0);
         saveAdminPswdHash();
         restartServer(0);
     }
@@ -1772,6 +1774,31 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
+void MediaServerProcess::doMigrateSystemNameFromConfig(CloudConnectionManager* const cloudConnectionManager)
+{
+    nx::SystemName systemName;
+    systemName.loadFromConfig();
+
+    if (!qnGlobalSettings->localSystemID().isNull())
+    {
+        systemName.clear();
+        systemName.saveToConfig(); //< remove from config file
+        return; //< systemName already in database
+    }
+
+    if (systemName.value().isEmpty())
+        systemName.resetToDefault(); //< generate default value
+
+    qnGlobalSettings->setSystemName(systemName.value());
+    qnGlobalSettings->setLocalSystemID(guidFromArbitraryData(systemName.value()));
+    qnGlobalSettings->setNewSystem(systemName.isDefault());
+    if (systemName.isDefault())
+        resetCloudParams(cloudConnectionManager);
+
+    systemName.clear();
+    systemName.saveToConfig(); //< remove from config file
+}
+
 void MediaServerProcess::run()
 {
     QnCallCountStart(std::chrono::milliseconds(5000));
@@ -1935,27 +1962,7 @@ void MediaServerProcess::run()
     if (!m_publicAddress.isNull())
         serverFlags |= Qn::SF_HasPublicIP;
 
-    nx::SystemName systemName;
-    systemName.loadFromConfig();
-
-    // If system name has been changed, reset 'database restore time' variable
-    if (systemName.value() != systemName.prevValue())
-    {
-        if (!systemName.prevValue().isEmpty())
-            nx::ServerSetting::setSysIdTime(0);
-        systemName.saveToConfig(); //< update prevValue
-    }
-
-    if (systemName.value().isEmpty())
-    {
-        systemName.resetToDefault();
-        nx::ServerSetting::setSysIdTime(0);
-        systemName.saveToConfig();
-    }
-
-    qnGlobalSettings->setSystemName(systemName.value());
-    qnGlobalSettings->setLocalSystemID(guidFromArbitraryData(systemName.value()));
-
+    doMigrateSystemNameFromConfig(&cloudConnectionManager);
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
@@ -2042,10 +2049,11 @@ void MediaServerProcess::run()
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &MediaServerProcess::at_databaseDumped);
     qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
-    if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
+    if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
+    {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
         nx::SystemName systemName(connectInfo.systemName);
-        systemName.saveToConfig();
+        systemName.saveToConfig(); //< migrate system name from foreign database via config
         nx::ServerSetting::setSysIdTime(0);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
@@ -2381,7 +2389,6 @@ void MediaServerProcess::run()
             qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
         bool isConnectedToCloud = !qnGlobalSettings->cloudSystemID().isEmpty();
         if (isNewServerInstance ||
-            systemName.isDefault() ||
             (isCloudInstanceChanged && isConnectedToCloud))
         {
             resetCloudParams(&cloudConnectionManager);

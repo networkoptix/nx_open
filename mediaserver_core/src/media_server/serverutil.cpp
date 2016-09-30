@@ -385,3 +385,9 @@ bool nx::SystemName::isDefault() const
 {
     return m_value.startsWith(AUTO_GEN_SYSTEM_NAME);
 }
+
+void nx::SystemName::clear()
+{
+    m_value.clear();
+    m_prevValue.clear();
+}
