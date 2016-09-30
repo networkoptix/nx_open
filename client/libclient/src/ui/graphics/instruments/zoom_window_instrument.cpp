@@ -339,9 +339,9 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
 {
     /* Sensible default. */
     m_colors
-        << qnNxStyle->mainColor(QnNxStyle::Colors::kYellow)
-        << qnNxStyle->mainColor(QnNxStyle::Colors::kGreen).lighter(2)
-        << qnNxStyle->mainColor(QnNxStyle::Colors::kRed).lighter(2);
+        << qnGlobals->warningTextColor()
+        << qnGlobals->successTextColor()
+        << qnGlobals->errorTextColor();
 
     connect(display(), &QnWorkbenchDisplay::zoomLinkAdded,              this, &ZoomWindowInstrument::at_display_zoomLinkAdded);
     connect(display(), &QnWorkbenchDisplay::zoomLinkAboutToBeRemoved,   this, &ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved);

@@ -4,6 +4,7 @@
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/common/palette.h>
+#include <ui/style/globals.h>
 #include <ui/widgets/word_wrapped_label.h>
 #include <ui/widgets/common/busy_indicator.h>
 
@@ -89,7 +90,7 @@ void setupCaptionLabel(QLabel* label, bool isErrorStyle)
     label->setVisible(false);
 
     const auto color = isErrorStyle
-        ? qnNxStyle->mainColor(QnNxStyle::Colors::kRed)
+        ? qnGlobals->errorTextColor()
         : qnNxStyle->mainColor(QnNxStyle::Colors::kContrast);
     setPaletteColor(label, QPalette::WindowText, color);
 }

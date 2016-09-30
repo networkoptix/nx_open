@@ -94,7 +94,9 @@
         "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
         "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
         "businessRuleInvalidHighlightColor": "opaqueSelection",
-        "errorTextColor": "red_l2"
+        "errorTextColor": "red_l2",
+        "warningTextColor": "yellow_core",
+        "successTextColor": "green_l2"
     },
 
     "QApplication": {
@@ -473,6 +475,14 @@
 
     "ZoomWindowInstrument": {
         "colors": ["yellow_core", "green_l2", "red_l2"]
+    },
+
+    "QnServerUpdatesModel": {
+        "colors": { 
+            "latest": "green_l2", 
+            "target": "yellow_core", 
+            "error": "red_l2" 
+        }
     },
 
     "QnStatusOverlayWidget": {
