@@ -34,3 +34,5 @@ private:
 };
 
 QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject);
+
+Q_DECLARE_METATYPE(QnResourceAccessSubject)
