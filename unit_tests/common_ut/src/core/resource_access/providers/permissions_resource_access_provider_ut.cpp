@@ -209,6 +209,18 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkVideoWallAccess)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnPermissionsResourceAccessProviderTest, checkUserGroupChangeAccess)
+{
+    auto target = addCamera();
+
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    user->setUserGroup(role.id);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnPermissionsResourceAccessProviderTest, nonPoolResourceAccess)
 {
     auto user = addUser(Qn::GlobalAdminPermission);

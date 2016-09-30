@@ -87,6 +87,14 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
     {
+        /* Changing of role means change of all user access rights. */
+        connect(user, &QnUserResource::userGroupChanged, this,
+            [this, user]
+            {
+                for (const auto& resource : qnResPool->getResources())
+                    updateAccess(user, resource);
+            });
+
         for (const auto& resource : qnResPool->getResources())
         {
             /* We have already update access to ourselves before */
