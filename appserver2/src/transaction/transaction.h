@@ -228,7 +228,7 @@ APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        ReadResourceParamAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       setResourceParamTransactionType()) /* regular transaction type */ \
+                       SetResourceParamTransactionType()) /* regular transaction type */ \
 APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
@@ -424,7 +424,7 @@ APPLY(401, saveMediaServer, ApiMediaServerData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       [](const Qn::UserAccessData& accessData, const ApiMediaServerData&) { return accessData == Qn::kSystemAccess; }, /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1136,7 +1136,7 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \

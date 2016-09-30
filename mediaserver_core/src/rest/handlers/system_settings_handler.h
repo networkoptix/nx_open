@@ -23,7 +23,7 @@ public:
         const QString& path,
         const QnRequestParams& params,
         QnJsonRestResult& result,
-        const QnRestConnectionProcessor*) override;
+        const QnRestConnectionProcessor* owner) override;
 private:
     void systemNameChanged(
         const QnRestConnectionProcessor* owner,

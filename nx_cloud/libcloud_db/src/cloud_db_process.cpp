@@ -222,7 +222,7 @@ int CloudDBProcess::exec()
         SystemManager systemManager(
             settings,
             &timerManager,
-            accountManager,
+            &accountManager,
             systemHealthInfoProvider,
             &dbManager,
             &transactionLog,
@@ -446,9 +446,14 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::system, DataActionType::fetch);
 
     registerHttpHandler(
-        kSystemUpdateSystemNamePath,
-        &SystemManager::updateSystemName, systemManager,
+        kSystemRenamePath,
+        &SystemManager::rename, systemManager,
         EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemRecordUserSessionStartPath,
+        &SystemManager::recordUserSessionStart, systemManager,
+        EntityType::account, DataActionType::update);   //< TODO: #ak: current entity:action is not suitable for this request
 
     //------------------------------------------
     // AuthenticationProvider
@@ -525,9 +530,9 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
     //starting async operation
     using namespace std::placeholders;
     dbManager->executeUpdateWithoutTran(
-        [](QSqlDatabase* connection) ->nx::db::DBResult
+        [](nx::db::QueryContext* queryContext) ->nx::db::DBResult
         {
-            QSqlQuery enableWalQuery(*connection);
+            QSqlQuery enableWalQuery(*queryContext->connection());
             enableWalQuery.prepare("PRAGMA journal_mode = WAL");
             if (!enableWalQuery.exec())
             {
@@ -537,7 +542,7 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
                 return nx::db::DBResult::ioError;
             }
 
-            QSqlQuery enableFKQuery(*connection);
+            QSqlQuery enableFKQuery(*queryContext->connection());
             enableFKQuery.prepare("PRAGMA foreign_keys = ON");
             if (!enableFKQuery.exec())
             {
@@ -558,7 +563,7 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
 
             return nx::db::DBResult::ok;
         },
-        [&](QSqlDatabase* /*connection*/, nx::db::DBResult dbResult)
+        [&](nx::db::QueryContext* /*queryContext*/, nx::db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -596,6 +601,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddPeerSequence);
     dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
     dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
+    dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     return dbStructureUpdater.updateStructSync();
 }
 

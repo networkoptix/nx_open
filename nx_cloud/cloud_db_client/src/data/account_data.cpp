@@ -8,12 +8,14 @@
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/buffer.h>
+#include <nx/network/url/query_parse_helper.h>
 #include <utils/preprocessor/field_name.h>
-
 
 namespace nx {
 namespace cdb {
 namespace api {
+
+using namespace nx::network;
 
 ////////////////////////////////////////////////////////////
 //// class AccountData
@@ -104,29 +106,17 @@ MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, customization)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data)
 {
-    if (urlQuery.hasQueryItem(AccountUpdateData_passwordHa1_field))
-        data->passwordHa1 = urlQuery.queryItemValue(AccountUpdateData_passwordHa1_field).toStdString();
-    if (urlQuery.hasQueryItem(AccountUpdateData_fullName_field))
-        data->fullName = urlQuery.queryItemValue(AccountUpdateData_fullName_field).toStdString();
-    if (urlQuery.hasQueryItem(AccountUpdateData_customization_field))
-        data->customization = urlQuery.queryItemValue(AccountUpdateData_customization_field).toStdString();
+    url::deserializeField(urlQuery, AccountUpdateData_passwordHa1_field, &data->passwordHa1);
+    url::deserializeField(urlQuery, AccountUpdateData_fullName_field, &data->fullName);
+    url::deserializeField(urlQuery, AccountUpdateData_customization_field, &data->customization);
     return true;
 }
 
 void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuery)
 {
-    if (data.passwordHa1)
-        urlQuery->addQueryItem(
-            AccountUpdateData_passwordHa1_field,
-            QString::fromStdString(data.passwordHa1.get()));
-    if (data.fullName)
-        urlQuery->addQueryItem(
-            AccountUpdateData_fullName_field,
-            QString::fromStdString(data.fullName.get()));
-    if (data.customization)
-        urlQuery->addQueryItem(
-            AccountUpdateData_customization_field,
-            QString::fromStdString(data.customization.get()));
+    url::serializeField(urlQuery, AccountUpdateData_passwordHa1_field, data.passwordHa1);
+    url::serializeField(urlQuery, AccountUpdateData_fullName_field, data.fullName);
+    url::serializeField(urlQuery, AccountUpdateData_customization_field, data.customization);
 }
 
 void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonValue)

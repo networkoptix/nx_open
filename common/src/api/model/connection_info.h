@@ -36,7 +36,8 @@ struct QnConnectionInfo
     QString customization;
     QString effectiveUserName;
     QString cloudHost;
-    QString systemId;
+    QString cloudSystemId;
+	QString localSystemId;
 
     /* Check if https protocol can be used. */
     QUrl effectiveUrl() const;
@@ -44,7 +45,7 @@ struct QnConnectionInfo
 
 #define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)\
     (box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)(newSystem)\
-    (cloudHost)(customization)(systemId)
+    (cloudHost)(customization)(cloudSystemId)(localSystemId)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

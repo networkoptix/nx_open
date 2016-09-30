@@ -59,11 +59,13 @@ public:
     }
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::DBResult)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::RdbmsDriverType)
 
 }   //db
 }   //nx
 
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::db::DBResult), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::db::RdbmsDriverType), (lexical))
 
 #endif  //NX_CLOUD_DB_DB_TYPES_H

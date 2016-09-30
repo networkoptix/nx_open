@@ -1072,14 +1072,14 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiMediaServerDataExList> tranServers;
         tranServers.command = ApiCommand::getMediaServersEx;
         tranServers.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tranServers.params) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranServers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
 
         ec2::ApiCameraDataExList cameras;
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, cameras) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), cameras) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1107,7 +1107,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiUserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
         tranUsers.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tranUsers.params) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranUsers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1116,7 +1116,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiLayoutDataList> tranLayouts;
         tranLayouts.command = ApiCommand::getLayouts;
         tranLayouts.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tranLayouts.params) != ErrorCode::ok)
+        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranLayouts.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1837,7 +1837,9 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
     //we need break connection only if following settings have been changed:
     //  connectionKeepAliveTimeout
     //  keepAliveProbeCount
-    if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    using namespace nx::settings_names;
+
+    if (key == kConnectionKeepAliveTimeoutKey)
     {
         const auto timeout = qnGlobalSettings->connectionKeepAliveTimeout();
         QnMutexLocker lock(&m_mutex);
@@ -1848,7 +1850,7 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
                 transport->setState(ec2::QnTransactionTransport::Error);
         }
     }
-    else if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    else if (key == kConnectionKeepAliveTimeoutKey)
     {
         const auto probeCount = qnGlobalSettings->keepAliveProbeCount();
         QnMutexLocker lock(&m_mutex);

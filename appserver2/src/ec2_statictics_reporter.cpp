@@ -62,15 +62,20 @@ namespace ec2
             return ErrorCode::ioError;
 
         ErrorCode res;
+        // TODO: Get rid of these macros.
         #define dbManager_queryOrReturn(ApiType, name) \
             ApiType name; \
             if ((res = dbManager(Qn::kSystemAccess).doQuery(nullptr, name)) != ErrorCode::ok) \
                 return res;
+        #define dbManager_queryOrReturn_uuid(ApiType, name) \
+            ApiType name; \
+            if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), name)) != ErrorCode::ok) \
+                return res;
 
-        dbManager_queryOrReturn(ApiMediaServerDataExList, mediaservers);
+        dbManager_queryOrReturn_uuid(ApiMediaServerDataExList, mediaservers);
         for (auto& ms : mediaservers) outData->mediaservers.push_back(std::move(ms));
 
-        dbManager_queryOrReturn(ApiCameraDataExList, cameras);
+        dbManager_queryOrReturn_uuid(ApiCameraDataExList, cameras);
         for (ApiCameraDataEx& cam : cameras)
             if (cam.typeId != m_desktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
@@ -87,16 +92,17 @@ namespace ec2
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
+        dbManager_queryOrReturn_uuid(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
 
-        if ((res = dbManager(Qn::kSystemAccess).doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
+        if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->layouts)) != ErrorCode::ok)
             return res;
 
-        dbManager_queryOrReturn(ApiUserDataList, users);
+        dbManager_queryOrReturn_uuid(ApiUserDataList, users);
         for (auto& u : users) outData->users.push_back(std::move(u));
 
         #undef dbManager_queryOrReturn
+        #undef dbManager_queryOrReturn_uuid
 
         outData->systemId = qnGlobalSettings->localSystemID();
         return ErrorCode::ok;

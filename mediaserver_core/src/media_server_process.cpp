@@ -1714,7 +1714,7 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
     auto mapper = std::make_unique<nx_upnp::PortMapper>();
 
     const auto configValue = MSSettings::roSettings()->value(
-        QnGlobalSettings::kNameUpnpPortMappingEnabled);
+        nx::settings_names::kNameUpnpPortMappingEnabled);
 
     if (!configValue.isNull())
     {

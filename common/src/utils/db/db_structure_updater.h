@@ -15,12 +15,11 @@
 #include "types.h"
 
 
-class QSqlDatabase;
-
 namespace nx {
 namespace db {
 
 class AsyncSqlQueryExecutor;
+class QueryContext;
 
 /*!
     \note Database is not created, it MUST already exist
@@ -51,10 +50,10 @@ private:
     std::vector<QByteArray> m_updateScripts;
     nx::utils::promise<DBResult> m_dbUpdatePromise;
 
-    DBResult updateDbInternal(QSqlDatabase* const dbConnection);
+    DBResult updateDbInternal(nx::db::QueryContext* const dbConnection);
     bool execSQLScript(
         QByteArray script,
-        QSqlDatabase* const dbConnection);
+        nx::db::QueryContext* const dbConnection);
 };
 
 }   //db

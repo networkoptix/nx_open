@@ -35,7 +35,7 @@ public:
 
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(const QnAbstractBusinessActionPtr& action);
-    bool removeLogForRes(QnUuid resId);
+    bool removeLogForRes(const QnUuid& resId);
 
     QnBusinessActionDataList getActions(
         const QnTimePeriod& period,
@@ -90,6 +90,7 @@ private:
     int getRuntimeActionsRecordCount();
     bool migrateBusinessParamsUnderTransaction();
     bool createBookmarkTagTriggersUnderTransaction();
+    bool bookmarksUniqueIdToCameraId();
     bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,

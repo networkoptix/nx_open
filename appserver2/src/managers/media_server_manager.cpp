@@ -74,8 +74,8 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ec2::ApiMediaServerDataList& servers) {
             handler->done( reqID, errorCode, servers);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getMediaServers, nullptr, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getMediaServers, QnUuid(), queryDoneHandler);
         return reqID;
     }
 

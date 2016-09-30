@@ -3,6 +3,7 @@
 
 #include "api_globals.h"
 #include "api_resource_data.h"
+#include <core/resource/resource_type.h>
 
 namespace ec2
 {
@@ -31,7 +32,13 @@ namespace ec2
 
     struct ApiStorageData: ApiResourceData
     {
-        ApiStorageData(): spaceLimit(0), usedForWriting(0), isBackup(false) {}
+        ApiStorageData():
+            spaceLimit(0),
+            usedForWriting(0),
+            isBackup(false)
+        {
+            typeId = QnResourceTypePool::kStorageTypeUuid;
+        }
 
         qint64          spaceLimit;
         bool            usedForWriting;
@@ -50,7 +57,12 @@ namespace ec2
 
     struct ApiMediaServerData: ApiResourceData
     {
-        ApiMediaServerData(): flags(Qn::SF_None), not_used(Qn::PM_None) {}
+        ApiMediaServerData():
+            flags(Qn::SF_None),
+            not_used(Qn::PM_None)
+        {
+            typeId = QnResourceTypePool::kServerTypeUuid;
+        }
 
         QString         networkAddresses;
         Qn::ServerFlags flags;
@@ -68,7 +80,7 @@ namespace ec2
     struct ApiMediaServerUserAttributesData: ApiData
     {
         ApiMediaServerUserAttributesData();
-        QnUuid getIdForMerging() { return serverId; } //< See ApiIdData::getIdForMerging().
+        QnUuid getIdForMerging() const { return serverId; } //< See ApiIdData::getIdForMerging().
 
         QnUuid          serverId;
         QString         serverName;

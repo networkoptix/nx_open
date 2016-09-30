@@ -23,7 +23,7 @@ namespace utils {
  *         // or:
  *         MyModuleConf(const char* s): nx::utils::FlagConfig(s) { reload(); } //< Initial reload.
  *
- *         NX_FLAG(0, myFlag "Here 0 stands for 'false' as the default value.");
+ *         NX_FLAG(0, myFlag, "Here 0 stands for 'false' as the default value.");
  *         NX_INT_PARAM(7, myInt, "Here 7 is the default value.");
  *         NX_STRING_PARAM("Default value", myStr, "Description.");
  *     };

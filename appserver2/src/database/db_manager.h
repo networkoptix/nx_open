@@ -202,7 +202,7 @@ namespace detail
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList);
 
         //getStorages
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
@@ -214,19 +214,19 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataExList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList);
 
         //getServersEx
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
 
         //getUserGroupList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& groupList);
@@ -238,16 +238,16 @@ namespace detail
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiVideowallDataList& videowallList);
 
         //getWebPageList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiWebPageDataList& webPageList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params);
@@ -598,6 +598,7 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         bool upgradeSerializedTransactionsToV2();
+        bool encryptKvPairs();
         bool upgradeSerializedTransactionsToV3();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
     private:

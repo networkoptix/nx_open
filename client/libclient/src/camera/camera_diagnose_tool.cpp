@@ -76,7 +76,7 @@ namespace CameraDiagnostics
     void DiagnoseTool::onGetServerSystemIdResponse( int status, QString serverSystemId, int /*handle*/ )
     {
         const ec2::AbstractECConnectionPtr& ecConnection = QnAppServerConnectionFactory::getConnection2();
-        if( (status != 0) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().systemId) )
+        if( (status != 0) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().localSystemId) )
         {
             m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
 

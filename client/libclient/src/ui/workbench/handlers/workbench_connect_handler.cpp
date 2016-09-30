@@ -28,6 +28,7 @@
 
 #include <client_core/client_core_settings.h>
 #include <client/desktop_client_message_processor.h>
+#include <nx/network/socket_global.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
@@ -591,7 +592,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     const auto settings = ConnectionSettings::create(
-        parameters.argument(Qn::IsConnectionToCloud, false),
+        nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()),
         parameters.argument(Qn::StorePasswordRole, false),
         parameters.argument(Qn::AutoLoginRole, false),
         parameters.argument(Qn::ForceRemoveOldConnectionRole, false));

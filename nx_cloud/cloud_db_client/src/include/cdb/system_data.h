@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cstdint>
+#include <chrono>
 #include <string>
 #include <vector>
+
+#include <boost/optional.hpp>
 
 namespace nx {
 namespace cdb {
@@ -147,18 +150,25 @@ public:
 };
 
 /**
- * Expands \a SystemSharing to contain account's full name.
+ * Expands \a SystemSharing to contain more data.
  */
 class SystemSharingEx
 :
     public SystemSharing
 {
 public:
-    SystemSharingEx() {}
+    SystemSharingEx()
+    :
+        usageFrequency(0.0)
+    {
+    }
 
     /** Globally unique account id. */
     std::string accountID;
     std::string accountFullName;
+    /** Shows how often user accesses given system in comparison to other user's systems. */
+    float usageFrequency;
+    std::chrono::system_clock::time_point lastLoginTime;
 
     bool operator==(const SystemSharingEx& rhs) const
     {
@@ -214,11 +224,22 @@ public:
     /** Permissions, account can share current system with. */
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
+    /**
+     * This number shows how often user, performing request, 
+     * uses this system in comparision to other systems.
+     */
+    float usageFrequency;
+    /**
+     * Time of last reported login of authenticated user to this system.
+     * \note Fact of login is reported by \a SystemManager::recordUserSessionStart()
+     */
+    std::chrono::system_clock::time_point lastLoginTime;
 
     SystemDataEx()
     :
         accessRole(SystemAccessRole::none),
-        stateOfHealth(SystemHealth::offline)
+        stateOfHealth(SystemHealth::offline),
+        usageFrequency(0)
     {
     }
 
@@ -226,7 +247,8 @@ public:
     :
         SystemData(std::move(systemData)),
         accessRole(SystemAccessRole::none),
-        stateOfHealth(SystemHealth::offline)
+        stateOfHealth(SystemHealth::offline),
+        usageFrequency(0)
     {
     }
 };
@@ -235,6 +257,16 @@ class SystemDataExList
 {
 public:
     std::vector<SystemDataEx> systems;
+};
+
+/**
+ * Information about newly started user session.
+ */
+class UserSessionDescriptor
+{
+public:
+    boost::optional<std::string> accountEmail;
+    boost::optional<std::string> systemId;
 };
 
 } // namespace api

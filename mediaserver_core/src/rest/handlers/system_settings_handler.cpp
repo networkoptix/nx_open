@@ -12,6 +12,7 @@
 #include <api/model/system_settings_reply.h>
 #include <audit/audit_manager.h>
 #include <rest/server/rest_connection_processor.h>
+#include <transaction/transaction_descriptor.h>
 
 int QnSystemSettingsHandler::executeGet(
     const QString& /*path*/,
@@ -20,16 +21,31 @@ int QnSystemSettingsHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     QnSystemSettingsReply reply;
-
     bool dirty = false;
     const auto& settings = QnGlobalSettings::instance()->allSettings();
+
+    namespace ahlp = ec2::access_helpers;
+
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
+        bool readAllowed = ahlp::kvSystemOnlyFilter(
+            ahlp::Mode::read,
+            owner->accessRights(), 
+            setting->key());
+
+        bool writeAllowed = ec2::access_helpers::kvSystemOnlyFilter(
+            ahlp::Mode::write,
+            owner->accessRights(), 
+            setting->key());
+
         if (!params.isEmpty())
         {
             auto paramIter = params.find(setting->key());
             if (paramIter == params.end())
                 continue;
+
+            if (!writeAllowed)
+                return nx_http::StatusCode::forbidden;
 
             if (setting->key() == QnGlobalSettings::kNameSystemName)
                 systemNameChanged(owner, setting->serializedValue(), paramIter.value());
@@ -37,7 +53,9 @@ int QnSystemSettingsHandler::executeGet(
             setting->setSerializedValue(paramIter.value());
             dirty = true;
         }
-        reply.settings.insert(setting->key(), setting->serializedValue());
+
+        if (readAllowed)
+            reply.settings.insert(setting->key(), setting->serializedValue());
     }
     if (dirty)
         QnGlobalSettings::instance()->synchronizeNow();

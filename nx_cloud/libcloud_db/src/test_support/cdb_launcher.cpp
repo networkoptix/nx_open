@@ -583,7 +583,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
     return resCode;
 }
 
-api::ResultCode CdbLauncher::updateSystemName(
+api::ResultCode CdbLauncher::renameSystem(
     const std::string& login,
     const std::string& password,
     const std::string& systemID,
@@ -596,7 +596,7 @@ api::ResultCode CdbLauncher::updateSystemName(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::updateSystemName,
+                &nx::cdb::api::SystemManager::rename,
                 connection->systemManager(),
                 systemID,
                 newSystemName,
@@ -736,6 +736,24 @@ api::ResultCode CdbLauncher::fetchSystemData(
         }
     }
     return api::ResultCode::notFound;
+}
+
+api::ResultCode CdbLauncher::recordUserSessionStart(
+    const AccountWithPassword& account,
+    const std::string& systemId)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(account.data.email, account.password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<nx::cdb::api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::recordUserSessionStart,
+                connection->systemManager(),
+                systemId,
+                std::placeholders::_1));
+    return resCode;
 }
 
 api::ResultCode CdbLauncher::getVmsConnections(

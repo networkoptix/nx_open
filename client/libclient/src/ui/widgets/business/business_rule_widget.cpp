@@ -26,6 +26,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/skin.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
@@ -46,6 +47,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->scheduleButton->setIcon(qnSkin->icon(lit("buttons/schedule.png")));
     setHelpTopic(ui->scheduleButton, Qn::EventsActions_Schedule_Help);
 
     ui->eventDefinitionGroupBox->installEventFilter(this);
@@ -308,24 +310,16 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
         {
             if (object == ui->eventDefinitionGroupBox)
             {
-                QnResourceList resources = m_model->eventResources();
-                foreach(QnResourcePtr res, m_dropResources)
-                {
-                    if (resources.contains(res))
-                        continue;
-                    resources.append(res);
-                }
+                auto resources = m_model->eventResources();
+                for (const auto &res: m_dropResources)
+                    resources << res->getId();
                 m_model->setEventResources(resources);
             }
             else if (object == ui->actionDefinitionGroupBox)
             {
-                QnResourceList resources = m_model->actionResources();
-                foreach(QnResourcePtr res, m_dropResources)
-                {
-                    if (resources.contains(res))
-                        continue;
-                    resources.append(res);
-                }
+                auto resources = m_model->actionResources();
+                for (const auto& res: m_dropResources)
+                    resources << res->getId();
                 m_model->setActionResources(resources);
             }
             m_dropResources = QnResourceList();
@@ -399,7 +393,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog dialog(this); //TODO: #GDM #Business or servers?
+    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this); //TODO: #GDM #Business or servers?
 
     QnBusiness::EventType eventType = m_model->eventType();
     if (eventType == QnBusiness::CameraMotionEvent)
@@ -418,11 +412,11 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog::SelectionTarget target;
+    QnResourceSelectionDialog::Filter target;
     if (QnBusiness::requiresCameraResource(m_model->actionType()))
-        target = QnResourceSelectionDialog::CameraResourceTarget;
+        target = QnResourceSelectionDialog::Filter::cameras;
     else if (QnBusiness::requiresUserResource(m_model->actionType()))
-        target = QnResourceSelectionDialog::UserResourceTarget;
+        target = QnResourceSelectionDialog::Filter::users;
     else
         return;
 
@@ -438,7 +432,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     else if (actionType == QnBusiness::ExecutePtzPresetAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
     else if (actionType == QnBusiness::SendMailAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(this));
+        dialog.setDelegate(new QnSendEmailActionDelegate(this));
     else if (actionType == QnBusiness::PlaySoundAction || actionType == QnBusiness::PlaySoundOnceAction || actionType == QnBusiness::SayTextAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
 

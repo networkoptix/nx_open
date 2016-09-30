@@ -32,7 +32,7 @@ public:
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(qint64 startTimeMs, qint64 endTimeMs);
-    void setCameraList(const QnVirtualCameraResourceList &cameras);
+    void setCameraList(const QSet<QnUuid>& ids);
     void setActionType(QnBusiness::ActionType value);
     void setEventType(QnBusiness::EventType value);
 
@@ -78,7 +78,7 @@ private:
     QSet<int> m_requests;
 
     QVector <QnBusinessActionDataListPtr> m_allEvents;
-    QnVirtualCameraResourceList m_filterCameraList;
+    QSet<QnUuid> m_filterCameraList;
     bool m_updateDisabled;
     bool m_dirty;
 

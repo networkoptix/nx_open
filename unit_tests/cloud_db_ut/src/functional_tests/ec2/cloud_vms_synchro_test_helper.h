@@ -11,13 +11,13 @@
 namespace nx {
 namespace cdb {
 
-class Ec2MserverCloudSynchronization2
+class Ec2MserverCloudSynchronization
     :
     public ::testing::Test
 {
 public:
-    Ec2MserverCloudSynchronization2();
-    ~Ec2MserverCloudSynchronization2();
+    Ec2MserverCloudSynchronization();
+    ~Ec2MserverCloudSynchronization();
 
     utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>* appserver2();
     CdbLauncher* cdb();

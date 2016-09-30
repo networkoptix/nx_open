@@ -95,12 +95,12 @@ public:
         m_noVideoLabel = addWarningLabel(tr("Schedule settings are not compatible with some devices."));
     }
 
-    virtual bool validate(const QnResourceList &selected) override
+    virtual bool validate(const QSet<QnUuid>& selected) override
     {
         using boost::algorithm::all_of;
         using boost::algorithm::any_of;
 
-        QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
+        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(selected);
 
         QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled);
 
@@ -1127,10 +1127,15 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
     bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
     bool hasVideo = boost::algorithm::all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) { return camera->hasVideo(0); });
 
-    QScopedPointer<QnResourceSelectionDialog> dialog(new QnResourceSelectionDialog(this));
+    QScopedPointer<QnResourceSelectionDialog> dialog(
+        new QnResourceSelectionDialog(QnResourceSelectionDialog::Filter::cameras, this));
     auto dialogDelegate = new QnExportScheduleResourceSelectionDialogDelegate(this, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);
     dialog->setDelegate(dialogDelegate);
-    dialog->setSelectedResources(m_cameras);
+
+    QSet<QnUuid> ids;
+    for (auto camera: m_cameras)
+        ids << camera->getId();
+    dialog->setSelectedResources(ids);
     setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
     if (!dialog->exec())
         return;
@@ -1180,7 +1185,9 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
         }
     };
 
-    qnResourcesChangesManager->saveCameras(dialog->selectedResources().filtered<QnVirtualCameraResource>(), applyChanges);
+    auto selectedCameras = qnResPool->getResources<QnVirtualCameraResource>(
+        dialog->selectedResources());
+    qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
     updateLicensesLabelText();
 }
 

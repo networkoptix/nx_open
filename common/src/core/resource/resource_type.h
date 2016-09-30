@@ -74,6 +74,11 @@ public:
     static const QString kStorageTypeId;
     static const QString kUserTypeId;
 
+    static const QnUuid kUserTypeUuid;
+    static const QnUuid kServerTypeUuid;
+    static const QnUuid kStorageTypeUuid;
+    static const QnUuid kLayoutTypeUuid;
+
     static QnResourceTypePool *instance();
 
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;

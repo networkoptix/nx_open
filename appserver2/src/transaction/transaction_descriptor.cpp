@@ -4,9 +4,11 @@
 #include <iostream>
 
 #include <api/global_settings.h>
+
 #include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/param.h>
 #include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
@@ -28,6 +30,84 @@
 #include "managers/webpage_manager.h"
 
 namespace ec2 {
+namespace access_helpers {
+
+namespace detail {
+std::vector<QString> getRestrictedKeysByMode(Mode mode)
+{
+    using namespace nx::settings_names;
+
+    switch (mode)
+    {
+        case Mode::read:
+            return {
+                kNamePassword,
+                ldapAdminPassword,
+                kNameCloudSystemID,
+                kNameCloudAuthKey,
+                Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+                Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME
+            };
+        case Mode::write:
+            return {
+                kNameCloudSystemID,
+                kNameCloudAuthKey,
+                kCloudHostName
+            };
+    }
+
+    return std::vector<QString>();
+}
+}
+
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue)
+{
+    auto in_ = [] (const std::vector<QString>& vec, const QString& value)
+    {
+        return std::any_of(vec.cbegin(), vec.cend(), [&value](const QString& s) { return s == value; });
+    };
+
+    if (in_(detail::getRestrictedKeysByMode(mode), keyValue->first) && accessData != Qn::kSystemAccess)
+        return false;
+
+    return true;
+}
+
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key)
+{
+    QString dummy = lit("dummy");
+
+    KeyValueFilterType kv(key, &dummy);
+    return kvSystemOnlyFilter(mode, accessData, &kv);
+}
+
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value)
+{
+    KeyValueFilterType kv(key, value);
+    return kvSystemOnlyFilter(mode, accessData, &kv);
+}
+
+void applyValueFilters(
+    Mode mode,
+    const Qn::UserAccessData& accessData,
+    KeyValueFilterType* keyValue,
+    const FilterFunctorListType& filterList,
+    bool* allowed)
+{
+    if (allowed)
+        *allowed = true;
+
+    for (auto filter : filterList)
+    {
+        bool isAllowed = filter(mode, accessData, keyValue);
+
+        if (allowed && !isAllowed)
+            *allowed = false;
+    }
+}
+
+}
+
 namespace detail {
 
 template<typename T, typename F>
@@ -454,12 +534,26 @@ struct ModifyResourceAccess
     bool isRemove;
 };
 
+template<typename Param>
+void applyColumnFilter(const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
+
+void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData& data)
+{
+    if (accessData != Qn::kSystemAccess)
+        data.authKey.clear();
+}
+
 struct ReadResourceAccess
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData& accessData, const Param& param)
+    bool operator()(const Qn::UserAccessData& accessData, Param& param)
     {
-        return resourceAccessHelper(accessData, param.id, Qn::ReadPermission);
+        if (resourceAccessHelper(accessData, param.id, Qn::ReadPermission))
+        {
+            applyColumnFilter(accessData, param);
+            return true;
+        }
+        return false;
     }
 };
 
@@ -476,9 +570,31 @@ struct ReadResourceAccessOut
 
 struct ReadResourceParamAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    bool operator()(const Qn::UserAccessData& accessData, ApiResourceParamWithRefData& param)
     {
-        return resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission);
+        if (resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission))
+        {
+            operator()(accessData, static_cast<ApiResourceParamData&>(param));
+            return true;
+        }
+        return false;
+    }
+
+    bool operator()(const Qn::UserAccessData& accessData, ApiResourceParamData& param)
+    {
+        namespace ahlp = access_helpers;
+        ahlp::FilterFunctorListType filters = {
+            static_cast<bool (*)(ahlp::Mode, const Qn::UserAccessData&, ahlp::KeyValueFilterType*)>(&ahlp::kvSystemOnlyFilter)
+        };
+
+        bool allowed;
+        ahlp::KeyValueFilterType keyValue(param.name, &param.value);
+        ahlp::applyValueFilters(ahlp::Mode::read, accessData, &keyValue, filters, &allowed);
+
+        if (!allowed)
+            return false;
+
+        return true;
     }
 };
 
@@ -498,11 +614,12 @@ struct ModifyResourceParamAccess
 
     bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
+        bool result = false;
         if (hasSystemAccess(accessData))
             return true;
 
         if (isRemove)
-            return qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
+            result = qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
                 qnResPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
 
@@ -511,7 +628,6 @@ struct ModifyResourceParamAccess
             permissions |= Qn::WriteFullNamePermission;
 
         return resourceAccessHelper(accessData, param.resourceId, permissions);
-
     }
 
     bool isRemove;
@@ -762,7 +878,7 @@ struct FilterListByAccess
     void operator()(const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData](const typename ParamContainer::value_type &param)
+            [&accessData](typename ParamContainer::value_type &param)
         {
             return !SingleAccess()(accessData, param);
         }), outList.end());
@@ -893,12 +1009,12 @@ struct SaveUserTransactionType
     }
 };
 
-struct setResourceParamTransactionType
+struct SetResourceParamTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiResourceParamWithRefData& param)
     {
         if (param.resourceId == QnUserResource::kAdminGuid &&
-            param.name == QnGlobalSettings::kNameSystemName)
+            param.name == nx::settings_names::kNameSystemName)
         {
             // System rename MUST be propagated to Nx Cloud
             return TransactionType::Cloud;
