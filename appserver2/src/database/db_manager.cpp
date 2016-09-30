@@ -13,6 +13,7 @@
 #include "nx/fusion/serialization/sql_functions.h"
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
+#include "utils/crypt/symmetrical.h"
 #include "nx/fusion/serialization/json.h"
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
@@ -1325,6 +1326,59 @@ bool QnDbManager::upgradeSerializedTransactionsToV2()
     return true;
 }
 
+bool QnDbManager::encryptKvPairs()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryStr = "SELECT rowid, value, name FROM vms_kvpair";
+
+    if(!query.prepare(queryStr))
+    {
+        NX_LOG(lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING);
+        return false;
+    }
+
+    if (!query.exec())
+    {
+        NX_LOG(lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING);
+        return false;
+    }
+
+    QSqlQuery insQuery(m_sdb);
+    QString insQueryString = "UPDATE vms_kvpair SET value = :value WHERE rowid = :rowid";
+
+    while (query.next())
+    {
+        int rowid     = query.value(0).toInt();
+        QString value = query.value(1).toString();
+        QString name  = query.value(2).toString();
+
+        bool allowed = ec2::access_helpers::kvSystemOnlyFilter(
+            ec2::access_helpers::Mode::read,
+            Qn::UserAccessData(), 
+            name);
+
+        if (!allowed) // need encrypt
+        {
+            value = nx::utils::encodeHexStringFromStringAES128CBC(value);
+
+            insQuery.prepare(insQueryString);
+
+            insQuery.bindValue(":name",  name);
+            insQuery.bindValue(":value", value);
+            insQuery.bindValue(":rowid", rowid);
+
+            if (!insQuery.exec())
+            {
+                NX_LOG(lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logWARNING);
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::upgradeSerializedTransactionsToV3()
 {
     // migrate transaction log
@@ -1543,6 +1597,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/70_make_transaction_timestamp_128bit.sql"))
     {
         return upgradeSerializedTransactionsToV3();
+    }
+    else if (updateName == lit(":/updates/73_encrypt_kvpairs.sql"))
+    {
+        return encryptKvPairs();
     }
 
     return true;

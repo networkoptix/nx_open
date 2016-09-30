@@ -11,6 +11,7 @@
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
+#include <utils/crypt/symmetrical.h>
 
 #include <nx_ec/data/api_resource_data.h>
 
@@ -34,45 +35,6 @@ namespace
         return updatedVendorList.toSet();
     }
 
-    const QString kNameDisabledVendors(lit("disabledVendors"));
-    const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
-    const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
-    const QString kNameHost(lit("smtpHost"));
-    const QString kNamePort(lit("smtpPort"));
-    const QString kNameUser(lit("smtpUser"));
-    const QString kNamePassword(lit("smptPassword"));
-    const QString kNameConnectionType(lit("smtpConnectionType"));
-    const QString kNameSimple(lit("smtpSimple"));
-    const QString kNameTimeout(lit("smtpTimeout"));
-    const QString kNameFrom(lit("emailFrom"));
-    const QString kNameSignature(lit("emailSignature"));
-    const QString kNameSupportEmail(lit("emailSupportEmail"));
-    const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
-    const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
-    const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
-    const QString kNameBackupQualities(lit("backupQualities"));
-    const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
-    const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
-    const QString kNameNewSystem(lit("newSystem"));
-    const QString kCloudHostName(lit("cloudHost"));
-
-    const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
-    const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
-    const QString kNameStatisticsReportLastVersion(lit("statisticsReportLastVersion"));
-    const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
-    const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
-    const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
-    const QString kNameSystemId(lit("systemId"));
-    const QString kNameSystemNameForId(lit("systemNameForId"));
-    const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
-    const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
-
-
-    const QString ldapUri(lit("ldapUri"));
-    const QString ldapAdminDn(lit("ldapAdminDn"));
-    const QString ldapAdminPassword(lit("ldapAdminPassword"));
-    const QString ldapSearchBase(lit("ldapSearchBase"));
-    const QString ldapSearchFilter(lit("ldapSearchFilter"));
 
     const int kEc2ConnectionKeepAliveTimeoutDefault = 5;
     const int kEc2KeepAliveProbeCountDefault = 3;
@@ -95,13 +57,8 @@ namespace
     const int kTakeCameraOwnershipWithoutLockDefault = false;
 }
 
-const QString QnGlobalSettings::kNameCloudAccountName(lit("cloudAccountName"));
-const QString QnGlobalSettings::kNameCloudSystemID(lit("cloudSystemID"));
-const QString QnGlobalSettings::kNameCloudAuthKey(lit("cloudAuthKey"));
+using namespace nx::settings_names;
 const QString QnGlobalSettings::kNameSystemName(lit("systemName"));
-const QString QnGlobalSettings::kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
-const QString QnGlobalSettings::kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
-const QString QnGlobalSettings::kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
     base_type(parent)
@@ -436,7 +393,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const
     QnLdapSettings result;
     result.uri = m_ldapUriAdaptor->value();
     result.adminDn = m_ldapAdminDnAdaptor->value();
-    result.adminPassword = m_ldapAdminPasswordAdaptor->value();
+    result.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_ldapAdminPasswordAdaptor->value());
     result.searchBase = m_ldapSearchBaseAdaptor->value();
     result.searchFilter = m_ldapSearchFilterAdaptor->value();
     return result;
@@ -446,7 +403,10 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings)
 {
     m_ldapUriAdaptor->setValue(settings.uri);
     m_ldapAdminDnAdaptor->setValue(settings.adminDn);
-    m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
+    m_ldapAdminPasswordAdaptor->setValue(
+        settings.isValid() 
+        ? nx::utils::encodeHexStringFromStringAES128CBC(settings.adminPassword) 
+        : QString());
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
 }
@@ -458,7 +418,7 @@ QnEmailSettings QnGlobalSettings::emailSettings() const
     result.email = m_fromAdaptor->value();
     result.port = m_portAdaptor->value();
     result.user = m_userAdaptor->value();
-    result.password = m_passwordAdaptor->value();
+    result.password = nx::utils::decodeStringFromHexStringAES128CBC(m_passwordAdaptor->value());
     result.connectionType = m_connectionTypeAdaptor->value();
     result.signature = m_signatureAdaptor->value();
     result.supportEmail = m_supportLinkAdaptor->value();
@@ -483,7 +443,10 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
     m_fromAdaptor->setValue(settings.email);
     m_portAdaptor->setValue(settings.port == QnEmailSettings::defaultPort(settings.connectionType) ? 0 : settings.port);
     m_userAdaptor->setValue(settings.user);
-    m_passwordAdaptor->setValue(settings.isValid() ? settings.password : QString());
+    m_passwordAdaptor->setValue(
+        settings.isValid() 
+        ? nx::utils::encodeHexStringFromStringAES128CBC(settings.password) 
+        : QString());
     m_connectionTypeAdaptor->setValue(settings.connectionType);
     m_signatureAdaptor->setValue(settings.signature);
     m_supportLinkAdaptor->setValue(settings.supportEmail);
@@ -759,12 +722,12 @@ void QnGlobalSettings::setCloudAccountName(const QString& value)
 
 QString QnGlobalSettings::cloudSystemID() const
 {
-    return m_cloudSystemIDAdaptor->value();
+    return nx::utils::decodeStringFromHexStringAES128CBC(m_cloudSystemIDAdaptor->value());
 }
 
 void QnGlobalSettings::setCloudSystemID(const QString& value)
 {
-    m_cloudSystemIDAdaptor->setValue(value);
+    m_cloudSystemIDAdaptor->setValue(nx::utils::encodeHexStringFromStringAES128CBC(value));
 }
 
 QString QnGlobalSettings::cloudAuthKey() const

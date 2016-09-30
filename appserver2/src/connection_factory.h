@@ -108,7 +108,7 @@ private:
 
     int testDirectConnection(const QUrl& addr, impl::TestConnectionHandlerPtr handler);
     int testRemoteConnection(const QUrl& addr, impl::TestConnectionHandlerPtr handler);
-    ErrorCode getSettings(nullptr_t, ApiResourceParamDataList* const outData);
+    ErrorCode getSettings(nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData&);
 
     template<class InputDataType>
     void regUpdate(QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd,
@@ -126,7 +126,7 @@ private:
     void regFunctor(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        std::function<ErrorCode(InputType, OutputType*)> handler,
+        std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler,
         Qn::GlobalPermission permission = Qn::NoGlobalPermissions);
 
     template<class InputType, class OutputType>

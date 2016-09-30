@@ -3,6 +3,7 @@
 
 #include <QtCore/QCryptographicHash>
 
+#include <utils/crypt/symmetrical.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
@@ -719,12 +720,7 @@ void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
 
 QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
 {
-    static const QByteArray mask = QByteArray::fromHex("4453D6654C634636990B2E5AA69A1312"); // generated from guid
-    static const int maskSize = mask.size();
-    QByteArray result = data;
-    for (int i = 0; i < result.size(); ++i)
-        result.data()[i] ^= mask.data()[i % maskSize];
-    return result;
+    return nx::utils::encodeSimple(data);
 }
 
 Qn::AuthResult QnAuthHelper::authenticateByUrl(
