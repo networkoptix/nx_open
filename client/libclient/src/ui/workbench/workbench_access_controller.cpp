@@ -7,11 +7,13 @@
 
 #include <common/common_module.h>
 
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_access/resource_access_manager.h>
+
+#include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
@@ -42,6 +44,18 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
             updatePermissions(resource);
         });
 
+    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this,
+        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+        {
+            if (!subject.user())
+                return;
+
+            if (subject.user() == m_user)
+                recalculateAllPermissions();
+            else
+                updatePermissions(subject.user());
+        });
 
     recalculateAllPermissions();
 }
@@ -275,19 +289,16 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
-    connect(resource, &QnResource::parentIdChanged,         this, &QnWorkbenchAccessController::updatePermissions);
-    connect(resource, &QnResource::flagsChanged,            this, &QnWorkbenchAccessController::updatePermissions);
+    connect(resource, &QnResource::flagsChanged, this,
+        &QnWorkbenchAccessController::updatePermissions);
 
-    if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
-    {
-        connect(layout, &QnLayoutResource::lockedChanged,   this, &QnWorkbenchAccessController::updatePermissions);
-    }
+    //TODO: #GDM really we need to listen only to resource_access_manager instead of the following
+    connect(resource, &QnResource::parentIdChanged, this,
+        &QnWorkbenchAccessController::updatePermissions);
 
-    if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
-    {
-        connect(user, &QnUserResource::permissionsChanged,  this, &QnWorkbenchAccessController::updatePermissions);
-        connect(user, &QnUserResource::userGroupChanged,    this, &QnWorkbenchAccessController::updatePermissions);
-    }
+    if (const auto& layout = resource.dynamicCast<QnLayoutResource>())
+        connect(layout, &QnLayoutResource::lockedChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
 
     updatePermissions(resource);
 }

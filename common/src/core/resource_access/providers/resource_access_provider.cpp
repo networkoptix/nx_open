@@ -1,5 +1,7 @@
 #include "resource_access_provider.h"
 
+#include <nx/utils/log/assert.h>
+
 QnResourceAccessProvider::QnResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
@@ -48,6 +50,24 @@ void QnResourceAccessProvider::insertBaseProvider(int index,
     m_providers.insert(index, provider);
     connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
         &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+}
+
+void QnResourceAccessProvider::removeBaseProvider(QnAbstractResourceAccessProvider* provider)
+{
+    NX_ASSERT(provider);
+    if (!provider)
+        return;
+
+    NX_ASSERT(m_providers.contains(provider));
+    m_providers.removeOne(provider);
+
+    if (provider->parent() == this)
+        provider->setParent(nullptr);
+}
+
+QList<QnAbstractResourceAccessProvider*> QnResourceAccessProvider::providers() const
+{
+    return m_providers;
 }
 
 int QnResourceAccessProvider::providersCount() const

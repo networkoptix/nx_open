@@ -35,6 +35,14 @@ public:
     */
     void insertBaseProvider(int index, QnAbstractResourceAccessProvider* provider);
 
+    /**
+    * Remove base provider from the module.
+    * NOTICE: this class will detach ownership! You must remove the provider yourself.
+    */
+    void removeBaseProvider(QnAbstractResourceAccessProvider* provider);
+
+    QList<QnAbstractResourceAccessProvider*> providers() const;
+
     /** Count of the installed providers. */
     int providersCount() const;
 

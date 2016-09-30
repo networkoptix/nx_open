@@ -9,8 +9,8 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
-QString QnResourcePoolTestHelper::kTestUserName = QStringLiteral("unit_test_user");
-QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("unit_test_user_2");
+QString QnResourcePoolTestHelper::kTestUserName = QStringLiteral("user");
+QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("user_2");
 
 QnUserResourcePtr QnResourcePoolTestHelper::createUser(Qn::GlobalPermissions globalPermissions,
     const QString& name,
@@ -50,6 +50,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
 QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera()
 {
     QnVirtualCameraResourcePtr camera(new QnCameraResourceStub());
+    camera->setName(QStringLiteral("camera"));
     return camera;
 }
 

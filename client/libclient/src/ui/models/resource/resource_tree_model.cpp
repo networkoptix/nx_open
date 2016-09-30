@@ -1977,9 +1977,9 @@ void QnResourceTreeModel::at_commonModule_systemNameChanged()
     m_rootNodes[Qn::CurrentSystemNode]->update();
 }
 
-void QnResourceTreeModel::at_user_enabledChanged(const QnResourcePtr &resource)
+void QnResourceTreeModel::at_user_enabledChanged(const QnUserResourcePtr& user)
 {
-    auto node = ensureResourceNode(resource);
+    auto node = ensureResourceNode(user);
     node->update();
 }
 

@@ -1,6 +1,6 @@
 #include "videowall_resource_access_provider.h"
 
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 
 #include <core/resource_management/resource_pool.h>
 
@@ -27,6 +27,8 @@ QSet<QnUuid> videoWallLayouts(const QnVideoWallResourcePtr& videoWall)
 QnVideoWallResourceAccessProvider::QnVideoWallResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
+    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this, &QnVideoWallResourceAccessProvider::updateAccessBySubject);
 }
 
 QnVideoWallResourceAccessProvider::~QnVideoWallResourceAccessProvider()
@@ -41,7 +43,7 @@ QnAbstractResourceAccessProvider::Source QnVideoWallResourceAccessProvider::base
 bool QnVideoWallResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!qnGlobalPermissionsManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
         return false;
 
     QSet<QnUuid> layoutIds = accessibleLayouts();
@@ -96,15 +98,6 @@ void QnVideoWallResourceAccessProvider::handleResourceAdded(const QnResourcePtr&
 
         connect(layout, &QnLayoutResource::itemAdded, this, handleItemChanged);
         connect(layout, &QnLayoutResource::itemRemoved, this, handleItemChanged);
-    }
-    else if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-    {
-        connect(user, &QnUserResource::permissionsChanged, this,
-            [this, user]
-            {
-                for (const auto& resource : qnResPool->getResources())
-                    updateAccess(user, resource);
-            });
     }
 }
 

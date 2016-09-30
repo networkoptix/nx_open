@@ -380,6 +380,16 @@ TEST_F(QnResourceAccessManagerTest, checkUserGroupChange)
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
 }
 
+TEST_F(QnResourceAccessManagerTest, checkUserEnabledChange)
+{
+    auto target = addCamera();
+
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+
+    user->setEnabled(false);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+}
 
 TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
 {
@@ -396,4 +406,30 @@ TEST_F(QnResourceAccessManagerTest, checkRoleAccessChange)
     qnUserRolesManager->addOrUpdateUserRole(role);
 
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+}
+
+TEST_F(QnResourceAccessManagerTest, checkEditAccessChange)
+{
+    auto target = addCamera();
+
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::SavePermission));
+
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission | Qn::GlobalEditCamerasPermission);
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::SavePermission));
+}
+
+TEST_F(QnResourceAccessManagerTest, checkRoleRemoved)
+{
+    auto target = addCamera();
+
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto role = createRole(Qn::GlobalAccessAllMediaPermission);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    user->setUserGroup(role.id);
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
+
+    qnUserRolesManager->removeUserRole(role.id);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
 }

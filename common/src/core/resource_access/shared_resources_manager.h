@@ -22,6 +22,14 @@ public:
     QSet<QnUuid> sharedResources(const QnResourceAccessSubject& subject) const;
     void setSharedResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& resources);
 
+private:
+    void setSharedResourcesInternal(const QnResourceAccessSubject& subject,
+        const QSet<QnUuid>& resources);
+
+    void handleResourceRemoved(const QnResourcePtr& resource);
+    void handleRoleRemoved(const ec2::ApiUserGroupData& userRole);
+    void handleSubjectRemoved(const QnResourceAccessSubject& subject);
+
 signals:
     void sharedResourcesChanged(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& resourceIds);

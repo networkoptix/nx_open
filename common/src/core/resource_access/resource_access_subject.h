@@ -32,3 +32,5 @@ public:
 private:
     QScopedPointer<QnResourceAccessSubjectPrivate> d_ptr;
 };
+
+QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject);

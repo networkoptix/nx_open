@@ -16,7 +16,6 @@ protected:
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
-    virtual void handleResourceAdded(const QnResourcePtr& resource) override;
 private:
     bool hasAccessToDesktopCamera(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;

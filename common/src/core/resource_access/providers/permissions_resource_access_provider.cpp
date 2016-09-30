@@ -1,7 +1,7 @@
 #include "permissions_resource_access_provider.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/camera_resource.h>
@@ -11,6 +11,8 @@
 QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
+    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this, &QnPermissionsResourceAccessProvider::updateAccessBySubject);
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
@@ -24,7 +26,7 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
      * if the user has the ability to push his screen. */
     return subject.user()
         && subject.user()->getName() == resource->getName()
-        && qnResourceAccessManager->hasGlobalPermission(subject,
+        && qnGlobalPermissionsManager->hasGlobalPermission(subject,
             Qn::GlobalControlVideoWallPermission);
 }
 
@@ -52,20 +54,5 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     else if (resource->hasFlags(Qn::videowall))
         requiredPermission = Qn::GlobalControlVideoWallPermission;
 
-    return qnResourceAccessManager->hasGlobalPermission(subject, requiredPermission);
-}
-
-void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
-{
-    base_type::handleResourceAdded(resource);
-
-    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-    {
-        connect(user, &QnUserResource::permissionsChanged, this,
-            [this, user]
-            {
-                for (const auto& resource : qnResPool->getResources())
-                    updateAccess(user, resource);
-            });
-    }
+    return qnGlobalPermissionsManager->hasGlobalPermission(subject, requiredPermission);
 }

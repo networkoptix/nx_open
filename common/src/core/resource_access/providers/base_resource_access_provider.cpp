@@ -31,7 +31,15 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
     if (!acceptable(subject, resource))
         return false;
 
-    NX_ASSERT(m_accessibleResources.contains(subject.id()));
+    /* We can get cache miss in the following scenario:
+     * * new user was added
+     * * global permissions manager emits 'changed'
+     * * access manager recalculates all permissions
+     * * access provider checks 'has access' to this user itself
+     */
+    if (!m_accessibleResources.contains(subject.id()))
+        return false;
+
     return m_accessibleResources[subject.id()].contains(resource->getId());
 }
 
@@ -49,13 +57,25 @@ bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& sub
     return resource && resource->resourcePool() && subject.isValid();
 }
 
+bool QnBaseResourceAccessProvider::isSubjectEnabled(const QnResourceAccessSubject& subject) const
+{
+    if (!subject.isValid())
+        return false;
+    return subject.user()
+        ? subject.user()->isEnabled()
+        : true; //< Roles are always enabled (at least for now)
+}
+
 void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& resource)
 {
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
-        updateAccess(user, resource);
+    for (const auto& subject : allSubjects())
+        updateAccess(subject, resource);
+}
 
-    for (const auto& role: qnUserRolesManager->userRoles())
-        updateAccess(role, resource);
+void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessSubject& subject)
+{
+    for (const auto& resource : qnResPool->getResources())
+        updateAccess(subject, resource);
 }
 
 void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
@@ -69,7 +89,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
     auto targetId = resource->getId();
 
     bool oldValue = accessible.contains(targetId);
-    bool newValue = calculateAccess(subject, resource);
+    bool newValue = isSubjectEnabled(subject) && calculateAccess(subject, resource);
     if (oldValue == newValue)
         return;
 
@@ -79,6 +99,9 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
         accessible.remove(targetId);
 
     emit accessChanged(subject, resource, newValue ? baseSource() : Source::none);
+
+    for (const auto& dependent: dependentSubjects(subject))
+        updateAccess(dependent, resource);
 }
 
 void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
@@ -87,20 +110,15 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
     {
+        /* Disabled user should have no access to anything. */
+        connect(user, &QnUserResource::enabledChanged, this,
+            &QnBaseResourceAccessProvider::updateAccessBySubject);
+
         /* Changing of role means change of all user access rights. */
         connect(user, &QnUserResource::userGroupChanged, this,
-            [this, user]
-            {
-                for (const auto& resource : qnResPool->getResources())
-                    updateAccess(user, resource);
-            });
+            &QnBaseResourceAccessProvider::updateAccessBySubject);
 
-        for (const auto& resource : qnResPool->getResources())
-        {
-            /* We have already update access to ourselves before */
-            if (user != resource)
-                updateAccess(user, resource);
-        }
+        updateAccessBySubject(user);
     }
 }
 
@@ -111,23 +129,7 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
     auto resourceId = resource->getId();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-    {
-        QnResourceAccessSubject subject(user);
-
-        NX_ASSERT(m_accessibleResources.contains(resourceId));
-        auto& accessible = m_accessibleResources[resourceId];
-
-        /* In the real world resource pool removes resources via batch, so selecting resources
-        * will not work here. Looks like we will not be notified about access lost to them. */
-        for (const auto& targetResource : qnResPool->getResources(accessible.values()))
-        {
-            QnUuid targetId = targetResource->getId();
-            accessible.remove(targetId);
-            emit accessChanged(subject, targetResource, Source::none);
-        }
-
-        m_accessibleResources.remove(resourceId);
-    }
+        handleSubjectRemoved(user);
 
     for (const auto& subject : allSubjects())
     {
@@ -146,37 +148,26 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
     const ec2::ApiUserGroupData& userRole)
 {
-    QList<QnResourceAccessSubject> subjects;
-    for (auto subject : allSubjects())
-    {
-        if (subject.effectiveId() == userRole.id)
-            subjects << subject;
-    }
-    NX_EXPECT(subjects.contains(userRole));
-
-    for (const auto& resource : qnResPool->getResources())
-    {
-        for (const auto& subject: subjects)
-            updateAccess(subject, resource);
-    }
+    updateAccessBySubject(userRole);
 }
 
 void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
-    QnResourceAccessSubject subject(userRole);
+    handleSubjectRemoved(userRole);
+    for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
+        updateAccessBySubject(subject);
+}
+
+void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)
+{
     auto id = subject.id();
 
     NX_ASSERT(m_accessibleResources.contains(id));
-    auto& accessible = m_accessibleResources[id];
 
-    for (const auto& targetResource : qnResPool->getResources(accessible.values()))
-    {
-        QnUuid targetId = targetResource->getId();
-        accessible.remove(targetId);
-        emit accessChanged(subject, targetResource, Source::none);
-    }
-    NX_ASSERT(accessible.isEmpty());
+    auto resources = qnResPool->getResources(m_accessibleResources[id].values());
     m_accessibleResources.remove(id);
+    for (const auto& targetResource : resources)
+        emit accessChanged(subject, targetResource, Source::none);
 }
 
 QSet<QnUuid> QnBaseResourceAccessProvider::accessible(const QnResourceAccessSubject& subject) const

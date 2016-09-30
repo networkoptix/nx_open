@@ -2,6 +2,8 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_access/providers/resource_access_provider.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 
@@ -10,8 +12,17 @@
 void QnAccessProviderTestFixture::SetUp()
 {
     m_module.reset(new QnCommonModule());
-    m_accessProvider.reset(createAccessProvider());
-    QObject::connect(accessProvider(),
+
+    for (auto provider : qnResourceAccessProvider->providers())
+    {
+        qnResourceAccessProvider->removeBaseProvider(provider);
+        delete provider;
+    }
+
+    m_accessProvider = createAccessProvider();
+    qnResourceAccessProvider->addBaseProvider(m_accessProvider);
+
+    QObject::connect(m_accessProvider,
         &QnAbstractResourceAccessProvider::accessChanged,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
             QnAbstractResourceAccessProvider::Source value)
@@ -23,13 +34,12 @@ void QnAccessProviderTestFixture::SetUp()
 void QnAccessProviderTestFixture::TearDown()
 {
     ASSERT_TRUE(m_awaitedAccessQueue.empty());
-    m_accessProvider.clear();
     m_module.clear();
 }
 
 QnAbstractResourceAccessProvider* QnAccessProviderTestFixture::accessProvider() const
 {
-    return m_accessProvider.data();
+    return m_accessProvider;
 }
 
 void QnAccessProviderTestFixture::awaitAccessValue(const QnResourceAccessSubject& subject,

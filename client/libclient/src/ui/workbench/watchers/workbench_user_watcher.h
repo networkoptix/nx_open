@@ -2,8 +2,6 @@
 
 #include <QtCore/QObject>
 
-#include <nx_ec/data/api_user_group_data.h>
-
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -51,12 +49,8 @@ private:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
     void at_user_resourceChanged(const QnResourcePtr &resource);
-    void at_user_permissionsChanged(const QnResourcePtr &user);
 
-    void at_userGroupAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
-    void at_userGroupRemoved(const ec2::ApiUserGroupData& userGroup);
 private:
-
     void setCurrentUser(const QnUserResourcePtr &currentUser);
     bool isReconnectRequired(const QnUserResourcePtr &user);
     void reconnect();
@@ -68,7 +62,6 @@ private:
     QString m_userPassword;
     QByteArray m_userDigest;
     QnUserResourcePtr m_user;
-    ec2::ApiUserGroupData m_group;
     bool m_reconnectOnPasswordChange;
 };
 

@@ -23,3 +23,19 @@ QList<QnResourceAccessSubject> QnAbstractResourceAccessProvider::allSubjects()
         result << role;
     return result;
 }
+
+QList<QnResourceAccessSubject> QnAbstractResourceAccessProvider::dependentSubjects(
+    const QnResourceAccessSubject& subject)
+{
+    if (!subject.isValid() || subject.user())
+        return QList<QnResourceAccessSubject>();
+
+    QList<QnResourceAccessSubject> result;
+    auto roleId = subject.id();
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (QnResourceAccessSubject(user).effectiveId() == roleId)
+            result << user;
+    }
+    return result;
+}

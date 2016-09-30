@@ -27,13 +27,19 @@ protected:
     bool acceptable(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;
 
+    bool isSubjectEnabled(const QnResourceAccessSubject& subject) const;
+
     void updateAccessToResource(const QnResourcePtr& resource);
+    void updateAccessBySubject(const QnResourceAccessSubject& subject);
     void updateAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
+
     virtual void handleResourceAdded(const QnResourcePtr& resource);
     virtual void handleResourceRemoved(const QnResourcePtr& resource);
 
     void handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole);
     void handleRoleRemoved(const ec2::ApiUserGroupData& userRole);
+
+    void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
     QSet<QnUuid> accessible(const QnResourceAccessSubject& subject) const;
 

@@ -135,7 +135,7 @@ private slots:
     void at_server_redundancyChanged(const QnResourcePtr &resource);
     void at_commonModule_systemNameChanged();
 
-    void at_user_enabledChanged(const QnResourcePtr &resource);
+    void at_user_enabledChanged(const QnUserResourcePtr& user);
 
     void at_serverAutoDiscoveryEnabledChanged();
 

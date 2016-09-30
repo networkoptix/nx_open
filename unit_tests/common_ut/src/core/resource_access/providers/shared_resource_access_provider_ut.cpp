@@ -2,6 +2,9 @@
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 
 #include <core/resource_access/shared_resources_manager.h>
+
+#include <core/resource_management/user_roles_manager.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -131,3 +134,43 @@ TEST_F(QnSharedResourceAccessProviderTest, checkAccessRemoved)
     awaitAccess(user, target, false);
     qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>());
 }
+
+TEST_F(QnSharedResourceAccessProviderTest, checkRoleAccessGranted)
+{
+    auto target = addCamera();
+
+    auto role = createRole(Qn::NoGlobalPermissions);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    auto user = addUser(Qn::NoGlobalPermissions);
+    user->setUserGroup(role.id);
+    awaitAccess(user, target, true);
+    qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
+}
+
+TEST_F(QnSharedResourceAccessProviderTest, checkUserRoleChanged)
+{
+    auto target = addCamera();
+
+    auto role = createRole(Qn::NoGlobalPermissions);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
+    auto user = addUser(Qn::NoGlobalPermissions);
+    awaitAccess(user, target, true);
+    user->setUserGroup(role.id);
+}
+
+TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
+{
+    auto target = addCamera();
+
+    auto role = createRole(Qn::NoGlobalPermissions);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+    auto user = addUser(Qn::NoGlobalPermissions);
+    user->setUserGroup(role.id);
+    qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+    awaitAccess(user, target, false);
+    qnUserRolesManager->removeUserRole(role.id);
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+

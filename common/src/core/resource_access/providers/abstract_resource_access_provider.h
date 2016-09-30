@@ -34,6 +34,8 @@ public:
     //TODO: #GDM Think if we have a better place for this method
     static QList<QnResourceAccessSubject> allSubjects();
 
+    /** List of users, belonging to given role. */
+    static QList<QnResourceAccessSubject> dependentSubjects(const QnResourceAccessSubject& subject);
 signals:
     void accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Source value);

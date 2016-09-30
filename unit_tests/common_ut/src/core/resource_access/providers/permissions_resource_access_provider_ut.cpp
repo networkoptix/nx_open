@@ -221,6 +221,17 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkUserGroupChangeAccess)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnPermissionsResourceAccessProviderTest, checkUserEnabledChange)
+{
+    auto target = addCamera();
+
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+
+    user->setEnabled(false);
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnPermissionsResourceAccessProviderTest, nonPoolResourceAccess)
 {
     auto user = addUser(Qn::GlobalAdminPermission);

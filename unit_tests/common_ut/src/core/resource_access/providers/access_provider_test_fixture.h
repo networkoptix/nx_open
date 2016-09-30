@@ -31,7 +31,7 @@ protected:
 
 private:
     QSharedPointer<QnCommonModule> m_module;
-    QSharedPointer<QnAbstractResourceAccessProvider> m_accessProvider;
+    QnAbstractResourceAccessProvider* m_accessProvider;
 
     struct AwaitedAccess
     {

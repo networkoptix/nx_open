@@ -8,7 +8,6 @@
 #include <core/resource_access/resource_access_subject.h>
 
 #include <nx_ec/data/api_fwd.h>
-#include <nx_ec/data/api_access_rights_data.h>
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
@@ -24,9 +23,6 @@ class QnResourceAccessManager : public Connective<QObject>,
 
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
-
-    /** Get a set of global permissions that will not work without the given one. */
-    static Qn::GlobalPermissions dependentPermissions(Qn::GlobalPermission value);
 
     /**
     * \param user                      User or role to get global permissions for.
@@ -130,15 +126,13 @@ signals:
     void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Qn::Permissions permissions);
 
-    void globalPermissionsChanged(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions permissions);
-
 private:
     void recalculateAllPermissions();
-    void updateGlobalPermissions(const QnResourceAccessSubject& subject);
+
     void updatePermissions(const QnResourceAccessSubject& subject, const QnResourcePtr& target);
 
-    Qn::GlobalPermissions calculateGlobalPermissions(const QnResourceAccessSubject& subject) const;
+    void handleResourceRemoved(const QnResourcePtr& resource);
+    void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
     Qn::Permissions calculatePermissions(const QnResourceAccessSubject& subject,
         const QnResourcePtr& target) const;
@@ -158,18 +152,11 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
         const QnUserResourcePtr& targetUser) const;
 
-    Qn::GlobalPermissions filterDependentPermissions(Qn::GlobalPermissions source) const;
-
-    void setGlobalPermissionsInternal(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions permissions);
-
     void setPermissionsInternal(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource, Qn::Permissions permissions);
 
 private:
     mutable QnMutex m_mutex;
-
-    QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 
     struct PermissionKey
     {

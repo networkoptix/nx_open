@@ -4,7 +4,9 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+
 #include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/global_permissions_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -33,12 +35,12 @@
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_mutex(QnMutex::NonRecursive),
-    m_globalPermissionsCache(),
     m_permissionsCache()
 {
     /* This change affects all accessible resources. */
-    connect(qnCommon,& QnCommonModule::readOnlyChanged, this,
-        &QnResourceAccessManager::recalculateAllPermissions);
+    /* We must get it from access provider and global permissions manager */
+//     connect(qnCommon,& QnCommonModule::readOnlyChanged, this,
+//         &QnResourceAccessManager::recalculateAllPermissions);
 
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
@@ -47,57 +49,21 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
             updatePermissions(subject, resource);
         });
 
-    /* update global permissions */
-    /*connect to subject removed*/
-    /*  user group change */
+    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this,
+        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+        {
+            for (const QnResourcePtr& resource : qnResPool->getResources())
+                updatePermissions(subject, resource);
+        });
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnResourceAccessManager::handleResourceRemoved);
+
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+        &QnResourceAccessManager::handleSubjectRemoved);
 
     recalculateAllPermissions();
-}
-
-Qn::GlobalPermissions QnResourceAccessManager::dependentPermissions(Qn::GlobalPermission value)
-{
-    switch (value)
-    {
-        case Qn::GlobalViewArchivePermission:
-            return Qn::GlobalViewBookmarksPermission | Qn::GlobalExportPermission
-                | Qn::GlobalManageBookmarksPermission;
-        case Qn::GlobalViewBookmarksPermission:
-            return Qn::GlobalManageBookmarksPermission;
-        default:
-            break;
-    }
-    return Qn::NoGlobalPermissions;
-}
-
-Qn::GlobalPermissions QnResourceAccessManager::filterDependentPermissions(
-    Qn::GlobalPermissions source) const
-{
-    //TODO: #GDM code duplication with ::dependentPermissions() method.
-    Qn::GlobalPermissions result = source;
-    if (!result.testFlag(Qn::GlobalViewArchivePermission))
-    {
-        result &= ~Qn::GlobalViewBookmarksPermission;
-        result &= ~Qn::GlobalExportPermission;
-    }
-
-    if (!result.testFlag(Qn::GlobalViewBookmarksPermission))
-    {
-        result &= ~Qn::GlobalManageBookmarksPermission;
-    }
-    return result;
-}
-
-void QnResourceAccessManager::setGlobalPermissionsInternal(const QnResourceAccessSubject& subject,
-    Qn::GlobalPermissions permissions)
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        auto& value = m_globalPermissionsCache[subject.id()];
-        if (value == permissions)
-            return;
-        value = permissions;
-    }
-    emit globalPermissionsChanged(subject, permissions);
 }
 
 void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubject& subject,
@@ -117,42 +83,31 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(
     const QnResourceAccessSubject& subject) const
 {
-    {
-        QnMutexLocker lk(&m_mutex);
-        auto iter = m_globalPermissionsCache.find(subject.effectiveId());
-        if (iter != m_globalPermissionsCache.cend())
-            return *iter;
-    }
-    return calculateGlobalPermissions(subject);
+    return qnGlobalPermissionsManager->globalPermissions(subject);
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const Qn::UserAccessData& accessRights,
     Qn::GlobalPermission requiredPermission) const
 {
-    if (accessRights == Qn::kSystemAccess)
-        return true;
-
-    auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
-    if (!user)
-        return false;
-    return hasGlobalPermission(user, requiredPermission);
+    return qnGlobalPermissionsManager->hasGlobalPermission(accessRights, requiredPermission);
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const QnResourceAccessSubject& subject,
     Qn::GlobalPermission requiredPermission) const
 {
-    if (requiredPermission == Qn::NoGlobalPermissions)
-        return true;
-
-    return globalPermissions(subject).testFlag(requiredPermission);
+    return qnGlobalPermissionsManager->hasGlobalPermission(subject, requiredPermission);
 }
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
     if (!subject.isValid() || !resource)
+        return Qn::NoPermissions;
+
+    /* User is already removed. */
+    if (subject.user() && !subject.user()->resourcePool())
         return Qn::NoPermissions;
 
     /* Resource is not added to pool, checking if we can create such resource. */
@@ -272,15 +227,9 @@ void QnResourceAccessManager::recalculateAllPermissions()
 {
     for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
     {
-        updateGlobalPermissions(subject);
         for (const QnResourcePtr& resource: qnResPool->getResources())
             updatePermissions(subject, resource);
     }
-}
-
-void QnResourceAccessManager::updateGlobalPermissions(const QnResourceAccessSubject& subject)
-{
-    setGlobalPermissionsInternal(subject, calculateGlobalPermissions(subject));
 }
 
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
@@ -289,55 +238,57 @@ void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& s
     setPermissionsInternal(subject, target, calculatePermissions(subject, target));
 }
 
-Qn::GlobalPermissions QnResourceAccessManager::calculateGlobalPermissions(
-    const QnResourceAccessSubject& subject) const
+void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    Qn::GlobalPermissions result = Qn::NoGlobalPermissions;
+    auto resourceId = resource->getId();
 
-    if (!subject.isValid())
-        return result;
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        handleSubjectRemoved(user);
 
-    if (subject.user())
+    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
     {
-        auto user = subject.user();
-        if (!user->isEnabled())
-            return result;
-
-        /* Handle just-created user situation. */
-        if (user->flags().testFlag(Qn::local))
-            return filterDependentPermissions(user->getRawPermissions());
-
-        /* User is already removed. Problems with 'on_resource_removed' connection order. */
-        if (!user->resourcePool())
-            return Qn::NoGlobalPermissions;
-
-        QnUuid userId = user->getId();
-
-        switch (user->role())
+        PermissionKey key(subject.id(), resourceId);
         {
-            case Qn::UserRole::CustomUserGroup:
-                result = globalPermissions(qnUserRolesManager->userRole(user->userGroup()));
-                break;
-            case Qn::UserRole::Owner:
-            case Qn::UserRole::Administrator:
-                result = Qn::GlobalAdminPermissionSet;
-                break;
-            default:
-                result = filterDependentPermissions(user->getRawPermissions());
-                break;
+            QnMutexLocker lk(&m_mutex);
+            auto iter = m_permissionsCache.find(key);
+            if (iter == m_permissionsCache.cend())
+                continue;
+            m_permissionsCache.erase(iter);
+        }
+        emit permissionsChanged(subject, resource, Qn::NoPermissions);
+    }
+}
+
+void QnResourceAccessManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
+{
+    auto id = subject.id();
+
+    QSet<QnResourcePtr> resorces;
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto iter = m_permissionsCache.begin();
+        while (iter != m_permissionsCache.end())
+        {
+            auto key = iter.key();
+            if (key.subjectId != id)
+            {
+                ++iter;
+            }
+            else
+            {
+                auto value = *iter;
+                iter = m_permissionsCache.erase(iter);
+                if (value == Qn::NoPermissions)
+                    continue;
+
+                QnResourcePtr targetResource = qnResPool->getResourceById(key.resourceId);
+                if (targetResource)
+                    resorces << targetResource;
+            }
         }
     }
-    else
-    {
-        /* If the group does not exist, permissions will be empty. */
-        result = subject.role().permissions;
-
-        /* If user belongs to group, he cannot be an admin - by design. */
-        result &= ~Qn::GlobalAdminPermission;
-        result = filterDependentPermissions(result);
-    }
-
-    return result;
+    for (const auto& targetResource : resorces)
+        emit permissionsChanged(subject, targetResource, Qn::NoPermissions);
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissions(
@@ -376,14 +327,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject,
     const QnVirtualCameraResourcePtr& camera) const
 {
-    if (subject.user())
-    {
-        TRACE("Calculate permissions of " << subject.user()->getName() << " to camera " << camera->getName());
-    }
-    else
-    {
-        TRACE("Calculate permissions of role " << subject.role().name << " to camera " << camera->getName());
-    }
+    TRACE("Calculate permissions of " << subject << " to camera " << camera->getName());
     NX_ASSERT(camera);
 
     Qn::Permissions result = Qn::NoPermissions;
@@ -482,14 +426,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnLayoutResourcePtr& layout) const
 {
-    if (subject.user())
-    {
-        TRACE("Calculate permissions of " << subject.user()->getName() << " to layout " << layout->getName());
-    }
-    else
-    {
-        TRACE("Calculate permissions of role " << subject.role().name << " to layout " << layout->getName());
-    }
+    TRACE("Calculate permissions of " << subject << " to layout " << layout->getName());
 
     NX_ASSERT(layout);
     if (!subject.isValid() || !layout)

@@ -104,3 +104,10 @@ bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) c
 {
     return d_ptr->id() == other.id();
 }
+
+QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject)
+{
+    QString name = subject.user() ? subject.user()->getName() : subject.role().name;
+    dbg.nospace() << "QnResourceAccessSubject(" << name << ")";
+    return dbg.space();
+}
