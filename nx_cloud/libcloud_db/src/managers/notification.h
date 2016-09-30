@@ -74,6 +74,7 @@ class AbstractNotification
 public:
     virtual ~AbstractNotification() = default;
 
+    virtual void setAddressee(std::string addressee) = 0;
     virtual QByteArray serializeToJson() const = 0;
 };
 
@@ -92,6 +93,12 @@ class NotificationSerializationProvider:
     public BaseType
 {
 public:
+    virtual void setAddressee(std::string addressee) override
+    {
+        static_cast<FusionEnabledDescendantType*>(this)->user_email
+            = std::move(addressee);
+    }
+
     virtual QByteArray serializeToJson() const override
     {
         return QJson::serialized<FusionEnabledDescendantType>(
@@ -106,7 +113,8 @@ class AbstractActivateAccountNotificationImplementor:
 public:
     virtual void setActivationCode(std::string code) override
     {
-        static_cast<FusionEnabledDescendantType*>(this)->message.code = std::move(code);
+        static_cast<FusionEnabledDescendantType*>(this)->message.code
+            = std::move(code);
     }
 };
 

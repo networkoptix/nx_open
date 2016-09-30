@@ -21,6 +21,7 @@
 #include "cache.h"
 #include "data/account_data.h"
 #include "managers_types.h"
+#include "notification.h"
 
 
 namespace nx {
@@ -99,7 +100,8 @@ public:
     nx::db::DBResult fetchExistingAccountOrCreateNewOneByEmail(
         nx::db::QueryContext* queryContext,
         const std::string& accountEmail,
-        data::AccountData* const accountData);
+        data::AccountData* const accountData,
+        std::unique_ptr<AbstractActivateAccountNotification> notification);
     nx::db::DBResult fetchExistingAccountByEmail(
         nx::db::QueryContext* queryContext,
         const std::string& accountEmail,
@@ -125,11 +127,13 @@ private:
     nx::db::DBResult insertAccount(
         nx::db::QueryContext* const tran,
         const data::AccountData& accountData,
-        data::AccountConfirmationCode* const resultData);
+        data::AccountConfirmationCode* const resultData,
+        std::unique_ptr<AbstractActivateAccountNotification> notification);
     nx::db::DBResult issueAccountActivationCode(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
-        data::AccountConfirmationCode* const resultData);
+        data::AccountConfirmationCode* const resultData,
+        std::unique_ptr<AbstractActivateAccountNotification> notification);
     void accountAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,

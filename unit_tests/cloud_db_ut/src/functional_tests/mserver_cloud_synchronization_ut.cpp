@@ -411,10 +411,10 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
-    //EXPECT_CALL(
-    //    mockedEmailManager,
-    //    sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))).Times(1);
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(1);

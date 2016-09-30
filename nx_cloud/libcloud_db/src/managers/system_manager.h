@@ -288,10 +288,12 @@ private:
      */
     nx::db::DBResult updateSharingInDb(
         nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
         const data::SystemSharing& sharing);
     void sharingUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
