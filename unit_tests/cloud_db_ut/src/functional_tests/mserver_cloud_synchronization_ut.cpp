@@ -7,7 +7,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
-#include <nx/utils/test_support/test_utils.h>
+#include <nx/utils/test_support/utils.h>
 
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>

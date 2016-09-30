@@ -18,7 +18,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/test_support/test_utils.h>
+#include <nx/utils/test_support/utils.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
