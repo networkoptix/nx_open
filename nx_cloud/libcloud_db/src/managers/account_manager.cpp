@@ -33,8 +33,6 @@
 namespace nx {
 namespace cdb {
 
-static const QString kConfirmaionEmailTemplateFileName = lit("activate_account");
-static const QString kPasswordResetEmailTemplateFileName = lit("restore_password");
 static const std::chrono::seconds kUnconfirmedAccountExpirationSec(3*24*60*60);
 
 AccountManager::AccountManager(
@@ -383,7 +381,7 @@ db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
         accountEmail,
         accountData);
     if (result != db::DBResult::notFound)
-        return result;
+        return result;  //< Found account or failed because of DB access error.
 
     // Creating new account.
 
@@ -393,9 +391,9 @@ db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
 
     NX_LOGX(lm("Creating new account %1").arg(accountEmail), cl_logDEBUG1);
 
-    // Creating new account.
     data::AccountConfirmationCode accountConfirmationCode;
-    const auto dbResult = insertAccount(queryContext, *accountData, &accountConfirmationCode);
+    const auto dbResult = 
+        insertAccount(queryContext, *accountData, &accountConfirmationCode);
     if (dbResult != db::DBResult::ok)
         return dbResult;
 
@@ -592,8 +590,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 
     //sending confirmation email
     ActivateAccountNotification notification;
-    notification.user_email = QString::fromStdString(accountEmail);
-    notification.type = kConfirmaionEmailTemplateFileName;
+    notification.user_email = accountEmail;
     notification.message.code = resultData->code;
     m_emailManager->sendAsync(
         std::move(notification),
@@ -838,9 +835,8 @@ void AccountManager::passwordResetCodeGenerated(
     }
 
     //sending password reset link
-    ActivateAccountNotification notification;
-    notification.user_email = QString::fromStdString(accountEmail.email);
-    notification.type = kPasswordResetEmailTemplateFileName;
+    RestorePasswordNotification notification;
+    notification.user_email = accountEmail.email;
     notification.message.code = confirmationCode.code;
     m_emailManager->sendAsync(
         std::move(notification),

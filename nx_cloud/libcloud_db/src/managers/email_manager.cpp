@@ -60,7 +60,7 @@ EMailManager::~EMailManager()
 }
 
 void EMailManager::sendAsync(
-    QByteArray serializedNotification,
+    const AbstractNotification& notification,
     std::function<void(bool)> completionHandler)
 {
     auto asyncOperationLocker = m_startedAsyncCallsCounter.getScopedIncrement();
@@ -103,7 +103,7 @@ void EMailManager::sendAsync(
     httpClient->doPost(
         url,
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        std::move(serializedNotification));
+        notification.serializeToJson());
 }
 
 void EMailManager::onSendNotificationRequestDone(
