@@ -1,5 +1,16 @@
 #include "fake_media_server.h"
 
+QnFakeMediaServerResource::QnFakeMediaServerResource()
+{
+    setId(QnUuid::createUuid());
+}
+
+QnUuid QnFakeMediaServerResource::getOriginalGuid() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_serverData.id;
+}
+
 void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData)
 {
     QnMutexLocker lock(&m_mutex);
@@ -9,7 +20,6 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
 
     m_serverData = serverData;
 
-    setId(serverData.id);
     setStatus(serverData.status, true);
 
     QList<SocketAddress> addressList;
@@ -45,7 +55,7 @@ QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
     return m_serverData;
 }
 
-void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized,
         Q_FUNC_INFO,

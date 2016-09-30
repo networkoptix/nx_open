@@ -111,6 +111,12 @@ public:
     qint64 currentStatusTime() const;
 
     void beforeDestroy();
+
+    /**
+     * This function need for client. Client may insert fakeServer with overriden ID and
+     * reference to a original ID. So, its overrid this call for fakeMediaServer
+     */
+    virtual QnUuid getOriginalGuid() const { return getId();  }
 protected:
     static QString apiUrlScheme(bool sslAllowed);
 private slots:

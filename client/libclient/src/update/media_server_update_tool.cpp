@@ -278,8 +278,12 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
             if (!server)
                 continue;
 
-            incompatibleTargets.insert(server->getId());
-            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(server->getId(), true);
+            const auto realId = server->getOriginalGuid();
+            if (realId.isNull())
+                continue;
+
+            incompatibleTargets.insert(realId);
+            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
         }
     }
 

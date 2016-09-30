@@ -64,7 +64,7 @@ private:
 
     QSet<QnUuid> m_restartTargets;
     QSet<QnUuid> m_updateTargets;
-    QSet<QnUuid> m_waitTargets;
+    QHash<QnUuid, QnUuid> m_waitTargets;
     QPointer<QnNetworkPeerTask> m_currentTask;
     QPointer<QnMediaServerUpdateTool> m_updateTool;
     bool m_restartAllPeers;

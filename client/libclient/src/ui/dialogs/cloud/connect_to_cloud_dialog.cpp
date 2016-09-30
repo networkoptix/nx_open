@@ -241,7 +241,6 @@ void QnConnectToCloudDialogPrivate::bindSystem()
         q->ui->loginInputField->text().trimmed().toStdString(),
         q->ui->passwordInputField->text().trimmed().toStdString());
 
-    //todo: akolesnikov. probably we need update it
     nx::cdb::api::SystemRegistrationData sysRegistrationData;
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
 

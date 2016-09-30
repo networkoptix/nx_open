@@ -30,12 +30,12 @@ int QnSystemSettingsHandler::executeGet(
     {
         bool readAllowed = ahlp::kvSystemOnlyFilter(
             ahlp::Mode::read,
-            owner->accessRights(), 
+            owner->accessRights(),
             setting->key());
 
         bool writeAllowed = ec2::access_helpers::kvSystemOnlyFilter(
             ahlp::Mode::write,
-            owner->accessRights(), 
+            owner->accessRights(),
             setting->key());
 
         if (!params.isEmpty())
@@ -47,7 +47,7 @@ int QnSystemSettingsHandler::executeGet(
             if (!writeAllowed)
                 return nx_http::StatusCode::forbidden;
 
-            if (setting->key() == QnGlobalSettings::kNameSystemName)
+            if (setting->key() == nx::settings_names::kNameSystemName)
                 systemNameChanged(owner, setting->serializedValue(), paramIter.value());
 
             setting->setSerializedValue(paramIter.value());

@@ -347,7 +347,7 @@ QnMediaServerConnection::QnMediaServerConnection(
         setExtraQueryParameters(std::move(queryParameters));
 
         extraHeaders.emplace(Qn::SERVER_GUID_HEADER_NAME,
-            mserver->getId().toByteArray());
+            mserver->getOriginalGuid().toByteArray());
     }
 
     if (!videowallGuid.isNull())

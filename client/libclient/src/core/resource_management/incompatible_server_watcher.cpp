@@ -297,8 +297,9 @@ void QnIncompatibleServerWatcherPrivate::removeResource(const QnUuid &id)
 
     if (server)
     {
-        NX_LOG(lit("QnIncompatibleServerWatcher: Remove incompatible server %1")
-            .arg(serverId.toString()),
+        NX_LOG(lit("QnIncompatibleServerWatcher: Remove incompatible server %1 at %2")
+            .arg(serverId.toString())
+            .arg(server->getModuleInformation().systemName),
             cl_logDEBUG1);
 
         qnResPool->removeResource(server);

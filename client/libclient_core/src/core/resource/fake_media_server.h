@@ -9,10 +9,11 @@ class QnFakeMediaServerResource: public QnMediaServerResource
 
     typedef QnMediaServerResource base_type;
 public:
-    QnFakeMediaServerResource() {}
-
+    QnFakeMediaServerResource();
+    virtual QnUuid getOriginalGuid() const override;
     void setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData);
     virtual QnModuleInformation getModuleInformation() const override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode) override;
 signals:
     void moduleInformationChanged(const QnResourcePtr &resource);
 private:

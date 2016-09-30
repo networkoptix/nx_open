@@ -95,7 +95,7 @@ private:
     void at_uploadTask_finished(int errorCode, const QSet<QnUuid> &failedPeers);
     void at_installTask_finished(int errorCode);
 
-    void at_restUpdateTask_peerUpdateFinished(const QnUuid &id);
+    void at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id);
     void at_clientUpdateInstalled();
 
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo &data);
