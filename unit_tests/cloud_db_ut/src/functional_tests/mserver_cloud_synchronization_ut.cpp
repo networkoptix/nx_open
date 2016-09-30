@@ -409,6 +409,7 @@ TEST_F(Ec2MserverCloudSynchronization, renameSystem)
 TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
 {
     EmailManagerMocked mockedEmailManager;
+#ifdef GMOCK_DYNAMIC_TYPE_MATCHER_PRESENT
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
@@ -418,6 +419,11 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(1);
+#else
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(::testing::_)).Times(3);
+#endif
     //< One for owner account, another one - for user account, third one - password reset
 
     // Expecting send email call when adding unknown user.
