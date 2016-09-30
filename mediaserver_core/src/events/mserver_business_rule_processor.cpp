@@ -988,8 +988,11 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusine
             [&groupsToUsers, &id, &addUserEmailToList]
             {
                 auto groupIt = groupsToUsers.find(id);
-                for (const auto& u : groupIt->second)
-                    addUserEmailToList(u);
+                if (groupIt != groupsToUsers.cend())
+                {
+                    for (const auto& u : groupIt->second)
+                        addUserEmailToList(u);
+                }
             });
     }
 
