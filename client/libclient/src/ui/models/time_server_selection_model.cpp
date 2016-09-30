@@ -489,12 +489,6 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
 {
     static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
     static const int kDoNotSuppress = -1;
-    static const int kMinimalOffsetMs = 1000;
-
-    offsetMs = qAbs(offsetMs);
-
-    if (offsetMs < kMinimalOffsetMs)
-        return QString();
 
     static const QString sSuffix = tr("s", "Suffix for displaying seconds of server time offset");
     static const QString mSuffix = tr("m", "Suffix for displaying minutes of server time offset");
