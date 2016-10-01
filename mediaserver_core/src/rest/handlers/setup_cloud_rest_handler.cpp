@@ -117,6 +117,7 @@ int QnSetupCloudSystemRestHandler::execute(
         qnGlobalSettings->setNewSystem(true); //< revert
         return httpResult;
     }
+    qnGlobalSettings->synchronizeNowSync();
 
 
     QString errStr;

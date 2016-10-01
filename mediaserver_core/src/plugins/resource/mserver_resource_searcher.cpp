@@ -76,7 +76,7 @@ class DiscoveryPacket
 
 private:
     QByteArray m_data;
-    QByteArray m_systemId;
+    QnUuid m_systemId;
     QByteArray m_appServerHost;
     QByteArray m_guid;
     QList<QByteArray> m_cameras;
@@ -88,7 +88,9 @@ public:
         QList<QByteArray> lines = m_data.split((char) 0);
         if (lines.size() >= 3) {
             m_guid = lines[0];
-            m_systemId = lines[1];
+            m_systemId = QnUuid::fromStringSafe(lines[1]);
+            if (m_systemId.isNull() && !lines[1].isEmpty())
+                m_systemId = guidFromArbitraryData(lines[1]); //< for compatibility with previous versions
             m_appServerHost = lines[2];
             for (int i = 3; i < lines.size(); ++i)
                 m_cameras << lines[i];
@@ -110,15 +112,18 @@ public:
         return result;
     }
 
-    bool isValidPacket() const {
+    bool isValidPacket() const
+    {
         return m_guid == guidStr;
     }
 
-    QByteArray appServerHost() const {
+    QByteArray appServerHost() const
+    {
         return m_appServerHost;
     }
 
-    QByteArray systemId() const {
+    QnUuid systemId() const
+    {
         return m_systemId;
     }
 
@@ -263,7 +268,7 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && QnUuid::fromStringSafe(packet.systemId()) != qnGlobalSettings->localSystemID())
+            if (packet.isValidPacket() && packet.systemId() != qnGlobalSettings->localSystemID())
             {
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]

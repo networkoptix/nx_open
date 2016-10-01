@@ -271,6 +271,9 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
         }
     }
 
+    if (!data.wholeSystem)
+        resumeConnectionsToRemotePeers();
+
     return true;
 }
 

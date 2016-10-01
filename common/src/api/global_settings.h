@@ -145,6 +145,7 @@ public:
     bool isUpnpPortMappingEnabled() const;
     void setUpnpPortMappingEnabled(bool value);
 
+    /** local systemId. Media servers connect if this value equal */
     QnUuid localSystemID() const;
     void setLocalSystemID(const QnUuid& value);
 

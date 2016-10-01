@@ -140,7 +140,6 @@ private:
     QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
-    //QnModuleInformation m_moduleInformation;
     QnModuleInformation m_moduleInformation;
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled;

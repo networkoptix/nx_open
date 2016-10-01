@@ -1589,6 +1589,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->systemName = qnGlobalSettings->systemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
     connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemID();
+    connectionInfo->localSystemId = qnGlobalSettings->localSystemID().toString();
     #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif

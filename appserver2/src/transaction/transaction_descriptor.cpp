@@ -52,7 +52,8 @@ std::vector<QString> getRestrictedKeysByMode(Mode mode)
             return {
                 kNameCloudSystemID,
                 kNameCloudAuthKey,
-                kCloudHostName
+                kCloudHostName,
+                kNameLocalSystemID
             };
     }
 

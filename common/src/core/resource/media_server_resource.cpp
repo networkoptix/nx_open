@@ -32,8 +32,6 @@
 #include <common/common_module.h>
 
 namespace {
-    //const QString protoVersionPropertyName = lit("protoVersion");
-    //const QString safeModePropertyName = lit("ecDbReadOnly");
     const QString kUrlScheme = lit("rtsp");
 
 }

@@ -574,7 +574,7 @@ class ECConnectionNotificationManager;
         Q_OBJECT
     public:
     signals:
-        void systemIdChangeRequested(const QnUuid systemId, qint64 sysIdTime, Timestamp tranLogTime);
+        void systemIdChangeRequested(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime);
     };
 
     typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
