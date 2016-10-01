@@ -33,8 +33,6 @@
 namespace nx {
 namespace cdb {
 
-static const QString kConfirmaionEmailTemplateFileName = lit("activate_account");
-static const QString kPasswordResetEmailTemplateFileName = lit("restore_password");
 static const std::chrono::seconds kUnconfirmedAccountExpirationSec(3*24*60*60);
 
 AccountManager::AccountManager(
@@ -136,7 +134,17 @@ void AccountManager::addAccount(
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountData, data::AccountConfirmationCode>(
-        std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
+        [this](
+            nx::db::QueryContext* const queryContext,
+            const data::AccountData& accountData,
+            data::AccountConfirmationCode* const resultData)
+        {
+            return insertAccount(
+                queryContext,
+                accountData,
+                resultData,
+                std::make_unique<ActivateAccountNotification>());
+        },
         std::move(accountData),
         std::bind(&AccountManager::accountAdded, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
@@ -284,7 +292,17 @@ void AccountManager::reactivateAccount(
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        std::bind(&AccountManager::issueAccountActivationCode, this, _1, _2, _3),
+        [this](
+            nx::db::QueryContext* const queryContext,
+            const std::string& accountEmail,
+            data::AccountConfirmationCode* const resultData)
+        {
+            return issueAccountActivationCode(
+                queryContext,
+                accountEmail, 
+                resultData,
+                std::make_unique<ActivateAccountNotification>());
+        },
         std::move(accountEmail.email),
         std::bind(&AccountManager::accountReactivated, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
@@ -376,14 +394,15 @@ boost::optional<data::AccountData> AccountManager::findAccountByUserName(
 db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
     nx::db::QueryContext* queryContext,
     const std::string& accountEmail,
-    data::AccountData* const accountData)
+    data::AccountData* const accountData,
+    std::unique_ptr<AbstractActivateAccountNotification> notification)
 {
     auto result = fetchExistingAccountByEmail(
         queryContext,
         accountEmail,
         accountData);
     if (result != db::DBResult::notFound)
-        return result;
+        return result;  //< Found account or failed because of DB access error.
 
     // Creating new account.
 
@@ -393,9 +412,12 @@ db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
 
     NX_LOGX(lm("Creating new account %1").arg(accountEmail), cl_logDEBUG1);
 
-    // Creating new account.
     data::AccountConfirmationCode accountConfirmationCode;
-    const auto dbResult = insertAccount(queryContext, *accountData, &accountConfirmationCode);
+    const auto dbResult = insertAccount(
+        queryContext,
+        *accountData,
+        &accountConfirmationCode,
+        std::move(notification));
     if (dbResult != db::DBResult::ok)
         return dbResult;
 
@@ -508,7 +530,8 @@ db::DBResult AccountManager::fetchAccounts(
 db::DBResult AccountManager::insertAccount(
     nx::db::QueryContext* const queryContext,
     const data::AccountData& accountData,
-    data::AccountConfirmationCode* const resultData)
+    data::AccountConfirmationCode* const resultData,
+    std::unique_ptr<AbstractActivateAccountNotification> notification)
 {
     //TODO #ak should return specific error if email address already used for account
 
@@ -531,13 +554,15 @@ db::DBResult AccountManager::insertAccount(
     return issueAccountActivationCode(
         queryContext,
         accountData.email,
-        resultData);
+        resultData,
+        std::move(notification));
 }
 
 db::DBResult AccountManager::issueAccountActivationCode(
     nx::db::QueryContext* const queryContext,
     const std::string& accountEmail,
-    data::AccountConfirmationCode* const resultData)
+    data::AccountConfirmationCode* const resultData,
+    std::unique_ptr<AbstractActivateAccountNotification> notification)
 {
     //removing already-existing activation codes
     QSqlQuery fetchActivationCodesQuery(*queryContext->connection());
@@ -591,12 +616,10 @@ db::DBResult AccountManager::issueAccountActivationCode(
     }
 
     //sending confirmation email
-    ActivateAccountNotification notification;
-    notification.user_email = QString::fromStdString(accountEmail);
-    notification.type = kConfirmaionEmailTemplateFileName;
-    notification.message.code = resultData->code;
+    notification->setActivationCode(resultData->code);
+    notification->setAddressee(accountEmail);
     m_emailManager->sendAsync(
-        std::move(notification),
+        *notification,
         std::function<void(bool)>());
 
     return db::DBResult::ok;
@@ -838,10 +861,9 @@ void AccountManager::passwordResetCodeGenerated(
     }
 
     //sending password reset link
-    ActivateAccountNotification notification;
-    notification.user_email = QString::fromStdString(accountEmail.email);
-    notification.type = kPasswordResetEmailTemplateFileName;
-    notification.message.code = confirmationCode.code;
+    RestorePasswordNotification notification;
+    notification.setAddressee(accountEmail.email);
+    notification.setActivationCode(confirmationCode.code);
     m_emailManager->sendAsync(
         std::move(notification),
         std::function<void(bool)>());

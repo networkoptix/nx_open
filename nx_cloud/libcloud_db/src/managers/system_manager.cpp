@@ -349,11 +349,18 @@ void SystemManager::getSystems(
 }
 
 void SystemManager::shareSystem(
-    const AuthorizationInfo& /*authzInfo*/,
+    const AuthorizationInfo& authzInfo,
     data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
+
+    std::string grantorEmail;
+    if (!authzInfo.get(attr::authAccountEmail, &grantorEmail))
+    {
+        NX_ASSERT(false);
+        return completionHandler(api::ResultCode::forbidden);
+    }
 
     Qn::GlobalPermissions permissions(Qn::NoPermissions);
     if (sharing.customPermissions.empty())
@@ -369,10 +376,12 @@ void SystemManager::shareSystem(
     data::SystemSharing* sharingOHeapPtr = sharingOHeap.get();
 
     auto dbUpdateFunc = 
-        [this, sharingOHeapPtr](nx::db::QueryContext* const queryContext) -> nx::db::DBResult
+        [this, grantorEmail = std::move(grantorEmail), sharingOHeapPtr](
+            nx::db::QueryContext* const queryContext) -> nx::db::DBResult
         {
             return updateSharingInDbAndGenerateTransaction(
                 queryContext,
+                grantorEmail,
                 *sharingOHeapPtr);
         };
 
@@ -786,8 +795,10 @@ nx::db::DBResult SystemManager::insertOwnerSharingToDb(
     ownerSharing->isEnabled = true;
     ownerSharing->customPermissions = QnLexical::serialized(
         static_cast<Qn::GlobalPermissions>(Qn::GlobalAdminPermissionSet)).toStdString();
-    const auto resultCode =
-        updateSharingInDbAndGenerateTransaction(queryContext, *ownerSharing);
+    const auto resultCode = updateSharingInDbAndGenerateTransaction(
+        queryContext,
+        newSystem.accountEmail,
+        *ownerSharing);
     if (resultCode != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
@@ -981,18 +992,23 @@ void SystemManager::systemDeleted(
 
 nx::db::DBResult SystemManager::updateSharingInDb(
     nx::db::QueryContext* const queryContext,
+    const std::string& grantorEmail,
     const data::SystemSharing& sharing,
     data::AccountData* const targetAccountData)
 {
     nx::db::DBResult result = nx::db::DBResult::ok;
 
+    std::string systemName;
     {
         // Initializing account customization for case if account has to be created.
         QnMutexLocker lk(&m_mutex);
         auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
         const auto systemIter = systemByIdIndex.find(sharing.systemID);
         if (systemIter != systemByIdIndex.end())
+        {
             targetAccountData->customization = systemIter->customization;
+            systemName = systemIter->name;
+        }
     }
 
     if (sharing.accessRole == api::SystemAccessRole::none)
@@ -1005,10 +1021,19 @@ nx::db::DBResult SystemManager::updateSharingInDb(
     }
     else
     {
+        const auto grantorAccountData = m_accountManager->findAccountByUserName(grantorEmail);
+
+        auto notification = std::make_unique<InviteUserNotification>();
+        notification->message.sharer_email = grantorEmail;
+        if (grantorAccountData)
+            notification->message.sharer_name = grantorAccountData->fullName;
+        notification->message.system_id = sharing.systemID;
+        notification->message.system_name = systemName;
         result = m_accountManager->fetchExistingAccountOrCreateNewOneByEmail(
             queryContext,
             sharing.accountEmail,
-            targetAccountData);
+            targetAccountData,
+            std::move(notification));
     }
 
     if (result != nx::db::DBResult::ok)
@@ -1050,10 +1075,11 @@ nx::db::DBResult SystemManager::updateSharingInDb(
 
 nx::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
     nx::db::QueryContext* const queryContext,
+    const std::string& grantorEmail,
     const data::SystemSharing& sharing)
 {
     data::AccountData account;
-    nx::db::DBResult result = updateSharingInDb(queryContext, sharing, &account);
+    nx::db::DBResult result = updateSharingInDb(queryContext, grantorEmail, sharing, &account);
     if (result != nx::db::DBResult::ok)
     {
         NX_LOGX(lm("Error sharing/unsharing system %1 with account %2. %3")
@@ -1638,10 +1664,22 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     systemSharingData->systemID = systemId.toStdString();
     ec2::convert(data, systemSharingData);
 
+    // We have no information about grantor here. Using system owner...
+    std::string ownerEmail;
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
+        const auto systemIter = systemByIdIndex.find(
+            std::string(systemId.constData(), systemId.size()));
+        NX_ASSERT(systemIter != systemByIdIndex.end());
+        if (systemIter != systemByIdIndex.end())
+            ownerEmail = systemIter->ownerAccountEmail;
+    }
+
     // Updating db.
     data::AccountData account;
     const nx::db::DBResult result = 
-        updateSharingInDb(queryContext, *systemSharingData, &account);
+        updateSharingInDb(queryContext, ownerEmail, *systemSharingData, &account);
     if (result != nx::db::DBResult::ok)
         return result;
 
