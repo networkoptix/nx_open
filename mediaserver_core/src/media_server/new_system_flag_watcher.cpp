@@ -49,9 +49,9 @@ void QnNewSystemServerFlagWatcher::update()
     Qn::ServerFlags serverFlags = m_server->getServerFlags();
 
     if (qnGlobalSettings->isNewSystem())
-        serverFlags &= ~Qn::SF_NewSystem;
-    else
         serverFlags |= Qn::SF_NewSystem;
+    else
+        serverFlags &= ~Qn::SF_NewSystem;
 
     //TODO: #GDM code duplication
     if (serverFlags != m_server->getServerFlags())
