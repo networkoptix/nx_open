@@ -1791,12 +1791,11 @@ void MediaServerProcess::doMigrateSystemNameFromConfig(CloudConnectionManager* c
 
     // move data from config
     qnGlobalSettings->setSystemName(systemName.value());
-    qnGlobalSettings->setNewSystem(systemName.isDefault());
 
-    if (qnGlobalSettings->isNewSystem())
+    if (systemName.isDefault())
         resetCloudParams(cloudConnectionManager);
-    else
-        qnGlobalSettings->setLocalSystemID(guidFromArbitraryData(systemName.value())); //< auto generate ID if not a new system
+
+    qnGlobalSettings->setLocalSystemID(systemName.isDefault() ? QnUuid() : QnUuid::createUuid());
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file
@@ -2396,7 +2395,7 @@ void MediaServerProcess::run()
             (isCloudInstanceChanged && isConnectedToCloud))
         {
             resetCloudParams(&cloudConnectionManager);
-            qnGlobalSettings->setNewSystem(true);
+            qnGlobalSettings->setLocalSystemID(QnUuid()); //< go to new state
         }
         if (isCloudInstanceChanged)
         {

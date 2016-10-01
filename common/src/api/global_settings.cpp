@@ -259,7 +259,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(kNameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
     m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
-    m_newSystemAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameNewSystem, false, this);
     m_cloudHostAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kCloudHostName, QString(), this);
 
     m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
@@ -285,7 +284,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
-    connect(m_newSystemAdaptor,                     &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::newSystemChanged,                    Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
     result
@@ -299,7 +297,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
         << m_upnpPortMappingEnabledAdaptor
-        << m_newSystemAdaptor
         << m_cloudHostAdaptor
         << m_arecontRtspEnabledAdaptor
         << m_maxRecorderQueueSizeBytes
@@ -743,16 +740,6 @@ void QnGlobalSettings::resetCloudParams()
     setCloudAccountName(QString());
     setCloudSystemID(QString());
     setCloudAuthKey(QString());
-}
-
-bool QnGlobalSettings::isNewSystem() const
-{
-    return m_newSystemAdaptor->value();
-}
-
-void QnGlobalSettings::setNewSystem(bool value)
-{
-    m_newSystemAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::cloudHost() const

@@ -30,7 +30,7 @@ QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent /*= n
     m_server()
 {
     connect(qnGlobalSettings, &QnGlobalSettings::initialized,       this, &QnNewSystemServerFlagWatcher::update);
-    connect(qnGlobalSettings, &QnGlobalSettings::newSystemChanged,  this, &QnNewSystemServerFlagWatcher::update);
+    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged,  this, &QnNewSystemServerFlagWatcher::update);
 
     connect(qnResPool, &QnResourcePool::resourceAdded,              this, &QnNewSystemServerFlagWatcher::at_resourcePool_resourceAdded);
     for (const QnResourcePtr &resource : qnResPool->getResources())
@@ -46,60 +46,12 @@ void QnNewSystemServerFlagWatcher::update()
     if (!m_server || !qnGlobalSettings->isInitialized())
         return;
 
-    auto newSystemMustBeSet = [this]
-    {
-        if (!qnGlobalSettings->cloudSystemID().isEmpty())
-            return false;
-
-        return boost::algorithm::none_of(qnResPool->getResources<QnUserResource>(), [](const QnUserResourcePtr& user)
-        {
-            return user->isOwner() && user->isEnabled();
-        });
-    };
-
-    auto newSystemMustBeCleaned = [this]
-    {
-        if (qnGlobalSettings->localSystemID().isNull())
-            return false;
-
-        if (!qnGlobalSettings->cloudSystemID().isEmpty())
-            return true;
-
-        auto owners = qnResPool->getResources<QnUserResource>().filtered([](const QnUserResourcePtr& user)
-        {
-            return user->isOwner() && user->isEnabled();
-        });
-
-        /* Check if there are other owners but admin. */
-        if (owners.size() != 1)
-            return true;
-
-        QnUserResourcePtr owner = owners.first();
-        if (owner->getName() != kDefaultOwnerName)
-            return true;
-
-        /* Check if admin's password was changed. */
-        return ! qnAuthHelper->checkUserPassword(owner, kDefaultOwnerPassword);
-    };
-
-    if (qnGlobalSettings->isNewSystem())
-    {
-        if (newSystemMustBeCleaned())
-            qnGlobalSettings->setNewSystem(false);
-    }
-    else
-    {
-        if (newSystemMustBeSet())
-            qnGlobalSettings->setNewSystem(true);
-    }
-    qnGlobalSettings->synchronizeNow();
-
     Qn::ServerFlags serverFlags = m_server->getServerFlags();
 
     if (qnGlobalSettings->isNewSystem())
-        serverFlags |= Qn::SF_NewSystem;
-    else
         serverFlags &= ~Qn::SF_NewSystem;
+    else
+        serverFlags |= Qn::SF_NewSystem;
 
     //TODO: #GDM code duplication
     if (serverFlags != m_server->getServerFlags())

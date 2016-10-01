@@ -47,7 +47,6 @@ const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"))
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
 const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
-const QString kNameNewSystem(lit("newSystem"));
 const QString kCloudHostName(lit("cloudHost"));
 
 const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
@@ -188,10 +187,7 @@ public:
 
     // -- Misc settings
 
-    /** System is not set, it has default admin password and not linked to the cloud. */
-    bool isNewSystem() const;
-    void setNewSystem(bool value);
-
+    bool isNewSystem() const { return localSystemID().isNull(); }
     /** Media server put cloud host here from QnAppInfo::defaultCloudHost */
     QString cloudHost() const;
     void setCloudHost(const QString& value);
@@ -228,7 +224,6 @@ signals:
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
-    void newSystemChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -301,7 +296,6 @@ private:
     // misc adaptors
     QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;

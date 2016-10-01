@@ -95,13 +95,14 @@ int QnSetupLocalSystemRestHandler::execute(
     const auto systemNameBak = qnGlobalSettings->systemName();
 
     qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->setNewSystem(false);
     qnGlobalSettings->setSystemName(data.systemName);
+    qnGlobalSettings->setLocalSystemID(QnUuid::createUuid());
 
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         //changing system name back
         qnGlobalSettings->setSystemName(systemNameBak);
+        qnGlobalSettings->setLocalSystemID(QnUuid()); //< revert
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
