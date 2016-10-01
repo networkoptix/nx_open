@@ -247,6 +247,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
 
     if (data.localSystemId.isNull())
         qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setLocalSystemID(data.localSystemId);
     qnGlobalSettings->setNewSystem(data.localSystemId.isNull());
     qnGlobalSettings->synchronizeNowSync();
 

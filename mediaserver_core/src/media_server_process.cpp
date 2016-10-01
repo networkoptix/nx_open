@@ -1779,7 +1779,7 @@ void MediaServerProcess::doMigrateSystemNameFromConfig(CloudConnectionManager* c
     nx::SystemName systemName;
     systemName.loadFromConfig();
 
-    if (!qnGlobalSettings->localSystemID().isNull())
+    if (!qnGlobalSettings->systemName().isEmpty())
     {
         systemName.clear();
         systemName.saveToConfig(); //< remove from config file
@@ -1789,11 +1789,14 @@ void MediaServerProcess::doMigrateSystemNameFromConfig(CloudConnectionManager* c
     if (systemName.value().isEmpty())
         systemName.resetToDefault(); //< generate default value
 
+    // move data from config
     qnGlobalSettings->setSystemName(systemName.value());
-    qnGlobalSettings->setLocalSystemID(guidFromArbitraryData(systemName.value()));
     qnGlobalSettings->setNewSystem(systemName.isDefault());
-    if (systemName.isDefault())
+
+    if (qnGlobalSettings->isNewSystem())
         resetCloudParams(cloudConnectionManager);
+    else
+        qnGlobalSettings->setLocalSystemID(guidFromArbitraryData(systemName.value())); //< auto generate ID if not a new system
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file
