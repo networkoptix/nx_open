@@ -53,7 +53,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
         &QnCloudStatusWatcher::updateSystems);
 
     connect(this, &QnCloudStatusPanel::clicked, this,
-        [this, parent]
+        [this, parent, d]
         {
             if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
             {
@@ -62,19 +62,18 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
             }
 
             const auto menu =
-                [this]() -> QMenu *
-            {
-                Q_D(QnCloudStatusPanel);
-                switch (qnCloudStatusWatcher->status())
+                [this, d]() -> QMenu*
                 {
-                    case QnCloudStatusWatcher::Online:
-                        return d->loggedInMenu;
-                    case QnCloudStatusWatcher::Offline:
-                        return d->offlineMenu;
-                    default:
-                        return nullptr;
-                }
-            }();
+                    switch (qnCloudStatusWatcher->status())
+                    {
+                        case QnCloudStatusWatcher::Online:
+                            return d->loggedInMenu;
+                        case QnCloudStatusWatcher::Offline:
+                            return d->offlineMenu;
+                        default:
+                            return nullptr;
+                    }
+                }();
 
             if (!menu)
                 return;
