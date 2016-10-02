@@ -160,7 +160,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Status overlay. */
     const auto overlay = new QnStatusOverlayWidget(this);
-    m_statusController = new QnStatusOverlayController(m_resource, overlay);
+    m_statusController = new QnStatusOverlayController(m_resource, overlay, this);
 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this, overlay, controller = m_statusController]()

@@ -98,7 +98,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
 
     /* Status overlay. */
     const auto overlay = new QnStatusOverlayWidget(this);
-    m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay);
+    m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay, this);
 
     connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this, overlay, controller = m_statusOverlayController]()
