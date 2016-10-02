@@ -30,6 +30,7 @@
 #include <client/desktop_client_message_processor.h>
 #include <nx/network/socket_global.h>
 
+#include <helpers/system_weight_helper.h>
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
 
@@ -81,12 +82,34 @@ namespace {
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 
+void updateWeightData(const QString& systemId)
+{
+    auto weightData = qnClientCoreSettings->localSystemWeightsData();
+    const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
+        [systemId](const QnLocalConnectionWeightData& data) { return data.systemId == systemId; });
+
+    auto currentWeightData = (itWeightData == weightData.end()
+        ? QnLocalConnectionWeightData({ systemId, 0, QDateTime::currentMSecsSinceEpoch() })
+        : *itWeightData);
+
+    currentWeightData.weight = helpers::calculateSystemWeight(
+        currentWeightData.weight, currentWeightData.lastConnectedUtcMs) + 1;
+    currentWeightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
+
+    if (itWeightData == weightData.end())
+        weightData.append(currentWeightData);
+    else
+        *itWeightData = currentWeightData;
+
+    qnClientCoreSettings->setLocalSystemWeightsData(weightData);
+}
+
 void storeLocalSystemConnection(const QString& systemName, const QString& systemId, QUrl url,
     bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
 {
-    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     // TODO: #ynikitenkov remove outdated connection data
 
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     if (autoLogin)
         storePassword = true;
 
@@ -103,9 +126,6 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
     QnLocalConnectionData targetConnection(QString(), systemName, systemId, url, storePassword);
     if (itFoundConnection != recentConnections.end())
     {
-        targetConnection.weight = itFoundConnection->weight;
-        targetConnection.lastConnectedUtcMs = itFoundConnection->lastConnectedUtcMs;
-
         if (forceRemoveOldConnection)
         {
             if (!itFoundConnection->name.isEmpty())
@@ -129,15 +149,16 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
         recentConnections.erase(itFoundConnection);
     }
 
-    targetConnection.weight = targetConnection.calcWeight() + 1;
-    targetConnection.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
-
     recentConnections.prepend(targetConnection);
+
+    updateWeightData(systemId);
 
     qnSettings->setLastUsedConnection(targetConnection);
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);
     qnSettings->setAutoLogin(autoLogin);
+
     qnSettings->save();
+    qnClientCoreSettings->save();
 }
 
 ec2::ApiClientInfoData clientInfo()

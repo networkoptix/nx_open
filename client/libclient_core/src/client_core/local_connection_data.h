@@ -25,21 +25,29 @@ struct QnLocalConnectionData
     QUrl url;
     bool isStoredPassword;
 
-    qreal weight;
-    qint64 lastConnectedUtcMs;
-
     static QnLocalConnectionData fromSettings(QSettings* settings);
 
     void writeToSettings(QSettings* settings) const;
-
-    qreal calcWeight() const;
 };
 
-#define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)\
-    (weight)(lastConnectedUtcMs)
-
+#define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)
 QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq))
 
+struct QnLocalConnectionWeightData
+{
+    QString systemId;
+    qreal weight;
+    qint64 lastConnectedUtcMs;
+
+    static QnLocalConnectionWeightData fromSettings(QSettings* settings);
+
+    void writeToSettings(QSettings* settings) const;
+};
+typedef QList<QnLocalConnectionWeightData> QnLocalConnectionWeightDataList;
+
+#define QnLocalConnectionWeightData_Fields (systemId)(weight)(lastConnectedUtcMs)
+QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionWeightData, (datastream)(metatype)(eq))
+Q_DECLARE_METATYPE(QnLocalConnectionWeightDataList)
 
 struct QnLocalConnectionDataList : public QList<QnLocalConnectionData>
 {
@@ -47,6 +55,8 @@ struct QnLocalConnectionDataList : public QList<QnLocalConnectionData>
 
 public:
     QnLocalConnectionDataList();
+
+    QnLocalConnectionDataList(const base_type& data);
 
     ~QnLocalConnectionDataList();
 
@@ -60,9 +70,6 @@ public:
     QString generateUniqueName(const QString &base) const;
 
     bool remove(const QString &name);
-
-    typedef QHash<QString, qreal> WeightHash;
-    WeightHash getWeights() const;
 };
 
 Q_DECLARE_METATYPE(QnLocalConnectionDataList)

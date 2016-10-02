@@ -16,20 +16,20 @@ namespace
     const auto kSystemIdTag = lit("systemId");
     const auto kStoredPasswordTag = lit("storedPassword");
     const auto kNameTag = lit("name");
+
     const auto kLastConnected = lit("lastConnectedUtcMs");
     const auto kWeight = lit("weight");
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (QnLocalConnectionData), (datastream)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData), (datastream)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionWeightData), (datastream)(eq), _Fields)
 
 QnLocalConnectionData::QnLocalConnectionData() :
     name(),
     systemName(),
     systemId(),
     url(),
-    isStoredPassword(false),
-    weight(0),
-    lastConnectedUtcMs(0)
+    isStoredPassword(false)
 {}
 
 QnLocalConnectionData::QnLocalConnectionData(const QString& name,
@@ -42,9 +42,7 @@ QnLocalConnectionData::QnLocalConnectionData(const QString& name,
     systemName(systemName),
     systemId(systemId),
     url(url),
-    isStoredPassword(isStoredPassword),
-    weight(0),
-    lastConnectedUtcMs(0)
+    isStoredPassword(isStoredPassword)
 {}
 
 void QnLocalConnectionData::writeToSettings(QSettings* settings) const
@@ -58,8 +56,6 @@ void QnLocalConnectionData::writeToSettings(QSettings* settings) const
     settings->setValue(kSystemIdTag, systemId);
     settings->setValue(kStoredPasswordTag, isStoredPassword);
     settings->setValue(kNameTag, name);
-    settings->setValue(kWeight, weight);
-    settings->setValue(kLastConnected, lastConnectedUtcMs);
 }
 
 QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
@@ -71,8 +67,6 @@ QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
     data.systemId = settings->value(kSystemIdTag).toString();
     data.isStoredPassword = settings->value(kStoredPasswordTag).toBool();
     data.name = settings->value(kNameTag).toString();
-    data.weight = settings->value(kWeight, QVariant::fromValue<qreal>(0)).toReal();
-    data.lastConnectedUtcMs = settings->value(kLastConnected, QVariant::fromValue<qint64>(0)).toLongLong();
     const auto encryptedPass = settings->value(kPasswordTag).toString();
     if (!encryptedPass.isEmpty())
         data.url.setPassword(nx::utils::xorDecrypt(encryptedPass, kXorKey));
@@ -80,25 +74,16 @@ QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
     return data;
 }
 
-qreal QnLocalConnectionData::calcWeight() const
-{
-    static const auto getDays =
-        [](qint64 utcMsSinceEpoch)
-    {
-        const qint64 kMsInDay = 60 * 60 * 24 * 1000;
-        return utcMsSinceEpoch / kMsInDay;
-    };
-
-    const auto currentTime = QDateTime::currentMSecsSinceEpoch();
-    const auto penality = (getDays(currentTime) - getDays(lastConnectedUtcMs)) / 30.0;
-    return std::max<qreal>((1.0 - penality) * weight, 0);
-}
-
 ///
 
 QnLocalConnectionDataList::QnLocalConnectionDataList()
     : base_type()
 {}
+
+QnLocalConnectionDataList::QnLocalConnectionDataList(const base_type& data):
+    base_type(data)
+{
+}
 
 QnLocalConnectionDataList::~QnLocalConnectionDataList()
 {}
@@ -148,10 +133,18 @@ bool QnLocalConnectionDataList::remove(const QString &name)
     return removed;
 }
 
-QnLocalConnectionDataList::WeightHash QnLocalConnectionDataList::getWeights() const
+QnLocalConnectionWeightData QnLocalConnectionWeightData::fromSettings(QSettings* settings)
 {
-    WeightHash result;
-    for (const auto connection : *this)
-        result.insert(connection.systemId, connection.weight);
-    return result;
+    QnLocalConnectionWeightData data;
+    data.systemId = settings->value(kSystemIdTag).toString();
+    data.weight = settings->value(kWeight, QVariant::fromValue<qreal>(0)).toReal();
+    data.lastConnectedUtcMs = settings->value(kLastConnected, QVariant::fromValue<qint64>(0)).toLongLong();
+    return data;
+}
+
+void QnLocalConnectionWeightData::writeToSettings(QSettings* settings) const
+{
+    settings->setValue(kSystemIdTag, systemId);
+    settings->setValue(kWeight, weight);
+    settings->setValue(kLastConnected, lastConnectedUtcMs);
 }

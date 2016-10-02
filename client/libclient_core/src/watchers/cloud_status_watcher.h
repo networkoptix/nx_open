@@ -19,13 +19,13 @@ struct QnCloudSystem
     QString ownerFullName;
     std::string authKey;
     qreal weight;
+    qint64 lastLoginTimeUtcMs;
 
-    bool operator <(const QnCloudSystem &other) const;
     bool operator ==(const QnCloudSystem &other) const;
 
     bool fullEqual(const QnCloudSystem& other) const;
 
-    static void writeToSettings(QSettings* settings, const QnCloudSystem& data);
+    void writeToSettings(QSettings* settings) const;
 
     static QnCloudSystem fromSettings(QSettings* settings);
 };

@@ -1,5 +1,6 @@
 #include "cloud_status_watcher.h"
 
+#include <chrono>
 #include <algorithm>
 
 #include <QtCore/QUrl>
@@ -27,6 +28,8 @@ const auto kIdTag = lit("id");
 const auto kNameTag = lit("name");
 const auto kOwnerAccounEmail = lit("email");
 const auto kOwnerFullName = lit("owner_full_name");
+const auto kWeight = lit("weight");
+const auto kLastLoginTimeUtcMs = lit("kLastLoginTimeUtcMs");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
@@ -45,10 +48,33 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
         system.authKey = systemData.authKey;
+        system.weight = systemData.usageFrequency;
+        system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
+            (systemData.lastLoginTime.time_since_epoch()).count();
         result.append(system);
     }
 
-    std::sort(result.begin(), result.end());
+    {
+        // TODO: #ynikitenkov remove this section when weights are available
+
+        // Temporary code section.
+        const bool isTmpValues = std::all_of(result.begin(), result.end(),
+            [](const QnCloudSystem& system) -> bool { return !system.weight; });
+        if (isTmpValues)
+        {
+            static const auto initialWeight = 10000.0;
+            static const auto step = 100.0;
+
+            qreal tmpWeight = initialWeight;
+            const auto tmpLastLoginTime = QDateTime::currentMSecsSinceEpoch();
+            for (auto& system : result)
+            {
+                system.weight = tmpWeight;
+                system.lastLoginTimeUtcMs = tmpLastLoginTime;
+                tmpWeight += step;
+            }
+        }
+    }
 
     return result;
 }
@@ -616,15 +642,6 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
         });
 }
 
-bool QnCloudSystem::operator <(const QnCloudSystem &other) const
-{
-    int comp = name.compare(other.name);
-    if (comp != 0)
-        return comp < 0;
-
-    return id < other.id;
-}
-
 bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
 {
     return id == other.id &&
@@ -641,12 +658,14 @@ bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
            ownerFullName == other.ownerFullName;
 }
 
-void QnCloudSystem::writeToSettings(QSettings* settings, const QnCloudSystem& data)
+void QnCloudSystem::writeToSettings(QSettings* settings) const
 {
-    settings->setValue(kIdTag, data.id);
-    settings->setValue(kNameTag, data.name);
-    settings->setValue(kOwnerAccounEmail, data.ownerAccountEmail);
-    settings->setValue(kOwnerFullName, data.ownerFullName);
+    settings->setValue(kIdTag, id);
+    settings->setValue(kNameTag, name);
+    settings->setValue(kOwnerAccounEmail, ownerAccountEmail);
+    settings->setValue(kOwnerFullName, ownerFullName);
+    settings->setValue(kWeight, weight);
+    settings->setValue(kLastLoginTimeUtcMs, lastLoginTimeUtcMs);
 }
 
 QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
@@ -657,6 +676,7 @@ QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
     result.name = settings->value(kNameTag).toString();
     result.ownerAccountEmail = settings->value(kOwnerAccounEmail).toString();
     result.ownerFullName = settings->value(kOwnerFullName).toString();
-
+    result.weight = settings->value(kWeight, 0.0).toReal();
+    result.lastLoginTimeUtcMs = settings->value(kLastLoginTimeUtcMs, 0).toLongLong();
     return result;
 }

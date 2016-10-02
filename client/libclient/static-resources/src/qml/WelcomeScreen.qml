@@ -144,7 +144,7 @@ Rectangle
                     deactivateFunc: function(item) { item.toggle(); };
                 }
 
-                model: QnQmlSortFilterProxyModel
+                model: QnOrderedSystemsModel
                 {
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role

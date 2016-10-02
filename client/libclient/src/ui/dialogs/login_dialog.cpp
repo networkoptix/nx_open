@@ -570,7 +570,7 @@ void QnLoginDialog::at_saveButton_clicked()
     QString password = ui->passwordLineEdit->text();
     bool autoLogin = qnSettings->autoLogin();
 
-    auto connections = qnClientCoreSettings->recentLocalConnections();
+    QnLocalConnectionDataList connections = qnClientCoreSettings->recentLocalConnections();
     const auto connectionIndex = connections.getIndexByName(name);
     if ((connectionIndex != -1) &&
         connections.at(connectionIndex).isStoredPassword)
