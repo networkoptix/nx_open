@@ -609,7 +609,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         if (!disconnectFromServer(force))
             return;
     }
-    else if (m_state.state() == QnConnectionState::Connecting)
+    else if (m_state.state() != QnConnectionState::Disconnected)
     {
         // break 'Connecting' state if any
         disconnectFromServer(true);
