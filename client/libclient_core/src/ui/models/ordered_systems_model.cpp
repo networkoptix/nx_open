@@ -45,44 +45,50 @@ qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
     const auto systemId = modelIndex.data(QnSystemsModel::SystemIdRoleId).toString();
     auto itWeight = m_finalWeights.find(systemId);
     if (itWeight != m_finalWeights.end())
-        return itWeight.value().first;
+        return itWeight.value().weight;
 
     // Check for uncommited new system weights
     const auto itNewSystemWeight = m_newSystemWeights.find(systemId);
     if (itNewSystemWeight != m_newSystemWeights.end())
-        return itNewSystemWeight.value().first;
+        return itNewSystemWeight.value().weight;
 
     // Add new system weight
-    const auto getMaxWeight =
+    const auto getRealConnectionMaxWeight =
         [](const IdWeightDataHash& weights) -> qreal
         {
-            qreal result = weights.isEmpty() ? 0 : weights.begin().value().first;
+            qreal result = 0;
             for (const auto& data : weights)
-                result = std::max(result, data.first);
+            {
+                if (data.realConnection)
+                    result = std::max(result, data.weight);
+            }
             return result;
         };
 
-    const auto maxWeight = std::max(getMaxWeight(m_localWeights), getMaxWeight(m_cloudWeights));
+    const auto maxWeight = std::max(getRealConnectionMaxWeight(m_localWeights),
+        getRealConnectionMaxWeight(m_cloudWeights));
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingWeights, true);
     const auto newSystemWeight = maxWeight + 1;
     const auto lastLoginTime = QDateTime::currentMSecsSinceEpoch();
 
-    m_newSystemWeights.insert(systemId, WeightLastLoginPair(newSystemWeight, lastLoginTime));
+    m_newSystemWeights.insert(systemId,
+        QnWeightData({ systemId, newSystemWeight, lastLoginTime, false }));
 
     auto weightsData = qnClientCoreSettings->localSystemWeightsData();
     const auto it = std::find_if(weightsData.begin(), weightsData.end(),
-        [systemId](const QnLocalConnectionWeightData& data) { return data.systemId == systemId; });
+        [systemId](const QnWeightData& data) { return data.systemId == systemId; });
 
     NX_ASSERT(it == weightsData.end(), "We don't expect weight data presence here");
     if (it == weightsData.end())
     {
-        weightsData.append({ systemId, newSystemWeight, lastLoginTime });
+        weightsData.append({ systemId, newSystemWeight, lastLoginTime, false });
     }
     else
     {
         it->weight = newSystemWeight;
         it->lastConnectedUtcMs = lastLoginTime;
+        it->realConnection = false;
     }
 
     qnClientCoreSettings->setLocalSystemWeightsData(weightsData);
@@ -148,7 +154,7 @@ bool QnOrderedSystemsModel::filterAcceptsRow(int row,
         return true;
 
     static const auto kMinWeight = 0.00001;
-    const auto weight = itLocalSystemWeight.value().first;
+    const auto weight = itLocalSystemWeight.value().weight;
     return (weight > kMinWeight);
 }
 
@@ -163,8 +169,8 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged()
             IdWeightDataHash result;
             for (const auto system : systems)
             {
-                const auto weightData = WeightLastLoginPair(system.weight,
-                    system.lastLoginTimeUtcMs);
+                const auto weightData = QnWeightData( {system.id, system.weight,
+                    system.lastLoginTimeUtcMs, true });   // Cloud connections are real always
                 result.insert(system.id, weightData);
             }
             return result;
@@ -192,7 +198,10 @@ void QnOrderedSystemsModel::handleLocalWeightsChanged()
 
     IdWeightDataHash newWeights;
     for (const auto data : localWeightData)
-        newWeights[data.systemId] = WeightLastLoginPair(data.weight, data.lastConnectedUtcMs);
+    {
+        newWeights[data.systemId] = QnWeightData({ data.systemId, data.weight,
+            data.lastConnectedUtcMs, data.realConnection });
+    }
 
     if (newWeights == m_localWeights)
         return;
@@ -213,7 +222,7 @@ void QnOrderedSystemsModel::updateFinalWeights()
 
     // Recalculates weights according to last connection time
     for (auto& data : newWeights)
-        data.first = helpers::calculateSystemWeight(data.first, data.second);
+        data.weight = helpers::calculateSystemWeight(data.weight, data.lastConnectedUtcMs);
 
     if (newWeights == m_finalWeights)
         return;

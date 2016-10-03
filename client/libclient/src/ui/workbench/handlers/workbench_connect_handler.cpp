@@ -86,10 +86,10 @@ void updateWeightData(const QString& systemId)
 {
     auto weightData = qnClientCoreSettings->localSystemWeightsData();
     const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
-        [systemId](const QnLocalConnectionWeightData& data) { return data.systemId == systemId; });
+        [systemId](const QnWeightData& data) { return data.systemId == systemId; });
 
     auto currentWeightData = (itWeightData == weightData.end()
-        ? QnLocalConnectionWeightData({ systemId, 0, QDateTime::currentMSecsSinceEpoch() })
+        ? QnWeightData({ systemId, 0, QDateTime::currentMSecsSinceEpoch(), true })
         : *itWeightData);
 
     currentWeightData.weight = helpers::calculateSystemWeight(
