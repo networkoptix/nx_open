@@ -14,9 +14,13 @@ QnSharedResourcesManager::QnSharedResourcesManager(QObject* parent):
     m_mutex(QnMutex::NonRecursive),
     m_sharedResources()
 {
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnSharedResourcesManager::handleResourceAdded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         &QnSharedResourcesManager::handleResourceRemoved);
 
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        &QnSharedResourcesManager::handleRoleAddedOrUpdated);
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
         &QnSharedResourcesManager::handleRoleRemoved);
 }
@@ -27,15 +31,25 @@ QnSharedResourcesManager::~QnSharedResourcesManager()
 
 void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_sharedResources.clear();
-    for (const auto& item : accessibleResourcesList)
+    QHash<QnUuid, QSet<QnUuid> > oldValues;
     {
-        QSet<QnUuid>& resources = m_sharedResources[item.userId];
-        for (const auto& id : item.resourceIds)
-            resources << id;
+        QnMutexLocker lk(&m_mutex);
+        oldValues = m_sharedResources;
+        m_sharedResources.clear();
+        for (const auto& item : accessibleResourcesList)
+        {
+            auto& resources = m_sharedResources[item.userId];
+            for (const auto& id : item.resourceIds)
+                resources << id;
+        }
     }
-    //TODO: #GDM possibly we should send correct signals, shouldn't we?
+
+    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    {
+        auto newValues = sharedResources(subject);
+        if (oldValues[subject.id()] != newValues)
+            emit sharedResourcesChanged(subject, newValues);
+    }
 }
 
 QSet<QnUuid> QnSharedResourcesManager::sharedResources(
@@ -75,10 +89,27 @@ void QnSharedResourcesManager::setSharedResourcesInternal(const QnResourceAccess
     emit sharedResourcesChanged(subject, resources);
 }
 
+void QnSharedResourcesManager::handleResourceAdded(const QnResourcePtr& resource)
+{
+    if (auto user = resource.dynamicCast<QnUserResource>())
+    {
+        auto resources = sharedResources(user);
+        if (!resources.isEmpty())
+            emit sharedResourcesChanged(user, resources);
+    }
+}
+
 void QnSharedResourcesManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
+}
+
+void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole)
+{
+    auto resources = sharedResources(userRole);
+    if (!resources.isEmpty())
+        emit sharedResourcesChanged(userRole, resources);
 }
 
 void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)

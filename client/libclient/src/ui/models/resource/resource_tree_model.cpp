@@ -120,8 +120,6 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         &QnResourceTreeModel::at_resPool_resourceRemoved);
     connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
         &QnResourceTreeModel::at_snapshotManager_flagsChanged);
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        &QnResourceTreeModel::at_accessController_permissionsChanged);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModel::rebuildTree, Qt::QueuedConnection);
     connect(qnCommon, &QnCommonModule::systemNameChanged, this,
@@ -409,29 +407,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (!node->resource())
         return bastardNode;
 
+    /* No users nodes must be created here. */
+    NX_ASSERT(!node->resourceFlags().testFlag(Qn::user));
     if (node->resourceFlags().testFlag(Qn::user))
-    {
-        if (m_scope == UsersScope)
-            return m_rootNodes[Qn::UsersNode];
-
-        if (m_scope == CamerasScope)
-            return bastardNode;
-
-        if (node->resource() == context()->user())
-            return rootNode;
-
-        if (isAdmin)
-        {
-//             auto user = node->resource().dynamicCast<QnUserResource>();
-//             NX_ASSERT(user);
-//             if (user && user->role() == Qn::UserRole::CustomUserGroup)
-//                 return ensurePlaceholderNode(user->userGroup(), Qn::RoleUsersNode);
-            return m_rootNodes[Qn::UsersNode];
-        }
-
-        /* We can get here in the process of reconnecting. */
         return bastardNode;
-    }
 
     /* In UsersScope all other nodes should be hidden. */
     if (m_scope == UsersScope)
@@ -554,51 +533,6 @@ void QnResourceTreeModel::updateNodeResource(const QnResourceTreeModelNodePtr& n
     if (resource)
         m_nodesByResource[resource].push_back(node);
 }
-
-//
-// void QnResourceTreeModel::updateRoleNodes()
-// {
-//     TRACE("Updating role nodes");
-//
-//     /* Non-admin users do not see roles. */
-//     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-//     {
-//         for (const QnUuid& key : m_roleNodeById.keys())
-//             removeNode(m_roleNodeById.take(key));
-//         cleanupGroupNodes(Qn::RecorderNode);
-//         return;
-//     }
-//
-//     auto roles = qnUserRolesManager->userRoles();
-//
-//     QSet<QnUuid> roleIds;
-//     for (const auto& role: roles)
-//         roleIds << role.id;
-//
-//     auto existingNodes = m_roleNodeById.keys().toSet();
-//     auto removedRoles = existingNodes - roleIds;
-//     for (const QnUuid& key: removedRoles)
-//         removeNode(m_roleNodeById.take(key));
-//
-//     for (const auto& role: roles)
-//     {
-//         auto id = role.id;
-//         ensureRoleNode(id)->update();
-//         updatePlaceholderNodes(role);
-//         updateSharedLayoutNodesForRole(id);
-//         updateAccessibleResourcesForRole(id);
-//     }
-//     cleanupGroupNodes(Qn::RecorderNode);
-// }
-//
-// void QnResourceTreeModel::updateUserSubNodes(const QnUserResourcePtr& user)
-// {
-//     updatePlaceholderNodes(user);
-//     updateSharedLayoutNodesForUser(user);
-//     updateAccessibleResourcesForUser(user);
-//     if (user->role() == Qn::UserRole::CustomUserGroup)
-//         updateRoleNodes();
-// }
 
 Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
 {
@@ -998,18 +932,6 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourceTreeModel::at_server_systemNameChanged);
     }
 
-//     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-//     if (user)
-//     {
-//         connect(user, &QnUserResource::enabledChanged, this, &QnResourceTreeModel::at_user_enabledChanged);
-//         connect(user, &QnUserResource::userGroupChanged, this,
-//             [this](const QnResourcePtr& resource)
-//             {
-//                  updateRoleNodes();
-//                  updateNodeParent(ensureResourceNode(resource));
-//             });
-//     }
-
     auto node = ensureResourceNode(resource);
     updateNodeParent(node);
 
@@ -1182,23 +1104,6 @@ void QnResourceTreeModel::handleAccessChanged(const QnResourceAccessSubject& sub
         for (auto node : m_nodesByResource[resource])
             node->updateRecursive();
     }
-
-//     updatePlaceholderNodes(subject);
-//     if (QnUserResourcePtr user = subject.user())
-//     {
-//         updateSharedLayoutNodesForUser(user);
-//         updateAccessibleResourcesForUser(user);
-//     }
-//     else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-//     {
-//         if (layout->isShared())
-//             updateSharedLayoutNodes(layout);
-//     }
-//     else
-//     {
-//         //TODO: #GDM updateAccessibleResourcesByResource
-//         updateRoleNodes();
-//     }
 }
 
 void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout)
@@ -1224,35 +1129,6 @@ void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResource
 //             if (iter != hash.constEnd())
 //                 (*iter)->setModified(modified);
 //         }
-//     }
-}
-
-void QnResourceTreeModel::at_accessController_permissionsChanged(const QnResourcePtr &resource)
-{
-    return;
-    /* All must be handled by access provider signal */
-
-    if (resource == context()->user())
-    {
-        rebuildTree();
-        return;
-    }
-
-    {
-        for (auto node : m_nodesByResource[resource])
-            node->updateRecursive();
-    }
-
-//     if (auto layout = resource.dynamicCast<QnLayoutResource>())
-//     {
-//         if (layout->isShared())
-//             updateSharedLayoutNodes(layout);
-//     }
-//     else if (auto user = resource.dynamicCast<QnUserResource>())
-//     {
-//         updatePlaceholderNodes(user);
-//         updateSharedLayoutNodesForUser(user);
-//         updateAccessibleResourcesForUser(user);
 //     }
 }
 

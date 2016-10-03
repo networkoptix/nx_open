@@ -27,6 +27,8 @@ public:
     /** Key value in the shared resources map. */
     QnUuid effectiveId() const;
 
+    QString name() const;
+
     void operator=(const QnResourceAccessSubject& other);
     bool operator==(const QnResourceAccessSubject& other) const;
 private:

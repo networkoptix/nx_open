@@ -74,8 +74,11 @@ private:
     /** Remove all nodes. */
     void clean();
 
-    void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
+    /** Remove recorder nodes that are not in use. */
+    void cleanupRecorders();
 
+    void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
+    void handleGlobalPermissionsChanged(const QnResourceAccessSubject& subject);
 private:
     QnResourceTreeModel* m_model;
 
