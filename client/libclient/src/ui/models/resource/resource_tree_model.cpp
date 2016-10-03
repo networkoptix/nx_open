@@ -124,39 +124,11 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
             m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
         });
 
-    /*
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this,
-        [this](const QSet<QnUuid>& resourceIds)
-        {
-            for (const QnResourcePtr& resource : qnResPool->getResources(resourceIds))
-            {
-                if (!m_nodesByResource.contains(resource))
-                    continue;
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+        &QnResourceTreeModel::rebuildTree);
 
-                {
-                    QN_SCOPED_VALUE_ROLLBACK(&m_iteratingOverNodesByResource, true);
-                    for (auto node: m_nodesByResource[resource])
-                        node->updateRecursive();
-                }
-
-                if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-                {
-                    updatePlaceholderNodesForUserOrRole(user->getId());
-                    updateSharedLayoutNodesForUser(user);
-                    updateAccessibleResourcesForUser(user);
-                }
-                else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-                {
-                    if (layout->isShared())
-                        updateSharedLayoutNodes(layout);
-                }
-                else
-                {
-                    //TODO: #GDM updateAccessibleResourcesByResource
-                    updateRoleNodes();
-                }
-            }
-        });*/
+    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+        &QnResourceTreeModel::handleAccessChanged);
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnResourceTreeModel::updateRoleNodes);
@@ -1748,6 +1720,34 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     }
 }
 
+void QnResourceTreeModel::handleAccessChanged(const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource)
+{
+    if (m_resourceNodeByResource.contains(resource))
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_iteratingOverNodesByResource, true);
+        for (auto node : m_nodesByResource[resource])
+            node->updateRecursive();
+    }
+
+    updatePlaceholderNodesForUserOrRole(subject.id());
+    if (QnUserResourcePtr user = subject.user())
+    {
+        updateSharedLayoutNodesForUser(user);
+        updateAccessibleResourcesForUser(user);
+    }
+    else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        if (layout->isShared())
+            updateSharedLayoutNodes(layout);
+    }
+    else
+    {
+        //TODO: #GDM updateAccessibleResourcesByResource
+        updateRoleNodes();
+    }
+}
+
 void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout)
 {
     bool modified = snapshotManager()->isModified(layout);
@@ -1776,6 +1776,9 @@ void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResource
 
 void QnResourceTreeModel::at_accessController_permissionsChanged(const QnResourcePtr &resource)
 {
+    return;
+    /* All must be handled by access provider signal */
+
     if (resource == context()->user())
     {
         rebuildTree();

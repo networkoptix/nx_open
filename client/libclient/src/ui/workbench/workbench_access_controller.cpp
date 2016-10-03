@@ -292,14 +292,6 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
-    //TODO: #GDM really we need to listen only to resource_access_manager instead of the following
-    connect(resource, &QnResource::parentIdChanged, this,
-        &QnWorkbenchAccessController::updatePermissions);
-
-    if (const auto& layout = resource.dynamicCast<QnLayoutResource>())
-        connect(layout, &QnLayoutResource::lockedChanged, this,
-            &QnWorkbenchAccessController::updatePermissions);
-
     updatePermissions(resource);
 }
 

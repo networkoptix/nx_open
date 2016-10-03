@@ -1,7 +1,5 @@
 #include "global_permissions_manager.h"
 
-#include <common/common_module.h>
-
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -14,10 +12,6 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(QObject* parent):
     m_mutex(QnMutex::NonRecursive),
     m_cache()
 {
-    /* This change affects all accessible resources. */
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this,
-        &QnGlobalPermissionsManager::recalculateAllPermissions);
-
     connect(qnResPool, &QnResourcePool::resourceAdded, this,
         &QnGlobalPermissionsManager::handleResourceAdded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,

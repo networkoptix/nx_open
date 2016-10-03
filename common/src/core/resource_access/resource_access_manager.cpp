@@ -38,25 +38,17 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
     m_permissionsCache()
 {
     /* This change affects all accessible resources. */
-    /* We must get it from access provider and global permissions manager */
-//     connect(qnCommon,& QnCommonModule::readOnlyChanged, this,
-//         &QnResourceAccessManager::recalculateAllPermissions);
+    connect(qnCommon,& QnCommonModule::readOnlyChanged, this,
+        &QnResourceAccessManager::recalculateAllPermissions);
 
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
-        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            QnAbstractResourceAccessProvider::Source /*value*/)
-        {
-            updatePermissions(subject, resource);
-        });
+        &QnResourceAccessManager::updatePermissions);
 
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
-        this,
-        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
-        {
-            for (const QnResourcePtr& resource : qnResPool->getResources())
-                updatePermissions(subject, resource);
-        });
+        this, &QnResourceAccessManager::updatePermissionsBySubject);
 
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnResourceAccessManager::handleResourceAdded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         &QnResourceAccessManager::handleResourceRemoved);
 
@@ -124,7 +116,7 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
             return *iter;
     }
 
-    NX_ASSERT("Should never normally get here.");
+    /* We can get here during batch resources adding. */
     return calculatePermissions(subject, resource);
 }
 
@@ -226,10 +218,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 void QnResourceAccessManager::recalculateAllPermissions()
 {
     for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
-    {
-        for (const QnResourcePtr& resource: qnResPool->getResources())
-            updatePermissions(subject, resource);
-    }
+        updatePermissionsBySubject(subject);
 }
 
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
@@ -238,8 +227,35 @@ void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& s
     setPermissionsInternal(subject, target, calculatePermissions(subject, target));
 }
 
+void QnResourceAccessManager::updatePermissionsToResource(const QnResourcePtr& resource)
+{
+    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+        updatePermissions(subject, resource);
+}
+
+void QnResourceAccessManager::updatePermissionsBySubject(const QnResourceAccessSubject& subject)
+{
+    for (const QnResourcePtr& resource : qnResPool->getResources())
+        updatePermissions(subject, resource);
+}
+
+void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
+{
+    updatePermissionsToResource(resource);
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+        updatePermissionsBySubject(user);
+
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        connect(layout, &QnLayoutResource::lockedChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+    }
+}
+
 void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
+    disconnect(resource, nullptr, this, nullptr);
+
     auto resourceId = resource->getId();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())

@@ -53,6 +53,18 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
         requiredPermission = Qn::GlobalAccessAllMediaPermission;
     else if (resource->hasFlags(Qn::videowall))
         requiredPermission = Qn::GlobalControlVideoWallPermission;
+    else if (isLayout(resource) && subject.user() && resource->getParentId() == subject.id())
+        requiredPermission = Qn::NoGlobalPermissions;
 
     return qnGlobalPermissionsManager->hasGlobalPermission(subject, requiredPermission);
+}
+
+void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
+{
+    base_type::handleResourceAdded(resource);
+    if (isLayout(resource))
+    {
+        connect(resource, &QnResource::parentIdChanged, this,
+            &QnPermissionsResourceAccessProvider::updateAccessToResource);
+    }
 }

@@ -433,3 +433,24 @@ TEST_F(QnResourceAccessManagerTest, checkRoleRemoved)
     qnUserRolesManager->removeUserRole(role.id);
     ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
 }
+
+TEST_F(QnResourceAccessManagerTest, checkParentChanged)
+{
+    loginAs(Qn::NoGlobalPermissions);
+    auto user = m_currentUser;
+    auto layout = createLayout(Qn::remote);
+    qnResPool->addResource(layout);
+    layout->setParentId(QnUuid());
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission));
+}
+
+TEST_F(QnResourceAccessManagerTest, checkLockedChanged)
+{
+    loginAs(Qn::NoGlobalPermissions);
+    auto user = m_currentUser;
+    auto layout = createLayout(Qn::remote);
+    qnResPool->addResource(layout);
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+    layout->setLocked(true);
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+}

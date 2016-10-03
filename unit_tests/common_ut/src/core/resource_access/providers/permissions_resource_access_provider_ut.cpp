@@ -386,3 +386,24 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRolePermi
     qnUserRolesManager->addOrUpdateUserRole(role);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkAccessToOwnLayout)
+{
+    auto target = createLayout();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    target->setParentId(user->getId());
+    qnResPool->addResource(target);
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnPermissionsResourceAccessProviderTest, checkParentIdChange)
+{
+    /* We cannot test parent id change from null to user's as it never happens
+     * (and therefore no signal is sent from QnResource in this case). */
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto target = createLayout();
+    target->setParentId(user->getId());
+    qnResPool->addResource(target);
+    target->setParentId(QnUuid());
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}

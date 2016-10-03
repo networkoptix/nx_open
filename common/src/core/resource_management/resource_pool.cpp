@@ -108,10 +108,8 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     resourcesLock.unlock();
 
-    QnResourceList layouts;
-    QnResourceList otherResources;
-
-    for (const QnResourcePtr &resource: newResources.values())
+    QnResourceList addedResources = newResources.values();
+    for (const auto& resource: addedResources)
     {
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
@@ -132,26 +130,14 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             if (resource->getStatus() != Qn::Offline)
                 resource->initAsync(false);
         }
-
-        if (resource.dynamicCast<QnLayoutResource>())
-            layouts << resource;
-        else
-            otherResources << resource;
     }
 
-    // Layouts should be notified first because their children should be instantiated before
-    // 'UserChanged' event occurs
-    for (const QnResourcePtr &resource: layouts) {
+
+    for (const auto& resource: addedResources)
+    {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
     }
-
-    for (const QnResourcePtr &resource: otherResources) {
-        TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
-        emit resourceAdded(resource);
-    }
-
-
 }
 
 void QnResourcePool::removeResources(const QnResourceList& resources)

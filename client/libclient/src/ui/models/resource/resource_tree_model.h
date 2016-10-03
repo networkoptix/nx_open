@@ -8,6 +8,7 @@
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_subject.h>
 
 #include <ui/models/resource/resource_tree_model_fwd.h>
 
@@ -106,7 +107,10 @@ private:
      * @param targetResource        On what drop was done.
      * @param mimeData              Full drag-n-drop data.
      */
-    void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData);
+    void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource,
+        const QMimeData *mimeData);
+
+    void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);

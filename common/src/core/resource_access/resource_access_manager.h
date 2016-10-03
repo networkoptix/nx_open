@@ -130,7 +130,10 @@ private:
     void recalculateAllPermissions();
 
     void updatePermissions(const QnResourceAccessSubject& subject, const QnResourcePtr& target);
+    void updatePermissionsToResource(const QnResourcePtr& resource);
+    void updatePermissionsBySubject(const QnResourceAccessSubject& subject);
 
+    void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
