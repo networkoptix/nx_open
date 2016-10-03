@@ -49,6 +49,8 @@ private:
 
     void emitHeadChanged();
 
+    void onSystemNameChanged(const QnSystemDescriptionPtr& system);
+
 private:
     typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;
     SystemsMap m_systems;
