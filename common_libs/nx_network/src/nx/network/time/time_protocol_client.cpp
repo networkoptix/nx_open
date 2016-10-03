@@ -105,7 +105,7 @@ namespace
             return -1;
         memcpy( &utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds) );
         utcTimeSeconds = ntohl( utcTimeSeconds );
-        utcTimeSeconds -= SECONDS_FROM_1900_01_01_TO_1970_01_01;
+        utcTimeSeconds -= kSecondsFrom19000101To19700101;
         return ((qint64)utcTimeSeconds) * MILLIS_PER_SEC;
     }
 }

@@ -11,11 +11,12 @@
 #include <QtCore/QByteArray>
 #include <nx/utils/thread/mutex.h>
 
-#include "abstract_accurate_time_fetcher.h"
 #include <nx/network/abstract_socket.h>
 
+#include "abstract_accurate_time_fetcher.h"
 
-constexpr const unsigned int SECONDS_FROM_1900_01_01_TO_1970_01_01 = 2208988800UL;
+
+constexpr const unsigned int kSecondsFrom19000101To19700101 = 2208988800UL;
 constexpr const unsigned short kTimeProtocolDefaultPort = 37;     //time protocol
 
 //!Fetches time using Time (rfc868) protocol
