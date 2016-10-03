@@ -13,6 +13,7 @@
  * Analogue of gtest's ASSERT_EQ but supports placing in non-void methods (throws on failure).
  */
 #define NX_GTEST_ASSERT_EQ(expected, actual) \
+    do \
     { \
         bool result = false; \
         auto x = [&]() -> void \
@@ -22,10 +23,13 @@
         }; \
         x(); \
         if (!result) \
+        { \
             throw std::runtime_error( \
                 "This is work around ASSERT_* inability to be used " \
                 "in non-void method. Just ignore..."); \
-    }
+        } \
+    } \
+    while (0)
 
 namespace nx {
 namespace cdb {
