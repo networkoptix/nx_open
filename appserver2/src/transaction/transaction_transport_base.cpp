@@ -700,7 +700,10 @@ void QnTransactionTransportBase::receivedTransactionNonSafe( const QnByteArrayCo
 
     nx::utils::ObjectDestructionFlag::Watcher watcher(
         &m_connectionFreedFlag);
-    emit gotTransaction( m_remotePeer.dataFormat, serializedTran, transportHeader);
+    emit gotTransaction(
+        m_remotePeer.dataFormat,
+        std::move(serializedTran),
+        transportHeader);
     if (watcher.objectDestroyed())
         return; //connection has been removed by handler
 

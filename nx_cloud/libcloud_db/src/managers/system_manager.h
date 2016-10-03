@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <functional>
@@ -112,7 +113,7 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
-    void rename(
+    void renameSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
@@ -153,6 +154,13 @@ public:
         data::DataFilter filter);
         
 private:
+    struct SqlFilterByField
+    {
+        const char* fieldName;
+        const char* bindValueName;
+        QVariant fieldValue;
+    };
+
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
         const api::SystemSharing& data);
     static std::pair<std::string, std::string> extractSystemIdAndAccountEmail(
@@ -253,9 +261,6 @@ private:
         InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
-    //nx::db::DBResult insertSystemSharingToDB(
-    //    nx::db::QueryContext* const queryContext,
-    //    const data::SystemSharing& systemSharing);
     void systemSharingAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
@@ -291,6 +296,22 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
+    /**
+     * Fetches existing account or creates new one sending corresponding notification.
+     */
+    nx::db::DBResult fetchAccountToShareWith(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const data::SystemSharing& sharing,
+        data::AccountData* const targetAccountData);
+    /**
+     * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
+     */
+    nx::db::DBResult calculateUsageFrequencyForANewSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountId,
+        const std::string& systemId,
+        float* const newSystemInitialUsageFrequency);
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
@@ -301,6 +322,10 @@ private:
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
         std::function<void(api::ResultCode)> completionHandler);
+    void updateSharingInCache(data::SystemSharing sharing);
+    void updateSharingInCache(
+        api::SystemSharingEx sharing,
+        bool updateExFields = true);
 
     nx::db::DBResult updateSystemNameInDB(
         nx::db::QueryContext* const queryContext,
@@ -387,6 +412,12 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
+    template<std::size_t FilterFieldCount = 0>
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* queryContext,
+        const std::string& systemId,
+        std::array<SqlFilterByField, FilterFieldCount> filterFields 
+            = std::array<SqlFilterByField, FilterFieldCount>());
     static float calculateSystemUsageFrequency(
         std::chrono::system_clock::time_point lastLoginTime,
         float currentUsageFrequency);

@@ -115,93 +115,7 @@ bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath)
     return false;
 }
 
-#if defined(Q_OS_WIN)
-const QString& getDevicePath(const QString& path)
-{
-    return path;
-}
-
-const QString& sysDrivePath()
-{
-    static QString deviceString;
-
-    if (!deviceString.isNull())
-        return deviceString;
-
-    const DWORD bufSize = MAX_PATH + 1;
-    TCHAR buf[bufSize];
-    GetWindowsDirectory(buf, bufSize);
-
-    deviceString = QString::fromWCharArray(buf, bufSize).left(2);
-
-    return deviceString;
-}
-
-#elif defined(Q_OS_LINUX)
-
-const QString getDevicePath(const QString& path)
-{
-    QString command = lit("df '") + path + lit("'");
-    FILE* pipe;
-    char buf[BUFSIZ];
-
-    if ((pipe = popen(command.toLatin1().constData(), "r")) == NULL)
-    {
-        NX_LOG(lit("%1 'df' call failed").arg(Q_FUNC_INFO), cl_logWARNING);
-        return QString();
-    }
-
-    if (fgets(buf, BUFSIZ, pipe) == NULL) // header line
-    {
-        pclose(pipe);
-        return QString();
-    }
-
-    if (fgets(buf, BUFSIZ, pipe) == NULL) // data
-    {
-        pclose(pipe);
-        return QString();
-    }
-
-    auto dataString = QString::fromUtf8(buf);
-    QString deviceString = dataString.section(QRegularExpression("\\s+"), 0, 0);
-
-    pclose(pipe);
-
-    return deviceString;
-}
-
-const QString& sysDrivePath()
-{
-    static QString devicePath = getDevicePath(lit("/root"));
-    return devicePath;
-}
-
-#else // Unsupported OS so far
-
-const QString& getDevicePath(const QString& path)
-{
-    return path;
-}
-
-const QString& sysDrivePath()
-{
-    return QString();
-}
-
-#endif
-
-bool isStorageOnSystemDrive(const QnStorageResourcePtr& storage)
-{
-    QString storageUrl = storage->getUrl();
-    if (storageUrl.contains(lit("://")))
-        return false;
-    QString sysPath = sysDrivePath();
-    return sysPath.isNull() ? false : getDevicePath(storageUrl).startsWith(sysDrivePath());
-}
-
 } // namespace <anonymous>
-
 class ArchiveScanPosition
 {
 public:
@@ -2124,7 +2038,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages() const
 
     for (auto it = result.begin(); it != result.end(); ++it)
     {
-        if (!isStorageOnSystemDrive(*it))
+        if (!(*it)->isSystem())
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
@@ -2742,9 +2656,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         -1,
         (qint16) timeZone
     );
-    QnMutexLocker lk(&m_mutexCatalog);
     catalog->addRecord(chunk);
-    catalog->setLastSyncTime(startDateMs);
     return true;
 }
 

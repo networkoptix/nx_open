@@ -49,6 +49,8 @@ public:
     virtual Qn::StorageInitResult initOrUpdate() const override;
 
     virtual void setUrl(const QString& url) override;
+    virtual bool isSystem() const override;
+
     virtual QString getPath() const override;
 
     qint64 getTotalSpaceWithoutInit();
@@ -104,6 +106,7 @@ private:
     mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
+    mutable bool m_isSystem;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 
