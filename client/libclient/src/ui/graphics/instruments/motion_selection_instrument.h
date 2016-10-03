@@ -52,6 +52,7 @@ protected:
     virtual void aboutToBeUninstalledNotify() override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
