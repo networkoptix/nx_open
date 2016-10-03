@@ -65,7 +65,9 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
     };
 
     m_mode = calculateMode();
-    m_accessibleResources = qnSharedResourcesManager->sharedResources(m_user);
+    m_accessibleResources = m_user
+        ? qnSharedResourcesManager->sharedResources(m_user)
+        : QSet<QnUuid>();
     emit userChanged(m_user);
 }
 
