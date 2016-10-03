@@ -291,6 +291,22 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
+    /**
+     * Fetches existing account or creates new one sending corresponding notification.
+     */
+    nx::db::DBResult fetchAccountToShareWith(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const data::SystemSharing& sharing,
+        data::AccountData* const targetAccountData);
+    /**
+     * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
+     */
+    nx::db::DBResult calculateUsageFrequencyForANewSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountId,
+        const std::string& systemId,
+        float* const newSystemInitialUsageFrequency);
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
@@ -301,6 +317,10 @@ private:
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
         std::function<void(api::ResultCode)> completionHandler);
+    void updateSharingInCache(data::SystemSharing sharing);
+    void updateSharingInCache(
+        api::SystemSharingEx sharing,
+        bool updateExFields = true);
 
     nx::db::DBResult updateSystemNameInDB(
         nx::db::QueryContext* const queryContext,

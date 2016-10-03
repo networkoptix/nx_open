@@ -597,18 +597,18 @@ TEST_F(System, sortingOrderMultipleSystems)
     const auto system2 = addRandomSystemToAccount(account);
     const auto system3 = addRandomSystemToAccount(account);
 
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 1; ++i)
         ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
     for (int i = 0; i < 2; ++i)
         ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system2.id));
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < 3; ++i)
         ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
 
     // First element has highest priority.
     std::list<std::string> systemIdsInSortOrder;
-    systemIdsInSortOrder.push_back(system1.id);
-    systemIdsInSortOrder.push_back(system2.id);
     systemIdsInSortOrder.push_back(system3.id);
+    systemIdsInSortOrder.push_back(system2.id);
+    systemIdsInSortOrder.push_back(system1.id);
 
     nx::utils::test::ScopedTimeShift timeShift;
 
@@ -619,9 +619,9 @@ TEST_F(System, sortingOrderMultipleSystems)
             // Shifting time and testing for access history expiration.
             timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
 
-            ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system3.id));
-
-            bringToTop(systemIdsInSortOrder, system3.id);
+            for (int j = 0; j < 2; ++j)
+                ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
+            bringToTop(systemIdsInSortOrder, system1.id);
         }
         else if (i == 2)
         {
@@ -658,7 +658,9 @@ TEST_F(System, sortingOrderLastLoginTime)
         api::ResultCode::ok,
         getSystems(account.data.email, account.password, &systems));
     const auto lastLoginTime1 = systems[0].lastLoginTime;
-    ASSERT_EQ(std::chrono::system_clock::time_point(), systems[0].lastLoginTime);
+    // Initial value for lastLoginTime is current time.
+    ASSERT_GT(systems[0].lastLoginTime, nx::utils::utcTime() - std::chrono::seconds(10));
+    ASSERT_LT(systems[0].lastLoginTime, nx::utils::utcTime() + std::chrono::seconds(10));
 
     ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
 
@@ -687,5 +689,65 @@ TEST_F(System, sortingOrderLastLoginTime)
     ASSERT_LT(lastLoginTime3, nx::utils::utcTime() + std::chrono::seconds(10));
 }
 
-}   //cdb
-}   //nx
+TEST_F(System, sortingOrderNewSystemIsOnTop)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account);
+
+    ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
+    std::vector<api::SystemDataEx> systems;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(account.data.email, account.password, &systems));
+    const auto lastLoginTime1 = systems[0].lastLoginTime;
+    const auto usageFrequency1 = systems[0].usageFrequency;
+
+    const auto system2 = addRandomSystemToAccount(account);
+
+    std::list<std::string> systemIdsInSortOrder;
+    systemIdsInSortOrder.push_back(system2.id);
+    systemIdsInSortOrder.push_back(system1.id);
+
+    for (int i = 0; i < 4; ++i)
+    {
+        const bool checkingThatNewSystemStaysonStopAfterAccess = i == 1;
+        const bool needRestart = i == 2;
+        const bool bringNewSystemDown = i == 3;
+        if (checkingThatNewSystemStaysonStopAfterAccess)
+        {
+            ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
+            ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system2.id));
+        }
+        if (needRestart)
+        {
+            restart();
+        }
+        nx::utils::test::ScopedTimeShift timeShift;
+        if (bringNewSystemDown)
+        {
+            timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
+            ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
+
+            bringToTop(systemIdsInSortOrder, system1.id);
+        }
+
+        systems.clear();
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(account.data.email, account.password, &systems));
+
+        std::sort(
+            systems.begin(), systems.end(),
+            [](const api::SystemDataEx& one, const api::SystemDataEx& two)
+            {
+                return one.usageFrequency > two.usageFrequency; //< Descending sort.
+            });
+
+        validateSystemsOrder(systemIdsInSortOrder, systems);
+    }
+}
+
+} // namespace cdb
+} // namespace nx

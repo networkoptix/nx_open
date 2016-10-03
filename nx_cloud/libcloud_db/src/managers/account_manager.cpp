@@ -431,7 +431,7 @@ db::DBResult AccountManager::fetchExistingAccountOrCreateNewOneByEmail(
             locker = m_startedAsyncCallsCounter.getScopedIncrement()](
                 nx::db::DBResult resultCode)
             {
-                if (resultCode != db::DBResult::ok)
+                if (resultCode != nx::db::DBResult::ok)
                     return;
                 auto email = accountData.email;
                 m_cache.insert(std::move(email), std::move(accountData));

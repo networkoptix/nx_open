@@ -30,6 +30,8 @@
 #include "stree/cdb_ns.h"
 
 
+// TODO: #ak "DELETE FROM system_to_account" is called in 4(!) places. Refactor that!
+
 namespace nx {
 namespace cdb {
 
@@ -996,6 +998,77 @@ nx::db::DBResult SystemManager::updateSharingInDb(
     const data::SystemSharing& sharing,
     data::AccountData* const targetAccountData)
 {
+    nx::db::DBResult result = fetchAccountToShareWith(
+        queryContext,
+        grantorEmail,
+        sharing,
+        targetAccountData);
+    if (result != nx::db::DBResult::ok)
+        return result;
+
+    api::SystemSharingEx resultSharing = createDerivedFromBase(sharing);
+    resultSharing.lastLoginTime = std::chrono::system_clock::now();
+    resultSharing.accountID = targetAccountData->id;
+
+    QSqlQuery updateRemoveSharingQuery(*queryContext->connection());
+    if (sharing.accessRole == api::SystemAccessRole::none)
+    {
+        updateRemoveSharingQuery.prepare(
+            R"sql(
+            DELETE FROM system_to_account 
+            WHERE account_id=:accountID AND system_id=:systemID
+            )sql");
+    }
+    else
+    {
+        result = calculateUsageFrequencyForANewSystem(
+            queryContext,
+            targetAccountData->id,
+            resultSharing.systemID,
+            &resultSharing.usageFrequency);
+        if (result != nx::db::DBResult::ok)
+            return result;
+
+        updateRemoveSharingQuery.prepare(
+            R"sql(
+            REPLACE INTO system_to_account(
+                account_id, system_id, access_role_id, group_id, custom_permissions,
+                is_enabled, vms_user_id, last_login_time_utc, usage_frequency)
+            VALUES(:accountID, :systemID, :accessRole, :groupID, :customPermissions,
+                   :isEnabled, :vmsUserId, :lastLoginTime, :usageFrequency)
+            )sql");
+    }
+    QnSql::bind(resultSharing, &updateRemoveSharingQuery);
+    if (!updateRemoveSharingQuery.exec())
+    {
+        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4")
+            .arg(sharing.systemID).arg(sharing.accountEmail)
+            .arg(QnLexical::serialized(sharing.accessRole))
+            .arg(updateRemoveSharingQuery.lastError().text()),
+            cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    if (sharing.accessRole != api::SystemAccessRole::none)
+    {
+        queryContext->transaction()->addAfterCommitHandler(
+            [this, resultSharing = std::move(resultSharing)](
+                nx::db::DBResult dbResult) mutable
+            {
+                if (dbResult == nx::db::DBResult::ok)
+                    updateSharingInCache(std::move(resultSharing));
+            });
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::fetchAccountToShareWith(
+    nx::db::QueryContext* const queryContext,
+    const std::string& grantorEmail,
+    const data::SystemSharing& sharing,
+    data::AccountData* const targetAccountData)
+{
     nx::db::DBResult result = nx::db::DBResult::ok;
 
     std::string systemName;
@@ -1044,32 +1117,38 @@ nx::db::DBResult SystemManager::updateSharingInDb(
         return result;
     }
 
-    QSqlQuery updateRemoveSharingQuery(*queryContext->connection());
-    if (sharing.accessRole == api::SystemAccessRole::none)
-        updateRemoveSharingQuery.prepare(
-            "DELETE FROM system_to_account "
-            "  WHERE account_id=:accountID AND system_id=:systemID");
-    else
-        updateRemoveSharingQuery.prepare(
-            "REPLACE INTO system_to_account( "
-                "account_id, system_id, access_role_id, "
-                "group_id, custom_permissions, is_enabled, vms_user_id ) "
-            "VALUES( :accountID, :systemID, :accessRole, "
-                    ":groupID, :customPermissions, :isEnabled, :vmsUserId )");
-    QnSql::bind(sharing, &updateRemoveSharingQuery);
-    updateRemoveSharingQuery.bindValue(
+    return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::calculateUsageFrequencyForANewSystem(
+    nx::db::QueryContext* const queryContext,
+    const std::string& accountId,
+    const std::string& systemId,
+    float* const newSystemInitialUsageFrequency)
+{
+    QSqlQuery calculateUsageFrequencyForTheNewSystem(*queryContext->connection());
+    calculateUsageFrequencyForTheNewSystem.setForwardOnly(true);
+    calculateUsageFrequencyForTheNewSystem.prepare(
+        R"sql(
+            SELECT MAX(usage_frequency) + 1 
+            FROM system_to_account 
+            WHERE account_id = :accountID
+            )sql");
+    calculateUsageFrequencyForTheNewSystem.bindValue(
         ":accountID",
-        QnSql::serialized_field(targetAccountData->id));
-    if (!updateRemoveSharingQuery.exec())
+        QnSql::serialized_field(accountId));
+    if (!calculateUsageFrequencyForTheNewSystem.exec() ||
+        !calculateUsageFrequencyForTheNewSystem.next())
     {
-        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4")
-            .arg(sharing.systemID).arg(sharing.accountEmail)
-            .arg(QnLexical::serialized(sharing.accessRole))
-            .arg(updateRemoveSharingQuery.lastError().text()),
+        NX_LOGX(lm("Failed to fetch usage_frequency for the new system %1 of account %2. %3")
+            .arg(systemId).arg(accountId)
+            .arg(calculateUsageFrequencyForTheNewSystem.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::db::DBResult::ioError;
     }
 
+    *newSystemInitialUsageFrequency = 
+        calculateUsageFrequencyForTheNewSystem.value(0).toFloat();
     return nx::db::DBResult::ok;
 }
 
@@ -1147,17 +1226,7 @@ void SystemManager::sharingUpdated(
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        //updating "systems by account id" index
-        QnMutexLocker lk(&m_mutex);
-        auto& accountSystemPairIndex =
-            m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
-        accountSystemPairIndex.erase(sharing);
-        if (sharing.accessRole != api::SystemAccessRole::none)
-        {
-            //inserting modified version
-            accountSystemPairIndex.emplace(createDerivedFromBase(std::move(sharing)));
-        }
-
+        updateSharingInCache(std::move(sharing));
         return completionHandler(api::ResultCode::ok);
     }
 
@@ -1165,6 +1234,44 @@ void SystemManager::sharingUpdated(
         dbResult == nx::db::DBResult::notFound
         ? api::ResultCode::notFound
         : api::ResultCode::dbError);
+}
+
+void SystemManager::updateSharingInCache(
+    data::SystemSharing sharing)
+{
+    updateSharingInCache(
+        createDerivedFromBase(std::move(sharing)),
+        false);
+}
+
+void SystemManager::updateSharingInCache(
+    api::SystemSharingEx sharing,
+    bool updateExFields)
+{
+    // Updating "systems by account id" index.
+    QnMutexLocker lk(&m_mutex);
+    auto& accountSystemPairIndex =
+        m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
+    if (sharing.accessRole == api::SystemAccessRole::none)
+    {
+        accountSystemPairIndex.erase(sharing);
+        return;
+    }
+
+    const auto iterAndInsertionFlag = accountSystemPairIndex.insert(sharing);
+    if (iterAndInsertionFlag.second)
+        return;
+
+    // Updating existing data while preserving fields of SystemSharingEx structure.
+    accountSystemPairIndex.modify(
+        iterAndInsertionFlag.first,
+        [&sharing, updateExFields](api::SystemSharingEx& existingData) mutable
+        {
+            if (updateExFields)
+                existingData = std::move(sharing);
+            else
+                existingData.api::SystemSharing::operator=(sharing);
+        });
 }
 
 nx::db::DBResult SystemManager::updateSystemNameInDB(
@@ -1703,16 +1810,7 @@ void SystemManager::onEc2SaveUserDone(
     if (dbResult != nx::db::DBResult::ok)
         return;
 
-    //updating "systems by account id" index
-    QnMutexLocker lk(&m_mutex);
-    auto& accountSystemPairIndex =
-        m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
-    accountSystemPairIndex.erase(sharing);
-    if (sharing.accessRole != api::SystemAccessRole::none)
-    {
-        //inserting modified version
-        accountSystemPairIndex.emplace(createDerivedFromBase(std::move(sharing)));
-    }
+    updateSharingInCache(std::move(sharing));
 }
 
 nx::db::DBResult SystemManager::processEc2RemoveUser(
