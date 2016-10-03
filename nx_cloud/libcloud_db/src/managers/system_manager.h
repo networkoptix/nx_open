@@ -112,7 +112,7 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
-    void rename(
+    void renameSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemNameUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
