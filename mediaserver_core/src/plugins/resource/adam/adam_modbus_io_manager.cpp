@@ -35,14 +35,6 @@ QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
     m_networkFaultsCounter(0)
 {
     initializeIO();
-
-    Qn::directConnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::done, 
-        this, &QnAdamModbusIOManager::routeMonitoringFlow);
-
-    Qn::directConnect(
-        &m_client, &nx_modbus::QnModbusAsyncClient::error, 
-        this, &QnAdamModbusIOManager::handleMonitoringError);
 }
 
 QnAdamModbusIOManager::~QnAdamModbusIOManager()
@@ -88,7 +80,7 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_monitoringIsInProgress = true;
 
     QUrl url(m_resource->getUrl());
-    auto host  = url.host();
+    auto host = url.host();
     auto port = url.port(nx::modbus::kDefaultModbusPort);
 
     SocketAddress endpoint(host, port);
@@ -96,8 +88,7 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_client.setEndpoint(endpoint);
     m_outputClient.setEndpoint(endpoint);
 
-    lock.unlock();
-    fetchAllPortStates();
+    fetchAllPortStatesUnsafe();
 
     return true;
 }
@@ -142,8 +133,8 @@ bool QnAdamModbusIOManager::setOutputPortState(const QString& outputId, bool isA
     {
         m_networkIssueCallback(
             lit("Couldn't set port %1 to %2 state")
-                .arg(outputId)
-                .arg(isActive ? lit("active") : lit("non-active")),
+            .arg(outputId)
+            .arg(isActive ? lit("active") : lit("non-active")),
             false);
     }
 
@@ -209,7 +200,7 @@ quint32 QnAdamModbusIOManager::getPortCoil(const QString& ioPortId, bool& succes
 {
     auto split = ioPortId.split("_");
 
-    if(split.size() != 2)
+    if (split.size() != 2)
     {
         success = false;
         return 0;
@@ -267,9 +258,8 @@ bool QnAdamModbusIOManager::initializeIO()
     return true;
 }
 
-void QnAdamModbusIOManager::fetchAllPortStates()
+void QnAdamModbusIOManager::fetchAllPortStatesUnsafe()
 {
-    QnMutexLocker lock(&m_mutex);
     if (m_inputs.empty() || m_outputs.empty())
         return;
 
@@ -302,7 +292,7 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx::modbus::Modbu
     {
         qDebug()
             << lit("QnAdamModbusIOManager::processAllPortStatesResponse(), Exception has occured %1")
-                .arg(m_client.getLastErrorString());
+            .arg(m_client.getLastErrorString());
         return;
     }
 
@@ -354,7 +344,7 @@ void QnAdamModbusIOManager::processAllPortStatesResponse(const nx::modbus::Modbu
     }
 
     lock.unlock();
-    for (const auto& change: changedStates)
+    for (const auto& change : changedStates)
     {
         m_inputStateChangedCallback(
             change.first,
@@ -399,7 +389,7 @@ QnIOStateDataList QnAdamModbusIOManager::getDebouncedStates() const
 
     auto debouncedStates = m_ioStates;
 
-    for (auto& state: debouncedStates)
+    for (auto& state : debouncedStates)
     {
         if (m_debouncedValues.find(state.id) != m_debouncedValues.end())
         {
@@ -431,10 +421,10 @@ void QnAdamModbusIOManager::scheduleMonitoringIteration()
     {
         m_inputMonitorTimerId = nx::utils::TimerManager::instance()->addTimer(
             [this](quint64 timerId)
-            {
-                if (timerId == m_inputMonitorTimerId)
-                    fetchAllPortStates();
-            },
+        {
+            if (timerId == m_inputMonitorTimerId)
+                fetchAllPortStates();
+        },
             std::chrono::milliseconds(kInputPollingIntervalMs));
     }
 }

@@ -626,7 +626,6 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     const QByteArray& authData,
     nx_http::Response& responseHeaders,
     Qn::UserAccessData* accessRights)
-    QnMutexLocker lock( &m_cookieNonceCacheMutex );
 {
     nx_http::Response tmpHeaders;
 
