@@ -17,6 +17,8 @@ namespace nx_ms_conf
     static const qint64 DEFAULT_MIN_STORAGE_SPACE = 5*1024*1024*1024ll; // 5gb
 #endif
 
+    static const QLatin1String DISABLE_STORAGE_OPTIMIZATION("disableStorageOptimization");
+
 	static const QLatin1String MAX_RECORD_QUEUE_SIZE_BYTES( "maxRecordQueueSizeBytes" );
     static const int DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES = 1024*1024*20;
 

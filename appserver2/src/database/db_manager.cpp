@@ -1191,27 +1191,6 @@ bool QnDbManager::removeEmptyLayoutsFromTransactionLog()
     return true;
 }
 
-bool QnDbManager::tuneDBAfterOpen()
-{
-    QSqlQuery enableWalQuery(m_sdb);
-    enableWalQuery.prepare("PRAGMA journal_mode = WAL");
-    if( !enableWalQuery.exec() )
-    {
-        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
-        return false;
-    }
-
-    QSqlQuery enableFKQuery(m_sdb);
-    enableFKQuery.prepare("PRAGMA foreign_keys = ON");
-    if( !enableFKQuery.exec() )
-    {
-        qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
-        return false;
-    }
-
-    return true;
-}
-
 bool QnDbManager::removeOldCameraHistory()
 {
     // migrate transaction log

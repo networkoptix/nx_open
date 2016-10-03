@@ -33,6 +33,28 @@ bool QnDbHelper::QnDbTransaction::beginTran()
     return true;
 }
 
+bool QnDbHelper::tuneDBAfterOpen()
+{
+    QSqlQuery enableWalQuery(m_sdb);
+    enableWalQuery.prepare(lit("PRAGMA journal_mode = WAL"));
+    if( !enableWalQuery.exec() )
+    {
+        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        return false;
+    }
+
+    QSqlQuery enableFKQuery(m_sdb);
+    enableFKQuery.prepare(lit("PRAGMA foreign_keys = ON"));
+    if( !enableFKQuery.exec() )
+    {
+        qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+
 void QnDbHelper::QnDbTransaction::rollback()
 {
     m_database.rollback();
