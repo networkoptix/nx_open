@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <functional>
@@ -153,6 +154,13 @@ public:
         data::DataFilter filter);
         
 private:
+    struct SqlFilterByField
+    {
+        const char* fieldName;
+        const char* bindValueName;
+        QVariant fieldValue;
+    };
+
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
         const api::SystemSharing& data);
     static std::pair<std::string, std::string> extractSystemIdAndAccountEmail(
@@ -253,9 +261,6 @@ private:
         InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
-    //nx::db::DBResult insertSystemSharingToDB(
-    //    nx::db::QueryContext* const queryContext,
-    //    const data::SystemSharing& systemSharing);
     void systemSharingAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
@@ -407,6 +412,12 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
+    template<std::size_t FilterFieldCount = 0>
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* queryContext,
+        const std::string& systemId,
+        std::array<SqlFilterByField, FilterFieldCount> filterFields 
+            = std::array<SqlFilterByField, FilterFieldCount>());
     static float calculateSystemUsageFrequency(
         std::chrono::system_clock::time_point lastLoginTime,
         float currentUsageFrequency);
