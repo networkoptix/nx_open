@@ -57,14 +57,29 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     m_roles(),
     m_users(),
     m_placeholders(),
-    m_sharedLayouts(),
-    m_sharedResources(),
+    m_shared(),
     m_recorders()
 {
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserNodes::handleAccessChanged);
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged);
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (auto user = resource.dynamicCast<QnUserResource>())
+            {
+                connect(user, &QnUserResource::enabledChanged, this,
+                    &QnResourceTreeModelUserNodes::handleUserEnabledChanged);
+            }
+        });
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            disconnect(resource, nullptr, this, nullptr);
+        });
 }
 
 QnResourceTreeModelUserNodes::~QnResourceTreeModelUserNodes()
@@ -307,10 +322,29 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
     return *pos;
 }
 
+QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureResourceNode(
+    const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
+{
+    if (isLayout(resource))
+    {
+        auto layout = resource.dynamicCast<QnLayoutResource>();
+        NX_ASSERT(layout);
+        if (layout && showLayoutForSubject(subject, layout))
+            return ensureLayoutNode(subject, layout);
+    }
+    else if (isMediaResource(resource))
+    {
+        if (showMediaForSubject(subject, resource))
+            return ensureMediaNode(subject, resource);
+    }
+
+    return QnResourceTreeModelNodePtr();
+}
+
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureLayoutNode(
     const QnResourceAccessSubject& subject, const QnLayoutResourcePtr& layout)
 {
-    auto& nodes = m_sharedLayouts[subject.id()];
+    auto& nodes = m_shared[subject.id()];
 
     for (auto node : nodes)
     {
@@ -337,7 +371,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureLayoutNode(
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureMediaNode(
     const QnResourceAccessSubject& subject, const QnResourcePtr& media)
 {
-    auto& nodes = m_sharedResources[subject.id()];
+    auto& nodes = m_shared[subject.id()];
 
     for (auto node : nodes)
     {
@@ -412,24 +446,6 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
-    QnResourceList media;
-    QnLayoutResourceList layouts;
-    QnUserResourceList users;
-    for (const auto& resource : qnResPool->getResources())
-    {
-        if (isLayout(resource))
-        {
-            auto layout = resource.dynamicCast<QnLayoutResource>();
-            NX_ASSERT(layout);
-            if (layout)
-                layouts << layout;
-        }
-        else if (isMediaResource(resource))
-        {
-            media << resource;
-        }
-    }
-
     ensureSubjectNode(subject);
     for (auto nodetype : allPlaceholders())
     {
@@ -437,17 +453,8 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
             ensurePlaceholderNode(subject, nodetype);
     }
 
-    for (const auto& layout : layouts)
-    {
-        if (showLayoutForSubject(subject, layout))
-            ensureLayoutNode(subject, layout);
-    }
-
-    for (const auto& resource : media)
-    {
-        if (showMediaForSubject(subject, resource))
-            ensureMediaNode(subject, resource);
-    }
+    for (const auto& resource: qnResPool->getResources())
+        ensureResourceNode(subject, resource);
 }
 
 void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& node)
@@ -489,12 +496,10 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
                 nodes.removeOne(node);
             break;
         case Qn::SharedLayoutNode:
-            for (NodeList& nodes : m_sharedLayouts)
+        case Qn::SharedResourceNode:
+            for (NodeList& nodes : m_shared)
                 nodes.removeOne(node);
             break;
-        case Qn::SharedResourceNode:
-            for (NodeList& nodes : m_sharedResources)
-                nodes.removeOne(node);
         case Qn::RecorderNode:
             if (m_recorders.contains(node->parent()))
             {
@@ -523,8 +528,7 @@ void QnResourceTreeModelUserNodes::clean()
     for (auto node : m_allNodes)
         removeNodeInternal(node);
     m_recorders.clear();
-    m_sharedResources.clear();
-    m_sharedLayouts.clear();
+    m_shared.clear();
     m_placeholders.clear();
     m_users.clear();
     m_roles.clear();
@@ -549,10 +553,27 @@ void QnResourceTreeModelUserNodes::cleanupRecorders()
 void QnResourceTreeModelUserNodes::handleAccessChanged(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
-    auto subjectNode = ensureSubjectNode(subject);
-    removeNode(subjectNode);
-    rebuildSubjectTree(subject);
-    cleanupRecorders();
+    if (qnResourceAccessProvider->hasAccess(subject, resource))
+    {
+        auto node = ensureResourceNode(subject, resource);
+        if (node)
+            node->update();
+    }
+    else
+    {
+        auto id = subject.id();
+        if (!m_shared.contains(id))
+            return;
+        for (auto node : m_shared[id])
+        {
+            if (node->resource() != resource)
+                continue;
+
+            removeNode(node);
+            cleanupRecorders();
+            break;
+        }
+    }
 }
 
 void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
@@ -567,6 +588,16 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
 
     auto subjectNode = ensureSubjectNode(subject);
     removeNode(subjectNode);
+
+    //TODO: #GDM really we need only handle permissions change that modifies placeholders
     rebuildSubjectTree(subject);
     cleanupRecorders();
+}
+
+void QnResourceTreeModelUserNodes::handleUserEnabledChanged(const QnUserResourcePtr& user)
+{
+    if (user->isEnabled())
+        ensureSubjectNode(user);
+    else if (m_users.contains(user->getId()))
+        removeNode(m_users.take(user->getId()));
 }

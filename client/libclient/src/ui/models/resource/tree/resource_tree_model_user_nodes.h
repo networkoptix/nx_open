@@ -6,12 +6,14 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/connective.h>
+
 /**
  * Helper class for constructing users and roles part of the resource tree.
  */
-class QnResourceTreeModelUserNodes: public QObject, public QnWorkbenchContextAware
+class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnWorkbenchContextAware
 {
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 public:
     QnResourceTreeModelUserNodes(QObject* parent = nullptr);
     virtual ~QnResourceTreeModelUserNodes();
@@ -47,6 +49,10 @@ private:
     /** Get or create user node. */
     QnResourceTreeModelNodePtr ensureUserNode(const QnUserResourcePtr& user);
 
+    /** Get or create shared resource node if needed. */
+    QnResourceTreeModelNodePtr ensureResourceNode(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource);
+
     /** Get or create layout node. */
     QnResourceTreeModelNodePtr ensureLayoutNode(const QnResourceAccessSubject& subject,
         const QnLayoutResourcePtr& layout);
@@ -79,6 +85,7 @@ private:
 
     void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
     void handleGlobalPermissionsChanged(const QnResourceAccessSubject& subject);
+    void handleUserEnabledChanged(const QnUserResourcePtr& user);
 private:
     QnResourceTreeModel* m_model;
 
@@ -97,11 +104,8 @@ private:
     /** Mapping of placeholder nodes by subject id. */
     QHash<QnUuid, NodeList> m_placeholders;
 
-    /** Mapping of shared layouts links by subject id. */
-    QHash<QnUuid, NodeList> m_sharedLayouts;
-
-    /** Mapping of shared resources (cameras, web pages, statistics) by subject id. */
-    QHash<QnUuid, NodeList> m_sharedResources;
+    /** Mapping of shared layouts links and shared resources by subject id. */
+    QHash<QnUuid, NodeList> m_shared;
 
     /** Mapping for recorder nodes by parent node. */
     QHash<QnResourceTreeModelNodePtr, RecorderHash> m_recorders;
