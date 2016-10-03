@@ -412,7 +412,7 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
-    template<int FilterFieldCount = 0>
+    template<std::size_t FilterFieldCount = 0>
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* queryContext,
         const std::string& systemId,

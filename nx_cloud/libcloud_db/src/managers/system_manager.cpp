@@ -1838,7 +1838,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     return db::DBResult::ok;
 }
 
-template<int FilterFieldCount>
+template<std::size_t FilterFieldCount>
 nx::db::DBResult SystemManager::deleteSharing(
     nx::db::QueryContext* queryContext,
     const std::string& systemId,
