@@ -35,6 +35,14 @@ QnAdamModbusIOManager::QnAdamModbusIOManager(QnResource* resource) :
     m_networkFaultsCounter(0)
 {
     initializeIO();
+
+    Qn::directConnect(
+        &m_client, &nx_modbus::QnModbusAsyncClient::done, 
+        this, &QnAdamModbusIOManager::routeMonitoringFlow);
+
+    Qn::directConnect(
+        &m_client, &nx_modbus::QnModbusAsyncClient::error, 
+        this, &QnAdamModbusIOManager::handleMonitoringError);
 }
 
 QnAdamModbusIOManager::~QnAdamModbusIOManager()
@@ -88,7 +96,8 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     m_client.setEndpoint(endpoint);
     m_outputClient.setEndpoint(endpoint);
 
-    fetchAllPortStatesUnsafe();
+    lock.unlock();
+    fetchAllPortStates();
 
     return true;
 }
@@ -258,8 +267,9 @@ bool QnAdamModbusIOManager::initializeIO()
     return true;
 }
 
-void QnAdamModbusIOManager::fetchAllPortStatesUnsafe()
+void QnAdamModbusIOManager::fetchAllPortStates()
 {
+    QnMutexLocker lock(&m_mutex);
     if (m_inputs.empty() || m_outputs.empty())
         return;
 

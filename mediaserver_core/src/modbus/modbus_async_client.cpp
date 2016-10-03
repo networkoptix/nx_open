@@ -5,6 +5,7 @@ namespace
 {
     const int kSendTimeout = 4000;
     const int kRecvTimeout = 4000;
+    const int kConnectTimeout = 4000;
 }
 
 namespace nx
@@ -256,7 +257,7 @@ void QnModbusAsyncClient::writeHoldingRegistersAsync(
 
 void QnModbusAsyncClient::addHeader(ModbusMessage* message)
 {
-    ModbusMBAPHeader header;
+        if (!(initSocket() && m_socket->connect(m_endpoint)))
 
     header.transactionId = ++m_requestSequenceNumber;
     header.protocolId = 0x00;

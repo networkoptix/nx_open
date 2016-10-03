@@ -173,12 +173,6 @@ public:
     QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;
     QString cameraUniqueId() const;
 
-    void setLastSyncTime(int64_t);
-    int64_t getLastSyncTime() const;
-
-    // This should be called without m_mutex locked
-    int64_t getLastSyncTimeFromDBNoLock() const;
-
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 

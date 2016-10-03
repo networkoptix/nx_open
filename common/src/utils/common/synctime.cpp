@@ -107,9 +107,9 @@ void QnSyncTime::updateTime(qint64 newTime)
 
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
+    const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
     QnMutexLocker lock( &m_mutex );
 
-    const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
     if (
         (
             m_lastReceivedTime == 0 
@@ -142,5 +142,5 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         return time;
     }
     else
-        return QDateTime::currentMSecsSinceEpoch();
+        return localTime;
 }
