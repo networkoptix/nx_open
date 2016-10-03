@@ -104,21 +104,18 @@ void QnSharedLayoutAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 }
 
 void QnSharedLayoutAccessProvider::handleSharedResourcesChanged(
-    const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
+    const QnResourceAccessSubject& subject,
+    const QSet<QnUuid>& oldValues,
+    const QSet<QnUuid>& newValues)
 {
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;
 
-    auto accessible = this->accessible(subject);
-    auto added = resourceIds - accessible;
-    auto removed = accessible - resourceIds;
-
-    auto changed = (resourceIds | accessible) - (resourceIds & accessible);
-    NX_ASSERT(changed == (added + removed));
+    auto changed = (newValues | oldValues) - (newValues & oldValues);
 
     QSet<QnUuid> changedResources;
-    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(added + removed);
+    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(changed);
     for (const auto& layout : sharedLayouts)
     {
         if (!layout->isShared())

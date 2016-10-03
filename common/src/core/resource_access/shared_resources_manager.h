@@ -35,7 +35,7 @@ private:
 
 signals:
     void sharedResourcesChanged(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& resourceIds);
+        const QSet<QnUuid>& oldValues, const QSet<QnUuid>& newValues);
 
 private:
     mutable QnMutex m_mutex;

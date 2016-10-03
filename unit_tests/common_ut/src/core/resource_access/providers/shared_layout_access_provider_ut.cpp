@@ -115,6 +115,22 @@ TEST_F(QnSharedLayoutAccessProviderTest, layoutMadeShared)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnSharedLayoutAccessProviderTest, layoutStopSharing)
+{
+    auto target = addCamera();
+    auto user = addUser(Qn::NoGlobalPermissions);
+    auto layout = addLayout();
+
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    layout->addItem(item);
+
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>());
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnSharedLayoutAccessProviderTest, layoutItemAdded)
 {
     auto target = addCamera();

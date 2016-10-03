@@ -9,6 +9,12 @@
 
 #include <core/resource/user_resource.h>
 
+namespace {
+
+static const QSet<QnUuid> kEmpty;
+
+}
+
 QnSharedResourcesManager::QnSharedResourcesManager(QObject* parent):
     base_type(parent),
     m_mutex(QnMutex::NonRecursive),
@@ -31,10 +37,10 @@ QnSharedResourcesManager::~QnSharedResourcesManager()
 
 void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
 {
-    QHash<QnUuid, QSet<QnUuid> > oldValues;
+    QHash<QnUuid, QSet<QnUuid> > oldValuesMap;
     {
         QnMutexLocker lk(&m_mutex);
-        oldValues = m_sharedResources;
+        oldValuesMap = m_sharedResources;
         m_sharedResources.clear();
         for (const auto& item : accessibleResourcesList)
         {
@@ -46,9 +52,10 @@ void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessi
 
     for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
     {
+        auto oldValues = oldValuesMap.value(subject.id());
         auto newValues = sharedResources(subject);
-        if (oldValues[subject.id()] != newValues)
-            emit sharedResourcesChanged(subject, newValues);
+        if (oldValues != newValues)
+            emit sharedResourcesChanged(subject, oldValues, newValues);
     }
 }
 
@@ -79,14 +86,16 @@ void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject&
 void QnSharedResourcesManager::setSharedResourcesInternal(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {
+    QSet<QnUuid> oldValue;
     {
         QnMutexLocker lk(&m_mutex);
         auto& value = m_sharedResources[subject.id()];
         if (value == resources)
             return;
+        oldValue = value;
         value = resources;
     }
-    emit sharedResourcesChanged(subject, resources);
+    emit sharedResourcesChanged(subject, oldValue, resources);
 }
 
 void QnSharedResourcesManager::handleResourceAdded(const QnResourcePtr& resource)
@@ -95,7 +104,7 @@ void QnSharedResourcesManager::handleResourceAdded(const QnResourcePtr& resource
     {
         auto resources = sharedResources(user);
         if (!resources.isEmpty())
-            emit sharedResourcesChanged(user, resources);
+            emit sharedResourcesChanged(user, kEmpty, resources);
     }
 }
 
@@ -109,25 +118,29 @@ void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupD
 {
     auto resources = sharedResources(userRole);
     if (!resources.isEmpty())
-        emit sharedResourcesChanged(userRole, resources);
+        emit sharedResourcesChanged(userRole, kEmpty, resources);
 }
 
 void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
     handleSubjectRemoved(userRole);
     for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
-        setSharedResourcesInternal(subject, QSet<QnUuid>());
+        setSharedResourcesInternal(subject, kEmpty);
 }
 
 void QnSharedResourcesManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
+    QSet<QnUuid> oldValue;
     auto id = subject.id();
     {
         QnMutexLocker lk(&m_mutex);
         if (!m_sharedResources.contains(id))
             return;
+        oldValue = m_sharedResources.value(id);
         m_sharedResources.remove(id);
     }
-    emit sharedResourcesChanged(subject, QSet<QnUuid>());
+
+    if (!oldValue.isEmpty())
+        emit sharedResourcesChanged(subject, oldValue, kEmpty);
 }
 
