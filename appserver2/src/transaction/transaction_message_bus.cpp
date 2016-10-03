@@ -534,7 +534,7 @@ bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRunt
 
 void QnTransactionMessageBus::at_gotTransaction(
     Qn::SerializationFormat tranFormat,
-    const QByteArray &serializedTran,
+    QByteArray serializedTran,
     const QnTransactionTransportHeader &transportHeader)
 {
     QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
@@ -563,7 +563,7 @@ void QnTransactionMessageBus::at_gotTransaction(
     using namespace std::placeholders;
     if (!handleTransaction(
         tranFormat,
-        serializedTran,
+        std::move(serializedTran),
         std::bind(GotTransactionFuction(), this, _1, sender, transportHeader),
         [](Qn::SerializationFormat, const QByteArray&) { return false; }))
     {
