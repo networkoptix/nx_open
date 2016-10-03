@@ -171,7 +171,7 @@ bool QnStorageDb::open(const QString& fileName)
         ((bool)m_storage && m_storage->getStorageType() == 
                             QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition));
 
-    if (isDbOnLocalStorage && !MSSettings::roSettings()->value(nx_ms_conf::DISABLE_STORAGE__DB_OPTIMIZATION).toInt())
+    if (isDbOnLocalStorage && !MSSettings::roSettings()->value(nx_ms_conf::DISABLE_STORAGE_DB_OPTIMIZATION).toInt())
     {
         if (!tuneDBAfterOpen())
             NX_LOG(lit("Tuning storage DB for storage %1 failed").arg(m_storage->getUrl()), cl_logWARNING);
