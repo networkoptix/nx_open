@@ -749,5 +749,43 @@ TEST_F(System, sortingOrderNewSystemIsOnTop)
     }
 }
 
+TEST_F(System, sortingOrderPersistenceAfterSharingUpdate)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account1);
+    const auto account2 = addActivatedAccount2();
+    const auto system2 = addRandomSystemToAccount(account2);
+
+    shareSystem2(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+
+    std::list<std::string> systemIdsInSortOrder;
+    systemIdsInSortOrder.push_back(system1.id);
+    systemIdsInSortOrder.push_back(system2.id);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        const bool updateSharing = i == 1;
+        const bool needRestart = i == 2;
+        if (updateSharing)
+            shareSystem2(account1, system1, account2, api::SystemAccessRole::advancedViewer);
+        if (needRestart)
+            restart();
+
+        std::vector<api::SystemDataEx> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(account2.data.email, account2.password, &systems));
+        std::sort(
+            systems.begin(), systems.end(),
+            [](const api::SystemDataEx& one, const api::SystemDataEx& two)
+            {
+                return one.usageFrequency > two.usageFrequency; //< Descending sort.
+            });
+        validateSystemsOrder(systemIdsInSortOrder, systems);
+    }
+}
+
 } // namespace cdb
 } // namespace nx
