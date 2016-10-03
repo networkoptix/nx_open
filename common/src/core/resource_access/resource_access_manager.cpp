@@ -61,13 +61,36 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
 void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource, Qn::Permissions permissions)
 {
+    if (!subject.isValid())
+        return;
+
+    auto isValid = [&]
     {
+        if (!resource->resourcePool())
+            return false;
+
+        if (subject.user())
+            return subject.user()->resourcePool() != nullptr;
+
+        return qnUserRolesManager->hasRole(subject.role().id);
+    };
+
+    PermissionKey key(subject.id(), resource->getId());
+    if (isValid())
+    {
+        /* Store permissions in cache */
         QnMutexLocker lk(&m_mutex);
-        PermissionKey key(subject.id(), resource->getId());
         auto& value = m_permissionsCache[key];
         if (value == permissions)
             return;
         value = permissions;
+    }
+    else
+    {
+        /* Just check if need to send the signal */
+        QnMutexLocker lk(&m_mutex);
+        if (m_permissionsCache.value(key) == permissions)
+            return;
     }
     emit permissionsChanged(subject, resource, permissions);
 }

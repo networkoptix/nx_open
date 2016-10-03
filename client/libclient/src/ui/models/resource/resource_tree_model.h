@@ -80,7 +80,7 @@ private:
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
 
     /** Update 'All cameras' / 'Cameras and resources'/ etc per-user placeholder nodes. */
-    void updatePlaceholderNodesForUserOrRole(const QnUuid& id);
+    void updatePlaceholderNodes(const QnResourceAccessSubject& subject);
 
     void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
     void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
