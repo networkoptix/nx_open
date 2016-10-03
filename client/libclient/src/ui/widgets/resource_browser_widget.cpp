@@ -451,7 +451,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const
             break;
             case Qn::ResourceNode:
             case Qn::SharedLayoutNode:
-            case Qn::AccessibleResourceNode:
+            case Qn::SharedResourceNode:
             case Qn::EdgeNode:
             {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -636,8 +636,8 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
         case Qn::LayoutsNode:
             user = context()->user();
             break;
-        case Qn::AccessibleResourcesNode:
-        case Qn::AccessibleLayoutsNode:
+        case Qn::SharedResourcesNode:
+        case Qn::SharedLayoutsNode:
             user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
             roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
             break;

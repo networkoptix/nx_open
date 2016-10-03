@@ -57,6 +57,9 @@ public:
 
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
+
+    Scope scope() const;
+
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
@@ -67,28 +70,12 @@ private:
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
     QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
-    QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnUuid& owner, const QnLayoutResourcePtr& sharedLayout);
-    QnResourceTreeModelNodePtr ensureAccessibleResourceNode(const QnUuid& owner, const QnResourcePtr& resource);
-    QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnUuid& owner, Qn::NodeType nodeType);
-    QnResourceTreeModelNodePtr ensureRoleNode(const QnUuid& roleId);
-
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
-
-    /** Update 'All cameras' / 'Cameras and resources'/ etc per-user placeholder nodes. */
-    void updatePlaceholderNodes(const QnResourceAccessSubject& subject);
-
-    void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
-    void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
-    void updateAccessibleResourcesForUser(const QnUserResourcePtr& user);
-    void updateSharedLayoutNodesForRole(const QnUuid& id);
-    void updateAccessibleResourcesForRole(const QnUuid& id);
-    void updateRoleNodes();
-    void updateUserSubNodes(const QnUserResourcePtr& user);
 
     Qn::NodeType rootNodeTypeForScope() const;
 
@@ -146,11 +133,6 @@ private slots:
 private:
     friend class QnResourceTreeModelNode;
 
-    typedef QHash<QString, QnResourceTreeModelNodePtr> RecorderHash;
-    typedef QHash<QnUuid, QnResourceTreeModelNodePtr> ItemHash;
-    typedef QHash<QnResourcePtr, QnResourceTreeModelNodePtr> ResourceHash;
-    typedef QList<QnResourceTreeModelNodePtr> NodeList;
-
     /** Root nodes array */
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
 
@@ -165,29 +147,17 @@ private:
 
     /** Mapping for all nodes by resource (for quick update). */
     QHash<QnResourcePtr, NodeList> m_nodesByResource;
-    /** Debug variable for VMS-3589. */
-    bool m_iteratingOverNodesByResource = false;    //TODO: #GDM #high remove before release
 
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
-
-    /** Mapping of placeholder nodes by owner (user or role). */
-    QHash<QnUuid, NodeList> m_placeholderNodesByOwner;
-
-    /** Mapping of role nodes by id. */
-    QHash<QnUuid, QnResourceTreeModelNodePtr> m_roleNodeById;
-
-    /** Mapping of shared layouts links by owner (user or role). */
-    QHash<QnUuid, ResourceHash> m_sharedLayoutNodesByOwner;
-
-    /** Mapping of accessible resources (cameras and web pages) by owner (user or role). */
-    QHash<QnUuid, ResourceHash> m_accessibleResourceNodesByOwner;
 
     /** Full list of all created nodes. */
     QList<QnResourceTreeModelNodePtr> m_allNodes;
 
     /** Delegate for custom column data. */
     QPointer<QnResourceTreeModelCustomColumnDelegate> m_customColumnDelegate;
+
+    QScopedPointer<QnResourceTreeModelUserNodes> m_userNodes;
 
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;

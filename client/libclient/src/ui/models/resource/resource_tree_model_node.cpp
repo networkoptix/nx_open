@@ -45,8 +45,8 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::SystemNode
         << Qn::RoleUsersNode
         << Qn::LayoutsNode
-        << Qn::AccessibleLayoutsNode
-        << Qn::AccessibleResourcesNode
+        << Qn::SharedLayoutsNode
+        << Qn::SharedResourcesNode
         << Qn::RoleUsersNode
         ;
     return result.contains(nodeType);
@@ -141,7 +141,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
         m_state = Invalid;
         break;
-    case Qn::AccessibleResourcesNode:
+    case Qn::SharedResourcesNode:
         m_displayName = m_name = tr("Cameras && Resources");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
         m_state = Invalid;
@@ -193,7 +193,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
     NX_ASSERT(nodeType == Qn::ResourceNode
         || nodeType == Qn::EdgeNode
         || nodeType == Qn::SharedLayoutNode
-        || nodeType == Qn::AccessibleResourceNode
+        || nodeType == Qn::SharedResourceNode
     );
     m_state = Invalid;
     m_status = Qn::Offline;
@@ -220,8 +220,12 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
             m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
             break;
         case Qn::RoleNode:
+        {
             m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+            auto role = qnUserRolesManager->userRole(m_uuid);
+            m_displayName = m_name = role.name;
             break;
+        }
         default:
             break;
     }
@@ -232,16 +236,16 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
 
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
+    if (m_resource == resource)
+        return;
+
     NX_ASSERT(m_type == Qn::LayoutItemNode
         || m_type == Qn::ResourceNode
         || m_type == Qn::VideoWallItemNode
         || m_type == Qn::EdgeNode
         || m_type == Qn::SharedLayoutNode
-        || m_type == Qn::AccessibleResourceNode
+        || m_type == Qn::SharedResourceNode
     );
-
-    if (m_resource == resource)
-        return;
 
     m_resource = resource;
     update();
@@ -256,7 +260,7 @@ void QnResourceTreeModelNode::update()
         case Qn::LayoutItemNode:
         case Qn::EdgeNode:
         case Qn::SharedLayoutNode:
-        case Qn::AccessibleResourceNode:
+        case Qn::SharedResourceNode:
         {
             if (!m_resource)
             {
@@ -336,7 +340,7 @@ void QnResourceTreeModelNode::update()
             m_displayName = m_name = role.name;
             break;
         }
-        case Qn::AccessibleLayoutsNode:
+        case Qn::SharedLayoutsNode:
         {
             if (m_parent && m_parent->type() == Qn::RoleNode)
             {
@@ -386,7 +390,7 @@ Qn::ResourceFlags QnResourceTreeModelNode::resourceFlags() const
     return m_flags;
 }
 
-const QnUuid& QnResourceTreeModelNode::uuid() const
+QnUuid QnResourceTreeModelNode::uuid() const
 {
     return m_uuid;
 }
@@ -432,10 +436,10 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::VideoWallMatrixNode:
         case Qn::AllCamerasAccessNode:
         case Qn::AllLayoutsAccessNode:
-        case Qn::AccessibleResourcesNode:
-        case Qn::AccessibleLayoutsNode:
+        case Qn::SharedResourcesNode:
+        case Qn::SharedLayoutsNode:
         case Qn::RoleUsersNode:
-        case Qn::AccessibleResourceNode:
+        case Qn::SharedResourceNode:
         case Qn::RoleNode:
             return false;
 
@@ -683,7 +687,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     case Qn::EdgeNode:
     case Qn::LayoutItemNode:
     case Qn::SharedLayoutNode:
-    case Qn::AccessibleResourceNode:
+    case Qn::SharedResourceNode:
         if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;

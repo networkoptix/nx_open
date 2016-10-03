@@ -57,6 +57,7 @@ public:
     Qn::NodeType type() const ;
     QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
+    QnUuid uuid() const;
 
     QList<QnResourceTreeModelNodePtr> children() const;
     QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
@@ -88,7 +89,7 @@ protected:
 private:
     QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
 
-    const QnUuid &uuid() const;
+
     bool isValid() const;
     State state() const;
     void setState(State state);
