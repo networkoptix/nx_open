@@ -35,7 +35,7 @@ void TimeServerProcess::pleaseStop()
 }
 
 void TimeServerProcess::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
+    nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> handler)
 {
     m_startedEventHandler = std::move(handler);
 }
