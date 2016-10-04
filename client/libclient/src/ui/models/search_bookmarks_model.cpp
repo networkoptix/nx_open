@@ -118,9 +118,9 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     m_filter.orderBy = QnSearchBookmarksModel::defaultSortOrder();
 
     connect(&m_cameraNamesWatcher, &utils::QnCameraNamesWatcher::cameraNameChanged, this
-        , [this](const QString &cameraUuid)
+        , [this](/*const QString &cameraUuid*/)
     {
-        Q_UNUSED(cameraUuid);
+//        Q_UNUSED(cameraUuid);
 
         const auto topIndex = m_owner->index(0);
         const auto bottomIndex = m_owner->index(m_bookmarks.size() - 1);

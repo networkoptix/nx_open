@@ -32,10 +32,6 @@ protected:
 
     virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data) override;
     virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data) override;
-
-private slots:
-    void at_systemNameChangeRequested(const QString &systemName);
-
 private:
     QnClientConnectionStatus m_status;
     bool m_connected;

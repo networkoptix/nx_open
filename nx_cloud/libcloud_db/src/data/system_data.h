@@ -22,6 +22,15 @@
 
 namespace nx {
 namespace cdb {
+
+namespace api {
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (SystemSharingEx),
+    (sql_record));
+
+} // namespace api
+
 namespace data {
 
 class SubscriptionData

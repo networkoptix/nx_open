@@ -13,6 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 #include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include <utils/common/value_cache.h>
 
 class QSettings;
 struct AdminPasswordData
@@ -80,9 +81,6 @@ public:
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }
 
-    void setLocalSystemName(const QString& value);
-    QString localSystemName() const;
-
     void setReadOnly(bool value);
     bool isReadOnly() const;
 
@@ -107,8 +105,8 @@ public:
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
 
-    void setModuleInformation(const QnModuleInformation &moduleInformation);
-    QnModuleInformation moduleInformation() const;
+    void setModuleInformation(const QnModuleInformation& moduleInformation);
+    QnModuleInformation moduleInformation();
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
@@ -119,20 +117,20 @@ public:
     void setLocalPeerType(Qn::PeerType peerType);
     Qn::PeerType localPeerType() const;
 
-    void updateModuleInformation();
-
 signals:
-    void systemNameChanged(const QString &systemName);
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
-
+private slots:
+    void resetCachedValue();
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
-
 private:
+    void updateModuleInformationUnsafe();
+private:
+    bool m_dirty;
     QnResourceDataPool *m_dataPool;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;

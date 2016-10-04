@@ -23,6 +23,7 @@
 #include <utils/merge_systems_tool.h>
 #include <utils/common/util.h>
 #include <utils/common/app_info.h>
+#include <api/global_settings.h>
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     base_type(parent),
@@ -114,7 +115,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
     {
         QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
-        QString systemName = server->getSystemName();
+        QString systemName = server->getModuleInformation().systemName;
         if (!systemName.isEmpty())
             label += lit(" (%1)").arg(systemName);
 
@@ -123,8 +124,8 @@ void QnMergeSystemsDialog::updateKnownSystems()
 
     ui->urlComboBox->setCurrentText(QString());
 
-    ui->currentSystemLabel->setText(tr("You are about to merge the current system %1 with the system").arg(qnCommon->localSystemName()));
-    ui->currentSystemRadioButton->setText(tr("%1 (current)").arg(qnCommon->localSystemName()));
+    ui->currentSystemLabel->setText(tr("You are about to merge the current system %1 with the system").arg(qnGlobalSettings->systemName()));
+    ui->currentSystemRadioButton->setText(tr("%1 (current)").arg(qnGlobalSettings->systemName()));
 }
 
 void QnMergeSystemsDialog::updateErrorLabel(const QString &error) {
@@ -221,7 +222,8 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     case QnMergeSystemsTool::StarterLicenseError:
     {
         QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
-        if (server && server->getStatus() == Qn::Online && moduleInformation.systemName == qnCommon->localSystemName()) {
+        if (server && server->getStatus() == Qn::Online && moduleInformation.localSystemId == qnGlobalSettings->localSystemId())
+        {
             if (m_url.host() == lit("localhost") || m_url.host() == lit("127.0.0.1"))
                 updateErrorLabel(tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));
             else
@@ -302,7 +304,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
             break;
         case QnMergeSystemsTool::notLocalOwner:
             /* User type is just 'cloud'. */
-            message = tr("Taking remote settings is not allowed because system owner is cloud user."); 
+            message = tr("Taking remote settings is not allowed because system owner is cloud user.");
             break;
         case QnMergeSystemsTool::BackupError:
             message = tr("Could not create a backup of the server database.");

@@ -36,7 +36,7 @@ private:
 
     bool applyRemoteSettings(
         const QUrl &remoteUrl,
-        const QString &systemName,
+        const QnUuid& systemId,
         const QString& getKey,
         const QString& postKey,
         const QnRestConnectionProcessor* owner);

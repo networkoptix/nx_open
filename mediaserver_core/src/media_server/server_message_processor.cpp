@@ -119,15 +119,15 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
         this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
-    connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-            this, [this](const QString &systemName, qint64 sysIdTime, ec2::Timestamp tranLogTime)
+    connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
+            this, [this](const QnUuid& systemId, qint64 sysIdTime, ec2::Timestamp tranLogTime)
                   {
                       ConfigureSystemData configSystemData;
-                      configSystemData.systemName = systemName;
+                      configSystemData.localSystemId = systemId;
                       configSystemData.sysIdTime = sysIdTime;
                       configSystemData.tranLogTime = tranLogTime;
                       configSystemData.wholeSystem = true;
-                      changeSystemName(configSystemData);
+                      changeLocalSystemId(configSystemData);
                   });
 }
 

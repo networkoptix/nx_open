@@ -7,15 +7,16 @@
 
 namespace ec2 {
 
-    struct ApiSystemNameData : ApiData {
-        ApiSystemNameData(): sysIdTime(0) {}
-        ApiSystemNameData(const QString &systemName): systemName(systemName), sysIdTime(0) {}
+    struct ApiSystemIdData: ApiData
+    {
+        ApiSystemIdData(): sysIdTime(0) {}
+        ApiSystemIdData(const QString &systemId): systemId(systemId), sysIdTime(0) {}
 
-        QString systemName;
+        QnUuid systemId;
         qint64 sysIdTime;
         Timestamp tranLogTime;
     };
-    #define ApiSystemNameData_Fields (systemName)(sysIdTime)(tranLogTime)
+    #define ApiSystemIdData_Fields (systemId)(sysIdTime)(tranLogTime)
 
 } // namespace ec2
 

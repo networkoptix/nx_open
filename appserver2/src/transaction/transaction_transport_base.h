@@ -201,7 +201,7 @@ public:
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
-        const QByteArray &data,
+        QByteArray data,
         const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
     void remotePeerUnauthorized(const QnUuid& id);

@@ -162,9 +162,9 @@ void QnUpdateBookmarkRequestData::loadFromParams(const QnRequestParamList& param
         params.toHash(),
         {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
     if (!camera)
-        bookmark.cameraId = QString();
+        bookmark.cameraId = QnUuid();
     else
-        bookmark.cameraId = camera->getId().toString();
+        bookmark.cameraId = camera->getId();
 
     bookmark.tags = params.allValues(kTagParam).toSet();
 }
@@ -179,7 +179,7 @@ QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
     result.insert(kTimeoutParam, QnLexical::serialized(bookmark.timeout));
     result.insert(kStartTimeParam, QnLexical::serialized(bookmark.startTimeMs));
     result.insert(kDurationParam, QnLexical::serialized(bookmark.durationMs));
-    result.insert(kCameraIdParam, bookmark.cameraId);
+    result.insert(kCameraIdParam, bookmark.cameraId.toString());
     for (const QString& tag: bookmark.tags)
         result.insert(kTagParam, tag);
 

@@ -285,6 +285,38 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::chrono::T
 QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(seconds)
 QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(milliseconds)
 QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(microseconds)
+
+/**
+ * Representing system_clock::time_point in json as milliseconds since epoch (1970-01-01T00:00).
+ */
+inline void serialize(
+    QnJsonContext*,
+    const std::chrono::system_clock::time_point& value,
+    QJsonValue* target)
+{
+    using namespace std::chrono;
+
+    const auto millisSinceEpoch =
+        duration_cast<milliseconds>(value.time_since_epoch()).count();
+    *target = QJsonValue(QString::number(millisSinceEpoch));
+}
+
+inline bool deserialize(
+    QnJsonContext*,
+    const QJsonValue& value,
+    std::chrono::system_clock::time_point* target)
+{
+    if (value.type() != QJsonValue::String)
+        return false;
+
+    const auto millisSinceEpoch = value.toVariant().toULongLong();
+    // Initializing with epoch.
+    *target = std::chrono::system_clock::time_point();
+    // Adding milliseconds since epoch.
+    *target += std::chrono::milliseconds(millisSinceEpoch);
+    return true;
+}
+
 #endif
 
 #define QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(TYPE)                    \

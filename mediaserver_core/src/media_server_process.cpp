@@ -961,6 +961,8 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     if (sender != qnCommon->moduleGUID())
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
+        // If system Id has been changed, reset 'database restore time' variable
+        nx::ServerSetting::setSysIdTime(0);
         saveAdminPswdHash();
         restartServer(0);
     }
@@ -1361,7 +1363,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     processor->startReceivingLocalNotifications(connection);
 }
 
-void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudConnectionManager)
+void MediaServerProcess::resetCloudParams(CloudConnectionManager& cloudConnectionManager)
 {
     while (1)
     {
@@ -1379,7 +1381,7 @@ void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudCon
             qWarning() << "Enable admin user and reset its password to default value due to automatic cloud disconnect and admin user was disabled";
         }
 
-        if (!cloudConnectionManager->cleanUpCloudDataInLocalDb())
+        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
         {
             qWarning() << "Error while clearing cloud information. Traying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1602,7 +1604,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // deprecated
     QnRestProcessorPool::instance()->registerHandler("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalAdvancedViewerPermissionSet); // new version
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getSystemName", new QnGetSystemNameRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getSystemId", new QnGetSystemIdRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler(), Qn::GlobalAdminPermission);
@@ -1714,7 +1716,7 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
     auto mapper = std::make_unique<nx_upnp::PortMapper>();
 
     const auto configValue = MSSettings::roSettings()->value(
-        QnGlobalSettings::kNameUpnpPortMappingEnabled);
+        nx::settings_names::kNameUpnpPortMappingEnabled);
 
     if (!configValue.isNull())
     {
@@ -1770,6 +1772,33 @@ QHostAddress MediaServerProcess::getPublicAddress()
 void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGuidList)
 {
     m_hardwareGuidList = hardwareGuidList;
+}
+
+void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager)
+{
+    nx::SystemName systemName;
+    systemName.loadFromConfig();
+
+    if (!qnGlobalSettings->systemName().isEmpty())
+    {
+        systemName.clear();
+        systemName.saveToConfig(); //< remove from config file
+        return; //< systemName already in database
+    }
+
+    if (systemName.value().isEmpty())
+        systemName.resetToDefault(); //< generate default value
+
+    // move data from config
+    qnGlobalSettings->setSystemName(systemName.value());
+
+    if (systemName.isDefault())
+        resetCloudParams(cloudConnectionManager);
+
+    qnGlobalSettings->setLocalSystemId(systemName.isDefault() ? QnUuid() : QnUuid::createUuid());
+
+    systemName.clear();
+    systemName.saveToConfig(); //< remove from config file
 }
 
 void MediaServerProcess::run()
@@ -1935,25 +1964,6 @@ void MediaServerProcess::run()
     if (!m_publicAddress.isNull())
         serverFlags |= Qn::SF_HasPublicIP;
 
-    nx::SystemName systemName;
-    systemName.loadFromConfig();
-
-    // If system name has been changed, reset 'database restore time' variable
-    if (systemName.value() != systemName.prevValue())
-    {
-        if (!systemName.prevValue().isEmpty())
-            nx::ServerSetting::setSysIdTime(0);
-        systemName.saveToConfig(); //< update prevValue
-    }
-
-    if (systemName.value().isEmpty())
-    {
-        systemName.resetToDefault();
-        nx::ServerSetting::setSysIdTime(0);
-        systemName.saveToConfig();
-    }
-
-    qnCommon->setLocalSystemName(systemName.value());
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
@@ -2040,10 +2050,11 @@ void MediaServerProcess::run()
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &MediaServerProcess::at_databaseDumped);
     qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
-    if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
+    if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
+    {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
         nx::SystemName systemName(connectInfo.systemName);
-        systemName.saveToConfig();
+        systemName.saveToConfig(); //< migrate system name from foreign database via config
         nx::ServerSetting::setSysIdTime(0);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
@@ -2159,7 +2170,6 @@ void MediaServerProcess::run()
             if (!noSetupWizardFlag)
                 isNewServerInstance = true;
         }
-        server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
         server->setServerFlags((Qn::ServerFlags) serverFlags);
 
@@ -2189,6 +2199,13 @@ void MediaServerProcess::run()
         for (const auto& host : m_localAddresses )
             serverAddresses << SocketAddress(host.toString(), port);
 
+        // used for statistics reported
+        if (server->getSystemInfo() != QnSystemInformation::currentSystemInformation())
+        {
+            server->setSystemInfo(QnSystemInformation::currentSystemInformation());
+            isModified = true;
+        }
+
         if (server->getNetAddrList() != serverAddresses) {
             server->setNetAddrList(serverAddresses);
             isModified = true;
@@ -2196,14 +2213,6 @@ void MediaServerProcess::run()
                    .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
         }
 
-        bool needUpdateAuthKey = false;
-        if (server->getSystemName() != qnCommon->localSystemName())
-        {
-            if (!server->getSystemName().isEmpty())
-                needUpdateAuthKey = true;
-            server->setSystemName(qnCommon->localSystemName());
-            isModified = true;
-        }
         if (server->getVersion() != qnCommon->engineVersion()) {
             server->setVersion(qnCommon->engineVersion());
             isModified = true;
@@ -2213,7 +2222,7 @@ void MediaServerProcess::run()
         QByteArray authKey = settingsAuthKey;
         if (authKey.isEmpty())
             authKey = server->getAuthKey().toLatin1();
-        if (authKey.isEmpty() || needUpdateAuthKey)
+        if (authKey.isEmpty())
             authKey = QnUuid::createUuid().toString().toLatin1();
 
         if (server->getAuthKey().toLatin1() != authKey) {
@@ -2298,7 +2307,12 @@ void MediaServerProcess::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation = m_mediaServer->getModuleInformation();
+    QnModuleInformation selfInformation;
+    selfInformation.id = qnCommon->moduleGUID();
+    selfInformation.type = QnModuleInformation::nxMediaServerId();
+    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+
     selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
     selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
@@ -2312,7 +2326,7 @@ void MediaServerProcess::run()
 
     // show our cloud host value in registry in case of installer will check it
     MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey,
-        qnGlobalSettings->cloudSystemID().isEmpty() ? "no" : "yes");
+        qnGlobalSettings->cloudSystemId().isEmpty() ? "no" : "yes");
     MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
 
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
@@ -2367,6 +2381,8 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
+    migrateSystemNameFromConfig(cloudConnectionManager);
+
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
@@ -2374,13 +2390,12 @@ void MediaServerProcess::run()
     {
         bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
             qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
-        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemID().isEmpty();
+        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
         if (isNewServerInstance ||
-            systemName.isDefault() ||
             (isCloudInstanceChanged && isConnectedToCloud))
         {
-            resetCloudParams(&cloudConnectionManager);
-            qnGlobalSettings->setNewSystem(true);
+            resetCloudParams(cloudConnectionManager);
+            qnGlobalSettings->setLocalSystemId(QnUuid()); //< go to new state
         }
         if (isCloudInstanceChanged)
         {
@@ -2404,7 +2419,6 @@ void MediaServerProcess::run()
     updateAddressesList();
 
     qnGlobalSettings->takeFromSettings(MSSettings::roSettings(), m_mediaServer);
-    qnCommon->updateModuleInformation();
 
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {

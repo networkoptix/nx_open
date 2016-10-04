@@ -1,6 +1,7 @@
 #ifndef QN_SERIALIZATION_SQL_FUNCTIONS_H
 #define QN_SERIALIZATION_SQL_FUNCTIONS_H
 
+#include <chrono>
 #include <string>
 
 #include <nx/utils/uuid.h>
@@ -97,6 +98,25 @@ inline void serialize_field(const QnUuid &value, QVariant *target) {
 
 inline void deserialize_field(const QVariant &value, QnUuid *target) {
     *target = QnUuid::fromRfc4122(value.value<QByteArray>());
+}
+
+/**
+ * Representing system_clock::time_point in SQL as milliseconds since epoch (1970-01-01T00:00).
+ */
+inline void serialize_field(const std::chrono::system_clock::time_point& value, QVariant* target) {
+    using namespace std::chrono;
+
+    const auto millisSinceEpoch =
+        duration_cast<milliseconds>(value.time_since_epoch()).count();
+    *target = QVariant::fromValue<qulonglong>(millisSinceEpoch);
+}
+
+inline void deserialize_field(const QVariant& value, std::chrono::system_clock::time_point* target) {
+    const auto millisSinceEpoch = value.toULongLong();
+    // Initializing with epoch.
+    *target = std::chrono::system_clock::time_point();
+    // Adding milliseconds since epoch.
+    *target += std::chrono::milliseconds(millisSinceEpoch);
 }
 
 

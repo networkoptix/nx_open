@@ -19,6 +19,7 @@
 #include <utils/common/util.h>
 #include <utils/common/systemerror.h>
 #include <http/custom_headers.h>
+#include <api/global_settings.h>
 
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
@@ -519,8 +520,8 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
 
     if (m_localPeer.isServer() && QnCommonModule::instance())
         m_httpClient->addAdditionalHeader(
-            Qn::EC2_SYSTEM_NAME_HEADER_NAME,
-            QnCommonModule::instance()->localSystemName().toUtf8());
+            Qn::EC2_SYSTEM_ID_HEADER_NAME,
+            qnGlobalSettings->localSystemId().toByteArray());
     if (m_base64EncodeOutgoingTransactions)    //requesting server to encode transactions
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
@@ -699,7 +700,10 @@ void QnTransactionTransportBase::receivedTransactionNonSafe( const QnByteArrayCo
 
     nx::utils::ObjectDestructionFlag::Watcher watcher(
         &m_connectionFreedFlag);
-    emit gotTransaction( m_remotePeer.dataFormat, serializedTran, transportHeader);
+    emit gotTransaction(
+        m_remotePeer.dataFormat,
+        std::move(serializedTran),
+        transportHeader);
     if (watcher.objectDestroyed())
         return; //connection has been removed by handler
 
@@ -992,7 +996,8 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         }
     }
     using namespace std::placeholders;
-    NX_LOG( lit("Sending data buffer (%1 bytes) to the peer %2").
+    NX_LOG( QnLog::EC2_TRAN_LOG,
+        lit("Sending data buffer (%1 bytes) to the peer %2").
         arg(dataCtx.encodedSourceData.size()).arg(m_remotePeer.id.toString()), cl_logDEBUG2 );
 
     if( m_outgoingDataSocket )

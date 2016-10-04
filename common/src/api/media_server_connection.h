@@ -205,7 +205,7 @@ public:
      * @param slot Slot MUST have signature (int, QString, int).
      * @return Request handle. -1 In case of failure to start async request.
      */
-    int getSystemNameAsync(QObject* target, const char* slot);
+    int getSystemIdAsync(QObject* target, const char* slot);
 
     /**
      * Request the server to run the camera diagnostics step following previousStep.

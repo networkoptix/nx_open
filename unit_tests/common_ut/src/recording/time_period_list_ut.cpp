@@ -12,7 +12,7 @@ namespace {
 #ifdef _DEBUG
     const qint64 bigDataTestsLimitMs = 5000;
 #else
-    const qint64 bigDataTestsLimitMs = 1500;
+    const qint64 bigDataTestsLimitMs = 2000;
 #endif
 }
 

@@ -7,7 +7,13 @@
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
 
-bool convertTo(const QString& src, std::string* const dst);
+namespace nx {
+namespace network {
+namespace url {
+
+namespace detail {
+
+NX_NETWORK_API bool convertTo(const QString& src, std::string* const dst);
 
 template<typename T>
 bool convertTo(const QString& src, boost::optional<T>* const dst)
@@ -16,34 +22,40 @@ bool convertTo(const QString& src, boost::optional<T>* const dst)
     return convertTo(src, &dst->get());
 }
 
+} // namespace detail
+
 /**
  * @return \a false if requested field was not found in \a urlQuery. \a true otherwise.
  */
 template<typename T>
-bool deserializeFromUrl(
+bool deserializeField(
     const QUrlQuery& urlQuery,
     const QString& fieldName,
     T* const value)
 {
     if (urlQuery.hasQueryItem(fieldName))
     {
-        convertTo(urlQuery.queryItemValue(fieldName), value);
+        detail::convertTo(urlQuery.queryItemValue(fieldName), value);
         return true;
     }
     return false;
 }
 
-void serializeToUrl(
+NX_NETWORK_API void serializeField(
     QUrlQuery* const urlQuery,
     const QString& fieldName,
     const std::string& value);
 
 template<typename T>
-void serializeToUrl(
+void serializeField(
     QUrlQuery* const urlQuery,
     const QString& fieldName,
     const boost::optional<T>& value)
 {
     if (value)
-        serializeToUrl(urlQuery, fieldName, value.get());
+        serializeField(urlQuery, fieldName, value.get());
 }
+
+} // namespace nx
+} // namespace network
+} // namespace url

@@ -66,7 +66,12 @@ void QnResourcePool::addResource(const QnResourcePtr &resource)
         addResources(QnResourceList() << resource);
 }
 
-void QnResourcePool::addResources(const QnResourceList &resources)
+void QnResourcePool::addIncompatibleResource(const QnResourcePtr &resource)
+{
+    addResources(QnResourceList() << resource, false);
+}
+
+void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool)
 {
     QnMutexLocker resourcesLock( &m_resourcesMtx );
 
@@ -93,16 +98,15 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                        << "url=" << resource->getUrl();
             continue;
         }
-        bool fakeServer = QnMediaServerResource::isFakeServer(resource);
 
         if( insertOrUpdateResource(
                 resource,
-                fakeServer ? &m_incompatibleResources : &m_resources ) )
+                mainPool ? &m_resources : &m_incompatibleResources) )
         {
             newResources.insert(resource->getId(), resource);
         }
 
-        if (!fakeServer)
+        if (mainPool)
             m_incompatibleResources.remove(resource->getId());
     }
 

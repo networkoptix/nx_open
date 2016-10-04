@@ -216,9 +216,9 @@ int QnMergeSystemsRestHandler::execute(
     QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
     QnModuleInformationWithAddresses remoteModuleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
-    if (remoteModuleInformation.systemName.isEmpty())
+    if (remoteModuleInformation.localSystemId.isNull())
     {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Remote (%1) system name is empty")
+        NX_LOG(lit("QnMergeSystemsRestHandler. Remote (%1) system id is empty")
             .arg(data.url), cl_logDEBUG1);
         /* Hmm there's no system name. It would be wrong system. Reject it. */
         result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
@@ -305,7 +305,7 @@ int QnMergeSystemsRestHandler::execute(
 
     if (data.takeRemoteSettings)
     {
-        if (!applyRemoteSettings(data.url, remoteModuleInformation.systemName, data.getKey, data.postKey, owner))
+        if (!applyRemoteSettings(data.url, remoteModuleInformation.localSystemId, data.getKey, data.postKey, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings), cl_logDEBUG1);
@@ -370,7 +370,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
 
     ConfigureSystemData data;
-    data.systemName = qnCommon->localSystemName();
+    data.localSystemId = qnGlobalSettings->localSystemId();
     data.sysIdTime = qnCommon->systemIdentityTime();
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     data.tranLogTime = ec2Connection->getTransactionLogTime();
@@ -448,7 +448,7 @@ bool executeRequest(
 
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
     const QUrl& remoteUrl,
-    const QString& systemName,
+    const QnUuid& systemId,
     const QString& getKey,
     const QString& postKey,
     const QnRestConnectionProcessor* owner)
@@ -542,19 +542,19 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
 
     ConfigureSystemData data;
-    data.systemName = systemName;
+    data.localSystemId = systemId;
     data.sysIdTime = pingReply.sysIdTime;
     data.tranLogTime = pingReply.tranLogTime;
     data.wholeSystem = true;
 
-    if (!changeSystemName(data))
+    if (!changeLocalSystemId(data))
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
         return false;
     }
 
     auto miscManager = ec2Connection()->getMiscManager(owner->accessRights());
-    errorCode = miscManager->changeSystemNameSync(systemName, pingReply.sysIdTime, pingReply.tranLogTime);
+    errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {

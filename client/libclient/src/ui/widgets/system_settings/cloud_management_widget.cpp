@@ -84,7 +84,7 @@ QnCloudManagementWidget::~QnCloudManagementWidget()
 
 void QnCloudManagementWidget::loadDataToUi()
 {
-    bool linked = !qnGlobalSettings->cloudSystemID().isEmpty() &&
+    bool linked = !qnGlobalSettings->cloudSystemId().isEmpty() &&
         !qnGlobalSettings->cloudAuthKey().isEmpty();
 
     if (linked)

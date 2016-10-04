@@ -70,14 +70,14 @@ public:
      */
     void startDbTransaction(
         const nx::String& systemId,
-        nx::utils::MoveOnlyFunc<nx::db::DBResult(QSqlDatabase*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(QSqlDatabase*, nx::db::DBResult)> onDbUpdateCompleted);
+        nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> onDbUpdateCompleted);
 
     /**
      * \note This call should be made only once when generating first transaction.
      */
     nx::db::DBResult updateTimestampHiForSystem(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId,
         quint64 newValue);
 
@@ -87,7 +87,7 @@ public:
      */
     template<typename TransactionDataType>
     nx::db::DBResult checkIfNeededAndSaveToLog(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId,
         ::ec2::QnTransaction<TransactionDataType> transaction,
         TransactionTransportHeader /*transportHeader*/)
@@ -125,7 +125,7 @@ public:
      */
     template<int TransactionCommandValue, typename TransactionDataType>
     nx::db::DBResult generateTransactionAndSaveToLog(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId,
         TransactionDataType transactionData)
     {
@@ -256,32 +256,32 @@ private:
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
-    std::map<QSqlDatabase*, DbTransactionContext> m_dbTransactionContexts;
+    std::map<nx::db::QueryContext*, DbTransactionContext> m_dbTransactionContexts;
     std::map<nx::String, VmsTransactionLogData> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
 
     /** Fills transaction state cache. Throws in case of error. */
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchTransactionState(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         int* const /*dummyResult*/);
     /**
      * Selects transactions from DB by condition.
      */
     nx::db::DBResult fetchTransactions(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId,
         const ::ec2::QnTranState& from,
         const ::ec2::QnTranState& to,
         int maxTransactionsToReturn,
         TransactionReadResult* const outputData);
     bool isShouldBeIgnored(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId,
         const ::ec2::QnAbstractTransaction& transaction,
         const QByteArray& transactionHash);
     nx::db::DBResult saveToDb(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId,
         const ::ec2::QnAbstractTransaction& transaction,
         const QByteArray& transactionHash,
@@ -295,13 +295,13 @@ private:
     }
 
     int generateNewTransactionSequence(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId);
     ::ec2::Timestamp generateNewTransactionTimestamp(
-        QSqlDatabase* connection,
+        nx::db::QueryContext* connection,
         const nx::String& systemId);
     void onDbTransactionCompleted(
-        QSqlDatabase* dbConnection,
+        nx::db::QueryContext* dbConnection,
         nx::db::DBResult dbResult);
 };
 

@@ -96,12 +96,7 @@ public:
 
     QnSystemInformation getSystemInfo() const;
     void setSystemInfo(const QnSystemInformation &systemInfo);
-
-    QString getSystemName() const;
-    void setSystemName(const QString &systemName);
-
-    QnModuleInformation getModuleInformation() const;
-    void setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation);
+    virtual QnModuleInformation getModuleInformation() const;
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
@@ -112,19 +107,18 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
-    /** Original GUID is set for incompatible servers when their getGuid() getter returns a fake GUID.
-     * This allows us to hold temporary fake server duplicates in the resource pool.
-     */
-    QnUuid getOriginalGuid() const;
-    /** Set original GUID. No signals emmited after this method because the original GUID should not be changed after resource creation. */
-    void setOriginalGuid(const QnUuid &guid);
-    static bool isFakeServer(const QnResourcePtr &resource);
-
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
 
     void beforeDestroy();
 
+    /**
+     * This function need for client. Client may insert fakeServer with overriden ID and
+     * reference to a original ID. So, its overrid this call for fakeMediaServer
+     */
+    virtual QnUuid getOriginalGuid() const { return getId();  }
+protected:
+    static QString apiUrlScheme(bool sslAllowed);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
@@ -137,7 +131,6 @@ signals:
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
-    void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
@@ -155,12 +148,9 @@ private:
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
-    QString m_systemName;
     QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
-
-    QnUuid m_originalGuid;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;
 

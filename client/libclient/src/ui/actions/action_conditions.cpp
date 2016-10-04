@@ -48,6 +48,7 @@
 
 #include "action_parameter_types.h"
 #include "action_manager.h"
+#include <core/resource/fake_media_server.h>
 
 QnActionCondition::QnActionCondition(QObject *parent):
     QObject(parent),
@@ -398,7 +399,7 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
                 return Qn::InvisibleAction;
 
             /* Incompatible resources cannot be renamed */
-            if (QnMediaServerResource::isFakeServer(target))
+            if (target.dynamicCast<QnFakeMediaServerResource>())
                 return Qn::InvisibleAction;
 
             return Qn::EnabledAction;
@@ -774,7 +775,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     {
         //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
-        if (isServer && QnMediaServerResource::isFakeServer(resource))
+        if (isServer && resource.dynamicCast<QnFakeMediaServerResource>())
             continue;
 
         bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
@@ -811,7 +812,7 @@ Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceLis
         if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
             return Qn::EnabledAction;
 
-        if (resource->hasFlags(Qn::server) && !QnMediaServerResource::isFakeServer(resource))
+        if (resource->hasFlags(Qn::server) && !resource.dynamicCast<QnFakeMediaServerResource>())
             return Qn::EnabledAction;
     }
 
@@ -1249,14 +1250,16 @@ Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResour
 }
 
 
-Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
+Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources)
+{
     bool found = false;
-    foreach (const QnResourcePtr &resource, resources) {
+    foreach (const QnResourcePtr &resource, resources)
+    {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
-        if (QnMediaServerResource::isFakeServer(resource))
+        if (server.dynamicCast<QnFakeMediaServerResource>())
             found = true;
         else if (m_all)
             return Qn::InvisibleAction;

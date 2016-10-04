@@ -401,7 +401,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemNameData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemIdData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -598,6 +598,7 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         bool upgradeSerializedTransactionsToV2();
+        bool encryptKvPairs();
         bool upgradeSerializedTransactionsToV3();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
     private:
@@ -618,11 +619,14 @@ namespace detail
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
+
+        // todo: move this variables to QFlag
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
         bool m_needResyncCameraUserAttributes;
         bool m_needResyncServerUserAttributes;
+        bool m_needResyncMediaServers;
         bool m_dbJustCreated;
         bool m_isBackupRestore;
         bool m_needResyncLayout;
@@ -630,6 +634,7 @@ namespace detail
         bool m_needResyncUsers;
         bool m_needResyncStorages;
         bool m_needResyncClientInfoData;
+
         bool m_dbReadOnly;
     };
 } // namespace detail

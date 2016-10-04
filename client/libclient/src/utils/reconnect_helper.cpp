@@ -19,6 +19,7 @@
 #include <nx/utils/collection.h>
 #include <nx/utils/string.h>
 #include <network/module_finder.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -164,7 +165,8 @@ void QnReconnectHelper::markServerAsInvalid(const QnMediaServerResourcePtr &serv
         item.ignored = true;
 }
 
-void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
+void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id)
+{
     QList<InterfaceInfo> &interfaces = m_interfacesByServer[id];
     for (InterfaceInfo &item: interfaces)
         item.online = false;
@@ -174,8 +176,8 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
     if (iter == boost::end(modules))
         return;
 
-    if (iter->systemName != qnCommon->localSystemName()) {
-        printLog("Server has another systemName: " + iter->systemName.toUtf8());
+    if (iter->localSystemId != qnGlobalSettings->localSystemId()) {
+        printLog("Server has another system ID: " + iter->localSystemId.toByteArray());
         for (InterfaceInfo &item: interfaces)
             item.ignored = true;
         return;

@@ -13,6 +13,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
+#include <nx/utils/time.h>
 
 
 namespace nx {
@@ -63,8 +64,9 @@ std::string generateCloudNonceBase(const std::string& systemID)
 {
     //{random_3_bytes}base64({ timestamp }MD5(systemID:timestamp:secret_key))
 
-    const uint32_t timestamp = std::chrono::duration_cast<std::chrono::seconds>
-        (std::chrono::system_clock::now().time_since_epoch()).count();
+    const uint32_t timestamp = 
+        std::chrono::duration_cast<std::chrono::seconds>(
+            nx::utils::timeSinceEpoch()).count();
     const uint32_t timestampInNetworkByteOrder = htonl(timestamp);
 
     //TODO #ak replace with proper vectors function when available

@@ -324,7 +324,7 @@ void QnResourceTreeModelNode::update()
         }
         case Qn::CurrentSystemNode:
         {
-            m_displayName = m_name = qnCommon->localSystemName();
+            m_displayName = m_name = qnGlobalSettings->systemName();
             break;
         }
         case Qn::RoleNode:

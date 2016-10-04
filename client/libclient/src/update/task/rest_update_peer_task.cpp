@@ -47,9 +47,9 @@ void QnRestUpdatePeerTask::doStart()
 
     for (const auto& id: peers())
     {
-        const auto server =
-            qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(QnMediaServerResource::isFakeServer(server),
+        QnFakeMediaServerResourcePtr server =
+            qnResPool->getIncompatibleResourceById(id).dynamicCast<QnFakeMediaServerResource>();
+        NX_ASSERT(server,
             Q_FUNC_INFO, "An incompatible server resource is expected here.");
 
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
@@ -113,8 +113,9 @@ void QnRestUpdatePeerTask::doStart()
     m_timer->start(checkTimeout);
 }
 
-void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
-    QnMediaServerResourcePtr server = m_serverByRealId.take(id);
+void QnRestUpdatePeerTask::finishPeer(const QnUuid &id)
+{
+    auto server = m_serverByRealId.take(id);
     if (!server)
         return;
 
@@ -157,13 +158,11 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr& resource)
     if (m_serverByRealId.isEmpty())
         return;
 
-    const auto server = resource.dynamicCast<QnMediaServerResource>();
+    const auto server = resource.dynamicCast<QnFakeMediaServerResource>();
     if (!server)
         return;
 
     auto id = server->getOriginalGuid();
-    if (id.isNull())
-        id = server->getId();
 
     if (!m_serverByRealId.contains(id))
         return;

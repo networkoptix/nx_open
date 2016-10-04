@@ -328,10 +328,15 @@ private:
             std::bind(&ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2));
     }
 
+    ErrorCode removeHelper(
+        const QnUuid& id,
+        ApiCommand::Value command,
+        std::list<std::function<void()>>* const transactionsToSend,
+        TransactionType::Value transactionType = TransactionType::Regular);
+
     ErrorCode removeObjAttrHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
     ErrorCode removeObjParamsHelper(
@@ -341,12 +346,10 @@ private:
 
     ErrorCode removeObjAccessRightsHelper(
         const QnUuid& id,
-        const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
     ErrorCode removeResourceStatusHelper(
         const QnUuid& id,
-        const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend,
         TransactionType::Value transactionType = TransactionType::Regular);
 
@@ -376,7 +379,6 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeCameraUserAttributes,
-                        connection,
                         transactionsToSend),
                     lit("Remove camera attributes failed"));
 
@@ -387,7 +389,6 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        connection,
                         transactionsToSend),
                     lit("Remove resource access status failed"));
 
@@ -400,7 +401,6 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeServerUserAttributes,
-                        connection,
                         transactionsToSend),
                     lit("Remove server attrs failed"));
 
@@ -421,7 +421,6 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        connection,
                         transactionsToSend,
                         TransactionType::Local),
                     lit("Remove resource status failed"));
@@ -434,7 +433,6 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        connection,
                         transactionsToSend),
                     lit("Remove resource status failed"));
 
@@ -446,6 +444,17 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeObjParamsHelper(tran, connection, transactionsToSend),
                     lit("Remove user params failed"));
+
+                RUN_AND_CHECK_ERROR(
+                    processMultiUpdateSync(
+                        ApiCommand::removeLayout,
+                        tran.transactionType,
+                        dbManager(m_userAccessData)
+                            .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
+                            .toIdList(),
+                        transactionsToSend),
+                    lit("Remove user child resources failed"));
+
                 break;
             }
 
@@ -456,7 +465,6 @@ private:
         RUN_AND_CHECK_ERROR(
             removeObjAccessRightsHelper(
                 tran.params.id,
-                connection,
                 transactionsToSend),
             lit("Remove resource access rights failed"));
 

@@ -1,5 +1,7 @@
 #include "mserver_business_rule_processor.h"
 
+#include <map>
+
 #include <QtCore/QList>
 
 #include "api/app_server_connection.h"
@@ -501,7 +503,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.startTimeMs = startTimeMs - recordBeforeMs;
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
-    bookmark.cameraId = camera->getUniqueId();
+    bookmark.cameraId = camera->getId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
@@ -930,14 +932,37 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
 void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources()))
-        unfiltered << user->getEmail();
+    auto allUsers = qnResPool->getResources<QnUserResource>();
+
+    QMap<QnUuid, QnUserResourceList> groups;
+    for (const auto& user : allUsers)
+        groups[user->userGroup()].push_back(user);
+
+    auto addUserToList = [&unfiltered](const QnUuid& id)
+    {
+        if (auto user = qnResPool->getResourceById<QnUserResource>(id))
+        {
+            unfiltered << user->getEmail();
+            return true;
+        }
+        return false;
+    };
+
+    for (const QnUuid& id : action->getResources())
+    {
+        if (!addUserToList(id)) //< add user by id
+        {
+            for (const auto& nestedUser : groups.value(id))
+                addUserToList(nestedUser->getId());  //< add user by group id
+        }
+    }
 
     auto recipientsFilter = [](const QString& email)
     {
         QString trimmed = email.trimmed();
         return !trimmed.isEmpty() && QnEmailAddress::isValid(trimmed);
     };
+
     QStringList recipients;
     std::copy_if(unfiltered.cbegin(), unfiltered.cend(), std::back_inserter(recipients), recipientsFilter);
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
