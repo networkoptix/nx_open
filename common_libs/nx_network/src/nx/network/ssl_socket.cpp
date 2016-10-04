@@ -1427,10 +1427,10 @@ long SslSocket::bioCtrl(BIO* bio, int cmd, long num, void* /*ptr*/)
     switch (cmd)
     {
         case BIO_C_SET_FD:
-            NX_ASSERT("Invalid proxy socket use!");
+            NX_ASSERT(false, "Invalid proxy socket use!");
             break;
         case BIO_C_GET_FD:
-            NX_ASSERT("Invalid proxy socket use!");
+            NX_ASSERT(false, "Invalid proxy socket use!");
             break;
         case BIO_CTRL_GET_CLOSE:
             ret = bio->shutdown;

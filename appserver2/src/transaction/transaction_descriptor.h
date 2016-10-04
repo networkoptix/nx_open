@@ -16,7 +16,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"

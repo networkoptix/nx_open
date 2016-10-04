@@ -35,25 +35,7 @@ bool isErrorOverlayCheck(Qn::ResourceStatusOverlay overlay)
     }
 }
 
-bool isButtonVisible(Qn::ResourceStatusOverlay overlay,
-    QnStatusOverlayController::Button button)
-{
-    switch (button)
-    {
-        case QnStatusOverlayController::Button::kDiagnostics:
-            return (overlay == Qn::OfflineOverlay);
-
-        case QnStatusOverlayController::Button::kIoEnable:
-        case QnStatusOverlayController::Button::kMoreLicenses:
-            return (overlay == Qn::IoModuleDisabledOverlay);
-        case QnStatusOverlayController::Button::kSettings:
-            return (overlay == Qn::UnauthorizedOverlay);
-        default:
-            return false;
-    }
-}
-
-}   // unnamed namespace
+} // unnamed namespace
 
 QnStatusOverlayController::QnStatusOverlayController(
     const QnResourcePtr& resource,
@@ -142,14 +124,12 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems()
 
     QnStatusOverlayWidget::Controls result = QnStatusOverlayWidget::Control::kCaption;
 
-    const bool visibleButton = isButtonVisible(overlay, m_currentButton);
-    if (visibleButton)
-        result |= QnStatusOverlayWidget::Control::kButton;
-
     if (!statusIcon(overlay).isEmpty())
         result |= QnStatusOverlayWidget::Control::kIcon;
 
-    if (!visibleButton && !descriptionText(overlay).isEmpty())
+    if (m_currentButton != Button::kNoButton)
+        result |= QnStatusOverlayWidget::Control::kButton;
+    else if (!descriptionText(overlay).isEmpty())
         result |= QnStatusOverlayWidget::Control::kDescription;
 
     return result;

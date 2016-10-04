@@ -11,6 +11,9 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+   <property name="topMargin">
+    <number>8</number>
+   </property>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
@@ -33,7 +36,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <property name="documentMode">
           <bool>false</bool>
@@ -44,7 +47,7 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="topMargin">
-            <number>16</number>
+            <number>12</number>
            </property>
            <item>
             <widget class="QnTableView" name="statsTable">
@@ -100,7 +103,7 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
            <property name="topMargin">
-            <number>16</number>
+            <number>12</number>
            </property>
            <item>
             <widget class="QnTableView" name="forecastTable">

@@ -232,7 +232,7 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     QnWorkbenchLayout* workbenchAlarmLayout = QnWorkbenchLayout::instance(QnLayoutResourcePtr(alarmLayout));
     if (!workbenchAlarmLayout) {
         workbenchAlarmLayout = new QnWorkbenchLayout(alarmLayout, workbench());
-        workbenchAlarmLayout->setData(Qt::DecorationRole, qnSkin->icon("titlebar/alert.png"));
+        workbenchAlarmLayout->setData(Qt::DecorationRole, qnSkin->icon("layouts/alarm.png"));
         workbench()->addLayout(workbenchAlarmLayout);
     }
 

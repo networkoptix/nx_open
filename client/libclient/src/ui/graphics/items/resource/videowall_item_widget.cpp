@@ -98,7 +98,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
 
     /* Status overlay. */
     const auto overlay = new QnStatusOverlayWidget(this);
-    m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay);
+    m_statusOverlayController = new QnStatusOverlayController(m_videowall, overlay, this);
 
     connect(m_statusOverlayController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this, overlay, controller = m_statusOverlayController]()
@@ -425,7 +425,10 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     QnHiDpiWorkarounds::showMenu(popupMenu.data(), QCursor::pos());
 }
 
-void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+    const QnVideoWallItem& oldItem,
+    const QnVideoWallItem& item)
+{
     Q_UNUSED(videoWall)
     if (item.uuid != m_itemUuid)
         return;

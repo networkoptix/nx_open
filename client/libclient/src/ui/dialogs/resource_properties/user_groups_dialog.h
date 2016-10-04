@@ -39,7 +39,6 @@ public:
 
 protected:
     virtual bool hasChanges() const override;
-    virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
 private:

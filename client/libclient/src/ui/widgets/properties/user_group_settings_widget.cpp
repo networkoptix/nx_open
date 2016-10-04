@@ -69,9 +69,8 @@ public:
             });
 
         connect(user, &QnUserResource::userGroupChanged, this,
-            [this](const QnResourcePtr& resource)
+            [this](const QnUserResourcePtr& user)
             {
-                auto user = resource.staticCast<QnUserResource>();
                 if (user->userGroup() == model->selectedGroup())
                     userAddedOrUpdated(user);
                 else

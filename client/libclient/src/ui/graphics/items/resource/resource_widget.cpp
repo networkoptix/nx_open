@@ -160,7 +160,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Status overlay. */
     const auto overlay = new QnStatusOverlayWidget(this);
-    m_statusController = new QnStatusOverlayController(m_resource, overlay);
+    m_statusController = new QnStatusOverlayController(m_resource, overlay, this);
 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this, overlay, controller = m_statusController]()
@@ -189,7 +189,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setInfoVisible(buttonsOverlay()->rightButtonsBar()->button(Qn::InfoButton)->isChecked(), false);
     updateTitleText();
     updateButtonsVisibility();
-    updateCursor();
 
     connect(this, &QnResourceWidget::rotationChanged, this, [this]()
     {
@@ -514,19 +513,6 @@ void QnResourceWidget::updatePositionText()
     m_overlayWidgets->positionItem->setVisible(!text.isEmpty());
 }
 
-QCursor QnResourceWidget::calculateCursor() const
-{
-    return Qt::ArrowCursor;
-}
-
-void QnResourceWidget::updateCursor()
-{
-    QCursor newCursor = calculateCursor();
-    QCursor oldCursor = this->cursor();
-    if (newCursor.shape() != oldCursor.shape() || newCursor.shape() == Qt::BitmapCursor)
-        setCursor(newCursor);
-}
-
 QnStatusOverlayController *QnResourceWidget::statusOverlayController() const
 {
     return m_statusController;
@@ -721,14 +707,6 @@ void QnResourceWidget::updateButtonsVisibility()
 
     buttonsOverlay()->rightButtonsBar()->setVisibleButtons(visibleButtons);
     buttonsOverlay()->leftButtonsBar()->setVisibleButtons(visibleButtons);
-}
-
-QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const
-{
-    if (section == Qn::NoSection)
-        return calculateCursor();
-
-    return base_type::windowCursorAt(section);
 }
 
 int QnResourceWidget::helpTopicAt(const QPointF &) const
@@ -1028,12 +1006,12 @@ QColor QnResourceWidget::calculateFrameColor() const
     }
 }
 
-void QnResourceWidget::paintWindowFrame(QPainter *painter,
-    const QStyleOptionGraphicsItem *option,
-    QWidget *widget)
+void QnResourceWidget::paintWindowFrame(
+    QPainter* painter,
+    const QStyleOptionGraphicsItem* option,
+    QWidget* /*widget*/)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    painter->fillRect(option->exposedRect, palette().window());
 
     if (qFuzzyIsNull(m_frameOpacity))
         return;
@@ -1076,26 +1054,6 @@ QnResourceWidget::OverlayWidgets* QnResourceWidget::overlayWidgets() const
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnResourceWidget::windowFrameEvent(QEvent *event)
-{
-    bool result = base_type::windowFrameEvent(event);
-
-    if (event->type() == QEvent::GraphicsSceneHoverMove)
-    {
-        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
-
-        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
-         *
-         * As this widget may not have a frame section associated with some parts of
-         * its frame, cursor must be unset manually. */
-        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
-        if (section == Qt::NoSection)
-            updateCursor();
-    }
-
-    return result;
-}
-
 void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     m_mouseInWidget = true;

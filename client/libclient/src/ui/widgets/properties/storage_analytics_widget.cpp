@@ -46,6 +46,8 @@ namespace {
     const qint64 kBytesInTB = 1024ll * kBytesInGB;
     const qint64 kFinalStepSeconds = 1000000000ll * 10;
 
+    const int kTableRowHeight = 24;
+
     //TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
     const std::array<qint64, 5> kExtraDataBase =
     {
@@ -60,7 +62,7 @@ namespace {
 
     class QnRecordingStatsItemDelegate: public QStyledItemDelegate
     {
-        typedef QStyledItemDelegate base_type;
+        using base_type = QStyledItemDelegate;
 
     public:
         explicit QnRecordingStatsItemDelegate(QObject* parent = nullptr):
@@ -195,7 +197,9 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     setWarningStyle(ui->warningLabel);
 
     auto refreshButton = new QPushButton(ui->tabWidget);
+    refreshButton->setFlat(true);
     refreshButton->setText(tr("Refresh"));
+    refreshButton->setIcon(qnSkin->icon(lit("buttons/refresh.png")));
     refreshButton->resize(refreshButton->sizeHint());
 
     auto anchor = new QnWidgetAnchor(refreshButton);
@@ -247,6 +251,8 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     table->setItemDelegate(new QnRecordingStatsItemDelegate(this));
     table->setItemDelegateForColumn(QnRecordingStatsModel::CameraNameColumn,
         new QnResourceItemDelegate(this));
+
+    table->verticalHeader()->setDefaultSectionSize(kTableRowHeight);
 
     CustomHorizontalHeader* headers = new CustomHorizontalHeader(this);
     table->setHorizontalHeader(headers);

@@ -7,7 +7,7 @@
 
 #include "network/tcp_connection_processor.h"
 #include "request_handler.h"
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 class QnRestProcessorPool
 :

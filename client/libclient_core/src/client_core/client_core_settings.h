@@ -18,6 +18,7 @@ public:
     enum PropertyIdentifier
     {
         RecentLocalConnections,
+        LocalSystemWeightsData,
         CdbEndpoint,
         CloudLogin,
         CloudPassword,
@@ -45,9 +46,12 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
-        QN_DECLARE_RW_PROPERTY(QnLocalConnectionDataList,
+        QN_DECLARE_RW_PROPERTY(QList<QnLocalConnectionData>,
             recentLocalConnections, setRecentLocalConnections,
-            RecentLocalConnections, QnLocalConnectionDataList())
+            RecentLocalConnections, QList<QnLocalConnectionData>())
+        QN_DECLARE_RW_PROPERTY(QList<QnWeightData>,
+            localSystemWeightsData, setLocalSystemWeightsData,
+            LocalSystemWeightsData, QList<QnWeightData>())
         QN_DECLARE_RW_PROPERTY(QString,
             cdbEndpoint, setCdbEndpoint,
             CdbEndpoint, QString())

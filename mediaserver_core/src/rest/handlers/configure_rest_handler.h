@@ -2,7 +2,7 @@
 #define CONFIGURE_REST_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 struct ConfigureSystemData;
 class QnConfigureRestHandler : public QnJsonRestHandler {

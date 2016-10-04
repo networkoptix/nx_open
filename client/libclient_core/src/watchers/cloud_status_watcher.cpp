@@ -1,5 +1,6 @@
 #include "cloud_status_watcher.h"
 
+#include <chrono>
 #include <algorithm>
 
 #include <QtCore/QUrl>
@@ -27,6 +28,8 @@ const auto kIdTag = lit("id");
 const auto kNameTag = lit("name");
 const auto kOwnerAccounEmail = lit("email");
 const auto kOwnerFullName = lit("owner_full_name");
+const auto kWeight = lit("weight");
+const auto kLastLoginTimeUtcMs = lit("kLastLoginTimeUtcMs");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
@@ -45,10 +48,33 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
         system.authKey = systemData.authKey;
+        system.weight = systemData.usageFrequency;
+        system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
+            (systemData.lastLoginTime.time_since_epoch()).count();
         result.append(system);
     }
 
-    std::sort(result.begin(), result.end());
+    {
+        // TODO: #ynikitenkov remove this section when weights are available
+
+        // Temporary code section.
+        const bool isTmpValues = std::all_of(result.begin(), result.end(),
+            [](const QnCloudSystem& system) -> bool { return !system.weight; });
+        if (isTmpValues)
+        {
+            static const auto initialWeight = 10000.0;
+            static const auto step = 100.0;
+
+            qreal tmpWeight = initialWeight;
+            const auto tmpLastLoginTime = QDateTime::currentMSecsSinceEpoch();
+            for (auto& system : result)
+            {
+                system.weight = tmpWeight;
+                system.lastLoginTimeUtcMs = tmpLastLoginTime;
+                tmpWeight += step;
+            }
+        }
+    }
 
     return result;
 }
@@ -77,7 +103,6 @@ public:
     std::unique_ptr<api::Connection> temporaryConnection;
 
     QnCloudStatusWatcher::Status status;
-    bool loggedIn;
 
     QnCloudSystemList cloudSystems;
     QnCloudSystemList recentCloudSystems;
@@ -87,6 +112,8 @@ public:
 public:
     void updateConnection(bool initial = false);
 
+    void setCloudEnabled(bool enabled);
+    bool cloudIsEnabled() const;
 private:
     void setStatus(QnCloudStatusWatcher::Status newStatus,
         QnCloudStatusWatcher::ErrorCode error);
@@ -99,12 +126,15 @@ private:
 
 private:
     QTimer* m_pingTimer;
+    bool m_cloudIsEnabled;
 };
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
     base_type(parent),
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
+    setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
+
     const auto correctOfflineState = [this]()
         {
             Q_D(QnCloudStatusWatcher);
@@ -134,7 +164,6 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
             qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
         });
 
-    setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
     setCloudEndpoint(qnClientCoreSettings->cdbEndpoint());
     //TODO: #GDM store temporary credentials
     setCloudCredentials(QnCredentials(
@@ -285,6 +314,12 @@ QnCloudStatusWatcher::Status QnCloudStatusWatcher::status() const
     return d->status;
 }
 
+bool QnCloudStatusWatcher::isCloudEnabled() const
+{
+    Q_D(const QnCloudStatusWatcher);
+    return d->cloudIsEnabled();
+}
+
 void QnCloudStatusWatcher::updateSystems()
 {
     Q_D(QnCloudStatusWatcher);
@@ -299,6 +334,10 @@ void QnCloudStatusWatcher::updateSystems()
             if (!guard)
                 return;
 
+            Q_D(QnCloudStatusWatcher);
+            if (!d->cloudConnection)
+                return;
+
             QnCloudSystemList cloudSystems;
 
             if (result == api::ResultCode::ok)
@@ -311,6 +350,11 @@ void QnCloudStatusWatcher::updateSystems()
                         return;
 
                     Q_D(QnCloudStatusWatcher);
+                    if (!d->cloudConnection)
+                        return;
+
+                    d->setCloudEnabled((result != api::ResultCode::networkError)
+                        && (result != api::ResultCode::serviceUnavailable));
 
                     switch (result)
                     {
@@ -328,7 +372,7 @@ void QnCloudStatusWatcher::updateSystems()
                                 QnCloudStatusWatcher::UnknownError);
                             break;
                     }
-                };
+            };
 
             executeDelayed(handler, 0, thread());
         }
@@ -362,7 +406,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     recentCloudSystems(qnClientCoreSettings->recentCloudSystems()),
     currentSystem(),
     temporaryCredentials(),
-    m_pingTimer(new QTimer(this))
+    m_pingTimer(new QTimer(this)),
+    m_cloudIsEnabled(true)
 {
     Q_Q(QnCloudStatusWatcher);
 
@@ -374,6 +419,23 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
 
     connect(m_pingTimer, &QTimer::timeout, this, &QnCloudStatusWatcherPrivate::prolongTemporaryCredentials);
 }
+
+bool QnCloudStatusWatcherPrivate::cloudIsEnabled() const
+{
+    return m_cloudIsEnabled;
+}
+
+void QnCloudStatusWatcherPrivate::setCloudEnabled(bool enabled)
+{
+    Q_Q(QnCloudStatusWatcher);
+
+    if (m_cloudIsEnabled == enabled)
+        return;
+
+    m_cloudIsEnabled = enabled;
+    emit q->isCloudEnabledChanged();
+}
+
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 {
@@ -580,15 +642,6 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
         });
 }
 
-bool QnCloudSystem::operator <(const QnCloudSystem &other) const
-{
-    int comp = name.compare(other.name);
-    if (comp != 0)
-        return comp < 0;
-
-    return id < other.id;
-}
-
 bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
 {
     return id == other.id &&
@@ -605,12 +658,14 @@ bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
            ownerFullName == other.ownerFullName;
 }
 
-void QnCloudSystem::writeToSettings(QSettings* settings, const QnCloudSystem& data)
+void QnCloudSystem::writeToSettings(QSettings* settings) const
 {
-    settings->setValue(kIdTag, data.id);
-    settings->setValue(kNameTag, data.name);
-    settings->setValue(kOwnerAccounEmail, data.ownerAccountEmail);
-    settings->setValue(kOwnerFullName, data.ownerFullName);
+    settings->setValue(kIdTag, id);
+    settings->setValue(kNameTag, name);
+    settings->setValue(kOwnerAccounEmail, ownerAccountEmail);
+    settings->setValue(kOwnerFullName, ownerFullName);
+    settings->setValue(kWeight, weight);
+    settings->setValue(kLastLoginTimeUtcMs, lastLoginTimeUtcMs);
 }
 
 QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
@@ -621,6 +676,7 @@ QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
     result.name = settings->value(kNameTag).toString();
     result.ownerAccountEmail = settings->value(kOwnerAccounEmail).toString();
     result.ownerFullName = settings->value(kOwnerFullName).toString();
-
+    result.weight = settings->value(kWeight, 0.0).toReal();
+    result.lastLoginTimeUtcMs = settings->value(kLastLoginTimeUtcMs, 0).toLongLong();
     return result;
 }

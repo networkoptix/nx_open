@@ -8,6 +8,7 @@
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_access/resource_access_subject.h>
 
 #include <ui/models/resource/resource_tree_model_fwd.h>
 
@@ -56,6 +57,9 @@ public:
 
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
+
+    Scope scope() const;
+
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
@@ -64,30 +68,15 @@ private:
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
-    QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
+    QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
+        const QnVirtualCameraResourcePtr& camera);
     QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
-    QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnUuid& owner, const QnLayoutResourcePtr& sharedLayout);
-    QnResourceTreeModelNodePtr ensureAccessibleResourceNode(const QnUuid& owner, const QnResourcePtr& resource);
-    QnResourceTreeModelNodePtr ensurePlaceholderNode(const QnUuid& owner, Qn::NodeType nodeType);
-    QnResourceTreeModelNodePtr ensureRoleNode(const QnUuid& roleId);
-
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
-
-    /** Update 'All cameras' / 'Cameras and resources'/ etc per-user placeholder nodes. */
-    void updatePlaceholderNodesForUserOrRole(const QnUuid& id);
-
-    void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
-    void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
-    void updateAccessibleResourcesForUser(const QnUserResourcePtr& user);
-    void updateSharedLayoutNodesForRole(const QnUuid& id);
-    void updateAccessibleResourcesForRole(const QnUuid& id);
-    void updateRoleNodes();
-    void updateUserSubNodes(const QnUserResourcePtr& user);
 
     Qn::NodeType rootNodeTypeForScope() const;
 
@@ -106,43 +95,35 @@ private:
      * @param targetResource        On what drop was done.
      * @param mimeData              Full drag-n-drop data.
      */
-    void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData);
+    void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource,
+        const QMimeData *mimeData);
+
+    void handlePermissionsChanged(const QnResourcePtr& resource);
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
-    void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
-    void at_resource_resourceChanged(const QnResourcePtr &resource);
 
-    void at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-    void at_layout_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-
-    void at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
+            const QnVideoWallItem& oldItem,
+            const QnVideoWallItem& item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
     void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
     void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
 
-    void at_camera_groupNameChanged(const QnResourcePtr &resource);
-
     void at_server_systemNameChanged(const QnResourcePtr &resource);
     void at_server_redundancyChanged(const QnResourcePtr &resource);
     void at_commonModule_systemNameChanged();
-
-    void at_user_enabledChanged(const QnResourcePtr &resource);
 
     void at_serverAutoDiscoveryEnabledChanged();
 
 private:
     friend class QnResourceTreeModelNode;
-
-    typedef QHash<QString, QnResourceTreeModelNodePtr> RecorderHash;
-    typedef QHash<QnUuid, QnResourceTreeModelNodePtr> ItemHash;
-    typedef QHash<QnResourcePtr, QnResourceTreeModelNodePtr> ResourceHash;
-    typedef QList<QnResourceTreeModelNodePtr> NodeList;
 
     /** Root nodes array */
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
@@ -158,29 +139,17 @@ private:
 
     /** Mapping for all nodes by resource (for quick update). */
     QHash<QnResourcePtr, NodeList> m_nodesByResource;
-    /** Debug variable for VMS-3589. */
-    bool m_iteratingOverNodesByResource = false;    //TODO: #GDM #high remove before release
 
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
-
-    /** Mapping of placeholder nodes by owner (user or role). */
-    QHash<QnUuid, NodeList> m_placeholderNodesByOwner;
-
-    /** Mapping of role nodes by id. */
-    QHash<QnUuid, QnResourceTreeModelNodePtr> m_roleNodeById;
-
-    /** Mapping of shared layouts links by owner (user or role). */
-    QHash<QnUuid, ResourceHash> m_sharedLayoutNodesByOwner;
-
-    /** Mapping of accessible resources (cameras and web pages) by owner (user or role). */
-    QHash<QnUuid, ResourceHash> m_accessibleResourceNodesByOwner;
 
     /** Full list of all created nodes. */
     QList<QnResourceTreeModelNodePtr> m_allNodes;
 
     /** Delegate for custom column data. */
     QPointer<QnResourceTreeModelCustomColumnDelegate> m_customColumnDelegate;
+
+    QScopedPointer<QnResourceTreeModelUserNodes> m_userNodes;
 
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;

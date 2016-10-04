@@ -108,10 +108,8 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     resourcesLock.unlock();
 
-    QnResourceList layouts;
-    QnResourceList otherResources;
-
-    for (const QnResourcePtr &resource: newResources.values())
+    QnResourceList addedResources = newResources.values();
+    for (const auto& resource: addedResources)
     {
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
@@ -132,35 +130,27 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             if (resource->getStatus() != Qn::Offline)
                 resource->initAsync(false);
         }
-
-        if (resource.dynamicCast<QnLayoutResource>())
-            layouts << resource;
-        else
-            otherResources << resource;
     }
 
-    // Layouts should be notified first because their children should be instantiated before
-    // 'UserChanged' event occurs
-    for (const QnResourcePtr &resource: layouts) {
+
+    for (const auto& resource: addedResources)
+    {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
     }
-
-    for (const QnResourcePtr &resource: otherResources) {
-        TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
-        emit resourceAdded(resource);
-    }
-
-
 }
 
 void QnResourcePool::removeResources(const QnResourceList& resources)
 {
-    QnResourceList removedLayoutResources, removedOtherResources;
+    QnResourceList removedLayoutResources;
+    QnResourceList removedUsers;
+    QnResourceList removedOtherResources;
     auto appendRemovedResource = [&](QnResourcePtr resource)
     {
-        if (resource.dynamicCast<QnLayoutResource>())
+        if (resource->hasFlags(Qn::layout))
             removedLayoutResources.push_back(resource);
+        else if (resource->hasFlags(Qn::user))
+            removedUsers.push_back(resource);
         else
             removedOtherResources.push_back(resource);
     };
@@ -250,11 +240,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     lk.unlock();
 
     /* Emit notifications. */
-    for (const QnResourcePtr& layoutResource: removedLayoutResources)
+    for (auto layoutResource: removedLayoutResources)
         emit resourceRemoved(layoutResource);
 
-    for (const QnResourcePtr& resource : removedOtherResources)
+    for (auto resource : removedOtherResources)
         emit resourceRemoved(resource);
+
+    for (auto user: removedUsers)
+        emit resourceRemoved(user);
 }
 
 QnResourceList QnResourcePool::getResources() const

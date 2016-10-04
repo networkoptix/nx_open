@@ -5,7 +5,10 @@
 #include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+
+#include <core/resource_access/resource_access_manager.h>
+
 #include <core/resource/user_resource.h>
 
 #include <ui/common/aligner.h>
@@ -171,7 +174,7 @@ bool QnUserSettingsWidget::hasChanges() const
             /* Check if we have selected a predefined internal group. */
             Qn::UserRole roleType = selectedRole();
             if (roleType != Qn::UserRole::CustomPermissions
-                && (qnResourceAccessManager->userRolePermissions(roleType)
+                && (QnUserRolesManager::userRolePermissions(roleType)
                     != qnResourceAccessManager->globalPermissions(m_model->user())))
             {
                 return true;
@@ -279,7 +282,8 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         m_model->user()->setUserGroup(selectedUserGroup());
-        m_model->user()->setRawPermissions(qnResourceAccessManager->userRolePermissions(selectedRole()));
+        if (m_model->user()->role() != Qn::UserRole::CustomPermissions)
+            m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
     }
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
