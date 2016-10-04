@@ -930,70 +930,32 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
     return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
 }
 
-namespace {
-
-struct Compare
-{
-    bool operator() (const QnUserResourcePtr& user, const QnUuid& id)
-    {
-        return user->getId() < id;
-    }
-
-    bool operator() (const QnUuid& id, const QnUserResourcePtr& user)
-    {
-        return id < user->getId();
-    }
-};
-
-template<typename F, typename G>
-void applyUserAction(const QnUuid& id, const QnUserResourceList& users, F userExistsAction, G userNotExistsAction)
-{
-    auto it = nx::utils::binary_find(users.cbegin(), users.cend(), id, Compare());
-    if (it != users.cend())
-        userExistsAction(*it);
-    else
-        userNotExistsAction();
-}
-
-using GroupIdToUsers = std::map<QnUuid, QnUserResourceList>;
-
-GroupIdToUsers buildGroupToUsersMap(const QnUserResourceList& users)
-{
-    GroupIdToUsers result;
-    for (const auto& u : users)
-        result[u->userGroup()].push_back(u);
-
-    return result;
-}
-}
-
 void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
     auto allUsers = qnResPool->getResources<QnUserResource>();
-    GroupIdToUsers groupsToUsers = buildGroupToUsersMap(allUsers);
 
-    std::sort(allUsers.begin(), allUsers.end(),
-        [] (const QnResourcePtr& lhs, const QnResourcePtr& rhs)
-        {
-            return lhs->getId() < rhs->getId();
-        });
+    QMap<QnUuid, QnUserResourceList> groups;
+    for (const auto& user : allUsers)
+        groups[user->userGroup()].push_back(user);
 
-    auto addUserEmailToList = [&unfiltered](const QnUserResourcePtr& user) { unfiltered << user->getEmail(); };
-
-    for (const QnUuid& id: action->getResources())
+    auto addUserToList = [&unfiltered](const QnUuid& id)
     {
-        applyUserAction(id, allUsers,
-            addUserEmailToList,
-            [&groupsToUsers, &id, &addUserEmailToList]
-            {
-                auto groupIt = groupsToUsers.find(id);
-                if (groupIt != groupsToUsers.cend())
-                {
-                    for (const auto& u : groupIt->second)
-                        addUserEmailToList(u);
-                }
-            });
+        if (auto user = qnResPool->getResourceById<QnUserResource>(id))
+        {
+            unfiltered << user->getEmail();
+            return true;
+        }
+        return false;
+    };
+
+    for (const QnUuid& id : action->getResources())
+    {
+        if (!addUserToList(id)) //< add user by id
+        {
+            for (const auto& nestedUser : groups.value(id))
+                addUserToList(nestedUser->getId());  //< add user by group id
+        }
     }
 
     auto recipientsFilter = [](const QString& email)
