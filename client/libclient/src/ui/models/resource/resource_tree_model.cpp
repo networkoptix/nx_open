@@ -101,8 +101,7 @@ QList<Qn::NodeType> rootNodeTypes()
 QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_scope(scope),
-    m_userNodes()
+    m_scope(scope)
 {
     /* Create top-level nodes. */
     for (Qn::NodeType t : rootNodeTypes())
