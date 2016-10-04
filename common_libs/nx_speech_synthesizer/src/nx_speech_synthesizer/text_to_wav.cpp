@@ -54,38 +54,88 @@ namespace
 
     int get_word_size(enum EST_sample_type_t sample_type)
     {
-        /* Returns word size from type */
-        int word_size;
+        int word_size = 0;
 
         switch (sample_type)
         {
-          case st_unknown:
-        word_size = 2; break;
-          case st_uchar:
-          case st_schar:
-        word_size = 1; break;
-          case st_mulaw:
-        word_size = 1; break;
-    #if 0
-          case st_adpcm:  /* maybe I mean 0.5 */
-        word_size = 1; break;
-    #endif
-          case st_short:
-        word_size = 2; break;
-          case st_int:
-        /* Yes I mean 4 not sizeof(int) these are machine independent defs */
-        word_size = 4; break;
-          case st_float:
-        word_size = 4; break;
-          case st_double:
-        word_size = 8; break;
-          default:
-        fprintf(stderr,"Unknown encoding format error\n");
-        word_size = 2;
+            case st_unknown:
+                word_size = 2; break;
+            case st_uchar:
+            case st_schar:
+                word_size = 1; break;
+            case st_mulaw:
+                word_size = 1; break;
+            case st_short:
+                word_size = 2; break;
+            case st_int:
+                /* Yes I mean 4 not sizeof(int) these are machine independent defs */
+                word_size = 4; break;
+            case st_float:
+                word_size = 4; break;
+            case st_double:
+                word_size = 8; break;
+            default:
+                NX_ASSERT(false, "TextToWaveServer, unknown sample size.");
         }
+
         return word_size;
     }
 
+    EST_sample_type_t fromStringToEstSampleType(const EST_String& sampleTypeStr)
+    {
+        if (sampleTypeStr.matches("short"))
+            return st_short;
+        if (sampleTypeStr.matches("shorten"))
+            return st_shorten;
+        if (sampleTypeStr.matches("ulaw") || sampleTypeStr.matches("mulaw"))
+            return st_mulaw;
+
+        if (sampleTypeStr.matches("char")
+            || sampleTypeStr.matches("byte")
+            || sampleTypeStr.matches("8bit"))
+        {
+            return st_schar;
+        }
+
+        if (sampleTypeStr.matches("unsignedchar")
+            || sampleTypeStr.matches("unsignedbyte")
+            || sampleTypeStr.matches("unsigned8bit"))
+        {
+            return st_uchar;
+        }
+
+        if (sampleTypeStr.matches("int"))
+            return st_int;
+        if (sampleTypeStr.matches("real") || sampleTypeStr.matches("float") || sampleTypeStr.matches("real4"))
+            return st_float;
+        if (sampleTypeStr.matches("real8") || sampleTypeStr.matches("double"))
+            return st_double;
+        if (sampleTypeStr.matches("alaw"))
+            return st_alaw;
+        if (sampleTypeStr.matches("ascii"))
+            return st_ascii;
+
+        return st_unknown;
+    }
+
+    QnAudioFormat::SampleType fromEstSampleTypeToQt(const EST_sample_type_t estSampleType)
+    {
+        switch (estSampleType)
+        {
+            case st_short:
+            case st_shorten:
+            case st_schar:
+            case st_int:
+                return QnAudioFormat::SignedInt;
+            case st_uchar:
+                return QnAudioFormat::UnSignedInt;
+            case st_float:
+            case st_double:
+                return QnAudioFormat::Float;
+            default:
+                return QnAudioFormat::Unknown;
+        }
+    }
 
     enum EST_write_status save_raw_data(QIODevice *fp, const short *data, int offset,
                         int num_samples, int num_channels,
@@ -134,12 +184,7 @@ namespace
         int data_size, data_int;
         short data_short;
 
-        Q_ASSERT(sample_type != st_schar);
-     //   if (sample_type == st_schar)
-     //     {
-        //EST_warning("RIFF format: Signed 8-bit not allowed by this file format");
-        //sample_type=st_uchar;
-     //     }
+        NX_ASSERT(sample_type != st_schar, "TextToWaveServer, RIFF format: Signed 8-bit not allowed by this file format");
 
         info = "RIFF";
         //fwrite(info,4,1,fp);
@@ -263,12 +308,33 @@ static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
     return festival_text_to_wave( text, wave );
 }
 
-static bool textToWavInternal( const QString& text, QIODevice* const dest )
+static bool textToWavInternal(const QString& text, QIODevice* const dest, QnAudioFormat* outFormat)
 {
     // Convert to a waveform
     EST_Wave wave;
     EST_String srcText( text.toLatin1().constData() );
     bool result = my_festival_text_to_wave( srcText, wave );
+
+    if (outFormat)
+    {
+        outFormat->setSampleRate(wave.sample_rate());
+        outFormat->setChannelCount(wave.num_channels());
+
+        //TODO: #dmishin set format properties according to EST_Wave's sample_type info.
+        outFormat->setCodec(QString("audio/pcm"));
+        outFormat->setByteOrder(QnAudioFormat::LittleEndian);
+
+        auto sampleType = fromStringToEstSampleType(wave.sample_type());
+
+        NX_ASSERT(sampleType != st_unknown, lm("TextToWaveServer, unknown sample format."));
+
+        auto sampleSize = get_word_size(sampleType);
+
+        NX_ASSERT(sampleSize, lm("TextToWaveServer, unknown sample size"));
+
+        outFormat->setSampleSize(sampleSize);
+        outFormat->setSampleType(fromEstSampleTypeToQt(sampleType));
+    }
 
     if( result )
     {
@@ -304,30 +370,15 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
 }
 
 
-
-
-
 TextToWaveServer::TextToWaveServer()
 :
     m_prevTaskID( 1 )
 {
-    m_audioFormat.setSampleRate(16000);
-    m_audioFormat.setChannelCount(1);
-    m_audioFormat.setCodec(QString("PCM"));
-    m_audioFormat.setByteOrder(QnAudioFormat::LittleEndian);
-    m_audioFormat.setSampleSize(2);
-    m_audioFormat.setSampleType(QnAudioFormat::SignedInt);
-
 }
 
 TextToWaveServer::~TextToWaveServer()
 {
     stop();
-}
-
-QnAudioFormat TextToWaveServer::getAudioFormat()
-{
-    return m_audioFormat;
 }
 
 void TextToWaveServer::pleaseStop()
@@ -342,12 +393,17 @@ int TextToWaveServer::generateSoundAsync( const QString& text, QIODevice* const 
     return task ? task->id : 0;
 }
 
-bool TextToWaveServer::generateSoundSync( const QString& text, QIODevice* const dest )
+bool TextToWaveServer::generateSoundSync(
+    const QString& text,
+    QIODevice* const dest,
+    QnAudioFormat* outFormat)
 {
     QnMutexLocker lk( &m_mutex );
     QSharedPointer<SynthetiseSpeechTask> task = addTaskToQueue( text, dest );
     while( !task->done )
         m_cond.wait( lk.mutex() );
+
+    *outFormat = task->format;
     return task->result;
 }
 
@@ -365,7 +421,7 @@ void TextToWaveServer::run()
         if( !task->dest )
             continue;
 
-        const bool result = textToWavInternal( task->text, task->dest );
+        const bool result = textToWavInternal(task->text, task->dest, &task->format);
         {
             QnMutexLocker lk( &m_mutex );
             task->done = true;

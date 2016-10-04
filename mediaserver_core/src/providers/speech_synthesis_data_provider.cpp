@@ -19,7 +19,6 @@ QnSpeechSynthesisDataProvider::QnSpeechSynthesisDataProvider(const QString& text
     m_text(text),
     m_curPos(0)
 {
-    m_ctx = initializeAudioContext();
 }
 
 QnSpeechSynthesisDataProvider::~QnSpeechSynthesisDataProvider()
@@ -27,18 +26,21 @@ QnSpeechSynthesisDataProvider::~QnSpeechSynthesisDataProvider()
     stop();
 }
 
-QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext()
+QnConstMediaContextPtr QnSpeechSynthesisDataProvider::initializeAudioContext(const QnAudioFormat& format)
 {
-    auto synthesizer = TextToWaveServer::instance();
-    auto format = synthesizer->getAudioFormat();
-    auto codecId = AV_CODEC_ID_PCM_S16LE; // synthesizer->getCodecId();
+    auto codecId = QnFfmpegHelper::fromQtAudioFormatToFfmpegPcmCodec(format);
+    if (codecId == AV_CODEC_ID_NONE)
+        return QnConstMediaContextPtr();
 
     auto mediaCtx = std::make_shared<QnAvCodecMediaContext>(codecId);
     auto ctx = mediaCtx->getAvCodecContext();
     if (!ctx)
         return QnConstMediaContextPtr();
 
-    ctx->sample_fmt = QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(format);
+    ctx->sample_fmt = QnFfmpegHelper::fromQtAudioFormatToFfmpegSampleType(format);
+    if (ctx->sample_fmt == AV_SAMPLE_FMT_NONE)
+        return QnConstMediaContextPtr();
+
     ctx->sample_rate = format.sampleRate();
     ctx->frame_size = kDefaultDataChunkSize / 2;
     ctx->channels = format.channelCount();
@@ -71,7 +73,11 @@ QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
 
 void QnSpeechSynthesisDataProvider::run()
 {
-    m_rawBuffer = doSynthesis(m_text);
+    bool status = true;
+    m_rawBuffer = doSynthesis(m_text, &status);
+
+    if (!status)
+        return;
 
     while(auto data = getNextData())
     {
@@ -94,17 +100,24 @@ void QnSpeechSynthesisDataProvider::setText(const QString &text)
     m_text = text;
 }
 
-QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text)
+QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text, bool* outStatus)
 {
     QBuffer soundBuf;
+    QnAudioFormat waveFormat;
     soundBuf.open(QIODevice::WriteOnly);
+
+    *outStatus = true;
 
 #ifndef DISABLE_FESTIVAL
     auto ttvInstance = TextToWaveServer::instance();
-    ttvInstance->generateSoundSync(text, &soundBuf);
+    ttvInstance->generateSoundSync(text, &soundBuf, &waveFormat);
 #endif
 
-    const size_t kSynthesizerOutputHeaderSize = 52;
+    m_ctx = initializeAudioContext(waveFormat);
+    if (!m_ctx)
+        *outStatus = false;
+
+    const std::size_t kSynthesizerOutputHeaderSize = 52;
     return soundBuf.data().mid(kSynthesizerOutputHeaderSize);
 }
 
