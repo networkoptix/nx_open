@@ -18,11 +18,12 @@ public:
     void setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData);
     virtual QnModuleInformation getModuleInformation() const override;
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode) override;
+protected:
+    virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;
 signals:
     void moduleInformationChanged(const QnResourcePtr &resource);
 private:
     ec2::ApiDiscoveredServerData m_serverData;
-    mutable QnMutex m_mutex;
 };
 
 typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;

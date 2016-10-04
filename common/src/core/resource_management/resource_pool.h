@@ -50,9 +50,9 @@ public:
     ~QnResourcePool();
 
     /**
-     * this function will add or update existing resources
+     * This function will add or update existing resources.
      * By default it add resources to the mainPool. if mainPoos parameter is false then resources are put to
-     * the incompatible resource pool
+     * the incompatible resource pool.
      */
 
     void addResources(const QnResourceList &resources, bool mainPool = true);

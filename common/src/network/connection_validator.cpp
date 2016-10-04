@@ -86,8 +86,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
 {
     return !info.localSystemId.isNull() &&
-           info.localSystemId == qnGlobalSettings->localSystemId() &&
-           validateConnection(info) == Qn::SuccessConnectionResult;
+        info.localSystemId == qnGlobalSettings->localSystemId() &&
+        validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(

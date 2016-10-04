@@ -7,7 +7,8 @@
 
 namespace ec2 {
 
-    struct ApiSystemIdData : ApiData {
+    struct ApiSystemIdData: ApiData
+    {
         ApiSystemIdData(): sysIdTime(0) {}
         ApiSystemIdData(const QString &systemId): systemId(systemId), sysIdTime(0) {}
 

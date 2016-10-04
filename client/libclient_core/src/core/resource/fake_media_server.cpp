@@ -1,6 +1,7 @@
 #include "fake_media_server.h"
 
-QnFakeMediaServerResource::QnFakeMediaServerResource()
+QnFakeMediaServerResource::QnFakeMediaServerResource():
+    QnMediaServerResource()
 {
     setId(QnUuid::createUuid());
 }
@@ -46,6 +47,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     else
         removeFlags(Qn::read_only);
 
+    lock.unlock();
     emit moduleInformationChanged(toSharedPointer());
 }
 
@@ -61,4 +63,9 @@ void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool sil
         Q_FUNC_INFO,
         "Incompatible servers should not take any status but incompatible or unauthorized");
     base_type::setStatus(newStatus, silenceMode);
+}
+
+void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)
+{
+    Q_ASSERT("This function should be not used for fake media servers");
 }

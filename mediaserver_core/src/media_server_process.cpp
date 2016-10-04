@@ -1363,7 +1363,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     processor->startReceivingLocalNotifications(connection);
 }
 
-void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudConnectionManager)
+void MediaServerProcess::resetCloudParams(CloudConnectionManager& cloudConnectionManager)
 {
     while (1)
     {
@@ -1381,7 +1381,7 @@ void MediaServerProcess::resetCloudParams(CloudConnectionManager* const cloudCon
             qWarning() << "Enable admin user and reset its password to default value due to automatic cloud disconnect and admin user was disabled";
         }
 
-        if (!cloudConnectionManager->cleanUpCloudDataInLocalDb())
+        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
         {
             qWarning() << "Error while clearing cloud information. Traying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1774,7 +1774,7 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
-void MediaServerProcess::doMigrateSystemNameFromConfig(CloudConnectionManager* const cloudConnectionManager)
+void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager)
 {
     nx::SystemName systemName;
     systemName.loadFromConfig();
@@ -2381,7 +2381,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
     loadResourcesFromECS(messageProcessor.data());
-    doMigrateSystemNameFromConfig(&cloudConnectionManager);
+    migrateSystemNameFromConfig(cloudConnectionManager);
 
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
@@ -2394,7 +2394,7 @@ void MediaServerProcess::run()
         if (isNewServerInstance ||
             (isCloudInstanceChanged && isConnectedToCloud))
         {
-            resetCloudParams(&cloudConnectionManager);
+            resetCloudParams(cloudConnectionManager);
             qnGlobalSettings->setLocalSystemId(QnUuid()); //< go to new state
         }
         if (isCloudInstanceChanged)
