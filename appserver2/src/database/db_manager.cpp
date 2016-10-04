@@ -415,14 +415,14 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
     }
 
-    if( !m_sdbStatic.open() )
+    if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic))
     {
         qWarning() << "can't initialize Server static sqlLite database " << m_sdbStatic.databaseName() << ". Error: " << m_sdbStatic.lastError().text();
         return false;
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen(&m_sdb) )
     {
         m_sdb.close();
         qWarning() << "Corrupted database file " << m_sdb.databaseName() << "!";
@@ -3685,14 +3685,14 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
         return ErrorCode::dbError;
     }
 
-    if( !m_sdbStatic.open() )
+    if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
         NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
         return ErrorCode::dbError;
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen(&m_sdb) )
         return ErrorCode::dbError;
 
     return ErrorCode::ok;
@@ -3720,14 +3720,14 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
         return ErrorCode::dbError;
     }
 
-    if( !m_sdbStatic.open() )
+    if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
         NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
         return ErrorCode::dbError;
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen(&m_sdb) )
         return ErrorCode::dbError;
 
     return ErrorCode::ok;

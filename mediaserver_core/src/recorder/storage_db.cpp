@@ -173,7 +173,7 @@ bool QnStorageDb::open(const QString& fileName)
 
     if (isDbOnLocalStorage && !MSSettings::roSettings()->value(nx_ms_conf::DISABLE_STORAGE_DB_OPTIMIZATION).toInt())
     {
-        if (!tuneDBAfterOpen())
+        if (!tuneDBAfterOpen(&m_sdb))
             NX_LOG(lit("Tuning storage DB for storage %1 failed").arg(m_storage->getUrl()), cl_logWARNING);
     }
     return result;

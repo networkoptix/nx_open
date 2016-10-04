@@ -46,6 +46,8 @@ public:
     bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details) const;
     bool execSQLQuery(QSqlQuery *query, const char* details) const;
 
+    static bool tuneDBAfterOpen(QSqlDatabase* const sqlDb);
+
     virtual QnDbTransaction* getTransaction() = 0;
     //const QnDbTransaction* getTransaction() const;
 
@@ -57,7 +59,6 @@ protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
     void removeDatabase();
-    bool tuneDBAfterOpen();
 
 protected:
     QSqlDatabase m_sdb;

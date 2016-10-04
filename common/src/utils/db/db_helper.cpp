@@ -33,9 +33,9 @@ bool QnDbHelper::QnDbTransaction::beginTran()
     return true;
 }
 
-bool QnDbHelper::tuneDBAfterOpen()
+bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
 {
-    QSqlQuery enableWalQuery(m_sdb);
+    QSqlQuery enableWalQuery(*sqlDb);
     enableWalQuery.prepare(lit("PRAGMA journal_mode = WAL"));
     if( !enableWalQuery.exec() )
     {
@@ -43,7 +43,7 @@ bool QnDbHelper::tuneDBAfterOpen()
         return false;
     }
 
-    QSqlQuery enableFKQuery(m_sdb);
+    QSqlQuery enableFKQuery(*sqlDb);
     enableFKQuery.prepare(lit("PRAGMA foreign_keys = ON"));
     if( !enableFKQuery.exec() )
     {
