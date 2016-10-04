@@ -305,7 +305,7 @@ private:
         const std::string& systemId,
         api::SystemSharingEx* const sharing);
     template<std::size_t filterFieldCount = 0>
-    nx::db::DBResult SystemManager::fetchUserSharings(
+    nx::db::DBResult fetchUserSharings(
         nx::db::QueryContext* const queryContext,
         std::vector<api::SystemSharingEx>* const sharings,
         std::array<SqlFilterByField, filterFieldCount> filterFields
