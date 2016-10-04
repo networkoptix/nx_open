@@ -1254,6 +1254,12 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const
 
 QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourceList &resources) const
 {
+    if (resources.size() == 1)
+    {
+        if (auto layout = resources.first().dynamicCast<QnLayoutResource>())
+            return layout;
+    }
+
     QnResourceList filtered;
     QMap<qreal, int> aspectRatios;
     qreal defaultAr = qnGlobals->defaultLayoutCellAspectRatio();

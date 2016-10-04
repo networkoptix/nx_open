@@ -1473,7 +1473,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false).
-        condition(new QnTreeNodeTypeCondition(Qn::SharedLayoutNode, this));
+        condition(new QnStopSharingActionCondition(this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).

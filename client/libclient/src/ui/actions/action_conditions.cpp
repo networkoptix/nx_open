@@ -6,11 +6,14 @@
 
 #include <common/common_module.h>
 
-#include <utils/common/warnings.h>
 #include <network/router.h>
+
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -371,6 +374,37 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParam
 
     return Qn::EnabledAction;
 }
+
+Qn::ActionVisibility QnStopSharingActionCondition::check(const QnActionParameters &parameters)
+{
+    if (qnCommon->isReadOnly())
+        return Qn::InvisibleAction;
+
+    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    if (nodeType != Qn::SharedLayoutNode)
+        return Qn::InvisibleAction;
+
+    auto user = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    auto roleId = parameters.argument<QnUuid>(Qn::UuidRole);
+    NX_ASSERT(user || !roleId.isNull());
+    if (!user && roleId.isNull())
+        return Qn::InvisibleAction;
+
+    QnResourceAccessSubject subject = user
+        ? QnResourceAccessSubject(user)
+        : QnResourceAccessSubject(qnUserRolesManager->userRole(roleId));
+    if (!subject.isValid())
+        return Qn::InvisibleAction;
+
+    for (auto resource: parameters.resources())
+    {
+        if (qnResourceAccessProvider->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+            return Qn::EnabledAction;
+    }
+
+    return Qn::DisabledAction;
+}
+
 
 Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters)
 {
