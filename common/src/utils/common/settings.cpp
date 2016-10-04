@@ -36,19 +36,20 @@ QVariant QnSettings::value(
 
 void QnLogSettings::load(const QnSettings& settings, const QString& prefix)
 {
-    const auto key = [&prefix](const char* key)
-    {
-        return QString(lm("%1/%2").arg(prefix).arg(key));
-    };
+    const auto makeKey =
+        [&prefix](const char* key)
+        {
+            return QString(lm("%1/%2").arg(prefix).arg(key));
+        };
 
-    const auto confLevel = QnLog::logLevelFromString(settings.value(key("logLevel")).toString());
+    const auto confLevel = QnLog::logLevelFromString(settings.value(makeKey("logLevel")).toString());
     if (confLevel != cl_logUNKNOWN)
         level = confLevel;
 
-    directory = settings.value(key("logDir")).toString();
-    maxBackupCount = (quint8) settings.value(key("maxBackupCount"), 5).toInt();
+    directory = settings.value(makeKey("logDir")).toString();
+    maxBackupCount = (quint8) settings.value(makeKey("maxBackupCount"), 5).toInt();
     maxFileSize = (quint32) nx::utils::stringToBytes(
-        settings.value(key("maxFileSize")).toString(), maxFileSize);
+        settings.value(makeKey("maxFileSize")).toString(), maxFileSize);
 }
 
 void initializeQnLog(
