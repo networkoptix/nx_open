@@ -12,7 +12,7 @@
 
 int QnGetSystemIdRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
-    result = qnGlobalSettings->localSystemID().toByteArray();
+    result = qnGlobalSettings->localSystemId().toByteArray();
     contentType = "application/text";
     return nx_http::StatusCode::ok;
 }

@@ -3,6 +3,10 @@
 #include <core/resource/media_server_resource.h>
 #include <nx_ec/data/api_discovery_data.h>
 
+/**
+ * This class is used for DesktopClient purpose to put incompatible
+ * media servers to the resource tree.
+ */
 class QnFakeMediaServerResource: public QnMediaServerResource
 {
     Q_OBJECT

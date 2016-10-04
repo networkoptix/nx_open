@@ -558,7 +558,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
         QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
         auto systemId = server->getModuleInformation().localSystemId;
-        if (systemId == qnGlobalSettings->localSystemID())
+        if (systemId == qnGlobalSettings->localSystemId())
             return m_rootNodes[Qn::ServersNode];
 
         return ensureSystemNode(server->getModuleInformation().systemName);

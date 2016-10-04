@@ -204,7 +204,7 @@ void resumeConnectionsToRemotePeers()
 
 bool changeLocalSystemId(const ConfigureSystemData& data)
 {
-    if (qnGlobalSettings->localSystemID() == data.localSystemId)
+    if (qnGlobalSettings->localSystemId() == data.localSystemId)
         return true;
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
@@ -247,7 +247,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
 
     if (data.localSystemId.isNull())
         qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->setLocalSystemID(data.localSystemId);
+    qnGlobalSettings->setLocalSystemId(data.localSystemId);
     qnGlobalSettings->synchronizeNowSync();
 
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);

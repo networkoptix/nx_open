@@ -82,8 +82,8 @@ int QnConfigureRestHandler::execute(
     }
 
     /* set system id */
-    const auto oldSystemId = qnGlobalSettings->localSystemID();
-    if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemID())
+    const auto oldSystemId = qnGlobalSettings->localSystemId();
+    if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemId())
     {
         if (!backupDatabase())
         {

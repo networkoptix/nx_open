@@ -241,7 +241,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
         AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
-        QByteArray datagram = DiscoveryPacket::getRequest(qnGlobalSettings->localSystemID().toByteArray());
+        QByteArray datagram = DiscoveryPacket::getRequest(qnGlobalSettings->localSystemId().toByteArray());
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
     }
 
@@ -268,7 +268,7 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.systemId() != qnGlobalSettings->localSystemID())
+            if (packet.isValidPacket() && packet.systemId() != qnGlobalSettings->localSystemId())
             {
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]

@@ -175,7 +175,7 @@ void QnServerUpdatesModel::resetResourses() {
     for (const QnMediaServerResourcePtr &server: allServers)
         m_items.append(new Item(server));
 
-    const auto localSystemId = qnGlobalSettings->localSystemID();
+    const auto localSystemId = qnGlobalSettings->localSystemId();
     for (const QnResourcePtr &resource: qnResPool->getAllIncompatibleResources())
     {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
@@ -201,7 +201,7 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemID())
+    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
         return;
 
     int row = m_items.size();
@@ -231,7 +231,7 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
 
     QModelIndex idx = index(server);
     bool exists = idx.isValid();
-    bool isOurServer = (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemID());
+    bool isOurServer = (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemId());
 
     if (exists == isOurServer) {
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));

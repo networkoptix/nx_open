@@ -142,12 +142,12 @@ void QnTransactionTcpProcessor::run()
         QnAppInfo::defaultCloudHost().toUtf8()));
     d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_SYSTEM_ID_HEADER_NAME,
-        qnGlobalSettings->localSystemID().toByteArray()));
+        qnGlobalSettings->localSystemId().toByteArray()));
 
     auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
     if( (systemNameHeaderIter != d->request.headers.end()) &&
         (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
-            qnGlobalSettings->localSystemID().toByteArray()) )
+            qnGlobalSettings->localSystemId().toByteArray()) )
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
@@ -188,12 +188,12 @@ void QnTransactionTcpProcessor::run()
 
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
-            qnGlobalSettings->localSystemID().toByteArray()));
+            qnGlobalSettings->localSystemId().toByteArray()));
 
         auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
         if( (systemNameHeaderIter != d->request.headers.end()) &&
             (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
-                qnGlobalSettings->localSystemID().toByteArray()) )
+                qnGlobalSettings->localSystemId().toByteArray()) )
         {
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;

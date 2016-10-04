@@ -316,8 +316,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         !item.addresses.contains(endpoint)) // Same ip:port with different runtime id means that
                                             // server was restarted
     {
-        bool oldModuleIsValid = item.moduleInformation.localSystemId == qnGlobalSettings->localSystemID();
-        bool newModuleIsValid = moduleInformation.localSystemId == qnGlobalSettings->localSystemID();
+        bool oldModuleIsValid = item.moduleInformation.localSystemId == qnGlobalSettings->localSystemId();
+        bool newModuleIsValid = moduleInformation.localSystemId == qnGlobalSettings->localSystemId();
 
         if (oldModuleIsValid == newModuleIsValid)
         {

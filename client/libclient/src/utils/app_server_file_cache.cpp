@@ -60,7 +60,7 @@ QnAppServerFileCache::~QnAppServerFileCache() {
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     /* Avoid empty folder name and collisions with our folders such as 'log'. */
-    QString systemName = L'_' + nx::utils::replaceNonFileNameCharacters(qnGlobalSettings->localSystemID().toString(), L'_');
+    QString systemName = L'_' + nx::utils::replaceNonFileNameCharacters(qnGlobalSettings->localSystemId().toString(), L'_');
 
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     return QDir::toNativeSeparators(QString(lit("%1/cache/%2/%3/%4"))

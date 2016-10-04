@@ -176,7 +176,7 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id)
     if (iter == boost::end(modules))
         return;
 
-    if (iter->localSystemId != qnGlobalSettings->localSystemID()) {
+    if (iter->localSystemId != qnGlobalSettings->localSystemId()) {
         printLog("Server has another system ID: " + iter->localSystemId.toByteArray());
         for (InterfaceInfo &item: interfaces)
             item.ignored = true;

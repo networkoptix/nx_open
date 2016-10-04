@@ -55,7 +55,7 @@ const QString kNameStatisticsReportLastVersion(lit("statisticsReportLastVersion"
 const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
 const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
 const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
-const QString kNameLocalSystemID(lit("localSystemId"));
+const QString kNameLocalSystemId(lit("localSystemId"));
 const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
@@ -68,7 +68,7 @@ const QString ldapSearchBase(lit("ldapSearchBase"));
 const QString ldapSearchFilter(lit("ldapSearchFilter"));
 
 const QString kNameCloudAccountName(lit("cloudAccountName"));
-const QString kNameCloudSystemID(lit("cloudSystemID"));
+const QString kNameCloudSystemId(lit("cloudSystemID")); //< todo: rename it to cloudSystemId
 const QString kNameCloudAuthKey(lit("cloudAuthKey"));
 const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
 const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
@@ -145,8 +145,8 @@ public:
     void setUpnpPortMappingEnabled(bool value);
 
     /** local systemId. Media servers connect if this value equal */
-    QnUuid localSystemID() const;
-    void setLocalSystemID(const QnUuid& value);
+    QnUuid localSystemId() const;
+    void setLocalSystemId(const QnUuid& value);
 
     QString clientStatisticsSettingsUrl() const;
 
@@ -174,8 +174,8 @@ public:
     QString cloudAccountName() const;
     void setCloudAccountName(const QString& value);
 
-    QString cloudSystemID() const;
-    void setCloudSystemID(const QString& value);
+    QString cloudSystemId() const;
+    void setCloudSystemId(const QString& value);
 
     QString cloudAuthKey() const;
     void setCloudAuthKey(const QString& value);
@@ -187,7 +187,7 @@ public:
 
     // -- Misc settings
 
-    bool isNewSystem() const { return localSystemID().isNull(); }
+    bool isNewSystem() const { return localSystemId().isNull(); }
     /** Media server put cloud host here from QnAppInfo::defaultCloudHost */
     QString cloudHost() const;
     void setCloudHost(const QString& value);
@@ -290,7 +290,7 @@ private:
 
     // set of cloud adaptors
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;
-    QnResourcePropertyAdaptor<QString>* m_cloudSystemIDAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
 
     // misc adaptors

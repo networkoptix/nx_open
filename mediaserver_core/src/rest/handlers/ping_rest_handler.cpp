@@ -18,7 +18,7 @@ int QnPingRestHandler::executeGet(const QString &path, const QnRequestParams &pa
 
     QnPingReply reply;
     reply.moduleGuid = qnCommon->moduleGUID();
-    reply.localSystemId = qnGlobalSettings->localSystemID();
+    reply.localSystemId = qnGlobalSettings->localSystemId();
     reply.sysIdTime = qnCommon->systemIdentityTime();
     reply.tranLogTime = ec2Connection->getTransactionLogTime();
 

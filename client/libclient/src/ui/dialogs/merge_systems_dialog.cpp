@@ -222,7 +222,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     case QnMergeSystemsTool::StarterLicenseError:
     {
         QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
-        if (server && server->getStatus() == Qn::Online && moduleInformation.localSystemId == qnGlobalSettings->localSystemID())
+        if (server && server->getStatus() == Qn::Online && moduleInformation.localSystemId == qnGlobalSettings->localSystemId())
         {
             if (m_url.host() == lit("localhost") || m_url.host() == lit("127.0.0.1"))
                 updateErrorLabel(tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));

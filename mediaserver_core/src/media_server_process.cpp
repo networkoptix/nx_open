@@ -1795,7 +1795,7 @@ void MediaServerProcess::doMigrateSystemNameFromConfig(CloudConnectionManager* c
     if (systemName.isDefault())
         resetCloudParams(cloudConnectionManager);
 
-    qnGlobalSettings->setLocalSystemID(systemName.isDefault() ? QnUuid() : QnUuid::createUuid());
+    qnGlobalSettings->setLocalSystemId(systemName.isDefault() ? QnUuid() : QnUuid::createUuid());
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file
@@ -2326,7 +2326,7 @@ void MediaServerProcess::run()
 
     // show our cloud host value in registry in case of installer will check it
     MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey,
-        qnGlobalSettings->cloudSystemID().isEmpty() ? "no" : "yes");
+        qnGlobalSettings->cloudSystemId().isEmpty() ? "no" : "yes");
     MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
 
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
@@ -2390,12 +2390,12 @@ void MediaServerProcess::run()
     {
         bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
             qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
-        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemID().isEmpty();
+        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
         if (isNewServerInstance ||
             (isCloudInstanceChanged && isConnectedToCloud))
         {
             resetCloudParams(&cloudConnectionManager);
-            qnGlobalSettings->setLocalSystemID(QnUuid()); //< go to new state
+            qnGlobalSettings->setLocalSystemId(QnUuid()); //< go to new state
         }
         if (isCloudInstanceChanged)
         {

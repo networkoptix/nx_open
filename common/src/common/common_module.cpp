@@ -248,8 +248,8 @@ void QnCommonModule::updateModuleInformationUnsafe()
     m_moduleInformation.serverFlags = server->getServerFlags();
 
     m_moduleInformation.systemName = qnGlobalSettings->systemName();
-    m_moduleInformation.localSystemId = qnGlobalSettings->localSystemID();
-    m_moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemID();
+    m_moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
+    m_moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)

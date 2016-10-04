@@ -57,7 +57,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, kNameCloudSystemID));
+            QnJsonRestResult::MissingParameter, kNameCloudSystemId));
         return nx_http::StatusCode::ok;
     }
 
@@ -77,7 +77,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    const QString cloudSystemId = qnGlobalSettings->cloudSystemID();
+    const QString cloudSystemId = qnGlobalSettings->cloudSystemId();
     if (!cloudSystemId.isEmpty() &&
         !qnGlobalSettings->cloudAuthKey().isEmpty())
     {
@@ -100,7 +100,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     }
 
 
-    qnGlobalSettings->setCloudSystemID(data.cloudSystemID);
+    qnGlobalSettings->setCloudSystemId(data.cloudSystemID);
     qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
     qnGlobalSettings->setCloudAuthKey(data.cloudAuthKey);
     if (!qnGlobalSettings->synchronizeNowSync())

@@ -104,14 +104,14 @@ namespace ec2
         #undef dbManager_queryOrReturn
         #undef dbManager_queryOrReturn_uuid
 
-        outData->systemId = qnGlobalSettings->localSystemID();
+        outData->systemId = qnGlobalSettings->localSystemId();
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = qnGlobalSettings->localSystemID();
+        outData->systemId = qnGlobalSettings->localSystemId();
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
     }

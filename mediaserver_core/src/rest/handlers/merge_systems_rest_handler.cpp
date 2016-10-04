@@ -370,7 +370,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
 
     ConfigureSystemData data;
-    data.localSystemId = qnGlobalSettings->localSystemID();
+    data.localSystemId = qnGlobalSettings->localSystemId();
     data.sysIdTime = qnCommon->systemIdentityTime();
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     data.tranLogTime = ec2Connection->getTransactionLogTime();

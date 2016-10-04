@@ -36,7 +36,7 @@ public:
     bool boundToCloud() const;
     /** Returns \a nullptr if not connected to the cloud */
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
-        const QString& cloudSystemID,
+        const QString& cloudSystemId,
         const QString& cloudAuthKey) const;
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
@@ -53,7 +53,7 @@ signals:
     void disconnectedFromCloud();
 
 private:
-    QString m_cloudSystemID;
+    QString m_cloudSystemId;
     QString m_cloudAuthKey;
     SocketAddress m_proxyAddress;
     mutable QnMutex m_mutex;

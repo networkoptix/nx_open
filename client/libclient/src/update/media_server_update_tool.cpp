@@ -139,7 +139,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
 
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>())
     {
-        if (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemID() &&
+        if (server->getModuleInformation().localSystemId == qnGlobalSettings->localSystemId() &&
             server.dynamicCast<QnFakeMediaServerResource>())
         {
             result.append(server);

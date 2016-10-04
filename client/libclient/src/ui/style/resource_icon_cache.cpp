@@ -207,7 +207,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             case Qn::Incompatible:
                 if (auto server = resource.dynamicCast<QnMediaServerResource>())
                 {
-                    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemID())
+                    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemId())
                     {
                         status = Online;
                         break;

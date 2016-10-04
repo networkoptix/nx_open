@@ -231,13 +231,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
 QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 {
     m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAccountName, QString(), this);
-    m_cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemID, QString(), this);
+    m_cloudSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemId, QString(), this);
     m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAuthKey, QString(), this);
 
     QnGlobalSettings::AdaptorList result;
     result
         << m_cloudAccountNameAdaptor
-        << m_cloudSystemIDAdaptor
+        << m_cloudSystemIdAdaptor
         << m_cloudAuthKeyAdaptor
         ;
 
@@ -250,7 +250,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 {
     m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemName, QString(), this);
-    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameLocalSystemID, QString(), this);
+    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameLocalSystemId, QString(), this);
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
@@ -482,7 +482,7 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
     changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings);
     changed |= m_clientStatisticsSettingsUrlAdaptor->takeFromSettings(settings);
 
-    changed |= m_cloudSystemIDAdaptor->takeFromSettings(settings);
+    changed |= m_cloudSystemIdAdaptor->takeFromSettings(settings);
     changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings);
 
     /**
@@ -620,12 +620,12 @@ void QnGlobalSettings::setUpnpPortMappingEnabled(bool value)
     m_upnpPortMappingEnabledAdaptor->setValue(value);
 }
 
-QnUuid QnGlobalSettings::localSystemID() const
+QnUuid QnGlobalSettings::localSystemId() const
 {
     return QnUuid(m_localSystemIdAdaptor->value());
 }
 
-void QnGlobalSettings::setLocalSystemID(const QnUuid& value)
+void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
 {
     m_localSystemIdAdaptor->setValue(value.toString());
 }
@@ -705,14 +705,14 @@ void QnGlobalSettings::setCloudAccountName(const QString& value)
     m_cloudAccountNameAdaptor->setValue(value);
 }
 
-QString QnGlobalSettings::cloudSystemID() const
+QString QnGlobalSettings::cloudSystemId() const
 {
-    return nx::utils::decodeStringFromHexStringAES128CBC(m_cloudSystemIDAdaptor->value());
+    return nx::utils::decodeStringFromHexStringAES128CBC(m_cloudSystemIdAdaptor->value());
 }
 
-void QnGlobalSettings::setCloudSystemID(const QString& value)
+void QnGlobalSettings::setCloudSystemId(const QString& value)
 {
-    m_cloudSystemIDAdaptor->setValue(nx::utils::encodeHexStringFromStringAES128CBC(value));
+    m_cloudSystemIdAdaptor->setValue(nx::utils::encodeHexStringFromStringAES128CBC(value));
 }
 
 QString QnGlobalSettings::cloudAuthKey() const
@@ -738,7 +738,7 @@ void QnGlobalSettings::setSystemName(const QString& value)
 void QnGlobalSettings::resetCloudParams()
 {
     setCloudAccountName(QString());
-    setCloudSystemID(QString());
+    setCloudSystemId(QString());
     setCloudAuthKey(QString());
 }
 
