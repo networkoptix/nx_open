@@ -17,6 +17,7 @@ namespace media {
 namespace {
 
 static const QSize kMaxTranscodingResolution(1920, 1080);
+static const QSize kDefaultAspect(16, 9);
 
 static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
 {
@@ -55,7 +56,10 @@ static QSize resolutionWithHeightAndAspect(int height, const QSize& aspect)
 }
 
 static QSize transcodingResolution(
-    QSize lowResolution, QSize highResolution, int videoQuality, AVCodecID transcodingCodec)
+    const QSize& lowResolution,
+    const QSize& highResolution,
+    int videoQuality,
+    AVCodecID transcodingCodec)
 {
     // Here videoQuality should not be a special value.
     NX_ASSERT(videoQuality != Player::HighVideoQuality);
@@ -65,7 +69,7 @@ static QSize transcodingResolution(
     if (aspect.isEmpty()) //< High stream resolution is unknown.
         aspect = lowResolution;
     if (aspect.isEmpty()) //< Both Low and High stream resolutions are unknown.
-        aspect = QSize(16, 9);
+        aspect = kDefaultAspect;
 
     const QSize& desiredResolution = resolutionWithHeightAndAspect(videoQuality, aspect);
 
@@ -105,7 +109,7 @@ static bool isTranscodingSupported(
     if (!server)
         return false;
 
-    return server->getServerFlags() & Qn::SF_SupportsTranscoding;
+    return server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding);
 }
 
 } // namespace

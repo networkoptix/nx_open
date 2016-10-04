@@ -4272,6 +4272,7 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabas
 }
 
 
+// TODO: #mike Check dummy vs QnUuid
 // ApiFullInfo
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfoData& data)
 {
