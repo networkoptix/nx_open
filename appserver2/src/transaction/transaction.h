@@ -1313,10 +1313,10 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
     struct HistoryAttributes
     {
         /** Id of user or entity who created transaction. */
-        QnUuid creatorGuid;
+        QnUuid author;
     };
 
-    #define HistoryAttributes_Fields (creatorGuid)
+    #define HistoryAttributes_Fields (author)
     QN_FUSION_DECLARE_FUNCTIONS(HistoryAttributes, (json)(ubjson)(xml)(csv_record))
 
     class QnAbstractTransaction

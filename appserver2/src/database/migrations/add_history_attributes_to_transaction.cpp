@@ -13,7 +13,7 @@ namespace after {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     HistoryAttributes,
     (ubjson),
-    (creatorGuid),
+    (author),
     (optional, false))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

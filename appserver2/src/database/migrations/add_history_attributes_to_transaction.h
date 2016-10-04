@@ -20,7 +20,7 @@ namespace after {
 struct HistoryAttributes
 {
     /** Id of user or entity who created transaction. */
-    QnUuid creatorGuid;
+    QnUuid author;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(HistoryAttributes, (ubjson))
