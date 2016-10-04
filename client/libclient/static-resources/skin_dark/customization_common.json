@@ -450,7 +450,12 @@
     },
 
     "QnResourceWidget": {
-        "palette": { "default": { "highlight": "selection" } }
+        "palette": {
+            "default": {
+                "window": "dark5",
+                "highlight": "selection"
+            }
+        }
     },
 
     "QnServerResourceWidget": {
@@ -688,7 +693,6 @@
     },
 
     "QnMediaResourceWidget": {
-        "palette": { "default": { "window": "dark4" } },
         "motionSensitivityColors": [
             "light16",
             "#627cd6",

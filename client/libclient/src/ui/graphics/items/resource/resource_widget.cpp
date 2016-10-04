@@ -1006,12 +1006,12 @@ QColor QnResourceWidget::calculateFrameColor() const
     }
 }
 
-void QnResourceWidget::paintWindowFrame(QPainter *painter,
-    const QStyleOptionGraphicsItem *option,
-    QWidget *widget)
+void QnResourceWidget::paintWindowFrame(
+    QPainter* painter,
+    const QStyleOptionGraphicsItem* option,
+    QWidget* /*widget*/)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    painter->fillRect(option->exposedRect, palette().window());
 
     if (qFuzzyIsNull(m_frameOpacity))
         return;
