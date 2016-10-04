@@ -11,12 +11,16 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/from_this_to_shared.h>
+#include <utils/common/connective.h>
 
-class QnResourceTreeModelNode: public QObject, public QnWorkbenchContextAware, public QnFromThisToShared<QnResourceTreeModelNode>
+class QnResourceTreeModelNode:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware,
+    public QnFromThisToShared<QnResourceTreeModelNode>
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    using base_type = Connective<QObject>;
 public:
     enum State
     {
@@ -48,7 +52,8 @@ public:
 
     ~QnResourceTreeModelNode();
 
-    void setResource(const QnResourcePtr &resource);
+    virtual void setResource(const QnResourcePtr &resource);
+    virtual void setParent(const QnResourceTreeModelNodePtr& parent);
 
     void update();
 
@@ -66,7 +71,7 @@ public:
 
     QnResourceTreeModelNodePtr parent() const ;
 
-    void setParent(const QnResourceTreeModelNodePtr& parent) ;
+
 
     QModelIndex createIndex(int row, int col);
     QModelIndex createIndex(int col);
@@ -82,6 +87,9 @@ public:
     void setModified(bool modified) ;
 
 protected:
+
+    QnResourceTreeModel* model() const;
+
     void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
     void addChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();

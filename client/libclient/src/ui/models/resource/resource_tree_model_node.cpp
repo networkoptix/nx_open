@@ -449,10 +449,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         /* Hide resource nodes without resource. */
         if (!m_resource)
             return true;
-
-        /* Only admin can see items under shared layout links. */
-        if (m_parent && m_parent->type() == Qn::SharedLayoutNode)
-            return !isAdmin;
+        return false;
 
         return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
 
@@ -870,6 +867,11 @@ void QnResourceTreeModelNode::setModified(bool modified)
     m_modified = modified;
 
     changeInternal();
+}
+
+QnResourceTreeModel* QnResourceTreeModelNode::model() const
+{
+    return m_model;
 }
 
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)

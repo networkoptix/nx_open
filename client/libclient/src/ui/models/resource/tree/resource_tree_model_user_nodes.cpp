@@ -14,6 +14,7 @@
 
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node.h>
+#include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -356,7 +357,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureLayoutNode(
         ? Qn::SharedLayoutNode
         : Qn::ResourceNode;
 
-    QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, layout, nodeType));
+    QnResourceTreeModelNodePtr node(new QnResourceTreeModelLayoutNode(m_model, layout, nodeType));
     auto parent = ensureSubjectNode(subject);
     if (placeholderAllowedForSubject(subject, Qn::SharedLayoutsNode))
         parent = ensurePlaceholderNode(subject, Qn::SharedLayoutsNode);

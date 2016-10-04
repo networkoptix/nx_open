@@ -107,9 +107,6 @@ private slots:
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_resourceChanged(const QnResourcePtr &resource);
 
-    void at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-    void at_layout_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-
     void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
             const QnVideoWallItem& oldItem,
@@ -124,8 +121,6 @@ private slots:
     void at_server_systemNameChanged(const QnResourcePtr &resource);
     void at_server_redundancyChanged(const QnResourcePtr &resource);
     void at_commonModule_systemNameChanged();
-
-    void at_user_enabledChanged(const QnUserResourcePtr& user);
 
     void at_serverAutoDiscoveryEnabledChanged();
 
