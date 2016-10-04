@@ -1646,13 +1646,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
 
-
-        const bool buttonIsVisible = (buttonsOverlay()->rightButtonsBar()->visibleButtons() & Qn::IoModuleButton);
-        const QnImageButtonWidget * const button = buttonsOverlay()->rightButtonsBar()->button(Qn::IoModuleButton);
-        const bool licenseError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisible in this case if license error
-        const bool isZoomWindow = !zoomRect().isNull();
-
-        if (licenseError && !isZoomWindow)
+        if (m_ioLicenceStatusHelper->status() != QnSingleCamLicenceStatusHelper::LicenseUsed)
             return Qn::IoModuleDisabledOverlay;
     }
 
@@ -1947,8 +1941,6 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = !hasVideo();
     const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
-
-    const auto resource = m_display->resource();
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
 
