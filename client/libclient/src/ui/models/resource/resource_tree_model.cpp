@@ -880,11 +880,8 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (resource.dynamicCast<QnUserResource>())
         return;
 
-    connect(resource,       &QnResource::parentIdChanged,                this,  &QnResourceTreeModel::at_resource_parentIdChanged);
-    connect(resource,       &QnResource::nameChanged,                    this,  &QnResourceTreeModel::at_resource_resourceChanged);
-    connect(resource,       &QnResource::statusChanged,                  this,  &QnResourceTreeModel::at_resource_resourceChanged);
-    connect(resource,       &QnResource::urlChanged,                     this,  &QnResourceTreeModel::at_resource_resourceChanged);
-    connect(resource,       &QnResource::flagsChanged,                   this,  &QnResourceTreeModel::at_resource_resourceChanged);
+    connect(resource, &QnResource::parentIdChanged, this,
+        &QnResourceTreeModel::at_resource_parentIdChanged);
 
     QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
     if (videoWall)
@@ -901,15 +898,18 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera)
     {
-        connect(camera,     &QnVirtualCameraResource::groupIdChanged,   this,   &QnResourceTreeModel::at_resource_parentIdChanged);
-        connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourceTreeModel::at_camera_groupNameChanged);
-        connect(camera,     &QnVirtualCameraResource::statusFlagsChanged, this, &QnResourceTreeModel::at_resource_resourceChanged);
+        connect(camera, &QnVirtualCameraResource::groupIdChanged,   this, &QnResourceTreeModel::at_resource_parentIdChanged);
+        connect(camera, &QnVirtualCameraResource::groupNameChanged, this, &QnResourceTreeModel::at_camera_groupNameChanged);
+
         auto updateParent = [this](const QnResourcePtr &resource)
             {
                 /* Automatically update display name of the EDGE server if its camera was renamed. */
                 QnResourcePtr parent = resource->getParentResource();
                 if (QnMediaServerResource::isEdgeServer(parent))
-                    at_resource_resourceChanged(parent);
+                {
+                    for (auto node : m_nodesByResource.value(parent))
+                        node->update();
+                }
             };
         connect(camera, &QnResource::nameChanged, this, updateParent);
         updateParent(camera);
@@ -918,10 +918,14 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server)
     {
-        connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourceTreeModel::at_server_redundancyChanged);
+        connect(server, &QnMediaServerResource::redundancyChanged, this,
+            &QnResourceTreeModel::at_server_redundancyChanged);
 
         if (QnMediaServerResource::isFakeServer(server))
-            connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourceTreeModel::at_server_systemNameChanged);
+        {
+            connect(server, &QnMediaServerResource::systemNameChanged, this,
+                &QnResourceTreeModel::at_server_systemNameChanged);
+        }
     }
 
     auto node = ensureResourceNode(resource);
@@ -1126,16 +1130,6 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
     }
 
     updateNodeParent(node);
-}
-
-void QnResourceTreeModel::at_resource_resourceChanged(const QnResourcePtr &resource)
-{
-    if (m_nodesByResource.contains(resource))
-        for (auto node: m_nodesByResource[resource])
-            node->update();
-
-    if (resource == context()->user())
-        m_rootNodes[Qn::CurrentUserNode]->update();
 }
 
 void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)

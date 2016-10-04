@@ -105,7 +105,6 @@ private slots:
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
-    void at_resource_resourceChanged(const QnResourcePtr &resource);
 
     void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,

@@ -49,7 +49,6 @@ void QnResourceTreeModelLayoutNode::setResource(const QnResourcePtr &resource)
     if (!this->resource())
         return;
 
-    disconnect(this->resource(), nullptr, this, nullptr);
     disconnect(qnResPool, nullptr, this, nullptr);
     base_type::setResource(resource);
     for (auto node : m_items)

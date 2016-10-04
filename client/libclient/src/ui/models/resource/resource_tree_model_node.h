@@ -58,7 +58,6 @@ public:
 
     void update();
 
-
     Qn::NodeType type() const ;
     QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
