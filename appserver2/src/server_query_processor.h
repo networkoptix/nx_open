@@ -331,15 +331,12 @@ private:
     ErrorCode removeHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend,
-        bool notificationNeeded = false,
         TransactionType::Value transactionType = TransactionType::Regular);
 
     ErrorCode removeObjAttrHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
     ErrorCode removeObjParamsHelper(
@@ -347,19 +344,12 @@ private:
         const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
-    ErrorCode removeLayoutsHelper(
-        const QnTransaction<ApiIdData>& tran,
-        const AbstractECConnectionPtr& connection,
-        std::list<std::function<void()>>* const transactionsToSend);
-
     ErrorCode removeObjAccessRightsHelper(
         const QnUuid& id,
-        const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend);
 
     ErrorCode removeResourceStatusHelper(
         const QnUuid& id,
-        const AbstractECConnectionPtr& connection,
         std::list<std::function<void()>>* const transactionsToSend,
         TransactionType::Value transactionType = TransactionType::Regular);
 
@@ -389,7 +379,6 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeCameraUserAttributes,
-                        connection,
                         transactionsToSend),
                     lit("Remove camera attributes failed"));
 
@@ -400,7 +389,6 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        connection,
                         transactionsToSend),
                     lit("Remove resource access status failed"));
 
@@ -413,7 +401,6 @@ private:
                     removeObjAttrHelper(
                         tran.params.id,
                         ApiCommand::removeServerUserAttributes,
-                        connection,
                         transactionsToSend),
                     lit("Remove server attrs failed"));
 
@@ -434,7 +421,6 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        connection,
                         transactionsToSend,
                         TransactionType::Local),
                     lit("Remove resource status failed"));
@@ -447,7 +433,6 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        connection,
                         transactionsToSend),
                     lit("Remove resource status failed"));
 
@@ -461,11 +446,14 @@ private:
                     lit("Remove user params failed"));
 
                 RUN_AND_CHECK_ERROR(
-                    removeLayoutsHelper(
-                        tran,
-                        connection,
+                    processMultiUpdateSync(
+                        ApiCommand::removeLayout,
+                        tran.transactionType,
+                        dbManager(m_userAccessData)
+                            .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
+                            .toIdList(),
                         transactionsToSend),
-                    lit("Remove resource status failed"));
+                    lit("Remove user child resources failed"));
 
                 break;
             }
@@ -477,7 +465,6 @@ private:
         RUN_AND_CHECK_ERROR(
             removeObjAccessRightsHelper(
                 tran.params.id,
-                connection,
                 transactionsToSend),
             lit("Remove resource access rights failed"));
 
