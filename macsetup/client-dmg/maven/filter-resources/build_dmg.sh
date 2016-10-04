@@ -44,6 +44,7 @@ rm "$SRC/DS_Store"
 
 python macdeployqt.py "$SRC/${display.product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP"
 security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
+security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
 
 # Boris, move this to a separate script (of even folder), please
 rm -rf "$AS_SRC"
