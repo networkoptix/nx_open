@@ -54,6 +54,13 @@ QnAccessibleResourcesModel::QnAccessibleResourcesModel(QObject* parent) :
     m_allChecked(false),
     m_subject()
 {
+    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+        [this](const QnResourceAccessSubject& subject)
+        {
+            if (subject == m_subject)
+                accessChanged();
+        });
+
 }
 
 QnAccessibleResourcesModel::~QnAccessibleResourcesModel()
@@ -162,7 +169,7 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
 
                 //TODO: #GDM #implement me #high #3.0
                 case Qt::ToolTipRole:
-                    return lit("FIX_ME");
+                    return lit("WILL_BE_FIXED_A_BIT_LATER");
 
                 case Qn::DisabledRole:
                     return index.sibling(index.row(), NameColumn).data(role);
