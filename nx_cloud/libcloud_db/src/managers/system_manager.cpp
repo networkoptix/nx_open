@@ -1060,25 +1060,19 @@ nx::db::DBResult SystemManager::fetchUserSharing(
         {{{"email", ":accountEmail", QnSql::serialized_field(accountEmail)},
           {"system_id", ":systemId", QnSql::serialized_field(systemId)}}};
 
-    std::vector<api::SystemSharingEx> sharings;
-    const auto result = fetchUserSharings(
+    const auto dbResult = fetchUserSharing(
         queryContext,
-        &sharings,
-        std::move(sqlFilter));
-    if (result != nx::db::DBResult::ok)
+        sqlFilter,
+        sharing);
+    if (dbResult != nx::db::DBResult::ok &&
+        dbResult != nx::db::DBResult::notFound)
     {
         NX_LOGX(lm("Error fetching sharing of system %1 to account %2")
             .arg(systemId).arg(accountEmail),
             cl_logWARNING);
-        return result;
     }
-    if (sharings.empty())
-        return nx::db::DBResult::notFound;
 
-    NX_ASSERT(sharings.size() == 1);
-    *sharing = std::move(sharings[0]);
-
-    return nx::db::DBResult::ok;
+    return dbResult;
 }
 
 template<std::size_t filterFieldCount>
@@ -1131,6 +1125,28 @@ nx::db::DBResult SystemManager::fetchUserSharings(
     return nx::db::DBResult::ok;
 }
 
+template<std::size_t filterFieldCount>
+nx::db::DBResult SystemManager::fetchUserSharing(
+    nx::db::QueryContext* const queryContext,
+    std::array<SqlFilterByField, filterFieldCount> filterFields,
+    api::SystemSharingEx* const sharing)
+{
+    std::vector<api::SystemSharingEx> sharings;
+    const auto result = fetchUserSharings(
+        queryContext,
+        &sharings,
+        std::move(filterFields));
+    if (result != nx::db::DBResult::ok)
+        return result;
+    if (sharings.empty())
+        return nx::db::DBResult::notFound;
+
+    NX_ASSERT(sharings.size() == 1);
+    *sharing = std::move(sharings[0]);
+
+    return nx::db::DBResult::ok;
+}
+
 nx::db::DBResult SystemManager::fetchAccountToShareWith(
     nx::db::QueryContext* const queryContext,
     const std::string& grantorEmail,
@@ -1166,7 +1182,7 @@ nx::db::DBResult SystemManager::fetchAccountToShareWith(
 
         auto notification = std::make_unique<InviteUserNotification>();
         notification->message.sharer_email = grantorEmail;
-        if (grantorAccountData)
+        if (grantorAccountData) //< It is ok if grantor is unknown (it can be local system user).
             notification->message.sharer_name = grantorAccountData->fullName;
         notification->message.system_id = sharing.systemID;
         notification->message.system_name = systemName;
@@ -1811,41 +1827,46 @@ void SystemManager::expiredSystemsDeletedFromDb(
 nx::db::DBResult SystemManager::processEc2SaveUser(
     nx::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::ApiUserData data,
+    ::ec2::QnTransaction<::ec2::ApiUserData> transaction,
     data::SystemSharing* const systemSharingData)
 {
+    const auto& vmsUser = transaction.params;
+
     NX_LOGX(lm("Processing vms transaction saveUser. "
         "user %1, systemId %2, permissions %3, enabled %4")
-        .arg(data.email).arg(systemId)
-        .arg(QnLexical::serialized(data.permissions)).arg(data.isEnabled),
+        .arg(vmsUser.email).arg(systemId)
+        .arg(QnLexical::serialized(vmsUser.permissions)).arg(vmsUser.isEnabled),
         cl_logDEBUG2);
 
     // Preparing SystemSharing structure.
     systemSharingData->systemID = systemId.toStdString();
-    ec2::convert(data, systemSharingData);
+    ec2::convert(vmsUser, systemSharingData);
 
     // We have no information about grantor here. Using system owner...
-    std::string ownerEmail;
+    std::array<SqlFilterByField, 1> sqlFilter = 
+        {{{"vms_user_id", ":vmsUserId",
+           QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())}}};
+    api::SystemSharingEx grantorInfo;
+    auto dbResult = fetchUserSharing(queryContext, std::move(sqlFilter), &grantorInfo);
+    if (dbResult != nx::db::DBResult::ok &&
+        dbResult != nx::db::DBResult::notFound)
     {
-        QnMutexLocker lk(&m_mutex);
-        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-        const auto systemIter = systemByIdIndex.find(
-            std::string(systemId.constData(), systemId.size()));
-        NX_ASSERT(systemIter != systemByIdIndex.end());
-        if (systemIter != systemByIdIndex.end())
-            ownerEmail = systemIter->ownerAccountEmail;
+        NX_LOGX(lm("Error fetching saveUser transaction author. systemId %1")
+            .arg(systemId), cl_logDEBUG1);
+        return dbResult;
     }
+    //< System could have been shared by a local user, so we will not find him in our DB.
 
     // Updating db.
     data::AccountData account;
-    const nx::db::DBResult result = 
-        updateSharingInDb(queryContext, ownerEmail, *systemSharingData, &account);
-    if (result != nx::db::DBResult::ok)
-        return result;
+    dbResult = updateSharingInDb(
+        queryContext, grantorInfo.accountEmail, *systemSharingData, &account);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     // Generating "save full name" transaction.
     ::ec2::ApiResourceParamWithRefData fullNameData;
-    fullNameData.resourceId = data.id;
+    fullNameData.resourceId = vmsUser.id;
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(account.fullName);
     return m_transactionLog->generateTransactionAndSaveToLog<
@@ -1869,9 +1890,11 @@ void SystemManager::onEc2SaveUserDone(
 nx::db::DBResult SystemManager::processEc2RemoveUser(
     nx::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::ApiIdData data,
+    ::ec2::QnTransaction<::ec2::ApiIdData> transaction,
     data::SystemSharing* const systemSharingData)
 {
+    const auto& data = transaction.params;
+
     NX_LOGX(
         QnLog::EC2_TRAN_LOG,
         lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
@@ -1960,9 +1983,11 @@ void SystemManager::onEc2RemoveUserDone(
 nx::db::DBResult SystemManager::processSetResourceParam(
     nx::db::QueryContext* queryContext,
     const nx::String& systemId,
-    ::ec2::ApiResourceParamWithRefData data,
+    ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> transaction,
     data::SystemNameUpdate* const systemNameUpdate)
 {
+    const auto& data = transaction.params;
+
     if (data.resourceId != QnUserResource::kAdminGuid ||
         data.name != QnGlobalSettings::kNameSystemName)
     {
