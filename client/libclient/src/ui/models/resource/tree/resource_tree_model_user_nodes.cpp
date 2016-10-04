@@ -63,6 +63,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
 {
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserNodes::handleAccessChanged);
+
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged);
 
@@ -80,6 +81,14 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
         [this](const QnResourcePtr& resource)
         {
             disconnect(resource, nullptr, this, nullptr);
+        });
+
+    /* Handling only rename here, all other issues are handled by access provider. */
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        [this](const ec2::ApiUserGroupData& role)
+        {
+            if (m_roles.contains(role.id))
+                m_roles[role.id]->update();
         });
 }
 
