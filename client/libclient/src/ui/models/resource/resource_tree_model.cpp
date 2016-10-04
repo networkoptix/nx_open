@@ -1126,12 +1126,6 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
     }
 
     updateNodeParent(node);
-//
-//     if (auto layout = resource.dynamicCast<QnLayoutResource>())
-//     {
-//         if (layout->isShared())
-//             updateSharedLayoutNodes(layout);
-//     }
 }
 
 void QnResourceTreeModel::at_resource_resourceChanged(const QnResourcePtr &resource)

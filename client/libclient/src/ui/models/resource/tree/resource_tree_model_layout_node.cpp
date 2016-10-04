@@ -28,6 +28,8 @@ QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnResourceTreeModelLayoutNode::handlePermissionsChanged);
 
+    connect(layout, &QnResource::parentIdChanged, this,
+        &QnResourceTreeModelLayoutNode::update);
     connect(layout, &QnLayoutResource::itemAdded, this,
         &QnResourceTreeModelLayoutNode::at_layout_itemAdded);
     connect(layout, &QnLayoutResource::itemRemoved, this,

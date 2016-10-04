@@ -36,7 +36,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            Qn::Permissions permissions)
+            Qn::Permissions /*permissions*/)
         {
             if (!m_user || subject.user() != m_user)
                 return;
@@ -46,7 +46,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
 
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
-        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
         {
             if (!subject.user())
                 return;
