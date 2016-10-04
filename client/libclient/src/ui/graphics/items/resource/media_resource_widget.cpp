@@ -1637,7 +1637,11 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::UnauthorizedOverlay;
 
         if (!states.isRealTimeSource)
+        {
+            if (m_display->camDisplay()->isLongWaiting())
+                return Qn::NoDataOverlay;
             return Qn::NoVideoDataOverlay;
+        }
 
         if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
