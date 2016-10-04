@@ -20,6 +20,9 @@
 
 #include "socket_test_helper.h"
 
+#ifdef _WIN32
+typedef uint32_t in_addr_t;
+#endif
 
 namespace
 {
@@ -390,7 +393,9 @@ void testHostAddress(
 
     if (ipv4)
     {
-        in_addr addr = { *ipv4 };
+        in_addr addr;
+        memset(&addr, 0, sizeof(addr));
+        addr.s_addr = *ipv4;
         testHostAddress(addr, ipv4, ipv6, string4);
     }
 

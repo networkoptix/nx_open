@@ -15,6 +15,10 @@ if [[ "${build.configuration}" == "release" ]]; then
     BUILD_TYPE=--release
     SIGN="--sign ${google.keystore} ${google.alias} --storepass ${google.storepass} --keypass ${google.keypass}"
     SOURCE_APK=apk/bin/QtApp-release-signed.apk
+    if [[ -z "${google.storepass}" ]]; then
+        SIGN=
+        SOURCE_APK=apk/bin/QtApp-release-unsigned.apk
+    fi
 
     if [[ "${beta}" == "true" ]]; then
         APK_SUFFIX="beta"
