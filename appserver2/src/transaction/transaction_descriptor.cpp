@@ -41,18 +41,19 @@ std::vector<QString> getRestrictedKeysByMode(Mode mode)
     {
         case Mode::read:
             return {
-                kNamePassword, 
+                kNamePassword,
                 ldapAdminPassword,
                 kNameCloudSystemID,
                 kNameCloudAuthKey,
                 Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-                Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME 
+                Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME
             };
         case Mode::write:
             return {
                 kNameCloudSystemID,
                 kNameCloudAuthKey,
-                kCloudHostName
+                kCloudHostName,
+                kNameLocalSystemID
             };
     }
 
@@ -89,8 +90,8 @@ bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const Q
 
 void applyValueFilters(
     Mode mode,
-    const Qn::UserAccessData& accessData, 
-    KeyValueFilterType* keyValue, 
+    const Qn::UserAccessData& accessData,
+    KeyValueFilterType* keyValue,
     const FilterFunctorListType& filterList,
     bool* allowed)
 {
@@ -537,7 +538,7 @@ struct ModifyResourceAccess
 template<typename Param>
 void applyColumnFilter(const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
 
-void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData& data) 
+void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData& data)
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
@@ -1014,7 +1015,7 @@ struct SetResourceParamTransactionType
     ec2::TransactionType::Value operator()(const ApiResourceParamWithRefData& param)
     {
         if (param.resourceId == QnUserResource::kAdminGuid &&
-            param.name == QnGlobalSettings::kNameSystemName)
+            param.name == nx::settings_names::kNameSystemName)
         {
             // System rename MUST be propagated to Nx Cloud
             return TransactionType::Cloud;

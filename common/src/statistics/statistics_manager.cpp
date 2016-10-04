@@ -328,7 +328,7 @@ void QnStatisticsManager::saveCurrentStatistics()
     // Appends mandatory metrics
 
     const auto sessionId = QnUuid::createUuid();
-    const auto systemName = qnCommon->localSystemName();
+    const auto systemName = qnGlobalSettings->systemName();
     metrics.insert(kSessionIdMetricTag, sessionId.toString());
     metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
     metrics.insert(kSystemNameMetricTag, systemName);

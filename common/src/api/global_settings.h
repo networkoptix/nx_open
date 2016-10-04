@@ -47,7 +47,6 @@ const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"))
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
 const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
-const QString kNameNewSystem(lit("newSystem"));
 const QString kCloudHostName(lit("cloudHost"));
 
 const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
@@ -56,8 +55,8 @@ const QString kNameStatisticsReportLastVersion(lit("statisticsReportLastVersion"
 const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
 const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
 const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
-const QString kNameSystemId(lit("systemId"));
-const QString kNameSystemNameForId(lit("systemNameForId"));
+const QString kNameLocalSystemID(lit("localSystemId"));
+const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
 
@@ -145,13 +144,9 @@ public:
     bool isUpnpPortMappingEnabled() const;
     void setUpnpPortMappingEnabled(bool value);
 
-    /** System id for the statistics server */
-    QnUuid systemId() const;
-    void setSystemId(const QnUuid &value);
-
-    /** System name, bound to the current system id */
-    QString systemNameForId() const;
-    void setSystemNameForId(const QString &value);
+    /** local systemId. Media servers connect if this value equal */
+    QnUuid localSystemID() const;
+    void setLocalSystemID(const QnUuid& value);
 
     QString clientStatisticsSettingsUrl() const;
 
@@ -185,7 +180,6 @@ public:
     QString cloudAuthKey() const;
     void setCloudAuthKey(const QString& value);
 
-    static const QString kNameSystemName;
     QString systemName() const;
     void setSystemName(const QString& value);
 
@@ -193,10 +187,7 @@ public:
 
     // -- Misc settings
 
-    /** System is not set, it has default admin password and not linked to the cloud. */
-    bool isNewSystem() const;
-    void setNewSystem(bool value);
-
+    bool isNewSystem() const { return localSystemID().isNull(); }
     /** Media server put cloud host here from QnAppInfo::defaultCloudHost */
     QString cloudHost() const;
     void setCloudHost(const QString& value);
@@ -221,6 +212,7 @@ signals:
     void initialized();
 
     void systemNameChanged();
+    void localSystemIdChanged();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
@@ -232,7 +224,6 @@ signals:
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
-    void newSystemChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -265,8 +256,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor;
     QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
-    QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
-    QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_localSystemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;
     QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor;
 
@@ -306,7 +296,6 @@ private:
     // misc adaptors
     QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
-    QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;

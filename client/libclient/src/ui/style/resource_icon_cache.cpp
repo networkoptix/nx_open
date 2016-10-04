@@ -13,6 +13,7 @@
 #include <core/resource/videowall_resource.h>
 
 #include <ui/style/skin.h>
+#include <api/global_settings.h>
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -206,7 +207,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             case Qn::Incompatible:
                 if (auto server = resource.dynamicCast<QnMediaServerResource>())
                 {
-                    if (server->getSystemName() != qnCommon->localSystemName())
+                    if (server->getModuleInformation().localSystemId != qnGlobalSettings->localSystemID())
                     {
                         status = Online;
                         break;

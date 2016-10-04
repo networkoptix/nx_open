@@ -254,11 +254,7 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) co
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnMediaServerResourcePtr& server) const
 {
-    auto id = server->getOriginalGuid();
-    if (id.isNull())
-        id = server->getId();
-
-    return moduleInformation(id);
+    return moduleInformation(server->getOriginalGuid());
 }
 
 QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const
@@ -320,8 +316,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         !item.addresses.contains(endpoint)) // Same ip:port with different runtime id means that
                                             // server was restarted
     {
-        bool oldModuleIsValid = item.moduleInformation.systemName == qnCommon->localSystemName();
-        bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
+        bool oldModuleIsValid = item.moduleInformation.localSystemId == qnGlobalSettings->localSystemID();
+        bool newModuleIsValid = moduleInformation.localSystemId == qnGlobalSettings->localSystemID();
 
         if (oldModuleIsValid == newModuleIsValid)
         {

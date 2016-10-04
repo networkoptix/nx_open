@@ -4,6 +4,7 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
+#include <core/resource/fake_media_server.h>
 
 struct QnUploadUpdateReply;
 
@@ -46,6 +47,6 @@ private:
     QString m_updateId;
     QnSoftwareVersion m_version;
     QHash<int, QnMediaServerResourcePtr> m_serverByRequest;
-    QHash<QnUuid, QnMediaServerResourcePtr> m_serverByRealId;
+    QHash<QnUuid, QnFakeMediaServerResourcePtr> m_serverByRealId;
     QTimer* m_timer;
 };
