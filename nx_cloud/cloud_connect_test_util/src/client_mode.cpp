@@ -35,47 +35,44 @@ std::vector<SocketAddress> resolveTargets(
     SocketAddress targetAddress,
     const nx::utils::ArgumentParser& args)
 {
-    std::vector<SocketAddress> targetList;
+    std::vector<SocketAddress> targets;
     if (targetAddress.address.toString().contains('.'))
     {
-        targetList.push_back(std::move(targetAddress));
-        return targetList;
+        targets.push_back(std::move(targetAddress));
+        return targets;
     }
 
-    // it's likelly a system id, add server IDs if avaliable
+    // It's likelly a system ID, add server IDs if avaliable:
     QString serverId;
     size_t serverCount;
     if (args.read("server-id", &serverId) && args.read("server-count", &serverCount))
     {
         const auto systemSuffix = '.' + targetAddress.address.toString().toUtf8();
-        targetList.push_back(SocketAddress(serverId + systemSuffix, 0));
+        targets.push_back(SocketAddress(serverId + systemSuffix, 0));
         for (std::size_t i = 1; i < serverCount; ++i)
         {
-            targetList.push_back(SocketAddress(
+            targets.push_back(SocketAddress(
                 serverId + QString::number(i).toUtf8() + systemSuffix, 0));
         }
 
-        return targetList;
+        return targets;
     }
 
-    // or resolve it
+    // Or resolve it:
     std::promise<void> promise;
+    const auto port = targetAddress.port;
     nx::network::SocketGlobals::addressResolver().resolveDomain(
         std::move(targetAddress.address),
-        [&targetAddress, &targetList, &promise](
-            std::vector<nx::network::cloud::TypedAddress> list)
+        [port, &targets, &promise](std::vector<nx::network::cloud::TypedAddress> addresses)
         {
-            for (auto& it : list)
-            {
-                targetList.push_back(SocketAddress(
-                    std::move(it.address), targetAddress.port));
-            }
+            for (auto& address: addresses)
+                targets.push_back(SocketAddress(std::move(address.address), port));
 
             promise.set_value();
         });
 
     promise.get_future().wait();
-    return targetList;
+    return targets;
 }
 
 int runInConnectMode(const nx::utils::ArgumentParser& args)
