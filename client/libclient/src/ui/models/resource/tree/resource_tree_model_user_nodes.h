@@ -67,7 +67,7 @@ private:
 
     /** Get or create recorder placeholder for grouped cameras. */
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
-        const QString& groupId, const QString& groupName);
+        const QnVirtualCameraResourcePtr& camera);
 
     void rebuildSubjectTree(const QnResourceAccessSubject& subject);
 

@@ -15,6 +15,7 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
+#include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -404,7 +405,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureMediaNode(
     {
         QString groupId = camera->getGroupId();
         if (!groupId.isEmpty())
-            parent = ensureRecorderNode(parent, groupId, camera->getGroupName());
+            parent = ensureRecorderNode(parent, camera);
     }
 
     node->setParent(parent);
@@ -437,18 +438,18 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensurePlaceholderNode(
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRecorderNode(
     const QnResourceTreeModelNodePtr& parentNode,
-    const QString& groupId,
-    const QString& groupName)
+    const QnVirtualCameraResourcePtr& camera)
 {
+    auto id = camera->getGroupId();
+
     auto& recorders = m_recorders[parentNode];
-    auto pos = recorders.find(groupId);
+    auto pos = recorders.find(id);
     if (pos == recorders.end())
     {
-        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, Qn::RecorderNode,
-            !groupName.isEmpty() ? groupName : groupId));
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(m_model, camera));
         node->setParent(parentNode);
 
-        pos = recorders.insert(groupId, node);
+        pos = recorders.insert(id, node);
         m_allNodes.append(*pos);
     }
     return *pos;
@@ -525,8 +526,8 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
 
 void QnResourceTreeModelUserNodes::removeNodeInternal(const QnResourceTreeModelNodePtr& node)
 {
-    node->setResource(QnResourcePtr());
     node->setParent(QnResourceTreeModelNodePtr());
+    node->setResource(QnResourcePtr());
 }
 
 void QnResourceTreeModelUserNodes::clean()

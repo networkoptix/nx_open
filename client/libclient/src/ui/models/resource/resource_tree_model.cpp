@@ -38,6 +38,7 @@
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/models/resource/tree/resource_tree_model_user_nodes.h>
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
+#include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -222,16 +223,19 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureItemNode(const QnResourceT
     return *pos;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString& groupId, const QString& groupName)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRecorderNode(
+    const QnResourceTreeModelNodePtr& parentNode, const QnVirtualCameraResourcePtr& camera)
 {
+    auto id = camera->getGroupId();
+
     RecorderHash& recorders = m_recorderHashByParent[parentNode];
-    auto pos = recorders.find(groupId);
+    auto pos = recorders.find(id);
     if (pos == recorders.end())
     {
-        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, Qn::RecorderNode, !groupName.isEmpty() ? groupName : groupId));
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelRecorderNode(this, camera));
         node->setParent(parentNode);
 
-        pos = recorders.insert(groupId, node);
+        pos = recorders.insert(id, node);
         m_allNodes.append(*pos);
     }
     return *pos;
@@ -298,8 +302,8 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         break;
     }
 
-    updateNodeResource(node, QnResourcePtr());
     node->setParent(QnResourceTreeModelNodePtr());
+    updateNodeResource(node, QnResourcePtr());
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceTreeModelNodePtr& node)
@@ -503,10 +507,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             ? ensureResourceNode(parentResource)
             : m_rootNodes[Qn::UserDevicesNode];
 
-        QString groupName = camera->getGroupName();
         QString groupId = camera->getGroupId();
         if (!groupId.isEmpty())
-            return ensureRecorderNode(parentNode, groupId, groupName);
+            return ensureRecorderNode(parentNode, camera);
 
         return parentNode;
     }
@@ -899,7 +902,6 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (camera)
     {
         connect(camera, &QnVirtualCameraResource::groupIdChanged,   this, &QnResourceTreeModel::at_resource_parentIdChanged);
-        connect(camera, &QnVirtualCameraResource::groupNameChanged, this, &QnResourceTreeModel::at_camera_groupNameChanged);
 
         auto updateParent = [this](const QnResourcePtr &resource)
             {
@@ -1175,25 +1177,6 @@ void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePt
     auto node = m_itemNodesByParent[parentNode].take(matrix.uuid);
     if (node)
         removeNode(node);
-}
-
-void QnResourceTreeModel::at_camera_groupNameChanged(const QnResourcePtr &resource)
-{
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    NX_ASSERT(camera);
-    if (!camera)
-        return;
-
-    const QString groupId = camera->getGroupId();
-    for (RecorderHash recorderHash: m_recorderHashByParent)
-    {
-        if (!recorderHash.contains(groupId))
-            continue;
-        auto recorder = recorderHash[groupId];
-        recorder->m_name = camera->getGroupName();
-        recorder->m_displayName = camera->getGroupName();
-        recorder->changeInternal();
-    }
 }
 
 void QnResourceTreeModel::at_server_systemNameChanged(const QnResourcePtr &resource)

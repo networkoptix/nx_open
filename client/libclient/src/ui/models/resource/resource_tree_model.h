@@ -68,7 +68,8 @@ private:
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
-    QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
+    QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
+        const QnVirtualCameraResourcePtr& camera);
     QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
@@ -114,8 +115,6 @@ private slots:
 
     void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
     void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
-
-    void at_camera_groupNameChanged(const QnResourcePtr &resource);
 
     void at_server_systemNameChanged(const QnResourcePtr &resource);
     void at_server_redundancyChanged(const QnResourcePtr &resource);

@@ -70,8 +70,6 @@ public:
 
     QnResourceTreeModelNodePtr parent() const ;
 
-
-
     QModelIndex createIndex(int row, int col);
     QModelIndex createIndex(int col);
 
@@ -89,10 +87,11 @@ protected:
 
     QnResourceTreeModel* model() const;
 
-    void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
-    void addChildInternal(const QnResourceTreeModelNodePtr& child);
+    virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
+    virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
+    void setName(const QString& name);
 private:
     QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
 
