@@ -327,7 +327,7 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParameters &parameters)
 {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
-    if (nodeType == Qn::SharedLayoutNode || nodeType == Qn::AccessibleResourceNode)
+    if (nodeType == Qn::SharedLayoutNode || nodeType == Qn::SharedResourceNode)
         return Qn::InvisibleAction;
 
     QnUserResourcePtr owner = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
@@ -380,7 +380,7 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
     {
         case Qn::ResourceNode:
         case Qn::SharedLayoutNode:
-        case Qn::AccessibleResourceNode:
+        case Qn::SharedResourceNode:
         {
             if (parameters.resources().size() != 1)
                 return Qn::InvisibleAction;

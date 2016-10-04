@@ -282,7 +282,8 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         m_model->user()->setUserGroup(selectedUserGroup());
-        m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
+        if (m_model->user()->role() != Qn::UserRole::CustomPermissions)
+            m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
     }
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))

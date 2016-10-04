@@ -21,7 +21,7 @@ protected:
 
 private:
     void handleSharedResourcesChanged(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& resourceIds);
+        const QSet<QnUuid>& oldValues, const QSet<QnUuid>& newValues);
 
     void updateAccessToLayoutItems(const QnLayoutResourcePtr& layout);
 };

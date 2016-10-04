@@ -16,6 +16,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 
+#include <nx/streaming/abstract_archive_resource.h>
+
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
@@ -358,7 +360,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
     if (QnWebPageResourcePtr webPage = target.dynamicCast<QnWebPageResource>())
         return calculatePermissionsInternal(subject, webPage);
 
-    NX_ASSERT("invalid resource type");
+    if (QnAbstractArchiveResourcePtr archive = target.dynamicCast<QnAbstractArchiveResource>())
+        return Qn::ReadPermission | Qn::ExportPermission;
+
+    NX_ASSERT(false, "invalid resource type");
     return Qn::NoPermissions;
 }
 

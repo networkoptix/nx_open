@@ -94,6 +94,11 @@ QnUuid QnResourceAccessSubject::effectiveId() const
     return d_ptr->effectiveId();
 }
 
+QString QnResourceAccessSubject::name() const
+{
+    return d_ptr->user ? d_ptr->user->getName() : d_ptr->role.name;
+}
+
 void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
 {
     d_ptr->user = other.d_ptr->user;
@@ -107,7 +112,6 @@ bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) c
 
 QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject)
 {
-    QString name = subject.user() ? subject.user()->getName() : subject.role().name;
-    dbg.nospace() << "QnResourceAccessSubject(" << name << ")";
+    dbg.nospace() << "QnResourceAccessSubject(" << subject.name() << ")";
     return dbg.space();
 }

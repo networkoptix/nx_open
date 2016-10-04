@@ -54,19 +54,16 @@ void QnSharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& re
 }
 
 void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
-    const QnResourceAccessSubject& subject, const QSet<QnUuid>& resourceIds)
+    const QnResourceAccessSubject& subject,
+    const QSet<QnUuid>& oldValues,
+    const QSet<QnUuid>& newValues)
 {
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;
 
-    auto accessible = this->accessible(subject);
-    auto added = resourceIds - accessible;
-    auto removed = accessible - resourceIds;
+    auto changed = (newValues | oldValues) - (newValues & oldValues);
 
-    auto changed = (resourceIds | accessible) - (resourceIds & accessible);
-    NX_ASSERT(changed == (added + removed));
-
-    for (auto resource: qnResPool->getResources(added + removed))
+    for (auto resource: qnResPool->getResources(changed))
         updateAccess(subject, resource);
 }

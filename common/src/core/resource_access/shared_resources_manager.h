@@ -26,13 +26,16 @@ private:
     void setSharedResourcesInternal(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& resources);
 
+    void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
+
+    void handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole);
     void handleRoleRemoved(const ec2::ApiUserGroupData& userRole);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
 signals:
     void sharedResourcesChanged(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& resourceIds);
+        const QSet<QnUuid>& oldValues, const QSet<QnUuid>& newValues);
 
 private:
     mutable QnMutex m_mutex;

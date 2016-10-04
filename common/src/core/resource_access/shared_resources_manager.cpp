@@ -9,14 +9,24 @@
 
 #include <core/resource/user_resource.h>
 
+namespace {
+
+static const QSet<QnUuid> kEmpty;
+
+}
+
 QnSharedResourcesManager::QnSharedResourcesManager(QObject* parent):
     base_type(parent),
     m_mutex(QnMutex::NonRecursive),
     m_sharedResources()
 {
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnSharedResourcesManager::handleResourceAdded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         &QnSharedResourcesManager::handleResourceRemoved);
 
+    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        &QnSharedResourcesManager::handleRoleAddedOrUpdated);
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
         &QnSharedResourcesManager::handleRoleRemoved);
 }
@@ -27,15 +37,26 @@ QnSharedResourcesManager::~QnSharedResourcesManager()
 
 void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_sharedResources.clear();
-    for (const auto& item : accessibleResourcesList)
+    QHash<QnUuid, QSet<QnUuid> > oldValuesMap;
     {
-        QSet<QnUuid>& resources = m_sharedResources[item.userId];
-        for (const auto& id : item.resourceIds)
-            resources << id;
+        QnMutexLocker lk(&m_mutex);
+        oldValuesMap = m_sharedResources;
+        m_sharedResources.clear();
+        for (const auto& item : accessibleResourcesList)
+        {
+            auto& resources = m_sharedResources[item.userId];
+            for (const auto& id : item.resourceIds)
+                resources << id;
+        }
     }
-    //TODO: #GDM possibly we should send correct signals, shouldn't we?
+
+    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    {
+        auto oldValues = oldValuesMap.value(subject.id());
+        auto newValues = sharedResources(subject);
+        if (oldValues != newValues)
+            emit sharedResourcesChanged(subject, oldValues, newValues);
+    }
 }
 
 QSet<QnUuid> QnSharedResourcesManager::sharedResources(
@@ -65,14 +86,26 @@ void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject&
 void QnSharedResourcesManager::setSharedResourcesInternal(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {
+    QSet<QnUuid> oldValue;
     {
         QnMutexLocker lk(&m_mutex);
         auto& value = m_sharedResources[subject.id()];
         if (value == resources)
             return;
+        oldValue = value;
         value = resources;
     }
-    emit sharedResourcesChanged(subject, resources);
+    emit sharedResourcesChanged(subject, oldValue, resources);
+}
+
+void QnSharedResourcesManager::handleResourceAdded(const QnResourcePtr& resource)
+{
+    if (auto user = resource.dynamicCast<QnUserResource>())
+    {
+        auto resources = sharedResources(user);
+        if (!resources.isEmpty())
+            emit sharedResourcesChanged(user, kEmpty, resources);
+    }
 }
 
 void QnSharedResourcesManager::handleResourceRemoved(const QnResourcePtr& resource)
@@ -81,22 +114,33 @@ void QnSharedResourcesManager::handleResourceRemoved(const QnResourcePtr& resour
         handleSubjectRemoved(user);
 }
 
+void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole)
+{
+    auto resources = sharedResources(userRole);
+    if (!resources.isEmpty())
+        emit sharedResourcesChanged(userRole, kEmpty, resources);
+}
+
 void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
 {
     handleSubjectRemoved(userRole);
     for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
-        setSharedResourcesInternal(subject, QSet<QnUuid>());
+        setSharedResourcesInternal(subject, kEmpty);
 }
 
 void QnSharedResourcesManager::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
+    QSet<QnUuid> oldValue;
     auto id = subject.id();
     {
         QnMutexLocker lk(&m_mutex);
         if (!m_sharedResources.contains(id))
             return;
+        oldValue = m_sharedResources.value(id);
         m_sharedResources.remove(id);
     }
-    emit sharedResourcesChanged(subject, QSet<QnUuid>());
+
+    if (!oldValue.isEmpty())
+        emit sharedResourcesChanged(subject, oldValue, kEmpty);
 }
 
