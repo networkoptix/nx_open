@@ -76,6 +76,7 @@ QList<Qn::NodeType> rootNodeTypes()
     {
         result
             << Qn::CurrentSystemNode
+            << Qn::CurrentUserNode
             << Qn::SeparatorNode
             << Qn::UsersNode
             << Qn::ServersNode
@@ -129,7 +130,9 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         &QnResourceTreeModel::at_commonModule_systemNameChanged);
     connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged, this,
         &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
-    connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this,
+    connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE),
+        &QnPropertyNotifier::valueChanged,
+        this,
         [this](int value)
         {
             Q_UNUSED(value);
@@ -141,9 +144,6 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
 
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModel::handleAccessChanged);
-
-//     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
-//         &QnResourceTreeModel::updateRoleNodes);
 
     rebuildTree();
 
@@ -341,6 +341,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::CurrentSystemNode:
+    case Qn::CurrentUserNode:
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
@@ -976,6 +977,8 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
 void QnResourceTreeModel::rebuildTree()
 {
+    m_rootNodes[Qn::CurrentUserNode]->setResource(context()->user());
+
     for (auto nodeType : rootNodeTypes())
     {
         auto node = m_rootNodes[nodeType];
@@ -1137,6 +1140,9 @@ void QnResourceTreeModel::at_resource_resourceChanged(const QnResourcePtr &resou
     if (m_nodesByResource.contains(resource))
         for (auto node: m_nodesByResource[resource])
             node->update();
+
+    if (resource == context()->user())
+        m_rootNodes[Qn::CurrentUserNode]->update();
 }
 
 void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)

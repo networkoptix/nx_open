@@ -91,6 +91,10 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::CurrentSystemNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
         break;
+    case Qn::CurrentUserNode:
+        m_icon = qnResIconCache->icon(QnResourceIconCache::User);
+        m_flags = Qn::user;
+        break;
     case Qn::SeparatorNode:
     case Qn::LocalSeparatorNode:
         m_displayName = QString();
@@ -245,6 +249,7 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
         || m_type == Qn::EdgeNode
         || m_type == Qn::SharedLayoutNode
         || m_type == Qn::SharedResourceNode
+        || m_type == Qn::CurrentUserNode
     );
 
     m_resource = resource;
@@ -332,6 +337,12 @@ void QnResourceTreeModelNode::update()
         case Qn::CurrentSystemNode:
         {
             m_displayName = m_name = qnCommon->localSystemName();
+            break;
+        }
+        case Qn::CurrentUserNode:
+        {
+            auto user = context()->user();
+            m_displayName = m_name = (user ? user->getName() : QString());
             break;
         }
         case Qn::RoleNode:
@@ -431,6 +442,12 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::BastardNode:
             return true;
 
+        /* Always visible. */
+        case Qn::RootNode:
+        case Qn::LocalResourcesNode:
+        case Qn::SeparatorNode:
+        case Qn::LocalSeparatorNode:
+
         /* These will be hidden or displayed together with their parent. */
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
@@ -438,11 +455,18 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::AllLayoutsAccessNode:
         case Qn::SharedResourcesNode:
         case Qn::SharedLayoutsNode:
+        case Qn::WebPagesNode:
         case Qn::RoleUsersNode:
         case Qn::SharedResourceNode:
         case Qn::RoleNode:
         case Qn::SharedLayoutNode:
+        case Qn::RecorderNode:
+        case Qn::SystemNode:
             return false;
+
+        case Qn::CurrentSystemNode:
+        case Qn::CurrentUserNode:
+            return !isLoggedIn;
 
     /* Hide non-readable resources. */
     case Qn::LayoutItemNode:
@@ -530,7 +554,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return false;
 
     default:
-        NX_ASSERT("Should never get here");
+        NX_ASSERT(false, "Should never get here");
         return false;
     }
 }

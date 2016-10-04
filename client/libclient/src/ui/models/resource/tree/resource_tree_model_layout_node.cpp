@@ -40,6 +40,9 @@ QnResourceTreeModelLayoutNode::~QnResourceTreeModelLayoutNode()
 void QnResourceTreeModelLayoutNode::setResource(const QnResourcePtr &resource)
 {
     NX_ASSERT(!resource);
+    if (!this->resource())
+        return;
+
     disconnect(this->resource(), nullptr, this, nullptr);
     disconnect(qnResPool, nullptr, this, nullptr);
     base_type::setResource(resource);

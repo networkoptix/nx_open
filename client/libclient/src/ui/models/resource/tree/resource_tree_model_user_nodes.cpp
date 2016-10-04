@@ -218,6 +218,9 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
     if (m_model->scope() != QnResourceTreeModel::FullScope)
         return false;
 
+    if (subject.user() && subject.user() == context()->user())
+        return false;
+
     if (layout->isFile())
         return false;
 
@@ -474,13 +477,6 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
 
     switch (node->type())
     {
-//         case Qn::LayoutItemNode:
-//             if (node->parent())
-//             {
-//                 ItemHash& hash = m_itemNodesByParent[node->parent()];
-//                 hash.remove(hash.key(node));
-//             }
-//             break;
         case Qn::ResourceNode:
         {
             NX_ASSERT(node->resource());

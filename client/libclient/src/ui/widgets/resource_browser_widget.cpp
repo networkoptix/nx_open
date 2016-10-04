@@ -453,6 +453,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const
             case Qn::SharedLayoutNode:
             case Qn::SharedResourceNode:
             case Qn::EdgeNode:
+            case Qn::CurrentUserNode:
             {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if (resource && !result.contains(resource))
