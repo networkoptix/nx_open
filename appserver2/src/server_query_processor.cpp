@@ -18,9 +18,7 @@ void detail::ServerQueryProcessor::setAuditData(
 ErrorCode detail::ServerQueryProcessor::removeHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend,
-    bool notificationNeeded,
     TransactionType::Value transactionType)
 {
     QnTransaction<ApiIdData> removeTran = createTransaction(command, ApiIdData(id));
@@ -29,19 +27,15 @@ ErrorCode detail::ServerQueryProcessor::removeHelper(
     if (errorCode != ErrorCode::ok)
         return errorCode;
 
-    if (notificationNeeded)
-        triggerNotification(connection, removeTran);
-
     return ErrorCode::ok;
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend)
 {
-    return removeHelper(id, command, connection, transactionsToSend, true);
+    return removeHelper(id, command, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
@@ -73,59 +67,22 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     return errorCode;
 }
 
-ErrorCode detail::ServerQueryProcessor::removeLayoutsHelper(
-    const QnTransaction<ApiIdData>& tran,
-    const AbstractECConnectionPtr& connection,
-    std::list<std::function<void()>>* const transactionsToSend)
-{
-    ApiObjectInfo userObjectInfo(ApiObjectType::ApiObject_User, tran.params.id);
-    ApiObjectInfoList userLayoutsObjInfoList =
-        dbManager(m_userAccessData)
-            .getNestedObjectsNoLock(userObjectInfo);
-
-    ApiIdDataList userLayouts;
-    for (const auto& objInfo : userLayoutsObjInfoList)
-        userLayouts.push_back(ApiIdData(objInfo.id));
-
-    ErrorCode errorCode = processMultiUpdateSync(
-        ApiCommand::removeLayout,
-        tran.transactionType,
-        userLayouts,
-        transactionsToSend);
-
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    for (const auto& layout: userLayouts)
-    {
-        QnTransaction<ApiIdData> removeLayoutTran = 
-            createTransaction(ApiCommand::Value::removeLayout, layout);
-        triggerNotification(connection, removeLayoutTran);
-    }
-
-    return errorCode;
-}
-
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend)
 {
-    return removeHelper(id, ApiCommand::removeAccessRights, connection, transactionsToSend);
+    return removeHelper(id, ApiCommand::removeAccessRights, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    const AbstractECConnectionPtr& connection,
     std::list<std::function<void()>>* const transactionsToSend,
     TransactionType::Value transactionType)
 {
     return removeHelper(
         id,
         ApiCommand::removeResourceStatus,
-        connection,
         transactionsToSend,
-        false,
         transactionType);
 }
 
