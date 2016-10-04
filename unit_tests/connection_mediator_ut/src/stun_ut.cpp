@@ -191,9 +191,9 @@ TEST_F( StunCustomTest, BindResolve )
     }
 }
 
-typedef std::unique_ptr<utils::TestSyncMultiQueue<String, SocketAddress>> IndicatinoQueue;
+typedef std::unique_ptr<utils::TestSyncMultiQueue<String, SocketAddress>> IndicatinonQueue;
 
-IndicatinoQueue listenForClientBind(
+IndicatinonQueue listenForClientBind(
     AsyncClient* client, const String& serverId, const conf::Settings& settings)
 {
     auto queue = std::make_unique<utils::TestSyncMultiQueue<String, SocketAddress>>();
@@ -229,7 +229,7 @@ IndicatinoQueue listenForClientBind(
 }
 
 void expectIndicationForEach(
-    std::vector<IndicatinoQueue::element_type*> msIndicationsList,
+    std::vector<IndicatinonQueue::element_type*> msIndicationsList,
     const String& peerId, const SocketAddress& address, bool exactlyOne = true)
 {
     for (auto& msIndications: msIndicationsList)
