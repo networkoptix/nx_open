@@ -113,7 +113,7 @@ Rectangle
 
                     ScriptAction
                     {
-                        script: { grid.setPositionTo(switchPageAnimation.pageIndex); }
+                        script: { grid.setPositionTo(switchPageAnimation.pageIndex, GridView.Beginning); }
                     }
 
                     NumberAnimation
@@ -196,6 +196,14 @@ Rectangle
                     var tilesPerPage = grid.colsCount * grid.rowsCount;
                     var firstItemIndex = index * tilesPerPage;
                     grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
+                }
+
+                footer: Item    //< Represents empty bottom space workaround for model with odd lines
+                {
+                    visible: ((grid.colsCount % 2) == 1)
+                        && ((pageSwitcher.page + 1) == pageSwitcher.pagesCount);
+                    height: grid.cellHeight;
+                    width: grid.width;
                 }
             }
 

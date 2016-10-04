@@ -56,6 +56,8 @@ public:
 
     void setServerHost(const QnUuid& serverId, const QString& host);
 
+    void setName(const QString& value);
+
 private:
     QnSystemDescription(const QString& systemId, const QString& systemName);
 
@@ -72,10 +74,10 @@ private:
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
     const QString m_id;
-    const QString m_systemName;
     const QString m_ownerAccountEmail;
     const QString m_ownerFullName;
     const bool m_isCloudSystem;
+    QString m_systemName;
     ServerLastUpdateTimeHash m_serverTimestamps;
     ServerInfoHash m_servers;
     PrioritiesMap m_prioritized;

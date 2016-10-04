@@ -2,6 +2,7 @@
 
 #include <QtCore/QSortFilterProxyModel>
 #include <watchers/cloud_status_watcher.h>
+#include <client_core/local_connection_data.h>
 
 class QTimer;
 
@@ -32,8 +33,7 @@ private:
     qreal getWeight(const QModelIndex& modelIndex) const;
 
 private:
-    typedef QPair<qreal, qint64> WeightLastLoginPair;
-    typedef QHash<QString, WeightLastLoginPair> IdWeightDataHash;
+    typedef QHash<QString, QnWeightData> IdWeightDataHash;
 
     QTimer* const m_updateTimer;
     IdWeightDataHash m_cloudWeights;

@@ -61,6 +61,8 @@ signals:
 
     void ownerChanged();
 
+    void systemNameChanged();
+
     void serverAdded(const QnUuid& serverId);
 
     void serverRemoved(const QnUuid& serverId);

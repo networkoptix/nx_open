@@ -22,7 +22,7 @@ namespace
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData), (datastream)(eq), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionWeightData), (datastream)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnWeightData), (datastream)(eq), _Fields)
 
 QnLocalConnectionData::QnLocalConnectionData() :
     name(),
@@ -133,16 +133,16 @@ bool QnLocalConnectionDataList::remove(const QString &name)
     return removed;
 }
 
-QnLocalConnectionWeightData QnLocalConnectionWeightData::fromSettings(QSettings* settings)
+QnWeightData QnWeightData::fromSettings(QSettings* settings)
 {
-    QnLocalConnectionWeightData data;
+    QnWeightData data;
     data.systemId = settings->value(kSystemIdTag).toString();
     data.weight = settings->value(kWeight, QVariant::fromValue<qreal>(0)).toReal();
     data.lastConnectedUtcMs = settings->value(kLastConnected, QVariant::fromValue<qint64>(0)).toLongLong();
     return data;
 }
 
-void QnLocalConnectionWeightData::writeToSettings(QSettings* settings) const
+void QnWeightData::writeToSettings(QSettings* settings) const
 {
     settings->setValue(kSystemIdTag, systemId);
     settings->setValue(kWeight, weight);

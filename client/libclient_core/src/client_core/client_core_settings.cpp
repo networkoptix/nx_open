@@ -77,7 +77,7 @@ void QnClientCoreSettings::writeValueToSettings(
             writeListData<QnLocalConnectionData>(settings, value, kRecentLocalConnectionsTag);
             break;
         case LocalSystemWeightsData:
-            writeListData<QnLocalConnectionWeightData>(settings, value, kLocalSystemWeights);
+            writeListData<QnWeightData>(settings, value, kLocalSystemWeights);
         case RecentCloudSystems:
             writeListData<QnCloudSystem>(settings, value, kRecentCloudSystemsTag);
             break;
@@ -100,7 +100,7 @@ QVariant QnClientCoreSettings::readValueFromSettings(
         case RecentLocalConnections:
             return readListData<QnLocalConnectionData>(settings, kRecentLocalConnectionsTag);
         case LocalSystemWeightsData:
-            return readListData<QnLocalConnectionWeightData>(settings, kLocalSystemWeights);
+            return readListData<QnWeightData>(settings, kLocalSystemWeights);
         case RecentCloudSystems:
             return readListData<QnCloudSystem>(settings, kRecentCloudSystemsTag);
         case CloudPassword:

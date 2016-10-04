@@ -54,10 +54,10 @@ QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
 QnSystemDescription::QnSystemDescription(const QString& systemId, const QString& systemName)
     :
     m_id(systemId),
-    m_systemName(systemName),
     m_ownerAccountEmail(),
     m_ownerFullName(),
     m_isCloudSystem(false),
+    m_systemName(systemName),
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
@@ -71,10 +71,10 @@ QnSystemDescription::QnSystemDescription(
     const QString& ownerFullName)
     :
     m_id(systemId),
-    m_systemName(systemName),
     m_ownerAccountEmail(cloudOwnerAccountEmail),
     m_ownerFullName(ownerFullName),
     m_isCloudSystem(true),
+    m_systemName(systemName),
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
@@ -192,6 +192,15 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
     const bool someoneRemoved = m_servers.remove(serverId);
     if (someoneRemoved)
         emit serverRemoved(serverId);
+}
+
+void QnSystemDescription::setName(const QString& value)
+{
+    if (m_systemName == value)
+        return;
+
+    m_systemName = value;
+    emit systemNameChanged();
 }
 
 void QnSystemDescription::setServerHost(const QnUuid& serverId, const QString& host)
