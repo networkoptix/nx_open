@@ -288,6 +288,9 @@ private:
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
+    //---------------------------------------------------------------
+    // system sharing methods. TODO: #ak: move to a separate class
+
     /**
      * @param targetAccountData Filled with attributes of account \a sharing.accountEmail
      */
@@ -296,6 +299,17 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
+    nx::db::DBResult fetchUserSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        const std::string& systemId,
+        api::SystemSharingEx* const sharing);
+    template<std::size_t filterFieldCount = 0>
+    nx::db::DBResult SystemManager::fetchUserSharings(
+        nx::db::QueryContext* const queryContext,
+        std::vector<api::SystemSharingEx>* const sharings,
+        std::array<SqlFilterByField, filterFieldCount> filterFields
+            = std::array<SqlFilterByField, filterFieldCount>());
     /**
      * Fetches existing account or creates new one sending corresponding notification.
      */
@@ -356,6 +370,12 @@ private:
         nx::db::QueryContext* queryContext,
         const data::UserSessionDescriptor& userSessionDescriptor,
         SaveUserSessionResult* const result);
+    nx::db::DBResult updateUserLoginStatistics(
+        nx::db::QueryContext* queryContext,
+        const std::string& accountId,
+        const std::string& systemId,
+        std::chrono::system_clock::time_point lastloginTime,
+        float usageFrequency);
     void userSessionStartSavedToDb(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
@@ -412,12 +432,12 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
-    template<std::size_t FilterFieldCount = 0>
+    template<std::size_t filterFieldCount = 0>
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* queryContext,
         const std::string& systemId,
-        std::array<SqlFilterByField, FilterFieldCount> filterFields 
-            = std::array<SqlFilterByField, FilterFieldCount>());
+        std::array<SqlFilterByField, filterFieldCount> filterFields
+            = std::array<SqlFilterByField, filterFieldCount>());
     static float calculateSystemUsageFrequency(
         std::chrono::system_clock::time_point lastLoginTime,
         float currentUsageFrequency);
