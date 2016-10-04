@@ -31,7 +31,7 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_frequency = audioFormat.sampleRate();
     m_bitsPerSample = audioFormat.sampleSize();
     m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
-    if (!m_size)
+    if (m_size == 0)
     {
         m_size = bitRate() / 32; // use 30+ ms buffers
         // Multiply by 2 to align OpenAL buffer
