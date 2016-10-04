@@ -403,7 +403,9 @@ bool TextToWaveServer::generateSoundSync(
     while( !task->done )
         m_cond.wait( lk.mutex() );
 
-    *outFormat = task->format;
+    if (outFormat)
+        *outFormat = task->format;
+
     return task->result;
 }
 
