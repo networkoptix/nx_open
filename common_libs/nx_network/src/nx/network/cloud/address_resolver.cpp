@@ -8,10 +8,10 @@
 #include <nx/fusion/serialization/lexical.h>
 
 #define DEBUG_LOG(MESSAGE) do \
-    { \
-        if (nx::network::SocketGlobals::debugConfiguration().addressResolver) \
-            NX_LOGX(MESSAGE, cl_logDEBUG1); \
-    } while(0)
+{ \
+    if (nx::network::SocketGlobals::debugConfiguration().addressResolver) \
+        NX_LOGX(MESSAGE, cl_logDEBUG1); \
+} while (0)
 
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
 static const auto kMediatorCacheTimeout = std::chrono::seconds(10);
