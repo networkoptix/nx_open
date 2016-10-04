@@ -54,10 +54,10 @@ public:
 
     virtual void setResource(const QnResourcePtr &resource);
     virtual void setParent(const QnResourceTreeModelNodePtr& parent);
+    virtual void updateRecursive();
 
     void update();
 
-    void updateRecursive() ;
 
     Qn::NodeType type() const ;
     QnResourcePtr resource() const;

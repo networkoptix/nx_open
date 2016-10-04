@@ -97,7 +97,7 @@ private:
     void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource,
         const QMimeData *mimeData);
 
-    void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
+    void handlePermissionsChanged(const QnResourcePtr& resource);
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);

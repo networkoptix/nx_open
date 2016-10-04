@@ -142,8 +142,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         &QnResourceTreeModel::rebuildTree);
 
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
-        &QnResourceTreeModel::handleAccessChanged);
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        &QnResourceTreeModel::handlePermissionsChanged);
 
     rebuildTree();
 
@@ -1079,8 +1079,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     }
 }
 
-void QnResourceTreeModel::handleAccessChanged(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource)
+void QnResourceTreeModel::handlePermissionsChanged(const QnResourcePtr& resource)
 {
     if (m_resourceNodeByResource.contains(resource))
     {

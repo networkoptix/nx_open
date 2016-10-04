@@ -4,6 +4,7 @@
 
 #include <core/resource/layout_resource.h>
 
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
@@ -23,6 +24,9 @@ QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
 
     connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
         &QnResourceTreeModelLayoutNode::at_snapshotManager_flagsChanged);
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        &QnResourceTreeModelLayoutNode::handlePermissionsChanged);
 
     connect(layout, &QnLayoutResource::itemAdded, this,
         &QnResourceTreeModelLayoutNode::at_layout_itemAdded);
@@ -58,6 +62,13 @@ void QnResourceTreeModelLayoutNode::setParent(const QnResourceTreeModelNodePtr& 
         item->setParent(toSharedPointer());
 }
 
+void QnResourceTreeModelLayoutNode::updateRecursive()
+{
+    update();
+    for (auto item: m_items)
+        item->update();
+}
+
 void QnResourceTreeModelLayoutNode::removeNode(const QnResourceTreeModelNodePtr& node)
 {
     node->setResource(QnResourcePtr());
@@ -86,6 +97,23 @@ void QnResourceTreeModelLayoutNode::handleResourceAdded(const QnResourcePtr& res
         if (fit)
             node->setResource(resource);
     }
+}
+
+void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr& resource)
+{
+    if (resource == this->resource())
+    {
+        update();
+    }
+    else
+    {
+        for (auto item : m_items)
+        {
+            if (item->resource() == resource)
+                item->update();
+        }
+    }
+
 }
 
 void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePtr& /*layout*/,

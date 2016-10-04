@@ -380,8 +380,7 @@ void QnResourceTreeModelNode::updateRecursive()
 {
     update();
 
-    /* Node may set bastard flag and therefore be removed from m_children */
-    auto nodesToUpdate = m_children;
+    auto nodesToUpdate = m_model->children(toSharedPointer());
     for (auto child: nodesToUpdate)
         child->updateRecursive();
 }
@@ -470,12 +469,13 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
     /* Hide non-readable resources. */
     case Qn::LayoutItemNode:
+    {
         /* Hide resource nodes without resource. */
         if (!m_resource)
             return true;
-        return false;
 
         return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
+    }
 
     case Qn::OtherSystemsNode:
         return !isAdmin || !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
@@ -522,10 +522,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
             return false;
         }
-
-        /* Hide disabled users. */
-        if (QnUserResourcePtr user = m_resource.dynamicCast<QnUserResource>())
-            return !user->isEnabled();
 
 #ifndef DESKTOP_CAMERA_DEBUG
         /* Hide desktop camera resources from the tree. */
