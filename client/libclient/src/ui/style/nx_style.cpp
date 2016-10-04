@@ -1673,9 +1673,6 @@ void QnNxStyle::drawControl(
                 {
                     QStyleOptionToolButton optionCopy(*button);
                     optionCopy.state &= ~State_MouseOver;
-                    optionCopy.icon = QnSkin::maximumSizePixmap(button->icon, QnIcon::Pressed,
-                        button->state.testFlag(State_On) ? QIcon::On : QIcon::Off);
-
                     base_type::drawControl(CE_ToolButtonLabel, &optionCopy, painter, widget);
                     return;
                 }
