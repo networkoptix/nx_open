@@ -388,7 +388,7 @@ TEST_F(Ec2MserverCloudSynchronization, renameSystem)
         {
             ::ec2::ApiResourceParamWithRefData param;
             param.resourceId = QnUserResource::kAdminGuid;
-            param.name = QnGlobalSettings::kNameSystemName;
+            param.name = nx::settings_names::kNameSystemName;
             param.value = QString::fromStdString(newSystemName);
             ::ec2::ApiResourceParamWithRefDataList paramList;
             paramList.push_back(std::move(param));

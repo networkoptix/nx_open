@@ -1353,7 +1353,7 @@ nx::db::DBResult SystemManager::updateSystemNameInDB(
     // Generating transaction.
     ::ec2::ApiResourceParamWithRefData systemNameData;
     systemNameData.resourceId = QnUserResource::kAdminGuid;
-    systemNameData.name = QnGlobalSettings::kNameSystemName;
+    systemNameData.name = nx::settings_names::kNameSystemName;
     systemNameData.value = QString::fromStdString(data.name);
 
     return m_transactionLog->generateTransactionAndSaveToLog<
@@ -1964,7 +1964,7 @@ nx::db::DBResult SystemManager::processSetResourceParam(
     data::SystemNameUpdate* const systemNameUpdate)
 {
     if (data.resourceId != QnUserResource::kAdminGuid ||
-        data.name != QnGlobalSettings::kNameSystemName)
+        data.name != nx::settings_names::kNameSystemName)
     {
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
