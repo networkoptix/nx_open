@@ -422,7 +422,7 @@ bool QnVideowallManageWidgetPrivate::ModelItem::free() const {
 
 void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value) {
     Q_UNUSED(value);
-    NX_ASSERT("Should never get here");
+    NX_ASSERT(false, "Should never get here");
 }
 
 void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {

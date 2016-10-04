@@ -332,7 +332,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     auto validState = m_state.state() == QnConnectionState::Connecting
         || m_state.state() == QnConnectionState::Reconnecting;
-    NX_ASSERT(validState);
+    //NX_ASSERT(validState);
     if (!validState)
         return;
     m_connectingHandle = 0;
