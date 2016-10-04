@@ -76,19 +76,16 @@ private:
     struct ClientBindInfo
     {
         ConnectionWeakRef connection;
-        nx::String originatingPeerID;
         std::list<SocketAddress> tcpReverseEndpoints;
-
-        nx::stun::Message makeIndication(const conf::Settings& settings) const;
     };
 
+    typedef std::map<nx::String, ClientBindInfo> BoundClients;
+    nx::stun::Message makeIndication(const String& id, const ClientBindInfo& info) const;
+
     const conf::Settings& m_settings;
-
     mutable QnMutex m_mutex;
-    std::list<ClientBindInfo> m_clientBindInfos;
+    BoundClients m_boundClients;
     ListeningPeerPool* const m_listeningPeerPool;
-
-
 };
 
 } // namespace hpm

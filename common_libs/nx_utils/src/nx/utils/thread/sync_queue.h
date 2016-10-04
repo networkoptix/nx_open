@@ -37,6 +37,7 @@ class SyncMultiQueue
     public SyncQueue<std::pair<R1, R2>>
 {
 public:
+    void push(R1 r1, R2 r2) /* overlap */;
     std::function<void(R1, R2)> pusher() /* overlap */;
 };
 
@@ -99,10 +100,13 @@ std::function<void(Result) > SyncQueue<Result>::pusher()
 template<typename R1, typename R2>
 std::function<void(R1, R2)> SyncMultiQueue<R1, R2>::pusher()
 {
-    return [this](R1 r1, R2 r2)
-    {
-        this->push(std::make_pair(std::move(r1), std::move(r2)));
-    };
+    return [this](R1 r1, R2 r2) { push(std::move(r1), std::move(r2)); };
+}
+
+template<typename R1, typename R2>
+void SyncMultiQueue<R1, R2>::push(R1 r1, R2 r2)
+{
+    SyncQueue<std::pair<R1, R2>>::push(std::make_pair(std::move(r1), std::move(r2)));
 }
 
 } // namespace utils

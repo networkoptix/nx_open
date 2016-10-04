@@ -47,6 +47,7 @@ private:
     const std::shared_ptr<MediatorConnection> m_mediatorConnection;
     ReverseAcceptor m_acceptor;
     HostAddress m_publicIp;
+    bool isReconnectHandlerSet;
 
     mutable QnMutex m_mutex;
     std::map<String, std::shared_ptr<ReverseConnectionHolder>> m_connectionHolders;

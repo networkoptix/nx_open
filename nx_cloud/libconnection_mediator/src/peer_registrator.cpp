@@ -151,14 +151,12 @@ void PeerRegistrator::listen(
     std::vector<nx::stun::Message> clientBindIndications;
     {
         QnMutexLocker lk(&m_mutex);
-        for (const auto& info: m_clientBindInfos)
-            clientBindIndications.push_back(info.makeIndication(m_settings));
+        for (const auto& client: m_boundClients)
+            clientBindIndications.push_back(makeIndication(client.first, client.second));
 
         auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
             connection,
-            MediaserverData(
-                requestData.systemId,
-                requestData.serverId));
+            MediaserverData(requestData.systemId, requestData.serverId));
 
         peerDataLocker.value().isListening = true;
         peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
@@ -255,38 +253,40 @@ void PeerRegistrator::clientBind(
         completionHandler(code);
     };
 
-    // Only local peers are alowed while auth is not avaliable for clients
+    // Only local peers are alowed while auth is not avaliable for clients:
     if (!connection->getSourceAddress().address.isLocal())
         return reject(api::ResultCode::notAuthorized);
 
     if (requestData.tcpReverseEndpoints.empty())
         return reject(api::ResultCode::badRequest);
 
+    auto peerId = std::move(requestData.originatingPeerID);
     nx::stun::Message indication;
     std::vector<ConnectionWeakRef> listeningPeerConnections;
-    std::list<ClientBindInfo>::iterator clientIt;
     {
         QnMutexLocker lk(&m_mutex);
-        clientIt = m_clientBindInfos.insert(
-            m_clientBindInfos.end(),
-            ClientBindInfo{
-                connection,
-                std::move(requestData.originatingPeerID),
-                std::move(requestData.tcpReverseEndpoints)});
+        ClientBindInfo& info = m_boundClients[peerId];
+        info.connection = connection;
+        info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
 
-        indication = clientIt->makeIndication(m_settings);
+        NX_LOGX(lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)")
+            .str(peerId).container(info.tcpReverseEndpoints)
+            .str(connection->getSourceAddress()), cl_logDEBUG1);
+
+        indication = makeIndication(peerId, info);
         listeningPeerConnections = m_listeningPeerPool->getAllConnections();
     }
 
-    NX_LOGX(lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %2)")
-        .str(clientIt->originatingPeerID).container(clientIt->tcpReverseEndpoints)
-        .str(connection->getSourceAddress()), cl_logDEBUG2);
-
     connection->addOnConnectionCloseHandler(
-        [this, clientIt]()
+        [this, peerId, connection]()
         {
             QnMutexLocker lk(&m_mutex);
-            m_clientBindInfos.erase(clientIt);
+            const auto it = m_boundClients.find(peerId);
+            if (it == m_boundClients.end() || it->second.connection.lock() != connection)
+                return;
+
+            NX_LOGX(lm("Client %1 has disconnected").str(peerId), cl_logDEBUG1);
+            m_boundClients.erase(it);
         });
 
     completionHandler(api::ResultCode::ok);
@@ -295,14 +295,13 @@ void PeerRegistrator::clientBind(
             connection->sendMessage(indication);
 }
 
-nx::stun::Message PeerRegistrator::ClientBindInfo::makeIndication(
-    const conf::Settings& settings) const
+nx::stun::Message PeerRegistrator::makeIndication(const String& id, const ClientBindInfo& info) const
 {
     api::ConnectionRequestedEvent event;
-    event.originatingPeerID = originatingPeerID;
-    event.tcpReverseEndpointList = tcpReverseEndpoints;
-    event.connectionMethods = api::ConnectionMethod::reverseConnect;
-    event.params = settings.connectionParameters();
+    event.originatingPeerID = id;
+    event.tcpReverseEndpointList = info.tcpReverseEndpoints;
+    event.connectionMethods = api::ConnectionMethod::reverseConnect; // TODO: Support others?
+    event.params = m_settings.connectionParameters();
     event.isPersistent = true;
 
     nx::stun::Message indication(stun::Header(stun::MessageClass::indication, event.kMethod));
