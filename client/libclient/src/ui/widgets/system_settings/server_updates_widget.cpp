@@ -25,6 +25,7 @@
 #include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/globals.h>
 #include <ui/style/nx_style.h>
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
@@ -430,7 +431,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         }
 
         case QnCheckForUpdateResult::NoNewerVersion:
-            setPaletteColor(ui->errorLabel, QPalette::WindowText, qnNxStyle->mainColor(QnNxStyle::Colors::kGreen));
+            setPaletteColor(ui->errorLabel, QPalette::WindowText, qnGlobals->successTextColor());
             detail = m_targetVersion.isNull()
                 ? tr("All components in your system are up to date.")
                 : tr("All components in your system are up to this version.");

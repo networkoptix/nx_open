@@ -51,6 +51,7 @@ public:
     void drawTextButton(
             QPainter* painter,
             const QStyleOptionButton* option,
+            QPalette::ColorRole foregroundRole,
             const QWidget* widget = nullptr) const;
 
     /* Insert horizontal separator line into QInputDialog above its button box. */
@@ -60,4 +61,5 @@ public:
     QnGenericPalette palette;
     QnNoptixStyleAnimator* idleAnimator;
     QnNoptixStyleAnimator* stateAnimator;
+    QWidget* lastProxiedWidgetUnderMouse;
 };

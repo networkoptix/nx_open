@@ -420,7 +420,7 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
     auto standardPixmap =
         [this](QStyle::StandardPixmap pixmapId) -> QPixmap
         {
-            return qnSkin->maximumSizePixmap(style()->standardIcon(pixmapId));
+            return QnSkin::maximumSizePixmap(style()->standardIcon(pixmapId));
         };
 
     QPixmap pixmap;

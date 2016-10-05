@@ -101,6 +101,7 @@
 
 #include <ui/style/globals.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/skin.h>
 
 #include <ui/widgets/views/resource_list_view.h>
 
@@ -1420,6 +1421,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
+    layout->setData(Qt::DecorationRole, qnSkin->icon("layouts/preview_search.png"));
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if (context()->user())
         layout->setParentId(context()->user()->getId());
@@ -1663,7 +1665,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
         case Qn::EdgeNode:
         case Qn::RecorderNode:
         case Qn::SharedLayoutNode:
-        case Qn::AccessibleResourceNode:
+        case Qn::SharedResourceNode:
             resource = parameters.resource();
             break;
         default:

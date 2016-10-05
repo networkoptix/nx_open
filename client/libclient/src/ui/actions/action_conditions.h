@@ -296,6 +296,14 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnStopSharingActionCondition: public QnActionCondition
+{
+public:
+    QnStopSharingActionCondition(QObject* parent): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 
 /**
  * Base class for edge-specific action conditions.

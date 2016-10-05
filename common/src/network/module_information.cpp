@@ -7,6 +7,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <api/model/connection_info.h>
 #include <utils/common/app_info.h>
+#include <utils/common/software_version.h>
 
 namespace {
 /*!
@@ -17,10 +18,19 @@ const QString nxClientId = lit("client.exe");
 const QString nxECId = lit("Enterprise Controller");
 const QString nxMediaServerId = lit("Media Server");
 
-QString getTargetSystemIdImpl(const QString& cloudId, const QString&systemName, bool isNewSystem)
+QString getTargetSystemIdImpl(
+    const QString& cloudId,
+    const QString& systemName,
+    const QnSoftwareVersion& serverVersion,
+    const QString& serverId,
+    bool isNewSystem)
 {
+    static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
+
     if (isNewSystem)
         return QUuid::createUuid().toString();
+    else if (serverVersion < kMinVersionWithSystem)
+        return serverId;
     else if (!cloudId.isEmpty())
         return cloudId;
     else
@@ -31,13 +41,14 @@ QString getTargetSystemIdImpl(const QString& cloudId, const QString&systemName, 
 
 QString helpers::getTargetSystemId(const QnConnectionInfo& info)
 {
-    return ::getTargetSystemIdImpl(info.cloudSystemId, info.systemName, info.newSystem);
+    return ::getTargetSystemIdImpl(info.cloudSystemId, info.systemName,
+        info.version, info.ecsGuid, info.newSystem);
 }
 
 QString helpers::getTargetSystemId(const QnModuleInformation& info)
 {
-    return ::getTargetSystemIdImpl(info.cloudSystemId,
-        info.systemName, info.serverFlags.testFlag(Qn::SF_NewSystem));
+    return ::getTargetSystemIdImpl(info.cloudSystemId, info.systemName,
+        info.version, info.id.toString(), info.serverFlags.testFlag(Qn::SF_NewSystem));
 }
 
 QnModuleInformation::QnModuleInformation():

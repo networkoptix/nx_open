@@ -6,7 +6,9 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -344,20 +346,19 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
     if (!connection)
         return;
 
-    auto key = subject.sharedResourcesKey();
     auto sessionGuid = qnCommon->runningInstanceGUID();
-    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(key);
-    if (accessibleResourcesBackup == accessibleResources)
+    auto backup = qnSharedResourcesManager->sharedResources(subject);
+    if (backup == accessibleResources)
         return;
 
-    qnResourceAccessManager->setAccessibleResources(key, accessibleResources);
+    qnSharedResourcesManager->setSharedResources(subject, accessibleResources);
 
     ec2::ApiAccessRightsData accessRights;
-    accessRights.userId = key;
+    accessRights.userId = subject.effectiveId();
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(accessRights, this,
-        [this, key, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
+        [this, subject, sessionGuid, backup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -369,7 +370,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->setAccessibleResources(key, accessibleResourcesBackup);
+        qnSharedResourcesManager->setSharedResources(subject, backup);
     });
 }
 
@@ -381,8 +382,8 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    auto backup = qnResourceAccessManager->userGroup(userGroup.id);
-    qnResourceAccessManager->addOrUpdateUserGroup(userGroup);
+    auto backup = qnUserRolesManager->userRole(userGroup.id);
+    qnUserRolesManager->addOrUpdateUserRole(userGroup);
 
     connection->getUserManager(Qn::kSystemAccess)->saveUserGroup(userGroup, this,
         [backup, userGroup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
@@ -398,9 +399,9 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
             return;
 
         if (backup.id.isNull())
-            qnResourceAccessManager->removeUserGroup(userGroup.id);  /*< New group was not added */
+            qnUserRolesManager->removeUserRole(userGroup.id);  /*< New group was not added */
         else
-            qnResourceAccessManager->addOrUpdateUserGroup(backup);
+            qnUserRolesManager->addOrUpdateUserRole(backup);
     });
 }
 
@@ -412,8 +413,8 @@ void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    auto backup = qnResourceAccessManager->userGroup(groupId);
-    qnResourceAccessManager->removeUserGroup(groupId);
+    auto backup = qnUserRolesManager->userRole(groupId);
+    qnUserRolesManager->removeUserRole(groupId);
 
     connection->getUserManager(Qn::kSystemAccess)->removeUserGroup(groupId, this,
         [backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
@@ -428,7 +429,7 @@ void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->addOrUpdateUserGroup(backup);
+        qnUserRolesManager->addOrUpdateUserRole(backup);
     });
 }
 

@@ -5,7 +5,8 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/resource_icon_cache.h>
@@ -89,7 +90,7 @@ void QnShowOnAlarmLayoutActionWidget::updateUsersButtonText()
 {
     auto ids = model()->actionParams().additionalResources;
     auto users = qnResPool->getResources<QnUserResource>(ids);
-    auto roles = qnResourceAccessManager->userGroups(ids);
+    auto roles = qnUserRolesManager->userRoles(ids);
 
     QString title;
     if (users.size() == 1 && roles.empty())
@@ -101,9 +102,9 @@ void QnShowOnAlarmLayoutActionWidget::updateUsersButtonText()
     else if (roles.empty())
         title = tr("%n Users", "", users.size());
     else if (users.empty())
-        title = tr("%n Roles", "", roles.size());
+        title = tr("%n Roles", "", (int)roles.size());
     else
-        title = tr("%n Users", "", users.size()) + lit(", ") + tr("%n Roles", "", roles.size());
+        title = tr("%n Users", "", users.size()) + lit(", ") + tr("%n Roles", "", (int)roles.size());
 
     ui->selectUsersButton->setText(title);
     ui->selectUsersButton->setIcon(qnResIconCache->icon(QnResourceIconCache::User));

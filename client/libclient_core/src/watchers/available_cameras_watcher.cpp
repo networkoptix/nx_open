@@ -1,10 +1,13 @@
 #include "available_cameras_watcher.h"
 
+#include <core/resource_access/global_permissions_manager.h>
+
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+
 #include <utils/common/connective.h>
 
 class QnAvailableCamerasWatcherPrivate : public Connective<QObject>
@@ -51,6 +54,18 @@ QnAvailableCamerasWatcher::QnAvailableCamerasWatcher(QObject* parent) :
     base_type(parent),
     d_ptr(new QnAvailableCamerasWatcherPrivate(this))
 {
+    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this,
+        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+        {
+            Q_D(QnAvailableCamerasWatcher);
+            if (!subject.user() || subject.user() != d->user)
+                return;
+
+            bool acceptAllCameras = value.testFlag(Qn::GlobalAdminPermission);
+            if (d->acceptAllCameras != acceptAllCameras)
+                d->initialize();
+        });
 }
 
 QnAvailableCamerasWatcher::~QnAvailableCamerasWatcher()
@@ -69,23 +84,7 @@ void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr& user)
     if (d->user == user)
         return;
 
-    if (d->user)
-        disconnect(d->user, nullptr, this, nullptr);
-
     d->user = user;
-
-    if (d->user)
-    {
-        connect(d->user, &QnUserResource::permissionsChanged, this, [this]()
-        {
-            Q_D(QnAvailableCamerasWatcher);
-
-            bool acceptAllCameras = qnResourceAccessManager->hasGlobalPermission(d->user, Qn::GlobalAdminPermission);
-            if (d->acceptAllCameras != acceptAllCameras)
-                d->initialize();
-        });
-    }
-
     d->initialize();
 }
 
@@ -159,7 +158,8 @@ void QnAvailableCamerasWatcherPrivate::initialize()
     if (!user)
         return;
 
-    acceptAllCameras = !useLayouts || qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
+    acceptAllCameras = !useLayouts || qnGlobalPermissionsManager->hasGlobalPermission(user,
+        Qn::GlobalAdminPermission);
 
     if (acceptAllCameras)
     {

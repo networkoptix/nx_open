@@ -17,7 +17,7 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>

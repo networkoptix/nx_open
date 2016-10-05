@@ -42,6 +42,7 @@ namespace style
         static const int kToolTipHeight;                /**< Height of a single line tooltip */
         static const int kMenuButtonIndicatorMargin;    /**< Margin between menu button text and dropdown indicator */
         static const int kTextButtonIconMargin;         /**< Margin between text button icon and text */
+        static const int kPushButtonIconMargin;         /**< Margin around push button icon */
     };
 
     class Hints
@@ -65,9 +66,7 @@ namespace style
         static const char* kCheckBoxAsButton;       /**< Name of a property to change checkbox appearance to switch button (bool). */
         static const char* kMenuAsDropdown;         /**< Name of a property to change menu appearance to dropdown (bool). */
         static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
-
-        //TODO: #vkutin Refactor this property to something else in the future
-        static const char* kButtonMarginProperty;   /**< Name of a property to hold a custom push button margin (int). Buttons with this property are left-aligned. */
+        static const char* kItemViewRadioButtons;   /**< Name of a property to change item view checkboxes to radio buttons (bool). */
     };
 
     /** Flags of additional slider features */

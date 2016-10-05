@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource_management/resource_access_subject.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 #include <nx_ec/data/api_fwd.h>

@@ -14,55 +14,27 @@
 
 namespace
 {
-    enum RoleId
-    {
-        FirstRoleId = Qt::UserRole + 1,
-
-        SearchRoleId = FirstRoleId,
-        SystemNameRoleId,
-        SystemIdRoleId,
-
-        OwnerDescriptionRoleId,
-        LastPasswordRoleId,
-
-        IsFactorySystemRoleId,
-
-        IsCloudSystemRoleId,
-        IsOnlineRoleId,
-        IsCompatibleRoleId,
-        IsCompatibleVersionRoleId,
-        IsCompatibleInternalRoleId,
-
-        WrongVersionRoleId,
-        CompatibleVersionRoleId,
-
-        // For local systems
-        LastPasswordsModelRoleId,
-
-        RolesCount
-    };
-
     typedef QHash<int, QByteArray> RoleNames;
     const auto kRoleNames = []() -> RoleNames
     {
         RoleNames result;
-        result.insert(SystemNameRoleId, "systemName");
-        result.insert(SystemIdRoleId, "systemId");
-        result.insert(OwnerDescriptionRoleId, "ownerDescription");
-        result.insert(LastPasswordRoleId, "lastPassword");
+        result.insert(QnSystemsModel::SystemNameRoleId, "systemName");
+        result.insert(QnSystemsModel::SystemIdRoleId, "systemId");
+        result.insert(QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription");
+        result.insert(QnSystemsModel::LastPasswordRoleId, "lastPassword");
 
-        result.insert(IsFactorySystemRoleId, "isFactorySystem");
+        result.insert(QnSystemsModel::IsFactorySystemRoleId, "isFactorySystem");
 
-        result.insert(IsCloudSystemRoleId, "isCloudSystem");
-        result.insert(IsOnlineRoleId, "isOnline");
-        result.insert(IsCompatibleRoleId, "isCompatible");
-        result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
-        result.insert(IsCompatibleInternalRoleId, "isCompatibleInternal");
+        result.insert(QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem");
+        result.insert(QnSystemsModel::IsOnlineRoleId, "isOnline");
+        result.insert(QnSystemsModel::IsCompatibleRoleId, "isCompatible");
+        result.insert(QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion");
+        result.insert(QnSystemsModel::IsCompatibleInternalRoleId, "isCompatibleInternal");
 
-        result.insert(WrongVersionRoleId, "wrongVersion");
-        result.insert(CompatibleVersionRoleId, "compatibleVersion");
+        result.insert(QnSystemsModel::WrongVersionRoleId, "wrongVersion");
+        result.insert(QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion");
 
-        result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
+        result.insert(QnSystemsModel::LastPasswordsModelRoleId, "lastPasswordsModel");
 
         return result;
     }();
@@ -104,18 +76,6 @@ public:
         , QVector<int> roles);
 
     void resetModel();
-
-    bool systemLess(const InternalSystemDataPtr& firstData,
-                    const InternalSystemDataPtr& secondData) const;
-
-    auto getSystemLessPred() const
-    {
-        return [this](const InternalSystemDataPtr& firstData,
-                      const InternalSystemDataPtr& secondData)
-        {
-            return systemLess(firstData, secondData);
-        };
-    }
 
     QString getIncompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     QString getCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
@@ -287,7 +247,8 @@ void QnSystemsModelPrivate::updateOwnerDescription()
         return;
 
     emit q->dataChanged(q->index(0), q->index(count - 1), QVector<int>()
-        << OwnerDescriptionRoleId << SearchRoleId);
+        << QnSystemsModel::OwnerDescriptionRoleId
+        << QnSystemsModel::SearchRoleId);
 }
 
 void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescription)
@@ -297,25 +258,23 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     const auto data = InternalSystemDataPtr(new InternalSystemData(
         { systemDescription, QnDisconnectHelper() }));
 
-    const auto insertPos = std::upper_bound(internalData.begin()
-        , internalData.end(), data, getSystemLessPred());
-
-    const int position = (insertPos == internalData.end()
-        ? internalData.size() : insertPos - internalData.begin());
-
     data->connections << connect(systemDescription, &QnBaseSystemDescription::serverChanged, this,
         [this, systemDescription] (const QnUuid &serverId, QnServerFields fields)
         {
             at_serverChanged(systemDescription, serverId, fields);
-        }
-    );
+        });
 
     data->connections << connect(systemDescription, &QnBaseSystemDescription::idChanged,this,
         [this, systemDescription]()
         {
-            emitDataChanged(systemDescription, QVector<int>() << SystemIdRoleId);
-        }
-    );
+            emitDataChanged(systemDescription, QVector<int>() << QnSystemsModel::SystemIdRoleId);
+        });
+
+    data->connections << connect(systemDescription, &QnBaseSystemDescription::systemNameChanged, this,
+        [this, systemDescription]()
+        {
+            emitDataChanged(systemDescription, QVector<int>() << QnSystemsModel::SystemNameRoleId);
+        });
 
     data->connections << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
         [this, systemDescription]()
@@ -323,13 +282,14 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             // Move system to right place. No data will not be preserved in case of cloud-to-system (and vice versa) state change
             removeSystem(systemDescription->id());
             addSystem(systemDescription);
-        }
-    );
+        });
 
     data->connections << connect(systemDescription, &QnBaseSystemDescription::ownerChanged, this,
         [this, systemDescription]()
         {
-            emitDataChanged(systemDescription, QVector<int>() << OwnerDescriptionRoleId << SearchRoleId);
+            emitDataChanged(systemDescription, QVector<int>()
+                << QnSystemsModel::OwnerDescriptionRoleId
+                << QnSystemsModel::SearchRoleId);
         }
     );
 
@@ -345,8 +305,8 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::serverRemoved, this, serverAction);
 
-    q->beginInsertRows(QModelIndex(), position, position);
-    internalData.insert(insertPos, data);
+    q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
+    internalData.append(data);
     q->endInsertRows();
 }
 
@@ -373,16 +333,16 @@ void QnSystemsModelPrivate::removeSystem(const QString &systemId)
 QnSystemsModelPrivate::InternalList::iterator QnSystemsModelPrivate::getInternalDataIt(
     const QnSystemDescriptionPtr& systemDescription)
 {
-    const auto data = InternalSystemDataPtr(new InternalSystemData(
+    const auto target = InternalSystemDataPtr(new InternalSystemData(
         { systemDescription, QnDisconnectHelper() }));
-    const auto it = std::lower_bound(internalData.begin()
-        , internalData.end(), data, getSystemLessPred());
 
-    if (it == internalData.end())
-        return internalData.end();
+    const auto it = std::find_if(internalData.begin(), internalData.end(),
+        [target](const InternalSystemDataPtr& data)
+        {
+            return target->system->id() == data->system->id();
+        });
 
-    const auto foundId = (*it)->system->id();
-    return (foundId == systemDescription->id() ? it : internalData.end());
+    return it;
 }
 
 void QnSystemsModelPrivate::emitDataChanged(const QnSystemDescriptionPtr& systemDescription
@@ -432,10 +392,13 @@ void QnSystemsModelPrivate::at_serverChanged(
     const auto testFlag = [this, q, modelIndex, fields](QnServerField field, int role)
     {
         if (fields.testFlag(field))
-            emit q->dataChanged(modelIndex, modelIndex, QVector<int>() << role << SearchRoleId);
+        {
+            emit q->dataChanged(modelIndex, modelIndex, QVector<int>() << role
+                << QnSystemsModel::SearchRoleId);
+        }
     };
 
-    testFlag(QnServerField::HostField, IsOnlineRoleId);
+    testFlag(QnServerField::HostField, QnSystemsModel::IsOnlineRoleId);
 }
 
 void QnSystemsModelPrivate::resetModel()
@@ -444,40 +407,6 @@ void QnSystemsModelPrivate::resetModel()
 
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
-}
-
-bool QnSystemsModelPrivate::systemLess(
-        const QnSystemsModelPrivate::InternalSystemDataPtr& firstData,
-        const QnSystemsModelPrivate::InternalSystemDataPtr& secondData) const
-{
-    const auto first = firstData->system;
-    const auto second = secondData->system;
-
-    const bool firstIsFactorySystem = isFactorySystem(first);
-    const bool sameFactoryStatus =
-        (firstIsFactorySystem == isFactorySystem(second));
-    if (!sameFactoryStatus)
-        return firstIsFactorySystem;
-
-    const bool firstIsCloudSystem = first->isCloudSystem();
-    const bool sameType =
-        (firstIsCloudSystem == second->isCloudSystem());
-    if (!sameType)
-        return firstIsCloudSystem;
-
-    const bool firstCompatible = isCompatibleSystem(first);
-    const bool sameCompatible =
-        (firstCompatible == isCompatibleSystem(second));
-    if (!sameCompatible)
-        return firstCompatible;
-
-    const bool firstFullCompatible = getCompatibleVersion(first).isEmpty();
-    const bool sameFullCompatible =
-        (firstFullCompatible == getCompatibleVersion(second).isEmpty());
-    if (!sameFullCompatible)
-        return firstFullCompatible;
-
-    return (first->name() < second->name());
 }
 
 QString QnSystemsModelPrivate::getCompatibleVersion(

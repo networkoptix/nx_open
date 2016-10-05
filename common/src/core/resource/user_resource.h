@@ -86,16 +86,17 @@ public:
      */
     void fillId();
 signals:
+    void permissionsChanged(const QnUserResourcePtr& user);
+    void userGroupChanged(const QnUserResourcePtr& user);
+    void enabledChanged(const QnUserResourcePtr& user);
+
     void hashChanged(const QnResourcePtr& user);
     void passwordChanged(const QnResourcePtr& user);
     void digestChanged(const QnResourcePtr& user);
     void cryptSha512HashChanged(const QnResourcePtr& user);
-    void permissionsChanged(const QnResourcePtr& user);
-    void userGroupChanged(const QnResourcePtr& user);
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
 	void realmChanged(const QnResourcePtr& user);
-    void enabledChanged(const QnResourcePtr& user);
 
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;

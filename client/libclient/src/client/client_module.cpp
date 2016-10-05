@@ -42,7 +42,6 @@
 #include <finders/direct_systems_finder.h>
 #include <finders/cloud_systems_finder.h>
 #include <finders/recent_local_systems_finder.h>
-
 #include <network/module_finder.h>
 #include <network/router.h>
 

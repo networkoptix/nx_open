@@ -230,16 +230,16 @@ void QnStatusOverlayWidget::setupCentralControls()
     const auto layout = new QVBoxLayout(container);
     layout->setSpacing(0);
 
-    layout->addStretch(1);
     layout->addWidget(m_centralAreaImage, 0, Qt::AlignHCenter);
     layout->addWidget(m_caption, 0, Qt::AlignHCenter);
-    layout->addStretch(1);
 
-    layout->setSizeConstraint(QLayout::SetMinimumSize);
+    layout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
-    const auto holderLayout = new QGraphicsLinearLayout(m_centralHolder);
+    const auto holderLayout = new QGraphicsLinearLayout(Qt::Vertical, m_centralHolder);
     holderLayout->setContentsMargins(16, 60, 16, 60);
+    holderLayout->addStretch(1);
     holderLayout->addItem(makeMaskedProxy(container, m_centralHolder));
+    holderLayout->addStretch(1);
 
     m_centralHolder->setOpacity(0.7);
     m_centralHolder->setAcceptedMouseButtons(Qt::NoButton);
@@ -360,4 +360,8 @@ void QnStatusOverlayWidget::updateAreasSizes()
     m_imageItem.setScale(imageSceneSize.width() / imageSize.width());
     m_imageItem.setPos((rect.width() - imageSceneSize.width()) / 2,
         (rect.height() - imageSceneSize.height()) / 2);
+
+    m_extrasHolder->updateScale();
+    m_preloaderHolder->updateScale();
+    m_centralHolder->updateScale();
 }

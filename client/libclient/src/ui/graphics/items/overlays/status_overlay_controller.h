@@ -7,7 +7,6 @@
 #include <utils/common/connective.h>
 
 class QnStatusOverlayWidget;
-class QnStatusOverlayWidget;
 
 class QnStatusOverlayController: public Connective<QObject>
 {
