@@ -119,7 +119,7 @@ private slots:
     void at_fakeserver_information_changed(const QnResourcePtr &resource);
 
     void at_server_redundancyChanged(const QnResourcePtr &resource);
-    void at_commonModule_systemNameChanged();
+    void at_systemNameChanged();
 
     void at_serverAutoDiscoveryEnabledChanged();
 
