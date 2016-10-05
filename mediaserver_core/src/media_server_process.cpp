@@ -1989,14 +1989,6 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
 
-    if (cmdLineArguments.cleanupDb)
-    {
-        const bool kCleanupDbObjects = true;
-        const bool kCleanupTransactionLog = true;
-        auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
-        miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
-    }
-
     if (needToStop())
         return; //TODO #ak correctly deinitialize what has been initialised
 
@@ -2354,6 +2346,15 @@ void MediaServerProcess::run()
 #endif
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
+
+    if (cmdLineArguments.cleanupDb)
+    {
+        const bool kCleanupDbObjects = true;
+        const bool kCleanupTransactionLog = true;
+        auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
+        miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
+    }
+
     loadResourcesFromECS(messageProcessor.data());
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
@@ -2931,7 +2932,9 @@ int MediaServerProcess::main(int argc, char* argv[])
     commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
         lit("Force ip version"), QString());
     commandLineParser.addParameter(&cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
-        lit("Cleans dangling cameras and servers user attributes, kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), false);
+        lit("Deletes resources with NULL ids, "
+            "cleans dangling cameras' and servers' user attributes, "
+            "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,

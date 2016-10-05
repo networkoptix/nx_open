@@ -1136,7 +1136,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
 
 bool QnDbManager::cleanupDanglingDbObjects()
 {
-    const QString kCleanupScript(":/updates/68_cleanup_dangling_attrs.sql");
+    const QString kCleanupScript(":/updates/68_cleanup_db.sql");
     return QnDbHelper::execSQLFile(kCleanupScript, m_sdb);
 }
 
@@ -1332,7 +1332,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     {
         return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
     }
-    else if (updateName == lit(":/updates/68_cleanup_dangling_attrs.sql"))
+    else if (updateName == lit(":/updates/68_cleanup_db.sql"))
     {
         if (!m_dbJustCreated)
         {

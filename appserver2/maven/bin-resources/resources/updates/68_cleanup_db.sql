@@ -1,3 +1,9 @@
+DELETE FROM 
+  vms_resource
+WHERE
+  guid IS NULL 
+    OR
+  guid = X'0000000000000000';	
 
 DELETE FROM 
   vms_camera_user_attributes
