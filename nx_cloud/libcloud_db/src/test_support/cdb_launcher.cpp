@@ -771,6 +771,30 @@ api::ResultCode CdbLauncher::getVmsConnections(
     return resCode;
 }
 
+bool CdbLauncher::isStartedWithExternalDb() const
+{
+    const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    return !connectionOptions.dbName.isEmpty();
+}
+
+bool CdbLauncher::placePreparedDB(const QString& dbDumpPath)
+{
+    //starting with old db
+    const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    if (!connectionOptions.dbName.isEmpty())
+        return false; //test is started with external DB: ignoring
+
+    if (!QDir().mkpath(testDataDir()))
+        return false;
+    const QString dbPath = QDir::cleanPath(testDataDir() + "/cdb_ut.sqlite");
+    QDir().remove(dbPath);
+    if (!QFile::copy(dbDumpPath, dbPath))
+        return false;
+    return QFile(dbPath).setPermissions(
+        QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+        QFileDevice::ReadUser | QFileDevice::WriteUser);
+}
+
 void CdbLauncher::setTemporaryDirectoryPath(const QString& path)
 {
     sTemporaryDirectoryPath = path;

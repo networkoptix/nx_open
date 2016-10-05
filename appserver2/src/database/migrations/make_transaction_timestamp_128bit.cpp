@@ -26,7 +26,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 QnAbstractTransaction::QnAbstractTransaction():
     command(ApiCommand::NotDefined),
-    peerID(qnCommon->moduleGUID()),
     transactionType(TransactionType::Regular)
 {
 }

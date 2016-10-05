@@ -22,9 +22,19 @@ public:
     utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>* appserver2();
     CdbLauncher* cdb();
     const CdbLauncher* cdb() const;
-    api::ResultCode bindRandomSystem();
+    api::ResultCode setOwnerAccountCredentials(
+        const std::string& email,
+        const std::string& password);
+    api::ResultCode bindSystemToOwnerAccount();
+    api::ResultCode registerAccountAndBindSystemToIt();
     api::ResultCode unbindSystem();
     api::ResultCode rebindSystem();
+    api::ResultCode fillRegisteredSystemDataByCredentials(
+        const std::string& systemId,
+        const std::string& authKey);
+    api::ResultCode saveCloudSystemCredentials(
+        const std::string& id,
+        const std::string& authKey);
     const api::AccountData& ownerAccount() const;
     const std::string& ownerAccountPassword() const;
     const api::SystemData& registeredSystemData() const;

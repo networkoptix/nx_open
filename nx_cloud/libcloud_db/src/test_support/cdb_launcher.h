@@ -177,6 +177,9 @@ public:
     api::ResultCode getVmsConnections(
         api::VmsConnectionDataList* const vmsConnections);
 
+    bool isStartedWithExternalDb() const;
+    bool placePreparedDB(const QString& dbDumpPath);
+
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath();
     static void setDbConnectionOptions(
