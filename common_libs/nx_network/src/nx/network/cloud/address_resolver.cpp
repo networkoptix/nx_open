@@ -289,7 +289,12 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     // TODO: make DnsResolver QnStoppableAsync
     m_dnsResolver.stop();
-    m_mediatorConnection->pleaseStop(std::move(handler));
+    m_mediatorConnection->pleaseStop(
+        [this, handler = std::move(handler)]()
+        {
+            m_mediatorConnection.reset();
+            handler();
+        });
 }
 
 AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress)
