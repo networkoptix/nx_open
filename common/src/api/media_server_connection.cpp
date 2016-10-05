@@ -1018,7 +1018,7 @@ int QnMediaServerConnection::getAuditLogAsync(
     QnRequestParamList params;
     params << QnRequestParam("from", startTimeMs * 1000ll);
     params << QnRequestParam("to", endTimeMs * 1000ll);
-    params << QnRequestParam("Loggedformat", "ubjson");
+    params << QnRequestParam("format", "ubjson");
     return sendAsyncGetRequest(AuditLogObject,
         params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
