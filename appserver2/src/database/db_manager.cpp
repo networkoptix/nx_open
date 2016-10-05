@@ -225,6 +225,7 @@ QnDbManager::QnDbManager()
     m_initialized(false),
     m_tran(m_sdb, m_mutex),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
+    m_needClearLog(false),
     m_needResyncLog(false),
     m_needResyncLicenses(false),
     m_needResyncFiles(false),
@@ -498,6 +499,9 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
 
     if (!syncLicensesBetweenDB())
+        return false;
+
+    if (m_needClearLog && !transactionLog->clear())
         return false;
 
     if( m_needResyncLog ) {
@@ -1246,6 +1250,12 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
     return true;
 }
 
+bool QnDbManager::cleanupDanglingDbObjects()
+{
+    const QString kCleanupScript(":/updates/68_cleanup_db.sql");
+    return QnDbHelper::execSQLFile(kCleanupScript, m_sdb);
+}
+
 bool QnDbManager::fixBusinessRules()
 {
     QSqlQuery query(m_sdb);
@@ -1600,6 +1610,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/68_add_transaction_type.sql"))
     {
         return upgradeSerializedTransactionsToV2();
+    }
+    else if (updateName == lit(":/updates/68_cleanup_db.sql"))
+    {
+        if (!m_dbJustCreated)
+        {
+            m_needClearLog = true;
+            m_needResyncLog = true;
+        }
     }
     else if (updateName == lit(":/updates/70_make_transaction_timestamp_128bit.sql"))
     {
@@ -4798,9 +4816,19 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& /*tran*/)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran)
 {
-    return transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+    ErrorCode result = ErrorCode::ok;
+    if (tran.params.cleanupDbObjects)
+        result = cleanupDanglingDbObjects() ? ErrorCode::ok : ErrorCode::failure;
+
+    if (result != ErrorCode::ok)
+        return result;
+
+    if (tran.params.cleanupTransactionLog)
+        result = transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+
+    return result;
 }
 
 QnUuid QnDbManager::getID() const

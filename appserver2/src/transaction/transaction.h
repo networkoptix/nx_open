@@ -1139,7 +1139,7 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \
+APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
                        true, \
                        false, \
                        InvalidGetHashHelper(), \
