@@ -73,10 +73,8 @@ public:
         s_endpoints.clear();
     }
 
-    AddressResolverTest()
-    :
-        AddressResolver(
-            std::make_shared<hpm::api::MediatorClientTcpConnection>(s_stunClient))
+    AddressResolverTest():
+        AddressResolver(std::make_unique<hpm::api::MediatorClientTcpConnection>(s_stunClient))
     {
     }
 

@@ -57,16 +57,14 @@ void MediatorConnector::enable( bool waitComplete )
         m_future->wait();
 }
 
-std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
+std::unique_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
 {
-    return std::shared_ptr<MediatorClientTcpConnection>(
-                new MediatorClientTcpConnection( m_stunClient ) );
+    return std::make_unique<MediatorClientTcpConnection>(m_stunClient);
 }
 
-std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
+std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
 {
-    return std::shared_ptr<MediatorServerTcpConnection>(
-                new MediatorServerTcpConnection( m_stunClient, this ) );
+    return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
 void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarning )

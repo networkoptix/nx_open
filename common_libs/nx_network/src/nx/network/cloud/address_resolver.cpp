@@ -105,7 +105,7 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver(
-    std::shared_ptr<hpm::api::MediatorClientTcpConnection> mediatorConnection)
+    std::unique_ptr<hpm::api::MediatorClientTcpConnection> mediatorConnection)
 :
     m_mediatorConnection(std::move(mediatorConnection)),
     m_cloudAddressRegExp(QLatin1String(
