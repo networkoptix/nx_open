@@ -43,23 +43,27 @@ private:
             return false; /* Not supported by the platform images implementation. */
 
         QPixmap normalPixmap = cursor.pixmap();
-        
+
         QPixmap rotatedPixmap(normalPixmap.size() * 1.5);
         rotatedPixmap.fill(Qt::transparent);
-        
+
         QTransform transform;
+
         transform.translate(rotatedPixmap.width() / 2, rotatedPixmap.height() / 2);
         transform.rotate(rotation);
         transform.translate(-normalPixmap.width() / 2, -normalPixmap.height() / 2);
 
         QPainter painter(&rotatedPixmap);
+
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
         painter.setTransform(transform);
         painter.drawPixmap(QPoint(0, 0), normalPixmap);
         painter.end();
 
-        QPoint hotSpot = transform.map(cursor.hotSpot());
-
+        const qreal primaryScreenRatio = qApp->primaryScreen()->devicePixelRatio();
+        rotatedPixmap.setDevicePixelRatio(primaryScreenRatio);
+        QPoint hotSpot = transform.map(cursor.hotSpot()) / primaryScreenRatio;
         *result = QCursor(rotatedPixmap, hotSpot.x(), hotSpot.y());
         return true;
     }
