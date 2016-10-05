@@ -606,7 +606,7 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction()
     return true;
 }
 
-bool QnServerDb::bookmarksUniqueIdToCameraId()
+bool QnServerDb::bookmarksUniqueIdToCameraGuid()
 {
     QMap<QnUuid, QString> uniqueIdByGuid;
 
@@ -631,7 +631,7 @@ bool QnServerDb::bookmarksUniqueIdToCameraId()
 
         QSqlQuery query(m_sdb);
         query.prepare(
-            "UPDATE bookmarks SET camera_id = :cameraId WHERE guid = :guid");
+            "UPDATE bookmarks SET camera_guid = :cameraId WHERE guid = :guid");
         query.bindValue(":guid", QnSql::serialized_field(it.key()));
         query.bindValue(":cameraId", QnSql::serialized_field(cameraId));
         if (!query.exec())
@@ -958,8 +958,8 @@ bool QnServerDb::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/03_add_bookmark_tag_counts_and_rename_tables.sql")))
         return createBookmarkTagTriggersUnderTransaction();
 
-    if (updateName.endsWith(lit("/07_1_bookmarks_unique_id_to_camera_id.sql")))
-        return bookmarksUniqueIdToCameraId();
+    if (updateName.endsWith(lit("/07_1_bookmarks_unique_id_to_camera_guid.sql")))
+        return bookmarksUniqueIdToCameraGuid();
 
     return true;
 }
@@ -994,7 +994,7 @@ bool QnServerDb::getBookmarks(
     for (auto it = cameraIds.begin(); it != cameraIds.end(); ++it)
     {
         const auto bindingName = getCameraBindingName(index);
-        camerasList.append(lit("book.camera_id = %1").arg(bindingName));
+        camerasList.append(lit("book.camera_guid = %1").arg(bindingName));
         bindings.append(bindingName);
         ++index;
     }
@@ -1029,7 +1029,7 @@ bool QnServerDb::getBookmarks(
         book.start_time + book.duration as endTimeMs,
         book.description as description,
         book.timeout as timeout,
-        book.camera_id as cameraId,
+        book.camera_guid as cameraId,
         group_concat(tag.name) as tags
         FROM bookmarks book
         LEFT JOIN bookmark_tags tag
