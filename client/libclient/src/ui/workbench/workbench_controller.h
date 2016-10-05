@@ -38,6 +38,7 @@ class ForwardingInstrument;
 class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
+class ZoomWindowInstrument;
 
 class QnToggle;
 class QnActionManager;
@@ -264,6 +265,8 @@ private:
 
     /** Instrument that tracks left clicks on items. */
     ClickInstrument *m_itemLeftClickInstrument;
+
+    ZoomWindowInstrument* m_zoomWindowInstrument;
 
     bool m_selectionOverlayHackInstrumentDisabled;
     bool m_selectionOverlayHackInstrumentDisabled2; // TODO: use toggles?

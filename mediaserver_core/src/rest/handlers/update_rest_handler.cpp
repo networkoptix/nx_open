@@ -10,7 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 #include <api/model/upload_update_reply.h>
-#include "core/resource_management/resource_access_manager.h"
+#include "core/resource_access/resource_access_manager.h"
 #include "rest/server/rest_connection_processor.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"

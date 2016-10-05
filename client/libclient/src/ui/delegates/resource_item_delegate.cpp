@@ -445,9 +445,6 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     baseName = index.data(Qt::DisplayRole).toString();
     extInfo = QString();
 
-    if (index.column() > Qn::NameColumn)
-        return;
-
     static const QString kCustomExtInfoTemplate = lit(" - %1");
 
     /* Two-component text from resource information: */

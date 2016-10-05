@@ -223,15 +223,19 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    QnMutexLocker lk( &m_mutex );
-    m_terminated = true;
-    m_cond.wakeAll();
+    std::shared_ptr<nx_http::HttpClient> client;
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_terminated = true;
+        m_cond.wakeAll();
+        std::swap(client, m_httpClient);
+    }
 
     //closing connection
-    if( m_httpClient )
+    if(client)
     {
-        m_httpClient->pleaseStop();
-        m_httpClient.reset();
+        client->pleaseStop();
+        client.reset();
     }
 }
 

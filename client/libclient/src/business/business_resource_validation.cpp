@@ -6,7 +6,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <utils/email/email.h>
 
@@ -136,7 +138,9 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
     if (cameras.isEmpty())
-        return tr("Select device");
+        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Select device"),
+            tr("Select camera"));
     else
         return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
 }
@@ -187,7 +191,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 {
     bool any = false;
 
-    auto roles = qnResourceAccessManager->userGroups(ids);
+    auto roles = qnUserRolesManager->userRoles(ids);
     if (!roles.empty())
         any = true;
 
@@ -213,7 +217,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
     const QString& additionalList)
 {
-    auto roles = qnResourceAccessManager->userGroups(ids);
+    auto roles = qnUserRolesManager->userRoles(ids);
     auto users = qnResPool->getResources<QnUserResource>(ids);
     auto additional = parseAdditional(additionalList);
 
@@ -264,7 +268,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     if (!users.empty())
         recipients << tr("%n Users", "", users.size());
     if (!roles.empty())
-        recipients << tr("%n Roles", "", roles.size());
+        recipients << tr("%n Roles", "", (int)roles.size());
     if (!additional.empty())
         recipients << tr("%n additional", "", additional.size());
 

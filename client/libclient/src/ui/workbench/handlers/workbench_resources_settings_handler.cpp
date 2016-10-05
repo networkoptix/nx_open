@@ -14,6 +14,7 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 
 #include <ui/workbench/workbench_access_controller.h>
+#include <core/resource/fake_media_server.h>
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
@@ -66,7 +67,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
     QnMediaServerResourceList servers = params.resources().filtered<QnMediaServerResource>(
         [](const QnMediaServerResourcePtr &server)
         {
-            return !QnMediaServerResource::isFakeServer(server);
+            return !server.dynamicCast<QnFakeMediaServerResource>();
         });
 
     NX_ASSERT(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");

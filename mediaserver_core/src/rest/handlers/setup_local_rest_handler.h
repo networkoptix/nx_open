@@ -1,7 +1,7 @@
 #pragma once
 
 #include <rest/server/json_rest_handler.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 struct SetupLocalSystemData;
 

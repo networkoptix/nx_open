@@ -12,17 +12,27 @@
 
 #include <common/common_meta_types.h>
 
-#include <core/resource/media_server_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/providers/permissions_resource_access_provider.h>
+#include <core/resource_access/providers/shared_resource_access_provider.h>
+#include <core/resource_access/providers/shared_layout_access_provider.h>
+#include <core/resource_access/providers/videowall_resource_access_provider.h>
+
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
+
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include "core/resource/camera_user_attribute_pool.h"
 #include "core/resource/media_server_user_attributes.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
 
 #include "utils/common/synctime.h"
 #include <utils/common/app_info.h>
@@ -72,12 +82,14 @@ bool AdminPasswordData::isEmpty() const
 
 // ------------------- QnCommonModule --------------------
 
-QnCommonModule::QnCommonModule(QObject *parent): QObject(parent)
+QnCommonModule::QnCommonModule(QObject *parent):
+    QObject(parent)
 {
     Q_INIT_RESOURCE(common);
 
     nx::network::SocketGlobals::init();
 
+    m_dirtyModuleInformation = false;
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
@@ -97,8 +109,21 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent)
     instance<QnResourceStatusDictionary>();
     instance<QnServerAdditionalAddressesDictionary>();
 
-    instance<QnResourcePool>();
-    instance<QnResourceAccessManager>();
+    instance<QnResourcePool>();             /*< Depends on nothing. */
+    instance<QnUserRolesManager>();         /*< Depends on nothing. */
+    instance<QnSharedResourcesManager>();   /*< Depends on respool and roles. */
+    instance<QnResourceAccessProvider>();   /*< Depends on respool, roles and shared resources. */
+
+    instance<QnGlobalPermissionsManager>(); /* Depends on respool. */
+
+    /* Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager. */
+    qnResourceAccessProvider->addBaseProvider(new QnPermissionsResourceAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnSharedResourceAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnSharedLayoutAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnVideoWallResourceAccessProvider());
+
+    instance<QnResourceAccessManager>();    /*< Depends on access provider. */
+
 
     instance<QnGlobalSettings>();
     instance<nx_http::ClientPool>();
@@ -119,11 +144,17 @@ QnCommonModule::~QnCommonModule()
     nx::network::SocketGlobals::deinit();
 }
 
-void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server) {
+void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server)
+{
     /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
-    connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::updateModuleInformation);
-    connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::updateModuleInformation);
-    connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
+    connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::resetCachedValue);
+    connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::resetCachedValue);
+    connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::resetCachedValue);
+
+    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this, &QnCommonModule::resetCachedValue);
+    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCommonModule::resetCachedValue);
+
 }
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid)
@@ -154,57 +185,58 @@ QnSoftwareVersion QnCommonModule::engineVersion() const {
     return m_engineVersion;
 }
 
-void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
+void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version)
+{
     QnMutexLocker lk( &m_mutex );
     m_engineVersion = version;
 }
 
-void QnCommonModule::setLocalSystemName(const QString& value)
+void QnCommonModule::setReadOnly(bool value)
 {
-    QnModuleInformation info = moduleInformation();
-    info.systemName = value;
-    setModuleInformation(info);
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (m_moduleInformation.ecDbReadOnly == value)
+            return;
+        m_moduleInformation.ecDbReadOnly = value;
+    }
+    emit moduleInformationChanged();
+    emit readOnlyChanged(value);
 }
 
-QString QnCommonModule::localSystemName() const
+bool QnCommonModule::isReadOnly() const
 {
-    return moduleInformation().systemName;
+    QnMutexLocker lk(&m_mutex);
+    return m_moduleInformation.ecDbReadOnly;
 }
 
-void QnCommonModule::setReadOnly(bool value) {
-    QnModuleInformation info = moduleInformation();
-    info.ecDbReadOnly = value;
-    setModuleInformation(info);
-}
-
-bool QnCommonModule::isReadOnly() const {
-    return moduleInformation().ecDbReadOnly;
-}
-
-void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation)
+void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInformation)
 {
-    bool isSystemNameChanged = false;
     bool isReadOnlyChanged = false;
     {
         QnMutexLocker lk( &m_mutex );
         if (m_moduleInformation == moduleInformation)
             return;
 
-        isSystemNameChanged = m_moduleInformation.systemName != moduleInformation.systemName;
         isReadOnlyChanged = m_moduleInformation.ecDbReadOnly != moduleInformation.ecDbReadOnly;
         m_moduleInformation = moduleInformation;
     }
-    if (isSystemNameChanged)
-        emit systemNameChanged(moduleInformation.systemName);
     if (isReadOnlyChanged)
         emit readOnlyChanged(moduleInformation.ecDbReadOnly);
     emit moduleInformationChanged();
 }
 
-QnModuleInformation QnCommonModule::moduleInformation() const
+QnModuleInformation QnCommonModule::moduleInformation()
 {
-    QnMutexLocker lk( &m_mutex );
-    return m_moduleInformation;
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_dirtyModuleInformation)
+        {
+            updateModuleInformationUnsafe();
+            m_dirtyModuleInformation = false;
+        }
+        return m_moduleInformation;
+    }
+
 }
 
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
@@ -213,26 +245,34 @@ void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QStrin
     NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an NX_ASSERT here? Something is wrong with resource data json file. */
 }
 
-void QnCommonModule::updateModuleInformation()
+void QnCommonModule::resetCachedValue()
 {
-    /* This code works only on server side. */
-    NX_ASSERT(!moduleGUID().isNull());
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_dirtyModuleInformation)
+            return;
+        m_dirtyModuleInformation = true;
+    }
+    emit moduleInformationChanged();
+}
 
-    QnMutexLocker lk( &m_mutex );
-    QnModuleInformation moduleInformationCopy = m_moduleInformation;
-    lk.unlock();
+void QnCommonModule::updateModuleInformationUnsafe()
+{
+    // This code works only on server side.
+    NX_ASSERT(!moduleGUID().isNull());
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
     NX_ASSERT(server);
-    if (server)
-    {
-        QnModuleInformation moduleInformation = server->getModuleInformation();
-        moduleInformationCopy.port = moduleInformation.port;
-        moduleInformationCopy.name = moduleInformation.name;
-        moduleInformationCopy.serverFlags = moduleInformation.serverFlags;
-    }
+    if (!server)
+        return;
 
-    setModuleInformation(moduleInformationCopy);
+    m_moduleInformation.port = server->getPort();
+    m_moduleInformation.name = server->getName();
+    m_moduleInformation.serverFlags = server->getServerFlags();
+
+    m_moduleInformation.systemName = qnGlobalSettings->systemName();
+    m_moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
+    m_moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)

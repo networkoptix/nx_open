@@ -10,7 +10,7 @@ CloudCredentialsData::CloudCredentialsData()
 }
 
 CloudCredentialsData::CloudCredentialsData(const QnRequestParams& params):
-    cloudSystemID(params.value(lit("cloudSystemID"))),
+    cloudSystemID(params.value(lit("cloudSystemID"))), // todo: rename it to cloudSystemId
     cloudAuthKey(params.value(lit("cloudAuthKey"))),
     cloudAccountName(params.value(lit("cloudAccountName")))
 {

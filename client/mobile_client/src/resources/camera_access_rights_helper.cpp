@@ -4,7 +4,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <watchers/user_watcher.h>
 #include <common/common_module.h>
 

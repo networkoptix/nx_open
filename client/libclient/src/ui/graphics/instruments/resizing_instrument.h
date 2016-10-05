@@ -1,6 +1,4 @@
-#ifndef QN_RESIZING_INSTRUMENT_H
-#define QN_RESIZING_INSTRUMENT_H
-
+#pragma once
 
 #include <QtGui/QTransform>
 
@@ -10,7 +8,8 @@ class ConstrainedGeometrically;
 class ResizeHoverInstrument;
 class ResizingInstrument;
 
-class ResizingInfo {
+class ResizingInfo
+{
 public:
     Qt::WindowFrameSection frameSection() const;
 
@@ -21,11 +20,14 @@ public:
 protected:
     friend class ResizingInstrument;
 
-    ResizingInfo(DragInfo *info, ResizingInstrument *instrument): m_info(info), m_instrument(instrument) {}
+    ResizingInfo(DragInfo* info, ResizingInstrument* instrument):
+        m_info(info),
+        m_instrument(instrument)
+    {}
 
 private:
-    DragInfo *m_info;
-    ResizingInstrument *m_instrument;
+    DragInfo* m_info;
+    ResizingInstrument* m_instrument;
 };
 
 
@@ -49,50 +51,47 @@ private:
  * releases the mouse button before moving the mouse pointer several pixels away.
  * In this case resizingStarted() signal will not be emitted.
  */
-class ResizingInstrument: public DragProcessingInstrument {
-    Q_OBJECT;
+class ResizingInstrument: public DragProcessingInstrument
+{
+    Q_OBJECT
 
-    typedef DragProcessingInstrument base_type;
+    using base_type = DragProcessingInstrument;
+
 public:
-    ResizingInstrument(QObject *parent = NULL);
+    ResizingInstrument(QObject* parent = nullptr);
     virtual ~ResizingInstrument();
 
-    Instrument *resizeHoverInstrument() const;
-
-    qreal effectRadius() const {
-        return m_effectRadius;
-    }
-
-    void setEffectRadius(qreal effectRadius) {
-        m_effectRadius = effectRadius;
-    }
+    qreal effectRadius() const;
+    void setEffectRadius(qreal effectRadius);
 
     void rehandle();
 
 signals:
-    void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
-    void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
-    void resizing(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
-    void resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
-    void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
+    void resizingProcessStarted(QGraphicsView* view, QGraphicsWidget* widget, ResizingInfo* info);
+    void resizingStarted(QGraphicsView* view, QGraphicsWidget* widget, ResizingInfo* info);
+    void resizing(QGraphicsView* view, QGraphicsWidget* widget, ResizingInfo* info);
+    void resizingFinished(QGraphicsView* view, QGraphicsWidget* widget, ResizingInfo* info);
+    void resizingProcessFinished(QGraphicsView* view, QGraphicsWidget* widget, ResizingInfo* info);
 
 protected:
-    virtual void enabledNotify() override;
-    virtual void aboutToBeDisabledNotify() override;
+    virtual bool mousePressEvent(QWidget* viewport, QMouseEvent* event) override;
+    virtual bool mouseMoveEvent(QWidget* viewport, QMouseEvent* event) override;
 
-    virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
+    virtual void startDragProcess(DragInfo* info) override;
+    virtual void startDrag(DragInfo* info) override;
+    virtual void dragMove(DragInfo* info) override;
+    virtual void finishDrag(DragInfo* info) override;
+    virtual void finishDragProcess(DragInfo* info) override;
 
-    virtual void startDragProcess(DragInfo *info) override;
-    virtual void startDrag(DragInfo *info) override;
-    virtual void dragMove(DragInfo *info) override;
-    virtual void finishDrag(DragInfo *info) override;
-    virtual void finishDragProcess(DragInfo *info) override;
+    void getWidgetAndFrameSection(
+        QWidget* viewport,
+        const QPoint& pos,
+        Qt::WindowFrameSection& section,
+        QGraphicsWidget*& widget) const;
 
-private:
+  private:
     friend class ResizingInfo;
 
-    ResizeHoverInstrument *m_resizeHoverInstrument;
     qreal m_effectRadius;
     QPointF m_startPinPoint;
     QSizeF m_startSize;
@@ -100,7 +99,6 @@ private:
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;
     QPointer<QGraphicsWidget> m_widget;
-    ConstrainedGeometrically *m_constrained;
+    ConstrainedGeometrically* m_constrained;
+    QGraphicsWidget* m_affectedWidget = nullptr;
 };
-
-#endif // QN_RESIZING_INSTRUMENT_H

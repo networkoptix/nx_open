@@ -15,7 +15,7 @@ extern "C" {
 #include <camera/get_image_helper.h>
 #include <utils/common/util.h>
 #include <rest/server/rest_connection_processor.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <nx/utils/log/log.h>
 #include <api/helpers/camera_id_helper.h>
 

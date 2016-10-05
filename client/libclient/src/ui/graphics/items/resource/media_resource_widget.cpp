@@ -424,7 +424,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateDetailsText();
     updatePositionText();
     updateCompositeOverlayMode();
-    updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
 
@@ -468,7 +467,7 @@ void QnMediaResourceWidget::createButtons()
         searchButton->setToolTip(tr("Smart Search"));
         setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
         connect(searchButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_searchButton_toggled);
+            &QnMediaResourceWidget::setMotionSearchModeEnabled);
         buttonsOverlay()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
 
@@ -505,7 +504,7 @@ void QnMediaResourceWidget::createButtons()
         zoomWindowButton->setToolTip(tr("Create Zoom Window"));
         setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
         connect(zoomWindowButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_zoomWindowButton_toggled);
+            &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
         buttonsOverlay()->rightButtonsBar()->addButton(Qn::ZoomWindowButton, zoomWindowButton);
     }
 
@@ -1446,9 +1445,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         }
     }
 
-    if (changedFlags & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow))
-        updateCursor();
-
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -1622,16 +1618,6 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     return result;
 }
 
-QCursor QnMediaResourceWidget::calculateCursor() const
-{
-    if ((options() & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow))
-        || (QApplication::keyboardModifiers() & Qt::ShiftModifier))
-    {
-        return Qt::CrossCursor;
-    }
-    return base_type::calculateCursor();
-}
-
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 {
     if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
@@ -1651,18 +1637,16 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::UnauthorizedOverlay;
 
         if (!states.isRealTimeSource)
+        {
+            if (m_display->camDisplay()->isLongWaiting())
+                return Qn::NoDataOverlay;
             return Qn::NoVideoDataOverlay;
+        }
 
         if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
 
-
-        const bool buttonIsVisible = (buttonsOverlay()->rightButtonsBar()->visibleButtons() & Qn::IoModuleButton);
-        const QnImageButtonWidget * const button = buttonsOverlay()->rightButtonsBar()->button(Qn::IoModuleButton);
-        const bool licenseError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisible in this case if license error
-        const bool isZoomWindow = !zoomRect().isNull();
-
-        if (licenseError && !isZoomWindow)
+        if (m_ioLicenceStatusHelper->status() != QnSingleCamLicenceStatusHelper::LicenseUsed)
             return Qn::IoModuleDisabledOverlay;
     }
 
@@ -1798,14 +1782,6 @@ void QnMediaResourceWidget::at_screenshotButton_clicked()
     menu()->trigger(QnActions::TakeScreenshotAction, this);
 }
 
-void QnMediaResourceWidget::at_searchButton_toggled(bool checked)
-{
-    setOption(DisplayMotion, checked);
-
-    if (checked)
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
-}
-
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
 {
     bool ptzEnabled =
@@ -1840,17 +1816,6 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     }
 
     updateButtonsVisibility();
-}
-
-void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked)
-{
-    setOption(ControlZoomWindow, checked);
-
-    if (checked)
-    {
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(
-            Qn::PtzButton | Qn::FishEyeButton | Qn::MotionSearchButton, false);
-    }
 }
 
 void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
@@ -1976,8 +1941,6 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = !hasVideo();
     const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
-
-    const auto resource = m_display->resource();
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
 
@@ -2148,4 +2111,35 @@ QVector<QColor> QnMediaResourceWidget::motionSensitivityColors() const
 void QnMediaResourceWidget::setMotionSensitivityColors(const QVector<QColor>& value)
 {
     m_motionSensitivityColors = value;
+}
+
+void QnMediaResourceWidget::setZoomWindowCreationModeEnabled(bool enabled)
+{
+    setOption(ControlZoomWindow, enabled);
+    buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::ZoomWindowButton, enabled);
+    if (enabled)
+    {
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(
+            Qn::PtzButton | Qn::FishEyeButton | Qn::MotionSearchButton, false);
+    }
+
+    setOption(WindowResizingForbidden, enabled);
+
+    emit zoomWindowCreationModeEnabled(enabled);
+}
+
+void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
+{
+    setOption(DisplayMotion, enabled);
+    buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, enabled);
+
+    if (enabled)
+    {
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(
+            Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
+    }
+
+    setOption(WindowResizingForbidden, enabled);
+
+    emit motionSearchModeEnabled(enabled);
 }

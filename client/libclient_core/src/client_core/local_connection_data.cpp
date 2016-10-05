@@ -16,9 +16,13 @@ namespace
     const auto kSystemIdTag = lit("systemId");
     const auto kStoredPasswordTag = lit("storedPassword");
     const auto kNameTag = lit("name");
+
+    const auto kLastConnected = lit("lastConnectedUtcMs");
+    const auto kWeight = lit("weight");
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (QnLocalConnectionData), (datastream)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLocalConnectionData), (datastream)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnWeightData), (datastream)(eq), _Fields)
 
 QnLocalConnectionData::QnLocalConnectionData() :
     name(),
@@ -41,17 +45,17 @@ QnLocalConnectionData::QnLocalConnectionData(const QString& name,
     isStoredPassword(isStoredPassword)
 {}
 
-void QnLocalConnectionData::writeToSettings(QSettings* settings
-    , QnLocalConnectionData data)
+void QnLocalConnectionData::writeToSettings(QSettings* settings) const
 {
-    const auto encryptedPass = nx::utils::xorEncrypt(data.url.password(), kXorKey);
-    data.url.setPassword(QString());
-    settings->setValue(kUrlNameTag, data.url.toString());
+    QUrl fixedUrl = url;
+    const auto encryptedPass = nx::utils::xorEncrypt(url.password(), kXorKey);
+    fixedUrl.setPassword(QString());
+    settings->setValue(kUrlNameTag, fixedUrl.toString());
     settings->setValue(kPasswordTag, encryptedPass);
-    settings->setValue(kSystemNameTag, data.systemName);
-    settings->setValue(kSystemIdTag, data.systemId);
-    settings->setValue(kStoredPasswordTag, data.isStoredPassword);
-    settings->setValue(kNameTag, data.name);
+    settings->setValue(kSystemNameTag, systemName);
+    settings->setValue(kSystemIdTag, systemId);
+    settings->setValue(kStoredPasswordTag, isStoredPassword);
+    settings->setValue(kNameTag, name);
 }
 
 QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
@@ -63,7 +67,6 @@ QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
     data.systemId = settings->value(kSystemIdTag).toString();
     data.isStoredPassword = settings->value(kStoredPasswordTag).toBool();
     data.name = settings->value(kNameTag).toString();
-
     const auto encryptedPass = settings->value(kPasswordTag).toString();
     if (!encryptedPass.isEmpty())
         data.url.setPassword(nx::utils::xorDecrypt(encryptedPass, kXorKey));
@@ -76,6 +79,11 @@ QnLocalConnectionData QnLocalConnectionData::fromSettings(QSettings *settings)
 QnLocalConnectionDataList::QnLocalConnectionDataList()
     : base_type()
 {}
+
+QnLocalConnectionDataList::QnLocalConnectionDataList(const base_type& data):
+    base_type(data)
+{
+}
 
 QnLocalConnectionDataList::~QnLocalConnectionDataList()
 {}
@@ -123,4 +131,20 @@ bool QnLocalConnectionDataList::remove(const QString &name)
     const bool removed = (newEnd != end());
     erase(newEnd, end());
     return removed;
+}
+
+QnWeightData QnWeightData::fromSettings(QSettings* settings)
+{
+    QnWeightData data;
+    data.systemId = settings->value(kSystemIdTag).toString();
+    data.weight = settings->value(kWeight, QVariant::fromValue<qreal>(0)).toReal();
+    data.lastConnectedUtcMs = settings->value(kLastConnected, QVariant::fromValue<qint64>(0)).toLongLong();
+    return data;
+}
+
+void QnWeightData::writeToSettings(QSettings* settings) const
+{
+    settings->setValue(kSystemIdTag, systemId);
+    settings->setValue(kWeight, weight);
+    settings->setValue(kLastConnected, lastConnectedUtcMs);
 }

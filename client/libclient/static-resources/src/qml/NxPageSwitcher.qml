@@ -8,6 +8,7 @@ Row
     id: control;
 
     property alias pagesCount: pageIndicator.count;
+    readonly property int page: impl.currentPage;
 
     height: 16;
     spacing: 4;

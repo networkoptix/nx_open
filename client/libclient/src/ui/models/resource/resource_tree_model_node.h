@@ -11,12 +11,16 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/from_this_to_shared.h>
+#include <utils/common/connective.h>
 
-class QnResourceTreeModelNode: public QObject, public QnWorkbenchContextAware, public QnFromThisToShared<QnResourceTreeModelNode>
+class QnResourceTreeModelNode:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware,
+    public QnFromThisToShared<QnResourceTreeModelNode>
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    using base_type = Connective<QObject>;
 public:
     enum State
     {
@@ -48,15 +52,16 @@ public:
 
     ~QnResourceTreeModelNode();
 
-    void setResource(const QnResourcePtr &resource);
+    virtual void setResource(const QnResourcePtr &resource);
+    virtual void setParent(const QnResourceTreeModelNodePtr& parent);
+    virtual void updateRecursive();
 
     void update();
-
-    void updateRecursive() ;
 
     Qn::NodeType type() const ;
     QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
+    QnUuid uuid() const;
 
     QList<QnResourceTreeModelNodePtr> children() const;
     QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
@@ -64,8 +69,6 @@ public:
     QnResourceTreeModelNodePtr child(int index) ;
 
     QnResourceTreeModelNodePtr parent() const ;
-
-    void setParent(const QnResourceTreeModelNodePtr& parent) ;
 
     QModelIndex createIndex(int row, int col);
     QModelIndex createIndex(int col);
@@ -81,14 +84,18 @@ public:
     void setModified(bool modified) ;
 
 protected:
-    void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
-    void addChildInternal(const QnResourceTreeModelNodePtr& child);
+
+    QnResourceTreeModel* model() const;
+
+    virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
+    virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
+    void setName(const QString& name);
 private:
     QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
 
-    const QnUuid &uuid() const;
+
     bool isValid() const;
     State state() const;
     void setState(State state);

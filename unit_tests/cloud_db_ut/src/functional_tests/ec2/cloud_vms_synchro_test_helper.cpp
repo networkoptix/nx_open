@@ -603,7 +603,7 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
             ->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(adminUserId, &systemSettings));
     for (const auto systemSetting: systemSettings)
     {
-        if (systemSetting.name == QnGlobalSettings::kNameSystemName)
+        if (systemSetting.name == nx::settings_names::kNameSystemName)
         {
             if (assertOnFailure)
             {
@@ -620,7 +620,7 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
 
     if (assertOnFailure)
     {
-        ASSERT_TRUE(false) << QnGlobalSettings::kNameSystemName.toStdString()
+        ASSERT_TRUE(false) << nx::settings_names::kNameSystemName.toStdString()
             << " setting not found";
     }
 }

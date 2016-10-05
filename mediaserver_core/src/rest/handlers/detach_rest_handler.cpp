@@ -84,7 +84,7 @@ int QnDetachFromCloudRestHandler::execute(
 
     // Second, updating data in cloud.
     api::ResultCode cdbResultCode = api::ResultCode::ok;
-    auto systemId = qnGlobalSettings->cloudSystemID();
+    auto systemId = qnGlobalSettings->cloudSystemId();
     auto authKey = qnGlobalSettings->cloudAuthKey();
     auto cloudConnection = m_cloudConnectionManager->getCloudConnection(systemId, authKey);
     std::tie(cdbResultCode) = makeSyncCall<api::ResultCode>(

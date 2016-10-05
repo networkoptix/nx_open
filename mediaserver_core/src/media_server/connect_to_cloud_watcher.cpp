@@ -45,7 +45,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     bool needCloudConnect =
         localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync) &&
-        !qnGlobalSettings->cloudSystemID().isEmpty() &&
+        !qnGlobalSettings->cloudSystemId().isEmpty() &&
 		!qnGlobalSettings->cloudAuthKey().isEmpty();
     if (!needCloudConnect)
     {
@@ -72,7 +72,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
             m_cloudUrl = QUrl(lit("http://%1:%2/ec2/events").
                 arg(endpoint->address.toString()).
                 arg(endpoint->port));
-            m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemID());
+            m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemId());
             m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
             qnTransactionBus->addConnectionToPeer(m_cloudUrl);
         });

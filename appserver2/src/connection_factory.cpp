@@ -1232,8 +1232,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
     // AbstractDiscoveryManager::getDiscoveryData
     regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
-    // AbstractMiscManager::changeSystemName
-    regUpdate<ApiSystemNameData>(p, ApiCommand::changeSystemName);
+    // AbstractMiscManager::changeSystemId
+    regUpdate<ApiSystemIdData>(p, ApiCommand::changeSystemId);
 
     // AbstractECConnection
     regUpdate<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
@@ -1586,9 +1586,10 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->version = qnCommon->engineVersion();
     connectionInfo->brand = localInfo.brand;
     connectionInfo->customization = localInfo.customization;
-    connectionInfo->systemName = qnCommon->localSystemName();
+    connectionInfo->systemName = qnGlobalSettings->systemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
-    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemID();
+    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemId();
+    connectionInfo->localSystemId = qnGlobalSettings->localSystemId().toString();
     #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif

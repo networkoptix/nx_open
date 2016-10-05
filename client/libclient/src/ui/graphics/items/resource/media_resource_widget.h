@@ -126,6 +126,9 @@ public:
     QVector<QColor> motionSensitivityColors() const;
     void setMotionSensitivityColors(const QVector<QColor>& value);
 
+    void setZoomWindowCreationModeEnabled(bool enabled);
+    void setMotionSearchModeEnabled(bool enabled);
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -133,6 +136,8 @@ signals:
     void dewarpingParamsChanged();
     void colorsChanged();
     void positionChanged(qint64 positionUtcMs);
+    void motionSearchModeEnabled(bool enabled);
+    void zoomWindowCreationModeEnabled(bool enabled);
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -145,7 +150,6 @@ protected:
     virtual QString calculatePositionText() const override;
     virtual QString calculateTitleText() const override;
     virtual int calculateButtonsVisibility() const override;
-    virtual QCursor calculateCursor() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -183,10 +187,8 @@ protected:
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
-    void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);
-    void at_zoomWindowButton_toggled(bool checked);
     void at_histogramButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();

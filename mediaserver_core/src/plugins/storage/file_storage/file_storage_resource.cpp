@@ -59,6 +59,10 @@ static const auto MS_NOEXEC = MNT_NOEXEC;
 
 namespace {
 
+const qint64 kMaxNasStorageSpaceLimit = 100ll * 1024 * 1024 * 1024; // 100 Gb
+const qint64 kMaxLocalStorageSpaceLimit = 30ll * 1024 * 1024 * 1024; // 30 Gb
+const int kMaxSpaceLimitRatio = 10; // i.e. max space limit <= totalSpace / 10
+
 #if defined(Q_OS_WIN)
 const QString& getDevicePath(const QString& path)
 {
@@ -236,7 +240,7 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
+qint64 QnFileStorageResource::getTotalSpaceWithoutInit() const
 {
     bool valid = false;
     QString url = getUrl();
@@ -654,7 +658,8 @@ QnFileStorageResource::QnFileStorageResource():
     m_valid(false),
     m_capabilities(0),
     m_cachedTotalSpace(QnStorageResource::kSizeDetectionOmitted),
-    m_isSystem(false)
+    m_isSystem(false),
+    m_spaceLimit(-1)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -731,7 +736,7 @@ qint64 QnFileStorageResource::getFreeSpace()
     return getDiskFreeSpace(localPathCopy.isEmpty() ?  getPath() : localPathCopy);
 }
 
-qint64 QnFileStorageResource::getTotalSpace()
+qint64 QnFileStorageResource::getTotalSpace() const
 {
     if (!m_valid)
         return QnStorageResource::kUnknownSize;
@@ -852,6 +857,33 @@ qint64 QnFileStorageResource::calcSpaceLimit(const QString &url)
 
     return QnFileStorageResource::isLocal(url) ?  defaultStorageSpaceLimit :
                                                   QnStorageResource::kNasStorageLimit;
+}
+
+qint64 QnFileStorageResource::getSpaceLimit() const 
+{
+    QnMutexLocker lock(&m_spaceLimitMutex);
+    if (m_spaceLimit < 0)
+    {
+        qint64 baseSpaceLimit = QnStorageResource::getSpaceLimit();
+        qint64 totalSpace = getTotalSpaceWithoutInit();
+
+        if (totalSpace < 0)
+            return baseSpaceLimit;
+        else
+        {
+            QString url = getUrl();
+            NX_ASSERT(!url.isEmpty());
+            if (url.isEmpty())
+                return baseSpaceLimit;
+
+            bool local = isLocal(url);
+            qint64 maxSpaceLimit = local ? kMaxLocalStorageSpaceLimit : kMaxNasStorageSpaceLimit;
+
+            m_spaceLimit = qMin(maxSpaceLimit, totalSpace / kMaxSpaceLimitRatio);
+        }
+    }
+
+    return m_spaceLimit;
 }
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)

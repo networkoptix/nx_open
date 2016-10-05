@@ -19,6 +19,7 @@
 #include <utils/common/util.h>
 #include <utils/common/systemerror.h>
 #include <http/custom_headers.h>
+#include <api/global_settings.h>
 
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
@@ -519,8 +520,8 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
 
     if (m_localPeer.isServer() && QnCommonModule::instance())
         m_httpClient->addAdditionalHeader(
-            Qn::EC2_SYSTEM_NAME_HEADER_NAME,
-            QnCommonModule::instance()->localSystemName().toUtf8());
+            Qn::EC2_SYSTEM_ID_HEADER_NAME,
+            qnGlobalSettings->localSystemId().toByteArray());
     if (m_base64EncodeOutgoingTransactions)    //requesting server to encode transactions
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,

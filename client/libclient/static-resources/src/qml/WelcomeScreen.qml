@@ -13,8 +13,8 @@ Rectangle
     height: context.pageSize.height;
 
     color: Style.colors.window;
-    
-    QnAppInfo 
+
+    QnAppInfo
     {
         id: appInfo
     }
@@ -26,26 +26,21 @@ Rectangle
         anchors.fill: parent;
         visible: context.visibleControls && !context.globalPreloaderVisible;
 
-        CloudPanel
+        Image
         {
-            id: cloudPanel;
+            id: statusImage;
 
-            y: ((gridHolder.y - height) / 2);
+            width: 120;
+            height: 120;
+            y: ((searchEdit.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            userName: context.cloudUserName;
-            loggedIn: context.isLoggedInToCloud;
-
-
-            onLoginToCloud: context.loginToCloud();
-            onCreateAccount: context.createAccount();
-
-            onManageAccount: context.manageCloudAccount();
-            onLogout: context.logoutFromCloud();
+            source: "qrc:/skin/welcome_page/logo.png"
         }
 
         NxSearchEdit
         {
+            id: searchEdit;
             visible: grid.totalItemsCount > grid.itemsPerPage
             visualParent: screenHolder
 
@@ -118,7 +113,7 @@ Rectangle
 
                     ScriptAction
                     {
-                        script: { grid.setPositionTo(switchPageAnimation.pageIndex); }
+                        script: { grid.setPositionTo(switchPageAnimation.pageIndex, GridView.Beginning); }
                     }
 
                     NumberAnimation
@@ -149,12 +144,11 @@ Rectangle
                     deactivateFunc: function(item) { item.toggle(); };
                 }
 
-                model: QnQmlSortFilterProxyModel
+                model: QnOrderedSystemsModel
                 {
-                    model: QnSystemsModel { minimalVersion: context.minSupportedVersion; }
                     filterCaseSensitivity: Qt.CaseInsensitive;
                     filterRole: 257;    // Search text role
-                    readonly property int totalCount: model.rowCount()
+                    readonly property int totalCount: rowCount();
                 }
 
                 delegate: Item
@@ -203,6 +197,14 @@ Rectangle
                     var firstItemIndex = index * tilesPerPage;
                     grid.positionViewAtIndex(firstItemIndex, GridView.Beginning);
                 }
+
+                footer: Item    //< Represents empty bottom space workaround for model with odd lines
+                {
+                    visible: ((grid.colsCount % 2) == 1)
+                        && ((pageSwitcher.page + 1) == pageSwitcher.pagesCount);
+                    height: grid.cellHeight;
+                    width: grid.width;
+                }
             }
 
             NxPageSwitcher
@@ -246,7 +248,7 @@ Rectangle
 
         NxBanner
         {
-            visible: context.isOfflineConnection;
+            visible: !context.isCloudEnabled;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;

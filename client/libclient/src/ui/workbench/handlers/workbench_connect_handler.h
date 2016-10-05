@@ -43,7 +43,6 @@ public:
 
 private:
     void showLoginDialog();
-    void showWelcomeScreen();
 
     bool tryToRestoreConnection();
 

@@ -36,7 +36,11 @@ const QString kDummyResourceId(lit("dummy_resource"));
 } // anonymous namespace
 
 
-QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent /*= 0*/):
+QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
+    QnAbstractPermissionsModel* permissionsModel,
+    QnResourceAccessFilter::Filter filter,
+    QWidget* parent /*= 0*/)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::AccessibleResourcesWidget()),
@@ -63,32 +67,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     initResourcesModel();
     initSortFilterModel();
 
-
     m_accessibleResourcesModel->setSourceModel(m_sortFilterModel);
-
-    m_accessibleResourcesModel->setIndirectAccessFunction(
-        [this]() -> QnIndirectAccessProviders
-        {
-            auto layouts = m_permissionsModel->accessibleLayouts();
-
-            if (m_filter == QnResourceAccessFilter::LayoutsFilter)
-                return layouts;
-
-            NX_ASSERT(m_filter == QnResourceAccessFilter::MediaFilter);
-            QnIndirectAccessProviders cameraAccessProviders;
-
-            for (auto layoutInfo = layouts.begin(); layoutInfo != layouts.end(); ++layoutInfo)
-            {
-                auto layout = qnResPool->getResourceById<QnLayoutResource>(layoutInfo.key());
-                if (!layout)
-                    continue;
-
-                for (const auto& item : layout->getItems())
-                    cameraAccessProviders[item.resource.id] << layout;
-            }
-
-            return cameraAccessProviders;
-        });
 
     connect(this, &QnAccessibleResourcesWidget::controlsChanged,
         m_accessibleResourcesModel, &QnAccessibleResourcesModel::setAllChecked);
@@ -194,11 +173,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();
-}
-
-void QnAccessibleResourcesWidget::indirectAccessChanged()
-{
-    m_accessibleResourcesModel->indirectAccessChanged();
 }
 
 QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
@@ -322,7 +296,8 @@ bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resour
     return resourcePassFilter(resource, context()->user(), m_filter);
 }
 
-bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resource, const QnUserResourcePtr& currentUser, QnResourceAccessFilter::Filter filter)
+bool QnAccessibleResourcesWidget::resourcePassFilter(const QnResourcePtr& resource,
+    const QnUserResourcePtr& currentUser, QnResourceAccessFilter::Filter filter)
 {
     switch (filter)
     {
@@ -431,6 +406,7 @@ void QnAccessibleResourcesWidget::initSortFilterModel()
     m_sortFilterModel->setFilterKeyColumn(QnResourceListModel::NameColumn);
     m_sortFilterModel->setDynamicSortFilter(true);
 
+    //TODO: #GDM #replace with SearchLineEdit
     ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
     ui->filterLineEdit->setClearButtonEnabled(true);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, updateFilter);
@@ -462,7 +438,7 @@ void QnAccessibleResourcesWidget::refreshModel()
     m_resourcesModel->setResources(QnResourceList());
     for (const QnResourcePtr& resource : qnResPool->getResources())
         handleResourceAdded(resource);
-    indirectAccessChanged();
+    m_accessibleResourcesModel->setSubject(m_permissionsModel->subject());
 }
 
 void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* event)

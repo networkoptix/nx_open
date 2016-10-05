@@ -56,9 +56,6 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
         return;
     m_lastView = view;
 
-    if(!isVisible())
-        return;
-
     QN_SCOPED_VALUE_ROLLBACK(&m_inUpdateScale, true);
     // TODO: #ynikitenkov Reuse QnViewportScaleWatcher class
     /* Assume affine transform that does not change x/y scale separately. */
