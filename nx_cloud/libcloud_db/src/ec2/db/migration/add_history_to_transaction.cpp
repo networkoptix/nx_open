@@ -13,7 +13,7 @@ namespace addHistoryToTransaction {
 
 nx::db::DBResult migrate(nx::db::QueryContext* const queryContext)
 {
-    return upgradeSerializedTransactions<
+    return detail::upgradeSerializedTransactions<
         before::QnAbstractTransaction,
         after::QnAbstractTransaction>(queryContext);
 }

@@ -12,6 +12,7 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 namespace migration {
+namespace detail {
 
 template<typename TransactionHeaderType>
 class Transaction
@@ -114,6 +115,7 @@ nx::db::DBResult upgradeSerializedTransactions(
     return nx::db::DBResult::ok;
 }
 
+} // namespace detail
 } // namespace migration
 } // namespace ec2
 } // namespace cdb
