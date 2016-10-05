@@ -480,7 +480,6 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     QUrl url = connectionInfo.effectiveUrl();
     QnAppServerConnectionFactory::setUrl(url);
     QnAppServerConnectionFactory::setEc2Connection(connection);
-    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
     QnClientMessageProcessor::instance()->init(connection);
 
     QnSessionManager::instance()->start();
@@ -747,7 +746,6 @@ void QnWorkbenchConnectHandler::clearConnection()
     QnClientMessageProcessor::instance()->init(NULL);
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setUrl(QUrl());
-    QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
 

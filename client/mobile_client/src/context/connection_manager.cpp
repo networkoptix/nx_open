@@ -195,7 +195,6 @@ void QnConnectionManager::disconnectFromServer(bool force) {
     d->doDisconnect(force);
 
     d->setUrl(QUrl());
-    QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     qnCommon->instance<QnUserWatcher>()->setUserName(QString());
 
     // TODO: #dklychkov Move it to a better place
@@ -306,7 +305,6 @@ void QnConnectionManagerPrivate::doConnect()
 
             QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
-            QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
             QnMobileClientMessageProcessor::instance()->init(ec2Connection);
 
