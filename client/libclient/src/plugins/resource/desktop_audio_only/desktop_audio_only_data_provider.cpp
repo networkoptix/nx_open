@@ -163,8 +163,8 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
 
     encoderCtx->codec_id = audioCodec->id;
     encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    encoderCtx->sample_fmt =
-        QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(
+    encoderCtx->sample_fmt = 
+        QnFfmpegHelper::fromQtAudioFormatToFfmpegSampleType(
             fromQtAudioFormat(format));
 
     encoderCtx->channels = m_audioSourcesInfo.size() > 1 ?
