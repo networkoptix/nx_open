@@ -534,7 +534,7 @@ bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRunt
 
 void QnTransactionMessageBus::at_gotTransaction(
     Qn::SerializationFormat tranFormat,
-    const QByteArray &serializedTran,
+    QByteArray serializedTran,
     const QnTransactionTransportHeader &transportHeader)
 {
     QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
@@ -563,7 +563,7 @@ void QnTransactionMessageBus::at_gotTransaction(
     using namespace std::placeholders;
     if (!handleTransaction(
         tranFormat,
-        serializedTran,
+        std::move(serializedTran),
         std::bind(GotTransactionFuction(), this, _1, sender, transportHeader),
         [](Qn::SerializationFormat, const QByteArray&) { return false; }))
     {
@@ -796,7 +796,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             {
                 case ApiCommand::installUpdate:
                 case ApiCommand::uploadUpdate:
-                case ApiCommand::changeSystemName:
+                case ApiCommand::changeSystemId:
                 {	// Transactions listed here should not go to the DbManager.
                     // We are only interested in relevant notifications triggered.
                     // Also they are allowed only if sender is Admin.
@@ -1837,7 +1837,9 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
     //we need break connection only if following settings have been changed:
     //  connectionKeepAliveTimeout
     //  keepAliveProbeCount
-    if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    using namespace nx::settings_names;
+
+    if (key == kConnectionKeepAliveTimeoutKey)
     {
         const auto timeout = qnGlobalSettings->connectionKeepAliveTimeout();
         QnMutexLocker lock(&m_mutex);
@@ -1848,7 +1850,7 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
                 transport->setState(ec2::QnTransactionTransport::Error);
         }
     }
-    else if (key == QnGlobalSettings::kConnectionKeepAliveTimeoutKey)
+    else if (key == kConnectionKeepAliveTimeoutKey)
     {
         const auto probeCount = qnGlobalSettings->keepAliveProbeCount();
         QnMutexLocker lock(&m_mutex);

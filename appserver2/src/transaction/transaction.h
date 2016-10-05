@@ -424,7 +424,7 @@ APPLY(401, saveMediaServer, ApiMediaServerData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       [](const Qn::UserAccessData& accessData, const ApiMediaServerData&) { return accessData == Qn::kSystemAccess; }, /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -1094,11 +1094,11 @@ APPLY(2003, getCurrentTime, ApiTimeData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2004, changeSystemName, ApiSystemNameData, \
+APPLY(2004, changeSystemId, ApiSystemIdData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
-                       [] (const QnTransaction<ApiSystemNameData> &tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<ApiSystemIdData> &tran, const NotificationParams &notificationParams) \
                         { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -1136,7 +1136,7 @@ APPLY(2007, getSettings, ApiResourceParamDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       FilterListByAccess<ReadResourceParamAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(),  \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
 APPLY(2008, rebuildTransactionLog, ApiRebuildTransactionLogData, \

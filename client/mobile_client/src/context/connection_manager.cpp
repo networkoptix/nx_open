@@ -84,7 +84,11 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
 {
     Q_D(QnConnectionManager);
 
-    connect(qnCommon, &QnCommonModule::systemNameChanged, this, &QnConnectionManager::systemNameChanged);
+    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
+        [this]()
+        {
+            emit systemNameChanged(qnGlobalSettings->systemName());
+        });
 
     connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived,
         d, [d](){ d->setInitialResourcesReceived(true); });
@@ -103,7 +107,7 @@ QnConnectionManager::~QnConnectionManager() {
 }
 
 QString QnConnectionManager::systemName() const {
-    return qnCommon->localSystemName();
+    return qnGlobalSettings->systemName();
 }
 
 QnConnectionManager::State QnConnectionManager::connectionState() const
@@ -325,7 +329,6 @@ void QnConnectionManagerPrivate::doConnect()
                 QnSyncTime::instance(),
                 static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
-            qnCommon->setLocalSystemName(connectionInfo.systemName);
             qnCommon->instance<QnUserWatcher>()->setUserName(
                 connectionInfo.effectiveUserName.isEmpty()
                     ? url.userName()

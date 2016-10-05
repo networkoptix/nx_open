@@ -162,6 +162,7 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
+#include <core/resource/fake_media_server.h>
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -313,7 +314,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     {
         //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
-        if (isServer && QnMediaServerResource::isFakeServer(resource))
+        if (isServer && resource.dynamicCast<QnFakeMediaServerResource>())
             return;
 
         bool nonVideo = isServer || resource->hasFlags(Qn::web_page);

@@ -116,9 +116,10 @@ private slots:
     void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
     void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
 
-    void at_server_systemNameChanged(const QnResourcePtr &resource);
+    void at_fakeserver_information_changed(const QnResourcePtr &resource);
+
     void at_server_redundancyChanged(const QnResourcePtr &resource);
-    void at_commonModule_systemNameChanged();
+    void at_systemNameChanged();
 
     void at_serverAutoDiscoveryEnabledChanged();
 

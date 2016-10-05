@@ -580,7 +580,6 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& 
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.authKey = src->getAuthKey();
-    dst.systemName = src->getSystemName();
 }
 
 void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst)
@@ -595,7 +594,6 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setAuthKey(src.authKey);
-    dst->setSystemName(src.systemName);
 }
 
 template<class List>

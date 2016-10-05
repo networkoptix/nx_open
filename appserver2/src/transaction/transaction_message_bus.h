@@ -261,7 +261,7 @@ private slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(
         Qn::SerializationFormat tranFormat,
-        const QByteArray &serializedTran,
+        QByteArray serializedTran,
         const QnTransactionTransportHeader &transportHeader);
     void doPeriodicTasks();
     bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);

@@ -296,6 +296,11 @@ void QnCommonMessageProcessor::on_userGroupChanged(const ec2::ApiUserGroupData& 
 void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& groupId)
 {
     qnUserRolesManager->removeUserRole(groupId);
+    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    {
+        if (user->userGroup() == groupId)
+            user->resetUserGroup();
+    }
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)

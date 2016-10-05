@@ -22,6 +22,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <api/global_settings.h>
 
 #ifdef SYSTEM_NAME_EDITING_ENABLED
 #include <utils/common/event_processors.h>
@@ -162,7 +163,7 @@ void QnGeneralSystemAdministrationWidget::loadDataToUi()
     ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
 
-    ui->systemNameLabel->setText(qnCommon->localSystemName());
+    ui->systemNameLabel->setText(qnGlobalSettings->systemName());
     ui->systemNameStackedWidget->setCurrentWidget(ui->labelPage);
 }
 

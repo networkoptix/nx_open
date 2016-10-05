@@ -577,7 +577,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
                 qnSyncTime->updateTime(syncTime);
         });
 
-    qnCommon->setLocalSystemName(connection->connectionInfo().systemName);
     qnCommon->setReadOnly(connection->connectionInfo().ecDbReadOnly);
 }
 
@@ -784,7 +783,6 @@ void QnWorkbenchConnectHandler::clearConnection()
     qnStatusDictionary->clear(idList);
 
     qnLicensePool->reset();
-    qnCommon->setLocalSystemName(QString());
     qnCommon->setReadOnly(false);
 }
 

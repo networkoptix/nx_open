@@ -44,6 +44,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     const QnRestConnectionProcessor* owner)
 {
     using namespace nx::cdb;
+    using namespace nx::settings_names;
 
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
@@ -56,7 +57,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudSystemID));
+            QnJsonRestResult::MissingParameter, kNameCloudSystemId));
         return nx_http::StatusCode::ok;
     }
 
@@ -64,7 +65,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         NX_LOGX(lit("Missing required parameter CloudAuthKey"), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAuthKey));
+            QnJsonRestResult::MissingParameter, kNameCloudAuthKey));
         return nx_http::StatusCode::ok;
     }
 
@@ -72,11 +73,11 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         NX_LOGX(lit("Missing required parameter CloudAccountName"), cl_logDEBUG1);
         result.setError(QnRestResult::ErrorDescriptor(
-            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAccountName));
+            QnJsonRestResult::MissingParameter, kNameCloudAccountName));
         return nx_http::StatusCode::ok;
     }
 
-    const QString cloudSystemId = qnGlobalSettings->cloudSystemID();
+    const QString cloudSystemId = qnGlobalSettings->cloudSystemId();
     if (!cloudSystemId.isEmpty() &&
         !qnGlobalSettings->cloudAuthKey().isEmpty())
     {
@@ -99,7 +100,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     }
 
 
-    qnGlobalSettings->setCloudSystemID(data.cloudSystemID);
+    qnGlobalSettings->setCloudSystemId(data.cloudSystemID);
     qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
     qnGlobalSettings->setCloudAuthKey(data.cloudAuthKey);
     if (!qnGlobalSettings->synchronizeNowSync())

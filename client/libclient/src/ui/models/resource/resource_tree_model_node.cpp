@@ -351,7 +351,7 @@ void QnResourceTreeModelNode::update()
         }
         case Qn::CurrentSystemNode:
         {
-            setName(qnCommon->localSystemName());
+            setName(qnGlobalSettings->systemName());
             break;
         }
         case Qn::CurrentUserNode:

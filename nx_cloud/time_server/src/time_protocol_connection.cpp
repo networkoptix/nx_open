@@ -36,7 +36,7 @@ void TimeProtocolConnection::startReadingConnection()
         .arg(utcTimeSeconds).str(m_socket->getForeignAddress()),
         cl_logDEBUG2);
 
-    utcTimeSeconds += SECONDS_FROM_1900_01_01_TO_1970_01_01;
+    utcTimeSeconds += kSecondsFrom19000101To19700101;
     utcTimeSeconds = htonl(utcTimeSeconds);
     m_outputBuffer.resize(sizeof(utcTimeSeconds));
     memcpy(m_outputBuffer.data(), &utcTimeSeconds, sizeof(utcTimeSeconds));

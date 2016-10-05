@@ -18,6 +18,7 @@
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include "ui/widgets/properties/storage_config_widget.h"
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
+#include <core/resource/fake_media_server.h>
 
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     base_type(parent),
@@ -55,7 +56,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
             auto servers = resources.filtered<QnMediaServerResource>(
                 [](const QnMediaServerResourcePtr &server)
                 {
-                    return !QnMediaServerResource::isFakeServer(server);
+                    return !server.dynamicCast<QnFakeMediaServerResource>();
                 });
 
             if (!servers.isEmpty())

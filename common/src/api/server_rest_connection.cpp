@@ -120,14 +120,14 @@ Handle ServerConnection::detachSystemFromCloud(
 }
 
 Handle ServerConnection::saveCloudSystemCredentials(
-    const QString& cloudSystemID,
+    const QString& cloudSystemId,
     const QString& cloudAuthKey,
     const QString &cloudAccountName,
     Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
     CloudCredentialsData data;
-    data.cloudSystemID = cloudSystemID;
+    data.cloudSystemID = cloudSystemId;
     data.cloudAuthKey = cloudAuthKey;
     data.cloudAccountName = cloudAccountName;
 

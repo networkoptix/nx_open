@@ -107,7 +107,7 @@ private:
     InputStateChangeCallback m_inputStateChangedCallback;
     NetworkIssueCallback m_networkIssueCallback;
 
-    quint8 m_networkFaultsCounter;
+    std::atomic<int> m_networkFaultsCounter;
 
     QMap<QString, nx_io_managment::IOPortState> m_defaultPortStates;
 

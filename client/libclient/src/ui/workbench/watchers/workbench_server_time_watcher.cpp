@@ -13,6 +13,7 @@
 #include <plugins/resource/avi/avi_resource.h>
 
 #include <utils/common/synctime.h>
+#include <core/resource/fake_media_server.h>
 
 namespace {
     const int serverTimeUpdatePeriodMs = 1000 * 60 * 2; /* 2 minutes. */
@@ -118,7 +119,7 @@ qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resou
 }
 
 void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server) {
-    if (server->getStatus() != Qn::Online || QnMediaServerResource::isFakeServer(server))
+    if (server->getStatus() != Qn::Online || server.dynamicCast<QnFakeMediaServerResource>())
         return;
 
     int handle = server->apiConnection()->getTimeAsync(this, SLOT(at_replyReceived(int, const QnTimeReply &, int)));
@@ -131,7 +132,7 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
 // -------------------------------------------------------------------------- //
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || QnMediaServerResource::isFakeServer(resource))
+    if (!server || server.dynamicCast<QnFakeMediaServerResource>())
         return;
 
     auto updateServer = [this, server]{ sendRequest(server); };

@@ -9,10 +9,10 @@
 #include "socket_global.h"
 
 #define DEBUG_LOG(MESSAGE) do \
-    { \
-        if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
-            NX_LOGX(MESSAGE, cl_logDEBUG1); \
-    } while(0)
+{ \
+    if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+        NX_LOGX(MESSAGE, cl_logDEBUG1); \
+} while (0)
 
 namespace nx {
 namespace network {

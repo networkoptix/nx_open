@@ -74,6 +74,35 @@ enum class RemotePeerAccess
     Partial
 };
 
+namespace access_helpers {
+
+enum class Mode 
+{
+    read,
+    write
+};
+
+using KeyValueFilterType        =   std::pair<const QString&, QString*>;
+using FilterFunctorType         =   std::function<bool(Mode mode, const Qn::UserAccessData&, KeyValueFilterType*)>;
+using FilterFunctorListType     =   std::vector<FilterFunctorType>;
+
+namespace detail {
+std::vector<QString> getRestrictedKeysByMode(Mode mode);
+}
+
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue);
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value);
+bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key);
+
+void applyValueFilters(
+    Mode mode,
+    const Qn::UserAccessData& accessData,
+    KeyValueFilterType* keyValue,
+    const FilterFunctorListType& filterList,
+    bool* allowed = nullptr);
+
+} // namespace access_helpers
+
 namespace detail {
 
 struct NoneType {};
@@ -82,7 +111,7 @@ template<typename ParamType>
 using CheckSavePermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using CheckReadPermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckReadPermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, ParamType&)>;
 
 template<typename ParamType>
 using FilterByReadPermissionFuncType = std::function<void(const Qn::UserAccessData& accessData, ParamType&)>;

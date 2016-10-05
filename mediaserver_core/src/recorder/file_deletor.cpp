@@ -8,7 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
-static const int SPACE_CLEARANCE_INTERVAL = 15;
+static const int SPACE_CLEARANCE_INTERVAL = 10;
 
 QnFileDeletor* QnFileDeletor_inst = 0;
 
@@ -46,9 +46,9 @@ void QnFileDeletor::run()
         int thresholdSecs = nx::utils::random::numberDelta<int>(SPACE_CLEARANCE_INTERVAL, DELTA);
         if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
+            m_storagesTimer.restart();
             qnNormalStorageMan->clearSpace();
             qnBackupStorageMan->clearSpace();
-            m_storagesTimer.restart();
         }
         msleep(500);
     }

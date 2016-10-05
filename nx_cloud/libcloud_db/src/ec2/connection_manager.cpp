@@ -66,7 +66,7 @@ ConnectionManager::~ConnectionManager()
     ConnectionDict localConnections;
     {
         QnMutexLocker lk(&m_mutex);
-        localConnections = std::move(m_connections);
+        std::swap(localConnections, m_connections);
     }
 
     for (auto& connectionContext: localConnections)

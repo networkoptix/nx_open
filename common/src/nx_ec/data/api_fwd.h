@@ -75,7 +75,7 @@ namespace ec2 {
     struct ApiDiscoveryData;
     struct ApiDiscoverPeerData;
     struct ApiConnectionData;
-    struct ApiSystemNameData;
+    struct ApiSystemIdData;
     struct ApiTransactionData;
     struct ApiTranLogFilter;
     struct ApiWebPageData;
@@ -196,7 +196,7 @@ namespace ec2 {
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
     (ApiConnectionData)\
-    (ApiSystemNameData)\
+    (ApiSystemIdData)\
     (ApiTimeData)\
     (ApiMiscData)\
     (ApiPeerData)\

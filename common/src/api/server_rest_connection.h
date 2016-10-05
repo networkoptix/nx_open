@@ -70,7 +70,7 @@ namespace rest
          * Save the credentials returned by cloud to the database.
          */
         Handle saveCloudSystemCredentials(
-            const QString &cloudSystemID,
+            const QString &cloudSystemId,
             const QString &cloudAuthKey,
             const QString &cloudAccountName,
             Result<QnRestResult>::type callback,

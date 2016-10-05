@@ -55,7 +55,6 @@
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
-#include <ui/workbench/watchers/workbench_system_name_watcher.h>
 #include <ui/workbench/watchers/workbench_server_address_watcher.h>
 #include <ui/workbench/watchers/workbench_server_port_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
@@ -237,7 +236,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
-    context->instance<QnWorkbenchSystemNameWatcher>();
     context->instance<QnWorkbenchServerAddressWatcher>();
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();

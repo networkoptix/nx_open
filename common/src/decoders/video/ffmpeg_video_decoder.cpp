@@ -631,8 +631,8 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             outFrame->linesize[2] = copyFromFrame->linesize[2];
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
-        outFrame->fillRightEdge();
         outFrame->format = correctedPixelFormat;
+        outFrame->fillRightEdge();
         outFrame->sample_aspect_ratio = getSampleAspectRatio();
         return m_context->pix_fmt != AV_PIX_FMT_NONE;
     }

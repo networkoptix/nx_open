@@ -11,6 +11,7 @@
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
+#include <utils/crypt/symmetrical.h>
 
 #include <nx_ec/data/api_resource_data.h>
 
@@ -34,45 +35,6 @@ namespace
         return updatedVendorList.toSet();
     }
 
-    const QString kNameDisabledVendors(lit("disabledVendors"));
-    const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
-    const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
-    const QString kNameHost(lit("smtpHost"));
-    const QString kNamePort(lit("smtpPort"));
-    const QString kNameUser(lit("smtpUser"));
-    const QString kNamePassword(lit("smptPassword"));
-    const QString kNameConnectionType(lit("smtpConnectionType"));
-    const QString kNameSimple(lit("smtpSimple"));
-    const QString kNameTimeout(lit("smtpTimeout"));
-    const QString kNameFrom(lit("emailFrom"));
-    const QString kNameSignature(lit("emailSignature"));
-    const QString kNameSupportEmail(lit("emailSupportEmail"));
-    const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
-    const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
-    const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
-    const QString kNameBackupQualities(lit("backupQualities"));
-    const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
-    const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
-    const QString kNameNewSystem(lit("newSystem"));
-    const QString kCloudHostName(lit("cloudHost"));
-
-    const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
-    const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
-    const QString kNameStatisticsReportLastVersion(lit("statisticsReportLastVersion"));
-    const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
-    const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
-    const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
-    const QString kNameSystemId(lit("systemId"));
-    const QString kNameSystemNameForId(lit("systemNameForId"));
-    const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
-    const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
-
-
-    const QString ldapUri(lit("ldapUri"));
-    const QString ldapAdminDn(lit("ldapAdminDn"));
-    const QString ldapAdminPassword(lit("ldapAdminPassword"));
-    const QString ldapSearchBase(lit("ldapSearchBase"));
-    const QString ldapSearchFilter(lit("ldapSearchFilter"));
 
     const int kEc2ConnectionKeepAliveTimeoutDefault = 5;
     const int kEc2KeepAliveProbeCountDefault = 3;
@@ -95,13 +57,7 @@ namespace
     const int kTakeCameraOwnershipWithoutLockDefault = false;
 }
 
-const QString QnGlobalSettings::kNameCloudAccountName(lit("cloudAccountName"));
-const QString QnGlobalSettings::kNameCloudSystemID(lit("cloudSystemID"));
-const QString QnGlobalSettings::kNameCloudAuthKey(lit("cloudAuthKey"));
-const QString QnGlobalSettings::kNameSystemName(lit("systemName"));
-const QString QnGlobalSettings::kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
-const QString QnGlobalSettings::kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
-const QString QnGlobalSettings::kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
+using namespace nx::settings_names;
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
     base_type(parent)
@@ -209,8 +165,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
     m_statisticsReportLastNumberAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNameStatisticsReportLastNumber, 0, this);
     m_statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportTimeCycle, QString(), this);
     m_statisticsReportUpdateDelayAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportUpdateDelay, QString(), this);
-    m_systemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameSystemId, QnUuid(), this);
-    m_systemNameForIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemNameForId, QString(), this);
     m_statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportServerApi, QString(), this);
     m_clientStatisticsSettingsUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSettingsUrlParam, QString(), this);
 
@@ -224,8 +178,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
         << m_statisticsReportLastNumberAdaptor
         << m_statisticsReportTimeCycleAdaptor
         << m_statisticsReportUpdateDelayAdaptor
-        << m_systemIdAdaptor
-        << m_systemNameForIdAdaptor
         << m_statisticsReportServerApiAdaptor
         << m_clientStatisticsSettingsUrlAdaptor
         ;
@@ -287,13 +239,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
 QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 {
     m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAccountName, QString(), this);
-    m_cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemID, QString(), this);
+    m_cloudSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemId, QString(), this);
     m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAuthKey, QString(), this);
 
     QnGlobalSettings::AdaptorList result;
     result
         << m_cloudAccountNameAdaptor
-        << m_cloudSystemIDAdaptor
+        << m_cloudSystemIdAdaptor
         << m_cloudAuthKeyAdaptor
         ;
 
@@ -306,6 +258,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
 QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 {
     m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemName, QString(), this);
+    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameLocalSystemId, QString(), this);
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
@@ -314,7 +267,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(kNameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
     m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
-    m_newSystemAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameNewSystem, false, this);
     m_cloudHostAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kCloudHostName, QString(), this);
 
     m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
@@ -333,17 +285,18 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         this);
 
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
+    connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
-    connect(m_newSystemAdaptor,                     &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::newSystemChanged,                    Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
     result
         << m_systemNameAdaptor
+        << m_localSystemIdAdaptor
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_auditTrailEnabledAdaptor
@@ -352,7 +305,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
         << m_upnpPortMappingEnabledAdaptor
-        << m_newSystemAdaptor
         << m_cloudHostAdaptor
         << m_arecontRtspEnabledAdaptor
         << m_maxRecorderQueueSizeBytes
@@ -444,7 +396,7 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const
     QnLdapSettings result;
     result.uri = m_ldapUriAdaptor->value();
     result.adminDn = m_ldapAdminDnAdaptor->value();
-    result.adminPassword = m_ldapAdminPasswordAdaptor->value();
+    result.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_ldapAdminPasswordAdaptor->value());
     result.searchBase = m_ldapSearchBaseAdaptor->value();
     result.searchFilter = m_ldapSearchFilterAdaptor->value();
     return result;
@@ -454,7 +406,10 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings)
 {
     m_ldapUriAdaptor->setValue(settings.uri);
     m_ldapAdminDnAdaptor->setValue(settings.adminDn);
-    m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
+    m_ldapAdminPasswordAdaptor->setValue(
+        settings.isValid()
+        ? nx::utils::encodeHexStringFromStringAES128CBC(settings.adminPassword)
+        : QString());
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
 }
@@ -466,7 +421,7 @@ QnEmailSettings QnGlobalSettings::emailSettings() const
     result.email = m_fromAdaptor->value();
     result.port = m_portAdaptor->value();
     result.user = m_userAdaptor->value();
-    result.password = m_passwordAdaptor->value();
+    result.password = nx::utils::decodeStringFromHexStringAES128CBC(m_passwordAdaptor->value());
     result.connectionType = m_connectionTypeAdaptor->value();
     result.signature = m_signatureAdaptor->value();
     result.supportEmail = m_supportLinkAdaptor->value();
@@ -491,7 +446,10 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
     m_fromAdaptor->setValue(settings.email);
     m_portAdaptor->setValue(settings.port == QnEmailSettings::defaultPort(settings.connectionType) ? 0 : settings.port);
     m_userAdaptor->setValue(settings.user);
-    m_passwordAdaptor->setValue(settings.isValid() ? settings.password : QString());
+    m_passwordAdaptor->setValue(
+        settings.isValid()
+        ? nx::utils::encodeHexStringFromStringAES128CBC(settings.password)
+        : QString());
     m_connectionTypeAdaptor->setValue(settings.connectionType);
     m_signatureAdaptor->setValue(settings.signature);
     m_supportLinkAdaptor->setValue(settings.supportEmail);
@@ -532,7 +490,7 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
     changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings);
     changed |= m_clientStatisticsSettingsUrlAdaptor->takeFromSettings(settings);
 
-    changed |= m_cloudSystemIDAdaptor->takeFromSettings(settings);
+    changed |= m_cloudSystemIdAdaptor->takeFromSettings(settings);
     changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings);
 
     /**
@@ -670,24 +628,14 @@ void QnGlobalSettings::setUpnpPortMappingEnabled(bool value)
     m_upnpPortMappingEnabledAdaptor->setValue(value);
 }
 
-QnUuid QnGlobalSettings::systemId() const
+QnUuid QnGlobalSettings::localSystemId() const
 {
-    return m_systemIdAdaptor->value();
+    return QnUuid(m_localSystemIdAdaptor->value());
 }
 
-void QnGlobalSettings::setSystemId(const QnUuid &value)
+void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
 {
-    m_systemIdAdaptor->setValue(value);
-}
-
-QString QnGlobalSettings::systemNameForId() const
-{
-    return m_systemNameForIdAdaptor->value();
-}
-
-void QnGlobalSettings::setSystemNameForId(const QString &value)
-{
-    m_systemNameForIdAdaptor->setValue(value);
+    m_localSystemIdAdaptor->setValue(value.toString());
 }
 
 QString QnGlobalSettings::clientStatisticsSettingsUrl() const
@@ -765,14 +713,14 @@ void QnGlobalSettings::setCloudAccountName(const QString& value)
     m_cloudAccountNameAdaptor->setValue(value);
 }
 
-QString QnGlobalSettings::cloudSystemID() const
+QString QnGlobalSettings::cloudSystemId() const
 {
-    return m_cloudSystemIDAdaptor->value();
+    return nx::utils::decodeStringFromHexStringAES128CBC(m_cloudSystemIdAdaptor->value());
 }
 
-void QnGlobalSettings::setCloudSystemID(const QString& value)
+void QnGlobalSettings::setCloudSystemId(const QString& value)
 {
-    m_cloudSystemIDAdaptor->setValue(value);
+    m_cloudSystemIdAdaptor->setValue(nx::utils::encodeHexStringFromStringAES128CBC(value));
 }
 
 QString QnGlobalSettings::cloudAuthKey() const
@@ -798,18 +746,8 @@ void QnGlobalSettings::setSystemName(const QString& value)
 void QnGlobalSettings::resetCloudParams()
 {
     setCloudAccountName(QString());
-    setCloudSystemID(QString());
+    setCloudSystemId(QString());
     setCloudAuthKey(QString());
-}
-
-bool QnGlobalSettings::isNewSystem() const
-{
-    return m_newSystemAdaptor->value();
-}
-
-void QnGlobalSettings::setNewSystem(bool value)
-{
-    m_newSystemAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::cloudHost() const

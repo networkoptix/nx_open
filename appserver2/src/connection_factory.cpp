@@ -1232,8 +1232,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
     // AbstractDiscoveryManager::getDiscoveryData
     regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
-    // AbstractMiscManager::changeSystemName
-    regUpdate<ApiSystemNameData>(p, ApiCommand::changeSystemName);
+    // AbstractMiscManager::changeSystemId
+    regUpdate<ApiSystemIdData>(p, ApiCommand::changeSystemId);
 
     // AbstractECConnection
     regUpdate<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
@@ -1289,11 +1289,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      */
     regFunctor<nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
-        std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2));
+        std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2, _3));
 
     // Ec2StaticticsReporter
     regFunctor<nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
-        [this](nullptr_t, ApiSystemStatistics* const out)
+        [this](nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
@@ -1301,7 +1301,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
                 nullptr, out);
         });
     regFunctor<nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
-        [this](nullptr_t, ApiStatisticsServerInfo* const out)
+        [this](nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
@@ -1586,9 +1586,10 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->version = qnCommon->engineVersion();
     connectionInfo->brand = localInfo.brand;
     connectionInfo->customization = localInfo.customization;
-    connectionInfo->systemName = qnCommon->localSystemName();
+    connectionInfo->systemName = qnGlobalSettings->systemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
-    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemID();
+    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemId();
+    connectionInfo->localSystemId = qnGlobalSettings->localSystemId().toString();
     #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif
@@ -1686,11 +1687,11 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
 }
 
 ErrorCode Ec2DirectConnectionFactory::getSettings(
-    nullptr_t, ApiResourceParamDataList* const outData)
+    nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData& accessData)
 {
     if (!detail::QnDbManager::instance())
         return ErrorCode::ioError;
-    return dbManager(Qn::kSystemAccess).doQuery(nullptr, *outData);
+    return dbManager(accessData).doQuery(nullptr, *outData);
 }
 
 template<class InputDataType>
@@ -1734,7 +1735,7 @@ template<class InputType, class OutputType>
 void Ec2DirectConnectionFactory::regFunctor(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
-    std::function<ErrorCode(InputType, OutputType*)> handler, Qn::GlobalPermission permission)
+    std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, Qn::GlobalPermission permission)
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),

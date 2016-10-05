@@ -15,6 +15,7 @@
 #include <core/resource/client_storage_resource.h>
 
 #include <utils/common/delayed.h>
+#include <core/resource/fake_media_server.h>
 
 namespace {
     /** Delay between requests when the rebuild is running. */
@@ -111,7 +112,7 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         }
 
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server || QnMediaServerResource::isFakeServer(server))
+        if (!server || server.dynamicCast<QnFakeMediaServerResource>())
             return;
 
         m_serverInfo.insert(server, ServerInfo());
@@ -132,7 +133,7 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         }
 
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server || QnMediaServerResource::isFakeServer(server))
+        if (!server || server.dynamicCast<QnFakeMediaServerResource>())
             return;
 
         m_serverInfo.remove(server);

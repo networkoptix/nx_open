@@ -146,17 +146,20 @@ private:
 
     void onGotTransaction(
         Qn::SerializationFormat tranFormat,
-        const QByteArray& data,
+        QByteArray data,
+        ::ec2::QnTransactionTransportHeader transportHeader);
+    void forwardTransactionToProcessor(
+        Qn::SerializationFormat tranFormat,
+        QByteArray data,
         ::ec2::QnTransactionTransportHeader transportHeader);
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);
+    void forwardStateChangedEvent(
+        ::ec2::QnTransactionTransportBase::State newState);
     void onTransactionsReadFromLog(
         api::ResultCode resultCode,
         std::vector<TransactionData> serializedTransaction,
         ::ec2::QnTranState readedUpTo);
     void enableOutputChannel();
-    //void addTransportHeaderToUbjsonTransaction(
-    //    nx::Buffer* const ubjsonTransaction);
-    //void addTransportHeaderToJsonTransaction(QJsonObject*);
 };
 
 } // namespace ec2

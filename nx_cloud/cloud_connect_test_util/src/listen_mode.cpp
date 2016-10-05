@@ -266,15 +266,15 @@ int printStatsAndWaitForCompletion(
     using nx::network::test::ConnectionTestStatistics;
     using namespace std::chrono;
 
-    constexpr const auto kUpdateStatisticsInterval = std::chrono::seconds(1);
-    constexpr const auto kStatisticsResetInterval = std::chrono::minutes(1);
-    constexpr const auto zeroStatistics = ConnectionTestStatistics{ 0, 0, 0, 0 };
-    constexpr const auto invalidStatistics =
-        ConnectionTestStatistics{ (uint64_t)-1, (uint64_t)-1, (size_t)-1, (size_t)-1 };
+    const std::chrono::seconds kUpdateStatisticsInterval(1);
+    const std::chrono::minutes kStatisticsResetInterval(1);
+    const ConnectionTestStatistics kZeroStatistics{0, 0, 0, 0};
+    const ConnectionTestStatistics kInvalidStatistics{
+        (uint64_t) -1, (uint64_t) -1, (size_t) -1, (size_t) -1};
 
     std::cout << "\nUsage statistics:" << std::endl;
-    ConnectionTestStatistics prevStatistics = invalidStatistics;
-    ConnectionTestStatistics baseStatisticsData = zeroStatistics;
+    ConnectionTestStatistics prevStatistics = kInvalidStatistics;
+    ConnectionTestStatistics baseStatisticsData = kZeroStatistics;
     boost::optional<steady_clock::time_point> sameStatisticsInterval;
     std::string prevStatToDisplayStr;
     for (;;)
@@ -285,7 +285,7 @@ int printStatsAndWaitForCompletion(
         const auto data = connectionPool->statistics();
         auto statToDisplay = data - baseStatisticsData;
 
-        if (statToDisplay != zeroStatistics &&
+        if (statToDisplay != kZeroStatistics &&
             data == prevStatistics)
         {
             if (!sameStatisticsInterval)
@@ -306,8 +306,8 @@ int printStatsAndWaitForCompletion(
                     baseStatisticsData.totalConnections -= baseStatisticsData.onlineConnections;
                     baseStatisticsData.onlineConnections = 0;
 
-                    prevStatistics = invalidStatistics;
-                    statToDisplay = zeroStatistics;
+                    prevStatistics = kInvalidStatistics;
+                    statToDisplay = kZeroStatistics;
                     sameStatisticsInterval.reset();
                 }
             }

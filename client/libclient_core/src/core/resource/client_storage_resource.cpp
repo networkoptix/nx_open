@@ -159,7 +159,7 @@ void QnClientStorageResource::setFreeSpace( qint64 value ) {
     emit freeSpaceChanged(::toSharedPointer(this));
 }
 
-qint64 QnClientStorageResource::getTotalSpace() {
+qint64 QnClientStorageResource::getTotalSpace() const {
     QnMutexLocker lock(&m_mutex);
     return m_totalSpace;
 }

@@ -696,7 +696,7 @@ begin_label:
                         {
                             if (m_delegate->endTime() != DATETIME_NOW) {
                                 m_topIFrameTime = m_delegate->endTime();
-                                seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
+                                m_bottomIFrameTime = seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
                             }
                             else {
                                 m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch() * 1000;
