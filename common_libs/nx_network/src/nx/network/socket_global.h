@@ -75,6 +75,7 @@ public:
 private:
     SocketGlobals();
     ~SocketGlobals();
+    void setDebugConfigurationTimer();
 
     static QnMutex s_mutex;
     static std::atomic<bool> s_isInitialized;
@@ -83,8 +84,9 @@ private:
 
 private:
     DebugConfiguration m_debugConfiguration;
-    std::shared_ptr< QnLog::Logs > m_log;
+    std::shared_ptr<QnLog::Logs> m_log;
     aio::AIOService m_aioService;
+    aio::Timer m_debugConfigurationTimer;
 
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;

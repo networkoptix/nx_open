@@ -8,38 +8,74 @@
 
 #include <nx_ec/data/api_runtime_data.h>
 
+#include <ui/delegates/resource_item_delegate.h>
+#include <ui/style/helper.h>
 #include <ui/models/time_server_selection_model.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/synctime.h>
 
-namespace {
-
-    class QnSortServersByPriorityProxyModel: public QSortFilterProxyModel {
-    public:
-        explicit QnSortServersByPriorityProxyModel(QObject *parent = 0): 
-            QSortFilterProxyModel(parent) {}
-
-    protected:
-        virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
-            return left.data(Qn::PriorityRole).toULongLong() < right.data(Qn::PriorityRole).toULongLong();
-        }
-    };
-
-}
-
-#ifdef _DEBUG
-    #define QN_TIME_SERVER_SELECTION_DEBUG
-#endif
+//#define QN_TIME_SERVER_SELECTION_DEBUG
 
 #ifdef QN_TIME_SERVER_SELECTION_DEBUG
 #define PRINT_DEBUG(MSG) qDebug() << MSG
 #else
-#define PRINT_DEBUG(MSG) 
-#endif 
+#define PRINT_DEBUG(MSG)
+#endif
 
-QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NULL*/):
+namespace {
+
+    static const int kTimeFontSizePixels = 40;
+    static const int kTimeFontWeight = QFont::Normal;
+    static const int kDateFontSizePixels = 14;
+    static const int kDateFontWeight = QFont::Bold;
+    static const int kZoneFontSizePixels = 14;
+    static const int kZoneFontWeight = QFont::Normal;
+    static const int kMinimumDateTimeWidth = 84;
+
+    class QnSortServersByPriorityProxyModel: public QSortFilterProxyModel
+    {
+    public:
+        explicit QnSortServersByPriorityProxyModel(QObject* parent = nullptr) :
+            QSortFilterProxyModel(parent) {}
+
+    protected:
+        virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const
+        {
+            return left.data(Qn::PriorityRole).toULongLong() < right.data(Qn::PriorityRole).toULongLong();
+        }
+    };
+
+    class QnTimeServerDelegate : public QStyledItemDelegate
+    {
+        using base_type = QStyledItemDelegate;
+
+    public:
+        QnTimeServerDelegate(QObject* parent = nullptr) : base_type(parent) {}
+
+        virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+        {
+            QSize size = base_type::sizeHint(option, index);
+
+            switch (index.column())
+            {
+                case QnTimeServerSelectionModel::DateColumn:
+                case QnTimeServerSelectionModel::TimeColumn:
+                    size.setWidth(qMax(size.width(), kMinimumDateTimeWidth));
+                    break;
+
+                default:
+                    break;
+            }
+
+            return size;
+        }
+    };
+
+} // namespace
+
+QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NULL*/) :
     QnAbstractPreferencesWidget(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::TimeServerSelectionWidget),
@@ -48,69 +84,102 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_TimeSynchronization_Help);
 
-    ui->timeSourceLabel->setVisible(false);
-    if (true) {
-        ui->timeSourceLabel->setText(tr("Time is taken from the Internet."));
-    } else {
-        ui->timeSourceLabel->setText(tr("Time is taken from %1."));
-    }
+    QFont font;
+    font.setPixelSize(kTimeFontSizePixels);
+    font.setWeight(kTimeFontWeight);
+    ui->timeLabel->setFont(font);
+    ui->timeLabel->setForegroundRole(QPalette::Text);
 
+    font.setPixelSize(kDateFontSizePixels);
+    font.setWeight(kDateFontWeight);
+    ui->dateLabel->setFont(font);
+    ui->dateLabel->setForegroundRole(QPalette::Light);
+
+    font.setPixelSize(kZoneFontSizePixels);
+    font.setWeight(kZoneFontWeight);
+    ui->zoneLabel->setFont(font);
+    ui->zoneLabel->setForegroundRole(QPalette::Light);
+
+    ui->timeSourceLabel->setVisible(false);
+#if 0
+    if (true)
+        ui->timeSourceLabel->setText(tr("Time is taken from the Internet."));
+    else
+        ui->timeSourceLabel->setText(tr("Time is taken from %1."));
+#endif
     QnSortServersByPriorityProxyModel* sortModel = new QnSortServersByPriorityProxyModel(this);
     sortModel->setSourceModel(m_model);
 
     ui->serversTable->setModel(sortModel);
+    ui->serversTable->setProperty(style::Properties::kItemViewRadioButtons, true);
+    ui->serversTable->setItemDelegate(new QnTimeServerDelegate(this));
+    ui->serversTable->setItemDelegateForColumn(
+        QnTimeServerSelectionModel::NameColumn, new QnResourceItemDelegate(this));
 
-    ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::CheckboxColumn, QHeaderView::ResizeToContents);
-    ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::NameColumn, QHeaderView::Stretch);
-    ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::TimeColumn, QHeaderView::ResizeToContents);
-    ui->serversTable->horizontalHeader()->setSectionResizeMode(QnTimeServerSelectionModel::OffsetColumn, QHeaderView::ResizeToContents);
-    ui->serversTable->horizontalHeader()->setSectionsClickable(false);
+    auto header = ui->serversTable->horizontalHeader();
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnTimeServerSelectionModel::NameColumn, QHeaderView::Stretch);
+    header->setSectionsClickable(false);
 
-    connect(qnSyncTime, &QnSyncTime::timeChanged, this, &QnTimeServerSelectionWidget::updateTime);
+    connect(m_model, &QnTimeServerSelectionModel::dataChanged,
+        this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(m_model, &QnTimeServerSelectionModel::dataChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+    auto updateTime =
+        [this]()
+        {
+            if (isVisible())
+                this->updateTime();
+        };
 
-    QTimer* timer = new QTimer(this);
+    connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);
+
+    auto timer = new QTimer(this);
     timer->setInterval(1000);
     timer->setSingleShot(false);
-    connect(timer, &QTimer::timeout, this,  &QnTimeServerSelectionWidget::updateTime);
+    connect(timer, &QTimer::timeout, this, updateTime);
     timer->start();
 }
 
-
-QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget() {
+QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget()
+{
 }
 
-
-void QnTimeServerSelectionWidget::loadDataToUi() {
+void QnTimeServerSelectionWidget::loadDataToUi()
+{
     PRINT_DEBUG("provide selected server to model:");
     m_model->setSelectedServer(selectedServer());
+    updateTime();
 }
 
-void QnTimeServerSelectionWidget::applyChanges() {
+void QnTimeServerSelectionWidget::applyChanges()
+{
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;
 
     PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
     auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
-    timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this, [this](int handle, ec2::ErrorCode errCode){
-        Q_UNUSED(handle);
-        Q_UNUSED(errCode);  //suppress warning in the release code
-        PRINT_DEBUG("forcing selected server finished with result " + ec2::toString(errCode).toUtf8());
-    });
-
+    timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this,
+        [this](int handle, ec2::ErrorCode errCode)
+        {
+            Q_UNUSED(handle);
+            Q_UNUSED(errCode);  //suppress warning in the release code
+            PRINT_DEBUG("forcing selected server finished with result " + ec2::toString(errCode).toUtf8());
+        });
 }
 
-bool QnTimeServerSelectionWidget::hasChanges() const {
+bool QnTimeServerSelectionWidget::hasChanges() const
+{
     PRINT_DEBUG("checking if the widget has changes " + m_model->selectedServer().toByteArray() + " vs...");
     return m_model->selectedServer() != selectedServer();
 }
 
-QnUuid QnTimeServerSelectionWidget::selectedServer() const {
+QnUuid QnTimeServerSelectionWidget::selectedServer() const
+{
     PRINT_DEBUG("check selected server by runtime info");
 
-    foreach (const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems()) {
+    for (const auto& runtimeInfo : qnRuntimeInfoManager->items()->getItems())
+    {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;
 
@@ -125,20 +194,25 @@ QnUuid QnTimeServerSelectionWidget::selectedServer() const {
     return QnUuid();
 }
 
-void QnTimeServerSelectionWidget::updateTime() {
-    if (!isVisible())
-        return;
-
+void QnTimeServerSelectionWidget::updateTime()
+{
     m_model->updateTime();
 
     QDateTime syncTime;
-    if (m_model->sameTimezone()) {
+    if (m_model->sameTimezone())
         syncTime.setTimeSpec(Qt::LocalTime);
-        syncTime.setMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());
-        ui->timeLabel->setText(syncTime.toString(lit("yyyy-MM-dd HH:mm:ss")));
-    } else {
+    else
         syncTime.setTimeSpec(Qt::UTC);
-        syncTime.setMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());
-        ui->timeLabel->setText(syncTime.toString(lit("yyyy-MM-dd HH:mm:ss t")));
-    }
+
+    syncTime.setMSecsSinceEpoch(qnSyncTime->currentMSecsSinceEpoch());
+
+    auto offsetFromUtc = syncTime.offsetFromUtc();
+    syncTime.setTimeSpec(Qt::OffsetFromUTC);
+    syncTime.setOffsetFromUtc(offsetFromUtc);
+
+    ui->timeLabel->setText(syncTime.toString(lit("HH:mm:ss")));
+    ui->dateLabel->setText(syncTime.toString(lit("dd/MM/yyyy")));
+    ui->zoneLabel->setText(syncTime.timeZoneAbbreviation());
+
+    ui->stackedWidget->setCurrentWidget(ui->timePage);
 }

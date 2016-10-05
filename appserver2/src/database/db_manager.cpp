@@ -15,9 +15,11 @@
 #include "utils/common/synctime.h"
 #include "utils/crypt/symmetrical.h"
 #include "nx/fusion/serialization/json.h"
+
 #include "core/resource/user_resource.h"
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_access_manager.h>
+
+#include <core/resource_management/user_roles_manager.h>
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
@@ -3918,7 +3920,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& res
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
 {
-    result = QnResourceAccessManager::getPredefinedRoles();
+    result = QnUserRolesManager::getPredefinedRoles();
     return ErrorCode::ok;
 }
 

@@ -510,11 +510,15 @@ void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
     event.connectionMethods &= m_supportedConnectionMethods;
+    DEBUG_LOG(lm("Connection request '%1' from %2 with methods: %3")
+        .strs(event.connectSessionId, event.originatingPeerID,
+            hpm::api::ConnectionMethod::toString(event.connectionMethods)));
+
     for (const auto& maker : m_acceptorMakers)
     {
         if (auto acceptor = maker(event))
         {
-            DEBUG_LOG(lm("Create acceptor %1 by connection request %2 from %3")
+            DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")
                 .strs(acceptor, event.connectSessionId, event.originatingPeerID));
 
             acceptor->setConnectionInfo(

@@ -17,8 +17,8 @@
 #include <utils/common/unused.h>
 #include <nx/utils/singleton.h>
 #include "nx/utils/type_utils.h"
-#include "core/resource_management/user_access_data.h"
-#include "core/resource_management/resource_access_manager.h"
+#include "core/resource_access/user_access_data.h"
+#include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
 
 

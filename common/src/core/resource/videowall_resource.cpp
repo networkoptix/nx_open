@@ -116,9 +116,10 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item)
         };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallItem &item)
+Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallItem& olditem,
+    const QnVideoWallItem& item)
 {
-    return [r = toSharedPointer(this), item]{ emit r->itemChanged(r, item); };
+    return [r = toSharedPointer(this), olditem, item]{ emit r->itemChanged(r, olditem, item); };
 }
 
 Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallPcData &item)
@@ -131,7 +132,8 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallPcData &ite
     return [r = toSharedPointer(this), item]{ emit r->pcRemoved(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallPcData &item)
+Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallPcData& /*oldItem*/,
+    const QnVideoWallPcData& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->pcChanged(r, item); };
 }
@@ -146,7 +148,8 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallMatrix &ite
     return [r = toSharedPointer(this), item]{ emit r->matrixRemoved(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix &item)
+Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix& /*oldItem*/,
+    const QnVideoWallMatrix& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->matrixChanged(r, item); };
 }

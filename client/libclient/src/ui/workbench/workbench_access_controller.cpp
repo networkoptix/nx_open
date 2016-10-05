@@ -7,11 +7,13 @@
 
 #include <common/common_module.h>
 
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+
+#include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
@@ -27,21 +29,33 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     m_user(),
     m_globalPermissions(Qn::NoGlobalPermissions)
 {
-    connect(qnResPool,          &QnResourcePool::resourceAdded,                     this,   &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
-    connect(qnResPool,          &QnResourcePool::resourceRemoved,                   this,   &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsInvalidated, this, [this](const QSet<QnUuid>& resourceIds)
-    {
-        if (m_user && resourceIds.contains(m_user->getId()))
+    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
+        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+            Qn::Permissions /*permissions*/)
         {
-            recalculateAllPermissions();
-            return;
-        }
+            if (!m_user || subject.user() != m_user)
+                return;
 
-        for (const QnResourcePtr& resource : qnResPool->getResources(resourceIds))
             updatePermissions(resource);
-    });
+        });
 
+    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this,
+        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
+        {
+            if (!subject.user())
+                return;
+
+            if (subject.user() == m_user)
+                recalculateAllPermissions();
+            else
+                updatePermissions(subject.user());
+        });
 
     recalculateAllPermissions();
 }
@@ -235,11 +249,14 @@ Qn::GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() 
     return qnResourceAccessManager->globalPermissions(m_user);
 }
 
-void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource) {
+void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource)
+{
     setPermissionsInternal(resource, calculatePermissions(resource));
 }
 
-void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& resource, Qn::Permissions permissions) {
+void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr& resource,
+    Qn::Permissions permissions)
+{
     if (m_dataByResource.contains(resource) &&
         permissions == this->permissions(resource))
         return;
@@ -272,19 +289,8 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
-    connect(resource, &QnResource::parentIdChanged,         this, &QnWorkbenchAccessController::updatePermissions);
-    connect(resource, &QnResource::flagsChanged,            this, &QnWorkbenchAccessController::updatePermissions);
-
-    if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
-    {
-        connect(layout, &QnLayoutResource::lockedChanged,   this, &QnWorkbenchAccessController::updatePermissions);
-    }
-
-    if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
-    {
-        connect(user, &QnUserResource::permissionsChanged,  this, &QnWorkbenchAccessController::updatePermissions);
-        connect(user, &QnUserResource::userGroupChanged,    this, &QnWorkbenchAccessController::updatePermissions);
-    }
+    connect(resource, &QnResource::flagsChanged, this,
+        &QnWorkbenchAccessController::updatePermissions);
 
     updatePermissions(resource);
 }

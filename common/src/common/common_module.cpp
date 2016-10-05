@@ -12,17 +12,27 @@
 
 #include <common/common_meta_types.h>
 
-#include <core/resource/media_server_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/providers/permissions_resource_access_provider.h>
+#include <core/resource_access/providers/shared_resource_access_provider.h>
+#include <core/resource_access/providers/shared_layout_access_provider.h>
+#include <core/resource_access/providers/videowall_resource_access_provider.h>
+
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
+
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include "core/resource/camera_user_attribute_pool.h"
 #include "core/resource/media_server_user_attributes.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
 
 #include "utils/common/synctime.h"
 #include <utils/common/app_info.h>
@@ -79,7 +89,7 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     nx::network::SocketGlobals::init();
 
-    m_dirty = false;
+    m_dirtyModuleInformation = false;
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
@@ -99,8 +109,21 @@ QnCommonModule::QnCommonModule(QObject *parent):
     instance<QnResourceStatusDictionary>();
     instance<QnServerAdditionalAddressesDictionary>();
 
-    instance<QnResourcePool>();
-    instance<QnResourceAccessManager>();
+    instance<QnResourcePool>();             /*< Depends on nothing. */
+    instance<QnUserRolesManager>();         /*< Depends on nothing. */
+    instance<QnSharedResourcesManager>();   /*< Depends on respool and roles. */
+    instance<QnResourceAccessProvider>();   /*< Depends on respool, roles and shared resources. */
+
+    instance<QnGlobalPermissionsManager>(); /* Depends on respool. */
+
+    /* Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager. */
+    qnResourceAccessProvider->addBaseProvider(new QnPermissionsResourceAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnSharedResourceAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnSharedLayoutAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnVideoWallResourceAccessProvider());
+
+    instance<QnResourceAccessManager>();    /*< Depends on access provider. */
+
 
     instance<QnGlobalSettings>();
     instance<nx_http::ClientPool>();
@@ -206,10 +229,10 @@ QnModuleInformation QnCommonModule::moduleInformation()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_dirty)
+        if (m_dirtyModuleInformation)
         {
             updateModuleInformationUnsafe();
-            m_dirty = false;
+            m_dirtyModuleInformation = false;
         }
         return m_moduleInformation;
     }
@@ -226,9 +249,9 @@ void QnCommonModule::resetCachedValue()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_dirty)
+        if (m_dirtyModuleInformation)
             return;
-        m_dirty = true;
+        m_dirtyModuleInformation = true;
     }
     emit moduleInformationChanged();
 }

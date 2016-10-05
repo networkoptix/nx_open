@@ -13,7 +13,7 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <nx/network/http/httptypes.h>
 #include <rest/server/rest_connection_processor.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <api/helpers/camera_id_helper.h>
 #include <nx/utils/log/log.h>

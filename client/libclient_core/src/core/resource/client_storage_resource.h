@@ -41,7 +41,7 @@ public:
     virtual qint64 getFreeSpace() override;
 
     void setTotalSpace(qint64 value);
-    virtual qint64 getTotalSpace() override;
+    virtual qint64 getTotalSpace() const override;
 
     void setWritable(bool isWritable);
     virtual int getCapabilities() const override;

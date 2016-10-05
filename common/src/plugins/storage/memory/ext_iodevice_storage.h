@@ -37,7 +37,7 @@ public:
     //!Implementation of QnStorageResource::getFreeSpace
     virtual qint64 getFreeSpace() override { return 0; }
     //!Implementation of QnStorageResource::getTotalSpace
-    virtual qint64 getTotalSpace() override { return 0; }
+    virtual qint64 getTotalSpace() const override { return 0; }
     //!Implementation of QnStorageResource::isStorageAvailable
     virtual Qn::StorageInitResult initOrUpdate() const override { return Qn::StorageInit_Ok; }
     //!Implementation of QnStorageResource::removeFile

@@ -1,9 +1,14 @@
 #include "user_list_model.h"
 
+#include <core/resource_access/global_permissions_manager.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+
+#include <nx_ec/data/api_user_group_data.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -34,7 +39,7 @@ public:
         connect(qnResPool, &QnResourcePool::resourceAdded,   this, &QnUserListModelPrivate::at_resourcePool_resourceAdded);
         connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnUserListModelPrivate::at_resourcePool_resourceRemoved);
 
-        connect(qnResourceAccessManager, &QnResourceAccessManager::userGroupAddedOrUpdated, this,
+        connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
             [this](const ec2::ApiUserGroupData& group)
             {
                 auto isUserAffected = [&group](const QnUserResourcePtr& user)
@@ -54,6 +59,14 @@ public:
                 emit model->dataChanged(first, last, { Qt::DisplayRole });
         });
 
+        connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+            this,
+            [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
+            {
+                if (subject.user())
+                    handleUserChanged(subject.user());
+            });
+
         for (const QnUserResourcePtr& user: userList)
             at_resourcePool_resourceAdded(user);
     }
@@ -61,6 +74,8 @@ public:
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
     void at_resourcePool_resourceChanged(const QnResourcePtr& resource);
+
+    void handleUserChanged(const QnUserResourcePtr& user);
 
     int userIndex(const QnUuid& id) const;
     QnUserResourcePtr user(const QModelIndex& index) const;
@@ -80,8 +95,6 @@ void QnUserListModelPrivate::at_resourcePool_resourceAdded(const QnResourcePtr& 
 
     connect(user, &QnUserResource::nameChanged,        this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user, &QnUserResource::fullNameChanged,    this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::permissionsChanged, this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::enabledChanged,     this, &QnUserListModelPrivate::at_resourcePool_resourceChanged);
 
     if (userIndex(user->getId()) != -1)
         return;
@@ -115,7 +128,11 @@ void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if (!user)
         return;
+    handleUserChanged(user);
+}
 
+void QnUserListModelPrivate::handleUserChanged(const QnUserResourcePtr& user)
+{
     int row = userIndex(user->getId());
     if (row == -1)
         return;
@@ -150,7 +167,7 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user)
 {
     QStringList permissionStrings;
 
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
+    Qn::GlobalPermissions permissions = qnGlobalPermissionsManager->globalPermissions(user);
 
     if (user->isOwner())
         return tr("Owner");
@@ -266,7 +283,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             {
                 case LoginColumn        : return user->getName();
                 case FullNameColumn     : return user->fullName();
-                case UserRoleColumn     : return qnResourceAccessManager->userRoleName(user);
+                case UserRoleColumn     : return qnUserRolesManager->userRoleName(user);
                 default                 : break;
 
             } // switch (column)

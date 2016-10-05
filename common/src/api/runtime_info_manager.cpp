@@ -55,7 +55,8 @@ Qn::Notifier QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo &it
     return [this, item]{ emit runtimeInfoRemoved(item); };
 }
 
-Qn::Notifier QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo &item)
+Qn::Notifier QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo& /*oldItem*/,
+    const QnPeerRuntimeInfo &item)
 {
 #ifdef RUNTIME_INFO_DEBUG
     qDebug() <<"runtime info changed" << item.uuid << item.data.peer.peerType;

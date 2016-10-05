@@ -14,6 +14,7 @@ namespace Qn
         // Single-occurrence nodes
         RootNode,               /**< Root node for the tree (current system node). */
         CurrentSystemNode,      /**< Root node, displaying current system name. */
+        CurrentUserNode,        /**< Root node, displaying current user. */
         SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
         ServersNode,            /**< Root node for servers for admin user. */
         UserDevicesNode,        /**< Root node for cameras and i/o modules for non-admin user. */
@@ -30,13 +31,13 @@ namespace Qn
         RoleUsersNode,          /**< Node that represents 'Users' node, displayed under roles. */
         AllCamerasAccessNode,   /**< Node that represents 'All Cameras' placeholder, displayed under users and roles with full access. */
         AllLayoutsAccessNode,   /**< Node that represents 'All Shared Layouts' placeholder, displayed under admins. */
-        AccessibleResourcesNode,/**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
-        AccessibleLayoutsNode,  /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
+        SharedResourcesNode,    /**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
+        SharedLayoutsNode,      /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
 
         // Repeating nodes
         RoleNode,               /**< Node that represents custom role. */
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
-        AccessibleResourceNode, /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
+        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */

@@ -42,7 +42,7 @@ std::vector<SocketAddress> resolveTargets(
         return targets;
     }
 
-    // It's likelly a system ID, add server IDs if avaliable:
+    // It's likelly a system id, add server ids if avaliable.
     QString serverId;
     size_t serverCount;
     if (args.read("server-id", &serverId) && args.read("server-count", &serverCount))
@@ -58,7 +58,7 @@ std::vector<SocketAddress> resolveTargets(
         return targets;
     }
 
-    // Or resolve it:
+    // Or resolve it.
     std::promise<void> promise;
     const auto port = targetAddress.port;
     nx::network::SocketGlobals::addressResolver().resolveDomain(

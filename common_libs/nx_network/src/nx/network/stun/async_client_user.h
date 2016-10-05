@@ -34,11 +34,14 @@ public:
 
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
+    ~AsyncClientUser() override;
 
     void sendRequest(Message request, AbstractAsyncClient::RequestHandler handler);
     bool setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);
 
 private:
+    void disconnectFromClient();
+
     std::atomic<bool> m_isEnabled;
     utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;

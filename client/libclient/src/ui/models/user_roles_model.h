@@ -29,7 +29,7 @@ public:
     void setUserRoles(const ec2::ApiUserGroupDataList& roles);
 
     bool updateUserRole(const ec2::ApiUserGroupData& role);
-    bool removeUserRole(const QnUuid& id);
+    bool removeUserRole(const QnUuid& roleId);
 
     void setCustomRole(bool enabled);
 

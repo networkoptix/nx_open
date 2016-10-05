@@ -165,7 +165,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
 
     QnLayoutResourcePtr resource = layout->resource();
     if (resource && resource->locked())
-        return qnSkin->icon("titlebar/lock.png");
+        return qnSkin->icon("layouts/locked.png");
 
     return QIcon();
 }

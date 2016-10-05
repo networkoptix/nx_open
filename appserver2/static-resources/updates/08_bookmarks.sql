@@ -20,7 +20,7 @@ CREATE TABLE "vms_bookmark" (
     description     TEXT NULL,
     timeout         INTEGER NULL                            -- period of time during which the bookmarked archive part should not be deleted
     );
-    
+
 CREATE UNIQUE INDEX idx_bookmark_guid ON vms_bookmark(guid);
 
 -- Index for faster TOP-100 requests

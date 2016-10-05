@@ -74,6 +74,10 @@ void QnSystemHostsModel::reloadHosts()
         beginResetModel();
         m_hosts.clear();
         endResetModel();
+
+        emit firstHostChanged();
+        emit isEmptyChanged();
+        emit countChanged();
     }
 
     m_disconnectHelper.reset(new QnDisconnectHelper());
@@ -221,7 +225,7 @@ void QnSystemHostsModel::removeServerInternal(const ServerIdHostList::iterator &
 }
 
 
-QnSystemHostsModel::ServerIdHostList::iterator 
+QnSystemHostsModel::ServerIdHostList::iterator
 QnSystemHostsModel::getDataIt(const QnUuid &serverId)
 {
     return std::find_if(m_hosts.begin(), m_hosts.end()

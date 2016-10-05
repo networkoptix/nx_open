@@ -19,7 +19,8 @@ BaseTile
     property string wrongVersion;
     property string compatibleVersion;
 
-    isConnecting: ((control.systemId == context.connectingToSystem) && !isFactoryTile);
+    isConnecting: ((control.systemId == context.connectingToSystem)
+        && context.connectingToSystem.length && !isFactoryTile);
 
     isAvailable:
     {
@@ -34,19 +35,17 @@ BaseTile
 
     tileColor:
     {
-        if (isFactoryTile)
-        {
-            return (isHovered ? Style.colors.custom.systemTile.factorySystemHovered :
-                Style.colors.custom.systemTile.factorySystemBkg);
-        }
-
         if (!control.isAvailable)
             return Style.colors.custom.systemTile.disabled;
 
         if (control.isHovered)
-            return Style.colors.custom.systemTile.backgroundHovered;
+        {
+            return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemHovered
+                : Style.colors.custom.systemTile.backgroundHovered);
+        }
 
-        return Style.colors.custom.systemTile.background;
+        return (isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
+                : Style.colors.custom.systemTile.background);
     }
 
     indicator

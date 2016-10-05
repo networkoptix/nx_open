@@ -43,7 +43,8 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
-    virtual qint64 getTotalSpace() override;
+    virtual qint64 getTotalSpace() const override;
+    virtual qint64 getSpaceLimit() const override;
 
     virtual int getCapabilities() const override;
     virtual Qn::StorageInitResult initOrUpdate() const override;
@@ -53,7 +54,7 @@ public:
 
     virtual QString getPath() const override;
 
-    qint64 getTotalSpaceWithoutInit();
+    qint64 getTotalSpaceWithoutInit() const;
 
     // true if storage is located on local disks
     static bool isLocal(const QString &url);
@@ -107,6 +108,8 @@ private:
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
     mutable bool m_isSystem;
+    mutable qint64 m_spaceLimit;
+    mutable QnMutex m_spaceLimitMutex;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

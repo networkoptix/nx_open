@@ -85,6 +85,8 @@ public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
 
+    void initialize();
+
     /** Check if global settings are ready to use. */
     bool isInitialized() const;
 
