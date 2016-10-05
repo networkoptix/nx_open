@@ -123,14 +123,13 @@ signals:
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
-private slots:
-    void resetCachedValue();
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 private:
+    void resetCachedValue();
     void updateModuleInformationUnsafe();
 private:
-    bool m_dirty;
+    bool m_dirtyModuleInformation;
     QnResourceDataPool *m_dataPool;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;

@@ -79,7 +79,7 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     nx::network::SocketGlobals::init();
 
-    m_dirty = false;
+    m_dirtyModuleInformation = false;
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
@@ -206,10 +206,10 @@ QnModuleInformation QnCommonModule::moduleInformation()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_dirty)
+        if (m_dirtyModuleInformation)
         {
             updateModuleInformationUnsafe();
-            m_dirty = false;
+            m_dirtyModuleInformation = false;
         }
         return m_moduleInformation;
     }
@@ -226,9 +226,9 @@ void QnCommonModule::resetCachedValue()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_dirty)
+        if (m_dirtyModuleInformation)
             return;
-        m_dirty = true;
+        m_dirtyModuleInformation = true;
     }
     emit moduleInformationChanged();
 }
