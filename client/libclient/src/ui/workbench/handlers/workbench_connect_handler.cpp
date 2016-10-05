@@ -210,16 +210,13 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         [this]
         {
+            /* Avoid double reconnect when server is very slow or in debug. */
+            m_connectingHandle = 0;
+
             /* We could get here if server advanced settings were changed so peer was reset. */
             if (m_state.state() == QnConnectionState::Ready)
                 return;
 
-            NX_ASSERT(m_state.state() == QnConnectionState::Connected);
-            if (m_state.state() != QnConnectionState::Connected)
-            {
-                disconnectFromServer(true);
-                return;
-            }
             trace(lit("resources received, state -> Ready"));
             m_state.setState(QnConnectionState::Ready);
 
@@ -549,7 +546,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 {
     trace(lit("connection opened, state -> Connected"));
     m_state.setState(QnConnectionState::Connected);
-    action(QnActions::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
+
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
     connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this,
@@ -743,8 +740,8 @@ void QnWorkbenchConnectHandler::clearConnection()
     m_connectingHandle = 0;
     stopReconnecting();
 
-    QnClientMessageProcessor::instance()->init(NULL);
-    QnAppServerConnectionFactory::setEc2Connection(NULL);
+    qnClientMessageProcessor->init(nullptr);
+    QnAppServerConnectionFactory::setEc2Connection(nullptr);
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
@@ -754,7 +751,6 @@ void QnWorkbenchConnectHandler::clearConnection()
     /* Get ready for the next connection. */
     m_warnMessagesDisplayed = false;
 
-    action(QnActions::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */

@@ -58,7 +58,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     {
         trace(lit("Connection established to %1").arg(connection->connectionInfo().ecsGuid));
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
-        //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
+        //TODO: #GDM #3.0 in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     }
     else if (m_connected)
     { // double init by null is allowed
@@ -199,15 +199,14 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         that were not sent as TransactionMessageBus was stopped. Peer id is the same if we are
         connecting to the same server we are already connected to (and just disconnected).
     */
-    if (m_status.state() == QnConnectionState::Connecting)
+    if (!m_connected)
         return;
 
     trace(lit("peer lost, state -> Reconnecting"));
     m_status.setState(QnConnectionState::Reconnecting);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server)
+    if (auto server = qnCommon->currentServer())
         server->setStatus(Qn::Offline);
 
     m_connected = false;
