@@ -10,6 +10,7 @@ extern "C"
 
 #include <QtCore/QIODevice>
 
+#include "audioformat.h"
 #include <nx/streaming/media_context.h>
 #include <nx/streaming/media_context_serializable_data.h>
 
@@ -78,6 +79,9 @@ public:
     static QString getErrorStr(int errnum);
 
     static int audioSampleSize(AVCodecContext* ctx);
+
+    static AVSampleFormat fromQtAudioFormatToFfmpegSampleType(const QnAudioFormat& format);
+    static AVCodecID fromQtAudioFormatToFfmpegPcmCodec(const QnAudioFormat& format);
 
 private:
     static void copyMediaContextFieldsToAvCodecContext(

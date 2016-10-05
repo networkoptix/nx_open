@@ -17,7 +17,6 @@ public:
     bool decode(QnCompressedAudioDataPtr& data, QnByteArray& result);
     ~QnFfmpegAudioDecoder();
 
-    static AVSampleFormat audioFormatQtToFfmpeg(const QnAudioFormat& fmt);
     bool isInitialized() const;
 private:
     AVCodec* codec;

@@ -22,8 +22,8 @@ signals:
     void finished(QnSpeechSynthesisDataProvider*);
 
 private:
-    QByteArray doSynthesis(const QString& text);
-    QnConstMediaContextPtr initializeAudioContext();
+    QByteArray doSynthesis(const QString& text, bool* outStatus);
+    QnConstMediaContextPtr initializeAudioContext(const QnAudioFormat& format);
     void afterRun();
 
 private:

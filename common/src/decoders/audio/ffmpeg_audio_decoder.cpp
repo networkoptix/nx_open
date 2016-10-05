@@ -14,20 +14,6 @@ struct AVCodecContext;
 
 bool QnFfmpegAudioDecoder::m_first_instance = true;
 
-AVSampleFormat QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& fmt)
-{
-    if (fmt.sampleSize() == 8)
-        return AV_SAMPLE_FMT_U8;
-    else if(fmt.sampleSize() == 16 && fmt.sampleType() == QnAudioFormat::SignedInt)
-        return AV_SAMPLE_FMT_S16;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QnAudioFormat::SignedInt)
-        return AV_SAMPLE_FMT_S32;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QnAudioFormat::Float)
-        return AV_SAMPLE_FMT_FLT;
-    else
-        return AV_SAMPLE_FMT_NONE;
-}
-
 // ================================================
 
 QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
@@ -102,6 +88,7 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         int got_frame = 0;
         // todo: ffmpeg-test
+        // TODO: #dmishin get rid of deprecated functions 
         int inputConsumed = avcodec_decode_audio4(m_audioDecoderCtx, m_outFrame, &got_frame, &avpkt);
         if (inputConsumed < 0)
             return false;
