@@ -26,7 +26,7 @@ public:
 
     void setStorageBitrateCoeff(float value);
     void setSpaceLimit(qint64 value);
-    qint64 getSpaceLimit() const;
+    virtual qint64 getSpaceLimit() const;
 
     void setStorageType(const QString& type);
     QString getStorageType() const;

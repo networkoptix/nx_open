@@ -343,7 +343,7 @@ qint64 QnThirdPartyStorageResource::getFreeSpace()
     return freeSpace;
 }
 
-qint64 QnThirdPartyStorageResource::getTotalSpace()
+qint64 QnThirdPartyStorageResource::getTotalSpace() const
 {
     if (!m_valid)
         return 0;

@@ -5,7 +5,7 @@
 
 #include <nx/utils/log/log.h>
 
-const qint64 QnStorageResource::kNasStorageLimit = 100LL * 1024 * 1024 * 1024; // 100 gb
+const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 
 QnStorageResource::QnStorageResource():
     base_type(),

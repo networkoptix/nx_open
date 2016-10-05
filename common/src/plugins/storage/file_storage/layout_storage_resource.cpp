@@ -313,7 +313,7 @@ qint64 QnLayoutFileStorageResource::getFreeSpace()
     return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
 }
 
-qint64 QnLayoutFileStorageResource::getTotalSpace()
+qint64 QnLayoutFileStorageResource::getTotalSpace() const
 {
     return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
 }
