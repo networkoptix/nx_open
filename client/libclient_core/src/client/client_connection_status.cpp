@@ -73,6 +73,11 @@ void QnClientConnectionStatus::setState(QnConnectionState state)
     emit stateChanged(state);
 }
 
+bool QnClientConnectionStatus::operator!=(QnConnectionState state) const
+{
+    return m_state != state;
+}
+
 QnClientConnectionStatus& QnClientConnectionStatus::operator=(QnConnectionState state)
 {
     setState(state);
