@@ -75,19 +75,24 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::rebuildTransactionLog(
+int QnMiscManager<QueryProcessorType>::cleanupDatabase(
+    bool cleanupDbObjects,
+    bool cleanupTransactionLog,
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    ApiRebuildTransactionLogData data;
+    ApiCleanupDatabaseData data;
+    data.cleanupDbObjects = cleanupDbObjects;
+    data.cleanupTransactionLog = cleanupTransactionLog;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::rebuildTransactionLog, data,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::cleanupDatabase,
+	    data,
         [handler, reqId](ErrorCode errorCode)
-    {
-        handler->done(reqId, errorCode);
-    }
-    );
+        {
+            handler->done(reqId, errorCode);
+        });
 
     return reqId;
 }
