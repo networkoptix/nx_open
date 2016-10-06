@@ -38,11 +38,12 @@ DBResult Transaction::commit()
 {
     NX_ASSERT(m_started);
     m_started = false;
-    const auto result = m_connection->commit() ? DBResult::ok : DBResult::ioError;
-    for (auto& handler: m_afterCommitHandlers)
-        handler(result);
-    m_afterCommitHandlers.clear();
-    return result;
+    if (!m_connection->commit())
+        return DBResult::ioError;
+    for (auto& handler: m_onSuccessfulCommitHandlers)
+        handler();
+    m_onSuccessfulCommitHandlers.clear();
+    return DBResult::ok;
 }
 
 DBResult Transaction::rollback()
@@ -52,10 +53,10 @@ DBResult Transaction::rollback()
     return m_connection->rollback() ? DBResult::ok : DBResult::ioError;
 }
 
-void Transaction::addAfterCommitHandler(
-    nx::utils::MoveOnlyFunc<void(DBResult)> func)
+void Transaction::addOnSuccessfulCommitHandler(
+    nx::utils::MoveOnlyFunc<void()> func)
 {
-    m_afterCommitHandlers.push_back(std::move(func));
+    m_onSuccessfulCommitHandlers.push_back(std::move(func));
 }
 
 } // namespace db

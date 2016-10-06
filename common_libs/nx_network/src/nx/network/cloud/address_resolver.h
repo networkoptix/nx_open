@@ -89,7 +89,7 @@ class NX_NETWORK_API AddressResolver
 {
 public:
     typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
-    AddressResolver(std::shared_ptr<MediatorConnection> mediatorConnection);
+    AddressResolver(std::unique_ptr<MediatorConnection> mediatorConnection);
     virtual ~AddressResolver() = default;
 
     //!Add new peer address
@@ -258,7 +258,7 @@ protected:
     std::multimap<void*, RequestInfo> m_requests;
 
     DnsResolver m_dnsResolver;
-    std::shared_ptr<MediatorConnection> m_mediatorConnection;
+    std::unique_ptr<MediatorConnection> m_mediatorConnection;
     const QRegExp m_cloudAddressRegExp;
 
     bool isCloudHostName(

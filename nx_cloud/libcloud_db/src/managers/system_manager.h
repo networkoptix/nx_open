@@ -21,6 +21,7 @@
 #include <nx_ec/data/api_user_data.h>
 #include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
+#include <utils/db/filter.h>
 
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
@@ -29,6 +30,7 @@
 #include "data/data_filter.h"
 #include "data/system_data.h"
 #include "data_view.h"
+#include "ec2/transaction_log.h"
 #include "managers_types.h"
 
 
@@ -39,6 +41,7 @@ namespace conf {
 class Settings;
 }   // namespace conf
 
+class AbstractEmailManager;
 class AccountManager;
 class SystemHealthInfoProvider;
 
@@ -67,6 +70,7 @@ public:
         AccountManager* const accountManager,
         const SystemHealthInfoProvider& systemHealthInfoProvider,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
+        AbstractEmailManager* const emailManager,
         ec2::TransactionLog* const transactionLog,
         ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error);
     virtual ~SystemManager();
@@ -154,13 +158,6 @@ public:
         data::DataFilter filter);
         
 private:
-    struct SqlFilterByField
-    {
-        const char* fieldName;
-        const char* bindValueName;
-        QVariant fieldValue;
-    };
-
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
         const api::SystemSharing& data);
     static std::pair<std::string, std::string> extractSystemIdAndAccountEmail(
@@ -230,6 +227,7 @@ private:
     AccountManager* const m_accountManager;
     const SystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    AbstractEmailManager* const m_emailManager;
     ec2::TransactionLog* const m_transactionLog;
     ec2::IncomingTransactionDispatcher* const m_transactionDispatcher;
     //!map<id, system>
@@ -299,17 +297,23 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
+
     nx::db::DBResult fetchUserSharing(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         const std::string& systemId,
         api::SystemSharingEx* const sharing);
-    template<std::size_t filterFieldCount = 0>
+
     nx::db::DBResult fetchUserSharings(
         nx::db::QueryContext* const queryContext,
-        std::vector<api::SystemSharingEx>* const sharings,
-        std::array<SqlFilterByField, filterFieldCount> filterFields
-            = std::array<SqlFilterByField, filterFieldCount>());
+        const nx::db::InnerJoinFilterFields& filter,
+        std::vector<api::SystemSharingEx>* const sharings);
+
+    nx::db::DBResult fetchUserSharing(
+        nx::db::QueryContext* const queryContext,
+        const nx::db::InnerJoinFilterFields& filter,
+        api::SystemSharingEx* const sharing);
+
     /**
      * Fetches existing account or creates new one sending corresponding notification.
      */
@@ -318,6 +322,12 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
+    nx::db::DBResult inviteNewUserToSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId,
+        const std::string& systemName);
     /**
      * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
      */
@@ -405,7 +415,7 @@ private:
     nx::db::DBResult processEc2SaveUser(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiUserData data,
+        ::ec2::QnTransaction<::ec2::ApiUserData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2SaveUserDone(
         nx::db::QueryContext* /*queryContext*/,
@@ -415,7 +425,7 @@ private:
     nx::db::DBResult processEc2RemoveUser(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiIdData data,
+        ::ec2::QnTransaction<::ec2::ApiIdData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2RemoveUserDone(
         nx::db::QueryContext* /*queryContext*/,
@@ -425,19 +435,17 @@ private:
     nx::db::DBResult processSetResourceParam(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiResourceParamWithRefData data,
+        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
         data::SystemNameUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
-    template<std::size_t filterFieldCount = 0>
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* queryContext,
         const std::string& systemId,
-        std::array<SqlFilterByField, filterFieldCount> filterFields
-            = std::array<SqlFilterByField, filterFieldCount>());
+        const nx::db::InnerJoinFilterFields& filter = nx::db::InnerJoinFilterFields());
     static float calculateSystemUsageFrequency(
         std::chrono::system_clock::time_point lastLoginTime,
         float currentUsageFrequency);

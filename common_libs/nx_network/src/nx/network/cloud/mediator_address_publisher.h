@@ -14,7 +14,7 @@ public:
     static const std::chrono::milliseconds kDefaultRetryInterval;
 
     MediatorAddressPublisher(
-        std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection);
+        std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection);
 
     void bindToAioThread(AbstractAioThread* aioThread);
     void setRetryInterval(std::chrono::milliseconds interval);
@@ -32,7 +32,7 @@ private:
     bool m_isRequestInProgress;
     std::list<SocketAddress> m_serverAddresses;
     std::list<SocketAddress> m_publishedAddresses;
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> m_updateHandler;
 };
 

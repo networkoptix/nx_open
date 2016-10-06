@@ -66,7 +66,7 @@ api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
     return system1;
 }
 
-void CdbFunctionalTest::shareSystem2(
+void CdbFunctionalTest::shareSystemEx(
     const AccountWithPassword& from,
     const api::SystemData& what,
     const AccountWithPassword& to,
@@ -79,6 +79,22 @@ void CdbFunctionalTest::shareSystem2(
             from.password,
             what.id,
             to.data.email,
+            targetRole));
+}
+
+void CdbFunctionalTest::shareSystemEx(
+    const AccountWithPassword& from,
+    const api::SystemData& what,
+    const std::string& emailToShareWith,
+    api::SystemAccessRole targetRole)
+{
+    NX_GTEST_ASSERT_EQ(
+        api::ResultCode::ok,
+        CdbLauncher::shareSystem(
+            from.data.email,
+            from.password,
+            what.id,
+            emailToShareWith,
             targetRole));
 }
 

@@ -24,7 +24,7 @@ TEST_F(HealthMonitoring, general)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     for (int i = 0; i < 2; ++i)
     {

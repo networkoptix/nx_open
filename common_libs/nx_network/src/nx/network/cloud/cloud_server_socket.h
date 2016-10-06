@@ -30,7 +30,7 @@ public:
     static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
 
     CloudServerSocket(
-        std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+        std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
         nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
             = nx::network::RetryPolicy(),
         std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
@@ -99,7 +99,7 @@ protected:
     void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);
     void onMediatorConnectionRestored();
 
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
     const std::vector<AcceptorMaker> m_acceptorMakers;
     int m_acceptQueueLen;

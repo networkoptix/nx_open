@@ -1,16 +1,8 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
-#define NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
-
+#pragma once
 
 namespace nx {
 namespace cdb {
 namespace db {
-
 
 static const char kCreateDbVersion13[] =
 "                                                                               \
@@ -609,7 +601,7 @@ CREATE TABLE transaction_source_settings (
 )sql";
 
 /**
- * CLOUD-441. Adding system ordering.
+ * #CLOUD-441. Adding system ordering.
  * For usage_frequency calculation see https://networkoptix.atlassian.net/wiki/display/PM/Systems+List.
  */
 static const char kAddSystemUsageFrequency[] =
@@ -620,8 +612,18 @@ ALTER TABLE system_to_account ADD COLUMN usage_frequency FLOAT;
 
 )sql";
 
-}   //db
-}   //cdb
-}   //nx
+/**
+ * #CLOUD-588. If user has ignored invitation email 
+ * he can still register cloud account in a regular way.
+ */
+static const char kAddInviteHasBeenSentAccountStatus[] =
+R"sql(
 
-#endif  //NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
+INSERT INTO account_status(code, description) 
+    VALUES(4, 'invite message has been sent');
+
+)sql";
+
+} // namespace db
+} // namespace cdb
+} // namespace nx

@@ -10,7 +10,7 @@ namespace cloud {
 namespace tcp {
 
 ReverseConnectionPool::ReverseConnectionPool(
-    std::shared_ptr<MediatorConnection> mediatorConnection)
+    std::unique_ptr<MediatorConnection> mediatorConnection)
 :
     m_mediatorConnection(std::move(mediatorConnection)),
     m_acceptor(

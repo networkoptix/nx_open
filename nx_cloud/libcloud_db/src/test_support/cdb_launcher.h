@@ -50,6 +50,7 @@ public:
         api::AccountData* const accountData,
         std::string* const password,
         api::AccountConfirmationCode* const activationCode);
+    std::string generateRandomEmailAddress() const;
     api::ResultCode activateAccount(
         const api::AccountConfirmationCode& activationCode,
         std::string* const accountEmail);
@@ -176,6 +177,9 @@ public:
 
     api::ResultCode getVmsConnections(
         api::VmsConnectionDataList* const vmsConnections);
+
+    bool isStartedWithExternalDb() const;
+    bool placePreparedDB(const QString& dbDumpPath);
 
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath();

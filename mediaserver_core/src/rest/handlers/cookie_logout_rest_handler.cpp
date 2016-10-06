@@ -4,7 +4,7 @@
 #include "nx/network/http/httptypes.h"
 #include <http/custom_headers.h>
 
-int QnCookieLogoutRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+int QnCookieLogoutRestHandler::executeGet(const QString &, const QnRequestParams &/*params*/, QnJsonRestResult &/*result*/, const QnRestConnectionProcessor* owner)
 {
     QString cookieDeletePattern(lit("%1=deleted; path=/; HttpOnly; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"));
 

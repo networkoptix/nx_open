@@ -26,7 +26,7 @@ TEST_F(Ec2MserverCloudSynchronization, general)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     for (int i = 0; i < 2; ++i)
     {
@@ -51,7 +51,7 @@ TEST_F(Ec2MserverCloudSynchronization, reconnecting)
 
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     for (int i = 0; i < 50; ++i)
     {
@@ -77,7 +77,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserLocallyWhileOffline)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     // Sharing system with some account.
     api::AccountData account2;
@@ -141,7 +141,7 @@ TEST_F(Ec2MserverCloudSynchronization, mergingOfflineChanges)
 
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     // Adding multiple accounts.
     // vector<pair<account, password>>
@@ -194,7 +194,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingUserInCloudAndRemovingLocally)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -244,7 +244,7 @@ TEST_F(Ec2MserverCloudSynchronization, syncFromCloud)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -269,7 +269,7 @@ TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -297,7 +297,7 @@ TEST_F(Ec2MserverCloudSynchronization, reBindingSystemToCloud)
                 ->deleteRemotePeer(cdbEc2TransactionUrl());
             ASSERT_EQ(api::ResultCode::ok, unbindSystem());
             cdb()->restart();
-            ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+            ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
         }
     }
 }
@@ -306,7 +306,7 @@ TEST_F(Ec2MserverCloudSynchronization, newTransactionTimestamp)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -353,7 +353,7 @@ TEST_F(Ec2MserverCloudSynchronization, renameSystem)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
@@ -429,7 +429,7 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
 
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, bindRandomSystem());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
@@ -444,6 +444,46 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
     ASSERT_EQ(
         api::ResultCode::ok,
         cdb()->resetAccountPassword(testEmail, &confirmationCode));
+}
+
+TEST_F(Ec2MserverCloudSynchronization, migrateTransactions)
+{
+    const std::string preRegisteredCloudAccountEmail =
+        "akolesnikov@networkoptix.com";
+    const std::string preRegisteredCloudAccountPassword = "123";
+
+    const std::string preRegisteredCloudSystemId = 
+        "00e2af6f-cabf-4792-b3e9-6075e7fe13c6";
+    const std::string preRegisteredCloudSystemAuthKey = 
+        "c22c770a-f1ff-4db3-9bb1-7c021874d83e";
+
+    if (cdb()->isStartedWithExternalDb())
+        return;
+
+    ASSERT_TRUE(cdb()->placePreparedDB(":/cdb_with_transactions.sqlite"));
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        setOwnerAccountCredentials(
+            preRegisteredCloudAccountEmail,
+            preRegisteredCloudAccountPassword));
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        fillRegisteredSystemDataByCredentials(
+            preRegisteredCloudSystemId,
+            preRegisteredCloudSystemAuthKey));
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        saveCloudSystemCredentials(
+            preRegisteredCloudSystemId,
+            preRegisteredCloudSystemAuthKey));
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+
+    waitForCloudAndVmsToSyncUsers();
 }
 
 } // namespace cdb

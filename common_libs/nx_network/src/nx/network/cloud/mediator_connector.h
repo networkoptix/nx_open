@@ -32,10 +32,10 @@ public:
     void enable( bool waitComplete = false );
 
     /** Provides client related functionality */
-    std::shared_ptr<MediatorClientTcpConnection> clientConnection();
+    std::unique_ptr<MediatorClientTcpConnection> clientConnection();
 
     /** Provides system related functionality */
-    std::shared_ptr<MediatorServerTcpConnection> systemConnection();
+    std::unique_ptr<MediatorServerTcpConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
     void mockupAddress( SocketAddress address, bool suppressWarning = false );

@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "db_structure_updater.h"
 
 #include <functional>
@@ -14,7 +9,6 @@
 #include <utils/db/db_helper.h>
 
 #include "async_sql_query_executor.h"
-
 
 namespace nx {
 namespace db {
@@ -50,14 +44,13 @@ static ReplacementsDictionary initializeReplacements()
 static const ReplacementsDictionary kSqlReplacements = initializeReplacements();
 
 static const char kCreateDbVersionTable[] = 
-"                                                   \
-CREATE TABLE db_version_data (                      \
-    db_version      integer NOT NULL DEFAULT 0      \
-);                                                  \
-\n                                                  \
-INSERT INTO db_version_data ( db_version )          \
-                   VALUES ( 0 );                    \
-";
+R"sql(
+CREATE TABLE db_version_data (
+    db_version      integer NOT NULL DEFAULT 0
+);
+
+INSERT INTO db_version_data (db_version) VALUES (0);
+)sql";
 
 } // namespace
 
@@ -67,7 +60,7 @@ DBStructureUpdater::DBStructureUpdater(AsyncSqlQueryExecutor* const dbManager)
     m_dbManager(dbManager),
     m_initialVersion(0)
 {
-    m_updateScripts.push_back(kCreateDbVersionTable);
+    m_updateScripts.emplace_back(QByteArray(kCreateDbVersionTable));
 }
 
 void DBStructureUpdater::setInitialVersion(unsigned int version)
@@ -77,7 +70,12 @@ void DBStructureUpdater::setInitialVersion(unsigned int version)
 
 void DBStructureUpdater::addUpdateScript(QByteArray updateScript)
 {
-    m_updateScripts.push_back(std::move(updateScript));
+    m_updateScripts.emplace_back(std::move(updateScript));
+}
+
+void DBStructureUpdater::addUpdateFunc(DbUpdateFunc dbUpdateFunc)
+{
+    m_updateScripts.emplace_back(std::move(dbUpdateFunc));
 }
 
 void DBStructureUpdater::addFullSchemaScript(
@@ -106,15 +104,15 @@ bool DBStructureUpdater::updateStructSync()
     return future.get() == DBResult::ok;
 }
 
-DBResult DBStructureUpdater::updateDbInternal( nx::db::QueryContext* const queryContext )
+DBResult DBStructureUpdater::updateDbInternal(nx::db::QueryContext* const queryContext)
 {
     //reading current DB version
     QSqlQuery fetchDbVersionQuery(*queryContext->connection());
-    fetchDbVersionQuery.prepare( lit("SELECT db_version FROM db_version_data") );
+    fetchDbVersionQuery.prepare(lit("SELECT db_version FROM db_version_data"));
     qint64 dbVersion = m_initialVersion;
     //absense of table db_version_data is normal: DB is just empty
     bool someSchemaExists = false;
-    if( fetchDbVersionQuery.exec() && fetchDbVersionQuery.next() )
+    if (fetchDbVersionQuery.exec() && fetchDbVersionQuery.next())
     {
         dbVersion = fetchDbVersionQuery.value(lit("db_version")).toUInt();
         someSchemaExists = true;
@@ -152,24 +150,47 @@ DBResult DBStructureUpdater::updateDbInternal( nx::db::QueryContext* const query
         }
     }
 
-    //applying scripts missing in current DB
-    for( ;
-        static_cast< size_t >( dbVersion ) < (m_initialVersion+m_updateScripts.size());
-        ++dbVersion )
+    // Applying scripts missing in current DB.
+    for (;
+        static_cast< size_t >(dbVersion) < (m_initialVersion + m_updateScripts.size());
+        ++dbVersion)
     {
-        if( !execSQLScript( m_updateScripts[dbVersion-m_initialVersion], queryContext ) )
+        if (!execDbUpdate(m_updateScripts[dbVersion - m_initialVersion], queryContext))
         {
-            NX_LOG( lit("DBStructureUpdater. Failure updating to version %1: %2").
-                arg( dbVersion ).arg( queryContext->connection()->lastError().text() ), cl_logWARNING );
+            NX_LOG(lit("DBStructureUpdater. Failure updating to version %1: %2").
+                arg(dbVersion).arg(queryContext->connection()->lastError().text()),
+                cl_logWARNING);
             return DBResult::ioError;
         }
     }
 
     //updating db version
     QSqlQuery updateDbVersion(*queryContext->connection());
-    updateDbVersion.prepare( lit("UPDATE db_version_data SET db_version = :dbVersion") );
-    updateDbVersion.bindValue( lit(":dbVersion"), dbVersion );
+    updateDbVersion.prepare(lit("UPDATE db_version_data SET db_version = :dbVersion"));
+    updateDbVersion.bindValue(lit(":dbVersion"), dbVersion);
     return updateDbVersion.exec() ? DBResult::ok : DBResult::ioError;
+}
+
+bool DBStructureUpdater::execDbUpdate(
+    const DbUpdate& dbUpdate,
+    nx::db::QueryContext* const queryContext)
+{
+    if (!dbUpdate.sqlScript.isEmpty())
+    {
+        if (!execSQLScript(dbUpdate.sqlScript, queryContext))
+            return false;
+    }
+
+    if (dbUpdate.func)
+    {
+        if (dbUpdate.func(queryContext) != nx::db::DBResult::ok)
+        {
+            NX_LOGX(lm("Error executing update function"), cl_logWARNING);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool DBStructureUpdater::execSQLScript(
@@ -191,5 +212,5 @@ bool DBStructureUpdater::execSQLScript(
     return QnDbHelper::execSQLScript(script, *queryContext->connection());
 }
 
-}   //db
-}   //nx
+} // namespace db
+} // namespace nx

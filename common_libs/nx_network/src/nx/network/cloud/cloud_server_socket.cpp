@@ -69,7 +69,7 @@ const std::vector<CloudServerSocket::AcceptorMaker>
     CloudServerSocket::kDefaultAcceptorMakers = defaultAcceptorMakers();
 
 CloudServerSocket::CloudServerSocket(
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
     nx::network::RetryPolicy mediatorRegistrationRetryPolicy,
     std::vector<AcceptorMaker> acceptorMakers)
 :
@@ -524,7 +524,7 @@ void CloudServerSocket::onConnectionRequested(
             acceptor->setConnectionInfo(
                 event.connectSessionId, event.originatingPeerID);
 
-            acceptor->setMediatorConnection(m_mediatorConnection);
+            acceptor->setMediatorConnection(m_mediatorConnection.get());
             startAcceptor(std::move(acceptor));
         }
     }

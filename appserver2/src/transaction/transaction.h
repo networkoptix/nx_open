@@ -1310,9 +1310,20 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
     }
 
+    struct HistoryAttributes
+    {
+        /** Id of user or entity who created transaction. */
+        QnUuid author;
+    };
+
+    #define HistoryAttributes_Fields (author)
+    QN_FUSION_DECLARE_FUNCTIONS(HistoryAttributes, (json)(ubjson)(xml)(csv_record))
+
     class QnAbstractTransaction
     {
     public:
+        typedef Timestamp TimestampType;
+
         /**
          * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
          */
@@ -1370,6 +1381,7 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         PersistentInfo persistentInfo;
 
         TransactionType::Value transactionType;
+        HistoryAttributes historyAttributes;
 
         QString toString() const;
         bool isLocal() const { return transactionType == TransactionType::Local; }
@@ -1380,7 +1392,7 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
     typedef std::vector<ec2::QnAbstractTransaction> QnAbstractTransactionList;
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
 #define QnAbstractTransaction_PERSISTENT_Fields (dbID)(sequence)(timestamp)
-#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(transactionType)
+#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(transactionType)(historyAttributes)
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction

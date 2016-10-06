@@ -24,13 +24,13 @@ public:
     /**
      * Add handler to be called after commit() not depending on result.
      */
-    void addAfterCommitHandler(
-        nx::utils::MoveOnlyFunc<void(DBResult)> func);
+    void addOnSuccessfulCommitHandler(
+        nx::utils::MoveOnlyFunc<void()> func);
 
 private:
     QSqlDatabase* const m_connection;
     bool m_started;
-    std::vector<nx::utils::MoveOnlyFunc<void(DBResult)>> m_afterCommitHandlers;
+    std::vector<nx::utils::MoveOnlyFunc<void()>> m_onSuccessfulCommitHandlers;
 };
 
 } // namespace db

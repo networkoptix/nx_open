@@ -57,7 +57,7 @@ public:
     void processUpdateAsync(
         ApiCommand::Value cmdCode, InputData input, HandlerType handler)
     {
-        QnTransaction<InputData> tran(cmdCode, std::move(input));
+        QnTransaction<InputData> tran = createTransaction(cmdCode, std::move(input));
         processUpdateAsync(tran, std::move(handler));
     }
 
@@ -584,7 +584,7 @@ private:
     {
         for(const SubDataType& data: nestedList)
         {
-            QnTransaction<SubDataType> subTran(command, data);
+            QnTransaction<SubDataType> subTran = createTransaction(command, data);
             subTran.transactionType = transactionType;
             ErrorCode errorCode = processUpdateSync(subTran, transactionsToSend);
             if (errorCode != ErrorCode::ok)
@@ -634,10 +634,18 @@ private:
 private:
     static QnMutex m_updateDataMutex;
     Qn::UserAccessData m_userAccessData;
-
-
     ECConnectionAuditManager* m_auditManager;
     QnAuthSession m_authSession;
+
+    template<typename DataType>
+    QnTransaction<DataType> createTransaction(
+        ApiCommand::Value command,
+        DataType data)
+    {
+        QnTransaction<DataType> transaction(command, std::move(data));
+        transaction.historyAttributes.author = m_userAccessData.userId;
+        return transaction;
+    }
 };
 
 } // namespace detail
