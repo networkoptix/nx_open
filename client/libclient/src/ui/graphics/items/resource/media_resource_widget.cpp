@@ -85,7 +85,7 @@
 
 namespace {
 
-const int kMicroInMilliSeconds = 1000;
+static const int kMicroInMilliSeconds = 1000;
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
@@ -93,9 +93,9 @@ const int kMicroInMilliSeconds = 1000;
 // Who returns it? --gdm?
 const int kNoTimeValue = 0;
 
-const qreal kTwoWayAudioButtonSize = 44.0;
+static const qreal kTwoWayAudioButtonSize = 44.0;
 
-const qreal kMotionRegionAlpha = 0.4;
+static const qreal kMotionRegionAlpha = 0.4;
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
 {
