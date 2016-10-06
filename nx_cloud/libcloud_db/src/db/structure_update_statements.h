@@ -601,7 +601,7 @@ CREATE TABLE transaction_source_settings (
 )sql";
 
 /**
- * CLOUD-441. Adding system ordering.
+ * #CLOUD-441. Adding system ordering.
  * For usage_frequency calculation see https://networkoptix.atlassian.net/wiki/display/PM/Systems+List.
  */
 static const char kAddSystemUsageFrequency[] =
@@ -609,6 +609,18 @@ R"sql(
 
 ALTER TABLE system_to_account ADD COLUMN last_login_time_utc BIGINT;
 ALTER TABLE system_to_account ADD COLUMN usage_frequency FLOAT;
+
+)sql";
+
+/**
+ * #CLOUD-588. If user has ignored invitation email 
+ * he can still register cloud account in a regular way.
+ */
+static const char kAddInviteHasBeenSentAccountStatus[] =
+R"sql(
+
+INSERT INTO account_status(code, description) 
+    VALUES(4, 'invite message has been sent');
 
 )sql";
 

@@ -226,6 +226,7 @@ int CloudDBProcess::exec()
             &accountManager,
             systemHealthInfoProvider,
             &dbManager,
+            emailManager.get(),
             &transactionLog,
             &incomingTransactionDispatcher);
         m_systemManager = &systemManager;
@@ -605,6 +606,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
     dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
+    dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
     return dbStructureUpdater.updateStructSync();
 }
 

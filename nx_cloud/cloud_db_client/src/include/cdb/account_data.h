@@ -23,7 +23,8 @@ enum class AccountStatus
     invalid = 0,
     awaitingActivation = 1,
     activated = 2,
-    blocked = 3
+    blocked = 3,
+    inviteHasBeenSent = 4,
 };
 
 class AccountData

@@ -861,7 +861,6 @@ TEST_F(Account, temporary_credentials_expiration)
     }
 }
 
-/** Feature for this test has not been implemented yet. */
 TEST_F(Account, DISABLED_created_while_sharing)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -875,7 +874,8 @@ TEST_F(Account, DISABLED_created_while_sharing)
     const std::string newAccountEmail = generateRandomEmailAddress();
     std::string newAccountPassword;
 
-    shareSystemEx(account1, system1, newAccountEmail, api::SystemAccessRole::cloudAdmin);
+    const auto newAccountAccessRoleInSystem1 = api::SystemAccessRole::cloudAdmin;
+    shareSystemEx(account1, system1, newAccountEmail, newAccountAccessRoleInSystem1);
 
     data::AccountData newAccount;
     newAccount.email = newAccountEmail;
@@ -888,7 +888,20 @@ TEST_F(Account, DISABLED_created_while_sharing)
         api::ResultCode::ok,
         activateAccount(accountConfirmationCode, &resultEmail));
 
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(newAccountEmail, newAccountPassword, &newAccount));
+    ASSERT_EQ(api::AccountStatus::activated, newAccount.statusCode);
+
     ASSERT_EQ(newAccountEmail, resultEmail);
+
+    std::vector<api::SystemDataEx> systems;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(newAccountEmail, newAccountPassword, &systems));
+    ASSERT_EQ(1, systems.size());
+    ASSERT_EQ(system1.id, systems[0].id);
+    ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }
 
 } // namespace cdb

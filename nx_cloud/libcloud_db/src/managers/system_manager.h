@@ -41,6 +41,7 @@ namespace conf {
 class Settings;
 }   // namespace conf
 
+class AbstractEmailManager;
 class AccountManager;
 class SystemHealthInfoProvider;
 
@@ -69,6 +70,7 @@ public:
         AccountManager* const accountManager,
         const SystemHealthInfoProvider& systemHealthInfoProvider,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
+        AbstractEmailManager* const emailManager,
         ec2::TransactionLog* const transactionLog,
         ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error);
     virtual ~SystemManager();
@@ -225,6 +227,7 @@ private:
     AccountManager* const m_accountManager;
     const SystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    AbstractEmailManager* const m_emailManager;
     ec2::TransactionLog* const m_transactionLog;
     ec2::IncomingTransactionDispatcher* const m_transactionDispatcher;
     //!map<id, system>
@@ -319,6 +322,12 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
+    nx::db::DBResult inviteNewUserToSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& inviterEmail,
+        const data::AccountData& inviteeAccount,
+        const std::string& systemId,
+        const std::string& systemName);
     /**
      * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
      */

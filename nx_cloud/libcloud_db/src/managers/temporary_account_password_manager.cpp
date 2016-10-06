@@ -183,12 +183,10 @@ nx::db::DBResult TemporaryAccountPasswordManager::registerTemporaryCredentials(
         return dbResult;
 
     // Adding to cache on successful commit.
-    queryContext->transaction()->addAfterCommitHandler(
-        [this, tmpPasswordDataInternal = std::move(tmpPasswordDataInternal)](
-            nx::db::DBResult resultCode)
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, tmpPasswordDataInternal = std::move(tmpPasswordDataInternal)]()
         {
-            if (resultCode == nx::db::DBResult::ok)
-                saveTempPasswordToCache(std::move(tmpPasswordDataInternal));
+            saveTempPasswordToCache(std::move(tmpPasswordDataInternal));
         });
 
     return dbResult;

@@ -25,6 +25,7 @@
 #include "ec2/data_conversion.h"
 #include "ec2/incoming_transaction_dispatcher.h"
 #include "ec2/transaction_log.h"
+#include "email_manager.h"
 #include "system_health_info_provider.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
@@ -46,6 +47,7 @@ SystemManager::SystemManager(
     AccountManager* const accountManager,
     const SystemHealthInfoProvider& systemHealthInfoProvider,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
+    AbstractEmailManager* const emailManager,
     ec2::TransactionLog* const transactionLog,
     ec2::IncomingTransactionDispatcher* const transactionDispatcher) throw(std::runtime_error)
 :
@@ -54,6 +56,7 @@ SystemManager::SystemManager(
     m_accountManager(accountManager),
     m_systemHealthInfoProvider(systemHealthInfoProvider),
     m_dbManager(dbManager),
+    m_emailManager(emailManager),
     m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
     m_dropSystemsTimerId(0),
@@ -1036,12 +1039,10 @@ nx::db::DBResult SystemManager::updateSharingInDb(
         return db::DBResult::ioError;
     }
 
-    queryContext->transaction()->addAfterCommitHandler(
-        [this, resultSharing = std::move(resultSharing)](
-            nx::db::DBResult dbResult) mutable
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, resultSharing = std::move(resultSharing)]() mutable
         {
-            if (dbResult == nx::db::DBResult::ok)
-                updateSharingInCache(std::move(resultSharing));
+            updateSharingInCache(std::move(resultSharing));
         });
 
     return nx::db::DBResult::ok;
@@ -1145,7 +1146,29 @@ nx::db::DBResult SystemManager::fetchAccountToShareWith(
     const data::SystemSharing& sharing,
     data::AccountData* const targetAccountData)
 {
-    nx::db::DBResult result = nx::db::DBResult::ok;
+    nx::db::DBResult dbResult = m_accountManager->fetchExistingAccountByEmail(
+        queryContext,
+        sharing.accountEmail,
+        targetAccountData);
+    switch (dbResult)
+    {
+        case nx::db::DBResult::ok:
+            return nx::db::DBResult::ok;
+
+        case nx::db::DBResult::notFound:
+            if (sharing.accessRole == api::SystemAccessRole::none)
+            {
+                //< Removing sharing, no sense to create account.
+                return nx::db::DBResult::notFound;
+            }
+            break;
+
+        default:
+            NX_LOGX(lm("Error fetching account by email %1. %2")
+                .arg(sharing.accountEmail).arg(QnLexical::serialized(dbResult)),
+                cl_logDEBUG1);
+            return dbResult;
+    }
 
     std::string systemName;
     {
@@ -1160,40 +1183,59 @@ nx::db::DBResult SystemManager::fetchAccountToShareWith(
         }
     }
 
-    if (sharing.accessRole == api::SystemAccessRole::none)
-    {
-        //< Removing sharing. No sense to create account
-        result = m_accountManager->fetchExistingAccountByEmail(
-            queryContext,
-            sharing.accountEmail,
-            targetAccountData);
-    }
-    else
-    {
-        const auto grantorAccountData = m_accountManager->findAccountByUserName(grantorEmail);
+    // Creating new account and sending invitation.
+    targetAccountData->id = m_accountManager->generateNewAccountId();
+    targetAccountData->email = sharing.accountEmail;
+    targetAccountData->statusCode = api::AccountStatus::inviteHasBeenSent;
+    return inviteNewUserToSystem(
+        queryContext,
+        grantorEmail,
+        *targetAccountData,
+        sharing.systemID,
+        systemName);
+}
 
-        auto notification = std::make_unique<InviteUserNotification>();
-        notification->message.sharer_email = grantorEmail;
-        if (grantorAccountData) //< It is ok if grantor is unknown (it can be local system user).
-            notification->message.sharer_name = grantorAccountData->fullName;
-        notification->message.system_id = sharing.systemID;
-        notification->message.system_name = systemName;
-        result = m_accountManager->fetchExistingAccountOrCreateNewOneByEmail(
-            queryContext,
-            sharing.accountEmail,
-            targetAccountData,
-            std::move(notification));
-    }
+nx::db::DBResult SystemManager::inviteNewUserToSystem(
+    nx::db::QueryContext* const queryContext,
+    const std::string& inviterEmail,
+    const data::AccountData& inviteeAccount,
+    const std::string& systemId,
+    const std::string& systemName)
+{
+    nx::db::DBResult dbResult = 
+        m_accountManager->insertAccount(queryContext, inviteeAccount);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
-    if (result != nx::db::DBResult::ok)
-    {
-        NX_LOGX(lm("Error fetching account by email %1. %2")
-            .arg(sharing.accountEmail).arg(QnLexical::serialized(result)),
-            cl_logDEBUG1);
-        return result;
-    }
+    data::AccountConfirmationCode accountConfirmationCode;
+    dbResult = m_accountManager->createPasswordResetCode(
+        queryContext,
+        inviteeAccount.email,
+        &accountConfirmationCode);
+    if (dbResult != db::DBResult::ok)
+        return dbResult;
 
-    return nx::db::DBResult::ok;
+    auto notification = std::make_unique<InviteUserNotification>();
+    notification->message.sharer_email = inviterEmail;
+    const auto inviterAccountData = m_accountManager->findAccountByUserName(inviterEmail);
+    if (inviterAccountData) //< It is ok if inviter is unknown (it can be local system user).
+        notification->message.sharer_name = inviterAccountData->fullName;
+    notification->message.system_id = systemId;
+    notification->message.system_name = systemName;
+    notification->setAddressee(inviteeAccount.email);
+    notification->setActivationCode(std::move(accountConfirmationCode.code));
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, 
+            notification = std::move(notification),
+            locker = m_startedAsyncCallsCounter.getScopedIncrement()]()
+        {
+            m_emailManager->sendAsync(
+                *notification,
+                std::function<void(bool)>());
+        });
+
+    return db::DBResult::ok;
 }
 
 nx::db::DBResult SystemManager::calculateUsageFrequencyForANewSystem(

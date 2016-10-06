@@ -268,4 +268,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, AccountStatus,
     (nx::cdb::api::AccountStatus::awaitingActivation, "awaitingEmailConfirmation")
     (nx::cdb::api::AccountStatus::activated, "activated")
     (nx::cdb::api::AccountStatus::blocked, "blocked")
+    (nx::cdb::api::AccountStatus::inviteHasBeenSent, "inviteHasBeenSent")
 )
