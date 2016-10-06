@@ -1,10 +1,4 @@
-/**********************************************************
-* aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_DB_TYPES_H
-#define NX_CLOUD_DB_DB_TYPES_H
+#pragma once
 
 #include <chrono>
 
@@ -47,7 +41,7 @@ public:
     QString password;
     QString connectOptions;
     size_t maxConnectionCount;
-    /** connection is closed if not used for this interval */
+    /** Connection is closed if not used for this interval. */
     std::chrono::seconds inactivityTimeout;
 
     ConnectionOptions():
@@ -62,10 +56,8 @@ public:
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::DBResult)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::RdbmsDriverType)
 
-}   //db
-}   //nx
+} // namespace db
+} // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::db::DBResult), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::db::RdbmsDriverType), (lexical))
-
-#endif  //NX_CLOUD_DB_DB_TYPES_H

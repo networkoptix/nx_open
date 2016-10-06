@@ -21,6 +21,7 @@
 #include <nx_ec/data/api_user_data.h>
 #include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
+#include <utils/db/filter.h>
 
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
@@ -155,13 +156,6 @@ public:
         data::DataFilter filter);
         
 private:
-    struct SqlFilterByField
-    {
-        const char* fieldName;
-        const char* bindValueName;
-        QVariant fieldValue;
-    };
-
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
         const api::SystemSharing& data);
     static std::pair<std::string, std::string> extractSystemIdAndAccountEmail(
@@ -307,17 +301,14 @@ private:
         const std::string& systemId,
         api::SystemSharingEx* const sharing);
 
-    template<std::size_t filterFieldCount = 0>
     nx::db::DBResult fetchUserSharings(
         nx::db::QueryContext* const queryContext,
-        std::vector<api::SystemSharingEx>* const sharings,
-        std::array<SqlFilterByField, filterFieldCount> filterFields
-            = std::array<SqlFilterByField, filterFieldCount>());
+        const nx::db::InnerJoinFilterFields& filter,
+        std::vector<api::SystemSharingEx>* const sharings);
 
-    template<std::size_t filterFieldCount = 0>
     nx::db::DBResult fetchUserSharing(
         nx::db::QueryContext* const queryContext,
-        std::array<SqlFilterByField, filterFieldCount> filterFields,
+        const nx::db::InnerJoinFilterFields& filter,
         api::SystemSharingEx* const sharing);
 
     /**
@@ -442,12 +433,10 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
-    template<std::size_t filterFieldCount = 0>
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* queryContext,
         const std::string& systemId,
-        std::array<SqlFilterByField, filterFieldCount> filterFields
-            = std::array<SqlFilterByField, filterFieldCount>());
+        const nx::db::InnerJoinFilterFields& filter = nx::db::InnerJoinFilterFields());
     static float calculateSystemUsageFrequency(
         std::chrono::system_clock::time_point lastLoginTime,
         float currentUsageFrequency);

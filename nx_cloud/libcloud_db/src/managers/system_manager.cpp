@@ -884,9 +884,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
     }
 
     //removing system-to-account
-    const auto dbResult = deleteSharing(
-        queryContext,
-        systemId);
+    const auto dbResult = deleteSharing(queryContext, systemId);
     if (dbResult != nx::db::DBResult::ok)
     {
         NX_LOG(lm("Could not delete system %1 from system_to_account. %2").
@@ -1007,8 +1005,7 @@ nx::db::DBResult SystemManager::updateSharingInDb(
         return deleteSharing(
             queryContext,
             resultSharing.systemID,
-            std::array<SqlFilterByField, 1>(
-                {{"account_id", ":accountID", QnSql::serialized_field(targetAccountData->id)}}));
+            {{"account_id", ":accountID", QnSql::serialized_field(targetAccountData->id)}});
     }
 
     result = calculateUsageFrequencyForANewSystem(
@@ -1056,13 +1053,10 @@ nx::db::DBResult SystemManager::fetchUserSharing(
     const std::string& systemId,
     api::SystemSharingEx* const sharing)
 {
-    std::array<SqlFilterByField, 2> sqlFilter = 
-        {{{"email", ":accountEmail", QnSql::serialized_field(accountEmail)},
-          {"system_id", ":systemId", QnSql::serialized_field(systemId)}}};
-
     const auto dbResult = fetchUserSharing(
         queryContext,
-        sqlFilter,
+        {{"email", ":accountEmail", QnSql::serialized_field(accountEmail)},
+         {"system_id", ":systemId", QnSql::serialized_field(systemId)}},
         sharing);
     if (dbResult != nx::db::DBResult::ok &&
         dbResult != nx::db::DBResult::notFound)
@@ -1075,11 +1069,10 @@ nx::db::DBResult SystemManager::fetchUserSharing(
     return dbResult;
 }
 
-template<std::size_t filterFieldCount>
 nx::db::DBResult SystemManager::fetchUserSharings(
     nx::db::QueryContext* const queryContext,
-    std::vector<api::SystemSharingEx>* const sharings,
-    std::array<SqlFilterByField, filterFieldCount> filterFields)
+    const nx::db::InnerJoinFilterFields& filterFields,
+    std::vector<api::SystemSharingEx>* const sharings)
 {
     QString sqlRequestStr = 
         R"sql(
@@ -1097,10 +1090,10 @@ nx::db::DBResult SystemManager::fetchUserSharings(
         WHERE sa.account_id=a.id
         )sql";
     QString filterStr;
-    for (const auto& filterField : filterFields)
+    for (const auto& filterField: filterFields)
     {
         filterStr += lm(" AND %1=%2")
-            .arg(filterField.fieldName).arg(filterField.bindValueName);
+            .arg(filterField.fieldName).arg(filterField.placeHolderName);
     }
     sqlRequestStr += filterStr;
 
@@ -1110,7 +1103,7 @@ nx::db::DBResult SystemManager::fetchUserSharings(
     for (const auto& filterField : filterFields)
     {
         selectSharingQuery.bindValue(
-            filterField.bindValueName,
+            filterField.placeHolderName,
             filterField.fieldValue);
     }
     if (!selectSharingQuery.exec())
@@ -1125,17 +1118,16 @@ nx::db::DBResult SystemManager::fetchUserSharings(
     return nx::db::DBResult::ok;
 }
 
-template<std::size_t filterFieldCount>
 nx::db::DBResult SystemManager::fetchUserSharing(
     nx::db::QueryContext* const queryContext,
-    std::array<SqlFilterByField, filterFieldCount> filterFields,
+    const nx::db::InnerJoinFilterFields& filterFields,
     api::SystemSharingEx* const sharing)
 {
     std::vector<api::SystemSharingEx> sharings;
     const auto result = fetchUserSharings(
         queryContext,
-        &sharings,
-        std::move(filterFields));
+        filterFields,
+        &sharings);
     if (result != nx::db::DBResult::ok)
         return result;
     if (sharings.empty())
@@ -1736,6 +1728,7 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(
     std::vector<api::SystemSharingEx> sharings;
     const auto result = fetchUserSharings(
         queryContext,
+        nx::db::InnerJoinFilterFields(),
         &sharings);
     if (result != nx::db::DBResult::ok)
     {
@@ -1843,11 +1836,14 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     ec2::convert(vmsUser, systemSharingData);
 
     // We have no information about grantor here. Using system owner...
-    std::array<SqlFilterByField, 1> sqlFilter = 
-        {{{"vms_user_id", ":vmsUserId",
-           QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())}}};
+    const nx::db::InnerJoinFilterFields sqlFilter =
+        {{"vms_user_id", ":vmsUserId",
+           QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())}};
     api::SystemSharingEx grantorInfo;
-    auto dbResult = fetchUserSharing(queryContext, std::move(sqlFilter), &grantorInfo);
+    auto dbResult = fetchUserSharing(
+        queryContext,
+        sqlFilter,
+        &grantorInfo);
     if (dbResult != nx::db::DBResult::ok &&
         dbResult != nx::db::DBResult::notFound)
     {
@@ -1907,9 +1903,8 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     const auto dbResult = deleteSharing(
         queryContext,
         systemId.toStdString(),
-        std::array<SqlFilterByField, 1>(
-            {{"vms_user_id", ":vmsUserId",
-                QnSql::serialized_field(systemSharingData->vmsUserId)}}));
+        {{"vms_user_id", ":vmsUserId",
+            QnSql::serialized_field(systemSharingData->vmsUserId)}});
     if (dbResult != nx::db::DBResult::ok)
     {
         NX_LOGX(
@@ -1924,11 +1919,10 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     return db::DBResult::ok;
 }
 
-template<std::size_t filterFieldCount>
 nx::db::DBResult SystemManager::deleteSharing(
     nx::db::QueryContext* queryContext,
     const std::string& systemId,
-    std::array<SqlFilterByField, filterFieldCount> filterFields)
+    const nx::db::InnerJoinFilterFields& filterFields)
 {
     QSqlQuery removeSharingQuery(*queryContext->connection());
     QString sqlQueryStr = 
@@ -1939,7 +1933,7 @@ nx::db::DBResult SystemManager::deleteSharing(
     for (const auto& filterField: filterFields)
     {
         filterStr += lm(" AND %1=%2")
-            .arg(filterField.fieldName).arg(filterField.bindValueName);
+            .arg(filterField.fieldName).arg(filterField.placeHolderName);
     }
     sqlQueryStr += filterStr;
     removeSharingQuery.prepare(sqlQueryStr);
@@ -1949,7 +1943,7 @@ nx::db::DBResult SystemManager::deleteSharing(
     for (const auto& filterField: filterFields)
     {
         removeSharingQuery.bindValue(
-            filterField.bindValueName,
+            filterField.placeHolderName,
             filterField.fieldValue);
     }
     if (!removeSharingQuery.exec())
