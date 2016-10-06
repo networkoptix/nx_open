@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 8, 2015
-* akolesnikov
-***********************************************************/
-
 #include <chrono>
 #include <functional>
 
@@ -18,13 +13,11 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/fusion/model_functions.h>
+#include <utils/common/app_info.h>
 #include <nx/utils/test_support/utils.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
-
-#include <utils/common/app_info.h>
-
 
 namespace nx {
 namespace cdb {
@@ -35,7 +28,7 @@ class Account
     public CdbFunctionalTest
 {
 };
-}
+} // namespace
 
 TEST_F(Account, activation)
 {
@@ -267,7 +260,7 @@ TEST_F(Account, general)
     }
 }
 
-TEST_F(Account, badRegistration)
+TEST_F(Account, bad_registration)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -322,7 +315,7 @@ TEST_F(Account, badRegistration)
     ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.errorClass);
 }
 
-TEST_F(Account, requestQueryDecode)
+TEST_F(Account, request_query_decode)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -479,7 +472,7 @@ TEST_F(Account, reset_password_general)
     }
 }
 
-TEST_F(Account, resetPassword_expiration)
+TEST_F(Account, reset_password_expiration)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -868,5 +861,35 @@ TEST_F(Account, temporary_credentials_expiration)
     }
 }
 
-}   //cdb
-}   //nx
+/** Feature for this test has not been implemented yet. */
+TEST_F(Account, DISABLED_created_while_sharing)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.data.email, account1.password, &system1));
+
+    const std::string newAccountEmail = generateRandomEmailAddress();
+    std::string newAccountPassword;
+
+    shareSystemEx(account1, system1, newAccountEmail, api::SystemAccessRole::cloudAdmin);
+
+    data::AccountData newAccount;
+    newAccount.email = newAccountEmail;
+    api::AccountConfirmationCode accountConfirmationCode;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addAccount(&newAccount, &newAccountPassword, &accountConfirmationCode));
+    std::string resultEmail;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        activateAccount(accountConfirmationCode, &resultEmail));
+
+    ASSERT_EQ(newAccountEmail, resultEmail);
+}
+
+} // namespace cdb
+} // namespace nx

@@ -32,10 +32,15 @@ public:
     AccountWithPassword addActivatedAccount2();
     api::SystemData addRandomSystemToAccount(
         const AccountWithPassword& account);
-    void shareSystem2(
+    void shareSystemEx(
         const AccountWithPassword& from,
         const api::SystemData& what,
         const AccountWithPassword& to,
+        api::SystemAccessRole targetRole);
+    void shareSystemEx(
+        const AccountWithPassword& from,
+        const api::SystemData& what,
+        const std::string& emailToShareWith,
         api::SystemAccessRole targetRole);
 };
 

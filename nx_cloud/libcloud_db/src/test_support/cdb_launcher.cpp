@@ -151,11 +151,7 @@ api::ResultCode CdbLauncher::addAccount(
     api::AccountConfirmationCode* const activationCode)
 {
     if (accountData->email.empty())
-    {
-        std::ostringstream ss;
-        ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
-        accountData->email = ss.str();
-    }
+        accountData->email = generateRandomEmailAddress();
 
     if (password->empty())
     {
@@ -188,6 +184,13 @@ api::ResultCode CdbLauncher::addAccount(
             *accountData,
             std::placeholders::_1));
     return result;
+}
+
+std::string CdbLauncher::generateRandomEmailAddress() const
+{
+    std::ostringstream ss;
+    ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
+    return ss.str();
 }
 
 api::ResultCode CdbLauncher::activateAccount(

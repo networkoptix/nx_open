@@ -50,6 +50,7 @@ public:
         api::AccountData* const accountData,
         std::string* const password,
         api::AccountConfirmationCode* const activationCode);
+    std::string generateRandomEmailAddress() const;
     api::ResultCode activateAccount(
         const api::AccountConfirmationCode& activationCode,
         std::string* const accountEmail);

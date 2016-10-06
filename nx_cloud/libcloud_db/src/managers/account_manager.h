@@ -1,10 +1,4 @@
-/**********************************************************
-* 3 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef cloud_db_account_manager_h
-#define cloud_db_account_manager_h
+#pragma once
 
 #include <functional>
 #include <string>
@@ -23,7 +17,6 @@
 #include "managers_types.h"
 #include "notification.h"
 
-
 namespace nx {
 namespace cdb {
 
@@ -32,20 +25,20 @@ class AbstractEmailManager;
 namespace conf
 {
     class Settings;
-}
+} // namespace conf
 class StreeManager;
 
-/*!
-    \note Methods of this class are re-enterable
-*/
+/**
+ * \note Methods of this class are re-enterable
+ */
 class AccountManager
 :
     public AbstractAuthenticationDataProvider
 {
 public:
-    /*!
-        \throw std::runtime_error In case of failure to pre-fill data cache
-    */
+    /**
+     * @throw std::runtime_error In case of failure to pre-fill data cache
+     */
     AccountManager(
         const conf::Settings& settings,
         const StreeManager& streeManager,
@@ -61,18 +54,24 @@ public:
         stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    //!Adds account in "not activated" state and sends verification email to the email address provided
+    /**
+     * Adds account in "not activated" state and sends verification email to the email address provided.
+     */
     void addAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountData accountData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
-    //!On success, account moved to "activated" state
+    /**
+     * On success, account moved to "activated" state.
+     */
     void activate(
         const AuthorizationInfo& authzInfo,
         data::AccountConfirmationCode emailVerificationCode,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
     
-    //!Retrieves account corresponding to authorization data \a authzInfo
+    /**
+     * Retrieves account corresponding to authorization data \a authzInfo.
+     */
     void getAccount(
         const AuthorizationInfo& authzInfo,
         std::function<void(api::ResultCode, data::AccountData)> completionHandler);
@@ -113,27 +112,30 @@ private:
     TemporaryAccountPasswordManager* const m_tempPasswordManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    //!map<email, account>
+    /** map<email, account>. */
     Cache<std::string, data::AccountData> m_cache;
     mutable QnMutex m_mutex;
-    //map<email, temporary password>
+    /** map<email, temporary password>. */
     std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     QnCounter m_startedAsyncCallsCounter;
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext, int* const dummyResult);
 
-    //add_account DB operations
+    //-----------------------------------------------------
+    // add_account DB operations
+    nx::db::DBResult registerNewAccountInDb(
+        nx::db::QueryContext* const queryContext,
+        const data::AccountData& accountData,
+        data::AccountConfirmationCode* const confirmationCode);
     nx::db::DBResult insertAccount(
         nx::db::QueryContext* const tran,
-        const data::AccountData& accountData,
-        data::AccountConfirmationCode* const resultData,
-        std::unique_ptr<AbstractActivateAccountNotification> notification);
+        const data::AccountData& accountData);
     nx::db::DBResult issueAccountActivationCode(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
-        data::AccountConfirmationCode* const resultData,
-        std::unique_ptr<AbstractActivateAccountNotification> notification);
+        std::unique_ptr<AbstractActivateAccountNotification> notification,
+        data::AccountConfirmationCode* const resultData);
     void accountAdded(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
@@ -151,7 +153,8 @@ private:
         data::AccountConfirmationCode resultData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
-    //verify_account DB operations
+    //-----------------------------------------------------
+    // verify_account DB operations
     nx::db::DBResult verifyAccount(
         nx::db::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,
@@ -176,11 +179,14 @@ private:
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler);
 
+    nx::db::DBResult createPasswordResetCode(
+        nx::db::QueryContext* const tran,
+        const std::string& accountEmail,
+        data::AccountConfirmationCode* const confirmationCode);
     void passwordResetCodeGenerated(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        bool requestSourceSecured,
-        api::ResultCode resultCode,
-        data::AccountEmail accountEmail,
+        bool hasRequestCameFromSecureSource,
+        nx::db::DBResult resultCode,
+        std::string accountEmail,
         data::AccountConfirmationCode confirmationCode,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
     void temporaryCredentialsSaved(
@@ -191,7 +197,5 @@ private:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
 };
 
-}   //cdb
-}   //nx
-
-#endif
+} // namespace cdb
+} // namespace nx

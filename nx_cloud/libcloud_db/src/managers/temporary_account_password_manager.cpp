@@ -117,10 +117,10 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
             _1, _2, _3, std::move(completionHandler)));
 }
 
-std::string TemporaryAccountPasswordManager::generateRandomPassword()
+std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
     const auto buffer = nx::utils::random::generate(
-            nx::utils::random::number<size_t>(10, 20), 'a', 'z');
+        nx::utils::random::number<size_t>(10, 20), 'a', 'z');
 
     return std::string(buffer.data(), buffer.size());
 }
@@ -165,6 +165,33 @@ void TemporaryAccountPasswordManager::removeTemporaryPasswordsFromCacheByAccount
 {
     QnMutexLocker lk(&m_mutex);
     m_accountPassword.erase(accountEmail);
+}
+
+nx::db::DBResult TemporaryAccountPasswordManager::registerTemporaryCredentials(
+    nx::db::QueryContext* const queryContext,
+    data::TemporaryAccountCredentials tempPasswordData)
+{
+    TemporaryAccountCredentialsEx tmpPasswordDataInternal(
+        std::move(tempPasswordData));
+    tmpPasswordDataInternal.id = 
+        QnUuid::createUuid().toSimpleString().toStdString();
+
+    const auto dbResult = insertTempPassword(
+        queryContext,
+        tmpPasswordDataInternal);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    // Adding to cache on successful commit.
+    queryContext->transaction()->addAfterCommitHandler(
+        [this, tmpPasswordDataInternal = std::move(tmpPasswordDataInternal)](
+            nx::db::DBResult resultCode)
+        {
+            if (resultCode == nx::db::DBResult::ok)
+                saveTempPasswordToCache(std::move(tmpPasswordDataInternal));
+        });
+
+    return dbResult;
 }
 
 bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
@@ -293,16 +320,19 @@ void TemporaryAccountPasswordManager::tempPasswordAddedToDb(
         return completionHandler(fromDbResultCode(resultCode));
     }
 
-    //placing temporary password to internal cache
-    {
-        QnMutexLocker lk(&m_mutex);
-        std::string login = tempPasswordData.login;
-        m_accountPassword.emplace(
-            std::move(login),
-            std::move(tempPasswordData));
-    }
+    saveTempPasswordToCache(std::move(tempPasswordData));
 
     return completionHandler(api::ResultCode::ok);
+}
+
+void TemporaryAccountPasswordManager::saveTempPasswordToCache(
+    TemporaryAccountCredentialsEx tempPasswordData)
+{
+    QnMutexLocker lk(&m_mutex);
+    std::string login = tempPasswordData.login;
+    m_accountPassword.emplace(
+        std::move(login),
+        std::move(tempPasswordData));
 }
 
 nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(

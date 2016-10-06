@@ -73,7 +73,7 @@ public:
         data::TemporaryAccountCredentials tmpPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
 
-    std::string generateRandomPassword();
+    std::string generateRandomPassword() const;
     /**
      * Adds password and password digest.
      * If \a data->login is empty, random login is generated
@@ -85,6 +85,10 @@ public:
         std::string accountEmail);
     void removeTemporaryPasswordsFromCacheByAccountEmail(
         std::string accountEmail);
+
+    nx::db::DBResult registerTemporaryCredentials(
+        nx::db::QueryContext* const queryContext,
+        data::TemporaryAccountCredentials tempPasswordData);
 
 private:
     const conf::Settings& m_settings;
@@ -112,6 +116,7 @@ private:
         nx::db::DBResult resultCode,
         TemporaryAccountCredentialsEx tempPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
+    void saveTempPasswordToCache(TemporaryAccountCredentialsEx tempPasswordData);
 
     nx::db::DBResult deleteTempPassword(
         nx::db::QueryContext* const queryContext,
