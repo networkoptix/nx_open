@@ -179,7 +179,7 @@ public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
     typedef nx::utils::MoveOnlyFunc<
         nx::db::DBResult(
-            nx::db::QueryContext*, nx::String /*systemId*/, TransactionDataType, AuxiliaryArgType*)
+            nx::db::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
     > ProcessEc2TransactionFunc;
     typedef nx::utils::MoveOnlyFunc<
         void(nx::db::QueryContext*, nx::db::DBResult, AuxiliaryArgType)
@@ -220,13 +220,21 @@ private:
         
         auto auxiliaryArg = std::make_unique<AuxiliaryArgType>();
         auto auxiliaryArgPtr = auxiliaryArg.get();
+        TransactionContext transactionContext{
+            std::move(transportHeader),
+            std::move(transaction)};
         m_transactionLog->startDbTransaction(
             transportHeader.systemId,
-            std::bind(
-                &TransactionProcessor::processTransactionInDbConnectionThread, this,
-                _1,
-                TransactionContext{ std::move(transportHeader), std::move(transaction) },
-                auxiliaryArgPtr),
+            [this,
+                auxiliaryArgPtr,
+                transactionContext = std::move(transactionContext)](
+                    nx::db::QueryContext* queryContext) mutable
+            {
+                return processTransactionInDbConnectionThread(
+                    queryContext,
+                    std::move(transactionContext),
+                    auxiliaryArgPtr);
+            },
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
                 nx::db::QueryContext* queryContext,
                 nx::db::DBResult dbResult) mutable
@@ -241,7 +249,7 @@ private:
 
     nx::db::DBResult processTransactionInDbConnectionThread(
         nx::db::QueryContext* queryContext,
-        const TransactionContext& transactionContext,
+        TransactionContext transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
         //DB transaction is created down the stack.
@@ -275,16 +283,17 @@ private:
             return dbResultCode;
         }
 
+        const auto transactionCommand = transactionContext.transaction.command;
         dbResultCode = m_processTranFunc(
             queryContext,
             transactionContext.transportHeader.systemId,
-            std::move(transactionContext.transaction.params),
+            std::move(transactionContext.transaction),
             auxiliaryArg);
         if (dbResultCode != nx::db::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG, 
                 lm("Error processing transaction %1 received from %2. %3")
-                .arg(::ec2::ApiCommand::toString(transactionContext.transaction.command))
+                .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .str(transactionContext.transportHeader)
                 .arg(queryContext->connection()->lastError().text()),
                 cl_logWARNING);

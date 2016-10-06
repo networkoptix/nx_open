@@ -41,7 +41,7 @@ public:
 
     static DebugConfiguration& debugConfiguration() { return s_instance->m_debugConfiguration; }
     static aio::AIOService& aioService() { return s_instance->m_aioService; }
-    static cloud::AddressResolver& addressResolver() { return s_instance->m_addressResolver; }
+    static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return s_instance->m_addressPublisher; }
     static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
     static OutgoingTunnelPool& outgoingTunnelPool() { return s_instance->m_outgoingTunnelPool; }
@@ -83,13 +83,23 @@ private:
     static SocketGlobals* s_instance;
 
 private:
+    // TODO: Initialization and deinitialization of this class is brocken by design (because of
+    //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:
+    // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
+    // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
+
     DebugConfiguration m_debugConfiguration;
     std::shared_ptr<QnLog::Logs> m_log;
+
+    // Is unique_ptr because it should be initiated after m_aioService but removed after.
+    std::unique_ptr<cloud::AddressResolver> m_addressResolver;
+
     aio::AIOService m_aioService;
     aio::Timer m_debugConfigurationTimer;
 
+    // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
-    cloud::AddressResolver m_addressResolver;
+
     cloud::MediatorAddressPublisher m_addressPublisher;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;

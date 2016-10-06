@@ -1,12 +1,10 @@
-/**********************************************************
-* Jan 25, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
-#include "test_setup.h"
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/test_support/utils.h>
 
+#include "email_manager_mocked.h"
+#include "test_setup.h"
 
 namespace nx {
 namespace cdb {
@@ -17,9 +15,9 @@ class SystemSharing
     public CdbFunctionalTest
 {
 };
-}
+} // namespace
 
-TEST_F(SystemSharing, getCloudUsers)
+TEST_F(SystemSharing, get_users)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -1061,7 +1059,7 @@ TEST_F(SystemSharing, DISABLED_remove_sharing_unknown_system)
             api::SystemAccessRole::none));
 }
 
-TEST_F(SystemSharing, changingOwnRightsOnSystem)
+TEST_F(SystemSharing, changing_own_rights_on_system)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -1088,7 +1086,7 @@ TEST_F(SystemSharing, changingOwnRightsOnSystem)
         const auto account1 = addActivatedAccount2();
         const auto account2 = addActivatedAccount2();
         const auto system1 = addRandomSystemToAccount(account1);
-        shareSystem2(account1, system1, account2, targetRole);
+        shareSystemEx(account1, system1, account2, targetRole);
 
         for (const auto role: allRoles)
         {
@@ -1104,9 +1102,119 @@ TEST_F(SystemSharing, changingOwnRightsOnSystem)
         }
 
         // Removing myself from system's uses
-        shareSystem2(account2, system1, account2, api::SystemAccessRole::none);
+        shareSystemEx(account2, system1, account2, api::SystemAccessRole::none);
     }
 }
 
-}   //cdb
-}   //nx
+namespace {
+class TestEmailManager:
+    public nx::cdb::AbstractEmailManager
+{
+public:
+    TestEmailManager(
+        nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> _delegate)
+        :
+        m_delegate(std::move(_delegate))
+    {
+    }
+
+    virtual void sendAsync(
+        const AbstractNotification& notification,
+        std::function<void(bool)> completionHandler) override
+    {
+        if (m_delegate)
+            m_delegate(notification);
+
+        if (completionHandler)
+            completionHandler(true);
+    }
+
+private:
+    nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> m_delegate;
+};
+} // namespace
+
+TEST_F(SystemSharing, share_with_email_not_registered_as_account)
+{
+    boost::optional<InviteUserNotification> inviteNotification;
+
+    TestEmailManager testEmailManager(
+        [&inviteNotification](const AbstractNotification& notification)
+        {
+            const auto* inviteNotificationPtr = 
+                dynamic_cast<const InviteUserNotification*>(&notification);
+            if (inviteNotificationPtr)
+                inviteNotification = *inviteNotificationPtr;
+        });
+    
+    EMailManagerFactory::setFactory(
+        [&testEmailManager](const conf::Settings& /*settings*/)
+        {
+            return std::make_unique<EmailManagerStub>(&testEmailManager);
+        });
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.data.email, account1.password, &system1));
+
+    const std::string newAccountEmail = generateRandomEmailAddress();
+    std::string newAccountPassword = "new_password";
+    const auto newAccountAccessRoleInSystem1 = api::SystemAccessRole::cloudAdmin;
+
+    shareSystemEx(account1, system1, newAccountEmail, newAccountAccessRoleInSystem1);
+
+    std::vector<api::SystemSharingEx> sharings;
+    ASSERT_EQ(
+        getSystemSharings(account1.data.email, account1.password, &sharings),
+        api::ResultCode::ok);
+    ASSERT_EQ(sharings.size(), 2);
+
+    ASSERT_EQ(
+        api::SystemAccessRole::owner,
+        accountAccessRoleForSystem(sharings, account1.data.email, system1.id));
+    ASSERT_EQ(
+        api::SystemAccessRole::cloudAdmin,
+        accountAccessRoleForSystem(sharings, newAccountEmail, system1.id));
+
+    ASSERT_TRUE(inviteNotification);
+
+    // Confirmation code has format: base64(tmp_password:email).
+    const auto tmpPasswordAndEmail = 
+        QByteArray::fromBase64(QByteArray::fromRawData(
+            inviteNotification->message.code.data(),
+            inviteNotification->message.code.size()));
+    const std::string tmpPassword = 
+        tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
+
+    // Setting new password.
+    api::AccountUpdateData update;
+    update.passwordHa1 = nx_http::calcHa1(
+        newAccountEmail.c_str(),
+        moduleInfo().realm.c_str(),
+        newAccountPassword.c_str()).constData();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        updateAccount(newAccountEmail, tmpPassword, update));
+
+    api::AccountData newAccount;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(newAccountEmail, newAccountPassword, &newAccount));
+    ASSERT_EQ(api::AccountStatus::activated, newAccount.statusCode);
+
+    // Checking new account access to system1.
+    std::vector<api::SystemDataEx> systems;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems(newAccountEmail, newAccountPassword, &systems));
+    ASSERT_EQ(1, systems.size());
+    ASSERT_EQ(system1.id, systems[0].id);
+    ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
+}
+
+} // namespace cdb
+} // namespace nx

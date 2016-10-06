@@ -79,7 +79,7 @@ protected:
         connectionParameters.rendezvousConnectTimeout = kSocketTimeout;
         tunnelAcceptor.reset(new TunnelAcceptor({get2ndPeerAddress()}, connectionParameters));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
-        tunnelAcceptor->setMediatorConnection(mediatorConnection);
+        tunnelAcceptor->setMediatorConnection(mediatorConnection.get());
         tunnelAcceptor->setUdpRetransmissionTimeout(kUdpRetryTimeout);
         tunnelAcceptor->setUdpMaxRetransmissions(1);
 

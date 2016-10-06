@@ -41,8 +41,8 @@ public:
     SocketAddress stunEndpoint() const;
     SocketAddress httpEndpoint() const;
 
-    std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
-    std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
+    std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
+    std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
 
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 

@@ -388,7 +388,7 @@ TEST_F(System, rename)
     const auto system1 = addRandomSystemToAccount(account1);
 
     const auto account2 = addActivatedAccount2();
-    shareSystem2(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
 
     const std::string actualSystemName = "new system name";
     // Owner is allowed to rename his system.
@@ -758,7 +758,7 @@ TEST_F(System, sortingOrderPersistenceAfterSharingUpdate)
     const auto account2 = addActivatedAccount2();
     const auto system2 = addRandomSystemToAccount(account2);
 
-    shareSystem2(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
 
     std::list<std::string> systemIdsInSortOrder;
     systemIdsInSortOrder.push_back(system1.id);
@@ -769,7 +769,7 @@ TEST_F(System, sortingOrderPersistenceAfterSharingUpdate)
         const bool updateSharing = i == 1;
         const bool needRestart = i == 2;
         if (updateSharing)
-            shareSystem2(account1, system1, account2, api::SystemAccessRole::advancedViewer);
+            shareSystemEx(account1, system1, account2, api::SystemAccessRole::advancedViewer);
         if (needRestart)
             restart();
 
