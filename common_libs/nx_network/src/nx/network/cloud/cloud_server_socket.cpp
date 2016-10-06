@@ -69,7 +69,7 @@ const std::vector<CloudServerSocket::AcceptorMaker>
     CloudServerSocket::kDefaultAcceptorMakers = defaultAcceptorMakers();
 
 CloudServerSocket::CloudServerSocket(
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
     nx::network::RetryPolicy mediatorRegistrationRetryPolicy,
     std::vector<AcceptorMaker> acceptorMakers)
 :
@@ -510,17 +510,21 @@ void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
     event.connectionMethods &= m_supportedConnectionMethods;
+    DEBUG_LOG(lm("Connection request '%1' from %2 with methods: %3")
+        .strs(event.connectSessionId, event.originatingPeerID,
+            hpm::api::ConnectionMethod::toString(event.connectionMethods)));
+
     for (const auto& maker : m_acceptorMakers)
     {
         if (auto acceptor = maker(event))
         {
-            DEBUG_LOG(lm("Create acceptor %1 by connection request %2 from %3")
+            DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")
                 .strs(acceptor, event.connectSessionId, event.originatingPeerID));
 
             acceptor->setConnectionInfo(
                 event.connectSessionId, event.originatingPeerID);
 
-            acceptor->setMediatorConnection(m_mediatorConnection);
+            acceptor->setMediatorConnection(m_mediatorConnection.get());
             startAcceptor(std::move(acceptor));
         }
     }

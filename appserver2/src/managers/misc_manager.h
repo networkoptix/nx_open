@@ -24,7 +24,7 @@ namespace ec2
 
         virtual ~QnMiscManager();
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) override;
-        virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) override;
+        virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) override;
 
     protected:
         virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) override;

@@ -70,7 +70,7 @@ qint64 QnStorageResourceStub::getFreeSpace()
     return 0;
 }
 
-qint64 QnStorageResourceStub::getTotalSpace()
+qint64 QnStorageResourceStub::getTotalSpace() const
 {
     NX_ASSERT(false);
     return 0;

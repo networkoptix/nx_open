@@ -33,8 +33,6 @@ public:
 
     virtual void pleaseStop() override;
 
-    QnAudioFormat getAudioFormat();
-
 public slots:
     //!Adds task to the queue
     /*!
@@ -46,7 +44,10 @@ public slots:
         \return generation result
         \note This method is synchronous and reenterable
     */
-    bool generateSoundSync( const QString& text, QIODevice* const dest );
+    bool generateSoundSync(
+        const QString& text,
+        QIODevice* const dest,
+        QnAudioFormat* outFormat = nullptr);
 
 signals:
     //!Emmitted in any case on text generation done (successfull or not)
@@ -62,13 +63,15 @@ private:
         int id;
         QString text;
         QIODevice* dest;
+        QnAudioFormat format;
         bool result;
         bool done;
 
         SynthetiseSpeechTask()
         :
             id( 0 ),
-            dest( NULL ),
+            dest(nullptr),
+            format(QnAudioFormat()),
             result( false ),
             done( false )
         {
@@ -79,7 +82,6 @@ private:
     QAtomicInt m_prevTaskID;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
-    QnAudioFormat m_audioFormat;
 
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };

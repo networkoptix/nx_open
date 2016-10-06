@@ -10,7 +10,7 @@ namespace cloud {
 namespace tcp {
 
 ReverseConnectionPool::ReverseConnectionPool(
-    std::shared_ptr<MediatorConnection> mediatorConnection)
+    std::unique_ptr<MediatorConnection> mediatorConnection)
 :
     m_mediatorConnection(std::move(mediatorConnection)),
     m_acceptor(
@@ -20,7 +20,7 @@ ReverseConnectionPool::ReverseConnectionPool(
             NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
             getHolder(hostName, true)->saveSocket(std::move(socket));
         }),
-    isReconnectHandlerSet(false)
+    m_isReconnectHandlerSet(false)
 {
 }
 
@@ -124,10 +124,10 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
                     .strs(m_acceptor.selfHostName(), code), cl_logWARNING);
             }
 
-            if (!isReconnectHandlerSet)
+            if (!m_isReconnectHandlerSet)
             {
                 m_mediatorConnection->setOnReconnectedHandler([this](){ registerOnMediator(); });
-                isReconnectHandlerSet = true;
+                m_isReconnectHandlerSet = true;
             }
 
             if (registrationPromise)

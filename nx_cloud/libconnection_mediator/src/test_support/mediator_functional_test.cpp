@@ -91,13 +91,13 @@ SocketAddress MediatorFunctionalTest::httpEndpoint() const
     return SocketAddress(HostAddress::localhost, m_httpPort);
 }
 
-std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
+std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
     return network::SocketGlobals::mediatorConnector().clientConnection();
 }
 
-std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection>
+std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
     MediatorFunctionalTest::systemConnection()
 {
     return network::SocketGlobals::mediatorConnector().systemConnection();

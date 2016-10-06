@@ -22,7 +22,7 @@ class NX_NETWORK_API ReverseConnectionPool:
 {
 public:
     typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
-    explicit ReverseConnectionPool(std::shared_ptr<MediatorConnection> mediatorConnection);
+    explicit ReverseConnectionPool(std::unique_ptr<MediatorConnection> mediatorConnection);
     ~ReverseConnectionPool();
 
     ReverseConnectionPool(const ReverseConnectionPool&) = delete;
@@ -44,10 +44,10 @@ private:
     bool registerOnMediator(bool waitForRegistration = false);
     std::shared_ptr<ReverseConnectionHolder> getHolder(const String& hostName, bool mayCreate);
 
-    const std::shared_ptr<MediatorConnection> m_mediatorConnection;
+    const std::unique_ptr<MediatorConnection> m_mediatorConnection;
     ReverseAcceptor m_acceptor;
     HostAddress m_publicIp;
-    bool isReconnectHandlerSet;
+    bool m_isReconnectHandlerSet;
 
     mutable QnMutex m_mutex;
     std::map<String, std::shared_ptr<ReverseConnectionHolder>> m_connectionHolders;

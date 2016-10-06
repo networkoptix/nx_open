@@ -447,7 +447,7 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateSequenceData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
@@ -595,6 +595,7 @@ namespace detail
         bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
+        bool cleanupDanglingDbObjects();
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         bool encryptKvPairs();
@@ -619,8 +620,8 @@ namespace detail
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
-
         // todo: move this variables to QFlag
+        bool m_needClearLog;
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;

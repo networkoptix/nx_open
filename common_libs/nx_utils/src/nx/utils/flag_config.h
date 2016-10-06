@@ -54,7 +54,7 @@ public:
     const char* regStringParam(const char** pValue, const char* defaultValue, const char* paramName, const char* descr);
 
     /** Reload values from file(s), logging the values to std::cerr. */
-    void reload();
+    void reload(bool verbose = true);
 
     /** Allows to avoid reloading on next call to reload(), which will only restore this flag. */
     void skipNextReload();

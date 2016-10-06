@@ -781,6 +781,8 @@ namespace nx_http
                         return "Basic";
                     case digest:
                         return "Digest";
+                    case automatic:
+                        return "Automatic";
                     default:
                         return "None";
                 }
@@ -792,6 +794,8 @@ namespace nx_http
                     return basic;
                 if( ::strcasecmp( str, "Digest" ) == 0 )
                     return digest;
+                if( ::strcasecmp( str, "Automatic" ) == 0 )
+                    return automatic;
                 return none;
             }
 
@@ -801,6 +805,8 @@ namespace nx_http
                     return basic;
                 if( str == "Digest" )
                     return digest;
+                if( str == "Automatic" )
+                    return automatic;
                 return none;
             }
         }

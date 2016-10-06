@@ -6,11 +6,11 @@
 namespace nx {
 namespace stun {
 
-/** AsyncClient wrapper.
- * Can be stopped (to prevent async calls) while AsyncClient still running */
-class NX_NETWORK_API AsyncClientUser
-:
-    public std::enable_shared_from_this<AsyncClientUser>,
+/**
+ * AsyncClient wrapper which lives in a designated AIO thread.
+ * Can be stopped (to prevent async calls) while AsyncClient still running.
+ */
+class NX_NETWORK_API AsyncClientUser:
     public network::aio::Timer
 {
 public:
@@ -34,11 +34,14 @@ public:
 
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
+    ~AsyncClientUser() override;
 
     void sendRequest(Message request, AbstractAsyncClient::RequestHandler handler);
     bool setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);
 
 private:
+    void disconnectFromClient();
+
     std::atomic<bool> m_isEnabled;
     utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;
