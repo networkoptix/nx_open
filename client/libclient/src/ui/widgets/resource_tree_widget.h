@@ -136,9 +136,7 @@ signals:
      */
     void afterRecursiveOperation();
 private slots:
-    void at_treeView_enterPressed(const QModelIndex &index);
     void at_treeView_spacePressed(const QModelIndex &index);
-    void at_treeView_doubleClicked(const QModelIndex &index);
     void at_treeView_clicked(const QModelIndex &index);
 
     void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
