@@ -48,12 +48,13 @@ RoleDescription::RoleDescription(const ec2::ApiUserGroupData& userRole):
 {
 }
 
-QnUserRolesModelPrivate::QnUserRolesModelPrivate(QnUserRolesModel* parent,
+QnUserRolesModelPrivate::QnUserRolesModelPrivate(
+    QnUserRolesModel* parent,
     QnUserRolesModel::DisplayRoleFlags flags)
     :
-    q_ptr(parent),
+    base_type(),
     QnWorkbenchContextAware(parent),
-    m_userRoles(),
+    q_ptr(parent),
     m_customRoleEnabled(flags.testFlag(QnUserRolesModel::CustomRoleFlag))
 {
     connect(context(), &QnWorkbenchContext::userChanged, this,
