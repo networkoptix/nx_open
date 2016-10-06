@@ -29,12 +29,12 @@ public:
     void setOnReconnectedHandler(AbstractAsyncClient::ReconnectHandler handler);
 
     /** Shall be called before the last shared_pointer is gone */
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    void pleaseStopSync(bool checkForLocks = true) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
 
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
-    ~AsyncClientUser() override;
+    virtual ~AsyncClientUser() override;
 
     void sendRequest(Message request, AbstractAsyncClient::RequestHandler handler);
     bool setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);

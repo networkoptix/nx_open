@@ -243,12 +243,6 @@ QnUuid QnUserResource::userGroup() const
     return m_userGroup;
 }
 
-void QnUserResource::resetUserGroup()
-{
-    QnMutexLocker lock(&m_mutex);
-    m_userGroup = QnUuid();
-}
-
 void QnUserResource::setUserGroup(const QnUuid& group)
 {
     {
