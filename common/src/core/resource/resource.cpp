@@ -649,29 +649,7 @@ QnUuid QnResource::getId() const
 void QnResource::setId(const QnUuid& id)
 {
     QnMutexLocker mutexLocker(&m_mutex);
-
-    if (m_id == id)
-        return;
-
-    //QnUuid oldId = m_id;
     m_id = id;
-
-    std::map<QString, LocalPropertyValue> locallySavedProperties;
-    std::swap(locallySavedProperties, m_locallySavedProperties);
-    mutexLocker.unlock();
-
-    for (auto prop : locallySavedProperties)
-    {
-        if (propertyDictionary->setValue(
-            id,
-            prop.first,
-            prop.second.value,
-            prop.second.markDirty,
-            prop.second.replaceIfExists))   //isModified?
-        {
-            emitPropertyChanged(prop.first);
-        }
-    }
 }
 
 QString QnResource::getUrl() const
@@ -1165,6 +1143,32 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 int QnResource::initializationAttemptCount() const
 {
     return m_initializationAttemptCount.load();
+}
+
+void QnResource::flushProperties()
+{
+    std::map<QString, LocalPropertyValue> locallySavedProperties;
+    QnUuid id;
+
+    {
+        QnMutexLocker mutexLocker(&m_mutex);
+        NX_ASSERT(!m_id.isNull(), lit("Id should be set before flushing properties"));
+        std::swap(locallySavedProperties, m_locallySavedProperties);
+        id = m_id;
+    }
+
+    for (auto prop : locallySavedProperties)
+    {
+        if (propertyDictionary->setValue(
+            id,
+            prop.first,
+            prop.second.value,
+            prop.second.markDirty,
+            prop.second.replaceIfExists))   //isModified?
+        {
+            emitPropertyChanged(prop.first);
+        }
+    }
 }
 
 bool QnResource::isInitialized() const

@@ -152,30 +152,14 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     // remote peer access rights are being checked, the resource should already reside in the
     // Resource Pool so ResourceAccessManager could check access rights for the pair
     // (remotePeerUserId, resourceId).
+
     QnResourcePtr existCamRes = qnResPool->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
         qnResPool->removeResource(existCamRes);
-    QnCommonMessageProcessor::instance()->updateResource(apiCameraData);
 
-    ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()
+    return QnAppServerConnectionFactory::getConnection2()
         ->getCameraManager(Qn::kSystemAccess)
         ->addCameraSync(apiCameraData);
-    if (errorCode != ec2::ErrorCode::ok)
-    {
-        NX_LOG(
-            QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1")
-                .arg(ec2::toString(errorCode)),
-            cl_logWARNING
-        );
-        // Here, if the transaction has failed, we have to restore Resource Pool
-        // initial (before cameraResource processing began) state.
-        qnResPool->removeResource(qnResPool->getResourceById(apiCameraData.id));
-        if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
-            QnCommonMessageProcessor::instance()->updateResource(existCamRes);
-        return errorCode;
-    }
-
-    return ec2::ErrorCode::ok;
 }
 
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const
@@ -195,6 +179,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     if (addAndPropagateCamResource(apiCamera) == ec2::ErrorCode::ok)
     {   // finally, when transaction is successful we can save params
         // for our new resource.
+        cameraResource->flushProperties();
         propertyDictionary->saveParams(cameraResource->getId());
     }
 
