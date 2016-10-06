@@ -328,7 +328,7 @@ static bool textToWavInternal(const QString& text, QIODevice* const dest, QnAudi
 
         NX_ASSERT(sampleType != st_unknown, lm("TextToWaveServer, unknown sample format."));
 
-        auto sampleSize = get_word_size(sampleType);
+        auto sampleSize = get_word_size(sampleType) * 8;
 
         NX_ASSERT(sampleSize, lm("TextToWaveServer, unknown sample size"));
 

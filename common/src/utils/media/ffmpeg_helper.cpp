@@ -428,23 +428,23 @@ AVSampleFormat QnFfmpegHelper::fromQtAudioFormatToFfmpegSampleType(const QnAudio
 
     if (qtSampleType == QnAudioFormat::SignedInt)
     {
-        if (sampleSizeInBytes == 2)
+        if (sampleSizeInBytes == 16)
             return AV_SAMPLE_FMT_S16;
-        if (sampleSizeInBytes == 4)
+        if (sampleSizeInBytes == 32)
             return AV_SAMPLE_FMT_S32;
     }
 
     if (qtSampleType == QnAudioFormat::UnSignedInt)
     {
-        if (sampleSizeInBytes == 1)
+        if (sampleSizeInBytes == 8)
             return AV_SAMPLE_FMT_U8;
     }
 
     if (qtSampleType == QnAudioFormat::Float)
     {
-        if (sampleSizeInBytes == 4)
+        if (sampleSizeInBytes == 32)
             return AV_SAMPLE_FMT_FLT;
-        if (sampleSizeInBytes == 8)
+        if (sampleSizeInBytes == 64)
             return AV_SAMPLE_FMT_DBL;
     }
 
