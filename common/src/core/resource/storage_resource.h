@@ -26,7 +26,7 @@ public:
 
     void setStorageBitrateCoeff(float value);
     void setSpaceLimit(qint64 value);
-    qint64 getSpaceLimit() const;
+    virtual qint64 getSpaceLimit() const;
 
     void setStorageType(const QString& type);
     QString getStorageType() const;
@@ -42,6 +42,7 @@ public:
 
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
     bool isExternal() const;
+    virtual bool isSystem() const { return false; }
 #ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return m_storageBitrateCoeff; }

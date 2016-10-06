@@ -596,6 +596,10 @@
             }
         },
         {
+            "keys":["Honeywell|H4D3PRV3"],
+            "preferredAuthScheme": "Automatic"
+        },
+        {
             "keys": [
                 "DW|DWC-MPTZ20X|unknown_beta",
                 "Win4NET Co., Ltd.|Clebo-PD20",

@@ -9,10 +9,10 @@
 #include "socket_global.h"
 
 #define DEBUG_LOG(MESSAGE) do \
-    { \
-        if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
-            NX_LOGX(MESSAGE, cl_logDEBUG1); \
-    } while(0)
+{ \
+    if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+        NX_LOGX(MESSAGE, cl_logDEBUG1); \
+} while (0)
 
 namespace nx {
 namespace network {
@@ -276,14 +276,14 @@ void MultipleServerSocket::acceptAsync(
 
 void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    DEBUG_LOG(lm("Cancel async IO async..."));
+    DEBUG_LOG(lm("Canceling async IO asynchronously..."));
     post(
         [this, handler = std::move(handler)]() mutable
         {
             for (auto& socketContext: m_serverSockets)
                 socketContext.stopAccepting();
 
-            NX_LOGX(lm("Async IO is canceled async"), cl_logDEBUG1);
+            NX_LOGX(lm("Async IO is canceled asynchronously"), cl_logDEBUG1);
             m_acceptHandler = nullptr;
             handler();
         });
@@ -291,7 +291,7 @@ void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler
 
 void MultipleServerSocket::cancelIOSync()
 {
-    DEBUG_LOG(lm("Cancel async IO sync..."));
+    DEBUG_LOG(lm("Canceling async IO synchronously..."));
     nx::utils::promise<void> ioCancelledPromise;
     //TODO #ak deal with copy-paste
     dispatch(
@@ -300,7 +300,7 @@ void MultipleServerSocket::cancelIOSync()
             for (auto& socketContext: m_serverSockets)
                 socketContext.stopAccepting();
 
-            NX_LOGX(lm("Async IO is canceled sync"), cl_logDEBUG1);
+            NX_LOGX(lm("Async IO is canceled synchronously"), cl_logDEBUG1);
             m_acceptHandler = nullptr;
             ioCancelledPromise.set_value();
         });

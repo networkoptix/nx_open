@@ -22,6 +22,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/counter.h>
 
+#include "notification.h"
 #include "settings.h"
 
 
@@ -37,18 +38,8 @@ class AbstractEmailManager
 public:
     virtual ~AbstractEmailManager() {}
 
-    template<class NotificationType>
-    void sendAsync(
-        NotificationType notification,
-        std::function<void(bool)> completionHandler)
-    {
-        sendAsync(
-            QJson::serialized(notification),
-            std::move(completionHandler));
-    }
-
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) = 0;
 };
 
@@ -63,7 +54,7 @@ public:
 
 protected:
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override;
 
 private:

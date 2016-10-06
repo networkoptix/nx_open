@@ -69,9 +69,6 @@ void QnRestoreStateRestHandler::afterExecute(
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
-        nx::SystemName systemName;
-        systemName.resetToDefault();
-        systemName.saveToConfig();
         restartServer(0);
     }
 }

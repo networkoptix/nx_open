@@ -155,7 +155,7 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
     int videoChannel = videoFrame->channelNumber;
-    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*> (videoFrame->dataProvider);
+    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
     if (archiveReader)
     {
         auto videoLayout = archiveReader->getDPVideoLayout();
@@ -341,7 +341,7 @@ void PlayerDataConsumer::endOfRun()
 QSize PlayerDataConsumer::currentResolution() const
 {
     QSize result;
-    for (const auto& decoder : m_videoDecoders)
+    for (const auto& decoder: m_videoDecoders)
         result = qMax(result, decoder->currentResolution());
 
     return result;

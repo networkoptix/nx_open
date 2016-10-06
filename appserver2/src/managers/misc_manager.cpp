@@ -6,9 +6,9 @@
 
 namespace ec2 {
 
-void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction)
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemIdData> &transaction)
 {
-    emit systemNameChangeRequested(transaction.params.systemName,
+    emit systemIdChangeRequested(transaction.params.systemId,
                                    transaction.params.sysIdTime,
                                    transaction.params.tranLogTime);
 }
@@ -25,8 +25,8 @@ template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::changeSystemName(
-        const QString &systemName,
+int QnMiscManager<QueryProcessorType>::changeSystemId(
+        const QnUuid& systemId,
         qint64 sysIdTime,
         Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler)
@@ -34,14 +34,14 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(
     const int reqId = generateRequestID();
 
 
-    ApiSystemNameData params;
-    params.systemName = systemName;
+    ApiSystemIdData params;
+    params.systemId = systemId;
     params.sysIdTime = sysIdTime;
     params.tranLogTime = tranLogTime;
 
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::changeSystemName, params,
+        ApiCommand::changeSystemId, params,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -75,19 +75,24 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::rebuildTransactionLog(
+int QnMiscManager<QueryProcessorType>::cleanupDatabase(
+    bool cleanupDbObjects,
+    bool cleanupTransactionLog,
     impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
-    ApiRebuildTransactionLogData data;
+    ApiCleanupDatabaseData data;
+    data.cleanupDbObjects = cleanupDbObjects;
+    data.cleanupTransactionLog = cleanupTransactionLog;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::rebuildTransactionLog, data,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::cleanupDatabase,
+	    data,
         [handler, reqId](ErrorCode errorCode)
-    {
-        handler->done(reqId, errorCode);
-    }
-    );
+        {
+            handler->done(reqId, errorCode);
+        });
 
     return reqId;
 }

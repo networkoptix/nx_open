@@ -442,7 +442,7 @@ class MockStorageResource1 : public AbstractMockStorageResource {
 public:
 	MockStorageResource1() : AbstractMockStorageResource((qint64)10 * 1024 * 1024 * 1024) {}
 
-    virtual qint64 getTotalSpace() override {
+    virtual qint64 getTotalSpace() const override {
         return (qint64)10 * 1024 * 1024 * 1024;
     }
 
@@ -455,7 +455,7 @@ class MockStorageResource2 : public AbstractMockStorageResource {
 public:
 	MockStorageResource2() : AbstractMockStorageResource((qint64)20 * 1024 * 1024 * 1024) {} 
 
-    virtual qint64 getTotalSpace() override {
+    virtual qint64 getTotalSpace() const override {
         return (qint64)20 * 1024 * 1024 * 1024;
     }
 
@@ -468,7 +468,7 @@ class MockStorageResource3 : public AbstractMockStorageResource {
 public:
 	MockStorageResource3() : AbstractMockStorageResource((qint64)30 * 1024 * 1024 * 1024) {}
 
-    virtual qint64 getTotalSpace() override {
+    virtual qint64 getTotalSpace() const override {
         return (qint64)30 * 1024 * 1024 * 1024;
     }
 

@@ -1,15 +1,8 @@
-/**********************************************************
-* Dec 18, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef EMAIL_MANAGER_MOCKED_H
-#define EMAIL_MANAGER_MOCKED_H
+#pragma once
 
 #include <gmock/gmock.h>
 
 #include <libcloud_db/src/managers/email_manager.h>
-
 
 class EmailManagerMocked
 :
@@ -18,17 +11,9 @@ class EmailManagerMocked
 public:
     MOCK_METHOD1(
         sendAsyncMocked,
-        void(QByteArray serializedNotification));
+        void(const nx::cdb::AbstractNotification& notification));
 
     virtual void sendAsync(
-        QByteArray /*serializedNotification*/,
-        std::function<void(bool)> completionHandler) override
-    {
-        //sendAsyncMocked(std::move(serializedNotification));
-        sendAsyncMocked(QByteArray());
-        if (completionHandler)
-            completionHandler(true);
-    }
+        const nx::cdb::AbstractNotification& notification,
+        std::function<void(bool)> completionHandler) override;
 };
-
-#endif  //EMAIL_MANAGER_MOCKED_H

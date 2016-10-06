@@ -65,7 +65,7 @@ namespace ec2 {
         std::vector<ApiStorageDataStatistics> storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
-    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
+    (flags)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
     (backupType)(backupDaysOfTheWeek)(backupStart)(backupDuration)(backupBitrate)
 
 	struct ApiLicenseStatistics

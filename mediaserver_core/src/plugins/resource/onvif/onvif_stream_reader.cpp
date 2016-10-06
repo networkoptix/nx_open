@@ -91,6 +91,18 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
 
     postStreamConfigureHook();
 
+    auto resData = qnCommon->dataPool()->data(m_onvifRes);
+    if (resData.contains(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME))
+    {
+        auto authScheme = nx_http::header::AuthScheme::fromString(
+            resData.value<QString>(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME)
+                .toLatin1()
+                .constData());
+
+        if (authScheme != nx_http::header::AuthScheme::none)
+            m_multiCodec.setPrefferedAuthScheme(authScheme);
+    }
+
     m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
 

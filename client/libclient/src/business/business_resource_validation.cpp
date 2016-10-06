@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <utils/email/email.h>
 
@@ -137,7 +138,9 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
     if (cameras.isEmpty())
-        return tr("Select device");
+        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Select device"),
+            tr("Select camera"));
     else
         return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
 }

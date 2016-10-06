@@ -210,13 +210,13 @@ public:
     }
 
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override
     {
         if (!m_target)
             return;
         m_target->sendAsync(
-            std::move(serializedNotification),
+            notification,
             std::move(completionHandler));
     }
 

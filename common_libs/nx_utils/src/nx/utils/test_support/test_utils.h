@@ -38,7 +38,7 @@ using namespace std::placeholders;
 
 static std::string qSizeToString(const QSize& size)
 {
-    return lit("%d x %d").arg(size.width()).arg(size.height()).toLatin1().constData();
+    return lit("%1 x %2").arg(size.width()).arg(size.height()).toLatin1().constData();
 }
 
 /**

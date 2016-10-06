@@ -75,7 +75,7 @@ namespace ec2 {
     struct ApiDiscoveryData;
     struct ApiDiscoverPeerData;
     struct ApiConnectionData;
-    struct ApiSystemNameData;
+    struct ApiSystemIdData;
     struct ApiTransactionData;
     struct ApiTranLogFilter;
     struct ApiWebPageData;
@@ -92,7 +92,7 @@ namespace ec2 {
     struct ApiDatabaseDumpData;
     struct ApiDatabaseDumpToFileData;
     struct ApiLicenseOverflowData;
-    struct ApiRebuildTransactionLogData;
+    struct ApiCleanupDatabaseData;
 
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
@@ -196,7 +196,7 @@ namespace ec2 {
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
     (ApiConnectionData)\
-    (ApiSystemNameData)\
+    (ApiSystemIdData)\
     (ApiTimeData)\
     (ApiMiscData)\
     (ApiPeerData)\
@@ -204,7 +204,7 @@ namespace ec2 {
     (ApiDatabaseDumpData)\
     (ApiDatabaseDumpToFileData)\
     (ApiLicenseOverflowData)\
-    (ApiRebuildTransactionLogData)\
+    (ApiCleanupDatabaseData)\
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
 

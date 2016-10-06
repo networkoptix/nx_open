@@ -25,6 +25,7 @@
 #include <nx/network/socket_common.h>
 #include "nx/utils/string.h"
 #include "utils/common/util.h"
+#include <core/resource/fake_media_server.h>
 
 namespace {
     ec2::AbstractECConnectionPtr connection2() {
@@ -481,7 +482,7 @@ void QnRoutingManagementWidget::reportUrlEditingError(int error) {
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || QnMediaServerResource::isFakeServer(server))
+    if (!server || server.dynamicCast<QnFakeMediaServerResource>())
         return;
 
     m_serverListModel->addResource(resource);
@@ -489,7 +490,7 @@ void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePt
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || QnMediaServerResource::isFakeServer(server))
+    if (!server || server.dynamicCast<QnFakeMediaServerResource>())
         return;
 
     m_serverListModel->removeResource(resource);

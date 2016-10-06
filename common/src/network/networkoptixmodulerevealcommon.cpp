@@ -66,6 +66,7 @@ QByteArray RevealResponse::serialize()
     map[lit("ecDbReadOnly")] = ecDbReadOnly;
     map[lit("cloudSystemId")] = cloudSystemId;
     map[lit("cloudHost")] = cloudHost;
+    map[lit("localSystemId")] = localSystemId.toByteArray();
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
@@ -94,6 +95,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     ecDbReadOnly = map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
     cloudSystemId =  map.value(lit("cloudSystemId")).toString();
     cloudHost = map.value(lit("cloudHost")).toString();
+    localSystemId = QnUuid(map.value(lit("localSystemId")).toByteArray());
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

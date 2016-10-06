@@ -808,7 +808,7 @@ QnAbstractPtzController *QnResource::createPtzController()
                 .arg(getUrl());
 
         qDebug() << message;
-        NX_LOG(message, cl_logERROR);
+        NX_LOG(message, cl_logWARNING);
     }
 
     if((capabilities & Qn::DevicePositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))

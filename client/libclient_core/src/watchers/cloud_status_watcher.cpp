@@ -527,7 +527,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
 {
     Q_Q(QnCloudStatusWatcher);
 
-    const auto systemId = qnGlobalSettings->cloudSystemID();
+    const auto systemId = qnGlobalSettings->cloudSystemId();
 
     const auto it = std::find_if(
         cloudSystems.begin(), cloudSystems.end(),

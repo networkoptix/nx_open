@@ -7,6 +7,7 @@
 
 struct CloudCredentialsData
 {
+    // todo: rename it to cloudSystemId
     QString cloudSystemID; //< keep same name as the constant QnGlobalSettings::kNameCloudSystemID
     QString cloudAuthKey; //< keep same name as the constant QnGlobalSettings::kNameCloudAuthKey
     QString cloudAccountName; //< keep same name as the constant QnGlobalSetttings::kNameCloudAccountName

@@ -141,13 +141,13 @@ void QnTransactionTcpProcessor::run()
         Qn::EC2_CLOUD_HOST_HEADER_NAME,
         QnAppInfo::defaultCloudHost().toUtf8()));
     d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_SYSTEM_NAME_HEADER_NAME,
-        QnCommonModule::instance()->localSystemName().toUtf8()));
+        Qn::EC2_SYSTEM_ID_HEADER_NAME,
+        qnGlobalSettings->localSystemId().toByteArray()));
 
-    auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_NAME_HEADER_NAME);
+    auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
     if( (systemNameHeaderIter != d->request.headers.end()) &&
-        (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) !=
-            QnCommonModule::instance()->localSystemName()) )
+        (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
+            qnGlobalSettings->localSystemId().toByteArray()) )
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
@@ -187,13 +187,13 @@ void QnTransactionTcpProcessor::run()
             QnAppInfo::defaultCloudHost().toUtf8()));
 
         d->response.headers.insert(nx_http::HttpHeader(
-            Qn::EC2_SYSTEM_NAME_HEADER_NAME,
-            QnCommonModule::instance()->localSystemName().toUtf8()));
+            Qn::EC2_SYSTEM_ID_HEADER_NAME,
+            qnGlobalSettings->localSystemId().toByteArray()));
 
-        auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_NAME_HEADER_NAME);
+        auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
         if( (systemNameHeaderIter != d->request.headers.end()) &&
-            (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) !=
-                QnCommonModule::instance()->localSystemName()) )
+            (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
+                qnGlobalSettings->localSystemId().toByteArray()) )
         {
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;

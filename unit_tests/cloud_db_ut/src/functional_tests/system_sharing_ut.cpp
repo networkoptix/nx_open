@@ -283,7 +283,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(sharings.size(), 2);
+        ASSERT_EQ(2, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -297,7 +297,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
-        ASSERT_EQ(sharings.size(), 2);
+        ASSERT_EQ(2, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -386,7 +386,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(sharings.size(), 1);
+        ASSERT_EQ(1, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -397,7 +397,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
-        ASSERT_EQ(sharings.size(), 0);
+        ASSERT_EQ(0, sharings.size());
     }
 
     restart();
@@ -408,7 +408,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(sharings.size(), 1);
+        ASSERT_EQ(1, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -419,7 +419,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
-        ASSERT_EQ(sharings.size(), 0);
+        ASSERT_EQ(0, sharings.size());
     }
 
     //adding "maintenance" sharing
@@ -455,7 +455,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &ownerSharings));
-        ASSERT_EQ(ownerSharings.size(), 3);
+        ASSERT_EQ(3, ownerSharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(ownerSharings, account1.email, system1.id));
@@ -491,7 +491,7 @@ TEST_F(SystemSharing, maintenance)
         addActivatedAccount(&account4, &account4Password));
 
     for (auto role = api::SystemAccessRole::owner;
-    role <= api::SystemAccessRole::cloudAdmin;
+        role <= api::SystemAccessRole::cloudAdmin;
         role = static_cast<api::SystemAccessRole>(static_cast<int>(role) + 1))
     {
         if (role == api::SystemAccessRole::maintenance)
@@ -533,7 +533,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &ownerSharings));
-        ASSERT_EQ(ownerSharings.size(), 2);
+        ASSERT_EQ(2, ownerSharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(ownerSharings, account1.email, system1.id));

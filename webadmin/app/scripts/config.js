@@ -45,25 +45,8 @@ var Config = {
         maxLength: 255,
         requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
         requiredMessage: L.passwordRequirements.requiredMessage,
-        strongPasswordCheck: function(password){
-
-            var classes = [
-                '[0-9]+',
-                '[a-z]+',
-                '[A-Z]+',
-                '[\\W_]+'
-            ];
-
-            var classesCount = 0;
-
-            for (var i = 0; i < classes.length; i++) {
-                var classRegex = classes[i];
-                if(new RegExp(classRegex).test(password)){
-                    classesCount ++;
-                }
-            }
-            return classesCount >= 3;
-        },
+        minClassesCount: 2,
+        strongClassesCount: 3,
         weakMessage: L.passwordRequirements.weakMessage,
         strongMessage: L.passwordRequirements.strongMessage,
         commonMessage: L.passwordRequirements.commonMessage
@@ -85,7 +68,7 @@ var Config = {
         ldapSearchBase: {label: 'LDAP search base', type: 'text'},
         ldapSearchFilter: {label: 'LDAP search filter', type: 'text'},
         ldapUri: {label: 'LDAP URI', type: 'text'},
-        serverAutoDiscoveryEnabled: {label: 'Enable device auto discovery', type: 'checkbox', setupWizard: true},
+        autoDiscoveryEnabled: {label: 'Enable device auto discovery', type: 'checkbox', setupWizard: true},
         smtpConnectionType: {label: 'SMTP connection type', type: 'text'},
         smtpHost: {label: 'SMTP host', type: 'text'},
         smtpPort: {label: 'SMTP port', type: 'number'},

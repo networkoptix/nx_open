@@ -234,7 +234,30 @@ void TransactionTransport::fillAuthInfo(
 
 void TransactionTransport::onGotTransaction(
     Qn::SerializationFormat tranFormat,
-    const QByteArray& data,
+    QByteArray data,
+    ::ec2::QnTransactionTransportHeader transportHeader)
+{
+    NX_CRITICAL(isInSelfAioThread());
+
+    // ::ec2::QnTransactionTransportBase::gotTransaction allows binding to 
+    //  itself only as QueuedConnection, so we have to use post to exit this handler ASAP.
+
+    post(
+        [this, 
+            tranFormat,
+            data = std::move(data),
+            transportHeader = std::move(transportHeader)]() mutable
+        {
+            forwardTransactionToProcessor(
+                tranFormat,
+                std::move(data),
+                std::move(transportHeader));
+        });
+}
+
+void TransactionTransport::forwardTransactionToProcessor(
+    Qn::SerializationFormat tranFormat,
+    QByteArray data,
     ::ec2::QnTransactionTransportHeader transportHeader)
 {
     NX_CRITICAL(isInSelfAioThread());
@@ -246,7 +269,7 @@ void TransactionTransport::onGotTransaction(
     {
         NX_LOGX(
             lm("systemId %1. Received transaction from %2 after connection closure")
-                .arg(m_systemId).str(m_commonTransportHeaderOfRemoteTransaction),
+            .arg(m_systemId).str(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG2);
         return;
     }
@@ -263,6 +286,21 @@ void TransactionTransport::onGotTransaction(
 }
 
 void TransactionTransport::onStateChanged(
+    ::ec2::QnTransactionTransportBase::State newState)
+{
+    NX_CRITICAL(isInSelfAioThread());
+
+    // ::ec2::QnTransactionTransportBase::gotTransaction allows binding to 
+    //  itself only as QueuedConnection, so we have to use post to exit this handler ASAP.
+
+    post(
+        [this, newState]() mutable
+        {
+            forwardStateChangedEvent(newState);
+        });
+}
+
+void TransactionTransport::forwardStateChangedEvent(
     ::ec2::QnTransactionTransportBase::State newState)
 {
     NX_CRITICAL(isInSelfAioThread());

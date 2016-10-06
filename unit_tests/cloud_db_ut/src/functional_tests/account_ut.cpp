@@ -18,6 +18,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/test_support/utils.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
@@ -43,7 +44,7 @@ TEST_F(Account, activation)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -93,7 +94,7 @@ TEST_F(Account, reactivation)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(2);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -149,7 +150,7 @@ TEST_F(Account, reactivation_activated_account)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -181,7 +182,7 @@ TEST_F(Account, general)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(3);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(3);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -271,7 +272,7 @@ TEST_F(Account, badRegistration)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(1);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -421,7 +422,10 @@ TEST_F(Account, reset_password_general)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(4);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -480,7 +484,10 @@ TEST_F(Account, resetPassword_expiration)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(QByteArray())).Times(2);
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(1);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {

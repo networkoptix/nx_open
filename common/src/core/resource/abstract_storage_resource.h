@@ -145,7 +145,7 @@ public:
     /**
      * \returns                         Storage total space in bytes, or <tt>kUnknownSize</tt> if this function is not supported.
      */
-    virtual qint64 getTotalSpace() = 0;
+    virtual qint64 getTotalSpace() const = 0;
 
     ///**
     // * \returns                         Whether the storage is physically accessible.

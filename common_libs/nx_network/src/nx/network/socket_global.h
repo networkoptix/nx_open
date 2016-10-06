@@ -33,29 +33,20 @@ public:
         NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
     };
 
-    static DebugConfiguration& debugConfiguration()
-    { return s_instance->m_debugConfiguration; }
+    typedef cloud::MediatorAddressPublisher AddressPublisher;
+    typedef hpm::api::MediatorConnector MediatorConnector;
+    typedef cloud::OutgoingTunnelPool OutgoingTunnelPool;
+    typedef cloud::CloudConnectSettings CloudSettings;
+    typedef cloud::tcp::ReverseConnectionPool TcpReversePool;
 
-    static aio::AIOService& aioService()
-    { return s_instance->m_aioService; }
-
-    static cloud::AddressResolver& addressResolver()
-    { return s_instance->m_addressResolver; }
-
-    static cloud::MediatorAddressPublisher& addressPublisher()
-    { return s_instance->m_addressPublisher; }
-
-    static hpm::api::MediatorConnector& mediatorConnector()
-    { return *s_instance->m_mediatorConnector; }
-
-    static cloud::OutgoingTunnelPool& outgoingTunnelPool()
-    { return s_instance->m_outgoingTunnelPool; }
-
-    static cloud::CloudConnectSettings& cloudConnectSettings()
-    { return s_instance->m_cloudConnectSettings; }
-
-    static cloud::tcp::ReverseConnectionPool& tcpReversePool()
-    { return s_instance->m_tcpReversePool; }
+    static DebugConfiguration& debugConfiguration() { return s_instance->m_debugConfiguration; }
+    static aio::AIOService& aioService() { return s_instance->m_aioService; }
+    static cloud::AddressResolver& addressResolver() { return s_instance->m_addressResolver; }
+    static AddressPublisher& addressPublisher() { return s_instance->m_addressPublisher; }
+    static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
+    static OutgoingTunnelPool& outgoingTunnelPool() { return s_instance->m_outgoingTunnelPool; }
+    static CloudSettings& cloudConnectSettings() { return s_instance->m_cloudConnectSettings; }
+    static TcpReversePool& tcpReversePool() { return s_instance->m_tcpReversePool; }
 
     static void init(); /**< Should be called before any socket use */
     static void deinit(); /**< Should be called when sockets are not needed any more */
@@ -84,6 +75,7 @@ public:
 private:
     SocketGlobals();
     ~SocketGlobals();
+    void setDebugConfigurationTimer();
 
     static QnMutex s_mutex;
     static std::atomic<bool> s_isInitialized;
@@ -92,8 +84,9 @@ private:
 
 private:
     DebugConfiguration m_debugConfiguration;
-    std::shared_ptr< QnLog::Logs > m_log;
+    std::shared_ptr<QnLog::Logs> m_log;
     aio::AIOService m_aioService;
+    aio::Timer m_debugConfigurationTimer;
 
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;

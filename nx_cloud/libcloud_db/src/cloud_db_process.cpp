@@ -447,13 +447,14 @@ void CloudDBProcess::registerApiHandlers(
 
     registerHttpHandler(
         kSystemRenamePath,
-        &SystemManager::rename, systemManager,
+        &SystemManager::renameSystem, systemManager,
         EntityType::system, DataActionType::update);
 
     registerHttpHandler(
         kSystemRecordUserSessionStartPath,
         &SystemManager::recordUserSessionStart, systemManager,
-        EntityType::account, DataActionType::update);   //< TODO: #ak: current entity:action is not suitable for this request
+        EntityType::account, DataActionType::update);
+    //< TODO: #ak: current entity:action is not suitable for this request
 
     //------------------------------------------
     // AuthenticationProvider

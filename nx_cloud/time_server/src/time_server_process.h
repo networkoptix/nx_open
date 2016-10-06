@@ -16,7 +16,7 @@ public:
     virtual void pleaseStop() override;
 
     void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+        nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> handler);
 
     int exec();
 
@@ -24,7 +24,7 @@ private:
     int m_argc;
     char** m_argv;
     nx::utils::promise<void> m_processTerminationEvent;
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
+    nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> m_startedEventHandler;
 };
 
 } // namespace time_server

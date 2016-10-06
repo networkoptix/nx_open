@@ -1,5 +1,5 @@
--- Change column "unique_id" (string) to "camera_id" (guid) - part 1 (before C++ code).
--- ATTENTION: Values of "camera_id" are calculated by C++ code as MD5(unique_id).
+-- Change column "unique_id" (string) to "camera_guid" (guid) - part 1 (before C++ code).
+-- ATTENTION: Values of "camera_guid" are calculated by C++ code as MD5(unique_id).
 
 DROP INDEX idx_bookmark_guid;
 DROP INDEX idx_bookmark_duration;
@@ -10,7 +10,7 @@ ALTER TABLE "bookmarks" RENAME TO "bookmarks_tmp";
 CREATE TABLE "bookmarks"
 (
     guid BLOB NOT NULL UNIQUE PRIMARY KEY,
-    camera_id BLOB(16),
+    camera_guid BLOB(16),
     start_time INTEGER NOT NULL,
     duration INTEGER NOT NULL,
     name TEXT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE "bookmarks"
 INSERT INTO "bookmarks"
     SELECT
         guid,
-        NULL, -- camera_id
+        NULL, -- unique_id
         start_time,
         duration,
         name,

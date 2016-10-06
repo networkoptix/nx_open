@@ -5,6 +5,7 @@
 #include <nx/media/abstract_video_decoder.h>
 #include <nx/media/video_decoder_registry.h>
 #include <nx/media/media_player.h>
+#include <nx/media/media_player_quality_chooser.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <core/resource/camera_resource.h>
@@ -33,9 +34,6 @@ namespace {
 //-------------------------------------------------------------------------------------------------
 // Test/mock classes.
 
-static const QSize kExpectedQualityLow{-1, MEDIA_Quality_Low};
-static const QSize kExpectedQualityHigh{-1, MEDIA_Quality_High};
-
 class TestPlayer: public Player
 {
 public:
@@ -50,17 +48,14 @@ public:
 class MockVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    MockVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution)
+    MockVideoDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
     {
-        QN_UNUSED(allocator, resolution);
     }
 
     virtual ~MockVideoDecoder() {}
 
     static bool isCompatible(const AVCodecID codec, const QSize& resolution)
     {
-        QN_UNUSED(codec);
-
         if (!s_maxResolution.isEmpty()
             && (resolution.width() > s_maxResolution.width()
                 || resolution.height() > s_maxResolution.height()))
@@ -73,32 +68,30 @@ public:
         }
 
         if (codec == s_transcodingCodec
-            && !s_maxTranscodingResolution.isEmpty()
-            && (resolution.width() > s_maxTranscodingResolution.width()
-                || resolution.height() > s_maxTranscodingResolution.height()))
+            && !s_maxTranscodedResolution.isEmpty()
+            && (resolution.width() > s_maxTranscodedResolution.width()
+                || resolution.height() > s_maxTranscodedResolution.height()))
         {
             LOG(lit("MockVideoDecoder::isCompatible() -> false: "
                 "For transcoding codec %1, resolution %2 x %3 is higher than %4 x %5")
                 .arg(s_transcodingCodec)
                 .arg(resolution.width()).arg(resolution.height())
-                .arg(s_maxTranscodingResolution.width()).arg(s_maxTranscodingResolution.height()));
+                .arg(s_maxTranscodedResolution.width()).arg(s_maxTranscodedResolution.height()));
             return false;
         }
 
         return true;
     }
 
-    static QSize maxResolution(const AVCodecID codec)
+    static QSize maxResolution(const AVCodecID /*codec*/)
     {
-        QN_UNUSED(codec);
         return s_maxResolution;
     }
 
     virtual int decode(
-        const QnConstCompressedVideoDataPtr& compressedVideoData,
-        QVideoFramePtr* outDecodedFrame) override
+        const QnConstCompressedVideoDataPtr& /*compressedVideoData*/,
+        QVideoFramePtr* /*outDecodedFrame*/) override
     {
-        QN_UNUSED(compressedVideoData, outDecodedFrame);
         LOG(lit("INTERNAL ERROR: VideoDecoder::decode() called"));
         return 0;
     }
@@ -107,11 +100,11 @@ public:
     // Should be assigned externally.
     static QSize s_maxResolution;
     static AVCodecID s_transcodingCodec;
-    static QSize s_maxTranscodingResolution;
+    static QSize s_maxTranscodedResolution;
 };
 QSize MockVideoDecoder::s_maxResolution{};
 AVCodecID MockVideoDecoder::s_transcodingCodec{AV_CODEC_ID_NONE};
-QSize MockVideoDecoder::s_maxTranscodingResolution{};
+QSize MockVideoDecoder::s_maxTranscodedResolution{};
 
 class MockServer: public QnMediaServerResource
 {
@@ -130,6 +123,34 @@ public:
     }
 };
 
+class MockVideoLayout: public QnResourceVideoLayout
+{
+public:
+    virtual int channelCount() const override
+    {
+        return m_channelCount;
+    }
+
+    virtual QSize size() const override
+    {
+        return QSize(channelCount(), 1);
+    }
+
+    virtual QPoint position(int /*channel*/) const override
+    {
+        return QPoint();
+    }
+
+    void setChannelCount(int channelCount)
+    {
+        ASSERT(channelCount >= 1);
+        m_channelCount = channelCount;
+    }
+
+private:
+    int m_channelCount = 1;
+};
+
 class MockCamera: public QnVirtualCameraResource
 {
 public:
@@ -140,6 +161,12 @@ public:
         setParentId(parentId);
 
         addFlags(Qn::server_live_cam);
+    }
+
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(
+        const QnAbstractStreamDataProvider* /*dataProvider*/ = nullptr) const override
+    {
+        return m_videoLayout;
     }
 
     /** Either resolution can be empty - the corresponding stream will not be created. */
@@ -179,8 +206,13 @@ public:
         }
     }
 
+    void setChannelCount(int channelCount)
+    {
+        m_videoLayout->setChannelCount(channelCount);
+    }
+
     virtual QString getDriverName() const override { return lit("MockCamera"); }
-    virtual void setIframeDistance(int frames, int timems) override { QN_UNUSED(frames, timems); }
+    virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
     virtual Qn::LicenseType licenseType() const override { return m_cameraType; }
 
@@ -215,6 +247,7 @@ private:
     }
 
 private:
+    QSharedPointer<MockVideoLayout> m_videoLayout{new MockVideoLayout()};
     Qn::LicenseType m_cameraType;
 };
 
@@ -260,7 +293,10 @@ public:
     }
 
     // Can be called multiple times.
-    void test(int sourceCodeLineNumber, const char* sourceCodeLineString,
+    void test(
+        int sourceCodeLineNumber,
+        const char* sourceCodeLineString,
+        int channelCount,
         bool clientSupportsTranscoding,
         bool serverSupportsTranscoding,
         QSize maxTranscodingResolution,
@@ -277,8 +313,9 @@ public:
         m_server->setSupportsTranscoding(serverSupportsTranscoding);
         MockVideoDecoder::s_maxResolution = maxDecoderResolution;
         MockVideoDecoder::s_transcodingCodec = m_archiveReader->getTranscodingCodec();
-        MockVideoDecoder::s_maxTranscodingResolution = maxTranscodingResolution;
+        MockVideoDecoder::s_maxTranscodedResolution = maxTranscodingResolution;
         m_camera->setStreams(highStreamResolution, lowStreamResolution);
+        m_camera->setChannelCount(channelCount);
 
         m_calledSetQuality = false;
 
@@ -292,12 +329,19 @@ public:
         EXPECT_TRUE(m_calledSetQuality) << "setQuality() has not been called by Player";
         if (m_calledSetQuality)
         {
-            if (expectedQuality == kExpectedQualityLow)
+            if (expectedQuality == media_player_quality_chooser::kQualityLow)
+            {
                 checkActualValues(MEDIA_Quality_Low, QSize());
-            else if (expectedQuality == kExpectedQualityHigh)
+            }
+            else if (expectedQuality == media_player_quality_chooser::kQualityHigh)
+            {
                 checkActualValues(MEDIA_Quality_High, QSize());
+            }
             else
-                checkActualValues(MEDIA_Quality_CustomResolution, expectedQuality);
+            {
+                checkActualValues(MEDIA_Quality_CustomResolution,
+                    QSize(/*width*/ 0, expectedQuality.height())); //< Player sets "auto" width.
+            }
         }
     }
 
@@ -391,52 +435,60 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     PlayerSetQualityTest test;
 
     static const QSize none{};
-    static const QSize high{kExpectedQualityHigh};
-    static const QSize low{kExpectedQualityLow};
+    static const QSize high{media_player_quality_chooser::kQualityHigh};
+    static const QSize low{media_player_quality_chooser::kQualityLow};
     static const Player::VideoQuality hi{Player::HighVideoQuality};
     static const Player::VideoQuality lo{Player::LowVideoQuality};
+    static const bool no = false;
+    static const bool yes = true;
     #define T(...) test.test(__LINE__, #__VA_ARGS__, __VA_ARGS__)
 
     // NOTE: kMaxTranscodingResolution is defined in Player private as 1920 x 1080.
 
-  // TranscoSupported                                                       Quality
-  //  Client  Server  MaxTranscoRes MaxDecoderRes HighStreamRes LowStreamRes  hi/lo  Expected
+  //     TranscSup                                                       Quality
+  // #Ch Cli  Ser  MaxTranscRes MaxDecodRes  HiStreamRes  LoStreamRes  hi/lo Expected
 
     // High stream requested.
-    T(false,  false,  none,         {1920,1080},  {1920,1080},  { 320, 240},    hi,  high       );
-    T(false,  false,  none,         {1920,1080},  {1920,1080},  { 320, 240},  1080,  high       );
-    T(false,  false,  none,         {1920,1080},  {1920,1080},  { 320, 240},    hi,  high       );
-    T(false,  false,  none,         { 640, 480},  {1920,1080},  { 320, 240},    hi,  low        );
-    T(true,   true,   none,         { 640, 480},  {1280, 720},  { 320, 240},    hi,  low        );
-    T(true,   true,   none,         {1920,1080},  {2560,1440},  { 320, 240},    hi,  {1920,1080});
-    T(true,   true,   none,         {1920,1080},  none,         { 320, 240},    hi,  low        );
+    T(1, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, high       );
+    T(1, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240}, 1080, high       );
+    T(1, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, high       );
+    T(1, no,  no,  none,        { 640, 480}, {1920,1080}, { 320, 240},   hi, low        );
+    T(1, yes, yes, none,        { 640, 480}, {1280, 720}, { 320, 240},   hi, low        );
+    T(1, yes, yes, none,        {1920,1080}, {2560,1440}, { 320, 240},   hi, {1920,1080});
+    T(1, yes, yes, none,        {1920,1080}, none,        { 320, 240},   hi, low        );
 
     // Low stream requested.
-    T(true,   true,   none,         {1920,1080},  {1920,1080},  { 320, 240},    lo,  low        );
-    T(true,   true,   none,         {1920,1080},  {1920,1080},  { 320, 240},   240,  low        );
+    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},   lo, low        );
+    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},  240, low        );
 
     // Invalid Video Quality.
-    T(true,   true,   none,         none,         {1920,1080},  { 640, 480},  -113,  low        );
+    T(1, yes, yes, none,        none,        {1920,1080}, { 640, 480}, -113, low        );
 
     // Transcoding requested and is available.
-    T(true,   true,   none,         none,         none,         { 640, 480},   360,  { 480, 360});
+    T(1, yes, yes, none,        none,        none,        { 640, 480},  360, { 480, 360});
 
     // Transcoding requested but is not available.
-    T(false,  false,  none,         none,         none,         { 640, 480},   360,  low        );
-    T(true,   false,  none,         none,         none,         { 640, 480},   360,  low        );
-    T(false,  true,   none,         none,         none,         { 640, 480},   360,  low        );
+    T(1, no,  no,  none,        none,        none,        { 640, 480},  360, low        );
+    T(1, yes, no,  none,        none,        none,        { 640, 480},  360, low        );
+    T(1, no,  yes, none,        none,        none,        { 640, 480},  360, low        );
 
     // Transcoding to the requested resolution which is within limits.
-    T(true,   true,   none,         {1920,1080},  {1920,1080},  { 320, 240},   720,  {1280, 720});
+    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},  720, {1280, 720});
 
     // Transcoding to a resolution limited by MaxDecoderRes.
-    T(true,   true,   none,         {1280, 720},  {2560,1440},  { 320, 240},  1080,  {1280, 720});
+    T(1, yes, yes, none,        {1280, 720}, {2560,1440}, { 320, 240}, 1080, {1280, 720});
 
     // Transcoding to a resolution limited by kMaxTranscodingResolution.
-    T(true,   true,   none,         none,         {3840,2160},  { 320, 240},  1440,  {1920,1080});
+    T(1, yes, yes, none,        none,        {3840,2160}, { 320, 240}, 1440, {1920,1080});
 
     // Transcoding to a resolution not supported by the decoder for the transcoding codec.
-    T(true,   true,   {1280, 720},  none,         {3840,2160},  { 320, 240},  1440,  low        );
+    T(1, yes, yes, {1280, 720}, none,        {3840,2160}, { 320, 240}, 1440, low        );
+
+    // Panoramic camera: transcoding is supported, thus, should be used.
+    T(4, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, {1920,1080});
+
+    // Panoramic camera: transcoding is not supported, thus, low quality should be chosen.
+    T(4, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, low        );
 
     #undef T
 

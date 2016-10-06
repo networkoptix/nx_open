@@ -49,6 +49,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <core/resource/fake_media_server.h>
 
 #define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
@@ -126,8 +127,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         &QnResourceTreeModel::at_snapshotManager_flagsChanged);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModel::rebuildTree, Qt::QueuedConnection);
-    connect(qnCommon, &QnCommonModule::systemNameChanged, this,
-        &QnResourceTreeModel::at_commonModule_systemNameChanged);
+    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
+        &QnResourceTreeModel::at_systemNameChanged);
     connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged, this,
         &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE),
@@ -421,7 +422,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (node->resourceFlags().testFlag(Qn::server))
     {
         /* Valid servers. */
-        if (!QnMediaServerResource::isFakeServer(node->resource()))
+        if (!node->resource().dynamicCast<QnFakeMediaServerResource>())
         {
             if (isAdmin)
                 return m_rootNodes[Qn::ServersNode];
@@ -434,11 +435,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return bastardNode;
 
         QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
-        QString systemName = server->getSystemName();
-        if (systemName == qnCommon->localSystemName())
+        auto systemId = server->getModuleInformation().localSystemId;
+        if (systemId == qnGlobalSettings->localSystemId())
             return m_rootNodes[Qn::ServersNode];
 
-        return ensureSystemNode(systemName);
+        return ensureSystemNode(server->getModuleInformation().systemName);
 
     }
 
@@ -918,16 +919,12 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server)
-    {
-        connect(server, &QnMediaServerResource::redundancyChanged, this,
-            &QnResourceTreeModel::at_server_redundancyChanged);
+        connect(server,     &QnMediaServerResource::redundancyChanged, this, &QnResourceTreeModel::at_server_redundancyChanged);
 
-        if (QnMediaServerResource::isFakeServer(server))
-        {
-            connect(server, &QnMediaServerResource::systemNameChanged, this,
-                &QnResourceTreeModel::at_server_systemNameChanged);
-        }
-    }
+    auto fakeServer = resource.dynamicCast<QnFakeMediaServerResource>();
+    if (fakeServer)
+        connect(fakeServer, &QnFakeMediaServerResource::moduleInformationChanged, this, &QnResourceTreeModel::at_fakeserver_information_changed);
+
 
     auto node = ensureResourceNode(resource);
     updateNodeParent(node);
@@ -975,7 +972,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     m_nodesByResource.remove(resource);
     m_resourceNodeByResource.remove(resource);
 
-    if (QnMediaServerResource::isFakeServer(resource))
+    if (resource.dynamicCast<QnFakeMediaServerResource>())
         cleanupGroupNodes(Qn::SystemNode);
 }
 
@@ -1067,7 +1064,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     /* Drop camera on server allows to move servers between cameras. */
     else if (QnMediaServerResourcePtr server = targetResource.dynamicCast<QnMediaServerResource>())
     {
-        if (QnMediaServerResource::isFakeServer(server))
+        if (server.dynamicCast<QnFakeMediaServerResource>())
             return;
 
         /* Do not allow to drop camera items from layouts. */
@@ -1178,7 +1175,7 @@ void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePt
         removeNode(node);
 }
 
-void QnResourceTreeModel::at_server_systemNameChanged(const QnResourcePtr &resource)
+void QnResourceTreeModel::at_fakeserver_information_changed(const QnResourcePtr &resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     NX_ASSERT(server);
@@ -1211,7 +1208,7 @@ void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resou
     }
 }
 
-void QnResourceTreeModel::at_commonModule_systemNameChanged()
+void QnResourceTreeModel::at_systemNameChanged()
 {
     m_rootNodes[Qn::CurrentSystemNode]->update();
 }
