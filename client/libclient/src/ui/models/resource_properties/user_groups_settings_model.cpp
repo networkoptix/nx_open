@@ -1,7 +1,8 @@
 #include "user_groups_settings_model.h"
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/style/resource_icon_cache.h>
@@ -43,19 +44,18 @@ void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
     beginResetModel();
 
     m_groups = value;
-    std::sort(m_groups.begin(), m_groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
-    {
-        /* Case Insensitive sort. */
-        return nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive) < 0;
-    });
+    std::sort(m_groups.begin(), m_groups.end(),
+        [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
+        {
+            /* Case Insensitive sort. */
+            return nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive) < 0;
+        });
 
     m_accessibleResources.clear();
     for (const auto& group : m_groups)
-        m_accessibleResources[group.id] = qnResourceAccessManager->accessibleResources(group.id);
+        m_accessibleResources[group.id] = qnSharedResourcesManager->sharedResources(group);
 
     m_replacements.clear();
-
-    m_accessibleLayoutsPreviews.clear();
 
     endResetModel();
 }
@@ -137,9 +137,9 @@ QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources() const
     return m_accessibleResources.value(m_currentGroupId);
 }
 
-QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources(const QnUuid& groupId) const
+QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources(const ec2::ApiUserGroupData& group) const
 {
-    return m_accessibleResources.value(groupId);
+    return m_accessibleResources.value(group.id);
 }
 
 int QnUserGroupSettingsModel::rowCount(const QModelIndex& parent) const
@@ -183,6 +183,11 @@ void QnUserGroupSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
         return;
 
     m_accessibleResources[m_currentGroupId] = value;
+}
+
+QnResourceAccessSubject QnUserGroupSettingsModel::subject() const
+{
+    return qnUserRolesManager->userRole(m_currentGroupId);
 }
 
 ec2::ApiUserGroupDataList::iterator QnUserGroupSettingsModel::currentGroup()
@@ -242,20 +247,4 @@ QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::replacement(
 QnUserGroupSettingsModel::RoleReplacement QnUserGroupSettingsModel::directReplacement(const QnUuid& source) const
 {
     return m_replacements[source];
-}
-
-void QnUserGroupSettingsModel::setAccessibleLayoutsPreview(const QSet<QnUuid>& value)
-{
-    m_accessibleLayoutsPreviews[m_currentGroupId] = value;
-}
-
-QnIndirectAccessProviders QnUserGroupSettingsModel::accessibleLayouts() const
-{
-    auto role = qnResourceAccessManager->userGroup(m_currentGroupId);
-    auto layouts = QnResourceAccessProvider::indirectlyAccessibleLayouts(role);
-
-    for (auto layoutPreview : m_accessibleLayoutsPreviews[m_currentGroupId])
-        layouts.insert(layoutPreview, QSet<QnResourcePtr>());
-
-    return layouts;
 }

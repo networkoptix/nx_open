@@ -47,8 +47,10 @@ protected:
     virtual bool registeredNotify(QGraphicsItem *item) override;
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
-    virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mousePressEvent(QWidget* viewport, QMouseEvent*event) override;
+    virtual bool mousePressEvent(QGraphicsItem* item, QGraphicsSceneMouseEvent* event) override;
+    virtual bool mouseMoveEvent(QWidget* viewport, QMouseEvent* event) override;
+//    virtual bool mouseReleaseEvent(QWidget* viewport, QMouseEvent* event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;

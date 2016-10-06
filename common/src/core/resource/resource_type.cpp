@@ -12,6 +12,14 @@ const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
 const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
 const QString QnResourceTypePool::kUserTypeId(lit("User"));
 
+const QnUuid QnResourceTypePool::kUserTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kUserTypeId));
+const QnUuid QnResourceTypePool::kServerTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kServerTypeId));
+const QnUuid QnResourceTypePool::kStorageTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kStorageTypeId));
+const QnUuid QnResourceTypePool::kLayoutTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kLayoutTypeId));
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -226,9 +234,6 @@ QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, con
         {
             int len = rt->getName().length();
             if (len > bestLen && rt->getName() == name.left(len)) {
-                NX_LOG(lit("RT %1 SATISFIES GIVEN CONDITIONS, UUID IS %2")
-                    .arg(rt->getName())
-                    .arg(rt->getId().toString()), cl_logINFO);
                 result = rt->getId();
                 bestLen = len;
                 if (len == name.length())

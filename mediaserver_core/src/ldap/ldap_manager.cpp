@@ -2,6 +2,7 @@
 
 #include "api/global_settings.h"
 #include <nx/utils/log/log.h>
+#include <utils/crypt/symmetrical.h>
 #include <iostream>
 #include <sstream>
 

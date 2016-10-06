@@ -9,6 +9,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <transaction/transaction.h>
 
+#include <api/global_settings.h>
 #include <utils/common/app_info.h>
 
 namespace nx {
@@ -16,7 +17,7 @@ namespace cdb {
 
 constexpr static const auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std::chrono::seconds(10);
 
-Ec2MserverCloudSynchronization2::Ec2MserverCloudSynchronization2()
+Ec2MserverCloudSynchronization::Ec2MserverCloudSynchronization()
 {
     const auto tmpDir =
         (CdbLauncher::temporaryDirectoryPath().isEmpty()
@@ -28,29 +29,29 @@ Ec2MserverCloudSynchronization2::Ec2MserverCloudSynchronization2()
     m_appserver2.addArg(dbFileArg.toStdString().c_str());
 }
 
-Ec2MserverCloudSynchronization2::~Ec2MserverCloudSynchronization2()
+Ec2MserverCloudSynchronization::~Ec2MserverCloudSynchronization()
 {
     m_appserver2.stop();
     m_cdb.stop();
 }
 
 utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>* 
-    Ec2MserverCloudSynchronization2::appserver2()
+    Ec2MserverCloudSynchronization::appserver2()
 {
     return &m_appserver2;
 }
 
-CdbLauncher* Ec2MserverCloudSynchronization2::cdb()
+CdbLauncher* Ec2MserverCloudSynchronization::cdb()
 {
     return &m_cdb;
 }
 
-const CdbLauncher* Ec2MserverCloudSynchronization2::cdb() const
+const CdbLauncher* Ec2MserverCloudSynchronization::cdb() const
 {
     return &m_cdb;
 }
 
-api::ResultCode Ec2MserverCloudSynchronization2::bindRandomSystem()
+api::ResultCode Ec2MserverCloudSynchronization::bindRandomSystem()
 {
     api::ResultCode result = api::ResultCode::ok;
     if (m_account.email.empty())    //< Account is not registered yet
@@ -89,7 +90,7 @@ api::ResultCode Ec2MserverCloudSynchronization2::bindRandomSystem()
     return api::ResultCode::ok;
 }
 
-api::ResultCode Ec2MserverCloudSynchronization2::unbindSystem()
+api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
 {
     api::ResultCode result = m_cdb.unbindSystem(m_account.email, m_accountPassword, m_system.id);
     if (result != api::ResultCode::ok)
@@ -137,7 +138,7 @@ api::ResultCode Ec2MserverCloudSynchronization2::unbindSystem()
     return api::ResultCode::ok;
 }
 
-api::ResultCode Ec2MserverCloudSynchronization2::rebindSystem()
+api::ResultCode Ec2MserverCloudSynchronization::rebindSystem()
 {
     auto resultCode = unbindSystem();
     if (resultCode != api::ResultCode::ok)
@@ -146,22 +147,22 @@ api::ResultCode Ec2MserverCloudSynchronization2::rebindSystem()
     return bindRandomSystem();
 }
 
-const api::AccountData& Ec2MserverCloudSynchronization2::ownerAccount() const
+const api::AccountData& Ec2MserverCloudSynchronization::ownerAccount() const
 {
     return m_account;
 }
 
-const std::string& Ec2MserverCloudSynchronization2::ownerAccountPassword() const
+const std::string& Ec2MserverCloudSynchronization::ownerAccountPassword() const
 {
     return m_accountPassword;
 }
 
-const api::SystemData& Ec2MserverCloudSynchronization2::registeredSystemData() const
+const api::SystemData& Ec2MserverCloudSynchronization::registeredSystemData() const
 {
     return m_system;
 }
 
-QUrl Ec2MserverCloudSynchronization2::cdbEc2TransactionUrl() const
+QUrl Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
 {
     QUrl url(lit("http://%1/").arg(cdb()->endpoint().toString()));
     url.setUserName(QString::fromStdString(m_system.id));
@@ -169,7 +170,7 @@ QUrl Ec2MserverCloudSynchronization2::cdbEc2TransactionUrl() const
     return url;
 }
 
-void Ec2MserverCloudSynchronization2::verifyTransactionConnection()
+void Ec2MserverCloudSynchronization::verifyTransactionConnection()
 {
     constexpr static const auto kMaxTimeToWaitForConnection = std::chrono::seconds(15);
 
@@ -195,7 +196,7 @@ void Ec2MserverCloudSynchronization2::verifyTransactionConnection()
     ASSERT_TRUE(false);
 }
 
-void Ec2MserverCloudSynchronization2::testSynchronizingCloudOwner()
+void Ec2MserverCloudSynchronization::testSynchronizingCloudOwner()
 {
     constexpr static const auto testTime = std::chrono::seconds(5);
 
@@ -217,7 +218,7 @@ void Ec2MserverCloudSynchronization2::testSynchronizingCloudOwner()
     ASSERT_TRUE(false);
 }
 
-void Ec2MserverCloudSynchronization2::testSynchronizingUserFromCloudToMediaServer()
+void Ec2MserverCloudSynchronization::testSynchronizingUserFromCloudToMediaServer()
 {
     // Sharing system with some account.
     api::AccountData account2;
@@ -250,7 +251,7 @@ void Ec2MserverCloudSynchronization2::testSynchronizingUserFromCloudToMediaServe
     ASSERT_TRUE(false);
 }
 
-void Ec2MserverCloudSynchronization2::testSynchronizingUserFromMediaServerToCloud()
+void Ec2MserverCloudSynchronization::testSynchronizingUserFromMediaServerToCloud()
 {
     // Adding cloud user.
 
@@ -266,7 +267,7 @@ void Ec2MserverCloudSynchronization2::testSynchronizingUserFromMediaServerToClou
     waitForUserToAppearInCloud(newCloudUser);
 }
 
-void Ec2MserverCloudSynchronization2::addCloudUserLocally(
+void Ec2MserverCloudSynchronization::addCloudUserLocally(
     const std::string& accountEmail,
     ::ec2::ApiUserData* const accountVmsData)
 {
@@ -289,7 +290,7 @@ void Ec2MserverCloudSynchronization2::addCloudUserLocally(
             ->getUserManager(Qn::kSystemAccess)->saveSync(*accountVmsData));
 }
 
-void Ec2MserverCloudSynchronization2::waitForUserToAppearInCloud(
+void Ec2MserverCloudSynchronization::waitForUserToAppearInCloud(
     const ::ec2::ApiUserData& accountVmsData)
 {
     // Waiting for it to appear in cloud.
@@ -335,7 +336,7 @@ void Ec2MserverCloudSynchronization2::waitForUserToAppearInCloud(
     }
 }
 
-void Ec2MserverCloudSynchronization2::waitForUserToDisappearFromCloud(const std::string& email)
+void Ec2MserverCloudSynchronization::waitForUserToDisappearFromCloud(const std::string& email)
 {
     // Waiting for it to appear in cloud.
     const auto t0 = std::chrono::steady_clock::now();
@@ -364,7 +365,7 @@ void Ec2MserverCloudSynchronization2::waitForUserToDisappearFromCloud(const std:
     }
 }
 
-void Ec2MserverCloudSynchronization2::waitForUserToDisappearLocally(const QnUuid& userId)
+void Ec2MserverCloudSynchronization::waitForUserToDisappearLocally(const QnUuid& userId)
 {
     const auto t0 = std::chrono::steady_clock::now();
     for (;;)
@@ -393,7 +394,7 @@ void Ec2MserverCloudSynchronization2::waitForUserToDisappearLocally(const QnUuid
     }
 }
 
-void Ec2MserverCloudSynchronization2::verifyCloudUserPresenceInLocalDb(
+void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     const api::SystemSharingEx& sharingData,
     bool* const found,
     bool assertOnUserAbsense)
@@ -466,7 +467,7 @@ void Ec2MserverCloudSynchronization2::verifyCloudUserPresenceInLocalDb(
         *found = true;
 }
 
-void Ec2MserverCloudSynchronization2::fetchOwnerSharing(api::SystemSharingEx* const ownerSharing)
+void Ec2MserverCloudSynchronization::fetchOwnerSharing(api::SystemSharingEx* const ownerSharing)
 {
     std::vector<api::SystemSharingEx> systemUsers;
     ASSERT_EQ(
@@ -488,7 +489,7 @@ void Ec2MserverCloudSynchronization2::fetchOwnerSharing(api::SystemSharingEx* co
     ASSERT_TRUE(false);
 }
 
-void Ec2MserverCloudSynchronization2::verifyThatUsersMatchInCloudAndVms(
+void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
     bool assertOnFailure,
     bool* const result)
 {
@@ -537,7 +538,56 @@ void Ec2MserverCloudSynchronization2::verifyThatUsersMatchInCloudAndVms(
         *result = true;
 }
 
-void Ec2MserverCloudSynchronization2::waitForCloudAndVmsToSyncUsers(
+void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
+    bool assertOnFailure,
+    bool* const result)
+{
+    if (result)
+        *result = false;
+
+    // Fetching data from cloud
+    api::SystemDataEx systemData;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        cdb()->getSystem(
+            ownerAccount().email,
+            ownerAccountPassword(),
+            registeredSystemData().id,
+            &systemData));
+
+    QnUuid adminUserId;
+    ASSERT_TRUE(findAdminUserId(&adminUserId));
+
+    ec2::ApiResourceParamWithRefDataList systemSettings;
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        appserver2()->moduleInstance()->ecConnection()
+            ->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(adminUserId, &systemSettings));
+    for (const auto systemSetting: systemSettings)
+    {
+        if (systemSetting.name == nx::settings_names::kNameSystemName)
+        {
+            if (assertOnFailure)
+            {
+                ASSERT_EQ(systemData.name, systemSetting.value.toStdString());
+            }
+            else if (systemData.name == systemSetting.value.toStdString())
+            {
+                if (result)
+                    *result = true;
+            }
+            return;
+        }
+    }
+
+    if (assertOnFailure)
+    {
+        ASSERT_TRUE(false) << nx::settings_names::kNameSystemName.toStdString()
+            << " setting not found";
+    }
+}
+
+void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncUsers(
     bool assertOnFailure,
     bool* const result)
 {
@@ -571,7 +621,41 @@ void Ec2MserverCloudSynchronization2::waitForCloudAndVmsToSyncUsers(
         *result = false;
 }
 
-api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLog(
+void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
+    bool assertOnFailure,
+    bool* const result)
+{
+    for (auto t0 = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::now() - t0 < kMaxTimeToWaitForChangesToBePropagatedToCloud;
+        )
+    {
+        const bool isLastRun =
+            (std::chrono::steady_clock::now() + std::chrono::seconds(1)) >=
+            (t0 + kMaxTimeToWaitForChangesToBePropagatedToCloud);
+
+        bool syncCompleted = false;
+        verifyThatSystemDataMatchInCloudAndVms(isLastRun, &syncCompleted);
+        if (syncCompleted)
+        {
+            if (result)
+                *result = true;
+            return;
+        }
+        if (isLastRun)
+            break;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    if (assertOnFailure)
+    {
+        ASSERT_TRUE(false);
+    }
+
+    if (result)
+        *result = false;
+}
+
+api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     const QUrl url(lm("http://%1/%2?systemID=%3")
@@ -580,7 +664,7 @@ api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLog(
     return fetchTransactionLog(url, transactionList);
 }
 
-api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLogFromMediaserver(
+api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMediaserver(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     QUrl url(lm("http://%1/%2?cloud_only=true")
@@ -590,7 +674,7 @@ api::ResultCode Ec2MserverCloudSynchronization2::fetchCloudTransactionLogFromMed
     return fetchTransactionLog(url, transactionList);
 }
 
-bool Ec2MserverCloudSynchronization2::findAdminUserId(QnUuid* const id)
+bool Ec2MserverCloudSynchronization::findAdminUserId(QnUuid* const id)
 {
     ec2::ApiUserDataList users;
     if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
@@ -612,7 +696,7 @@ bool Ec2MserverCloudSynchronization2::findAdminUserId(QnUuid* const id)
     return true;
 }
 
-api::ResultCode Ec2MserverCloudSynchronization2::fetchTransactionLog(
+api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
     const QUrl& url,
     ::ec2::ApiTransactionDataList* const transactionList)
 {

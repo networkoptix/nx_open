@@ -26,8 +26,9 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <nx/utils/thread/mutex.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/media/custom_output_stream.h>
 
 #include "ilp_empty_packet.h"
@@ -40,11 +41,12 @@ static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
 static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 static const int MAX_FRAME_SIZE = 4*1024*1024;
 
-StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
-                           nxpl::TimeProvider *const timeProvider,
-                           const nxcip::CameraInfo& cameraInfo,
-                           float fps,
-                           int encoderNumber )
+StreamReader::StreamReader(
+    nxpt::CommonRefManager* const parentRefManager,
+    nxpl::TimeProvider *const timeProvider,
+    const nxcip::CameraInfo& cameraInfo,
+    float fps,
+    int encoderNumber )
 :
     m_refManager( parentRefManager ),
     m_cameraInfo( cameraInfo ),
@@ -60,11 +62,6 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
 {
     NX_ASSERT(m_timeProvider);
     setFps( fps );
-
-    using namespace std::placeholders;
-
-    auto jpgFrameHandleFunc = std::bind( &StreamReader::gotJpegFrame, this, _1 );
-    m_multipartContentParser.setNextFilter( std::make_shared<CustomOutputStream<decltype(jpgFrameHandleFunc)> >(jpgFrameHandleFunc) );
 }
 
 StreamReader::~StreamReader()
@@ -125,6 +122,14 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
     if( httpClientHasBeenJustCreated )
     {
+        using namespace std::placeholders;
+
+        m_multipartContentParser = std::make_unique<nx_http::MultipartContentParser>();
+        auto jpgFrameHandleFunc = std::bind(&StreamReader::gotJpegFrame, this, _1);
+        m_multipartContentParser->setNextFilter(
+            std::make_shared<CustomOutputStream<decltype(jpgFrameHandleFunc)>>(
+                jpgFrameHandleFunc));
+
         const int result = doRequest( localHttpClientPtr.get() );
         if( result != nxcip::NX_NO_ERROR )
             return result;
@@ -134,7 +139,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             //single jpeg, have to get it by timer
             m_streamType = jpg;
         }
-        else if( m_multipartContentParser.setContentType(localHttpClientPtr->contentType()) )
+        else if( m_multipartContentParser->setContentType(localHttpClientPtr->contentType()) )
         {
             //motion jpeg stream
             m_streamType = mjpg;
@@ -189,7 +194,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             //reading mjpg picture
             while( !m_videoPacket.get() && !localHttpClientPtr->eof() )
             {
-                m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
+                m_multipartContentParser->processData(localHttpClientPtr->fetchMessageBodyBuffer());
                 {
                     QnMutexLocker lk( &m_mutex );
                     if( m_terminated )
@@ -223,15 +228,19 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    QnMutexLocker lk( &m_mutex );
-    m_terminated = true;
-    m_cond.wakeAll();
+    std::shared_ptr<nx_http::HttpClient> client;
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_terminated = true;
+        m_cond.wakeAll();
+        std::swap(client, m_httpClient);
+    }
 
     //closing connection
-    if( m_httpClient )
+    if(client)
     {
-        m_httpClient->pleaseStop();
-        m_httpClient.reset();
+        client->pleaseStop();
+        client.reset();
     }
 }
 

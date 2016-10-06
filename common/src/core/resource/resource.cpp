@@ -9,12 +9,13 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
-#include <nx/utils/log/log.h>
-#include <utils/common/warnings.h>
+#include <nx_ec/data/api_resource_data.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/utils/log/log.h>
 
 #include <core/resource/camera_advanced_param.h>
-#include "nx/streaming/abstract_stream_data_provider.h"
+#include <utils/common/warnings.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/ptz/abstract_ptz_controller.h"
 
@@ -25,7 +26,6 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "resource_command.h"
-#include "nx_ec/data/api_resource_data.h"
 #include "../resource_management/resource_properties.h"
 #include "../resource_management/status_dictionary.h"
 
@@ -808,7 +808,7 @@ QnAbstractPtzController *QnResource::createPtzController()
                 .arg(getUrl());
 
         qDebug() << message;
-        NX_LOG(message, cl_logERROR);
+        NX_LOG(message, cl_logWARNING);
     }
 
     if((capabilities & Qn::DevicePositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))

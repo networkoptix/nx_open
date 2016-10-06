@@ -4,6 +4,16 @@
 #include <network/module_finder.h>
 #include <nx/network/socket_common.h>
 
+namespace {
+
+bool isOldServer(const QnModuleInformation& info)
+{
+    static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
+    return (info.version < kMinVersionWithSystem);
+}
+
+} // namespace
+
 QnDirectSystemsFinder::QnDirectSystemsFinder(QObject *parent)
     : base_type(parent)
 {
@@ -64,8 +74,12 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
     const auto createNewSystem = (itSystem == m_systems.end());
     if (createNewSystem)
     {
+        const auto systemName = (isOldServer(moduleInformation)
+            ? tr("System")
+            : moduleInformation.systemName);
+
         const auto systemDescription = QnSystemDescription::createLocalSystem(
-            systemId, moduleInformation.systemName);
+            systemId, systemName);
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }
@@ -139,6 +153,14 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
 
     const auto systemDescription = systemIt.value();
     systemDescription->setServerHost(moduleInformation.id, address.toString());
+
+    // Workaround for systems with version less than 2.3.
+    // In these systems only one server is visible, and system name does not exist.
+
+    static const auto kNameTemplate = tr("System (%1)", "%1 is ip and port of system");
+    if (isOldServer(moduleInformation))
+        systemDescription->setName(kNameTemplate.arg(address.toString()));
+
 }
 
 QnDirectSystemsFinder::SystemsHash::iterator

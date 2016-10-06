@@ -6,11 +6,14 @@
 
 #include <common/common_module.h>
 
-#include <utils/common/warnings.h>
 #include <network/router.h>
+
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -48,6 +51,7 @@
 
 #include "action_parameter_types.h"
 #include "action_manager.h"
+#include <core/resource/fake_media_server.h>
 
 QnActionCondition::QnActionCondition(QObject *parent):
     QObject(parent),
@@ -327,7 +331,7 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParameters &parameters)
 {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
-    if (nodeType == Qn::SharedLayoutNode || nodeType == Qn::AccessibleResourceNode)
+    if (nodeType == Qn::SharedLayoutNode || nodeType == Qn::SharedResourceNode)
         return Qn::InvisibleAction;
 
     QnUserResourcePtr owner = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
@@ -372,6 +376,37 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParam
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnStopSharingActionCondition::check(const QnActionParameters &parameters)
+{
+    if (qnCommon->isReadOnly())
+        return Qn::InvisibleAction;
+
+    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    if (nodeType != Qn::SharedLayoutNode)
+        return Qn::InvisibleAction;
+
+    auto user = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    auto roleId = parameters.argument<QnUuid>(Qn::UuidRole);
+    NX_ASSERT(user || !roleId.isNull());
+    if (!user && roleId.isNull())
+        return Qn::InvisibleAction;
+
+    QnResourceAccessSubject subject = user
+        ? QnResourceAccessSubject(user)
+        : QnResourceAccessSubject(qnUserRolesManager->userRole(roleId));
+    if (!subject.isValid())
+        return Qn::InvisibleAction;
+
+    for (auto resource: parameters.resources())
+    {
+        if (qnResourceAccessProvider->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+            return Qn::EnabledAction;
+    }
+
+    return Qn::DisabledAction;
+}
+
+
 Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters)
 {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
@@ -380,7 +415,7 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
     {
         case Qn::ResourceNode:
         case Qn::SharedLayoutNode:
-        case Qn::AccessibleResourceNode:
+        case Qn::SharedResourceNode:
         {
             if (parameters.resources().size() != 1)
                 return Qn::InvisibleAction;
@@ -398,7 +433,7 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
                 return Qn::InvisibleAction;
 
             /* Incompatible resources cannot be renamed */
-            if (QnMediaServerResource::isFakeServer(target))
+            if (target.dynamicCast<QnFakeMediaServerResource>())
                 return Qn::InvisibleAction;
 
             return Qn::EnabledAction;
@@ -774,7 +809,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     {
         //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
-        if (isServer && QnMediaServerResource::isFakeServer(resource))
+        if (isServer && resource.dynamicCast<QnFakeMediaServerResource>())
             continue;
 
         bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
@@ -811,7 +846,7 @@ Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceLis
         if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
             return Qn::EnabledAction;
 
-        if (resource->hasFlags(Qn::server) && !QnMediaServerResource::isFakeServer(resource))
+        if (resource->hasFlags(Qn::server) && !resource.dynamicCast<QnFakeMediaServerResource>())
             return Qn::EnabledAction;
     }
 
@@ -1249,14 +1284,16 @@ Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResour
 }
 
 
-Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
+Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources)
+{
     bool found = false;
-    foreach (const QnResourcePtr &resource, resources) {
+    foreach (const QnResourcePtr &resource, resources)
+    {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
-        if (QnMediaServerResource::isFakeServer(resource))
+        if (server.dynamicCast<QnFakeMediaServerResource>())
             found = true;
         else if (m_all)
             return Qn::InvisibleAction;

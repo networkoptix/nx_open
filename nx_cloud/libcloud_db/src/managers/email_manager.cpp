@@ -60,7 +60,7 @@ EMailManager::~EMailManager()
 }
 
 void EMailManager::sendAsync(
-    QByteArray serializedNotification,
+    const AbstractNotification& notification,
     std::function<void(bool)> completionHandler)
 {
     auto asyncOperationLocker = m_startedAsyncCallsCounter.getScopedIncrement();
@@ -87,12 +87,14 @@ void EMailManager::sendAsync(
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         httpClient.get(),
-        [this, asyncOperationLocker, completionHandler](nx_http::AsyncHttpClientPtr client) {
-        onSendNotificationRequestDone(
-            std::move(asyncOperationLocker),
-            std::move(client),
-            std::move(completionHandler));
-    },
+        [this, asyncOperationLocker, completionHandler](
+            nx_http::AsyncHttpClientPtr client)
+        {
+            onSendNotificationRequestDone(
+                std::move(asyncOperationLocker),
+                std::move(client),
+                std::move(completionHandler));
+        },
         Qt::DirectConnection);
     {
         QnMutexLocker lk(&m_mutex);
@@ -101,7 +103,7 @@ void EMailManager::sendAsync(
     httpClient->doPost(
         url,
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        std::move(serializedNotification));
+        notification.serializeToJson());
 }
 
 void EMailManager::onSendNotificationRequestDone(

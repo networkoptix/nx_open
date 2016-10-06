@@ -32,7 +32,7 @@ namespace Qn
     static const QByteArray API_RESULT_CODE_HEADER_NAME = "X-Nx-Result-Code";
     static const QByteArray RTT_MS_HEADER_NAME = "X-Nx-rtt-ms";
 
-    static const QByteArray EC2_SYSTEM_NAME_HEADER_NAME = "X-Nx-EC-SYSTEM-NAME";
+    static const QByteArray EC2_SYSTEM_ID_HEADER_NAME = "X-Nx-Ec-SYSTEM-Id";
     static const QByteArray EC2_CONNECTION_STATE_HEADER_NAME = "X-Nx-EC-CONNECTION-STATE";
     static const QByteArray EC2_CONNECTION_DIRECTION_HEADER_NAME = "X-Nx-Connection-Direction";
     static const QByteArray EC2_CONNECTION_GUID_HEADER_NAME = "X-Nx-Connection-Guid";

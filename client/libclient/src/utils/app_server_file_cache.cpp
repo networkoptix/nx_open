@@ -13,6 +13,7 @@
 #include <utils/common/util.h> /* For removeDir. */
 #include <nx/utils/uuid.h>
 #include <nx/utils/string.h>
+#include <api/global_settings.h>
 
 namespace {
     /** Maximum allowed file size is 15 Mb, hard limit of Jaguar or S2 cameras. */
@@ -59,7 +60,7 @@ QnAppServerFileCache::~QnAppServerFileCache() {
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     /* Avoid empty folder name and collisions with our folders such as 'log'. */
-    QString systemName = L'_' + nx::utils::replaceNonFileNameCharacters(qnCommon->localSystemName(), L'_');
+    QString systemName = L'_' + nx::utils::replaceNonFileNameCharacters(qnGlobalSettings->localSystemId().toString(), L'_');
 
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     return QDir::toNativeSeparators(QString(lit("%1/cache/%2/%3/%4"))

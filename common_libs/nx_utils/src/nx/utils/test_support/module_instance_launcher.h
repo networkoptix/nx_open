@@ -47,9 +47,9 @@ public:
                 m_moduleInstance = std::make_unique<ModuleProcessType>(
                     static_cast<int>(m_args.size()), m_args.data());
                 m_moduleInstance->setOnStartedEventHandler(
-                    [this](bool result)
+                    [this](bool isStarted)
                     {
-                        m_moduleStartedPromise->set_value(result);
+                        m_moduleStartedPromise->set_value(isStarted);
                     });
                 moduleInstantiatedCreatedPromise.set_value();
                 return m_moduleInstance->exec();

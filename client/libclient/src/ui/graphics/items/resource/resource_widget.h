@@ -69,8 +69,9 @@ public:
         ControlZoomWindow           = 0x00200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
         WindowRotationForbidden     = 0x01000,
-        SyncPlayForbidden           = 0x02000,   /**< Whether SyncPlay is forbidden for this widget. */
-        InfoOverlaysForbidden       = 0x04000,
+        WindowResizingForbidden     = 0x02000,
+        SyncPlayForbidden           = 0x04000,   /**< Whether SyncPlay is forbidden for this widget. */
+        InfoOverlaysForbidden       = 0x08000,
 
         FullScreenMode              = 0x08000,
         ActivityPresence            = 0x10000,
@@ -254,10 +255,8 @@ signals:
     void displayInfoChanged();
 
 protected:
-    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
-    virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
@@ -295,9 +294,6 @@ protected:
     void updatePositionText();
 
     void updateInfoText();
-
-    virtual QCursor calculateCursor() const;
-    Q_SLOT void updateCursor();
 
     QnStatusOverlayController *statusOverlayController() const;
 

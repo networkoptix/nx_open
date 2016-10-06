@@ -36,9 +36,7 @@ public:
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;
 
-    virtual QnIndirectAccessProviders accessibleLayouts() const override;
-
-    void setAccessibleLayoutsPreview(const QSet<QnUuid>& value);
+    virtual QnResourceAccessSubject subject() const override;
 
 signals:
     void userChanged(const QnUserResourcePtr& newUser);

@@ -17,8 +17,8 @@
 #include <utils/common/unused.h>
 #include <nx/utils/singleton.h>
 #include "nx/utils/type_utils.h"
-#include "core/resource_management/user_access_data.h"
-#include "core/resource_management/resource_access_manager.h"
+#include "core/resource_access/user_access_data.h"
+#include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
 
 
@@ -202,7 +202,7 @@ namespace detail
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList);
 
         //getStorages
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
@@ -214,19 +214,19 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataExList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList);
 
         //getServersEx
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
 
         //getUserGroupList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& groupList);
@@ -238,16 +238,16 @@ namespace detail
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiVideowallDataList& videowallList);
 
         //getWebPageList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiWebPageDataList& webPageList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params);
@@ -401,7 +401,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemNameData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemIdData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -447,7 +447,7 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiRebuildTransactionLogData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateSequenceData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
@@ -595,9 +595,11 @@ namespace detail
         bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
+        bool cleanupDanglingDbObjects();
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         bool upgradeSerializedTransactionsToV2();
+        bool encryptKvPairs();
         bool upgradeSerializedTransactionsToV3();
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
     private:
@@ -618,11 +620,14 @@ namespace detail
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
+        // todo: move this variables to QFlag
+        bool m_needClearLog;
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
         bool m_needResyncCameraUserAttributes;
         bool m_needResyncServerUserAttributes;
+        bool m_needResyncMediaServers;
         bool m_dbJustCreated;
         bool m_isBackupRestore;
         bool m_needResyncLayout;
@@ -630,6 +635,7 @@ namespace detail
         bool m_needResyncUsers;
         bool m_needResyncStorages;
         bool m_needResyncClientInfoData;
+
         bool m_dbReadOnly;
     };
 } // namespace detail

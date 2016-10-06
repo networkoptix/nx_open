@@ -48,7 +48,7 @@ bool checkBookmarkForQuery(const QnCameraBookmarksQueryPtr &query, const QnCamer
         bool match = false;
         for (const QnVirtualCameraResourcePtr &camera : query->cameras())
         {
-            if (bookmark.cameraId == camera->getUniqueId())
+            if (bookmark.cameraId == camera->getId())
             {
                 match = true;
                 break;
@@ -192,7 +192,7 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
     if (!bookmark.isValid())
         return;
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(bookmark.cameraId);
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
         server = qnCommon->currentServer();
@@ -564,7 +564,7 @@ void QnCameraBookmarksManagerPrivate::removeCameraFromQueries(const QnResourcePt
     if (!camera)
         return;
 
-    auto cameraId = camera->getUniqueId();
+    QnUuid cameraId = camera->getId();
 
     for (QueryInfo &info : m_queries)
     {

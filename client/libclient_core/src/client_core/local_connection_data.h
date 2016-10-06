@@ -25,15 +25,30 @@ struct QnLocalConnectionData
     QUrl url;
     bool isStoredPassword;
 
-    static void writeToSettings(QSettings* settings
-        , QnLocalConnectionData data);
-
     static QnLocalConnectionData fromSettings(QSettings* settings);
+
+    void writeToSettings(QSettings* settings) const;
 };
 
 #define QnLocalConnectionData_Fields (name)(systemName)(systemId)(url)(isStoredPassword)
 QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq))
 
+struct QnWeightData
+{
+    QString systemId;
+    qreal weight;
+    qint64 lastConnectedUtcMs;
+    bool realConnection;    //< Shows if it was real connection or just record for new system
+
+    static QnWeightData fromSettings(QSettings* settings);
+
+    void writeToSettings(QSettings* settings) const;
+};
+typedef QList<QnWeightData> QnWeightDataList;
+
+#define QnWeightData_Fields (systemId)(weight)(lastConnectedUtcMs)(realConnection)
+QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq))
+Q_DECLARE_METATYPE(QnWeightDataList)
 
 struct QnLocalConnectionDataList : public QList<QnLocalConnectionData>
 {
@@ -41,6 +56,8 @@ struct QnLocalConnectionDataList : public QList<QnLocalConnectionData>
 
 public:
     QnLocalConnectionDataList();
+
+    QnLocalConnectionDataList(const base_type& data);
 
     ~QnLocalConnectionDataList();
 

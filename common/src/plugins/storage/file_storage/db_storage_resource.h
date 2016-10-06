@@ -30,7 +30,7 @@ public:
     virtual bool isFileExists(const QString& /*url*/) override {return true;}
     virtual bool isDirExists(const QString& /*url*/) override {return true;}
     virtual qint64 getFreeSpace() override {return 999999999;}
-    virtual qint64 getTotalSpace() override {return 9999999999;}
+    virtual qint64 getTotalSpace() const override {return 9999999999;}
 
 private:
     mutable QnMutex m_mutex;

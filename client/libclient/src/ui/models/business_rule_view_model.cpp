@@ -6,7 +6,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/resource_display_info.h>
 
 #include <client/client_settings.h>
@@ -113,7 +114,7 @@ QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, ActionType actionTyp
     if (requiresUserResource(actionType))
     {
         auto users = qnResPool->getResources<QnUserResource>(ids);
-        auto roles = qnResourceAccessManager->userGroups(ids);
+        auto roles = qnUserRolesManager->userRoles(ids);
         auto result = toIds(users);
         for (auto role: roles)
             result << role.id;

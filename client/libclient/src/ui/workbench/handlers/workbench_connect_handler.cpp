@@ -30,6 +30,7 @@
 #include <client/desktop_client_message_processor.h>
 #include <nx/network/socket_global.h>
 
+#include <helpers/system_weight_helper.h>
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
 
@@ -81,12 +82,34 @@ namespace {
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
 
+void updateWeightData(const QString& systemId)
+{
+    auto weightData = qnClientCoreSettings->localSystemWeightsData();
+    const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
+        [systemId](const QnWeightData& data) { return data.systemId == systemId; });
+
+    auto currentWeightData = (itWeightData == weightData.end()
+        ? QnWeightData({ systemId, 0, QDateTime::currentMSecsSinceEpoch(), true })
+        : *itWeightData);
+
+    currentWeightData.weight = helpers::calculateSystemWeight(
+        currentWeightData.weight, currentWeightData.lastConnectedUtcMs) + 1;
+    currentWeightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
+
+    if (itWeightData == weightData.end())
+        weightData.append(currentWeightData);
+    else
+        *itWeightData = currentWeightData;
+
+    qnClientCoreSettings->setLocalSystemWeightsData(weightData);
+}
+
 void storeLocalSystemConnection(const QString& systemName, const QString& systemId, QUrl url,
     bool storePassword, bool autoLogin, bool forceRemoveOldConnection)
 {
-    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     // TODO: #ynikitenkov remove outdated connection data
 
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     if (autoLogin)
         storePassword = true;
 
@@ -101,7 +124,6 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
         });
 
     QnLocalConnectionData targetConnection(QString(), systemName, systemId, url, storePassword);
-
     if (itFoundConnection != recentConnections.end())
     {
         if (forceRemoveOldConnection)
@@ -126,12 +148,17 @@ void storeLocalSystemConnection(const QString& systemName, const QString& system
         }
         recentConnections.erase(itFoundConnection);
     }
+
     recentConnections.prepend(targetConnection);
+
+    updateWeightData(systemId);
 
     qnSettings->setLastUsedConnection(targetConnection);
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);
     qnSettings->setAutoLogin(autoLogin);
+
     qnSettings->save();
+    qnClientCoreSettings->save();
 }
 
 ec2::ApiClientInfoData clientInfo()
@@ -269,6 +296,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                 case QnConnectionState::Connecting:
                     // Does nothing. If welcome screen is shown it manages connecting state.
                     // If it is reconnecting state - we just see our scene.
+                    // If it is connection from caused by web page - it is processed by workbench context
                     break;
                 case QnConnectionState::Connected:
                     // If connection is successful we show global preloader while loading resources
@@ -304,7 +332,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     auto validState = m_state.state() == QnConnectionState::Connecting
         || m_state.state() == QnConnectionState::Reconnecting;
-    NX_ASSERT(validState);
+    //NX_ASSERT(validState);
     if (!validState)
         return;
     m_connectingHandle = 0;
@@ -549,7 +577,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
                 qnSyncTime->updateTime(syncTime);
         });
 
-    qnCommon->setLocalSystemName(connection->connectionInfo().systemName);
     qnCommon->setReadOnly(connection->connectionInfo().ecDbReadOnly);
 }
 
@@ -581,7 +608,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         if (!disconnectFromServer(force))
             return;
     }
-    else
+    else if (m_state.state() != QnConnectionState::Disconnected)
     {
         // break 'Connecting' state if any
         disconnectFromServer(true);
@@ -697,7 +724,6 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force)
     }
 
     clearConnection();
-    showWelcomeScreen();
     return true;
 }
 
@@ -708,26 +734,6 @@ void QnWorkbenchConnectHandler::showLoginDialog()
 
     const QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(context()->mainWindow()));
     dialog->exec();
-}
-
-void QnWorkbenchConnectHandler::showWelcomeScreen()
-{
-    if (!qnRuntime->isDesktopMode())
-        return;
-
-    if (context()->closingDown())
-        return;
-
-    if (m_state.state() != QnConnectionState::Disconnected)
-    {
-        showLoginDialog();
-    }
-    else
-    {
-        auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setGlobalPreloaderVisible(false);
-        action(QnActions::ResourcesModeAction)->setChecked(false); //< Show welcome screen
-    }
 }
 
 void QnWorkbenchConnectHandler::clearConnection()
@@ -777,7 +783,6 @@ void QnWorkbenchConnectHandler::clearConnection()
     qnStatusDictionary->clear(idList);
 
     qnLicensePool->reset();
-    qnCommon->setLocalSystemName(QString());
     qnCommon->setReadOnly(false);
 }
 

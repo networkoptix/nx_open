@@ -414,45 +414,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
     return chunk;
 }
 
-void DeviceFileCatalog::setLastSyncTime(int64_t time)
-{
-    qnServerDb->setLastBackupTime(
-        m_storagePool,
-        guidFromArbitraryData(m_cameraUniqueId),
-        m_catalog,
-        time
-    );
-
-    QnMutexLocker lk(&m_mutex);
-    m_lastSyncTime = time;
-}
-
-int64_t DeviceFileCatalog::getLastSyncTimeFromDBNoLock() const
-{
-    int64_t ret = qnServerDb->getLastBackupTime(
-        m_storagePool,
-        guidFromArbitraryData(m_cameraUniqueId),
-        m_catalog
-    );
-    return ret;
-}
-
-int64_t DeviceFileCatalog::getLastSyncTime() const
-{
-    QnMutexLocker lk(&m_mutex);
-    if (m_lastSyncTime == 0)
-    {   // need to unlock here to fetch data from DB.
-        lk.unlock();
-        int64_t dbLastSyncTime = getLastSyncTimeFromDBNoLock();
-        // locking again
-        lk.relock();
-        m_lastSyncTime = dbLastSyncTime;
-        if (m_lastSyncTime == 0)
-            m_lastSyncTime = 1;
-    }
-    return m_lastSyncTime;
-}
-
 QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
 {
     if (m_storagePool == QnServer::StoragePool::Normal)

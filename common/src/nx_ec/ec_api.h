@@ -17,7 +17,7 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
@@ -574,30 +574,30 @@ class ECConnectionNotificationManager;
         Q_OBJECT
     public:
     signals:
-        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime);
+        void systemIdChangeRequested(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime);
     };
 
     typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
 
     class AbstractMiscManager {
     public:
-        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime, TargetType *target, HandlerType handler) {
-            return changeSystemName(systemName, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, TargetType *target, HandlerType handler) {
+            return changeSystemId(systemId, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        ErrorCode changeSystemNameSync(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime) {
+        ErrorCode changeSystemIdSync(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime) {
             return impl::doSyncCall<impl::SimpleHandler>(
                 [=](const impl::SimpleHandlerPtr &handler) {
-                    return this->changeSystemName(systemName, sysIdTime, tranLogTime, handler);
+                    return this->changeSystemId(systemId, sysIdTime, tranLogTime, handler);
                 }
             );
         }
 
-        ErrorCode rebuildTransactionLogSync()
+        ErrorCode cleanupDatabaseSync(bool cleanupDbObjects, bool cleanupTransactionLog)
         {
-            int(AbstractMiscManager::*fn)(impl::SimpleHandlerPtr) = &AbstractMiscManager::rebuildTransactionLog;
-            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, std::placeholders::_1));
+            int(AbstractMiscManager::*fn)(bool, bool, impl::SimpleHandlerPtr) = &AbstractMiscManager::cleanupDatabase;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, cleanupDbObjects, cleanupTransactionLog, std::placeholders::_1));
         }
 
         template<class TargetType, class HandlerType> int markLicenseOverflow(bool value, qint64 time, TargetType *target, HandlerType handler) {
@@ -612,9 +612,9 @@ class ECConnectionNotificationManager;
 
 
     protected:
-        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
+        virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
-        virtual int rebuildTransactionLog(impl::SimpleHandlerPtr handler) = 0;
+        virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

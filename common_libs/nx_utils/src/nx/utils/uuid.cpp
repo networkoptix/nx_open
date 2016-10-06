@@ -170,7 +170,7 @@ QnUuid QnUuid::fromStringSafe(const QByteArray& uuid)
 
 QnUuid QnUuid::fromStringSafe(const std::string& uuid)
 {
-    return QnUuid(QUuid(QByteArray::fromRawData(uuid.c_str(), uuid.size())));
+    return QnUuid(QUuid(QByteArray::fromRawData(uuid.c_str(), (int)uuid.size())));
 }
 
 QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset) {

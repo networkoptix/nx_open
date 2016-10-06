@@ -188,7 +188,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getStatusList
      * Read current status values for cameras, servers and storages.
      * %param[default] format
-     * %param[opt] id Object unique Id
+     * %param[opt] id Object unique id.
      * %return Returns objects status list data formatted in a requested
      * format. If id parameter is specified, the list contains only one
      * object with that id, or nothing, if there is no such object found.
@@ -196,7 +196,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regGet<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
     // AbstractMediaServerManager::getServers
-    regGet<nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+    regGet<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
 
     // AbstractMediaServerManager::save
     regUpdate<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
@@ -208,7 +208,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %param serverId Server unique id.
+     * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
      * %param allowAutoRedundancy Whether the server can take cameras from
@@ -244,7 +244,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %param serverId Server unique id.
+     * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
      * %param serverName Server name.
      * %param maxCameras Maximum number of cameras on the server.
      * %param allowAutoRedundancy Whether the server can take cameras from
@@ -317,7 +317,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractMediaServerManager::getServersEx
      */
-    regGet<nullptr_t, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+    regGet<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
     regUpdate<ApiStorageDataList>(p, ApiCommand::saveStorages);
 
@@ -328,7 +328,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %param id Storage unique id.
+     * %param[opt] id Storage unique id. Can be omitted when creating a new object.
      * %param parentId Should be empty.
      * %param name Storage name.
      * %param url Should be empty.
@@ -360,7 +360,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiCameraDataList>(p, ApiCommand::saveCameras);
 
     // AbstractCameraManager::getCameras
-    regGet<nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
+    regGet<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
 
     /**%apidoc POST /ec2/saveCameraUserAttributesList
     * Save additional camera attributes for a number of cameras.
@@ -369,6 +369,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     * content type "application/json". Example of such object can be seen in
     * the result of the corresponding GET function.
     * </p>
+    * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
+    * %param cameraName Camera name.
     * %param userDefinedGroupName Name of the user-defined camera group.
     * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
     *     %value false
@@ -469,6 +471,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
+     * %param cameraId Camera unique id. If such object exists, omitted fields will not be changed.
+     * %param cameraName Camera name.
      * %param userDefinedGroupName Name of the user-defined camera group.
      * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
      *     %value false
@@ -681,7 +685,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[default] format
      * %return List of objects with camera information formatted in the requested format.
      *     %// From struct ApiResourceData:
-     *     %param id Camera unique Id.
+     *     %param id Camera unique id.
      *     %param parentId Unique Id of a camera server.
      *     %param name Camera name.
      *     %param url Camera IP address, or a complete HTTP URL if the camera was added manually.
@@ -805,7 +809,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         such information as full ONVIF URL, camera maximum fps, etc.
      * %// AbstractCameraManager::getCamerasEx
      */
-    regGet<nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+    regGet<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
@@ -842,10 +846,13 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getEventRules
      * Return all event rules.
      * %param[default] format
-     * %return Return object in requested format
+     * %param[opt] id Object unique id.
+     * %return Returns objects status list data formatted in a requested
+     * format. If id parameter is specified, the list contains only one
+     * object with that id, or nothing, if there is no such object found.
      * %// AbstractBusinessEventManager::getBusinessRules
      */
-    regGet<nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
+    regGet<QnUuid, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
@@ -862,15 +869,17 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Return users registered in the system. User's password contain MD5
      * hash data with salt
      * %param[default] format
-     * %return Return object in requested format
+     * %param[opt] id Object unique id.
+     * %return Object in requested format. If id parameter is specified, the list contains only one
+     * object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUsers
      */
-    regGet<nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
+    regGet<QnUuid, ApiUserDataList>(p, ApiCommand::getUsers);
 
     /**%apidoc GET /ec2/getUserGroups
      * Return user groups registered in the system.
      * %param[default] format
-     * %param[opt] id Object unique Id.
+     * %param[opt] id Object unique id.
      * %return Object in requested format. If id parameter is specified, the list contains only one
      * object with that id, or nothing, if there is no such object found.
      * %// AbstractUserManager::getUserGroups
@@ -903,13 +912,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %param id User unique id. Should be generated when creating a new user.
+     * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
+     *     exists, omitted fields will not be changed.
      * %param[opt] parentId Should be empty.
      * %param name User name.
      * %param[opt] url Should be empty.
-     * %param typeId Should have fixed value.
+     * %param[proprietary] typeId Should have fixed value.
      *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
-     * %param isAdmin Indended for internal use; keep the value when saving
+     * %param[proprietary] isAdmin Indended for internal use; keep the value when saving
      *     a previously received object, use false when creating a new one.
      *     %value false
      *     %value true
@@ -935,13 +945,17 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     hash = "md5$" + salt + "$" + md5(salt + password).toHex();</code>
      * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
-     * %param realm Should have fixed value which can be obtained via gettime call.
-     * %param isLdap Whether the user was imported from LDAP.
+     * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
+     *     /api/gettime.
+     * %param[opt] isLdap Whether the user was imported from LDAP.
      *     %value false
      *     %value true
-     * %param isEnabled Whether the user is enabled.
-     *     %value false
+     * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
+     *     %value false Default value.
      *     %value true
+     * %param[opt] isEnabled Whether the user is enabled.
+     *     %value false
+     *     %value true Default value.
      * %// AbstractUserManager::save
      */
     regUpdate<ApiUserData>(p, ApiCommand::saveUser);
@@ -964,7 +978,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %param id Group unique id. Should be generated when creating a new group.
+     * %param[opt] id Group unique id. Can be omitted when creating a new object. If such object
+     * exists, omitted fields will not be changed.
      * %param name Group name.
      * %param permissions Combination (via "|") of the following flags:
      *     %value GlobalEditCamerasPermission Can edit camera settings.
@@ -1005,14 +1020,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      * %// AbstractVideowallManager::getVideowalls
      */
-    regGet<nullptr_t, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
+    regGet<QnUuid, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
     // AbstractVideowallManager::save
     regUpdate<ApiVideowallData>(p, ApiCommand::saveVideowall);
     // AbstractVideowallManager::remove
     regUpdate<ApiIdData>(p, ApiCommand::removeVideowall);
     regUpdate<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
-    regGet<nullptr_t, ApiWebPageDataList>(p, ApiCommand::getWebPages);
+    regGet<QnUuid, ApiWebPageDataList>(p, ApiCommand::getWebPages);
     regUpdate<ApiWebPageData>(p, ApiCommand::saveWebPage);
     // AbstractWebPageManager::remove
     regUpdate<ApiIdData>(p, ApiCommand::removeWebPage);
@@ -1020,10 +1035,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %return Return object in requested format
+     * %param[opt] id Layout unique id.
+     * %return Return object in requested format. If id parameter is specified, the list contains
+     * only one object with that id, or nothing, if there is no such object found.
      * %// AbstractLayoutManager::getLayouts
      */
-    regGet<nullptr_t, ApiLayoutDataList>(p, ApiCommand::getLayouts);
+    regGet<QnUuid, ApiLayoutDataList>(p, ApiCommand::getLayouts);
 
     /**%apidoc POST /ec2/saveLayout
      * Save layout.
@@ -1032,11 +1049,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %param id Layout unique id. Should be generated when creating a new layout.
+     * %param[opt] id Layout unique id. Can be omitted when creating a new object. If such object
+     *     exists, omitted fields will not be changed.
      * %param parentId Unique id of the user owning the layout.
      * %param name Layout name.
      * %param url Should be empty string.
-     * %param typeId Should have fixed value.
+     * %param[proprietary] typeId Should have fixed value.
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
@@ -1045,8 +1063,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     * %param item.id Item unique id. If omitted, will be generated by the
-     *     server.
+     * %param item.id Item unique id. Can be omitted when creating a new object.
      * %param item.flags Should have fixed value.
      *     %value 0
      * %param item.left Left coordinate of the layout item (floating-point).
@@ -1098,11 +1115,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
-     * %param id Layout unique id. If omitted, will be generated by the server.
+     * %param id Layout unique id. Can be omitted when creating a new object. If such object
+     *     exists, omitted fields will not be changed.
      * %param parentId Unique id of the user owning the layout.
      * %param name Layout name.
      * %param url Should be empty string.
-     * %param typeId Should have fixed value.
+     * %param[proprietary] typeId Should have fixed value.
      *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
      * %param cellAspectRatio Aspect ratio of a cell for layout items
      *     (floating-point).
@@ -1111,8 +1129,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param verticalSpacing Vertical spacing between layout items
      *     (floating-point).
      * %param items List of the layout items.
-     * %param item.id Item unique id. If omitted, will be generated by the
-     *     server.
+     * %param item.id Item unique id. Can be omitted when creating a new object.
      * %param item.flags Should have fixed value.
      *     %value 0
      * %param item.left Left coordinate of the layout item (floating-point).
@@ -1215,8 +1232,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
     // AbstractDiscoveryManager::getDiscoveryData
     regGet<QnUuid, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
-    // AbstractMiscManager::changeSystemName
-    regUpdate<ApiSystemNameData>(p, ApiCommand::changeSystemName);
+    // AbstractMiscManager::changeSystemId
+    regUpdate<ApiSystemIdData>(p, ApiCommand::changeSystemId);
 
     // AbstractECConnection
     regUpdate<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
@@ -1272,11 +1289,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return Return object in requested format
      */
     regFunctor<nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
-        std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2));
+        std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2, _3));
 
     // Ec2StaticticsReporter
     regFunctor<nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
-        [this](nullptr_t, ApiSystemStatistics* const out)
+        [this](nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
@@ -1284,7 +1301,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
                 nullptr, out);
         });
     regFunctor<nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
-        [this](nullptr_t, ApiStatisticsServerInfo* const out)
+        [this](nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
         {
             if (!m_directConnection)
                 return ErrorCode::failure;
@@ -1569,9 +1586,10 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->version = qnCommon->engineVersion();
     connectionInfo->brand = localInfo.brand;
     connectionInfo->customization = localInfo.customization;
-    connectionInfo->systemName = qnCommon->localSystemName();
+    connectionInfo->systemName = qnGlobalSettings->systemName();
     connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
-    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemID();
+    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemId();
+    connectionInfo->localSystemId = qnGlobalSettings->localSystemId().toString();
     #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif
@@ -1669,11 +1687,11 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
 }
 
 ErrorCode Ec2DirectConnectionFactory::getSettings(
-    nullptr_t, ApiResourceParamDataList* const outData)
+    nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData& accessData)
 {
     if (!detail::QnDbManager::instance())
         return ErrorCode::ioError;
-    return dbManager(Qn::kSystemAccess).doQuery(nullptr, *outData);
+    return dbManager(accessData).doQuery(nullptr, *outData);
 }
 
 template<class InputDataType>
@@ -1717,7 +1735,7 @@ template<class InputType, class OutputType>
 void Ec2DirectConnectionFactory::regFunctor(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
-    std::function<ErrorCode(InputType, OutputType*)> handler, Qn::GlobalPermission permission)
+    std::function<ErrorCode(InputType, OutputType*, const Qn::UserAccessData&)> handler, Qn::GlobalPermission permission)
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),

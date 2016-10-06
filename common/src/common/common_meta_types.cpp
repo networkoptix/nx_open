@@ -29,6 +29,8 @@
 #include <api/model/getnonce_reply.h>
 #include <api/runtime_info_manager.h>
 
+#include <core/resource_access/resource_access_subject.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_advanced_param.h>
@@ -149,6 +151,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnWebPageResourcePtr>();
     qRegisterMetaType<QnWebPageResourceList>();
+
+    qRegisterMetaType<QnResourceAccessSubject>();
 
     qRegisterMetaType<QnCameraUserAttributes>();
     qRegisterMetaType<QnCameraUserAttributesPtr>();

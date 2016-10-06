@@ -22,7 +22,7 @@
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"
 #include "network/auth/abstract_user_data_provider.h"
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 
 #define USE_USER_RESOURCE_PROVIDER

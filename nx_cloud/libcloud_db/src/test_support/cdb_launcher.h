@@ -132,7 +132,7 @@ public:
         const std::string& password,
         const std::string& systemID,
         std::set<api::SystemAccessRole>* const accessRoles);
-    api::ResultCode updateSystemName(
+    api::ResultCode renameSystem(
         const std::string& login,
         const std::string& password,
         const std::string& systemID,
@@ -170,6 +170,10 @@ public:
         const std::string& systemId,
         api::SystemDataEx* const systemData);
 
+    api::ResultCode recordUserSessionStart(
+        const AccountWithPassword& account,
+        const std::string& systemId);
+
     api::ResultCode getVmsConnections(
         api::VmsConnectionDataList* const vmsConnections);
 
@@ -206,13 +210,13 @@ public:
     }
 
     virtual void sendAsync(
-        QByteArray serializedNotification,
+        const AbstractNotification& notification,
         std::function<void(bool)> completionHandler) override
     {
         if (!m_target)
             return;
         m_target->sendAsync(
-            std::move(serializedNotification),
+            notification,
             std::move(completionHandler));
     }
 

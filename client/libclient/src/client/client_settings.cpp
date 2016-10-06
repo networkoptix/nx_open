@@ -146,7 +146,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
-        QnLocalConnectionData::writeToSettings(settings, value.value<QnLocalConnectionData>());
+        value.value<QnLocalConnectionData>().writeToSettings(settings);
         settings->endGroup();
         settings->endGroup();
         break;

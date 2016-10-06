@@ -19,7 +19,7 @@ CREATE TABLE account_status(                                                    
     description         TEXT                                                    \
 );                                                                              \
                                                                                 \
-INSERT INTO account_status VALUES(1,'awaiting email confirmation');             \
+INSERT INTO account_status VALUES(1, 'awaiting email confirmation');            \
 INSERT INTO account_status VALUES(2, 'activated');                              \
 INSERT INTO account_status VALUES(3, 'blocked');                                \
                                                                                 \
@@ -28,7 +28,7 @@ CREATE TABLE system_status(                                                     
     description         TEXT                                                    \
 );                                                                              \
                                                                                 \
-INSERT INTO system_status VALUES(1,'not activated');                            \
+INSERT INTO system_status VALUES(1, 'not activated');                           \
 INSERT INTO system_status VALUES(2, 'activated');                               \
 INSERT INTO system_status VALUES(3, 'deleted');                                 \
                                                                                 \
@@ -37,7 +37,7 @@ CREATE TABLE access_role(                                                       
     description         TEXT NOT NULL                                           \
 );                                                                              \
                                                                                 \
-INSERT INTO access_role VALUES(1,'liveViewer');                                 \
+INSERT INTO access_role VALUES(1, 'liveViewer');                                \
 INSERT INTO access_role VALUES(2, 'viewer');                                    \
 INSERT INTO access_role VALUES(3, 'advancedViewer');                            \
 INSERT INTO access_role VALUES(4, 'localAdmin');                                \
@@ -605,6 +605,18 @@ CREATE TABLE transaction_source_settings (
     timestamp_hi    BIGINT NOT NULL,
     FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
 );
+
+)sql";
+
+/**
+ * CLOUD-441. Adding system ordering.
+ * For usage_frequency calculation see https://networkoptix.atlassian.net/wiki/display/PM/Systems+List.
+ */
+static const char kAddSystemUsageFrequency[] =
+R"sql(
+
+ALTER TABLE system_to_account ADD COLUMN last_login_time_utc BIGINT;
+ALTER TABLE system_to_account ADD COLUMN usage_frequency FLOAT;
 
 )sql";
 

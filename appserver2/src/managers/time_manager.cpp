@@ -262,7 +262,8 @@ namespace ec2
     static const size_t MILLIS_PER_SEC = 1000;
     static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 0;
     static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
-    static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };
+    // Requesting same server twice to greatly reduce chance of receiving corrupted time value
+    static const char* RFC868_SERVERS[] = { "instance1.rfc868server.com", "instance1.rfc868server.com"/*, "time1.ucla.edu"*/ };
 #ifdef _DEBUG
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*MILLIS_PER_SEC;
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*MILLIS_PER_SEC;

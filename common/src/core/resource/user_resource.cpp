@@ -13,8 +13,11 @@ namespace {
 }
 
 
+const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
+
 QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
+    m_realm(QnAppInfo::realm()),
     m_permissions(0),
     m_userGroup(),
     m_isOwner(false),
@@ -240,6 +243,12 @@ QnUuid QnUserResource::userGroup() const
     return m_userGroup;
 }
 
+void QnUserResource::resetUserGroup()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_userGroup = QnUuid();
+}
+
 void QnUserResource::setUserGroup(const QnUuid& group)
 {
     {
@@ -417,6 +426,7 @@ bool QnUserResource::passwordExpired() const
 
 void QnUserResource::fillId()
 {
+    // ATTENTION: This logic is similar to ApiUserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
     QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
     setId(id);

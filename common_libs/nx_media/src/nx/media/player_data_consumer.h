@@ -111,17 +111,17 @@ private:
 
 private:
     /**
-    * In case of multi sensor video camera this class is used to calculate
-    * which video channels still don't provide frames.
-    * Player displays frames without delay unless each channel provide at least 1 frame.
-    */
+     * In case of multi-sensor video camera this class is used to calculate
+     * which video channels still don't provide frames.
+     * Player displays frames without delay unless each channel provides at least 1 frame.
+     */
     class MultiSensorHelper
     {
     private:
         int m_mask;
         int m_channels;
     public:
-        MultiSensorHelper() : m_mask(0), m_channels(1) {}
+        MultiSensorHelper(): m_mask(0), m_channels(1) {}
 
         int channelCount() const { return m_channels;  }
         void setChannelCount(int value)
@@ -132,7 +132,7 @@ private:
             if (m_mask)
                 setMask(); //< update mask for new channels value
         }
-        void setMask() { m_mask = (1 << m_channels) - 1; }
+        void setMask() { m_mask = (1 << m_channels) - 1; } //< Set m_channels low bits to 1.
         void resetMask() { m_mask = 0; }
         void removeChannel(int channelNumber) { m_mask &= ~(1 << channelNumber); }
         bool hasChannel(int channelNumber) const { return m_mask & (1 << channelNumber);  }
@@ -155,7 +155,7 @@ private:
 
     struct BofFrameInfo
     {
-        BofFrameInfo() : videoChannel(0), frameNumber(0) {}
+        BofFrameInfo(): videoChannel(0), frameNumber(0) {}
 
         int videoChannel;
         int frameNumber;

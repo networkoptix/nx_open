@@ -11,15 +11,16 @@
 
 #include <cdb/cloud_nonce.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/random.h>
+#include <nx/utils/time.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/util.h>
 
 #include "access_control/authentication_manager.h"
 #include "account_manager.h"
-#include "system_manager.h"
-#include "stree/cdb_ns.h"
 #include "settings.h"
+#include "stree/cdb_ns.h"
+#include "system_manager.h"
 
 
 namespace nx {
@@ -84,7 +85,7 @@ void AuthenticationProvider::getAuthenticationResponse(
         return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
 
     if (std::chrono::seconds(timestamp) + m_settings.auth().nonceValidityPeriod <
-        std::chrono::system_clock::now().time_since_epoch())
+        nx::utils::timeSinceEpoch())
     {
         return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
     }

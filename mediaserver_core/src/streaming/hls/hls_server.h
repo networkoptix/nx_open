@@ -16,7 +16,7 @@
 #include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
 #include "../streaming_chunk.h"
-#include <core/resource_management/user_access_data.h>
+#include <core/resource_access/user_access_data.h>
 
 
 namespace nx_hls

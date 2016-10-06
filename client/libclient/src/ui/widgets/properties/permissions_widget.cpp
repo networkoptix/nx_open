@@ -1,7 +1,7 @@
 #include "permissions_widget.h"
 #include "ui_permissions_widget.h"
 
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 
 #include <ui/models/abstract_permissions_model.h>
 
@@ -94,7 +94,7 @@ void QnPermissionsWidget::updateDependentPermissions()
 {
     for (QCheckBox* checkbox : m_checkboxes)
     {
-        auto dependent = QnResourceAccessManager::dependentPermissions(permission(checkbox));
+        auto dependent = QnGlobalPermissionsManager::dependentPermissions(permission(checkbox));
         if (dependent == Qn::NoGlobalPermissions)
             continue;
 

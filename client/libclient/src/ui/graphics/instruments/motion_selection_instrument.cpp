@@ -58,6 +58,8 @@ MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     QScopedPointer<SelectionItem> item(new SelectionItem());
     m_pen = item->pen();
     m_brush = item->brush();
+
+    dragProcessor()->setStartDragTime(0);
 }
 
 MotionSelectionInstrument::~MotionSelectionInstrument() {
@@ -112,6 +114,11 @@ void MotionSelectionInstrument::installedNotify() {
 
 void MotionSelectionInstrument::aboutToBeDisabledNotify() {
     m_isClick = false;
+    if (m_target)
+    {
+        m_target->unsetCursor();
+        m_target = nullptr;
+    }
 
     base_type::aboutToBeDisabledNotify();
 }
@@ -143,16 +150,18 @@ Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnMediaResou
     return static_cast<Qt::KeyboardModifiers>(qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers), m_selectionModifiers));
 }
 
-bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
+bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event)
+{
     if(event->button() != Qt::LeftButton)
         return false;
 
-    QGraphicsView *view = this->view(viewport);
-    QnMediaResourceWidget *target = dynamic_cast<QnMediaResourceWidget *>(this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
-    if(!target)
+    auto view = this->view(viewport);
+    auto target = dynamic_cast<QnMediaResourceWidget*>(
+        this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
+    if (!target)
         return false;
 
-    if(!target->resource()->toResource()->hasFlags(Qn::motion))
+    if (!target->resource()->toResource()->hasFlags(Qn::motion))
         return false;
 
     Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target);
@@ -163,6 +172,41 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     
     dragProcessor()->mousePressEvent(viewport, event);
     
+    event->accept();
+    return false;
+}
+
+bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
+{
+    auto view = this->view(viewport);
+    auto target = dynamic_cast<QnMediaResourceWidget*>(
+        this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
+
+    if (!event->buttons().testFlag(Qt::LeftButton))
+    {
+        if (m_target && m_target != target)
+        {
+            m_target->unsetCursor();
+            m_target = nullptr;
+        }
+    }
+
+    if (!target)
+        return false;
+
+    const auto options = target->options();
+    bool motionSelectionAllowed =
+        options.testFlag(QnMediaResourceWidget::DisplayMotion)
+        || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
+
+    if (!motionSelectionAllowed)
+        return false;
+
+    if (!m_target)
+        m_target = target;
+
+    m_target->setCursor(Qt::CrossCursor);
+
     event->accept();
     return false;
 }

@@ -35,7 +35,7 @@ public:
 
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(const QnAbstractBusinessActionPtr& action);
-    bool removeLogForRes(QnUuid resId);
+    bool removeLogForRes(const QnUuid& resId);
 
     QnBusinessActionDataList getActions(
         const QnTimePeriod& period,
@@ -71,12 +71,6 @@ public:
     bool deleteBookmark(const QnUuid &bookmarkId);
     bool deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete);
 
-    bool setLastBackupTime(QnServer::StoragePool pool, const QnUuid& camera,
-                           QnServer::ChunksCatalog catalog, qint64 timestampMs);
-
-    qint64 getLastBackupTime(QnServer::StoragePool pool, const QnUuid& camera,
-                             QnServer::ChunksCatalog catalog) const;
-
     void setBookmarkCountController(std::function<void(size_t)> handler);
 
 protected:
@@ -90,6 +84,7 @@ private:
     int getRuntimeActionsRecordCount();
     bool migrateBusinessParamsUnderTransaction();
     bool createBookmarkTagTriggersUnderTransaction();
+    bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,

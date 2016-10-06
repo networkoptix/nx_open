@@ -96,8 +96,6 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     base_type::connectToConnection(connection);
-    connect(connection->getMiscNotificationManager(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-        this, &QnClientMessageProcessor::at_systemNameChangeRequested);
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
@@ -214,14 +212,6 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 
     if (!m_holdConnection)
         emit connectionClosed();
-}
-
-void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName)
-{
-    if (qnCommon->localSystemName() == systemName)
-        return;
-
-    qnCommon->setLocalSystemName(systemName);
 }
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)

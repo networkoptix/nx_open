@@ -73,7 +73,12 @@ public:
     virtual void setPlaybackRange(const QnTimePeriod& playbackRange) = 0;
     virtual QnTimePeriod getPlaybackRange() const = 0;
 
+    /**
+     * @param resolution Should be specified only if quality == MEDIA_Quality_CustomResolution;
+     *     width can be <= 0 which is treated as "auto".
+     */
     virtual void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution = QSize()) = 0;
+
     virtual MediaQuality getQuality() const = 0;
     virtual AVCodecID getTranscodingCodec() const = 0;
 

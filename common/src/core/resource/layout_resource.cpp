@@ -127,7 +127,8 @@ Qn::Notifier QnLayoutResource::storedItemRemoved(const QnLayoutItemData& item)
     return [r = toSharedPointer(this), item]{ emit r->itemRemoved(r, item); };
 }
 
-Qn::Notifier QnLayoutResource::storedItemChanged(const QnLayoutItemData& item)
+Qn::Notifier QnLayoutResource::storedItemChanged(const QnLayoutItemData& /*oldItem*/,
+    const QnLayoutItemData& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->itemChanged(r, item); };
 }

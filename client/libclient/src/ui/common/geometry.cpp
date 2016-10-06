@@ -88,18 +88,18 @@ MarginsF QnGeometry::cwiseDiv(const QSizeF &l, const MarginsF &r) {
 
 MarginsF QnGeometry::cwiseMul(const MarginsF &l, const MarginsF &r) {
     return MarginsF(
-        l.left()   * r.left(), 
-        l.top()    * r.top(), 
-        l.right()  * r.right(), 
+        l.left()   * r.left(),
+        l.top()    * r.top(),
+        l.right()  * r.right(),
         l.bottom() * r.bottom()
     );
 }
 
 MarginsF QnGeometry::cwiseDiv(const MarginsF &l, const MarginsF &r) {
     return MarginsF(
-        l.left()   / r.left(), 
-        l.top()    / r.top(), 
-        l.right()  / r.right(), 
+        l.left()   / r.left(),
+        l.top()    / r.top(),
+        l.right()  / r.right(),
         l.bottom() / r.bottom()
     );
 }
@@ -160,18 +160,18 @@ QRectF QnGeometry::cwiseMul(const QRectF &l, qreal r) {
 
 QMargins QnGeometry::cwiseSub(const QMargins &l, const QMargins &r) {
     return QMargins(
-        l.left()   - r.left(), 
-        l.top()    - r.top(), 
-        l.right()  - r.right(), 
+        l.left()   - r.left(),
+        l.top()    - r.top(),
+        l.right()  - r.right(),
         l.bottom() - r.bottom()
     );
 }
 
 QMargins QnGeometry::cwiseAdd(const QMargins &l, const QMargins &r) {
     return QMargins(
-        l.left()   + r.left(), 
-        l.top()    + r.top(), 
-        l.right()  + r.right(), 
+        l.left()   + r.left(),
+        l.top()    + r.top(),
+        l.right()  + r.right(),
         l.bottom() + r.bottom()
     );
 }
@@ -234,12 +234,12 @@ qreal QnGeometry::atan2(const QPointF &point) {
 
 QPointF QnGeometry::pointCentroid(const QPolygonF &polygon) {
     QPointF result;
-    
+
     int size = polygon.size() - 1;
     for(int i = 0; i < size; i++)
         result += polygon[i];
 
-    /* Add last point only if it's not equal to the first. 
+    /* Add last point only if it's not equal to the first.
      * This way both open and closed support polygons are supported. */
     if(!qFuzzyEquals(polygon[0], polygon[size])) {
         result += polygon[size];
@@ -249,12 +249,19 @@ QPointF QnGeometry::pointCentroid(const QPolygonF &polygon) {
     return result / size;
 }
 
-qreal QnGeometry::scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mode) {
-    if(mode == Qt::KeepAspectRatioByExpanding) {
-        return qMax(bounds.width() / size.width(), bounds.height() / size.height());
-    } else {
-        return qMin(bounds.width() / size.width(), bounds.height() / size.height());
-    }
+qreal QnGeometry::scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mode)
+{
+    static const qreal kNoScaleFactor = 1.0;
+    if (qFuzzyIsNull(size.width()) || qFuzzyIsNull(size.height()))
+        return kNoScaleFactor;
+
+    const auto result = (mode == Qt::KeepAspectRatioByExpanding
+        ? qMax(bounds.width() / size.width(), bounds.height() / size.height())
+        : qMin(bounds.width() / size.width(), bounds.height() / size.height()));
+
+    if (qFuzzyIsNull(result))
+        return kNoScaleFactor;
+    return result;
 }
 
 QPointF QnGeometry::bounded(const QPointF &pos, const QRectF &bounds) {
@@ -472,15 +479,15 @@ QRectF QnGeometry::toSubRect(const QRectF &rect, const QRectF &absoluteSubRect) 
 
 QPointF QnGeometry::corner(const QRectF &rect, Qn::Corner corner) {
     switch(corner) {
-        case Qn::TopLeftCorner: 
+        case Qn::TopLeftCorner:
             return rect.topLeft();
-        case Qn::TopRightCorner: 
+        case Qn::TopRightCorner:
             return rect.topRight();
-        case Qn::BottomLeftCorner: 
+        case Qn::BottomLeftCorner:
             return rect.bottomLeft();
-        case Qn::BottomRightCorner: 
+        case Qn::BottomRightCorner:
             return rect.bottomRight();
-        case Qn::NoCorner: 
+        case Qn::NoCorner:
             return rect.center();
         default:
             qnWarning("Invalid corner value '%1'.", static_cast<int>(corner));

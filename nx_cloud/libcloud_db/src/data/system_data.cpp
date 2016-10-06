@@ -12,8 +12,17 @@
 
 namespace nx {
 namespace cdb {
-namespace data {
 
+namespace api {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemSharingEx),
+    (sql_record),
+    _Fields);
+
+} // namespace api
+
+namespace data {
 
 ////////////////////////////////////////////////////////////
 //// class SystemRegistrationData
@@ -72,7 +81,7 @@ bool SystemSharing::getAsVariant(int resID, QVariant* const value) const
     }
 }
 
-bool SystemSharingList::getAsVariant(int resID, QVariant* const value) const
+bool SystemSharingList::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
 {
     return false;
 }
@@ -111,8 +120,32 @@ bool SystemNameUpdate::getAsVariant(int resID, QVariant* const value) const
     switch (resID)
     {
         case attr::systemID:
-            *value = QString::fromStdString(id);
+            *value = QString::fromStdString(systemID);
             return true;
+        default:
+            return false;
+    }
+}
+
+//----------------------------------------------------------
+// class UserSessionDescriptor
+
+bool UserSessionDescriptor::getAsVariant(int resID, QVariant* const value) const
+{
+    switch (resID)
+    {
+        case attr::systemID:
+            if (!systemId)
+                return false;
+            *value = QString::fromStdString(*systemId);
+            return true;
+
+        case attr::accountEmail:
+            if (!accountEmail)
+                return false;
+            *value = QString::fromStdString(*accountEmail);
+            return true;
+
         default:
             return false;
     }

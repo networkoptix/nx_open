@@ -17,9 +17,7 @@
 
 //TODO #ak try multiple servers in case of error or empty string (it happens pretty often)
 
-static const unsigned int SECONDS_FROM_1900_01_01_TO_1970_01_01 = 2208988800L;
 static const size_t MAX_TIME_STR_LENGTH = sizeof(quint32); 
-static const unsigned short TIME_PROTOCOL_DEFAULT_PORT = 37;     //time protocol
 static const int SOCKET_READ_TIMEOUT = 7000;
 static const int MILLIS_PER_SEC = 1000;
 //static const int SEC_PER_MIN = 60;
@@ -61,7 +59,7 @@ void TimeProtocolClient::join()
 void TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
 {
     NX_LOGX( lit( "rfc868 time_sync. Starting time synchronization with server %1:%2" ).
-        arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
+        arg( m_timeServer ).arg( kTimeProtocolDefaultPort ), cl_logDEBUG2 );
 
     {
         QnMutexLocker lk( &m_mutex );
@@ -93,7 +91,7 @@ void TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::E
 
     using namespace std::placeholders;
     m_tcpSock->connectAsync(
-        SocketAddress( HostAddress( m_timeServer ), TIME_PROTOCOL_DEFAULT_PORT ),
+        SocketAddress( HostAddress( m_timeServer ), kTimeProtocolDefaultPort ),
         std::bind( &TimeProtocolClient::onConnectionEstablished, this, _1 ) );
 }
 
@@ -107,7 +105,7 @@ namespace
             return -1;
         memcpy( &utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds) );
         utcTimeSeconds = ntohl( utcTimeSeconds );
-        utcTimeSeconds -= SECONDS_FROM_1900_01_01_TO_1970_01_01;
+        utcTimeSeconds -= kSecondsFrom19000101To19700101;
         return ((qint64)utcTimeSeconds) * MILLIS_PER_SEC;
     }
 }
@@ -115,7 +113,7 @@ namespace
 void TimeProtocolClient::onConnectionEstablished( SystemError::ErrorCode errorCode )
 {
     NX_LOGX( lit( "rfc868 time_sync. Connection to time server %1:%2 completed with following result: %3" ).
-        arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg(SystemError::toString(errorCode)), cl_logDEBUG2 );
+        arg( m_timeServer ).arg( kTimeProtocolDefaultPort ).arg(SystemError::toString(errorCode)), cl_logDEBUG2 );
 
     if( errorCode )
     {
@@ -139,7 +137,7 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     if( errorCode )
     {
         NX_LOGX( lit( "rfc868 time_sync. Failed to read from time server %1:%2. %3" ).
-            arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            arg( m_timeServer ).arg( kTimeProtocolDefaultPort ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
 
         m_handlerFunc( -1, errorCode );
         return;
@@ -148,7 +146,7 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     if( bytesRead == 0 )
     {
         NX_LOGX( lit( "rfc868 time_sync. Connection to time server %1:%2 closed. Read text %3" ).
-            arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( QLatin1String(m_timeStr.trimmed()) ), cl_logDEBUG2 );
+            arg( m_timeServer ).arg( kTimeProtocolDefaultPort ).arg( QLatin1String(m_timeStr.trimmed()) ), cl_logDEBUG2 );
 
         //connection closed
         m_handlerFunc( -1, SystemError::notConnected );
@@ -156,12 +154,12 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
     }
 
     NX_LOGX( lit( "rfc868 time_sync. Read %1 bytes from time server %2:%3" ).
-        arg( bytesRead ).arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
+        arg( bytesRead ).arg( m_timeServer ).arg( kTimeProtocolDefaultPort ), cl_logDEBUG2 );
 
     if( m_timeStr.size() >= m_timeStr.capacity() )
     {
         NX_LOGX( lit( "rfc868 time_sync. Read %1 from time server %2:%3" ).
-            arg( QLatin1String(m_timeStr.toHex()) ).arg(m_timeServer).arg(TIME_PROTOCOL_DEFAULT_PORT), cl_logDEBUG1 );
+            arg( QLatin1String(m_timeStr.toHex()) ).arg(m_timeServer).arg(kTimeProtocolDefaultPort), cl_logDEBUG1 );
 
         //max data size has been read, ignoring futher data
         m_handlerFunc( rfc868TimestampToTimeToUTCMillis( m_timeStr ), SystemError::noError );

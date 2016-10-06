@@ -68,7 +68,7 @@ qint64 QnQtFileStorageResource::getFreeSpace()
     return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
 }
 
-qint64 QnQtFileStorageResource::getTotalSpace()
+qint64 QnQtFileStorageResource::getTotalSpace() const
 {
     return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
 }
@@ -111,7 +111,7 @@ Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate() const
     return Qn::StorageInit_WrongPath;
 }
 
-QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
+QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url) const
 {
     int prefix = url.indexOf(QLatin1String("://"));
     return prefix == -1 ? url : url.mid(prefix + 3);

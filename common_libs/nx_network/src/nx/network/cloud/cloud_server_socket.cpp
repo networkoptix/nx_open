@@ -1,4 +1,3 @@
-
 #include "cloud_server_socket.h"
 
 #include <nx/network/socket_global.h>
@@ -8,9 +7,11 @@
 #include "tunnel/udp/acceptor.h"
 #include "tunnel/tcp/reverse_tunnel_acceptor.h"
 
-#define DEBUG_LOG(message) \
-    if (nx::network::SocketGlobals::debugFlags().cloudServerSocket) \
-        NX_LOGX(message, cl_logDEBUG1);
+#define DEBUG_LOG(MESSAGE) do \
+{ \
+    if (nx::network::SocketGlobals::debugConfiguration().cloudServerSocket) \
+        NX_LOGX(MESSAGE, cl_logDEBUG1); \
+} while (0)
 
 namespace nx {
 namespace network {
@@ -405,7 +406,7 @@ void CloudServerSocket::startAcceptor(
                 [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
                 { return a.get() == acceptorPtr; });
 
-            NX_CRITICAL(it != m_acceptors.end(), Q_FUNC_INFO, "where did it go?");
+            NX_CRITICAL(it != m_acceptors.end());
             m_acceptors.erase(it);
 
             if (code == SystemError::noError)
@@ -435,7 +436,7 @@ void CloudServerSocket::onListenRequestCompleted(
         // Should retry if failed since system registration data can be propagated to mediator
         // with some delay.
         const auto retry = m_mediatorRegistrationRetryTimer.scheduleNextTry(
-            [this]
+            [this]()
             {
                 NX_LOGX(lm("Retry to register on mediator"), cl_logDEBUG1);
                 issueRegistrationRequest();
@@ -509,11 +510,15 @@ void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
     event.connectionMethods &= m_supportedConnectionMethods;
+    DEBUG_LOG(lm("Connection request '%1' from %2 with methods: %3")
+        .strs(event.connectSessionId, event.originatingPeerID,
+            hpm::api::ConnectionMethod::toString(event.connectionMethods)));
+
     for (const auto& maker : m_acceptorMakers)
     {
         if (auto acceptor = maker(event))
         {
-            DEBUG_LOG(lm("Create acceptor %1 by connection request %2 from %3")
+            DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")
                 .strs(acceptor, event.connectSessionId, event.originatingPeerID));
 
             acceptor->setConnectionInfo(

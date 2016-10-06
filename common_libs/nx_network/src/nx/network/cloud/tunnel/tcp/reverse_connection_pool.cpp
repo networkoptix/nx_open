@@ -19,7 +19,8 @@ ReverseConnectionPool::ReverseConnectionPool(
         {
             NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
             getHolder(hostName, true)->saveSocket(std::move(socket));
-        })
+        }),
+    m_isReconnectHandlerSet(false)
 {
 }
 
@@ -123,7 +124,11 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
                     .strs(m_acceptor.selfHostName(), code), cl_logWARNING);
             }
 
-            m_mediatorConnection->setOnReconnectedHandler([this](){ registerOnMediator(); });
+            if (!m_isReconnectHandlerSet)
+            {
+                m_mediatorConnection->setOnReconnectedHandler([this](){ registerOnMediator(); });
+                m_isReconnectHandlerSet = true;
+            }
 
             if (registrationPromise)
                 registrationPromise->set_value(code == nx::hpm::api::ResultCode::ok);

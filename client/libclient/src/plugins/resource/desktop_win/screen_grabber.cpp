@@ -587,7 +587,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
 #endif
         sws_scale(m_scaleContext,
             m_tmpFrame->data, m_tmpFrame->linesize,
-            0, m_ddm.Height,
+            0, height,
             pFrame->data, pFrame->linesize);
     }
     else
