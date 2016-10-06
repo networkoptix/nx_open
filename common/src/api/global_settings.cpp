@@ -725,12 +725,12 @@ void QnGlobalSettings::setCloudSystemId(const QString& value)
 
 QString QnGlobalSettings::cloudAuthKey() const
 {
-    return m_cloudAuthKeyAdaptor->value();
+    return nx::utils::decodeStringFromHexStringAES128CBC(m_cloudAuthKeyAdaptor->value());
 }
 
 void QnGlobalSettings::setCloudAuthKey(const QString& value)
 {
-    m_cloudAuthKeyAdaptor->setValue(value);
+    m_cloudAuthKeyAdaptor->setValue(nx::utils::encodeHexStringFromStringAES128CBC(value));
 }
 
 QString QnGlobalSettings::systemName() const
