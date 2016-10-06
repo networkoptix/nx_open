@@ -4,12 +4,12 @@
 #include "app_info.h"
 
 QnSettings::QnSettings(
-    const QString& applicationName_,
-    const QString& moduleName_, 
+    const QString& applicationName,
+    const QString& moduleName,
     QSettings::Scope scope)
     :
-    applicationName(applicationName_),
-    moduleName(moduleName_),
+    m_applicationName(applicationName),
+    m_moduleName(moduleName),
     #ifdef _WIN32
         m_systemSettings(scope, QnAppInfo::organizationName(), applicationName)
     #else
@@ -17,6 +17,7 @@ QnSettings::QnSettings(
             .arg(QnAppInfo::linuxOrganizationName()).arg(moduleName), QSettings::IniFormat)
     #endif
 {
+    (void) scope; //< Unused on certain platforms.
 }
 
 void QnSettings::parseArgs(int argc, const char* argv[])
@@ -69,9 +70,9 @@ void initializeQnLog(
     QDir().mkpath(logDir);
     const QString& fileName = logDir + lit("/") + baseName;
     if (!QnLog::instance(id)->create(
-            fileName, settings.maxFileSize, settings.maxBackupCount, settings.level))
+        fileName, settings.maxFileSize, settings.maxBackupCount, settings.level))
     {
-        std::wcerr << L"Failed to create log file " << fileName.toStdWString() << std::endl;
+        std::cerr << "Failed to create log file " << fileName.toStdString() << std::endl;
     }
 
     const auto logInfo = lm("Logging level: %1, maxFileSize: %2, maxBackupCount: %3, fileName: %4")

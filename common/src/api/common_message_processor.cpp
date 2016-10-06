@@ -299,7 +299,7 @@ void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& groupId)
     for (const auto& user : qnResPool->getResources<QnUserResource>())
     {
         if (user->userGroup() == groupId)
-            user->resetUserGroup();
+            user->setUserGroup(QnUuid());
     }
 }
 
