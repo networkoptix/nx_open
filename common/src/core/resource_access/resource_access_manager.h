@@ -101,6 +101,7 @@ public:
     bool canCreateLayout    (const QnResourceAccessSubject& subject, const QnUuid& layoutParentId) const;
     bool canCreateUser      (const QnResourceAccessSubject& subject,
         Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateUser(const QnResourceAccessSubject& subject, Qn::UserRole role) const;
     bool canCreateVideoWall (const QnResourceAccessSubject& subject) const;
     bool canCreateWebPage   (const QnResourceAccessSubject& subject) const;
 
