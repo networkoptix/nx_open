@@ -3,7 +3,7 @@
 
 #include <nx/utils/std/future.h>
 
-std::chrono::seconds kReloadDebugConfigurationInterval(10);
+const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 
 namespace nx {
 namespace network {
@@ -99,7 +99,7 @@ void SocketGlobals::setDebugConfigurationTimer()
         kReloadDebugConfigurationInterval,
         [this]()
         {
-            m_debugConfiguration.reload(false); // silent reload
+            m_debugConfiguration.reload(false); //< Silent reload.
             setDebugConfigurationTimer();
         });
 }

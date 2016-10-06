@@ -651,7 +651,7 @@ const char* FlagConfig::regStringParam(
     return defaultValue;
 }
 
-void FlagConfig::reload()
+void FlagConfig::reload(bool /*verbose*/)
 {
 }
 
