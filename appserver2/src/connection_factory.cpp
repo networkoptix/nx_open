@@ -934,6 +934,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
+     *     %value GlobalCustomUserPermission Flag: this user has custom permissions
      * %param email User's email.
      * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value

@@ -23,10 +23,7 @@ public:
         q_ptr(parent),
         model(model),
         usersModel(new QStandardItemModel(this)),
-        replacementRoles(new QnUserRolesModel(this,
-            true,  /* standardRoles */
-            false, /* userRoles (will be filled later) */
-            false  /* customRole */))
+        replacementRoles(new QnUserRolesModel(this, QnUserRolesModel::StandardRoleFlag))
     {
         for (const auto& user : qnResPool->getResources<QnUserResource>())
             connectUserSignals(user);
@@ -51,7 +48,7 @@ public:
                 if (!user)
                     return;
 
-                disconnectUserSignals(user);
+                disconnect(user, nullptr, this, nullptr);
 
                 if (user->userGroup() == this->model->selectedGroup())
                     userMaybeRemoved(user);
@@ -76,11 +73,6 @@ public:
                 else
                     userMaybeRemoved(user);
             });
-    }
-
-    void disconnectUserSignals(const QnUserResourcePtr& user)
-    {
-        user->disconnect(this);
     }
 
     void resetUsers()
@@ -125,8 +117,16 @@ public:
                 QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                 q->window());
 
-            replacementRoles->setUserRoles(model->groups());
-            replacementRoles->removeUserRole(model->selectedGroup());
+            auto roles = model->groups();
+            auto selectedRole = std::find_if(roles.begin(), roles.end(),
+                [selectedId = model->selectedGroup()](const ec2::ApiUserGroupData& role)
+                {
+                    return role.id == selectedId;
+                });
+            if (selectedRole != roles.end())
+                roles.erase(selectedRole);
+
+            replacementRoles->setUserRoles(roles);
 
             messageBox.setInformativeText(tr("All users that had this role will be assigned the following role:"));
 

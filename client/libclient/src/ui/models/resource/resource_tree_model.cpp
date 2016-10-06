@@ -890,7 +890,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (videoWall)
     {
         connect(videoWall,  &QnVideoWallResource::itemAdded,            this,   &QnResourceTreeModel::at_videoWall_itemAdded);
-        connect(videoWall,  &QnVideoWallResource::itemChanged,          this,   &QnResourceTreeModel::at_videoWall_itemChanged);
+        connect(videoWall,  &QnVideoWallResource::itemChanged,          this,   &QnResourceTreeModel::at_videoWall_itemAdded);
         connect(videoWall,  &QnVideoWallResource::itemRemoved,          this,   &QnResourceTreeModel::at_videoWall_itemRemoved);
 
         connect(videoWall,  &QnVideoWallResource::matrixAdded,          this,   &QnResourceTreeModel::at_videoWall_matrixAddedOrChanged);
@@ -1143,13 +1143,6 @@ void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &v
         updateNodeResource(node, resource);
     else
         node->update(); // in case of _changed method call, where setResource will exit instantly
-}
-
-void QnResourceTreeModel::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallItem& /*oldItem*/,
-    const QnVideoWallItem& item)
-{
-    at_videoWall_itemAdded(videoWall, item);
 }
 
 void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)

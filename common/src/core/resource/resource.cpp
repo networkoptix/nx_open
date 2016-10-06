@@ -244,6 +244,7 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
 {
     // unique id MUST be the same
     NX_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId());
+    NX_ASSERT(toSharedPointer(this));
 
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
@@ -813,7 +814,7 @@ QnAbstractPtzController *QnResource::createPtzController()
 
     if((capabilities & Qn::DevicePositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
     {
-        auto message = 
+        auto message =
             lit("Device position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
                 .arg(getName())
                 .arg(getUrl());

@@ -1,10 +1,8 @@
-#ifndef QN_APP_SERVER_CONNECTION_H
-#define QN_APP_SERVER_CONNECTION_H
+#pragma once
 
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/request_param.h>
-#include <utils/common/software_version.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/misc/schedule_task.h>
@@ -25,12 +23,10 @@ public:
     virtual ~QnAppServerConnectionFactory();
 
     static QUrl url();
-    static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
     static void setUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
-    static void setCurrentVersion(const QnSoftwareVersion &version);
 
     /** If the client is started in videowall mode, videowall's guid is stored here. */
     static QnUuid videowallGuid();
@@ -53,8 +49,5 @@ private:
     QnUuid m_videowallGuid;
     QnUuid m_instanceGuid;
 
-    QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
 };
-
-#endif // QN_APP_SERVER_CONNECTION_H

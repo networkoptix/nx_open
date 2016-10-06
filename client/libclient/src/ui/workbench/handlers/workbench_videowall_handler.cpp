@@ -2224,7 +2224,6 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallItem& oldItem,
     const QnVideoWallItem& item)
 {
     //TODO: #GDM #VW implement screen size changes handling
@@ -2251,7 +2250,6 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallReso
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode(
     const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallItem& oldItem,
     const QnVideoWallItem& item)
 {
     if (videoWall->getId() != m_videoWallMode.guid || item.uuid != m_videoWallMode.instanceGuid)

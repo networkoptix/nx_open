@@ -426,7 +426,6 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
 }
 
 void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallItem& oldItem,
     const QnVideoWallItem& item)
 {
     Q_UNUSED(videoWall)
