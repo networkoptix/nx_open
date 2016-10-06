@@ -46,7 +46,7 @@ enum class SystemStatus
 class SystemData
 {
 public:
-    /** Globally unique ID of system assigned by cloud. */
+    /** Globally unique id of system assigned by cloud. */
     std::string id;
     /** Not unique system name. */
     std::string name;

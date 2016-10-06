@@ -36,6 +36,7 @@
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"
 #include "ec2/connection_manager.h"
+#include "ec2/db/migration/add_history_to_transaction.h"
 #include "ec2/incoming_transaction_dispatcher.h"
 #include "ec2/outgoing_transaction_dispatcher.h"
 #include "ec2/transaction_log.h"
@@ -603,6 +604,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddSystemSequence);
     dbStructureUpdater.addUpdateScript(db::kMakeTransactionTimestamp128Bit);
     dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
+    dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
     return dbStructureUpdater.updateStructSync();
 }
 

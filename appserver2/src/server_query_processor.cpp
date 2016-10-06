@@ -21,7 +21,7 @@ ErrorCode detail::ServerQueryProcessor::removeHelper(
     std::list<std::function<void()>>* const transactionsToSend,
     TransactionType::Value transactionType)
 {
-    QnTransaction<ApiIdData> removeTran(command, ApiIdData(id));
+    QnTransaction<ApiIdData> removeTran = createTransaction(command, ApiIdData(id));
     removeTran.transactionType = transactionType;
     ErrorCode errorCode = processUpdateSync(removeTran, transactionsToSend, 0);
     if (errorCode != ErrorCode::ok)
@@ -57,9 +57,10 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
 
     for (const auto& param : resourceParams)
     {
-        QnTransaction<ApiResourceParamWithRefData> removeParamTran(
-            ApiCommand::Value::removeResourceParam,
-            param);
+        QnTransaction<ApiResourceParamWithRefData> removeParamTran = 
+            createTransaction(
+                ApiCommand::Value::removeResourceParam,
+                param);
         triggerNotification(connection, removeParamTran);
     }
 

@@ -50,7 +50,7 @@ namespace ec2
         (optional, false))
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-        (QnAbstractTransaction)(ApiTransactionData),
+        (HistoryAttributes)(QnAbstractTransaction)(ApiTransactionData),
         (json)(ubjson)(xml)(csv_record),
         _Fields,
         (optional, false))

@@ -1,16 +1,8 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
-#define NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
-
+#pragma once
 
 namespace nx {
 namespace cdb {
 namespace db {
-
 
 static const char kCreateDbVersion13[] =
 "                                                                               \
@@ -620,8 +612,6 @@ ALTER TABLE system_to_account ADD COLUMN usage_frequency FLOAT;
 
 )sql";
 
-}   //db
-}   //cdb
-}   //nx
-
-#endif  //NX_CLOUD_DB_STRUCTURE_UPDATE_STATEMENTS_H
+} // namespace db
+} // namespace cdb
+} // namespace nx

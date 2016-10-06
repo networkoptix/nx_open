@@ -29,6 +29,7 @@
 #include "data/data_filter.h"
 #include "data/system_data.h"
 #include "data_view.h"
+#include "ec2/transaction_log.h"
 #include "managers_types.h"
 
 
@@ -299,17 +300,26 @@ private:
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const targetAccountData);
+
     nx::db::DBResult fetchUserSharing(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         const std::string& systemId,
         api::SystemSharingEx* const sharing);
+
     template<std::size_t filterFieldCount = 0>
     nx::db::DBResult fetchUserSharings(
         nx::db::QueryContext* const queryContext,
         std::vector<api::SystemSharingEx>* const sharings,
         std::array<SqlFilterByField, filterFieldCount> filterFields
             = std::array<SqlFilterByField, filterFieldCount>());
+
+    template<std::size_t filterFieldCount = 0>
+    nx::db::DBResult fetchUserSharing(
+        nx::db::QueryContext* const queryContext,
+        std::array<SqlFilterByField, filterFieldCount> filterFields,
+        api::SystemSharingEx* const sharing);
+
     /**
      * Fetches existing account or creates new one sending corresponding notification.
      */
@@ -405,7 +415,7 @@ private:
     nx::db::DBResult processEc2SaveUser(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiUserData data,
+        ::ec2::QnTransaction<::ec2::ApiUserData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2SaveUserDone(
         nx::db::QueryContext* /*queryContext*/,
@@ -415,7 +425,7 @@ private:
     nx::db::DBResult processEc2RemoveUser(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiIdData data,
+        ::ec2::QnTransaction<::ec2::ApiIdData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2RemoveUserDone(
         nx::db::QueryContext* /*queryContext*/,
@@ -425,7 +435,7 @@ private:
     nx::db::DBResult processSetResourceParam(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::ApiResourceParamWithRefData data,
+        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
         data::SystemNameUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
