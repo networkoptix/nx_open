@@ -28,8 +28,8 @@ class QnSettings
 {
 public:
     QnSettings(
-        const QString& applicationName_,
-        const QString& moduleName_,
+        const QString& applicationName,
+        const QString& moduleName,
         QSettings::Scope scope = QSettings::SystemScope);
 
     void parseArgs(int argc, const char* argv[]);
@@ -37,10 +37,13 @@ public:
         const QString& key,
         const QVariant& defaultValue = QVariant()) const;
 
-    const QString applicationName;
-    const QString moduleName;
+    const QString getApplicationName() const { return m_applicationName; }
+    const QString getModuleName() const { return m_moduleName; }
 
 private:
+    const QString m_applicationName;
+    const QString m_moduleName;
+
     QSettings m_systemSettings;
     nx::utils::ArgumentParser m_args;
 };
