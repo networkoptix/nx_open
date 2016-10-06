@@ -103,7 +103,7 @@ var L = {
         oldPasswordMistmatch: 'Current password is incorrect.',
         passwordMismatch: 'Wrong password',
 
-        systemForbidden: 'You don't have access to this system.',
+        systemForbidden: 'You don\'t have access to this system.',
         systemNotFound: 'System not found.',
 
         cantEditYourself: 'Changing own permissions is not allowed.',
@@ -122,7 +122,7 @@ var L = {
 
         shareTitle: 'Share',
         shareConfirmButton: 'Share',
-        editShareTitle: 'Edit users' permissions',
+        editShareTitle: 'Edit users\' permissions',
         editShareConfirmButton: 'Save'
     },
     system:{

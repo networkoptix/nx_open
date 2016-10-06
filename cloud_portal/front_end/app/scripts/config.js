@@ -80,25 +80,8 @@ var Config = {
         maxLength: 255,
         requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
         requiredMessage: L.passwordRequirements.requiredMessage,
-        strongPasswordCheck: function(password){
-
-            var classes = [
-                '[0-9]+',
-                '[a-z]+',
-                '[A-Z]+',
-                '[\\W_]+'
-            ];
-
-            var classesCount = 0;
-
-            for (var i = 0; i < classes.length; i++) {
-                var classRegex = classes[i];
-                if(new RegExp(classRegex).test(password)) {
-                    classesCount ++;
-                }
-            }
-            return classesCount >= 3;
-        },
+        minClassesCount: 2,
+        strongClassesCount: 3,
         weakMessage: L.passwordRequirements.weakMessage,
         strongMessage: L.passwordRequirements.strongMessage,
         commonMessage: L.passwordRequirements.commonMessage

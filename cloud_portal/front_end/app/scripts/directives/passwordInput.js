@@ -14,10 +14,9 @@ angular.module('cloudApp')
                 complex:'=',
                 label:'='
             },
-            link:function(scope,element,attrs,ngModel){
-                //Complex - check password complexity
+            link:function(scope, element, attrs, ngModel){
                 scope.Config = Config;
-                scope.weakPassword = true;
+                scope.fairPassword = true;
                 function loadCommonPasswords(){
                     if(!Config.commonPasswordsList) {
                         cloudApi.getCommonPasswords().then(function (data) {
@@ -43,21 +42,40 @@ angular.module('cloudApp')
                     if(!commonPassword){
                         // Check if password is in uppercase and it's lowercase value is in common list
                         commonPassword = scope.ngModel.toUpperCase() == scope.ngModel &&
-                            Config.commonPasswordsList[scope.ngModel.toLowerCase()];
+                        Config.commonPasswordsList[scope.ngModel.toLowerCase()];
                     }
 
                     scope.passwordInput.password.$setValidity('common', !commonPassword);
                 }
-                scope.$watch('ngModel',function(val){
+                function checkComplexity(){
+                    var classes = [
+                        '[0-9]+',
+                        '[a-z]+',
+                        '[A-Z]+',
+                        '[\\W_]+'
+                    ];
 
+                    var classesCount = 0;
+
+                    for (var i = 0; i < classes.length; i++) {
+                        var classRegex = classes[i];
+                        if(new RegExp(classRegex).test(scope.ngModel)){
+                            classesCount ++;
+                        }
+                    }
+                    scope.passwordInput.password.$setValidity('weak', !scope.ngModel || classesCount >= Config.passwordRequirements.minClassesCount);
+
+                    scope.fairPassword = classesCount < Config.passwordRequirements.strongClassesCount;
+
+                }
+                scope.$watch('ngModel',function(val){
                     checkCommonPassword();
+                    checkComplexity();
 
                     if(!scope.passwordInput.password.$dirty || scope.passwordInput.password.$invalid){
-                        scope.weakPassword = false;
+                        scope.fairPassword = false;
                         return;
                     }
-
-                    scope.weakPassword = !Config.passwordRequirements.strongPasswordCheck(scope.ngModel);
                 });
 
             }
