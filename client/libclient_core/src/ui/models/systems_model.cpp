@@ -149,7 +149,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             QString hosts;
             for (const auto& moduleInfo : system->servers())
             {
-                hosts.append(system->getServerHost(moduleInfo.id));
+                hosts.append(system->getServerHost(moduleInfo.id).host());
                 hosts.append(lit(" "));
             }
 

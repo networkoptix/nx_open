@@ -34,9 +34,9 @@ void QnSystemHostsModel::setSystemId(const QString &id)
     emit systemIdChanged();
 }
 
-QString QnSystemHostsModel::firstHost() const
+QUrl QnSystemHostsModel::firstHost() const
 {
-    return (m_hosts.isEmpty() ? QString() : m_hosts.front().second);
+    return (m_hosts.isEmpty() ? QUrl() : m_hosts.front().second);
 }
 
 bool QnSystemHostsModel::isEmpty() const
@@ -174,7 +174,7 @@ void QnSystemHostsModel::updateServerHost(const QnSystemDescriptionPtr &systemDe
 }
 
 bool QnSystemHostsModel::updateServerHostInternal(const ServerIdHostList::iterator &it
-    , const QString &host)
+    , const QUrl& host)
 {
     if (it == m_hosts.end())
         return false;

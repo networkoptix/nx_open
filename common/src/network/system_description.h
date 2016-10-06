@@ -42,7 +42,7 @@ public: // overrides
 
     QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QString getServerHost(const QnUuid& serverId) const override;
+    QUrl getServerHost(const QnUuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
@@ -54,7 +54,7 @@ public:
 
     void removeServer(const QnUuid& serverId);
 
-    void setServerHost(const QnUuid& serverId, const QString& host);
+    void setServerHost(const QnUuid& serverId, const QUrl& host);
 
     void setName(const QString& value);
 
@@ -70,7 +70,7 @@ private:
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
-    typedef QHash<QnUuid, QString> HostsHash;
+    typedef QHash<QnUuid, QUrl> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
     const QString m_id;

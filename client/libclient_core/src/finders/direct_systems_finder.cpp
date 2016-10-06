@@ -152,7 +152,12 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
         return;
 
     const auto systemDescription = systemIt.value();
-    systemDescription->setServerHost(moduleInformation.id, address.toString());
+    QUrl url;
+    url.setHost(address.address.toString());
+    url.setPort(address.port);
+    if (moduleInformation.sslAllowed)
+        url.setScheme(lit("https"));
+    systemDescription->setServerHost(moduleInformation.id, url);
 
     // Workaround for systems with version less than 2.3.
     // In these systems only one server is visible, and system name does not exist.
