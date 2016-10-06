@@ -1471,6 +1471,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     {
         return migration::add_history::migrate(&m_sdb);
     }
+    else if (updateName == lit(":/updates/76_rename_discovery_attribute.sql"))
+    {
+        if (!m_dbJustCreated)
+        {
+            m_needClearLog = true;
+            m_needResyncLog = true;
+        }
+    }
 
     return true;
 }

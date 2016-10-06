@@ -43,7 +43,7 @@ const QString kNameSignature(lit("emailSignature"));
 const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
-const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
+const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
 const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
@@ -104,8 +104,8 @@ public:
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
 
-    bool isServerAutoDiscoveryEnabled() const;
-    void setServerAutoDiscoveryEnabled(bool enabled);
+    bool isAutoDiscoveryEnabled() const;
+    void setAutoDiscoveryEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
@@ -218,7 +218,7 @@ signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
-    void serverAutoDiscoveryChanged();
+    void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
@@ -244,7 +244,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
-    QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;

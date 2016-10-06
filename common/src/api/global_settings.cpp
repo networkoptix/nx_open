@@ -262,7 +262,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
-    m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameServerAutoDiscoveryEnabled, true, this);
+    m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpdateNotificationsEnabled, true, this);
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(kNameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
@@ -289,7 +289,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
-    connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
+    connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
 
@@ -300,7 +300,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_auditTrailEnabledAdaptor
-        << m_serverAutoDiscoveryEnabledAdaptor
+        << m_autoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
@@ -349,13 +349,13 @@ void QnGlobalSettings::setAuditTrailEnabled(bool value)
     m_auditTrailEnabledAdaptor->setValue(value);
 }
 
-bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
-    return m_serverAutoDiscoveryEnabledAdaptor->value();
+bool QnGlobalSettings::isAutoDiscoveryEnabled() const {
+    return m_autoDiscoveryEnabledAdaptor->value();
 }
 
-void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled)
+void QnGlobalSettings::setAutoDiscoveryEnabled(bool enabled)
 {
-    m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
+    m_autoDiscoveryEnabledAdaptor->setValue(enabled);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
