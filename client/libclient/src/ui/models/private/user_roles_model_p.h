@@ -24,6 +24,7 @@ struct RoleDescription
 
 class QnUserRolesModelPrivate: public Connective<QObject>, public QnWorkbenchContextAware
 {
+    using base_type = Connective<QObject>;
 public:
     QnUserRolesModelPrivate(QnUserRolesModel* parent, QnUserRolesModel::DisplayRoleFlags flags);
 
