@@ -226,7 +226,6 @@ void serializeToUrlQuery(
 }
 
 MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsParams, type)
-MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsParams, timeouts)
 
 bool loadFromUrlQuery(
     const QUrlQuery& urlQuery,

@@ -615,12 +615,11 @@ struct ModifyResourceParamAccess
 
     bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
-        bool result = false;
         if (hasSystemAccess(accessData))
             return true;
 
         if (isRemove)
-            result = qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
+            qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
                 qnResPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
 
