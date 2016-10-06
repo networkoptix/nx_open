@@ -102,6 +102,12 @@ public:
         return true;
     }
 
+    void forEach(nx::utils::MoveOnlyFunc<void(SocketServerType*)> function)
+    {
+        for (auto& listener: m_listeners)
+            function(listener.get());
+    }
+
 private:
     std::function<std::unique_ptr<SocketServerType>()> m_socketServerFactory;
     std::list<std::unique_ptr<SocketServerType> > m_listeners;

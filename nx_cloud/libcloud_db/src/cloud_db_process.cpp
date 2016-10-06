@@ -285,6 +285,16 @@ int CloudDBProcess::exec()
             false,  //TODO #ak enable ssl when it works properly
             SocketFactory::NatTraversalType::nttDisabled );
 
+        if (m_settings->auth().connectionInactivityPeriod.count())
+        {
+            multiAddressHttpServer.forEach(
+                [&](nx_http::HttpStreamSocketServer* server)
+                {
+                    server->setConnectionInactivityTimeout(
+                        m_settings->auth().connectionInactivityPeriod);
+                });
+        }
+
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
 
