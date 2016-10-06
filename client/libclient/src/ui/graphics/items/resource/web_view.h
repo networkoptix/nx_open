@@ -31,6 +31,7 @@ public:
 
     void setPageUrl(const QUrl &newUrl);
 
+    void setupStyle();
 signals:
     void statusChanged();
 
