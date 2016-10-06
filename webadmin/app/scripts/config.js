@@ -68,7 +68,7 @@ var Config = {
         ldapSearchBase: {label: 'LDAP search base', type: 'text'},
         ldapSearchFilter: {label: 'LDAP search filter', type: 'text'},
         ldapUri: {label: 'LDAP URI', type: 'text'},
-        serverAutoDiscoveryEnabled: {label: 'Enable device auto discovery', type: 'checkbox', setupWizard: true},
+        autoDiscoveryEnabled: {label: 'Enable device auto discovery', type: 'checkbox', setupWizard: true},
         smtpConnectionType: {label: 'SMTP connection type', type: 'text'},
         smtpHost: {label: 'SMTP host', type: 'text'},
         smtpPort: {label: 'SMTP port', type: 'number'},
