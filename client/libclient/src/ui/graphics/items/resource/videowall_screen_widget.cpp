@@ -201,8 +201,8 @@ void QnVideowallScreenWidget::at_thumbnailReady(const QnUuid &resourceId, const 
 }
 
 void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallItem& oldItem,
-    const QnVideoWallItem& item)
+    const QnVideoWallItem& item,
+    const QnVideoWallItem& oldItem)
 {
     Q_UNUSED(videoWall)
 

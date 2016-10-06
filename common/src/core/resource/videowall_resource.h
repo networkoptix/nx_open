@@ -33,11 +33,12 @@ public:
     QList<QnUuid> onlineItems() const;
 
     virtual Qn::ResourceStatus getStatus() const override;
+
 signals:
     void itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
     void itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
-    void itemChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallItem& oldItem,
-        const QnVideoWallItem& item);
+    void itemChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallItem& item,
+        const QnVideoWallItem& oldItem);
 
     void pcAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
     void pcRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
@@ -54,18 +55,16 @@ protected:
 
     virtual Qn::Notifier storedItemAdded(const QnVideoWallItem& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallItem& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnVideoWallItem& oldItem,
-        const QnVideoWallItem& item) override;
+    virtual Qn::Notifier storedItemChanged(const QnVideoWallItem& item,
+        const QnVideoWallItem& oldItem) override;
 
     virtual Qn::Notifier storedItemAdded(const QnVideoWallPcData& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallPcData& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnVideoWallPcData& oldItem,
-        const QnVideoWallPcData& item) override;
+    virtual Qn::Notifier storedItemChanged(const QnVideoWallPcData& item) override;
 
     virtual Qn::Notifier storedItemAdded(const QnVideoWallMatrix& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallMatrix& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnVideoWallMatrix& oldItem,
-        const QnVideoWallMatrix& item) override;
+    virtual Qn::Notifier storedItemChanged(const QnVideoWallMatrix& item) override;
 private:
     bool m_autorun;
 
