@@ -15,7 +15,7 @@ public:
     template<class Deleter>
     QnSharedResourcePointer(Resource *ptr, Deleter d): base_type(ptr, d) { initialize(*this); }
 
-    // copy 
+    // copy
     QnSharedResourcePointer(const QSharedPointer<Resource> &other): base_type(other) {}
 
     QnSharedResourcePointer<Resource> &operator=(const QSharedPointer<Resource> &other) {
@@ -32,20 +32,20 @@ public:
         return *this;
     }
 
-    // move 
+    // move
     QnSharedResourcePointer(QSharedPointer<Resource> &&other): base_type(std::move(other)) {
-        other.reset();
+        other.clear();
     }
 
     QnSharedResourcePointer<Resource> &operator=(QSharedPointer<Resource> &&other) {
         base_type::operator=(std::move(other));
-        other.reset();
+        other.clear();
         return *this;
     }
 
     template<class OtherResource>
     QnSharedResourcePointer(QSharedPointer<OtherResource> &&other): base_type(std::move(other)) {
-        other.reset();
+        other.clear();
     }
 
     template<class OtherResource>
@@ -55,7 +55,10 @@ public:
         return *this;
     }
 
-    using base_type::reset;
+    void reset()
+    {
+        base_type::reset();
+    }
 
     template<class OtherResource>
     void reset(OtherResource *resource) {
@@ -67,9 +70,9 @@ public:
     QnSharedResourcePointer(const QWeakPointer<OtherResource> &other): base_type(other) {}
 
     template<class OtherResource>
-    QnSharedResourcePointer<Resource> &operator=(const QWeakPointer<OtherResource> &other) { 
+    QnSharedResourcePointer<Resource> &operator=(const QWeakPointer<OtherResource> &other) {
         base_type::operator=(other);
-        return *this; 
+        return *this;
     }
 
     template<class OtherResource>
