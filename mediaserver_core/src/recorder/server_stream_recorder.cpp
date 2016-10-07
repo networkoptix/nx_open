@@ -63,7 +63,6 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
-    m_stopOnWriteError = false;
     m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
 
     QnScheduleTask::Data scheduleData;
