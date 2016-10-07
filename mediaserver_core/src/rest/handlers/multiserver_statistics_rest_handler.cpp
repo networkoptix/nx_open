@@ -245,7 +245,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     static const auto settingsUrl = []()
     {
         static const auto kSettingsUrl =
-            ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats.json");
+            ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats_v2.json");
 
         // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
         const auto admin = qnResPool->getAdministrator();
