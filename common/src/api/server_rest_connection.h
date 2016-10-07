@@ -9,6 +9,8 @@
 #include <api/helpers/request_helpers_fwd.h>
 #include "utils/network/http/asynchttpclient.h"
 #include <rest/server/json_rest_result.h>
+#include <core/resource/resource_fwd.h>
+
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -108,6 +110,8 @@ namespace rest
 
         typedef std::function<void (Handle, SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
         Handle sendRequest(const Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
+
+        QnMediaServerResourcePtr getServerWithInternetAccess() const;
     private:
         QnUuid m_serverId;
         QMap<Handle, nx_http::AsyncHttpClientPtr> m_runningRequests;
