@@ -92,7 +92,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto mediaServerManager = connection->getMediaServerNotificationManager();
-    connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData));
+    connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,   this, &QnCommonMessageProcessor::updateServerResource);
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::storageChanged,   this, on_resourceUpdated(ec2::ApiStorageData));
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::storageRemoved,   this, &QnCommonMessageProcessor::on_resourceRemoved );
@@ -435,7 +435,8 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     };
     */
 
-#define updateResources(source) { for (const auto& resource : source) { updateResource(resource); remoteResources.remove(resource.id); } }
+#define updateResources(source) { for (const auto& resource: source) { updateResource(resource); remoteResources.remove(resource.id); } }
+#define updateServerResources(source, peerId) { for (const auto& resource: source) { updateServerResource(resource, peerId); remoteResources.remove(resource.id); } }
 
     /* Packet adding. */
     qnResPool->beginTran();
@@ -445,7 +446,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     updateResources(fullData.layouts);
     updateResources(fullData.videowalls);
     updateResources(fullData.webPages);
-    updateResources(fullData.servers);
+    updateServerResources(fullData.servers, qnCommon->remoteGUID());
     updateResources(fullData.storages);
 
     qnResPool->commit();
@@ -605,7 +606,7 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr& )
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, const QnUuid& )
 {
 }
 
@@ -654,11 +655,11 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
     }
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server)
+void QnCommonMessageProcessor::updateServerResource(const ec2::ApiMediaServerData& server, const QnUuid& peerId)
 {
     QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
     fromApiToResource(server, qnServer);
-    updateResource(qnServer);
+    updateResource(qnServer, peerId);
 }
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage)

@@ -55,7 +55,7 @@ namespace ec2
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveMediaServer);
-        emit addedOrUpdated(tran.params);
+        emit addedOrUpdated(tran.params, tran.peerID);
     }
 
 

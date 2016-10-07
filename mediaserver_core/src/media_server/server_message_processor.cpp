@@ -36,7 +36,7 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 {
 }
 
-void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
 {
     QnCommonMessageProcessor::updateResource(resource);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
@@ -58,8 +58,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
             ec2::fromResourceToApi(ownMediaServer, ownData);
             ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
 
-            if (ownData != newData)
+            if (ownData != newData && peerId != qnCommon->moduleGUID())
             {
+                // if remote peer send update for our server then ignore it and resend our own data
                 QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
                 return;
             }

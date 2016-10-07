@@ -29,13 +29,17 @@ public:
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
-    virtual void updateResource(const QnResourcePtr &resource);
+    /**
+     * @param resource resource to update
+     * @param peerId peer what modified resource. null if not known
+     */
+    virtual void updateResource(const QnResourcePtr &resource, const QnUuid& peerId = QnUuid());
     virtual void updateResource(const ec2::ApiUserData& user);
     virtual void updateResource(const ec2::ApiLayoutData& layout);
     virtual void updateResource(const ec2::ApiVideowallData& videowall);
     virtual void updateResource(const ec2::ApiWebPageData& webpage);
     virtual void updateResource(const ec2::ApiCameraData& camera);
-    virtual void updateResource(const ec2::ApiMediaServerData& server);
+    virtual void updateServerResource(const ec2::ApiMediaServerData& server, const QnUuid& peerId);
     virtual void updateResource(const ec2::ApiStorageData& storage);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
