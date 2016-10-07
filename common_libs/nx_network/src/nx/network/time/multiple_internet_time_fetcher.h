@@ -1,72 +1,56 @@
-/**********************************************************
-* 5 feb 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef MULTIPLE_INTERNET_TIME_FETCHER_H
-#define MULTIPLE_INTERNET_TIME_FETCHER_H
-
-#include "abstract_accurate_time_fetcher.h"
+#pragma once
 
 #include <memory>
 #include <vector>
 
-#include <nx/utils/thread/mutex.h>
+#include "abstract_accurate_time_fetcher.h"
 
+namespace nx {
+namespace network {
 
-//!Fetches time from multiple time fetchers. If all succeeded than returns mean value
-class NX_NETWORK_API MultipleInternetTimeFetcher
+/**
+ * Fetches time from multiple time fetchers. If all succeeded than returns mean value.
+ */
+class NX_NETWORK_API MeanTimeFetcher
 :
     public AbstractAccurateTimeFetcher
 {
 public:
-    static const qint64 DEFAULT_MAX_DEVIATION_MILLIS = 60*1000;
+    static const qint64 kDefaultMaxDeviationMillis = 60*1000;
     
-    /*!
-        \param maxDeviationMillis Maximum allowed deviation between time values received via different time fetchers
-    */
-    MultipleInternetTimeFetcher( qint64 maxDeviationMillis = DEFAULT_MAX_DEVIATION_MILLIS );
-    virtual ~MultipleInternetTimeFetcher();
+    /**
+     * @param maxDeviationMillis Maximum allowed deviation between time values received via different time fetchers
+     */
+    MeanTimeFetcher(qint64 maxDeviationMillis = kDefaultMaxDeviationMillis);
+    virtual ~MeanTimeFetcher();
 
-    //!Implementation of \a QnStoppable::pleaseStop
-    virtual void pleaseStop() override;
-    //!Implementation of \a QnJoinable::join
-    virtual void join() override;
+    virtual void stopWhileInAioThread() override;
 
-    //!Implementation of AbstractAccurateTimeFetcher
-    virtual void getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) override;
+    virtual void getTimeAsync(CompletionHandler completionHandler) override;
 
-    void addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher );
+    void addTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher);
 
 private:
     struct TimeFetcherContext
     {
-        enum State
-        {
-            init,
-            working,
-            done
-        };
-
         std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher;
         qint64 utcMillis;
         SystemError::ErrorCode errorCode;
-        State state;
 
         TimeFetcherContext();
     };
 
     qint64 m_maxDeviationMillis;
     std::vector<std::unique_ptr<TimeFetcherContext>> m_timeFetchers;
-    mutable QnMutex m_mutex;
     size_t m_awaitedAnswers;
-    bool m_terminated;
-    std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;
+    CompletionHandler m_completionHandler;
 
+    void getTimeAsyncInAioThread(CompletionHandler completionHandler);
     void timeFetchingDone(
         TimeFetcherContext* ctx,
         qint64 utcMillis,
-        SystemError::ErrorCode errorCode );
+        SystemError::ErrorCode errorCode);
 };
 
-#endif //MULTIPLE_INTERNET_TIME_FETCHER_H
+} // namespace network
+} // namespace nx
