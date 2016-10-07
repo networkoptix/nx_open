@@ -2406,6 +2406,9 @@ void MediaServerProcess::run()
         if (isNewServerInstance ||
             (isCloudInstanceChanged && isConnectedToCloud))
         {
+            if (isCloudInstanceChanged)
+                qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
+                    "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
             resetCloudParams(cloudConnectionManager);
             qnGlobalSettings->setLocalSystemId(QnUuid()); //< go to new state
         }
