@@ -525,8 +525,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_Server = 0,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
-        PT_MobileClient = 3,
-        PT_LiteClient = 4,
+        PT_OldMobileClient = 3,
+        PT_MobileClient = 4,
         PT_CloudServer = 5,
         PT_Count
     };
