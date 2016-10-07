@@ -60,7 +60,7 @@ public:
     /**
      * Adds account in "not activated" state and sends verification email to the email address provided.
      */
-    void addAccount(
+    void registerAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountData accountData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
@@ -100,20 +100,26 @@ public:
 
     std::string generateNewAccountId() const;
 
+    /**
+     * Fetches account from cache.
+     */
     boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const;
     
     nx::db::DBResult insertAccount(
-        nx::db::QueryContext* const tran,
-        data::AccountData accountData);
+        nx::db::QueryContext* const queryContext,
+        data::AccountData account);
+    nx::db::DBResult updateAccount(
+        nx::db::QueryContext* const queryContext,
+        data::AccountData account);
 
-    nx::db::DBResult fetchExistingAccountByEmail(
+    nx::db::DBResult fetchAccountByEmail(
         nx::db::QueryContext* queryContext,
         const std::string& accountEmail,
         data::AccountData* const accountData);
 
     nx::db::DBResult createPasswordResetCode(
-        nx::db::QueryContext* const tran,
+        nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);
 
@@ -144,13 +150,6 @@ private:
         const std::string& accountEmail,
         std::unique_ptr<AbstractActivateAccountNotification> notification,
         data::AccountConfirmationCode* const resultData);
-    void accountAdded(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        bool requestSourceSecured,
-        nx::db::DBResult resultCode,
-        data::AccountData accountData,
-        data::AccountConfirmationCode resultData,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
     void accountReactivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,

@@ -1146,7 +1146,7 @@ nx::db::DBResult SystemManager::fetchAccountToShareWith(
     const data::SystemSharing& sharing,
     data::AccountData* const targetAccountData)
 {
-    nx::db::DBResult dbResult = m_accountManager->fetchExistingAccountByEmail(
+    nx::db::DBResult dbResult = m_accountManager->fetchAccountByEmail(
         queryContext,
         sharing.accountEmail,
         targetAccountData);

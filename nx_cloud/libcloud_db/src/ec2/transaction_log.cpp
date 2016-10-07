@@ -119,7 +119,7 @@ void TransactionLog::readTransactions(
             completionHandler(
                 dbResult == nx::db::DBResult::ok
                     ? outputData.resultCode
-                    : fromDbResultCode(dbResult),
+                    : dbResultToApiResult(dbResult),
                 std::move(outputData.transactions),
                 std::move(outputData.state));
         });

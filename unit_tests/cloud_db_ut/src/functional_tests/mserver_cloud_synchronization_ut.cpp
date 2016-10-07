@@ -420,7 +420,6 @@ TEST_F(Ec2MserverCloudSynchronization, addingCloudUserWithNotRegisteredEmail)
         sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const RestorePasswordNotification&))).Times(1);
     //< One for owner account, another one - for user account, third one - password reset
 
-    // Expecting send email call when adding unknown user.
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/)
         {

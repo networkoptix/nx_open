@@ -315,7 +315,7 @@ void TemporaryAccountPasswordManager::tempPasswordAddedToDb(
     {
         NX_LOG(lm("add_temporary_account_password (%1). Failed to save password to DB. DB error: %2").
             arg(tempPasswordData.accountEmail).arg((int)resultCode), cl_logDEBUG1);
-        return completionHandler(fromDbResultCode(resultCode));
+        return completionHandler(dbResultToApiResult(resultCode));
     }
 
     saveTempPasswordToCache(std::move(tempPasswordData));
@@ -359,7 +359,7 @@ void TemporaryAccountPasswordManager::tempPasswordDeleted(
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (completionHandler)
-        completionHandler(fromDbResultCode(resultCode));
+        completionHandler(dbResultToApiResult(resultCode));
 }
 
 }   //cdb

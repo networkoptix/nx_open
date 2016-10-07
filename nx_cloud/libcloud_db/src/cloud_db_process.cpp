@@ -392,7 +392,7 @@ void CloudDBProcess::registerApiHandlers(
     // AccountManager
     registerHttpHandler(
         kAccountRegisterPath,
-        &AccountManager::addAccount, accountManager,
+        &AccountManager::registerAccount, accountManager,
         EntityType::account, DataActionType::insert);
 
     registerHttpHandler(
