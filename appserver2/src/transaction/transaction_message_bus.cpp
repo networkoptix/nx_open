@@ -1029,17 +1029,16 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
 bool QnTransactionMessageBus::readApiFullInfoData(
     QnTransactionTransport* transport, ApiFullInfoData* data)
 {
-    auto& manager = dbManager(transport->getUserAccessData());
-
+    const auto& user = transport->getUserAccessData();
     ErrorCode errorCode;
     if (transport->remotePeer().peerType == Qn::PT_MobileClient)
     {
-        errorCode = manager.readApiFullInfoDataForMobileClient(
-            data, transport->getUserAccessData().userId);
+        errorCode = dbManager(user).readApiFullInfoDataForMobileClient(
+            data, user.userId);
     }
     else
     {
-        errorCode = manager.readApiFullInfoDataComplete(data);
+        errorCode = dbManager(user).readApiFullInfoDataComplete(data);
     }
 
     if (errorCode != ErrorCode::ok)
