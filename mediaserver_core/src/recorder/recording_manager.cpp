@@ -305,6 +305,8 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi) {
             recorderHiRes->pleaseStop();
             camera->notInUse(recorderHiRes);
+            if (providerHi)
+                providerHi->setFps(cameraRes->getMaxFps());
         }
 
         if (needStopLow) {
@@ -319,10 +321,7 @@ bool QnRecordingManager::startOrStopRecording(
         if (!res->hasFlags(Qn::foreigner)) {
             if(!needStopHi && !needStopLow && res->getStatus() == Qn::Recording)
                 res->setStatus(Qn::Online); // may be recording thread was not runned, so reset status to online
-        }
-
-        if (providerHi)
-            providerHi->setFps(cameraRes->getMaxFps());
+        }   
     }
 
     //doing anyway to stop internal cache, etc...
