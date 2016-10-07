@@ -243,6 +243,7 @@ namespace nx_http
             notAllowed = 405,
             notAcceptable = 406,
             proxyAuthenticationRequired = 407,
+            unsupportedMediaType = 415,
             rangeNotSatisfiable = 416,
             invalidParameter = 451,
 
