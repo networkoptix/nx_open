@@ -26,8 +26,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
+    const auto client = clientConnection();
 
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
@@ -83,8 +82,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
+    const auto client = clientConnection();
 
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
@@ -118,8 +116,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
+    const auto client = clientConnection();
 
     //resolving unknown system
     api::ResolveDomainResponse resolveResponse;
@@ -142,9 +139,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
-
+    const auto client = clientConnection();
     const auto system1 = addRandomSystem();
 
     //resolving unknown system
@@ -168,9 +163,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
-
+    const auto client = clientConnection();
     const auto system1 = addRandomSystem();
 
     //emulating local mediaserver

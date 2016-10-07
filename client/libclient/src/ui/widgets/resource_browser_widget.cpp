@@ -236,9 +236,14 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     auto dropResource =
         [this](const QnResourcePtr& resource)
         {
-            // user resources cannot be dropped on the scene
-            if (!resource || resource.dynamicCast<QnUserResource>())
+            // handle resources that should not be dropped on the scene
+            if (!resource
+                || resource->hasFlags(Qn::user)
+                || resource->hasFlags(Qn::server)
+                )
+            {
                 return;
+            }
 
             menu()->trigger(QnActions::DropResourcesAction, resource);
         };

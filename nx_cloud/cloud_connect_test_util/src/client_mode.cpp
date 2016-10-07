@@ -42,7 +42,7 @@ std::vector<SocketAddress> resolveTargets(
         return targets;
     }
 
-    // It's likelly a system id, add server ids if avaliable.
+    // It's likely a system id, add server ids if available.
     QString serverId;
     size_t serverCount;
     if (args.read("server-id", &serverId) && args.read("server-count", &serverCount))

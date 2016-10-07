@@ -775,6 +775,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAccessAllMediaPermission          = 0x01000000,   /**< Has access to all media resources (cameras and web pages). */
 
 
+        GlobalCustomUserPermission              = 0x10000000,   /**< Flag that just mark new user as 'custom'. */
+
         /* Shortcuts. */
 
         /* Live viewer has access to all cameras and global layouts by default. */

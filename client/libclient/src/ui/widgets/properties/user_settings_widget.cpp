@@ -46,7 +46,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserSettingsWidget()),
     m_model(model),
-    m_rolesModel(new QnUserRolesModel(this)),
+    m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::AllRoleFlags)),
     m_aligner(new QnAligner(this))
 {
     ui->setupUi(this);
@@ -282,7 +282,7 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         m_model->user()->setUserGroup(selectedUserGroup());
-        if (m_model->user()->role() != Qn::UserRole::CustomPermissions)
+        if (selectedRole() != Qn::UserRole::CustomPermissions)
             m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
     }
 

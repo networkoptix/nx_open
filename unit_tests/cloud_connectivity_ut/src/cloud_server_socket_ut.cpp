@@ -284,7 +284,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         });
 
     auto server = std::make_unique<CloudServerSocket>(
-        std::make_shared<hpm::api::MediatorServerTcpConnection>(
+        std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
             &nx::network::SocketGlobals::mediatorConnector()),
         nx::network::RetryPolicy(),
@@ -367,7 +367,7 @@ protected:
             });
 
         auto cloudServerSocket = std::make_unique<CloudServerSocket>(
-            std::make_shared<hpm::api::MediatorServerTcpConnection>(
+            std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient, &SocketGlobals::mediatorConnector()),
             nx::network::RetryPolicy(),
             std::move(acceptorMakers));

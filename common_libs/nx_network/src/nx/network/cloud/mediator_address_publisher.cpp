@@ -10,7 +10,7 @@ const std::chrono::milliseconds MediatorAddressPublisher::kDefaultRetryInterval 
     std::chrono::minutes(10);
 
 MediatorAddressPublisher::MediatorAddressPublisher(
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection)
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection)
 :
     m_retryInterval(kDefaultRetryInterval),
     m_isRequestInProgress(false),

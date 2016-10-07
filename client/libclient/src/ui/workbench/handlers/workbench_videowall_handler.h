@@ -120,12 +120,10 @@ private slots:
 
     void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
-        const QnVideoWallItem& oldItem,
         const QnVideoWallItem& item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
     void at_videoWall_itemChanged_activeMode(const QnVideoWallResourcePtr& videoWall,
-        const QnVideoWallItem& oldItem,
         const QnVideoWallItem& item);
     void at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 

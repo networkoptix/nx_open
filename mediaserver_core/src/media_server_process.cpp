@@ -1796,7 +1796,8 @@ void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& clo
     if (systemName.isDefault())
         resetCloudParams(cloudConnectionManager);
 
-    qnGlobalSettings->setLocalSystemId(systemName.isDefault() ? QnUuid() : QnUuid::createUuid());
+    qnGlobalSettings->setLocalSystemId(
+        systemName.isDefault() ? QnUuid() : guidFromArbitraryData(systemName.value()));
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file

@@ -51,7 +51,30 @@ const CdbLauncher* Ec2MserverCloudSynchronization::cdb() const
     return &m_cdb;
 }
 
-api::ResultCode Ec2MserverCloudSynchronization::bindRandomSystem()
+api::ResultCode Ec2MserverCloudSynchronization::setOwnerAccountCredentials(
+    const std::string& email,
+    const std::string& password)
+{
+    const auto resultCode = m_cdb.getAccount(email, password, &m_account);
+    if (resultCode != api::ResultCode::ok)
+        return resultCode;
+    m_accountPassword = password;
+    return api::ResultCode::ok;
+}
+
+api::ResultCode Ec2MserverCloudSynchronization::bindSystemToOwnerAccount()
+{
+    // Adding system1 to account1.
+    api::ResultCode result = m_cdb.bindRandomSystem(
+        m_account.email, m_accountPassword, &m_system);
+    if (result != api::ResultCode::ok)
+        return result;
+
+    // Saving cloud credentials to vms db.
+    return saveCloudSystemCredentials(m_system.id, m_system.authKey);
+}
+
+api::ResultCode Ec2MserverCloudSynchronization::registerAccountAndBindSystemToIt()
 {
     api::ResultCode result = api::ResultCode::ok;
     if (m_account.email.empty())    //< Account is not registered yet
@@ -62,32 +85,7 @@ api::ResultCode Ec2MserverCloudSynchronization::bindRandomSystem()
     }
 
     // Adding system1 to account1.
-    result = m_cdb.bindRandomSystem(m_account.email, m_accountPassword, &m_system);
-    if (result != api::ResultCode::ok)
-        return result;
-
-    // Saving cloud credentials to vms db.
-    QnUuid adminUserId;
-    if (!findAdminUserId(&adminUserId))
-        return api::ResultCode::unknownError;
-
-    ec2::ApiResourceParamWithRefDataList params;
-    params.emplace_back(ec2::ApiResourceParamWithRefData(
-        adminUserId,
-        "cloudSystemID",
-        QString::fromStdString(m_system.id)));
-    params.emplace_back(ec2::ApiResourceParamWithRefData(
-        adminUserId,
-        "cloudAuthKey",
-        QString::fromStdString(m_system.authKey)));
-    ec2::ApiResourceParamWithRefDataList outParams;
-    if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
-    {
-        return api::ResultCode::unknownError;
-    }
-
-    return api::ResultCode::ok;
+    return bindSystemToOwnerAccount();
 }
 
 api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
@@ -144,7 +142,47 @@ api::ResultCode Ec2MserverCloudSynchronization::rebindSystem()
     if (resultCode != api::ResultCode::ok)
         return resultCode;
 
-    return bindRandomSystem();
+    return registerAccountAndBindSystemToIt();
+}
+
+api::ResultCode Ec2MserverCloudSynchronization::fillRegisteredSystemDataByCredentials(
+    const std::string& systemId,
+    const std::string& authKey)
+{
+    api::SystemDataEx system;
+    const auto result = cdb()->getSystem(systemId, authKey, systemId, &system);
+    if (result != api::ResultCode::ok)
+        return result;
+    m_system = system;
+    m_system.authKey = authKey;
+    return api::ResultCode::ok;
+}
+
+api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
+    const std::string& id,
+    const std::string& authKey)
+{
+    QnUuid adminUserId;
+    if (!findAdminUserId(&adminUserId))
+        return api::ResultCode::unknownError;
+
+    ec2::ApiResourceParamWithRefDataList params;
+    params.emplace_back(ec2::ApiResourceParamWithRefData(
+        adminUserId,
+        "cloudSystemID",
+        QString::fromStdString(m_system.id)));
+    params.emplace_back(ec2::ApiResourceParamWithRefData(
+        adminUserId,
+        "cloudAuthKey",
+        QString::fromStdString(m_system.authKey)));
+    ec2::ApiResourceParamWithRefDataList outParams;
+    if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
+            ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
+    {
+        return api::ResultCode::unknownError;
+    }
+
+    return api::ResultCode::ok;
 }
 
 const api::AccountData& Ec2MserverCloudSynchronization::ownerAccount() const

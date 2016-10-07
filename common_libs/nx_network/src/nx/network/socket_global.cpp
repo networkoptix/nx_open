@@ -3,7 +3,7 @@
 
 #include <nx/utils/std/future.h>
 
-std::chrono::seconds kReloadDebugConfigurationInterval(10);
+const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 
 namespace nx {
 namespace network {
@@ -11,10 +11,10 @@ namespace network {
 SocketGlobals::SocketGlobals():
     m_log(QnLog::logs()),
     m_mediatorConnector(new hpm::api::MediatorConnector),
-    m_addressResolver(m_mediatorConnector->clientConnection()),
     m_addressPublisher(m_mediatorConnector->systemConnection()),
     m_tcpReversePool(m_mediatorConnector->clientConnection())
 {
+    m_addressResolver.reset(new cloud::AddressResolver(m_mediatorConnector->clientConnection()));
 }
 
 SocketGlobals::~SocketGlobals()
@@ -26,7 +26,7 @@ SocketGlobals::~SocketGlobals()
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
         m_debugConfigurationTimer.pleaseStop(barrier.fork());
-        m_addressResolver.pleaseStop(barrier.fork());
+        m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher.pleaseStop(barrier.fork());
         m_mediatorConnector->pleaseStop(barrier.fork());
         m_outgoingTunnelPool.pleaseStop(barrier.fork());
@@ -99,7 +99,7 @@ void SocketGlobals::setDebugConfigurationTimer()
         kReloadDebugConfigurationInterval,
         [this]()
         {
-            m_debugConfiguration.reload(false); // silent reload
+            m_debugConfiguration.reload(false); //< Silent reload.
             setDebugConfigurationTimer();
         });
 }

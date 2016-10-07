@@ -49,7 +49,9 @@ QnPermissionsWidget::~QnPermissionsWidget()
 bool QnPermissionsWidget::hasChanges() const
 {
     Qn::GlobalPermissions value = m_permissionsModel->rawPermissions();
-    value &= ~Qn::GlobalAccessAllMediaPermission; /*< This permission is handled separately. */
+
+    /* These permissions are handled separately. */
+    value &= ~Qn::GlobalAccessAllMediaPermission;
 
     return selectedPermissions() != value;
 }
@@ -74,6 +76,11 @@ void QnPermissionsWidget::applyChanges()
         else
             value &= ~permission(checkbox);
     }
+
+    /* We must set special 'Custom' flag for the users to avoid collisions with built-in roles. */
+    if (m_permissionsModel->subject().user())
+        value |= Qn::GlobalCustomUserPermission;
+
     m_permissionsModel->setRawPermissions(value);
 }
 
@@ -87,6 +94,11 @@ Qn::GlobalPermissions QnPermissionsWidget::selectedPermissions() const
         else
             value &= ~permission(checkbox);
     }
+
+    /* We must set special 'Custom' flag for the users to avoid collisions with built-in roles. */
+    if (m_permissionsModel->subject().user())
+        value |= Qn::GlobalCustomUserPermission;
+
     return value;
 }
 

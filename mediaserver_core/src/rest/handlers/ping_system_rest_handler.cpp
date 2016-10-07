@@ -23,7 +23,7 @@ int QnPingSystemRestHandler::executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
-        const QnRestConnectionProcessor* owner)
+        const QnRestConnectionProcessor* /*owner*/)
 {
     Q_UNUSED(path)
 

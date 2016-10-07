@@ -61,7 +61,6 @@ public:
 
     QnUuid userGroup() const;
     void setUserGroup(const QnUuid& group);
-    void resetUserGroup();
 
     bool isEnabled() const;
     void setEnabled(bool isEnabled);

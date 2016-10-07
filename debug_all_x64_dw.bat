@@ -1,1 +1,0 @@
-mvn compile -Dbuild.configuration=debug -Darch=x64 -Dcustomization=digitalwatchdog -P!installer
