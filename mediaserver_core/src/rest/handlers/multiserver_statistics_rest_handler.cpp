@@ -204,14 +204,7 @@ public:
 
 private:
     typedef QnMultiserverRequestContext<QnEmptyRequestData> Context;
-
     nx_http::StatusCode::Value loadSettingsLocally(QnStatisticsSettings &outputSettings);
-
-    nx_http::StatusCode::Value loadSettingsRemotely(QnStatisticsSettings &outputSettings
-        , const QnMediaServerResourcePtr &server
-        , Context *context);
-
-private:
 };
 
 SettingsActionHandler::SettingsActionHandler(const QString &baseUrl)
@@ -228,8 +221,6 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
     const QnEmptyRequestData request =
         QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
 
-    Context context(request, port);
-
     QnStatisticsSettings settings;
     nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notFound;
 
@@ -241,26 +232,7 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
         return nx_http::StatusCode::ok;
     }
 
-    if (request.isLocal)
-        return resultCode;
-
-    const auto moduleGuid = qnCommon->moduleGUID();
-    for (const auto server: qnResPool->getAllServers(Qn::Online))
-    {
-        if (server->getId() == moduleGuid)
-            continue;
-
-        resultCode = loadSettingsRemotely(settings, server, &context);
-        if (isSuccessHttpCode(resultCode))
-            break;
-    }
-
-    if (!isSuccessHttpCode(resultCode))
-        return resultCode;
-
-    QnFusionRestHandlerDetail::serialize(settings, result, contentType
-        , Qn::JsonFormat, request.extraFormatting);
-    return nx_http::StatusCode::ok;
+    return resultCode;
 }
 
 nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisticsSettings &outputSettings)
@@ -299,50 +271,6 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     SettingsCache::update(outputSettings);
     return nx_http::StatusCode::ok;
 }
-
-nx_http::StatusCode::Value SettingsActionHandler::loadSettingsRemotely(
-    QnStatisticsSettings &outputSettings
-    , const QnMediaServerResourcePtr &server
-    , Context *context)
-{
-    auto result = nx_http::StatusCode::notFound;
-    if (!hasInternetConnection(server))
-        return result;
-
-    const auto completionFunc = [&outputSettings, &result, context]
-        (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType body)
-    {
-        const auto httpCode = static_cast<nx_http::StatusCode::Value>(statusCode);
-
-        QnStatisticsSettings settings;
-        bool success = false;
-        if ((osErrorCode == SystemError::noError) && isSuccessHttpCode(httpCode))
-        {
-            settings = QJson::deserialized(body, settings, &success);
-        }
-
-        const auto updateOutputDataCallback =
-            [&outputSettings, &result, success, settings, context, httpCode]()
-        {
-            if (success)
-            {
-                outputSettings = settings;
-                result = httpCode;
-            }
-
-            context->requestProcessed();
-        };
-
-        context->executeGuarded(updateOutputDataCallback);
-    };
-
-    const QUrl apiUrl = getServerApiUrl(path(), server, *context);
-    runMultiserverDownloadRequest(apiUrl, server, completionFunc, context);
-    context->waitForDone();
-    return result;
-}
-
-//
 
 class SendStatisticsActionHandler : public StatisticsActionHandler
 {
@@ -392,25 +320,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     if (!correctJson)
         return nx_http::StatusCode::invalidParameter;
 
-    Context context(request, port);
-
-    nx_http::StatusCode::Value resultCode =
-        sendStatisticsLocally(body, request.statisticsServerUrl);
-
-    if (request.isLocal || isSuccessHttpCode(resultCode))
-        return resultCode;
-
-    const auto moduleGuid = qnCommon->moduleGUID();
-    for (const auto server: qnResPool->getAllServers(Qn::Online))
-    {
-        if (server->getId() == moduleGuid)
-            continue;
-
-        resultCode = sendStatisticsRemotely(body, server, &context);
-        if (isSuccessHttpCode(resultCode))
-            break;
-    }
-    return resultCode;
+    return sendStatisticsLocally(body, request.statisticsServerUrl);
 }
 
 nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
@@ -430,39 +340,6 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
     return (error == SystemError::noError
         ? httpCode : nx_http::StatusCode::internalServerError);
 }
-
-nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsRemotely(
-    const QByteArray &metricsList
-    , const QnMediaServerResourcePtr &server
-    , Context *context)
-{
-    auto result = nx_http::StatusCode::notAcceptable;
-
-    if (!hasInternetConnection(server))
-        return result;
-
-    const auto completionFunc = [&result, context]
-        (SystemError::ErrorCode errorCode, int statusCode)
-    {
-        const auto httpCode = static_cast<nx_http::StatusCode::Value>(statusCode);
-        const auto updateOutputDataCallback =[&result, errorCode, httpCode, context]()
-        {
-            result = (errorCode == SystemError::noError
-                ? httpCode : nx_http::StatusCode::internalServerError);
-            context->requestProcessed();
-        };
-
-        context->executeGuarded(updateOutputDataCallback);
-    };
-
-    const QUrl apiUrl = getServerApiUrl(path(), server, *context);
-    runMultiserverUploadRequest(apiUrl, metricsList, kJsonContentType
-        , kSendStatUser, kSendStatPass, server, completionFunc, context);
-    context->waitForDone();
-
-    return result;
-}
-//
 
 QnMultiserverStatisticsRestHandler::QnMultiserverStatisticsRestHandler(const QString &basePath)
     : QnFusionRestHandler()
