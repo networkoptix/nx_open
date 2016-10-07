@@ -109,7 +109,7 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& /*peerId*/)
 {
     NX_ASSERT(resource);
     /*
