@@ -1801,6 +1801,7 @@ void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& clo
 
     systemName.clear();
     systemName.saveToConfig(); //< remove from config file
+    qnGlobalSettings->synchronizeNow();
 }
 
 void MediaServerProcess::run()
