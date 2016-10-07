@@ -309,13 +309,13 @@ void QnServerStreamRecorder::updateStreamParams()
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
         if (m_catalog == QnServer::HiQualityCatalog) {
-            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never) {
+            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled()) {
                 liveProvider->setFps(m_currentScheduleTask.getFps());
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
             }
             else {
                 NX_ASSERT(camera);
-                liveProvider->setFps(camera->getMaxFps()-5);
+                liveProvider->setFps(camera->getMaxFps());
                 liveProvider->setQuality(Qn::QualityHighest);
             }
             liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
