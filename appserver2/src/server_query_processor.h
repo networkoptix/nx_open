@@ -284,8 +284,6 @@ private:
         std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD(
             this, SCOPED_GUARD_FUNC);
 
-        QnMutexLocker lock(&m_updateDataMutex);
-
         // Starting transaction.
         std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
         std::list<std::function<void()>> transactionsToSend;
@@ -507,9 +505,10 @@ private:
         tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(tran.params);
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
+        QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+
+        QnMutexLocker lock(&m_updateDataMutex);
         transactionLog->fillPersistentInfo(tran);
-        QByteArray serializedTran =
-            QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
         ErrorCode errorCode =
             dbManager(m_userAccessData).executeTransactionNoLock(tran, serializedTran);
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence
@@ -517,10 +516,10 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
-
         transactionsToSend->push_back(std::bind(SendTransactionFunction(), tran));
 
+        lock.unlock();
+        triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
         return errorCode;
     }
 
