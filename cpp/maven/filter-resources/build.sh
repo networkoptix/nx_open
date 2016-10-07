@@ -49,4 +49,9 @@ if [ '${box}' == 'isd' ] || [ '${box}' == 'isd_s2' ]; then
     fi
 fi
 
+if [ '${box}' == 'ios' ]; then
+    echo "Unlocking Keychain..."
+    security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
+fi    
+
 make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] $DEBUG || exit 1
