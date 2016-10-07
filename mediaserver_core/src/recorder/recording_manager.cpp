@@ -248,13 +248,13 @@ bool QnRecordingManager::startOrStopRecording(
 
     bool someRecordingIsPresent = false;
 
+    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
+    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
+
     if (needRecordCamera && res->getStatus() != Qn::Offline)
     {
         if (!cameraRes->isInitialized())
             return false; // wait for initialization
-
-        QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
-        QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
 
         someRecordingIsPresent = true;
 
@@ -306,6 +306,7 @@ bool QnRecordingManager::startOrStopRecording(
             recorderHiRes->pleaseStop();
             camera->notInUse(recorderHiRes);
         }
+
         if (needStopLow) {
             recorderLowRes->pleaseStop();
             camera->notInUse(recorderLowRes);
@@ -314,10 +315,14 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi) {
             NX_LOG(QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()), cl_logINFO);
         }
+
         if (!res->hasFlags(Qn::foreigner)) {
             if(!needStopHi && !needStopLow && res->getStatus() == Qn::Recording)
                 res->setStatus(Qn::Online); // may be recording thread was not runned, so reset status to online
         }
+
+        if (providerHi)
+            providerHi->setFps(cameraRes->getMaxFps());
     }
 
     //doing anyway to stop internal cache, etc...
