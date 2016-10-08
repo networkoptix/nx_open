@@ -61,7 +61,6 @@ public slots:
 
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
-    void at_localInterfacesChanged();
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -87,7 +86,7 @@ private:
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
     bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
-    QHostAddress getPublicAddress();
+    void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
@@ -107,8 +106,6 @@ private:
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
-    QHostAddress m_publicAddress;
-    QList<QHostAddress> m_localAddresses;
     std::map<HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;

@@ -276,6 +276,8 @@ const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
 const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
+static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
+
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
@@ -1058,17 +1060,24 @@ QString containerToQString( const Container& container )
 
 void MediaServerProcess::updateAddressesList()
 {
+    if (isStopping())
+        return;
+
+    ec2::ApiMediaServerData prevValue;
+    fromResourceToApi(m_mediaServer, prevValue);
+
+
     QList<SocketAddress> serverAddresses;
 
     const auto port = m_mediaServer->getPort();
-    for (const auto& host : m_localAddresses )
+    for (const auto& host: allLocalAddresses())
         serverAddresses << SocketAddress(host.toString(), port);
 
     for (const auto& host : m_forwardedAddresses )
         serverAddresses << SocketAddress(host.first, host.second);
 
-    if (!m_publicAddress.isNull())
-        serverAddresses << SocketAddress(m_publicAddress.toString(), m_mediaServer->getPort());
+    if (!m_ipDiscovery->publicIP().isNull())
+        serverAddresses << SocketAddress(m_ipDiscovery->publicIP().toString(), m_mediaServer->getPort());
 
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
@@ -1088,7 +1097,8 @@ void MediaServerProcess::updateAddressesList()
 
     ec2::ApiMediaServerData server;
     fromResourceToApi(m_mediaServer, server);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->save(server, this, &MediaServerProcess::at_serverSaved);
+    if (server != prevValue)
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->save(server, this, &MediaServerProcess::at_serverSaved);
 
     nx::network::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
         serverAddresses.begin(), serverAddresses.end()));
@@ -1397,19 +1407,16 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
     if (isStopping())
         return;
-    m_publicAddress = publicIP;
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    localInfo.data.publicIP = m_publicAddress.toString();
+    localInfo.data.publicIP = publicIP.toString();
     QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
-
-    at_localInterfacesChanged();
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (server)
     {
         Qn::ServerFlags serverFlags = server->getServerFlags();
-        if (m_publicAddress.isNull())
+        if (publicIP.isNull())
             serverFlags &= ~Qn::SF_HasPublicIP;
         else
             serverFlags |= Qn::SF_HasPublicIP;
@@ -1423,20 +1430,11 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
-        if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
+        if (server->setProperty(Qn::PUBLIC_IP, publicIP.toString(), QnResource::NO_ALLOW_EMPTY))
             propertyDictionary->saveParams(server->getId());
 
-        updateAddressesList();
+        updateAddressesList(); //< update interface list to add/remove publicIP
     }
-}
-
-void MediaServerProcess::at_localInterfacesChanged()
-{
-    if (isStopping())
-        return;
-
-    m_localAddresses = allLocalAddresses();
-    updateAddressesList();
 }
 
 void MediaServerProcess::at_portMappingChanged(QString address)
@@ -1752,7 +1750,7 @@ std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMappe
     return mapper;
 }
 
-QHostAddress MediaServerProcess::getPublicAddress()
+void MediaServerProcess::initPublicIpDiscovery()
 {
     m_ipDiscovery.reset(new QnPublicIPDiscovery(
         MSSettings::roSettings()->value(nx_ms_conf::PUBLIC_IP_SERVERS).toString().split(";", QString::SkipEmptyParts)));
@@ -1762,12 +1760,21 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
     int publicIPEnabled = MSSettings::roSettings()->value("publicIPEnabled").toInt();
     if (publicIPEnabled == 0)
-        return QHostAddress(); // disabled
+        return; // disabled
     else if (publicIPEnabled > 1)
-        return QHostAddress(MSSettings::roSettings()->value("staticPublicIP").toString()); // manually added
+    {
+        auto staticIp = MSSettings::roSettings()->value("staticPublicIP").toString();
+        at_updatePublicAddress(QHostAddress(staticIp)); // manually added
+        return;
+    }
     m_ipDiscovery->update();
     m_ipDiscovery->waitForFinished();
-    return m_ipDiscovery->publicIP();
+    at_updatePublicAddress(m_ipDiscovery->publicIP());
+
+    m_updatePiblicIpTimer.reset(new QTimer());
+    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
+    connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+    m_updatePiblicIpTimer->start(kPublicIpUpdateTimeoutMs);
 }
 
 void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGuidList)
@@ -1963,10 +1970,6 @@ void MediaServerProcess::run()
 
     if (!isLocal)
         serverFlags |= Qn::SF_RemoteEC;
-    m_publicAddress = getPublicAddress();
-    if (!m_publicAddress.isNull())
-        serverFlags |= Qn::SF_HasPublicIP;
-
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
@@ -1991,6 +1994,11 @@ void MediaServerProcess::run()
 
     runtimeData.hardwareIds = m_hardwareGuidList;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
+
+    initPublicIpDiscovery();
+    if (!m_ipDiscovery->publicIP().isNull())
+        serverFlags |= Qn::SF_HasPublicIP;
+
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory(
@@ -2157,7 +2165,6 @@ void MediaServerProcess::run()
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
-    qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
     bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
     m_moduleFinder = new QnModuleFinder(false);
@@ -2196,24 +2203,13 @@ void MediaServerProcess::run()
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
-        QList<SocketAddress> serverAddresses;
         const auto port = server->getPort();
-        m_localAddresses = allLocalAddresses();
-        for (const auto& host : m_localAddresses )
-            serverAddresses << SocketAddress(host.toString(), port);
 
         // used for statistics reported
         if (server->getSystemInfo() != QnSystemInformation::currentSystemInformation())
         {
             server->setSystemInfo(QnSystemInformation::currentSystemInformation());
             isModified = true;
-        }
-
-        if (server->getNetAddrList() != serverAddresses) {
-            server->setNetAddrList(serverAddresses);
-            isModified = true;
-            NX_LOG(lit("%1 Update mediaserver addresses on startup: %2")
-                   .arg(Q_FUNC_INFO).arg(containerToQString(serverAddresses)), cl_logDEBUG1);
         }
 
         if (server->getVersion() != qnCommon->engineVersion()) {
@@ -2249,7 +2245,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
         server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
         server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
-        server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
+        server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
         qnServerDb->setBookmarkCountController([server](size_t count){
@@ -2274,20 +2270,6 @@ void MediaServerProcess::run()
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
-    }
-
-    if (!m_publicAddress.isNull())
-    {
-        if (!m_ipDiscovery->publicIP().isNull()) {
-            m_updatePiblicIpTimer.reset(new QTimer());
-            connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
-            connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
-            m_updatePiblicIpTimer->start(60 * 1000 * 2);
-        }
-
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-        localInfo.data.publicIP = m_publicAddress.toString();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
     }
 
     /* This key means that password should be forcibly changed in the database. */
@@ -2466,7 +2448,11 @@ void MediaServerProcess::run()
     //    we are not able to add cameras to DB anyway, so no sense to do discover
 
 
-    connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
+    connect(
+        QnResourceDiscoveryManager::instance(),
+        &QnResourceDiscoveryManager::localInterfacesChanged,
+        this,
+        &MediaServerProcess::updateAddressesList);
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
