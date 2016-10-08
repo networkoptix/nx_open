@@ -109,7 +109,7 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& /*peerId*/)
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
 {
     NX_ASSERT(resource);
     /*
@@ -137,7 +137,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, con
     resource->addFlags(Qn::remote);
     resource->removeFlags(Qn::local);
 
-    QnCommonMessageProcessor::updateResource(resource);
+    QnCommonMessageProcessor::updateResource(resource, peerId);
     if (!ownResource)
     {
         qnResPool->addResource(resource);

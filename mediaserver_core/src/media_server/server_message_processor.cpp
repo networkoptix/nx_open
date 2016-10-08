@@ -38,7 +38,7 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
 {
-    QnCommonMessageProcessor::updateResource(resource);
+    QnCommonMessageProcessor::updateResource(resource, peerId);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
     if (resource.dynamicCast<QnVirtualCameraResource>())

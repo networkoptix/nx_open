@@ -43,13 +43,13 @@ namespace ec2
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiStorageDataList>& tran)
     {
         for (const auto& storage : tran.params)
-            emit storageChanged(storage);
+            emit storageChanged(storage, tran.peerID);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiStorageData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveStorage);
-        emit storageChanged(tran.params);
+        emit storageChanged(tran.params, tran.peerID);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerData>& tran)

@@ -15,7 +15,7 @@ class AbstractUserNotificationManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void addedOrUpdated(const ec2::ApiUserData& user);
+    void addedOrUpdated(const ec2::ApiUserData& user, const QnUuid& peerId);
     void groupAddedOrUpdated(const ec2::ApiUserGroupData& group);
     void removed(const QnUuid& id);
     void groupRemoved(const QnUuid& id);
