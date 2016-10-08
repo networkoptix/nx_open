@@ -2172,6 +2172,8 @@ void MediaServerProcess::run()
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
+        ec2::ApiMediaServerData prevServerData;
+        fromResourceToApi(server, prevServerData);
 
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
@@ -2191,9 +2193,6 @@ void MediaServerProcess::run()
             } while (appserverHost.toIPv4Address() == 0);
         }
 
-        bool isModified = false;
-        if (m_universalTcpListener->getPort() != server->getPort())
-            isModified = true;
 
         setServerNameAndUrls(
             server,
@@ -2206,16 +2205,8 @@ void MediaServerProcess::run()
         const auto port = server->getPort();
 
         // used for statistics reported
-        if (server->getSystemInfo() != QnSystemInformation::currentSystemInformation())
-        {
-            server->setSystemInfo(QnSystemInformation::currentSystemInformation());
-            isModified = true;
-        }
-
-        if (server->getVersion() != qnCommon->engineVersion()) {
-            server->setVersion(qnCommon->engineVersion());
-            isModified = true;
-        }
+        server->setSystemInfo(QnSystemInformation::currentSystemInformation());
+        server->setVersion(qnCommon->engineVersion());
 
         QByteArray settingsAuthKey = nx::ServerSetting::getAuthKey();
         QByteArray authKey = settingsAuthKey;
@@ -2223,16 +2214,15 @@ void MediaServerProcess::run()
             authKey = server->getAuthKey().toLatin1();
         if (authKey.isEmpty())
             authKey = QnUuid::createUuid().toString().toLatin1();
+        server->setAuthKey(authKey);
 
-        if (server->getAuthKey().toLatin1() != authKey) {
-            server->setAuthKey(authKey);
-            isModified = true;
-        }
         // Keep server auth key in registry. Server MUST be able pass authorization after deleting database in database restore process
         if (settingsAuthKey != authKey)
             nx::ServerSetting::setAuthKey(authKey);
 
-        if (isModified)
+        ec2::ApiMediaServerData newServerData;
+        fromResourceToApi(server, newServerData);
+        if (prevServerData != newServerData)
             m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
         else
             m_mediaServer = server;
