@@ -1216,5 +1216,30 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }
 
+TEST_F(SystemSharing, sharing_notification)
+{
+    EmailManagerMocked mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&))).Times(1);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/)
+        {
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
+        });
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account1);
+
+    const auto account2 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+}
+
 } // namespace cdb
 } // namespace nx

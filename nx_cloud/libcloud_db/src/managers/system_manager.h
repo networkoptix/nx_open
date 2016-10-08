@@ -127,19 +127,6 @@ public:
         data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
 
-    //void addSubscription(
-    //    const AuthorizationInfo& authzInfo,
-    //    const std::string& systemID,
-    //    const std::string& productID,
-    //    std::function<void(api::ResultCode)> completionHandler);
-    ///*!
-    //    \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
-    //*/
-    //void getActiveSubscriptions(
-    //    const AuthorizationInfo& authzInfo,
-    //    const std::string& systemID,
-    //    std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
-
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
         - \a accountEmail has no rights for \a systemID
@@ -290,15 +277,32 @@ private:
     // system sharing methods. TODO: #ak: move to a separate class
 
     /**
-     * @param targetAccountData Filled with attributes of account \a sharing.accountEmail
+     * @param inviteeAccount Filled with attributes of account \a sharing.accountEmail
      */
-    nx::db::DBResult updateSharingInDb(
+    nx::db::DBResult shareSystem(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
-        data::AccountData* const targetAccountData);
+        data::AccountData* const inviteeAccount);
 
-    nx::db::DBResult fetchUserSharing(
+    nx::db::DBResult insertOrReplaceSharing(
+        nx::db::QueryContext* const queryContext,
+        api::SystemSharingEx sharing);
+
+    template<typename Notification>
+    void fillSystemSharedNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const std::string& systemId,
+        const std::string& inviteeEmail,
+        Notification* const notification);
+
+    void scheduleSystemHasBeenSharedNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const api::SystemSharing& sharing);
+
+    nx::db::DBResult fetchSharing(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         const std::string& systemId,
@@ -309,7 +313,7 @@ private:
         const nx::db::InnerJoinFilterFields& filter,
         std::vector<api::SystemSharingEx>* const sharings);
 
-    nx::db::DBResult fetchUserSharing(
+    nx::db::DBResult fetchSharing(
         nx::db::QueryContext* const queryContext,
         const nx::db::InnerJoinFilterFields& filter,
         api::SystemSharingEx* const sharing);
@@ -321,13 +325,13 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
-        data::AccountData* const targetAccountData);
+        data::AccountData* const inviteeAccount,
+        bool* const isNewAccount);
     nx::db::DBResult inviteNewUserToSystem(
         nx::db::QueryContext* const queryContext,
         const std::string& inviterEmail,
         const data::AccountData& inviteeAccount,
-        const std::string& systemId,
-        const std::string& systemName);
+        const std::string& systemId);
     /**
      * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
      */
