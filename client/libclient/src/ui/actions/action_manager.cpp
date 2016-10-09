@@ -26,7 +26,6 @@
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -837,7 +836,14 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    if (QnScreenRecorder::isSupported())
+    const bool screenRecordingSupported =
+#if defined(Q_OS_WIN)
+        true;
+#else
+        false;
+#endif
+
+    if (screenRecordingSupported)
     {
         factory(QnActions::ToggleScreenRecordingAction).
             flags(Qn::Main | Qn::GlobalHotkey).
