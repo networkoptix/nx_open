@@ -309,10 +309,23 @@ Rectangle
         id: recordingHolder;
         anchors.centerIn: parent;
         visible: (context.countdownSeconds > 0);
+        opacity: (visible ? 1.0 : 0.0);
+
         radius: 2;
-        color: Style.colors.brand;
+        color: Style.colorWithAlpha(
+            Style.darkerColor(Style.colors.brand, 2), 0.8);
         width: recordingLabel.implicitWidth;
         height: recordingLabel.implicitHeight;
+
+        Behavior on opacity
+        {
+            PropertyAnimation
+            {
+                target: recordingHolder;
+                property: "opacity";
+                duration: 200;
+            }
+        }
 
         NxLabel
         {
@@ -322,7 +335,9 @@ Rectangle
             standardColor: Style.colors.brandContrast;
             leftPadding: 24;
             rightPadding: leftPadding;
-            text: qsTr("Recording in %1...").arg(context.countdownSeconds);
+            topPadding: 10;
+            bottomPadding: topPadding;
+            text: context.countdownMessage.arg(context.countdownSeconds);
         }
     }
 
@@ -334,6 +349,7 @@ Rectangle
 
         text: context.softwareVersion;
         standardColor: Style.darkerColor(Style.colors.windowText, 1);
+
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
     }
 

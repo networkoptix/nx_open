@@ -36,6 +36,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
     Q_PROPERTY(int countdownSeconds READ countdownSeconds WRITE setCountdownSeconds NOTIFY countdownSecondsChanged)
+    Q_PROPERTY(QString countdownMessage READ countdownMessage CONSTANT)
 
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
@@ -81,6 +82,8 @@ public: // Properties
 
     void setCountdownSeconds(int value);
 
+    QString countdownMessage() const;
+
 public slots:
     bool isAcceptableDrag(const UrlsList& urls);
 
@@ -110,6 +113,7 @@ public slots:
     void createAccount();
 
     void forceActiveFocus();
+
 
 public slots:
     QColor getPaletteColor(const QString& group, int index);
@@ -153,8 +157,6 @@ private:
 private:
     void showScreen();
 
-    void enableScreen();
-
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;
 
@@ -171,5 +173,4 @@ private:
     const WidgetPtr m_widget;
     QSize m_pageSize;
     int m_countdownSeconds;
-    QScopedPointer<QEventLoop> m_countdownConfirmLoop;
 };

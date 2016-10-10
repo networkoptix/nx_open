@@ -98,7 +98,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_quickView(new QQuickView()),
     m_widget(createMainView(this, m_quickView)),
     m_pageSize(m_widget->size()),
-    m_countdownSeconds(0)
+    m_countdownSeconds()
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
@@ -110,6 +110,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
 
     //
     m_widget->installEventFilter(this);
+    m_quickView->installEventFilter(this);
     qApp->installEventFilter(this); //< QTBUG-34414 workaround
     connect(action(QnActions::DisconnectAction), &QAction::triggered,
         this, &QnWorkbenchWelcomeScreen::showScreen);
@@ -251,7 +252,20 @@ void QnWorkbenchWelcomeScreen::setCountdownSeconds(int value)
         return;
 
     m_countdownSeconds = value;
+
     emit countdownSecondsChanged();
+
+    m_widget->repaint();
+    m_widget->window()->repaint();
+    m_widget->window()->update();
+
+    qApp->flush();
+    qApp->sendPostedEvents();
+}
+
+QString QnWorkbenchWelcomeScreen::countdownMessage() const
+{
+    return tr("Recording in %1...");
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)

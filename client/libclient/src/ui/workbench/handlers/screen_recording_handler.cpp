@@ -74,23 +74,23 @@ void QnScreenRecorder::timerEvent(QTimerEvent* event)
     if (m_countdown.isValid())
         millisecondsLeft = kRecordingCountdownMs - m_countdown.elapsed();
 
-    const int seconds = (millisecondsLeft + 500) / 1000;
+    const int seconds = std::max((millisecondsLeft + 500) / 1000, 0);
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setCountdownSeconds(seconds);
+
+    if (m_messageBox)
+    {
+        if (millisecondsLeft < kHideWhenMillisecondsLeft)
+            m_messageBox->hideAnimated();
+
+        m_messageBox->setText(recordingCountdownText(seconds));
+    }
 
     if (seconds > 0)
-    {
-        context()->instance<QnWorkbenchWelcomeScreen>()->setCountdownSeconds(seconds);
-        if (m_messageBox)
-        {
-            m_messageBox->setText(recordingCountdownText(seconds));
-            if (millisecondsLeft < kHideWhenMillisecondsLeft)
-                m_messageBox->hideAnimated();
-        }
-    }
-    else
-    {
-        stopRecordingCountdown();
-        startRecordingInternal();
-    }
+        return;
+
+    stopRecordingCountdown();
+    startRecordingInternal();
 }
 
 bool QnScreenRecorder::isRecording() const
@@ -131,13 +131,17 @@ void QnScreenRecorder::startRecordingCountdown()
 
     int seconds = kRecordingCountdownMs / 1000;
     m_countdown.restart();
-    m_messageBox = QnGraphicsMessageBox::information(recordingCountdownText(seconds));
+    m_messageBox = QnGraphicsMessageBox::information(
+        recordingCountdownText(seconds), kRecordingCountdownMs);
 }
 
 void QnScreenRecorder::stopRecordingCountdown()
 {
     if (m_timerId != 0)
+    {
         killTimer(m_timerId);
+        m_timerId = 0;
+    }
     m_countdown.invalidate();
     if (m_messageBox)
         m_messageBox->hideImmideately();
@@ -152,7 +156,8 @@ bool QnScreenRecorder::isRecordingCountdown() const
 
 QString QnScreenRecorder::recordingCountdownText(int seconds) const
 {
-    return tr("Recording in...%1").arg(seconds);
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    return welcomeScreen->countdownMessage().arg(seconds);
 }
 
 void QnScreenRecorder::startRecordingInternal()
