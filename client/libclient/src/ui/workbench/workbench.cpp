@@ -171,14 +171,15 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     if(!m_layouts.contains(layout) && layout != m_dummyLayout)
         addLayout(layout);
 
-    qreal oldCellAspectRatio = 0.0, newCellAspectRatio = 0.0;
-    qreal oldCellSpacing, newCellSpacing;
-
-
     emit currentLayoutAboutToBeChanged();
+
+
     /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
-    if(m_currentLayout != NULL) {
+    qreal oldCellAspectRatio = -1.0;
+    qreal oldCellSpacing = -1.0;
+    if (m_currentLayout)
+    {
         oldCellAspectRatio = m_currentLayout->cellAspectRatio();
         oldCellSpacing = m_currentLayout->cellSpacing();
 
@@ -212,8 +213,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     connect(m_currentLayout,    SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
     connect(m_currentLayout,    SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
 
-    newCellAspectRatio = m_currentLayout->cellAspectRatio();
-    newCellSpacing = m_currentLayout->cellSpacing();
+    const qreal newCellAspectRatio = m_currentLayout->cellAspectRatio();
+    const qreal newCellSpacing = m_currentLayout->cellSpacing();
 
     if(!qFuzzyEquals(newCellAspectRatio, oldCellAspectRatio))
         at_layout_cellAspectRatioChanged();
