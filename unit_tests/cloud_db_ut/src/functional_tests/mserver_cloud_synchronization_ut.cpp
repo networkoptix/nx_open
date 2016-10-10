@@ -485,5 +485,62 @@ TEST_F(Ec2MserverCloudSynchronization, migrateTransactions)
     waitForCloudAndVmsToSyncUsers();
 }
 
+TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
+{
+    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+    waitForCloudAndVmsToSyncUsers();
+
+    using namespace std::chrono;
+
+    for (int i = 0; i < 2; ++i)
+    {
+        // Shifting transaction timestamp.
+        auto timestamp = appserver2()->moduleInstance()->ecConnection()->getTransactionLogTime();
+        timestamp.ticks += duration_cast<milliseconds>(hours(24)).count();
+        appserver2()->moduleInstance()->ecConnection()->setTransactionLogTime(timestamp);
+
+        if (i == 1)
+        {
+            appserver2()->moduleInstance()->ecConnection()
+                ->deleteRemotePeer(cdbEc2TransactionUrl());
+            cdb()->restart();
+            appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+        }
+
+        // Adding user locally with shifted timestamp.
+        const std::string newAccountEmail = cdb()->generateRandomEmailAddress();
+        ::ec2::ApiUserData userData;
+        addCloudUserLocally(newAccountEmail, &userData);
+
+        waitForCloudAndVmsToSyncUsers();
+
+        // Removing user in cloud.
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->updateSystemSharing(
+                ownerAccount().email,
+                ownerAccountPassword(),
+                registeredSystemData().id,
+                newAccountEmail,
+                api::SystemAccessRole::none));
+        waitForCloudAndVmsToSyncUsers();
+
+        // Checking that user has been removed.
+        std::vector<api::SystemSharingEx> systemUsers;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->getSystemSharings(
+                ownerAccount().email,
+                ownerAccountPassword(),
+                registeredSystemData().id,
+                &systemUsers));
+        ASSERT_EQ(1, systemUsers.size());
+    }
+}
+
 } // namespace cdb
 } // namespace nx

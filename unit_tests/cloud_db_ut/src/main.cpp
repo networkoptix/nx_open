@@ -1,5 +1,7 @@
 #include <QCoreApplication>
 
+#include <QDateTime>
+
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/auth_tools.h>
