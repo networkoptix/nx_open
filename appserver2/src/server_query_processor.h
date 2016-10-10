@@ -505,10 +505,11 @@ private:
         tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(tran.params);
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
-        QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
 
         QnMutexLocker lock(&m_updateDataMutex);
         transactionLog->fillPersistentInfo(tran);
+        QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+
         ErrorCode errorCode =
             dbManager(m_userAccessData).executeTransactionNoLock(tran, serializedTran);
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence
