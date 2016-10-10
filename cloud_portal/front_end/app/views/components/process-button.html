@@ -1,13 +1,11 @@
 <div class="process-button">
-    <div class="progress progress-striped" ng-if="process.processing">
-        <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%" ng-bind-html="buttonText">
-        </div>
+    <div class="btn active focus loading" ng-class="buttonClass" ng-if="process.processing">
+        <span class="dot1"></span><span class="dot2"></span><span class="dot3"></span>
     </div>
 
     <button class="btn"
-            ng-class="buttonClass"
             ng-bind-html="buttonText"
-            ng-class="{processing:process.processing}"
+            ng-class="process.processing?'processing':buttonClass"
             ng-disabled="buttonDisabled"
             ng-click="checkForm()">
     </button>

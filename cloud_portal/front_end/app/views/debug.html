@@ -107,6 +107,20 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button class="btn btn-primary" ng-click="debugProcess.process.run()">Run process</button>
             <button class="btn btn-primary" ng-click="notify()">Call notification</button>
+            <br>
+            <br>
+
+            <process-button process="debugProcess.process"
+                            action-type="'danger'"
+                            button-text="'Danger'"></process-button>
+
+            <process-button process="debugProcess.process"
+                            button-text="'Standard'"></process-button>
+
+            <process-button process="debugProcess.process"
+                            action-type="'default'"
+                            button-text="'Default'"></process-button>
+
 
         </div>
     </div>
