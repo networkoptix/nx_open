@@ -201,6 +201,7 @@ void QnLayoutFileStorageResource::closeOpenedFiles()
         QnLayoutFile* file = *itr;
         file->lockFile();
         file->storeStateAndClose();
+        file->unlockFile();
     }
     m_index.entryCount = 0;
 }
@@ -211,6 +212,7 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
     for (QSet<QnLayoutFile*>::Iterator itr = m_openedFiles.begin(); itr != m_openedFiles.end(); ++itr)
     {
         QnLayoutFile* file = *itr;
+        file->lockFile();
         file->restoreState();
         file->unlockFile();
     }
