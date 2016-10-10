@@ -35,7 +35,13 @@ public: // Properties
 
 public: // overrides
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+    QHash<int, QByteArray> roleNames() const override;
+
+public slots:
+    QVariant getData(const QString& dataRole, int row);
 
 private:
     void reloadHosts();

@@ -5,6 +5,7 @@ import ".."
 Column
 {
     property string host;
+    property string displayHost;
 
     topPadding: 2;
 
@@ -18,7 +19,7 @@ Column
         anchors.leftMargin: 4;
 
         font: Style.fonts.systemTile.info;
-        text: host;
+        text: displayHost;
     }
 
     Row
