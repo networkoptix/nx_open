@@ -38,7 +38,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
     addPage(SettingsPage, m_settingsPage, tr("Role Info"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
-    addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
+    addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
     for (auto page : allPages())
