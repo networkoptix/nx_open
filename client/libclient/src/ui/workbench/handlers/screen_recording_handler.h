@@ -6,15 +6,17 @@
 
 #include <recording/stream_recorder.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
 class QGLWidget;
+class QnCountdownTimer;
 class QnGraphicsMessageBox;
 class QnDesktopDataProviderWrapper;
 
-class QnScreenRecorder: public QObject, public QnWorkbenchContextAware
+class QnScreenRecorder: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QnWorkbenchContextAware;
+    using base_type = Connective<QObject>;
 
 public:
     /*
@@ -27,13 +29,6 @@ public:
      * Virtual destructor.
      */
     virtual ~QnScreenRecorder();
-
-signals:
-    void recordingStarted();
-
-    void recordingFinished(const QString &recordedFileName);
-
-    void error(const QString &errorReason);
 
 private:
     /*
@@ -48,15 +43,13 @@ private:
     /*
     * Initiates screen recording.
     */
-    void startRecording();
+    void startRecodingCountdown();
 
 private:
-    void cleanupRecorder();
+    void cleanupRecordingStuff();
 
     // Starts real screen recording
     void startRecordingInternal();
-
-    void onRecordingAnimationFinished();
 
     void onRecordingFinished(const QString& fileName);
 
@@ -64,9 +57,13 @@ private:
         const QnStreamRecorder::ErrorStruct& status,
         const QString& filename);
 
+    void onError(const QString& reason);
+
 private:
     bool m_recording;
-    QnDesktopDataProviderWrapper* m_dataProvider;
-    QnStreamRecorder* m_recorder;
-    QnGraphicsMessageBox *m_recordingCountdownLabel;
+    int m_countdownCounters;
+
+    QScopedPointer<QnDesktopDataProviderWrapper> m_dataProvider;
+    QScopedPointer<QnStreamRecorder> m_recorder;
+    QScopedPointer<QnCountdownTimer> m_countdown;
 };

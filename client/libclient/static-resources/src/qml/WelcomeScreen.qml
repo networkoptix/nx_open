@@ -304,6 +304,28 @@ Rectangle
         }
     }
 
+    Rectangle
+    {
+        id: recordingHolder;
+        anchors.centerIn: parent;
+        visible: (context.countdownSeconds > 0);
+        radius: 2;
+        color: Style.colors.brand;
+        width: recordingLabel.implicitWidth;
+        height: recordingLabel.implicitHeight;
+
+        NxLabel
+        {
+            id: recordingLabel;
+            anchors.centerIn: parent;
+            font: Style.fonts.screenRecording;
+            standardColor: Style.colors.brandContrast;
+            leftPadding: 24;
+            rightPadding: leftPadding;
+            text: qsTr("Recording in %1...").arg(context.countdownSeconds);
+        }
+    }
+
     NxLabel
     {
         x: 8;

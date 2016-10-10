@@ -35,6 +35,8 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(QString softwareVersion READ softwareVersion CONSTANT)
     Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
+    Q_PROPERTY(int countdownSeconds READ countdownSeconds WRITE setCountdownSeconds NOTIFY countdownSecondsChanged)
+
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
 
@@ -74,6 +76,10 @@ public: // Properties
     QString softwareVersion() const;
 
     QString minSupportedVersion() const;
+
+    int countdownSeconds() const;
+
+    void setCountdownSeconds(int value);
 
 public slots:
     bool isAcceptableDrag(const UrlsList& urls);
@@ -133,6 +139,8 @@ signals:
 
     void globalPreloaderVisibleChanged();
 
+    void countdownSecondsChanged();
+
 private:
     void connectToSystemInternal(
         const QString& systemId,
@@ -162,4 +170,6 @@ private:
     QQuickView* m_quickView;
     const WidgetPtr m_widget;
     QSize m_pageSize;
+    int m_countdownSeconds;
+    QScopedPointer<QEventLoop> m_countdownConfirmLoop;
 };

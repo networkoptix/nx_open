@@ -97,7 +97,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_palette(extractPalette()),
     m_quickView(new QQuickView()),
     m_widget(createMainView(this, m_quickView)),
-    m_pageSize(m_widget->size())
+    m_pageSize(m_widget->size()),
+    m_countdownSeconds(0)
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
@@ -237,6 +238,20 @@ QString QnWorkbenchWelcomeScreen::softwareVersion() const
 QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
 {
     return QnConnectionValidator::minSupportedVersion().toString();
+}
+
+int QnWorkbenchWelcomeScreen::countdownSeconds() const
+{
+    return m_countdownSeconds;
+}
+
+void QnWorkbenchWelcomeScreen::setCountdownSeconds(int value)
+{
+    if (m_countdownSeconds == value)
+        return;
+
+    m_countdownSeconds = value;
+    emit countdownSecondsChanged();
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)

@@ -12,6 +12,7 @@
 #include <ui/common/palette.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/utils/countdown_timer.h>
 
 namespace {
 
@@ -76,7 +77,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
         kHorizontalMargin,
         kVerticalMargin,
         kHorizontalMargin,
-        kVerticalMargin);  
+        kVerticalMargin);
     layout->addItem(m_label);
     setLayout(layout);
 
@@ -144,41 +145,38 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int
     return box;
 }
 
-QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text, int timeoutMsec)
+QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text,
+    QnCountdownTimer* countdown)
 {
     auto holder = QnGraphicsMessageBoxHolder::instance();
-    NX_ASSERT(holder);
-    if (!holder)
+    NX_ASSERT(holder && countdown);
+    if (!holder || !countdown)
         return nullptr;
 
-    QPointer<QnGraphicsMessageBox> box = new QnGraphicsMessageBox(holder, QString(), timeoutMsec);
+    const QPointer<QnGraphicsMessageBox> box(
+        new QnGraphicsMessageBox(holder, QString(), countdown->timeoutMs()));
     holder->addItem(box);
 
-    QElapsedTimer elapsed;
-    elapsed.start();
-
-    const auto tickHandler = 
-        [box, text, timeoutMsec, e = std::move(elapsed)]
+    connect(countdown, &QnCountdownTimer::finished, box,
+        [box]() { box->hideImmideately(); });
+    connect(countdown, &QnCountdownTimer::secondsChanged, box,
+        [box, text](int secondsLeft)
         {
-            if (!box)
-                return;
-
-            int left = timeoutMsec - e.elapsed();
-            int n = (left + 500) / 1000;
-
-            if (n > 0)
-                box->setText(text.arg(n));
-            else
+            if (secondsLeft <= 0)
                 box->hideImmideately();
-        };
-    auto timer = new QTimer(box);
-    timer->setSingleShot(false);
-    timer->setInterval(200);
-    connect(timer, &QTimer::timeout, box, tickHandler);
-    timer->start();
+            else
+                box->setText(text.arg(secondsLeft));
+        });
 
-    tickHandler();
+    return box;
+}
 
+QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text, int timeoutMsec)
+{
+    auto countdown = new QnCountdownTimer();
+    countdown->startTimer(timeoutMsec);
+    auto box = informationTicking(text, countdown);
+    countdown->setParent(box);
     return box;
 }
 
@@ -191,7 +189,7 @@ void QnGraphicsMessageBox::showAnimated()
         setOpacity(1.0);
     else
         animator->animateTo(1.0);
-        
+
     //animator->setTimeLimit(200);
 }
 
@@ -220,6 +218,6 @@ void QnGraphicsMessageBox::hideImmideately()
         animator->stop();
     setVisible(false);
     emit finished();
-    deleteLater();  
+    deleteLater();
 }
 

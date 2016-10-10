@@ -11,6 +11,9 @@
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_welcome_screen.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/utils/countdown_timer.h>
 #include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
@@ -22,42 +25,41 @@
 namespace {
 /** Countdown value before screen recording starts. */
 static const int kRecordingCountdownMs = 3000;
-
 }
 
 QnScreenRecorder::QnScreenRecorder(QObject *parent) :
-    QObject(parent),
     base_type(parent),
+    QnWorkbenchContextAware(parent),
 
     m_recording(false),
-    m_dataProvider(0),
-    m_recorder(0),
-    m_recordingCountdownLabel(nullptr)
+    m_dataProvider(nullptr),
+    m_recorder(nullptr),
+    m_countdown(new QnCountdownTimer())
 {
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
         return;
 
-    connect(this, &QnScreenRecorder::recordingFinished, this, &QnScreenRecorder::onRecordingFinished);
-
-    const auto view = display()->view();
-    view->window()->addAction(screenRecordingAction);
-
-    connect(this, &QnScreenRecorder::error, this,
-        [this, view](const QString& errorReason)
-        {
-            QnMessageBox::warning(display()->view(), tr("Warning"),
-                tr("Unable to start recording due to the following error: %1").arg(errorReason));
-        });
+    display()->view()->window()->addAction(screenRecordingAction);
 
     connect(screenRecordingAction, &QAction::triggered, this,
         [this](bool checked)
         {
             if (checked)
-                startRecording();
+                startRecodingCountdown();
             else
                 stopRecording();
         });
+
+    connect(m_countdown, &QnCountdownTimer::finished,
+        this, &QnScreenRecorder::startRecordingInternal);
+
+    connect(m_countdown, &QnCountdownTimer::secondsChanged, this,
+        [this](int seconds)
+        {
+            context()->instance<QnWorkbenchWelcomeScreen>()->setCountdownSeconds(seconds);
+        });
+
 }
 
 QnScreenRecorder::~QnScreenRecorder()
@@ -71,7 +73,7 @@ bool QnScreenRecorder::isRecording() const
     return m_recording;
 }
 
-void QnScreenRecorder::startRecording()
+void QnScreenRecorder::startRecodingCountdown()
 {
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
@@ -86,17 +88,14 @@ void QnScreenRecorder::startRecording()
         return;
     }
 
-    if (isRecording() || m_recordingCountdownLabel)
+    if (isRecording() || m_countdown->isActive())
     {
-        screenRecordingAction->setChecked(false);
+        screenRecordingAction->setChecked(false);   // Stops recording
         return;
     }
 
-    screenRecordingAction->setChecked(true); //? do i need this line? - there is no start screen recording call in other place
-    m_recordingCountdownLabel = QnGraphicsMessageBox::informationTicking(
-        tr("Recording in...%1"), kRecordingCountdownMs);
-    connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::finished,
-        this, &QnScreenRecorder::onRecordingAnimationFinished);
+    m_countdown->start(kRecordingCountdownMs);
+    QnGraphicsMessageBox::informationTicking(tr("Recording in...%1"), m_countdown.data());
 }
 
 void QnScreenRecorder::startRecordingInternal()
@@ -130,15 +129,19 @@ void QnScreenRecorder::startRecordingInternal()
         secondAudioDevice = QnAudioDeviceInfo();
     }
 
-    QnDesktopResourcePtr res = qnResPool->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
-    if (!res) {
-        emit error(tr("Screen capturing subsystem is not initialized yet. Please try again later."));
+    const QnDesktopResourcePtr res =
+        qnResPool->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
+
+    if (!res)
+    {
+        onError(tr("Screen capturing subsystem is not initialized yet. Please try again later."));
         return;
     }
 
-    m_dataProvider = dynamic_cast<QnDesktopDataProviderWrapper*> (res->createDataProvider(Qn::CR_Default));
-    m_recorder = new QnStreamRecorder(res->toResourcePtr());
-    m_dataProvider->addDataProcessor(m_recorder);
+    m_dataProvider.reset(dynamic_cast<QnDesktopDataProviderWrapper*>(
+        res->createDataProvider(Qn::CR_Default)));
+    m_recorder.reset(new QnStreamRecorder(res->toResourcePtr()));
+    m_dataProvider->addDataProcessor(m_recorder.data());
     m_recorder->addRecordingContext(filePath);
     m_recorder->setContainer(lit("avi"));
     m_recorder->setRole(QnStreamRecorder::Role_FileExport);
@@ -151,28 +154,23 @@ void QnScreenRecorder::startRecordingInternal()
     if (!m_dataProvider->isInitialized()) {
         cl_log.log(m_dataProvider->lastErrorStr(), cl_logERROR);
 
-        emit error(m_dataProvider->lastErrorStr());
-        cleanupRecorder();
+        onError(m_dataProvider->lastErrorStr());
         return;
     }
 
     m_recorder->start();
     m_recording = true;
-
-    if (!m_recordingCountdownLabel)
-        m_recordingCountdownLabel->setOpacity(0.0);
-
-    emit recordingStarted();
 }
 
-void QnScreenRecorder::cleanupRecorder()
+void QnScreenRecorder::cleanupRecordingStuff()
 {
     if (m_dataProvider && m_recorder)
-        m_dataProvider->removeDataProcessor(m_recorder);
-    delete m_recorder;
-    delete m_dataProvider;
-    m_recorder = 0;
-    m_dataProvider = 0;
+        m_dataProvider->removeDataProcessor(m_recorder.data());
+
+    m_recorder.reset();
+    m_dataProvider.reset();
+
+    m_countdown->stop();
 }
 
 void QnScreenRecorder::onStreamRecordingFinished(
@@ -186,19 +184,11 @@ void QnScreenRecorder::onStreamRecordingFinished(
     action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
 
     const auto errorReason = QnStreamRecorder::errorString(status.lastError);
-    emit error(errorReason);
-    cleanupRecorder();
+    onError(errorReason);
 }
 
 void QnScreenRecorder::stopRecording()
 {
-    if (m_recordingCountdownLabel)
-    {
-        disconnect(m_recordingCountdownLabel, nullptr, this, nullptr);
-        m_recordingCountdownLabel->hideImmideately();
-        m_recordingCountdownLabel = nullptr;
-    }
-
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
     {
@@ -206,23 +196,19 @@ void QnScreenRecorder::stopRecording()
         return;
     }
 
+    const QString recordedFileName = (m_recorder
+        ? m_recorder->fixedFileName()
+        : QString());
+
+    cleanupRecordingStuff();
     screenRecordingAction->setChecked(false);
+
     if(!m_recording)
         return; /* Stopping when nothing is being recorded is OK. */
 
-    QString recordedFileName = m_recorder->fixedFileName();
-
-    m_dataProvider->removeDataProcessor(m_recorder);
-
-    delete m_dataProvider;
-    delete m_recorder;
-
-    m_dataProvider = 0;
-    m_recorder = 0;
-
     m_recording = false;
 
-    emit recordingFinished(recordedFileName);
+    onRecordingFinished(recordedFileName);
 }
 
 void QnScreenRecorder::onRecordingFinished(const QString& fileName)
@@ -268,14 +254,10 @@ void QnScreenRecorder::onRecordingFinished(const QString& fileName)
     }
 }
 
-void QnScreenRecorder::onRecordingAnimationFinished()
+void QnScreenRecorder::onError(const QString& reason)
 {
-    if (m_recordingCountdownLabel)
-    {
-        m_recordingCountdownLabel->setOpacity(0.0);
-        m_recordingCountdownLabel = nullptr;
-    }
+    stopRecording();
 
-    startRecordingInternal();
+    QnMessageBox::warning(display()->view(), tr("Warning"),
+        tr("Unable to start recording due to the following error: %1").arg(reason));
 }
-

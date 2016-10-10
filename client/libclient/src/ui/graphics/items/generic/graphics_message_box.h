@@ -13,6 +13,7 @@
 #include <nx/utils/singleton.h>
 
 class GraphicsLabel;
+class QnCountdownTimer;
 
 class QnGraphicsMessageBoxHolder:
     public GraphicsWidget,
@@ -61,6 +62,7 @@ public:
 
     static QnGraphicsMessageBox* information(const QString &text, int timeoutMsec = 0);
     static QnGraphicsMessageBox* informationTicking(const QString &text, int timeoutMsec = 0);
+    static QnGraphicsMessageBox* informationTicking(const QString &text, QnCountdownTimer* countdown);
 
 public:
     void showAnimated();

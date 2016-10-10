@@ -472,8 +472,8 @@ bool QnDesktopDataProvider::init()
 
         const auto audioContext = new QnAvCodecMediaContext(m_audioCodecCtx);
         m_audioContext = QnConstMediaContextPtr(audioContext);
-
-        if (avcodec_open2(m_audioCodecCtx, audioCodec, nullptr) < 0)
+        const auto res = avcodec_open2(m_audioCodecCtx, audioCodec, nullptr);
+        if (res < 0)
         {
             m_lastErrorStr = tr("Could not initialize audio encoder.");
             return false;

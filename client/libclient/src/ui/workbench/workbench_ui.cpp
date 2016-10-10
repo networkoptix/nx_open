@@ -72,8 +72,6 @@
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/screen_recording/screen_recorder.h>
-
 #include <ui/statistics/modules/controls_statistics_module.h>
 
 #include <ui/style/skin.h>
