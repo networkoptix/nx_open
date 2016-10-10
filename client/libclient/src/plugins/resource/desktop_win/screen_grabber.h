@@ -1,9 +1,4 @@
-#ifndef QN_SCREEN_GRABBER_H
-#define QN_SCREEN_GRABBER_H
-
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_WIN
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -29,12 +24,10 @@ struct CaptureInfo
 
 typedef QSharedPointer<CaptureInfo> CaptureInfoPtr;
 
-Q_DECLARE_METATYPE(CaptureInfoPtr);
-
+Q_DECLARE_METATYPE(CaptureInfoPtr)
 
 class QnScreenGrabber: public QObject
 {
-    Q_OBJECT
 public:
 
 
@@ -108,7 +101,3 @@ private:
     QnWaitCondition m_waitCond;
     bool m_needStop;
 };
-
-#endif // Q_OS_WIN
-
-#endif
