@@ -382,7 +382,7 @@ private:
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
-    nx::db::DBResult saveUserSessionStartToDb(
+    nx::db::DBResult saveUserSessionStart(
         nx::db::QueryContext* queryContext,
         const data::UserSessionDescriptor& userSessionDescriptor,
         SaveUserSessionResult* const result);
@@ -392,15 +392,13 @@ private:
         const std::string& systemId,
         std::chrono::system_clock::time_point lastloginTime,
         float usageFrequency);
-    void userSessionStartSavedToDb(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult dbResult,
-        data::UserSessionDescriptor userSessionDescriptor,
-        SaveUserSessionResult result,
-        std::function<void(api::ResultCode)> completionHandler);
+    void updateSystemUsageStatisticsCache(
+        const data::UserSessionDescriptor& userSessionDescriptor,
+        const SaveUserSessionResult& usageStatistics);
 
-    /** returns sharing permissions depending on current access role */
+    /**
+     * @return Sharing permissions depending on current access role.
+     */
     api::SystemAccessRoleList getSharingPermissions(
         api::SystemAccessRole accessRole) const;
 

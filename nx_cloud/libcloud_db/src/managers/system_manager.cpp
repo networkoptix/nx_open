@@ -610,11 +610,17 @@ void SystemManager::recordUserSessionStart(
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::UserSessionDescriptor, SaveUserSessionResult>(
-        std::bind(&SystemManager::saveUserSessionStartToDb, this, _1, _2, _3),
+        std::bind(&SystemManager::saveUserSessionStart, this, _1, _2, _3),
         std::move(userSessionDescriptor),
-        std::bind(&SystemManager::userSessionStartSavedToDb, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, _3, _4, std::move(completionHandler)));
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            completionHandler = std::move(completionHandler)](
+                nx::db::QueryContext* /*queryContext*/,
+                nx::db::DBResult dbResult,
+                data::UserSessionDescriptor /*userSessionDescriptor*/,
+                SaveUserSessionResult /*result*/)
+        {
+            completionHandler(dbResultToApiResult(dbResult));
+        });
 }
 
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
@@ -1593,10 +1599,10 @@ void SystemManager::systemActivated(
 
 constexpr const int kSecondsPerDay = 60*60*24;
 
-nx::db::DBResult SystemManager::saveUserSessionStartToDb(
+nx::db::DBResult SystemManager::saveUserSessionStart(
     nx::db::QueryContext* queryContext,
     const data::UserSessionDescriptor& userSessionDescriptor,
-    SaveUserSessionResult* const result)
+    SaveUserSessionResult* const usageStatistics)
 {
     using namespace std::chrono;
 
@@ -1619,24 +1625,32 @@ nx::db::DBResult SystemManager::saveUserSessionStartToDb(
     }
 
     // Calculating usage frequency.
-    result->lastloginTime = nx::utils::utcTime();
-    result->usageFrequency = calculateSystemUsageFrequency(
+    usageStatistics->lastloginTime = nx::utils::utcTime();
+    usageStatistics->usageFrequency = calculateSystemUsageFrequency(
         sharing.lastLoginTime,
         sharing.usageFrequency);
-    const auto newUsageFrequency = result->usageFrequency + 1;
+    const auto newUsageFrequency = usageStatistics->usageFrequency + 1;
 
     // Saving new statistics to DB.
     dbResult = updateUserLoginStatistics(
         queryContext,
         sharing.accountID,
         sharing.systemID,
-        result->lastloginTime,
+        usageStatistics->lastloginTime,
         newUsageFrequency);
     if (dbResult != nx::db::DBResult::ok)
     {
         NX_LOGX(lm("Error updating user login statistics"), cl_logWARNING);
         return dbResult;
     }
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, userSessionDescriptor, usageStatistics = *usageStatistics]()
+        {
+            updateSystemUsageStatisticsCache(
+                userSessionDescriptor,
+                usageStatistics);
+        });
 
     return nx::db::DBResult::ok;
 }
@@ -1674,41 +1688,29 @@ nx::db::DBResult SystemManager::updateUserLoginStatistics(
     return nx::db::DBResult::ok;
 }
 
-void SystemManager::userSessionStartSavedToDb(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    nx::db::QueryContext* /*queryContext*/,
-    nx::db::DBResult dbResult,
-    data::UserSessionDescriptor userSessionDescriptor,
-    SaveUserSessionResult result,
-    std::function<void(api::ResultCode)> completionHandler)
+void SystemManager::updateSystemUsageStatisticsCache(
+    const data::UserSessionDescriptor& userSessionDescriptor,
+    const SaveUserSessionResult& usageStatistics)
 {
-    if (dbResult == nx::db::DBResult::ok)
+    // Updating in cache.
+    QnMutexLocker lk(&m_mutex);
+
+    auto& bySystemIdAndAccountEmailIndex =
+        m_accountAccessRoleForSystem.get<kSharingBySystemIdAndAccountEmailIndex>();
+    auto systemIter = bySystemIdAndAccountEmailIndex.find(
+        std::make_pair(
+            userSessionDescriptor.systemId.get(),
+            userSessionDescriptor.accountEmail.get()));
+    if (systemIter != bySystemIdAndAccountEmailIndex.end())
     {
-        // Updating in cache.
-        QnMutexLocker lk(&m_mutex);
-
-        auto& bySystemIdAndAccountEmailIndex = 
-            m_accountAccessRoleForSystem.get<kSharingBySystemIdAndAccountEmailIndex>();
-        auto systemIter = bySystemIdAndAccountEmailIndex.find(
-            std::make_pair(
-                userSessionDescriptor.systemId.get(),
-                userSessionDescriptor.accountEmail.get()));
-        if (systemIter != bySystemIdAndAccountEmailIndex.end())
-        {
-            bySystemIdAndAccountEmailIndex.modify(
-                systemIter,
-                [&result](api::SystemSharingEx& systemSharing)
-                {
-                    systemSharing.usageFrequency = result.usageFrequency;
-                    systemSharing.lastLoginTime = result.lastloginTime;
-                });
-        }
+        bySystemIdAndAccountEmailIndex.modify(
+            systemIter,
+            [&usageStatistics](api::SystemSharingEx& systemSharing)
+            {
+                systemSharing.usageFrequency = usageStatistics.usageFrequency;
+                systemSharing.lastLoginTime = usageStatistics.lastloginTime;
+            });
     }
-
-    completionHandler(
-        dbResult == nx::db::DBResult::ok
-        ? api::ResultCode::ok
-        : api::ResultCode::dbError);
 }
 
 api::SystemAccessRoleList SystemManager::getSharingPermissions(
