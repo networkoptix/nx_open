@@ -1239,6 +1239,33 @@ TEST_F(SystemSharing, sharing_notification)
 
     const auto account2 = addActivatedAccount2();
     shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+
+    // updating existing sharing - notification not sent
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::advancedViewer);
+
+    // removing existing sharing - notification not sent
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::none);
+}
+
+TEST_F(SystemSharing, remove_sharing)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account1);
+
+    const auto account2 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
+
+    api::SystemDataEx systemData;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystem(account2.data.email, account2.password, system1.id, &systemData));
+
+    shareSystemEx(account1, system1, account2, api::SystemAccessRole::none);
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        getSystem(account2.data.email, account2.password, system1.id, &systemData));
 }
 
 } // namespace cdb

@@ -60,6 +60,12 @@ class SystemManager
     public AbstractAuthenticationDataProvider
 {
 public:
+    enum class NotificationCommand
+    {
+        sendNotification,
+        doNotSendNotification,
+    };
+
     /*!
         Fills internal cache
         \throw std::runtime_error In case of failure to pre-fill data cache
@@ -283,6 +289,7 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
+        NotificationCommand notificationCommand,
         data::AccountData* const inviteeAccount);
 
     nx::db::DBResult insertOrReplaceSharing(
@@ -343,13 +350,8 @@ private:
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
-        const data::SystemSharing& sharing);
-    void sharingUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult dbResult,
-        data::SystemSharing sharing,
-        std::function<void(api::ResultCode)> completionHandler);
+        const data::SystemSharing& sharing,
+        NotificationCommand notificationCommand);
     void updateSharingInCache(data::SystemSharing sharing);
     void updateSharingInCache(
         api::SystemSharingEx sharing,
@@ -446,6 +448,10 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId,
+        const data::AccountData& inviteeAccount);
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* queryContext,
         const std::string& systemId,
