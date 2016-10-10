@@ -546,9 +546,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
     if (binaryExport)
     {
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
-        if (!existingLayout)
-            existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
+        auto existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             removeLayoutFromPool(existingLayout);
 
@@ -716,7 +714,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         if (resource->getParentResource() == layout)
             continue;
         hasImage |= resource->hasFlags(Qn::still_image);
-        hasLocal |= resource->hasFlags(Qn::local) || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
+        hasLocal |= resource->hasFlags(Qn::local);
         if (hasImage || hasLocal)
             break;
     }
@@ -878,9 +876,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
-    QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
-    if (!existingLayout)
-        existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
+    auto existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
     if (existingLayout)
         removeLayoutFromPool(existingLayout);
 

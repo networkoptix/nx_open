@@ -547,8 +547,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (m_flags.testFlag(Qn::local_server))
             return true;
 
-        //TODO: #Elric hack hack hack VMS-1725
-        if (m_flags.testFlag(Qn::local_media) && m_resource->getUrl().startsWith(lit("layout://")))
+        /* Hide exported cameras inside of exported layouts. */
+        if (m_flags.testFlag(Qn::exported_media))
             return true;
 
         /* Hide storages. */

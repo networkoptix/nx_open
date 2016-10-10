@@ -1505,11 +1505,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
 
+    //TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(QnActions::DeleteFromDiskAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Delete from Disk")).
         autoRepeat(false).
-        condition(hasFlags(Qn::url | Qn::local | Qn::media));
+        condition(hasFlags(Qn::local_media));
 
     factory(QnActions::SetAsBackgroundAction).
         flags(Qn::Scene | Qn::SingleTarget).
