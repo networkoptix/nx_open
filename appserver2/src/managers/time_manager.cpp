@@ -34,8 +34,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
-#include <nx/network/time/multiple_internet_time_fetcher.h>
 
 #include "database/db_manager.h"
 #include "ec2_thread_pool.h"
