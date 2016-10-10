@@ -123,8 +123,8 @@ void QnServerStreamRecorder::at_recordingFinished(
                     QnBusiness::StorageIoErrorReason ,
                     status.storage
                 );
+            m_diskErrorWarned = true;
         }
-        m_diskErrorWarned = true;
     }
 }
 

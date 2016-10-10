@@ -839,7 +839,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 m_lastError = ErrorStruct(FileCreateError, m_recordingContextVector[i].storage);
                 NX_LOG(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
                 m_recordingFinished = true;
-                m_needStop = true;
                 msleep(500); // avoid createFile flood
                 return false;
             }
