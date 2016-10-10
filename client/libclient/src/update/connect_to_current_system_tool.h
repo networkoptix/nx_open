@@ -5,14 +5,13 @@
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
 #include <update/updates_common.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 class QnNetworkPeerTask;
 class QnMediaServerUpdateTool;
 struct QnUpdateResult;
 
-class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware
+class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnSessionAwareDelegate
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -30,8 +29,8 @@ public:
     explicit QnConnectToCurrentSystemTool(QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
-    bool tryClose(bool force);
-    void forcedUpdate();
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
     void start(const QSet<QnUuid> &targets, const QString &adminPassword);
 
@@ -68,6 +67,4 @@ private:
     QPointer<QnNetworkPeerTask> m_currentTask;
     QPointer<QnMediaServerUpdateTool> m_updateTool;
     bool m_restartAllPeers;
-
-    QScopedPointer<QnSessionAwareDelegate> m_workbenchStateDelegate;
 };

@@ -5,11 +5,9 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
-class QnSessionAwareDelegate;
-
-class QnWorkbenchLayoutsHandler: public QObject, public QnWorkbenchContextAware
+class QnWorkbenchLayoutsHandler: public QObject, public QnSessionAwareDelegate
 {
     Q_OBJECT
 public:
@@ -18,8 +16,8 @@ public:
 
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
     bool closeAllLayouts(bool waitForReply = false, bool force = false);
-    bool tryClose(bool force);
-    void forcedUpdate();
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
 private:
     void at_newUserLayoutAction_triggered();
@@ -83,8 +81,6 @@ private:
 
     void at_layout_saved(bool success, const QnLayoutResourcePtr &layout);
 private:
-    QScopedPointer<QnSessionAwareDelegate> m_workbenchStateDelegate;
-
     /** Flag that we are in layouts closing process. */
     bool m_closingLayouts;
 };

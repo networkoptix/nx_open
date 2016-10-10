@@ -29,7 +29,7 @@
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnSessionAwareDelegate(parent),
     m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
     m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {

@@ -89,8 +89,7 @@ QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUuid &p
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnWorkbenchLayoutsHandler>(this)),
+    QnSessionAwareDelegate(parent),
     m_closingLayouts(false)
 {
     connect(action(QnActions::NewUserLayoutAction),                 &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
