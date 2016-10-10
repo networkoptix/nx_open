@@ -185,12 +185,11 @@ private:
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler);
 
-    void passwordResetCodeGenerated(
-        bool hasRequestCameFromSecureSource,
-        nx::db::DBResult resultCode,
-        std::string accountEmail,
-        data::AccountConfirmationCode confirmationCode,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+    nx::db::DBResult resetPassword(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        data::AccountConfirmationCode* const confirmationCode);
+
     void temporaryCredentialsSaved(
         QnCounter::ScopedIncrement asyncCallLocker,
         api::ResultCode resultCode,

@@ -220,25 +220,28 @@ void AccountManager::resetPassword(
     bool hasRequestCameFromSecureSource = false;
     authzInfo.get(attr::secureSource, &hasRequestCameFromSecureSource);
 
-    using namespace std::placeholders;
-
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        std::bind(&AccountManager::createPasswordResetCode, this, _1, _2, _3),
+        [this](
+            nx::db::QueryContext* const queryContext,
+            const std::string& accountEmail,
+            data::AccountConfirmationCode* const confirmationCode)
+        {
+            return resetPassword(queryContext, accountEmail, confirmationCode);
+        },
         accountEmail.email,
         [this, hasRequestCameFromSecureSource,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::db::QueryContext* /*queryContext*/,
                 nx::db::DBResult dbResultCode,
-                std::string accountEmail,
+                std::string /*accountEmail*/,
                 data::AccountConfirmationCode confirmationCode)
         {
-            passwordResetCodeGenerated(
-                hasRequestCameFromSecureSource,
-                dbResultCode,
-                std::move(accountEmail),
-                std::move(confirmationCode),
-                std::move(completionHandler));
+            return completionHandler(
+                dbResultToApiResult(dbResultCode),
+                hasRequestCameFromSecureSource
+                    ? std::move(confirmationCode)
+                    : data::AccountConfirmationCode());
         });
 }
 
@@ -688,12 +691,15 @@ db::DBResult AccountManager::issueAccountActivationCode(
             emailVerificationCode.size());
     }
 
-    //sending confirmation email
     notification->setActivationCode(resultData->code);
     notification->setAddressee(accountEmail);
-    m_emailManager->sendAsync(
-        *notification,
-        std::function<void(bool)>());
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, notification = std::move(notification)]()
+        {
+            m_emailManager->sendAsync(
+                *notification,
+                std::function<void(bool)>());
+        });
 
     return db::DBResult::ok;
 }
@@ -887,37 +893,33 @@ void AccountManager::accountUpdated(
     completionHandler(dbResultToApiResult(resultCode));
 }
 
-void AccountManager::passwordResetCodeGenerated(
-    bool hasRequestCameFromSecureSource,
-    nx::db::DBResult resultCode,
-    std::string accountEmail,
-    data::AccountConfirmationCode confirmationCode,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+nx::db::DBResult AccountManager::resetPassword(
+    nx::db::QueryContext* const queryContext,
+    const std::string& accountEmail,
+    data::AccountConfirmationCode* const confirmationCode)
 {
-    if (resultCode != nx::db::DBResult::ok)
+    const auto dbResult = createPasswordResetCode(
+        queryContext, accountEmail, confirmationCode);
+    if (dbResult != nx::db::DBResult::ok)
     {
-        NX_LOG(lm("%1 (%2). Failed to save password reset code (%3)")
-            .arg(kAccountPasswordResetPath).arg(accountEmail)
-            .arg(QnLexical::serialized(resultCode)),
-            cl_logDEBUG1);
-        return completionHandler(
-            dbResultToApiResult(resultCode),
-            data::AccountConfirmationCode());
+        NX_LOGX(lm("Failed to issue password reset code for account %1")
+            .arg(accountEmail), cl_logDEBUG1);
+        return dbResult;
     }
 
-    //sending password reset link
     RestorePasswordNotification notification;
     notification.setAddressee(accountEmail);
-    notification.setActivationCode(confirmationCode.code);
-    m_emailManager->sendAsync(
-        std::move(notification),
-        std::function<void(bool)>());
+    notification.setActivationCode(confirmationCode->code);
 
-    return completionHandler(
-        api::ResultCode::ok,
-        hasRequestCameFromSecureSource
-            ? std::move(confirmationCode)
-            : data::AccountConfirmationCode());
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, notification = std::move(notification)]()
+        {
+            m_emailManager->sendAsync(
+                std::move(notification),
+                std::function<void(bool)>());
+        });
+
+    return nx::db::DBResult::ok;
 }
 
 void AccountManager::temporaryCredentialsSaved(
