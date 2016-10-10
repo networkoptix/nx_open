@@ -77,15 +77,14 @@ angular.module('webadminApp')
                             isAdmin: user.isAdmin,
                             name: user.name
                         };
+                        pingServers();
                     },function(error){
                         if(error.status !== 401 && error.status !== 403) {
                             alert(L.navigaion.cannotGetUser);
                         }
+                        pingServers();
                     });
-
-                    pingServers();
                 });
-
             }
         };
     }]);
