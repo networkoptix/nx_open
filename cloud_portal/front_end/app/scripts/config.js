@@ -6,7 +6,8 @@ var Config = {
     enableUrlAuth: false,
 
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds
-    updateInterval:  30 * 1000, // Update content on pages every 30 seconds 
+    updateInterval:  30 * 1000, // Update content on pages every 30 seconds
+    openClientTimeout: 30 * 1000, // 30 second we wait for client to open
 
     alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds
     alertsMaxCount: 5,
