@@ -86,6 +86,8 @@ void MeanTimeFetcher::timeFetchingDone(
     if ((--m_awaitedAnswers) > 0)
         return;
 
+    auto completionHandler = std::move(m_completionHandler);
+
     //all fetchers answered, analyzing results
     qint64 sumOfReceivedUtcTimesMillis = 0;
     qint64 minUtcTimeMillis = std::numeric_limits<qint64>::max();
@@ -93,18 +95,13 @@ void MeanTimeFetcher::timeFetchingDone(
     for (std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers)
     {
         if (ctx->errorCode != SystemError::noError)
-        {
-            auto completionHandler = std::move(m_completionHandler);
-            completionHandler(-1, ctx->errorCode);
-            return;
-        }
+            return completionHandler(-1, ctx->errorCode);
 
         //analyzing fetched time and calculating mean value
         if ((minUtcTimeMillis != std::numeric_limits<qint64>::max()) &&
             (qAbs(ctx->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis))
         {
             //failure
-            auto completionHandler = std::move(m_completionHandler);
             completionHandler(-1, SystemError::invalidData);
             return;
         }
@@ -117,7 +114,6 @@ void MeanTimeFetcher::timeFetchingDone(
 
     NX_ASSERT(collectedValuesCount > 0);
 
-    auto completionHandler = std::move(m_completionHandler);
     completionHandler(
         sumOfReceivedUtcTimesMillis / collectedValuesCount,
         SystemError::noError);
