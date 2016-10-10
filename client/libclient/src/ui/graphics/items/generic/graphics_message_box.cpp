@@ -12,7 +12,6 @@
 #include <ui/common/palette.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/standard/graphics_label.h>
-#include <ui/utils/countdown_timer.h>
 
 namespace {
 
@@ -142,41 +141,6 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int
 
     QnGraphicsMessageBox* box = new QnGraphicsMessageBox(holder, text, timeoutMsec);
     holder->addItem(box);
-    return box;
-}
-
-QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text,
-    QnCountdownTimer* countdown)
-{
-    auto holder = QnGraphicsMessageBoxHolder::instance();
-    NX_ASSERT(holder && countdown);
-    if (!holder || !countdown)
-        return nullptr;
-
-    const QPointer<QnGraphicsMessageBox> box(
-        new QnGraphicsMessageBox(holder, QString(), countdown->timeoutMs()));
-    holder->addItem(box);
-
-    connect(countdown, &QnCountdownTimer::finished, box,
-        [box]() { box->hideImmideately(); });
-    connect(countdown, &QnCountdownTimer::secondsChanged, box,
-        [box, text](int secondsLeft)
-        {
-            if (secondsLeft <= 0)
-                box->hideImmideately();
-            else
-                box->setText(text.arg(secondsLeft));
-        });
-
-    return box;
-}
-
-QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text, int timeoutMsec)
-{
-    auto countdown = new QnCountdownTimer();
-    countdown->startTimer(timeoutMsec);
-    auto box = informationTicking(text, countdown);
-    countdown->setParent(box);
     return box;
 }
 

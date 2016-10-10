@@ -412,12 +412,15 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         default:    //error
             if (!qnRuntime->isDesktopMode())
             {
-                QnGraphicsMessageBox* incompatibleMessageBox =
-                    QnGraphicsMessageBox::informationTicking(
-                        tr("Could not connect to server. Closing in %1..."),
+                QnGraphicsMessageBox::information(
+                        tr("Could not connect to server. Video Wall will be closed."),
                         kVideowallCloseTimeoutMSec);
-                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished,
-                    action(QnActions::ExitAction), &QAction::trigger);
+                executeDelayedParented(
+                    [this]
+                    {
+                        action(QnActions::ExitAction)->trigger();
+                    }, kVideowallCloseTimeoutMSec, this
+                );
             }
             else
             {

@@ -13,7 +13,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/utils/countdown_timer.h>
+
 #include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
@@ -23,8 +23,14 @@
 #include <core/resource_management/resource_pool.h>
 
 namespace {
+
 /** Countdown value before screen recording starts. */
 static const int kRecordingCountdownMs = 3000;
+
+static const int kHideWhenMillisecondsLeft = 300;
+
+static const int kTimerPrecisionMs = 100;
+
 }
 
 QnScreenRecorder::QnScreenRecorder(QObject *parent) :
@@ -32,9 +38,9 @@ QnScreenRecorder::QnScreenRecorder(QObject *parent) :
     QnWorkbenchContextAware(parent),
 
     m_recording(false),
+    m_timerId(0),
     m_dataProvider(nullptr),
-    m_recorder(nullptr),
-    m_countdown(new QnCountdownTimer())
+    m_recorder(nullptr)
 {
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
@@ -46,20 +52,10 @@ QnScreenRecorder::QnScreenRecorder(QObject *parent) :
         [this](bool checked)
         {
             if (checked)
-                startRecodingCountdown();
+                startRecordingCountdown();
             else
                 stopRecording();
         });
-
-    connect(m_countdown, &QnCountdownTimer::finished,
-        this, &QnScreenRecorder::startRecordingInternal);
-
-    connect(m_countdown, &QnCountdownTimer::secondsChanged, this,
-        [this](int seconds)
-        {
-            context()->instance<QnWorkbenchWelcomeScreen>()->setCountdownSeconds(seconds);
-        });
-
 }
 
 QnScreenRecorder::~QnScreenRecorder()
@@ -68,14 +64,44 @@ QnScreenRecorder::~QnScreenRecorder()
 }
 
 
+void QnScreenRecorder::timerEvent(QTimerEvent* event)
+{
+    base_type::timerEvent(event);
+
+    NX_ASSERT(isRecordingCountdown());
+
+    int millisecondsLeft = 0;
+    if (m_countdown.isValid())
+        millisecondsLeft = kRecordingCountdownMs - m_countdown.elapsed();
+
+    const int seconds = (millisecondsLeft + 500) / 1000;
+
+    if (seconds > 0)
+    {
+        context()->instance<QnWorkbenchWelcomeScreen>()->setCountdownSeconds(seconds);
+        if (m_messageBox)
+        {
+            m_messageBox->setText(recordingCountdownText(seconds));
+            if (millisecondsLeft < kHideWhenMillisecondsLeft)
+                m_messageBox->hideAnimated();
+        }
+    }
+    else
+    {
+        stopRecordingCountdown();
+        startRecordingInternal();
+    }
+}
+
 bool QnScreenRecorder::isRecording() const
 {
     return m_recording;
 }
 
-void QnScreenRecorder::startRecodingCountdown()
+void QnScreenRecorder::startRecordingCountdown()
 {
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    NX_ASSERT(screenRecordingAction);
     if (!screenRecordingAction)
         return;
 
@@ -88,19 +114,50 @@ void QnScreenRecorder::startRecodingCountdown()
         return;
     }
 
-    if (isRecording() || m_countdown->isActive())
+    if (isRecording() || isRecordingCountdown())
     {
         screenRecordingAction->setChecked(false);   // Stops recording
         return;
     }
 
-    m_countdown->start(kRecordingCountdownMs);
-    QnGraphicsMessageBox::informationTicking(tr("Recording in...%1"), m_countdown.data());
+    m_timerId = startTimer(kTimerPrecisionMs);
+    const bool started = (m_timerId != 0);
+    NX_ASSERT(started);
+    if (!started)
+    {
+        stopRecordingCountdown();
+        return;
+    }
+
+    int seconds = kRecordingCountdownMs / 1000;
+    m_countdown.restart();
+    m_messageBox = QnGraphicsMessageBox::information(recordingCountdownText(seconds));
+}
+
+void QnScreenRecorder::stopRecordingCountdown()
+{
+    if (m_timerId != 0)
+        killTimer(m_timerId);
+    m_countdown.invalidate();
+    if (m_messageBox)
+        m_messageBox->hideImmideately();
+}
+
+bool QnScreenRecorder::isRecordingCountdown() const
+{
+    return m_timerId != 0
+        && m_countdown.isValid()
+        && m_messageBox;
+}
+
+QString QnScreenRecorder::recordingCountdownText(int seconds) const
+{
+    return tr("Recording in...%1").arg(seconds);
 }
 
 void QnScreenRecorder::startRecordingInternal()
 {
-    if(m_recording)
+    if (m_recording)
     {
         qnWarning("Screen recording already in progress.");
         return;
@@ -162,15 +219,13 @@ void QnScreenRecorder::startRecordingInternal()
     m_recording = true;
 }
 
-void QnScreenRecorder::cleanupRecordingStuff()
+void QnScreenRecorder::stopRecordingInternal()
 {
     if (m_dataProvider && m_recorder)
         m_dataProvider->removeDataProcessor(m_recorder.data());
 
     m_recorder.reset();
     m_dataProvider.reset();
-
-    m_countdown->stop();
 }
 
 void QnScreenRecorder::onStreamRecordingFinished(
@@ -189,6 +244,8 @@ void QnScreenRecorder::onStreamRecordingFinished(
 
 void QnScreenRecorder::stopRecording()
 {
+    stopRecordingCountdown();
+
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
     {
@@ -200,7 +257,7 @@ void QnScreenRecorder::stopRecording()
         ? m_recorder->fixedFileName()
         : QString());
 
-    cleanupRecordingStuff();
+    stopRecordingInternal();
     screenRecordingAction->setChecked(false);
 
     if(!m_recording)

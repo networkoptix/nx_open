@@ -1,8 +1,8 @@
-
 #pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QElapsedTimer>
 
 #include <recording/stream_recorder.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -30,6 +30,9 @@ public:
      */
     virtual ~QnScreenRecorder();
 
+protected:
+    virtual void timerEvent(QTimerEvent* event) override;
+
 private:
     /*
     * \returns                         Whether recording is in progress.
@@ -43,10 +46,14 @@ private:
     /*
     * Initiates screen recording.
     */
-    void startRecodingCountdown();
+    void startRecordingCountdown();
+    void stopRecordingCountdown();
 
-private:
-    void cleanupRecordingStuff();
+    bool isRecordingCountdown() const;
+
+    QString recordingCountdownText(int seconds) const;
+
+    void stopRecordingInternal();
 
     // Starts real screen recording
     void startRecordingInternal();
@@ -61,9 +68,10 @@ private:
 
 private:
     bool m_recording;
-    int m_countdownCounters;
+    int m_timerId;
 
     QScopedPointer<QnDesktopDataProviderWrapper> m_dataProvider;
     QScopedPointer<QnStreamRecorder> m_recorder;
-    QScopedPointer<QnCountdownTimer> m_countdown;
+    QElapsedTimer m_countdown;
+    QPointer<QnGraphicsMessageBox> m_messageBox;
 };
