@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process', 'account', '$poll',
-    function ($scope, cloudApi, $location, urlProtocol, process, account, $poll) {
+    .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process', 'account', '$poll', '$routeParams',
+    function ($scope, cloudApi, $location, urlProtocol, process, account, $poll, $routeParams) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -45,6 +45,11 @@ angular.module('cloudApp')
         },{
             errorPrefix: 'Systems list is unavailable:'
         }).then(function(result){
+            // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
+            if($routeParams.defaultMode && result.data.length == 1){
+                $scope.openSystem(result.data[0]);
+                return;
+            }
             $scope.systems = sortSystems(result.data);
             delayedUpdateSystems();
         });

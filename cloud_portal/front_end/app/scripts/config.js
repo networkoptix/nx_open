@@ -11,7 +11,7 @@ var Config = {
     alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds
     alertsMaxCount: 5,
 
-    redirectAuthorised:'/systems', // Page for redirecting all authorised users
+    redirectAuthorised:'/systems/default', // Page for redirecting all authorised users
     redirectUnauthorised:'/', // Page for redirecting all unauthorised users by default
 
     systemStatuses: {
