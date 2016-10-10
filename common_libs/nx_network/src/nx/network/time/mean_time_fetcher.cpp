@@ -1,4 +1,4 @@
-#include "multiple_internet_time_fetcher.h"
+#include "mean_time_fetcher.h"
 
 #include <limits>
 
