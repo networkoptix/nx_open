@@ -2,6 +2,7 @@
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
 
+//TODO: #GDM rename to VideoWall_Item_AccessProvider when will refactor to namespaces
 /** Handles access to layouts, cameras and web pages, placed on videowall. */
 class QnVideoWallResourceAccessProvider: public QnBaseResourceAccessProvider
 {

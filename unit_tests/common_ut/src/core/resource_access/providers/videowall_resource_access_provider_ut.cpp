@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/access_provider_test_fixture.h>
+#include <core/resource_access/providers/base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/videowall_resource_access_provider.h>
 
 #include <core/resource_access/resource_access_manager.h>
@@ -13,7 +13,7 @@
 
 #include <nx_ec/data/api_user_group_data.h>
 
-class QnVideoWallResourceAccessProviderTest: public QnAccessProviderTestFixture
+class QnVideoWallResourceAccessProviderTest: public QnBaseAccessProviderTestFixture
 {
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override

@@ -27,22 +27,17 @@ static const auto kNone = QnAbstractResourceAccessProvider::Source::none;
 
 class QnResourceAccessProviderTest: public QnAccessProviderTestFixture
 {
+    using base_type = QnAccessProviderTestFixture;
 protected:
     virtual void SetUp()
     {
-        QnAccessProviderTestFixture::SetUp();
-        accessProvider()->addBaseProvider(new QnPermissionsResourceAccessProvider());
-        accessProvider()->addBaseProvider(new QnSharedResourceAccessProvider());
-    }
-
-    virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
-    {
-        return new QnResourceAccessProvider();
+        base_type::SetUp();
+        setupAwaitAccess();
     }
 
     QnResourceAccessProvider* accessProvider() const
     {
-        return dynamic_cast<QnResourceAccessProvider*>(QnAccessProviderTestFixture::accessProvider());
+        return qnResourceAccessProvider;
     }
 };
 
@@ -113,4 +108,68 @@ TEST_F(QnResourceAccessProviderTest, checkDuplicatedSignals)
 
     /* And here - should. */
     user->setRawPermissions(Qn::NoGlobalPermissions);
+}
+
+TEST_F(QnResourceAccessProviderTest, checkSequentialAccessAdding)
+{
+    auto camera = addCamera();
+
+    auto layout = addLayout();
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = camera->getId();
+    layout->addItem(layoutItem);
+
+    auto videoWall = addVideoWall();
+    QnVideoWallItem item;
+    item.layout = layout->getId();
+    videoWall->items()->addItem(item);
+
+    auto user = addUser(Qn::NoGlobalPermissions);
+
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::videowall);
+    user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
+
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::layout);
+    auto sharedIds = QSet<QnUuid>() << layout->getId();
+    qnSharedResourcesManager->setSharedResources(user, sharedIds);
+
+    sharedIds << camera->getId();
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::shared);
+    qnSharedResourcesManager->setSharedResources(user, sharedIds);
+
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::permissions);
+    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+}
+
+TEST_F(QnResourceAccessProviderTest, checkSequentialAccessRemoving)
+{
+    auto camera = addCamera();
+    auto videoWall = addVideoWall();
+    auto layout = addLayout();
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = camera->getId();
+    layout->addItem(layoutItem);
+
+    QnVideoWallItem item;
+    item.layout = layout->getId();
+    videoWall->items()->addItem(item);
+
+    auto user = createUser(Qn::GlobalAccessAllMediaPermission);
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::permissions);
+    qnResPool->addResource(user);   //permissions
+
+    auto sharedIds = QSet<QnUuid>() << layout->getId() << camera->getId();
+    qnSharedResourcesManager->setSharedResources(user, sharedIds);
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::shared);
+    user->setRawPermissions(Qn::GlobalControlVideoWallPermission); // shared
+
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::layout);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << layout->getId());
+
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::videowall);
+    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>());
+
+    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::none);
+    videoWall->items()->removeItem(item);
 }

@@ -2,6 +2,7 @@
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
 
+//TODO: #GDM rename to SharedLayout_Item_AccessProvider when will refactor to namespaces
 /** Handles access to cameras and web pages, placed on shared layouts. */
 class QnSharedLayoutAccessProvider: public QnBaseResourceAccessProvider
 {
