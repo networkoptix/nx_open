@@ -1278,7 +1278,7 @@ nx::db::DBResult SystemManager::fetchAccountToShareWith(
     // Creating new account and sending invitation.
     inviteeAccount->id = m_accountManager->generateNewAccountId();
     inviteeAccount->email = sharing.accountEmail;
-    inviteeAccount->statusCode = api::AccountStatus::inviteHasBeenSent;
+    inviteeAccount->statusCode = api::AccountStatus::invited;
     return inviteNewUserToSystem(
         queryContext,
         grantorEmail,

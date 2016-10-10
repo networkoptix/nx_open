@@ -589,7 +589,7 @@ nx::db::DBResult AccountManager::registerNewAccountInDb(
 
     if (dbResult == nx::db::DBResult::ok)
     {
-        if (existingAccount.statusCode != api::AccountStatus::inviteHasBeenSent)
+        if (existingAccount.statusCode != api::AccountStatus::invited)
         {
             NX_LOG(lm("Failed to add account with already used email %1, status %2").
                 arg(accountData.email).arg(QnLexical::serialized(existingAccount.statusCode)),
