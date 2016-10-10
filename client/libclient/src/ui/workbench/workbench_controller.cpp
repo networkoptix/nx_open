@@ -1103,8 +1103,11 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     workbench()->setItem(Qn::RaisedRole, nullptr);
 }
 
-void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
-    Q_UNUSED(view)
+void QnWorkbenchController::at_item_rightClicked(
+    QGraphicsView* /*view*/,
+    QGraphicsItem* item,
+    const ClickInfo& /*info*/)
+{
     TRACE("ITEM RCLICKED");
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -1192,7 +1195,8 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
     workbench()->setItem(Qn::RaisedRole, NULL);
 }
 
-void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info) {
+void QnWorkbenchController::at_scene_rightClicked(QGraphicsView* view, const ClickInfo& /*info*/)
+{
     TRACE("SCENE RCLICKED");
 
     view->scene()->clearSelection(); /* Just to feel safe. */
