@@ -1,7 +1,7 @@
 #include "desktop_data_provider_wrapper.h"
 
-#include "desktop_resource.h"
-#include "desktop_data_provider.h"
+#include <plugins/resource/desktop_win/desktop_resource.h>
+#include <plugins/resource/desktop_win/desktop_data_provider.h>
 
 QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(
     QnResourcePtr res,
