@@ -102,7 +102,8 @@ public:
         return true;
     }
 
-    void forEach(nx::utils::MoveOnlyFunc<void(SocketServerType*)> function)
+    template<typename Function>
+    void forEachListener(const Function& function)
     {
         for (auto& listener: m_listeners)
             function(listener.get());

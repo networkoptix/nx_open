@@ -287,7 +287,7 @@ int CloudDBProcess::exec()
 
         if (m_settings->auth().connectionInactivityPeriod.count())
         {
-            multiAddressHttpServer.forEach(
+            multiAddressHttpServer.forEachListener(
                 [&](nx_http::HttpStreamSocketServer* server)
                 {
                     server->setConnectionInactivityTimeout(
