@@ -393,7 +393,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     }
     case NetworkNoResponseFromDevice:
     {
-        return tr("Device does not respond.");
+        return tr("Device does not respond to network requests.");
     }
     case ServerTerminatedReason:
     {
