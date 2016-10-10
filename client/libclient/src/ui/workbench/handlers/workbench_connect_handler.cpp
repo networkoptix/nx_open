@@ -533,8 +533,17 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const ConnectionSettingsPtr& storeSettings)
 {
     // We don't save connection to cloud or new systems
-    if (!storeSettings || storeSettings->isConnectionToCloud)
+    if (!storeSettings)
         return;
+
+    if (storeSettings->isConnectionToCloud)
+    {
+        using namespace nx::network;
+        auto systemId = QnUuid::fromStringSafe(info.ecsGuid);
+        NX_EXPECT(SocketGlobals::addressResolver().isCloudHostName(info.ecUrl.host()));
+        qnCloudStatusWatcher->logSession(systemId);
+        return;
+    }
 
     const auto serverModuleInfo =
         qnModuleFinder->moduleInformation(QnUuid::fromStringSafe(info.ecsGuid));

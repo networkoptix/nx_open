@@ -249,6 +249,21 @@ void QnCloudStatusWatcher::setStayConnected(bool value)
     emit stayConnectedChanged();
 }
 
+void QnCloudStatusWatcher::logSession(const QnUuid& systemId)
+{
+    Q_D(QnCloudStatusWatcher);
+
+    if (!d->cloudConnection)
+        return;
+
+    qDebug() << "log session" << systemId;
+    d->cloudConnection->systemManager()->recordUserSessionStart(systemId.toStdString(),
+        [](api::ResultCode result)
+        {
+            qDebug() << "log session result" << QString::fromStdString(api::toString(result));
+        });
+}
+
 void QnCloudStatusWatcher::resetCloudCredentials()
 {
     setCloudCredentials(QnCredentials());
