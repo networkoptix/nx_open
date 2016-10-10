@@ -11,19 +11,13 @@ angular.module('cloudApp')
         $scope.Config = Config;
 
         function sortSystems(systems){
-            return _.sortBy(systems,function(system){
-                var statusOrder = Config.systemStatuses.sortOrder.indexOf(system.stateOfHealth);
-                if(statusOrder < 0){ // unknown yet status
-                    statusOrder = Config.systemStatuses.sortOrder.length;
-                }
-
-                statusOrder = "0" + statusOrder;
-                statusOrder = statusOrder.substr(statusOrder.length - 2); // Make leading zeros and fixed length
-
-                var nameOrder = $scope.getSystemOwnerName(system,true);
-
-                return statusOrder + nameOrder;
-
+            // Alphabet sorting
+            var preSort =  _.sortBy(systems,function(system){
+                return $scope.getSystemOwnerName(system,true);
+            });
+            // Sort by usage frequency is more important than Alphabet
+            return _.sortBy(preSort,function(system){
+                return -system.usageFrequency;
             });
         }
 
