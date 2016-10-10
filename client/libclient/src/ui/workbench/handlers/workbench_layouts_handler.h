@@ -15,7 +15,6 @@ public:
     virtual ~QnWorkbenchLayoutsHandler();
 
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
-    bool closeAllLayouts(bool waitForReply = false, bool force = false);
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
@@ -35,9 +34,8 @@ private:
     void at_removeLayoutItemAction_triggered();
     void at_removeLayoutItemFromSceneAction_triggered();
 
-    void at_workbench_layoutsChanged();
-
 private:
+    bool closeAllLayouts(bool force = false);
 
     /** Save target file, local or remote layout. */
     void saveLayout(const QnLayoutResourcePtr &layout);
@@ -75,12 +73,12 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
-    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources);
-    bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false, bool force = false);
-    bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false, bool force = false);
+    void closeLayouts(
+        const QnLayoutResourceList& resources,
+        const QnLayoutResourceList& rollbackResources,
+        const QnLayoutResourceList& saveResources);
+    bool closeLayouts(const QnLayoutResourceList& resources, bool force = false);
+    bool closeLayouts(const QnWorkbenchLayoutList& layouts, bool force = false);
 
     void at_layout_saved(bool success, const QnLayoutResourcePtr &layout);
-private:
-    /** Flag that we are in layouts closing process. */
-    bool m_closingLayouts;
 };

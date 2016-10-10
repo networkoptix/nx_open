@@ -187,10 +187,6 @@ signals:
 
     void layoutsChanged();
 
-    void layoutAdded(QnWorkbenchLayout *layout);
-
-    void layoutRemoved(QnWorkbenchLayout *layout);
-
     /**
      * This signal is emitted whenever a new item is assigned to the role.
      *

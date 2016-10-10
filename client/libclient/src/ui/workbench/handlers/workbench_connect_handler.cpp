@@ -337,7 +337,12 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
 
     connect(resourceModeAction, &QAction::toggled, this,
-        [this, welcomeScreen](bool checked) { welcomeScreen->setVisible(!checked); });
+        [this, welcomeScreen](bool checked)
+        {
+            welcomeScreen->setVisible(!checked);
+            if (workbench()->layouts().isEmpty())
+                action(QnActions::OpenNewTabAction)->trigger();
+        });
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
@@ -713,13 +718,13 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (m_logicalState == LogicalState::connected)
     {
-        // ask user if he wants to save changes
+        // Ask user if he wants to save changes.
         if (!disconnectFromServer(force))
             return;
     }
-    else if (m_logicalState != LogicalState::disconnected)
+    else
     {
-        // break 'Connecting' state if any
+        // Break 'Connecting' state and clear workbench.
         disconnectFromServer(true);
     }
 

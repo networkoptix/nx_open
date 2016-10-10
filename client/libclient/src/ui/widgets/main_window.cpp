@@ -329,9 +329,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setOptions(TitleBarDraggable);
 #endif
 
-    /* Open single tab. */
-    action(QnActions::OpenNewTabAction)->trigger();
-
 #ifdef Q_OS_MACX
     //initialize system-wide menu
     menu()->newMenu(Qn::MainScope);
