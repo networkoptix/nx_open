@@ -53,8 +53,10 @@ public:
     /** Called by NX_STRING_PARAM() macro; @return defaultValue. */
     const char* regStringParam(const char** pValue, const char* defaultValue, const char* paramName, const char* descr);
 
+    enum class Output { verbose, silent };
+
     /** Reload values from file(s), logging the values to std::cerr. */
-    void reload(bool verbose = true);
+    void reload(Output output = Output::verbose);
 
     /** Allows to avoid reloading on next call to reload(), which will only restore this flag. */
     void skipNextReload();
