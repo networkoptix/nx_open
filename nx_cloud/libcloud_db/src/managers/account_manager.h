@@ -54,7 +54,7 @@ public:
         stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    //-----------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // Public API methods
 
     /**
@@ -96,7 +96,7 @@ public:
         data::TemporaryCredentialsParams params,
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
 
-    //-----------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     std::string generateNewAccountId() const;
 
@@ -139,8 +139,6 @@ private:
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext, int* const dummyResult);
 
-    //-----------------------------------------------------
-    // add_account DB operations
     nx::db::DBResult registerNewAccountInDb(
         nx::db::QueryContext* const queryContext,
         const data::AccountData& accountData,
@@ -159,8 +157,6 @@ private:
         data::AccountConfirmationCode resultData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
-    //-----------------------------------------------------
-    // verify_account DB operations
     nx::db::DBResult verifyAccount(
         nx::db::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,

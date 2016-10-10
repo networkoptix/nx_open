@@ -388,7 +388,7 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<PingHandler>(authorizationManager);
         });
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AccountManager
     registerHttpHandler(
         kAccountRegisterPath,
@@ -425,7 +425,7 @@ void CloudDBProcess::registerApiHandlers(
         &AccountManager::createTemporaryCredentials, accountManager,
         EntityType::account, DataActionType::update);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // SystemManager
     registerHttpHandler(
         kSystemBindPath,
@@ -468,7 +468,7 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::account, DataActionType::update);
     //< TODO: #ak: current entity:action is not suitable for this request
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AuthenticationProvider
     registerHttpHandler(
         kAuthGetNoncePath,
@@ -480,7 +480,7 @@ void CloudDBProcess::registerApiHandlers(
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // ec2::ConnectionManager
     registerHttpHandler(
         kEstablishEc2TransactionConnectionPath,
@@ -493,7 +493,7 @@ void CloudDBProcess::registerApiHandlers(
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // MaintenanceManager
     registerHttpHandler(
         kMaintenanceGetVmsConnections,

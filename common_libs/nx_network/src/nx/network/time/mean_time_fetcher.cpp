@@ -7,7 +7,7 @@
 namespace nx {
 namespace network {
 
-//---------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MeanTimeFetcher::TimeFetcherContext
 
 MeanTimeFetcher::TimeFetcherContext::TimeFetcherContext():
@@ -16,7 +16,7 @@ MeanTimeFetcher::TimeFetcherContext::TimeFetcherContext():
 {
 }
 
-//---------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MeanTimeFetcher
 
 MeanTimeFetcher::MeanTimeFetcher(qint64 maxDeviationMillis):

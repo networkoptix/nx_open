@@ -127,7 +127,7 @@ bool SystemNameUpdate::getAsVariant(int resID, QVariant* const value) const
     }
 }
 
-//----------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // class UserSessionDescriptor
 
 bool UserSessionDescriptor::getAsVariant(int resID, QVariant* const value) const

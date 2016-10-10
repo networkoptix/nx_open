@@ -279,7 +279,7 @@ private:
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
-    //---------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // system sharing methods. TODO: #ak: move to a separate class
 
     /**
