@@ -68,6 +68,9 @@ ec2::ApiUserGroupData QnUserRolesManager::userRole(const QnUuid& id) const
 void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserGroupData& role)
 {
     NX_ASSERT(!role.isNull());
+    if (role.isNull())
+        return;
+
     {
         QnMutexLocker lk(&m_mutex);
         if (m_roles.value(role.id) == role)
