@@ -64,24 +64,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     ui->groupsTreeView->setModel(m_model);
 
     connect(ui->groupsTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
-        [this](const QModelIndex& current, const QModelIndex& previous)
-        {
-            Q_UNUSED(previous);
-
-            bool valid = current.isValid();
-            ui->groupInfoStackedWidget->setCurrentWidget(valid ? ui->groupInfoPage : ui->noGroupsPage);
-            if (!valid)
-                return;
-
-            QnUuid groupId = current.data(Qn::UuidRole).value<QnUuid>();
-            if (m_model->selectedGroup() == groupId)
-                return;
-
-            /* Apply page changes to current group in the model. */
-            base_type::applyChanges();
-            m_model->selectGroup(groupId);
-            loadDataToUi();
-        });
+        &QnUserGroupsDialog::at_model_currentChanged);
 
     connect(ui->newGroupButton, &QPushButton::clicked, this,
         [this]
@@ -213,6 +196,23 @@ void QnUserGroupsDialog::applyChanges()
     }
 
     updateButtonBox();
+    loadDataToUi();
+}
+
+void QnUserGroupsDialog::at_model_currentChanged(const QModelIndex& current)
+{
+    bool valid = current.isValid();
+    ui->groupInfoStackedWidget->setCurrentWidget(valid ? ui->groupInfoPage : ui->noGroupsPage);
+    if (!valid)
+        return;
+
+    QnUuid groupId = current.data(Qn::UuidRole).value<QnUuid>();
+    if (m_model->selectedGroup() == groupId)
+        return;
+
+    /* Apply page changes to current group in the model. */
+    base_type::applyChanges();
+    m_model->selectGroup(groupId);
     loadDataToUi();
 }
 
