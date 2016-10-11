@@ -76,8 +76,6 @@ angular.module('cloudApp')
             account: cacheGet(apiBase + '/account'),
             login:function(email, password, remember){
                 clearCache();
-                $localStorage.email = email;
-                $localStorage.password = password;
                 return $http.post(apiBase + '/account/login',{
                     email: email,
                     password: password,
