@@ -29,7 +29,6 @@ void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr
     if (m_onlineSystems.contains(system->id()))
         return;
 
-    qDebug() << "--- processSystemAdded " << system->name();
     const auto newFilter = system->name();
     ++m_onlineSystemNames[newFilter];
     m_onlineSystems.insert(system->id(), system->name());
