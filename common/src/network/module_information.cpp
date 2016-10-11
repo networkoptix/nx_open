@@ -20,35 +20,36 @@ const QString nxMediaServerId = lit("Media Server");
 
 QString getTargetSystemIdImpl(
     const QString& cloudId,
-    const QString& systemName,
-    const QnSoftwareVersion& serverVersion,
+    const QString& localSystemId,
     const QString& serverId,
-    bool isNewSystem)
+    const QnSoftwareVersion& serverVersion)
 {
     static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
 
-    if (isNewSystem)
+    if (localSystemId.isEmpty())
         return QUuid::createUuid().toString();
-    else if (serverVersion < kMinVersionWithSystem)
+
+    if (serverVersion < kMinVersionWithSystem)
         return serverId;
-    else if (!cloudId.isEmpty())
+
+    if (!cloudId.isEmpty())
         return cloudId;
-    else
-        return systemName;
+
+    return localSystemId;
 }
 
 }
 
 QString helpers::getTargetSystemId(const QnConnectionInfo& info)
 {
-    return ::getTargetSystemIdImpl(info.cloudSystemId, info.systemName,
-        info.version, info.ecsGuid, info.newSystem);
+    return ::getTargetSystemIdImpl(info.cloudSystemId, info.localSystemId,
+        info.ecsGuid, info.version);
 }
 
 QString helpers::getTargetSystemId(const QnModuleInformation& info)
 {
-    return ::getTargetSystemIdImpl(info.cloudSystemId, info.systemName,
-        info.version, info.id.toString(), info.serverFlags.testFlag(Qn::SF_NewSystem));
+    return ::getTargetSystemIdImpl(info.cloudSystemId, info.localSystemId.toString(),
+        info.id.toString(), info.version);
 }
 
 QnModuleInformation::QnModuleInformation():

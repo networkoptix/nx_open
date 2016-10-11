@@ -16,6 +16,7 @@
 #include <utils/common/delayed.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/fuzzy.h>
 
 using namespace nx::cdb;
 
@@ -57,28 +58,6 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
             (systemData.lastLoginTime.time_since_epoch()).count();
         result.append(system);
-    }
-
-    {
-        // TODO: #ynikitenkov remove this section when weights are available
-
-        // Temporary code section.
-        const bool isTmpValues = std::all_of(result.begin(), result.end(),
-            [](const QnCloudSystem& system) -> bool { return !system.weight; });
-        if (isTmpValues)
-        {
-            static const auto initialWeight = 10000.0;
-            static const auto step = 100.0;
-
-            qreal tmpWeight = initialWeight;
-            const auto tmpLastLoginTime = QDateTime::currentMSecsSinceEpoch();
-            for (auto& system : result)
-            {
-                system.weight = tmpWeight;
-                system.lastLoginTimeUtcMs = tmpLastLoginTime;
-                tmpWeight += step;
-            }
-        }
     }
 
     return result;
@@ -669,9 +648,11 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 
 bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
 {
-    return id == other.id &&
-           name == other.name &&
-           authKey == other.authKey;
+    return ((id == other.id)
+        && (name == other.name)
+        && (authKey == other.authKey)
+        && (lastLoginTimeUtcMs == other.lastLoginTimeUtcMs)
+        && qFuzzyEquals(weight, other.weight));
 }
 
 bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const

@@ -2112,9 +2112,9 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
         if (unit == Qt::NoUnit)
             return 0;
 
-        Q_ASSERT_X(format.testFlag(unit), Q_FUNC_INFO, "Requesting invalid unit");
+        NX_ASSERT(format.testFlag(unit), Q_FUNC_INFO, "Requesting invalid unit");
         int* ptr = partsHash.value(unit);
-        Q_ASSERT_X(ptr, Q_FUNC_INFO, "Invalid hash");
+        NX_ASSERT(ptr, Q_FUNC_INFO, "Invalid hash");
         if (ptr)
             return *ptr;
         return 0;
@@ -2122,7 +2122,7 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
 
     int primairy = safeValue(primairyUnit);
     int secondairy = safeValue(secondairyUnit);
-    Q_ASSERT_X(primairy > 0 || secondairy == 0, Q_FUNC_INFO, "Secondary without primary is an error");
+    NX_ASSERT(primairy != 0 || secondairy == 0, Q_FUNC_INFO, "Secondary without primary is an error");
 
     auto toUnitString = [this, unitStringConverter](Qt::TimeSpanUnit unit, int num)
     {
