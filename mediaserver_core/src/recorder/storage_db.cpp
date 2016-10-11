@@ -7,7 +7,10 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <utils/serialization/sql.h>
+#include <utils/serialization/lexical.h>
+#include "media_server/serverutil.h"
 #include "utils/common/log.h"
+#include <media_server/settings.h>
 #include "utils/common/util.h"
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;
@@ -159,10 +162,21 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
 bool QnStorageDb::open(const QString& fileName)
 {
-    // TODO: #akulikov If storage is DBReady, DB should work via Storage::IODevice.
-    //       But this change requires DB implementation to be able to work via IODevice, and this is not the case right now.
+    bool result = false;
+
     addDatabase(fileName, QString("QnStorageManager_%1").arg(fileName));
-    return m_sdb.open() && createDatabase();
+    result = m_sdb.open() && createDatabase();
+
+    bool isDbOnLocalStorage = fileName.startsWith(getDataDirectory()) ||
+        ((bool)m_storage && m_storage->getStorageType() == 
+                            QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition));
+
+    if (isDbOnLocalStorage && !MSSettings::roSettings()->value(nx_ms_conf::DISABLE_STORAGE_DB_OPTIMIZATION).toInt())
+    {
+        if (!tuneDBAfterOpen(&m_sdb))
+            NX_LOG(lit("Tuning storage DB for storage %1 failed").arg(m_storage->getUrl()), cl_logWARNING);
+    }
+    return result;
 }
 
 bool QnStorageDb::createDatabase()

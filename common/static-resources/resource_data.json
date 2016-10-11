@@ -590,7 +590,7 @@
             }
         },
         {
-            "keys":["Honeywell|H4D3PRV3"],
+            "keys":["Honeywell|H4D3PRV3", "Honeywell|H4D3PRV2"],
             "preferredAuthScheme": "Automatic"
         },
         {
