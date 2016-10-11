@@ -7,9 +7,11 @@
 
 QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent):
     base_type(parent),
-    m_systems(),
-    m_reservedSystems(),
-    m_onlineSystems()
+
+    m_recentSystems(),
+    m_onlineSystems(),
+    m_onlineSystemNames(),
+    m_finalSystems()
 {
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
         [this](int valueId)
@@ -24,55 +26,62 @@ QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent):
 
 void QnRecentLocalSystemsFinder::processSystemAdded(const QnSystemDescriptionPtr& system)
 {
-    auto it = m_onlineSystems.find(system->id());
-    if (it == m_onlineSystems.end())
-        it = m_onlineSystems.insert(system->id(), SystemNameCountPair(system->name(), 1));
-    else
-        ++it->second;
-
-    if (it->second > 1)
+    if (m_onlineSystems.contains(system->id()))
         return;
 
-    checkAllSystems();
+    qDebug() << "--- processSystemAdded " << system->name();
+    const auto newFilter = system->name();
+    ++m_onlineSystemNames[newFilter];
+    m_onlineSystems.insert(system->id(), system->name());
+
+    // Filters out final systems
+    for (auto it = m_finalSystems.begin(); it != m_finalSystems.end();)
+    {
+        const auto targetSystem = it.value();
+        if (newFilter == targetSystem->name())
+        {
+            it = m_finalSystems.erase(it);
+            emit systemLost(targetSystem->id());
+        }
+        else
+            ++it;
+    }
 }
 
 void QnRecentLocalSystemsFinder::processSystemRemoved(const QString& systemId)
 {
-    const auto it = m_onlineSystems.find(systemId);
-    if (it == m_onlineSystems.end())
+    if (!m_onlineSystems.contains(systemId))
         return;
 
-    if (it->second > 1)
-    {
-        --it->second;
+    const auto systemName = m_onlineSystems.value(systemId);
+    const auto it = m_onlineSystemNames.find(systemName);
+    if (it == m_onlineSystemNames.end())
         return;
+
+    auto& namesCount = it.value();
+    if (--namesCount > 0)
+        return; // We have other systems with same name
+
+    m_onlineSystemNames.erase(it);
+
+    SystemsHash newRecentSystems;
+    for (const auto currentSystem : m_recentSystems)
+    {
+        if (!isFilteredOut(currentSystem))
+            newRecentSystems.insert(currentSystem->id(), currentSystem);
     }
 
-    m_onlineSystems.erase(it);
-    checkAllSystems();
-}
-
-void QnRecentLocalSystemsFinder::checkAllSystems()
-{
-    const auto processSystems =
-        [this](const SystemsHash& systems)
-        {
-            for (const auto id : systems.keys())
-                checkSystem(systems.value(id));
-        };
-
-    processSystems(m_systems);
-    processSystems(m_reservedSystems);
+    updateRecentSystems(newRecentSystems);
 }
 
 QnAbstractSystemsFinder::SystemDescriptionList QnRecentLocalSystemsFinder::systems() const
 {
-    return m_systems.values();
+    return m_finalSystems.values();
 }
 
 QnSystemDescriptionPtr QnRecentLocalSystemsFinder::getSystem(const QString &id) const
 {
-    return m_systems.value(id, QnSystemDescriptionPtr());
+    return m_finalSystems.value(id, QnSystemDescriptionPtr());
 }
 
 void QnRecentLocalSystemsFinder::updateSystems()
@@ -82,70 +91,55 @@ void QnRecentLocalSystemsFinder::updateSystems()
     {
         if (connection.systemId.isEmpty())
             continue;
+
         const auto system = QnSystemDescription::createLocalSystem(
             connection.systemId, connection.systemName);
-        newSystems.insert(connection.systemId, system);
+
+        const auto itSameName = std::find_if(newSystems.begin(), newSystems.end(),
+            [name = system->name()](const QnSystemDescriptionPtr& val)
+            {
+                return (name == val->name());
+            });
+
+        if (itSameName == newSystems.end())
+            newSystems.insert(connection.systemId, system);
+        else if (itSameName.value()->id() > system->id())   //< to have definitely one system
+        {
+            newSystems.erase(itSameName);
+            newSystems.insert(connection.systemId, system);
+        }
     }
 
+    updateRecentSystems(newSystems);
+}
+
+void QnRecentLocalSystemsFinder::updateRecentSystems(const SystemsHash& newSystems)
+{
     const auto newSystemsKeys = newSystems.keys().toSet();
-    const auto currentKeys = m_systems.keys().toSet();
+    const auto currentKeys = m_recentSystems.keys().toSet();
     const auto added = newSystemsKeys - currentKeys;
     const auto removed = currentKeys - newSystemsKeys;
 
     for (const auto systemId : removed)
     {
-        m_reservedSystems.remove(systemId);
-        removeVisibleSystem(systemId);
+        m_recentSystems.remove(systemId);
+        if (m_finalSystems.remove(systemId))
+            emit systemLost(systemId);
     }
 
     for (const auto systemId : added)
     {
         const auto system = newSystems.value(systemId);
-        checkSystem(system);
+        m_recentSystems.insert(systemId, system);
+        if (!isFilteredOut(system))
+        {
+            m_finalSystems.insert(systemId, system);
+            emit systemDiscovered(system);
+        }
     }
 }
 
-void QnRecentLocalSystemsFinder::removeVisibleSystem(const QString& systemId)
+bool QnRecentLocalSystemsFinder::isFilteredOut(const QnSystemDescriptionPtr& system) const
 {
-    if (m_systems.remove(systemId))
-        emit systemLost(systemId);
-}
-
-void QnRecentLocalSystemsFinder::checkSystem(const QnSystemDescriptionPtr& system)
-{
-    if (!system)
-        return;
-
-    const auto systemId = system->id();
-    if (shouldRemoveSystem(system))
-    {
-        // adds to online list
-        if (!m_reservedSystems.contains(systemId))
-            m_reservedSystems.insert(systemId, system);
-
-        removeVisibleSystem(systemId);
-    }
-    else
-    {
-        m_reservedSystems.remove(systemId);
-        if (m_systems.contains(systemId))
-            return;
-
-        m_systems.insert(systemId, system);
-        emit systemDiscovered(system);
-    }
-}
-
-bool QnRecentLocalSystemsFinder::shouldRemoveSystem(const QnSystemDescriptionPtr& system)
-{
-    if (!system)
-        return true;
-
-    for (const auto data: m_onlineSystems)
-    {
-        const auto systemName = data.first;
-        if (system->name() == systemName)
-            return true;
-    }
-    return false;
+    return m_onlineSystemNames.contains(system->name());
 }

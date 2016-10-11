@@ -26,22 +26,17 @@ public: // overrides
 private:
     void updateSystems();
 
-    void checkAllSystems();
+    bool isFilteredOut(const QnSystemDescriptionPtr& system) const;
 
-    void checkSystem(const QnSystemDescriptionPtr& system);
-
-    void removeVisibleSystem(const QString& systemId);
-
-    bool shouldRemoveSystem(const QnSystemDescriptionPtr& system);
+    typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
+    void updateRecentSystems(const SystemsHash& newSystems);
 
 private:
-    typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
-    typedef QPair<QString, int> SystemNameCountPair;
-    typedef QHash<QString, SystemNameCountPair> SystemNamesHash;
+    typedef QHash<QString, int> NameCountHash;
+    typedef QHash<QString, QString> IdNameHush;
 
-    SystemsHash m_systems;
-    SystemsHash m_reservedSystems;
-
-    SystemNamesHash m_onlineSystems;
-
+    SystemsHash m_recentSystems;
+    IdNameHush m_onlineSystems;
+    NameCountHash m_onlineSystemNames;
+    SystemsHash m_finalSystems;
 };

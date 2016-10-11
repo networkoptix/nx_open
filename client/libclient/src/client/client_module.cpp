@@ -504,6 +504,9 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     connect(directSystemsFinder.data(), &QnAbstractSystemsFinder::systemLost,
         recentLocalSystemsFinder.data(), &QnRecentLocalSystemsFinder::processSystemRemoved);
 
+    for (const auto system : (cloudSystemsFinder->systems() + directSystemsFinder->systems()))
+        recentLocalSystemsFinder->processSystemAdded(system);
+
     systemsFinder->addSystemsFinder(recentLocalSystemsFinder.data(), kRecentFinder);
 
     qnCommon->store<QnSystemsFinder>(systemsFinder.take());
