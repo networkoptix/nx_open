@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="title_activity_resources">Câmaras</string>
-    <string name="title_activity_video">Vídeo</string>
-    <string name="title_activity_archive">Arquivo</string>
-	<string name="title_activity_sendlog">Criar e enviar Log</string>
-</resources>

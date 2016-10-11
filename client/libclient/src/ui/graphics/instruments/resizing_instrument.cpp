@@ -4,6 +4,8 @@
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/cursor_cache.h>
+
+#include <ui/graphics/items/resource/web_view.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 namespace {
@@ -21,6 +23,9 @@ struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem*, bool>
         {
             return false;
         }
+
+        if (auto webView = dynamic_cast<QnWebView*>(item))
+            return false;
 
         return true;
     }

@@ -116,14 +116,14 @@ void QnVideoWallResourceAccessProvider::handleVideoWallItemAdded(
 
 void QnVideoWallResourceAccessProvider::handleVideoWallItemChanged(
     const QnVideoWallResourcePtr& /*resource*/,
-    const QnVideoWallItem& oldItem,
-    const QnVideoWallItem& item)
+    const QnVideoWallItem& item,
+    const QnVideoWallItem& oldItem)
 {
     if (oldItem.layout == item.layout)
         return;
 
-    updateByLayoutId(oldItem.layout);
     updateByLayoutId(item.layout);
+    updateByLayoutId(oldItem.layout);
 }
 
 void QnVideoWallResourceAccessProvider::handleVideoWallItemRemoved(

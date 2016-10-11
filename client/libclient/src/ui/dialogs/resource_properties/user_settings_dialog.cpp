@@ -57,8 +57,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
-        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            Qn::Permissions permissions)
+        [this](const QnResourceAccessSubject& subject)
         {
             if (m_user && subject.user() == m_user)
                 permissionsChanged();
