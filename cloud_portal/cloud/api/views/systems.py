@@ -74,7 +74,7 @@ def get_auth(request, system_id):
     nonce = data["nonce"]
     realm = settings.CLOUD_CONNECT['password_realm']
     auth = digest(request.session['login'], request.session['password'], realm, nonce)
-    return api_success({auth: auth})
+    return api_success({'auth': auth})
 
 
 @api_view(['POST'])

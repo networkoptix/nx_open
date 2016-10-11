@@ -25,8 +25,9 @@ angular.module('cloudApp')
 
         system.prototype.updateSystemAuth = function(){
             var self = this;
-            return cloudApi.getSystemNonce(self.id).then(function(data){
-                return self.mediaserver.login(data.data.nonce);
+            return cloudApi.getSystemAuth(self.id).then(function(data){
+                var auth = data.data.auth;
+                return self.mediaserver.login(auth);
             })
         };
         system.prototype.updateSystemState = function(){

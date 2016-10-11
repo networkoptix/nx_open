@@ -168,6 +168,9 @@ angular.module('cloudApp')
                     name:systemName
                 });
             },
+            getSystemAuth:function(systemId){
+                return $http.get(apiBase + '/systems/' + systemId + '/auth');
+            },
 
             getSystemNonce:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/nonce');

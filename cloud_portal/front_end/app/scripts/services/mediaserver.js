@@ -34,8 +34,8 @@ angular.module('cloudApp')
                     });*/
                     return auth;
                 },
-                login:function(nonce){
-                    return $localStorage[systemId] = {auth: this.digest($localStorage.email, $localStorage.password, Config.realm, nonce)};
+                login:function(auth){
+                    return $localStorage[systemId] = {auth: auth};
                 },
                 logout:function(){
                     $localStorage[systemId] = null;
