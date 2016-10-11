@@ -4,6 +4,10 @@ from api.controllers import cloud_api, cloud_gateway
 
 from api.helpers.exceptions import handle_exceptions, api_success, require_params
 
+from cloud import settings
+import hashlib
+import base64
+
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
@@ -46,6 +50,34 @@ def sharing(request, system_id):
 def get_nonce(request, system_id):
     data = cloud_api.System.get_nonce(request.session['login'], request.session['password'], system_id)
     return api_success(data)
+
+
+def md5(data):
+    m = hashlib.md5()
+    m.update(data)
+    return m.hexdigest()
+
+
+def digest(login, password, realm, nonce):
+    dig = md5(login + ':' + realm + ':' + password)
+    method = md5('GET:')
+    auth_digest = md5(dig + ':' + nonce + ':' + method)
+    auth = base64.b64encode(login + ':' + nonce + ':' + auth_digest)
+    return {digest: dig,
+            auth: auth,
+            method: method,
+            auth_digest: auth_digest}
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
+def get_auth(request, system_id):
+    data = cloud_api.System.get_nonce(request.session['login'], request.session['password'], system_id)
+    nonce = data["nonce"]
+    realm = settings.CLOUD_CONNECT['password_realm']
+    auth = digest(request.session['login'], request.session['password'], realm, nonce)
+    return api_success({auth: auth})
 
 
 @api_view(['POST'])
