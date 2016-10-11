@@ -26,8 +26,11 @@ bool QnMobileClientMessageProcessor::isConnected() const
     }
 }
 
-void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
-    base_type::updateResource(resource);
+void QnMobileClientMessageProcessor::updateResource(
+    const QnResourcePtr &resource,
+    const QnUuid& peerId)
+{
+    base_type::updateResource(resource, peerId);
 
     if (resource->getId() == qnCommon->remoteGUID())
         updateMainServerApiUrl(resource.dynamicCast<QnMediaServerResource>());

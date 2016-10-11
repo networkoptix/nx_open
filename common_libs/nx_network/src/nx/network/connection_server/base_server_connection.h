@@ -113,8 +113,12 @@ namespace nx_api
         /*!
             \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
         */
-        void startReadingConnection()
+        void startReadingConnection(
+            boost::optional<std::chrono::milliseconds> inactivityTimeout = boost::none)
         {
+            if (inactivityTimeout)
+                m_streamSocket->setRecvTimeout(*inactivityTimeout);
+
             m_streamSocket->readSomeAsync(
                 &m_readBuffer,
                 std::bind( &SelfType::onBytesRead, this, std::placeholders::_1, std::placeholders::_2 ) );

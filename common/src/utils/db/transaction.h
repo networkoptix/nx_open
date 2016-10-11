@@ -21,9 +21,6 @@ public:
     DBResult commit();
     DBResult rollback();
 
-    /**
-     * Add handler to be called after commit() not depending on result.
-     */
     void addOnSuccessfulCommitHandler(
         nx::utils::MoveOnlyFunc<void()> func);
 

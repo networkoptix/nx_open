@@ -9,7 +9,7 @@
 #include <nx/utils/string.h>
 
 /**
- * Able to take settings from \a QSettings class (win32 registry or linux ini file) or from
+ * Able to take settings from QSettings class (win32 registry or linux ini file) or from
  *  command line arguments.
  *
  * Value defined as command line argument has preference over registry.

@@ -115,7 +115,7 @@ bool QnTcpListener::bindToLocalAddress()
     if (!d->serverSocket
         || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
-        const auto errorMessage = lm("Unable to bind and listen on %1: %2")
+        const auto errorMessage = lm("Error: Unable to bind and listen on %1: %2")
             .strs(localAddress, SystemError::toString(lastError()));
 
         NX_LOGX(errorMessage, cl_logWARNING);

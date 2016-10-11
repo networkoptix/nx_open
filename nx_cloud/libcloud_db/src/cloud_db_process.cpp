@@ -285,6 +285,16 @@ int CloudDBProcess::exec()
             false,  //TODO #ak enable ssl when it works properly
             SocketFactory::NatTraversalType::nttDisabled );
 
+        if (m_settings->auth().connectionInactivityPeriod.count())
+        {
+            multiAddressHttpServer.forEachListener(
+                [&](nx_http::HttpStreamSocketServer* server)
+                {
+                    server->setConnectionInactivityTimeout(
+                        m_settings->auth().connectionInactivityPeriod);
+                });
+        }
+
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
 
@@ -378,11 +388,11 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<PingHandler>(authorizationManager);
         });
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AccountManager
     registerHttpHandler(
         kAccountRegisterPath,
-        &AccountManager::addAccount, accountManager,
+        &AccountManager::registerAccount, accountManager,
         EntityType::account, DataActionType::insert);
 
     registerHttpHandler(
@@ -415,7 +425,7 @@ void CloudDBProcess::registerApiHandlers(
         &AccountManager::createTemporaryCredentials, accountManager,
         EntityType::account, DataActionType::update);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // SystemManager
     registerHttpHandler(
         kSystemBindPath,
@@ -458,7 +468,7 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::account, DataActionType::update);
     //< TODO: #ak: current entity:action is not suitable for this request
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AuthenticationProvider
     registerHttpHandler(
         kAuthGetNoncePath,
@@ -470,7 +480,7 @@ void CloudDBProcess::registerApiHandlers(
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // ec2::ConnectionManager
     registerHttpHandler(
         kEstablishEc2TransactionConnectionPath,
@@ -483,7 +493,7 @@ void CloudDBProcess::registerApiHandlers(
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // MaintenanceManager
     registerHttpHandler(
         kMaintenanceGetVmsConnections,

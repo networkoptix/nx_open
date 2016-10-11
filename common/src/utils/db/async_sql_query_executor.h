@@ -29,9 +29,10 @@
 namespace nx {
 namespace db {
 
-/** Executes DB request.
-    Scales DB operations on multiple threads
-*/
+/**
+ * Executes DB request asynchronously.
+ * Scales DB operations on multiple threads
+ */
 class AsyncSqlQueryExecutor
 {
 public:
@@ -41,29 +42,25 @@ public:
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
 
-    /** Executes data modification request that spawns some output data.
-        Hold multiple threads inside. \a dbUpdateFunc is executed within random thread.
-        Transaction is started before \a dbUpdateFunc call.
-        Transaction committed if \a dbUpdateFunc succeeded.
-        \param dbUpdateFunc This function may executed SQL commands and fill output data
-        \param completionHandler DB operation result is passed here. Output data is valid only if operation succeeded
-        \note DB operation may fail even if \a dbUpdateFunc finished successfully (e.g., transaction commit fails)
-    */
+    /**
+     * Executes data modification request that spawns some output data.
+     * Hold multiple threads inside. \a dbUpdateFunc is executed within random thread.
+     * Transaction is started before \a dbUpdateFunc call.
+     * Transaction committed if \a dbUpdateFunc succeeded.
+     * @param dbUpdateFunc This function may executed SQL commands and fill output data
+     * @param completionHandler DB operation result is passed here. Output data is valid only if operation succeeded
+     * @note DB operation may fail even if \a dbUpdateFunc finished successfully (e.g., transaction commit fails)
+     */
     template<typename InputData, typename OutputData>
     void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData input,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult, InputData, OutputData)> completionHandler)
     {
-        openOneMoreConnectionIfNeeded();
-
-        auto ctx = std::make_unique<UpdateWithOutputExecutor<InputData, OutputData>>(
+        scheduleQuery<UpdateWithOutputExecutor<InputData, OutputData>>(
             std::move(dbUpdateFunc),
-            std::move(input),
-            std::move(completionHandler));
-
-        QnMutexLocker lk(&m_mutex);
-        m_requestQueue.push(std::move(ctx));
+            std::move(completionHandler),
+            std::move(input));
     }
 
     /** Overload for updates with no output data. */
@@ -73,15 +70,10 @@ public:
         InputData input,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult, InputData)> completionHandler)
     {
-        openOneMoreConnectionIfNeeded();
-
-        auto ctx = std::make_unique<UpdateExecutor<InputData>>(
+        scheduleQuery<UpdateExecutor<InputData>>(
             std::move(dbUpdateFunc),
-            std::move(input),
-            std::move(completionHandler));
-
-        QnMutexLocker lk(&m_mutex);
-        m_requestQueue.push(std::move(ctx));
+            std::move(completionHandler),
+            std::move(input));
     }
 
     /** Overload for updates with no input data. */
@@ -89,28 +81,18 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
     {
-        openOneMoreConnectionIfNeeded();
-
-        auto ctx = std::make_unique<UpdateWithoutAnyDataExecutor>(
+        scheduleQuery<UpdateWithoutAnyDataExecutor>(
             std::move(dbUpdateFunc),
             std::move(completionHandler));
-
-        QnMutexLocker lk(&m_mutex);
-        m_requestQueue.push(std::move(ctx));
     }
 
     void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
     {
-        openOneMoreConnectionIfNeeded();
-
-        auto ctx = std::make_unique<UpdateWithoutAnyDataExecutorNoTran>(
+        scheduleQuery<UpdateWithoutAnyDataExecutorNoTran>(
             std::move(dbUpdateFunc),
             std::move(completionHandler));
-
-        QnMutexLocker lk(&m_mutex);
-        m_requestQueue.push(std::move(ctx));
     }
 
     template<typename OutputData>
@@ -118,14 +100,9 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*, OutputData* const)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult, OutputData)> completionHandler)
     {
-        openOneMoreConnectionIfNeeded();
-
-        auto ctx = std::make_unique<SelectExecutor<OutputData>>(
+        scheduleQuery<SelectExecutor<OutputData>>(
             std::move(dbSelectFunc),
             std::move(completionHandler));
-
-        QnMutexLocker lk(&m_mutex);
-        m_requestQueue.push(std::move(ctx));
     }
 
     const ConnectionOptions& connectionOptions() const
@@ -143,15 +120,34 @@ private:
     CLThreadQueue<std::unique_ptr<DbRequestExecutionThread>> m_connectionsToDropQueue;
 
     /**
-        @return \a true if no new connection is required or new connection has been opened.
-            \a false in case of failure to open connection when required
-    */
+     * @return \a true if no new connection is required or new connection has been opened.
+     *         \a false in case of failure to open connection when required.
+     */
     bool openOneMoreConnectionIfNeeded();
     void dropClosedConnections(QnMutexLockerBase* const lk);
     void dropExpiredConnectionsThreadFunc();
+
+    template<
+        typename Executor, typename UpdateFunc,
+        typename CompletionHandler, typename ... Input>
+    void scheduleQuery(
+        UpdateFunc updateFunc,
+        CompletionHandler completionHandler,
+        Input ... input)
+    {
+        openOneMoreConnectionIfNeeded();
+
+        auto ctx = std::make_unique<Executor>(
+            std::move(updateFunc),
+            std::move(input)...,
+            std::move(completionHandler));
+
+        QnMutexLocker lk(&m_mutex);
+        m_requestQueue.push(std::move(ctx));
+    }
 };
 
-}   //db
-}   //nx
+} // namespace db
+} // namespace nx
 
 #endif  //NX_CLOUD_DB_DB_MANAGER_H

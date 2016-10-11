@@ -37,8 +37,7 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     retranslateUi();
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(qnGlobalSettings, &QnGlobalSettings::disabledVendorsChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged,        this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged,              this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,          this,   &QnSystemSettingsWidget::loadDataToUi);
@@ -62,13 +61,8 @@ void QnSystemSettingsWidget::retranslateUi()
 
 void QnSystemSettingsWidget::loadDataToUi()
 {
-    QSet<QString> disabledVendors = qnGlobalSettings->disabledVendorsSet();
-    bool discoveryEnabled = (!disabledVendors.contains(lit("all")) && !disabledVendors.contains(lit("all=partial"))) || qnGlobalSettings->isServerAutoDiscoveryEnabled();
-    bool discoveryFullEnabled = disabledVendors.isEmpty() && qnGlobalSettings->isServerAutoDiscoveryEnabled();
-    ui->autoDiscoveryCheckBox->setCheckState(discoveryEnabled ? (discoveryFullEnabled ? Qt::Checked : Qt::PartiallyChecked)
-                                                              : Qt::Unchecked);
+    ui->autoDiscoveryCheckBox->setChecked(qnGlobalSettings->isAutoDiscoveryEnabled());
     ui->auditTrailCheckBox->setChecked(qnGlobalSettings->isAuditTrailEnabled());
-
     ui->autoSettingsCheckBox->setChecked(qnGlobalSettings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
 
@@ -82,13 +76,11 @@ void QnSystemSettingsWidget::applyChanges()
 
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked)
     {
-        qnGlobalSettings->setDisabledVendors(QString());
-        qnGlobalSettings->setServerAutoDiscoveryEnabled(true);
+        qnGlobalSettings->setAutoDiscoveryEnabled(true);
     }
     else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked)
     {
-        qnGlobalSettings->setDisabledVendors(lit("all=partial"));
-        qnGlobalSettings->setServerAutoDiscoveryEnabled(false);
+        qnGlobalSettings->setAutoDiscoveryEnabled(false);
     }
 
     qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
@@ -104,12 +96,7 @@ bool QnSystemSettingsWidget::hasChanges() const
     if (isReadOnly())
         return false;
 
-    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked
-        && !qnGlobalSettings->disabledVendors().isEmpty())
-        return true;
-
-    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked
-        && !qnGlobalSettings->disabledVendors().contains(lit("all")) )  //MUST not overwrite "all" with "all=partial"
+    if (ui->autoDiscoveryCheckBox->isChecked() != qnGlobalSettings->isAutoDiscoveryEnabled())
         return true;
 
     if (qnGlobalSettings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())

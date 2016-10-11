@@ -10,3 +10,7 @@ win* {
 }
 
 SOURCES += ${project.build.directory}/libcloud_db_app_info_impl.cpp
+
+linux {
+    QMAKE_CXXFLAGS += -Werror
+}

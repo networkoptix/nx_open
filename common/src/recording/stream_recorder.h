@@ -213,7 +213,6 @@ protected:
     bool m_fixedFileName;
     qint64 m_endDateTime;
     qint64 m_startDateTime;
-    bool m_stopOnWriteError;
     int m_currentTimeZone;
     std::vector<RecordingContext> m_recordingContextVector;
 

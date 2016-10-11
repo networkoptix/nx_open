@@ -90,7 +90,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 #define SystemDataExList_Fields (systems)
 
 
-//-----------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, UserSessionDescriptor* const data);
@@ -99,7 +99,7 @@ void serializeToUrlQuery(const UserSessionDescriptor&, QUrlQuery* const urlQuery
 void serialize(QnJsonContext*, const UserSessionDescriptor&, QJsonValue*);
 bool deserialize(QnJsonContext*, const QJsonValue&, UserSessionDescriptor*);
 
-//-----------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // common functions
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

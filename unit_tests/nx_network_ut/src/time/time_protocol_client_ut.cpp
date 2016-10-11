@@ -10,7 +10,7 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx/network/time/multiple_internet_time_fetcher.h>
+#include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
 
 

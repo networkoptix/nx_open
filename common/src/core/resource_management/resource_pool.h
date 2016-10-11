@@ -58,6 +58,7 @@ public:
     void addResources(const QnResourceList &resources, bool mainPool = true);
 
     void addResource(const QnResourcePtr &resource);
+    // TODO: We need to remove this function. Client should use separate instance of resource pool instead
     void addIncompatibleResource(const QnResourcePtr &resource);
 
     void beginTran();

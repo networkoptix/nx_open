@@ -22,7 +22,7 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode fromDbResultCode( nx::db::DBResult );
+api::ResultCode dbResultToApiResult( nx::db::DBResult );
 
 enum class EntityType
 {

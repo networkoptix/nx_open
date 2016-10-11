@@ -285,7 +285,7 @@ void QnAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
         }
     } while (recordProcessed);
     for (const auto& record: recordsToAdd) {
-        registerNewConnection(record.authSession, record.eventType == Qn::AR_Login); // add new session if not exists
+        registerNewConnection(record.authSession, record.eventType == Qn::AR_Login); //< add new session if not exists
         addAuditRecordInternal(record);
     }
 }
