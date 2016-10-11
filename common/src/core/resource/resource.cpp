@@ -29,6 +29,8 @@
 #include "../resource_management/resource_properties.h"
 #include "../resource_management/status_dictionary.h"
 
+#include <core/resource/security_cam_resource.h>
+
 std::atomic<bool> QnResource::m_appStopping(false);
 // TODO: #rvasilenko move it to QnResourcePool
 Q_GLOBAL_STATIC(QnInitResPool, initResPool)
@@ -649,6 +651,12 @@ QnUuid QnResource::getId() const
 void QnResource::setId(const QnUuid& id)
 {
     QnMutexLocker mutexLocker(&m_mutex);
+
+    //TODO: #dmishin it seems really wrong. Think about how to do it in another way.
+    NX_ASSERT(
+        dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.size() == 0,
+        lit("Only camera resources are allowed to set properties if id is not set."));
+
     m_id = id;
 }
 
