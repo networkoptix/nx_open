@@ -34,6 +34,8 @@ public:
         ec2::ErrorCode errorCode);
 
 private:
+    static bool checkApplaucherRunning();
+
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,
         QWidget* parentWidget);

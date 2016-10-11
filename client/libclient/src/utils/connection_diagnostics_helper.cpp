@@ -6,6 +6,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/self_updater.h>
 
 #include <nx_ec/ec_api.h>
 
@@ -137,6 +138,32 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
     return result;
 }
 
+bool QnConnectionDiagnosticsHelper::checkApplaucherRunning()
+{
+    int counter = 0;
+    QList<QnSoftwareVersion> versions;
+    auto errCode = applauncher::getInstalledVersions(&versions);
+    while (errCode != applauncher::api::ResultType::ok)
+    {
+        /* Try to run applauncher but only once. */
+        if (counter == 0 && errCode == applauncher::api::ResultType::connectError)
+        {
+            bool success = nx::vms::client::SelfUpdater::runMinilaucher();
+            if (!success)
+                return false;
+        }
+        ++counter;
+        if (counter > 5)
+            return false;
+
+        /* Wait a bit and try again. */
+        QThread::msleep(100);
+        qApp->processEvents();
+        errCode = applauncher::getInstalledVersions(&versions);
+    }
+    return true;
+}
+
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     const QnConnectionInfo &connectionInfo,
     QWidget* parentWidget)
@@ -150,6 +177,16 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         + tr(" - Server version: %1.").arg(connectionInfo.version.toString())
         + L'\n';
 
+    if (!checkApplaucherRunning())
+    {
+        QnMessageBox::critical(
+            parentWidget,
+            tr("Launcher process not found."),
+            tr("Please close the application and start it again using the shortcut in the start menu.")
+        );
+        return Qn::IncompatibleVersionConnectionResult;
+    }
+
     bool haveExactVersion = false;
     QList<QnSoftwareVersion> versions;
     if (applauncher::getInstalledVersions(&versions) == applauncher::api::ResultType::ok)
@@ -158,7 +195,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     while (true)
     {
         bool isInstalled = false;
-        if (applauncher::isVersionInstalled(connectionInfo.version, &isInstalled) != applauncher::api::ResultType::ok)
+        int errCode = applauncher::isVersionInstalled(connectionInfo.version, &isInstalled);
+        if (errCode != applauncher::api::ResultType::ok)
         {
             QnMessageBox::warning(
                 parentWidget,
@@ -166,7 +204,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 getErrorString(ErrorStrings::UnableConnect),
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
-                + tr("An error has occurred while trying to restart in compatibility mode."),
+                + tr("An error has occurred while trying to restart in compatibility mode (%1).")
+                .arg(errCode),
                 QDialogButtonBox::Ok
             );
             return Qn::IncompatibleVersionConnectionResult;
