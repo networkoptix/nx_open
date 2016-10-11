@@ -1,5 +1,5 @@
 #include "desktop_data_provider.h"
-#if defined(Q_OS_WIN)
+
 #include <intrin.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -30,8 +30,8 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_helper.h>
-namespace {
 
+namespace {
 
     struct FffmpegLog
     {
@@ -52,7 +52,7 @@ namespace {
         }
     };
 
-}
+} // namespace
 
 QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
     m_owner(owner),
@@ -60,7 +60,6 @@ QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider*
     m_speexPreprocess(0),
     m_terminated(false)
 {
-
 }
 
 QnDesktopDataProvider::EncodedAudioInfo::~EncodedAudioInfo()
@@ -472,8 +471,8 @@ bool QnDesktopDataProvider::init()
 
         const auto audioContext = new QnAvCodecMediaContext(m_audioCodecCtx);
         m_audioContext = QnConstMediaContextPtr(audioContext);
-
-        if (avcodec_open2(m_audioCodecCtx, audioCodec, nullptr) < 0)
+        const auto res = avcodec_open2(m_audioCodecCtx, audioCodec, nullptr);
+        if (res < 0)
         {
             m_lastErrorStr = tr("Could not initialize audio encoder.");
             return false;
@@ -884,5 +883,3 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
     }
 }
 */
-
-#endif // Q_OS_WIN

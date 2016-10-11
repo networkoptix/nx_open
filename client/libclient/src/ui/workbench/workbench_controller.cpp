@@ -29,7 +29,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -41,7 +40,6 @@
 
 #include "client/client_settings.h"
 
-#include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
@@ -147,9 +145,6 @@ namespace {
     /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
 
-    /** Countdown value before screen recording starts. */
-    const int recordingCountdownMs = 3000;
-
     const qreal raisedGeometryThreshold = 0.002;
 } // anonymous namespace
 
@@ -202,8 +197,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_screenRecorder(NULL),
-    m_recordingCountdownLabel(NULL),
     m_tourModeHintLabel(NULL),
     m_menuEnabled(true)
 {
@@ -448,10 +441,12 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
-    if (QnScreenRecorder::isSupported())
-        window->addAction(action(QnActions::ToggleScreenRecordingAction));
     window->addAction(action(QnActions::ToggleSmartSearchAction));
     window->addAction(action(QnActions::ToggleInfoAction));
+
+    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    if (screenRecordingAction)
+        window->addAction(screenRecordingAction);
 
     connect(action(QnActions::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(QnActions::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
@@ -464,28 +459,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(QnActions::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(QnActions::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(QnActions::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
-    if (QnScreenRecorder::isSupported())
-        connect(action(QnActions::ToggleScreenRecordingAction), SIGNAL(triggered(bool)),                                                   this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(action(QnActions::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
     connect(action(QnActions::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
-
-    /* Init screen recorder. */
-    if (QnScreenRecorder::isSupported()){
-        m_screenRecorder = new QnScreenRecorder(this);
-        connect(m_screenRecorder,       SIGNAL(recordingStarted()),                                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
-        connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
-        connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
-    }
-
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);
-}
-
-QnWorkbenchController::~QnWorkbenchController() {
-    if (m_screenRecorder){
-        disconnect(m_screenRecorder, NULL, this, NULL);
-        m_screenRecorder->stopRecording();
-    }
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -610,114 +587,8 @@ void QnWorkbenchController::updateDraggedItems()
 }
 
 // -------------------------------------------------------------------------- //
-// Screen recording
-// -------------------------------------------------------------------------- //
-void QnWorkbenchController::startRecording() 
-{
-    auto desktop = qnResPool->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
-    if (!desktop)
-    {
-        QnGraphicsMessageBox::information(tr("Screen capturing subsystem is not initialized yet. "
-            "Please try again later."), recordingCountdownMs);
-        return;
-    }
-
-    if (!m_screenRecorder) {
-        action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
-        return;
-    }
-
-    if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
-        action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
-        return;
-    }
-
-    action(QnActions::ToggleScreenRecordingAction)->setChecked(true);
-
-    m_recordingCountdownLabel = QnGraphicsMessageBox::informationTicking(tr("Recording in...%1"), recordingCountdownMs);
-    connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::finished, this, &QnWorkbenchController::at_recordingAnimation_finished);
-}
-
-void QnWorkbenchController::stopRecording() {
-    if (m_recordingCountdownLabel) {
-        disconnect(m_recordingCountdownLabel, NULL, this, NULL);
-        m_recordingCountdownLabel->hideImmideately();
-        m_recordingCountdownLabel = NULL;
-    }
-
-    action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
-
-    if (m_screenRecorder)
-        m_screenRecorder->stopRecording();
-}
-
-void QnWorkbenchController::at_recordingAnimation_finished() {
-    if (m_recordingCountdownLabel)
-        m_recordingCountdownLabel->setOpacity(0.0);
-    m_recordingCountdownLabel = NULL;
-    if (m_screenRecorder) // just in case =)
-        m_screenRecorder->startRecording();
-}
-
-
-void QnWorkbenchController::at_screenRecorder_recordingStarted() {
-    if (!m_recordingCountdownLabel)
-        return;
-    m_recordingCountdownLabel->setOpacity(0.0);
-}
-
-void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    if (QnScreenRecorder::isSupported())
-        action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
-
-    QnMessageBox::warning(display()->view(), tr("Warning"), tr("Unable to start recording due to the following error: %1").arg(errorMessage));
-}
-
-void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
-    QString suggetion = QFileInfo(recordedFileName).fileName();
-    if (suggetion.isEmpty())
-        suggetion = tr("Recorded Video");
-
-    while (true) {
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-                                                      display()->view(),
-                                                      tr("Save Recording As..."),
-                                                      qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
-                                                      tr("AVI (Audio/Video Interleaved) (*.avi)")));
-        dialog->setFileMode(QFileDialog::AnyFile);
-        dialog->setAcceptMode(QFileDialog::AcceptSave);
-        int dialogResult = dialog->exec();
-
-        QString filePath = dialog->selectedFile();
-        if (dialogResult == QDialog::Accepted && !filePath.isEmpty()) {
-            QString selectedExtension = dialog->selectedExtension();
-            if (!filePath.endsWith(selectedExtension, Qt::CaseInsensitive))
-                filePath += selectedExtension;
-
-            QFile::remove(filePath);
-            if (!QFile::rename(recordedFileName, filePath)) {
-                QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
-                CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QnMessageBox::warning(display()->view(), tr("Warning"), message, QDialogButtonBox::Ok, QDialogButtonBox::NoButton);
-                continue;
-            }
-
-            QnFileProcessor::createResourcesForFile(filePath);
-
-            qnSettings->setLastRecordingDir(QFileInfo(filePath).absolutePath());
-        } else {
-            QFile::remove(recordedFileName);
-        }
-        break;
-    }
-}
-
-
-// -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-
-#include <ui/workbench/workbench_welcome_screen.h>
 
 void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event) {
     if (event->type() != QEvent::KeyPress)
@@ -1232,8 +1103,11 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     workbench()->setItem(Qn::RaisedRole, nullptr);
 }
 
-void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
-    Q_UNUSED(view)
+void QnWorkbenchController::at_item_rightClicked(
+    QGraphicsView* /*view*/,
+    QGraphicsItem* item,
+    const ClickInfo& /*info*/)
+{
     TRACE("ITEM RCLICKED");
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -1321,7 +1195,8 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
     workbench()->setItem(Qn::RaisedRole, NULL);
 }
 
-void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info) {
+void QnWorkbenchController::at_scene_rightClicked(QGraphicsView* view, const ClickInfo& /*info*/)
+{
     TRACE("SCENE RCLICKED");
 
     view->scene()->clearSelection(); /* Just to feel safe. */
@@ -1503,15 +1378,6 @@ void QnWorkbenchController::at_maximizeItemAction_triggered() {
 
 void QnWorkbenchController::at_unmaximizeItemAction_triggered() {
     workbench()->setItem(Qn::ZoomedRole, NULL);
-}
-
-
-void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
-    if(checked) {
-        startRecording();
-    } else {
-        stopRecording();
-    }
 }
 
 void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {

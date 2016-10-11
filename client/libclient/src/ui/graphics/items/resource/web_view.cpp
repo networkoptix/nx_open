@@ -40,6 +40,7 @@ QnWebView::QnWebView(const QUrl &url
     settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
     settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true);
 
+    setupStyle();
     setPage(new QnWebPage(this));
 
     connect(page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
@@ -114,6 +115,52 @@ void QnWebView::setPageUrl(const QUrl &newUrl)
     setUrl(newUrl);
 }
 
+
+void QnWebView::setupStyle()
+{
+    //TODO: #GDM 90% of this is not used really.
+
+    QStyle* style = QStyleFactory().create(lit("fusion"));
+    setStyle(style);
+
+    QPalette palette = this->palette();
+
+    // Outline around the menu
+    palette.setColor(QPalette::Window, Qt::gray);
+    palette.setColor(QPalette::WindowText, Qt::black);
+
+    palette.setColor(QPalette::BrightText, Qt::gray);
+    palette.setColor(QPalette::BrightText, Qt::black);
+
+    // combo button
+    palette.setColor(QPalette::Button, Qt::gray);
+    palette.setColor(QPalette::ButtonText, Qt::black);
+
+    // combo menu
+    palette.setColor(QPalette::Base, Qt::gray);
+    palette.setColor(QPalette::Text, Qt::black);
+
+    // tool tips
+    palette.setColor(QPalette::ToolTipBase, Qt::gray);
+    palette.setColor(QPalette::ToolTipText, Qt::black);
+
+    palette.setColor(QPalette::NoRole, Qt::gray);
+    palette.setColor(QPalette::AlternateBase, Qt::gray);
+
+    palette.setColor(QPalette::Link, Qt::black);
+    palette.setColor(QPalette::LinkVisited, Qt::black);
+
+    // highlight button & menu
+    palette.setColor(QPalette::Highlight, Qt::gray);
+    palette.setColor(QPalette::HighlightedText, Qt::black);
+
+    // to customize the disabled color
+    palette.setColor(QPalette::Disabled, QPalette::Button, Qt::gray);
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::black);
+
+    setPalette(palette);
+    setAutoFillBackground(true);
+}
 
 void QnWebView::setStatus(WebViewPageStatus value)
 {

@@ -18,8 +18,8 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/shared_resource_access_provider.h>
-#include <core/resource_access/providers/shared_layout_access_provider.h>
-#include <core/resource_access/providers/videowall_resource_access_provider.h>
+#include <core/resource_access/providers/shared_layout_item_access_provider.h>
+#include <core/resource_access/providers/videowall_item_access_provider.h>
 
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -119,8 +119,8 @@ QnCommonModule::QnCommonModule(QObject *parent):
     /* Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager. */
     qnResourceAccessProvider->addBaseProvider(new QnPermissionsResourceAccessProvider());
     qnResourceAccessProvider->addBaseProvider(new QnSharedResourceAccessProvider());
-    qnResourceAccessProvider->addBaseProvider(new QnSharedLayoutAccessProvider());
-    qnResourceAccessProvider->addBaseProvider(new QnVideoWallResourceAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnSharedLayoutItemAccessProvider());
+    qnResourceAccessProvider->addBaseProvider(new QnVideoWallItemAccessProvider());
 
     instance<QnResourceAccessManager>();    /*< Depends on access provider. */
 

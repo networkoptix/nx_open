@@ -84,6 +84,7 @@ Item
             isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
             comboBoxTextRole: "display";
+            comboBoxValueRole: "url";
             iconUrl: "qrc:/skin/welcome_page/server.png";                   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/server_disabled.png";

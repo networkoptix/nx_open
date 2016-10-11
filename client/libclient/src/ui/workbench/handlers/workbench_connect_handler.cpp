@@ -337,7 +337,12 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
 
     connect(resourceModeAction, &QAction::toggled, this,
-        [this, welcomeScreen](bool checked) { welcomeScreen->setVisible(!checked); });
+        [this, welcomeScreen](bool checked)
+        {
+            welcomeScreen->setVisible(!checked);
+            if (workbench()->layouts().isEmpty())
+                action(QnActions::OpenNewTabAction)->trigger();
+        });
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
@@ -412,12 +417,15 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         default:    //error
             if (!qnRuntime->isDesktopMode())
             {
-                QnGraphicsMessageBox* incompatibleMessageBox =
-                    QnGraphicsMessageBox::informationTicking(
-                        tr("Could not connect to server. Closing in %1..."),
+                QnGraphicsMessageBox::information(
+                        tr("Could not connect to server. Video Wall will be closed."),
                         kVideowallCloseTimeoutMSec);
-                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished,
-                    action(QnActions::ExitAction), &QAction::trigger);
+                executeDelayedParented(
+                    [this]
+                    {
+                        action(QnActions::ExitAction)->trigger();
+                    }, kVideowallCloseTimeoutMSec, this
+                );
             }
             else
             {
@@ -525,8 +533,18 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const ConnectionSettingsPtr& storeSettings)
 {
     // We don't save connection to cloud or new systems
-    if (!storeSettings || storeSettings->isConnectionToCloud)
+    if (!storeSettings)
         return;
+
+    if (storeSettings->isConnectionToCloud)
+    {
+        using namespace nx::network;
+        NX_EXPECT(SocketGlobals::addressResolver().isCloudHostName(info.ecUrl.host()));
+        /* For cloud systems id is a string now. It may be changed in the future. */
+        NX_EXPECT(!QnUuid::fromStringSafe(info.cloudSystemId).isNull());
+        qnCloudStatusWatcher->logSession(info.cloudSystemId);
+        return;
+    }
 
     const auto serverModuleInfo =
         qnModuleFinder->moduleInformation(QnUuid::fromStringSafe(info.ecsGuid));
@@ -710,13 +728,13 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (m_logicalState == LogicalState::connected)
     {
-        // ask user if he wants to save changes
+        // Ask user if he wants to save changes.
         if (!disconnectFromServer(force))
             return;
     }
-    else if (m_logicalState != LogicalState::disconnected)
+    else
     {
-        // break 'Connecting' state if any
+        // Break 'Connecting' state and clear workbench.
         disconnectFromServer(true);
     }
 

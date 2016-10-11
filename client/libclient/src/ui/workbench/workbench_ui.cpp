@@ -72,8 +72,6 @@
 
 #include <ui/processors/hover_processor.h>
 
-#include <ui/screen_recording/screen_recorder.h>
-
 #include <ui/statistics/modules/controls_statistics_module.h>
 
 #include <ui/style/skin.h>
@@ -730,7 +728,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
     QRectF rect = controlsWidget->rect();
     if (qFuzzyEquals(m_controlsWidgetRect, rect))
         return;
-    QRectF oldRect = m_controlsWidgetRect;
+
     m_controlsWidgetRect = rect;
 
     /* We lay everything out manually. */

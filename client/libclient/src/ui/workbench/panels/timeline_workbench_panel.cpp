@@ -189,7 +189,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     sliderZoomInButton->setPreferredSize(19, 16);
     context()->statisticsModule()->registerButton(lit("slider_zoom_in"), sliderZoomInButton);
 
-    QGraphicsLinearLayout *sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    auto sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     sliderZoomButtonsLayout->setSpacing(0.0);
     sliderZoomButtonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     sliderZoomButtonsLayout->addItem(sliderZoomOutButton);
@@ -197,6 +197,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
 
     m_zoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
     m_zoomButtonsWidget->setOpacity(0.0);
+    m_zoomButtonsWidget->setZValue(NxUi::ControlItemZOrder);
 
     m_zoomButtonsWidget->setVisible(navigator()->hasArchive());
     connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,

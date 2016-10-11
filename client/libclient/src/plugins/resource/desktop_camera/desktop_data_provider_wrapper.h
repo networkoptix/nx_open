@@ -1,5 +1,4 @@
-#ifndef __DESKTOP_DATA_PROVIDER_WRAPPER_H
-#define __DESKTOP_DATA_PROVIDER_WRAPPER_H
+#pragma once
 
 #include <QtCore/QtGlobal>
 
@@ -23,13 +22,14 @@ public:
     QString lastErrorStr() const;
     virtual bool hasThread() const override { return false; }
     virtual bool needConfigureProvider() const override;
+
 protected:
-    virtual bool processData(const QnAbstractDataPacketPtr& /*data*/) { return true; }
+    virtual bool processData(const QnAbstractDataPacketPtr& /*data*/) override { return true; }
+
 protected:
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
+
 private:
     QSet<void*> m_needKeyData;
     QnDesktopDataProvider* m_owner;
 };
-
-#endif

@@ -32,10 +32,10 @@ private:
 
 
 /**
- * This instrument implements resizing of QGraphicsWidget. 
+ * This instrument implements resizing of QGraphicsWidget.
  * Unlike default resizing algorithm, it allows resizing to non-integer sizes.
  * Size hints are currently not supported.
- * 
+ *
  * This instrument implements the following resizing process:
  * <ol>
  * <li>User presses a mouse button on a widget's frame.</li>
@@ -100,5 +100,5 @@ protected:
     Qt::WindowFrameSection m_section;
     QPointer<QGraphicsWidget> m_widget;
     ConstrainedGeometrically* m_constrained;
-    QGraphicsWidget* m_affectedWidget = nullptr;
+    QPointer<QGraphicsWidget> m_affectedWidget;
 };

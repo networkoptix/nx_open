@@ -1,9 +1,4 @@
-#ifndef __BUFFERED_SCREEN_GRABBER_H
-#define __BUFFERED_SCREEN_GRABBER_H
-
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_WIN
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include "screen_grabber.h"
@@ -13,7 +8,6 @@
 
 class QnBufferedScreenGrabber: public QnLongRunnable
 {
-    Q_OBJECT;
 public:
     static const int DEFAULT_QUEUE_SIZE = 8;
     static const int DEFAULT_FRAME_RATE = 0;
@@ -40,6 +34,7 @@ public:
     bool capturedDataToFrame(CaptureInfoPtr data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
     void setLogo(const QPixmap& logo) { m_grabber.setLogo(logo); }
     virtual void pleaseStop() override;
+
 protected:
     virtual void run();
 
@@ -54,8 +49,3 @@ private:
     static QnMutex m_instanceMutex;
     static int m_aeroInstanceCounter;
 };
-
-#endif
-
-#endif
-

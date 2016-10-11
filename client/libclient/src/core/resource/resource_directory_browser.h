@@ -22,13 +22,13 @@ public:
     // Local files search only once. Use cleanup before search to re-search files again
     void cleanup();
 
-    static QnLayoutResourcePtr layoutFromFile(const QString& xfile);
-    static QnResourcePtr resourceFromFile(const QString &filename);
+    static QnLayoutResourcePtr layoutFromFile(const QString& filename);
+    static QnResourcePtr resourceFromFile(const QString& filename);
 
 protected:
     bool m_resourceReady;
 
-    static QnResourcePtr createArchiveResource(const QString& xfile);
+    static QnResourcePtr createArchiveResource(const QString& filename);
 
     void findResources(const QString &directory, QnResourceList *result);
 };

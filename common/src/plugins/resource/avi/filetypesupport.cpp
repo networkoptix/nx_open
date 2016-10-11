@@ -46,9 +46,10 @@ bool FileTypeSupport::isImageFileExt(const QString &filename)
 
 bool FileTypeSupport::isLayoutFileExt(const QString &filename)
 {
-    if (filename.toLower().endsWith(QLatin1String(".nov")))
+    if (filename.toLower().endsWith(lit(".nov")))
         return true;
-    if (filename.toLower().endsWith(QLatin1String(".exe")))
+
+    if (filename.toLower().endsWith(lit(".exe")))
     {
         QFile f(filename);
         if (f.open(QIODevice::ReadOnly))

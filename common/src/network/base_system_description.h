@@ -50,7 +50,7 @@ public:
 
     virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
 
-    virtual QString getServerHost(const QnUuid& serverId) const = 0;
+    virtual QUrl getServerHost(const QnUuid& serverId) const = 0;
 
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
 

@@ -4,6 +4,37 @@
 #include <finders/systems_finder.h>
 #include <nx/utils/disconnect_helper.h>
 
+namespace {
+
+static const int kUrlRole = Qt::UserRole + 1;
+
+typedef QHash<int, QByteArray> RolesHash;
+static const auto kRoles =
+    []() -> RolesHash
+    {
+        RolesHash result;
+        result.insert(Qt::DisplayRole, "display");
+        result.insert(kUrlRole, "url");
+        return result;
+    }();
+
+int roleByName(const QString& name)
+{
+    typedef QHash<QByteArray, int> IdsHash;
+    static const auto kReversedRoles =
+        [name]() -> IdsHash
+    {
+        IdsHash roles;
+        for (auto it = kRoles.begin(); it != kRoles.end(); ++it)
+            roles.insert(it.value(), it.key());
+        return roles;
+    }();
+
+    const auto it = kReversedRoles.find(name.toLatin1());
+    return (it == kReversedRoles.end() ? Qt::DisplayRole : it.value());
+}
+}
+
 QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
     base_type(parent),
     m_disconnectHelper(),
@@ -34,9 +65,9 @@ void QnSystemHostsModel::setSystemId(const QString &id)
     emit systemIdChanged();
 }
 
-QString QnSystemHostsModel::firstHost() const
+QUrl QnSystemHostsModel::firstHost() const
 {
-    return (m_hosts.isEmpty() ? QString() : m_hosts.front().second);
+    return (m_hosts.isEmpty() ? QUrl() : m_hosts.front().second);
 }
 
 bool QnSystemHostsModel::isEmpty() const
@@ -54,17 +85,28 @@ int QnSystemHostsModel::rowCount(const QModelIndex &parent) const
     return (parent.isValid() ? 0 : m_hosts.size());
 }
 
+QVariant QnSystemHostsModel::getData(const QString& dataRole, int row)
+{
+    const auto role = roleByName(dataRole);
+    return data(index(row), role);
+}
+
 QVariant QnSystemHostsModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
 
     const auto row = index.row();
-    if (!qBetween<int>(0, row, m_hosts.size()) || (role != Qt::DisplayRole))
+    if (!qBetween<int>(0, row, m_hosts.size()))
         return QVariant();
 
-    const auto hostData = m_hosts.at(row);
-    return hostData.second;
+    const auto& hostData = m_hosts.at(row);
+    if (role == Qt::DisplayRole)
+        return hostData.second.host();
+    else if (role == kUrlRole)
+        return hostData.second.toString();
+
+    return QVariant();
 }
 
 void QnSystemHostsModel::reloadHosts()
@@ -174,7 +216,7 @@ void QnSystemHostsModel::updateServerHost(const QnSystemDescriptionPtr &systemDe
 }
 
 bool QnSystemHostsModel::updateServerHostInternal(const ServerIdHostList::iterator &it
-    , const QString &host)
+    , const QUrl& host)
 {
     if (it == m_hosts.end())
         return false;
@@ -224,7 +266,6 @@ void QnSystemHostsModel::removeServerInternal(const ServerIdHostList::iterator &
     }
 }
 
-
 QnSystemHostsModel::ServerIdHostList::iterator
 QnSystemHostsModel::getDataIt(const QnUuid &serverId)
 {
@@ -233,4 +274,9 @@ QnSystemHostsModel::getDataIt(const QnUuid &serverId)
     {
         return (value.first == serverId);
     });
+}
+
+RolesHash QnSystemHostsModel::roleNames() const
+{
+    return kRoles;
 }

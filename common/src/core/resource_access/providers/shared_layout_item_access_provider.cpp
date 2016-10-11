@@ -1,4 +1,4 @@
-#include "shared_layout_access_provider.h"
+#include "shared_layout_item_access_provider.h"
 
 #include <core/resource_management/resource_pool.h>
 
@@ -25,24 +25,24 @@ QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
 
 }
 
-QnSharedLayoutAccessProvider::QnSharedLayoutAccessProvider(QObject* parent):
+QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(QObject* parent):
     base_type(parent)
 {
     connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
-        &QnSharedLayoutAccessProvider::handleSharedResourcesChanged);
+        &QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged);
 }
 
-QnSharedLayoutAccessProvider::~QnSharedLayoutAccessProvider()
+QnSharedLayoutItemAccessProvider::~QnSharedLayoutItemAccessProvider()
 {
 
 }
 
-QnAbstractResourceAccessProvider::Source QnSharedLayoutAccessProvider::baseSource() const
+QnAbstractResourceAccessProvider::Source QnSharedLayoutItemAccessProvider::baseSource() const
 {
     return Source::layout;
 }
 
-bool QnSharedLayoutAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
+bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
     if (!isMediaResource(resource))
@@ -68,7 +68,7 @@ bool QnSharedLayoutAccessProvider::calculateAccess(const QnResourceAccessSubject
     return false;
 }
 
-void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
+void QnSharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
     base_type::handleResourceAdded(resource);
 
@@ -96,14 +96,14 @@ void QnSharedLayoutAccessProvider::handleResourceAdded(const QnResourcePtr& reso
     }
 }
 
-void QnSharedLayoutAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
+void QnSharedLayoutItemAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
     base_type::handleResourceRemoved(resource);
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
         updateAccessToLayoutItems(layout);
 }
 
-void QnSharedLayoutAccessProvider::handleSharedResourcesChanged(
+void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& oldValues,
     const QSet<QnUuid>& newValues)
@@ -128,7 +128,7 @@ void QnSharedLayoutAccessProvider::handleSharedResourcesChanged(
         updateAccess(subject, resource);
 }
 
-void QnSharedLayoutAccessProvider::updateAccessToLayoutItems(const QnLayoutResourcePtr& layout)
+void QnSharedLayoutItemAccessProvider::updateAccessToLayoutItems(const QnLayoutResourcePtr& layout)
 {
     for (auto resource : qnResPool->getResources(layoutItems(layout)))
         updateAccessToResource(resource);

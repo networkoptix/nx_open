@@ -876,14 +876,19 @@ void QnNxStyle::drawPrimitive(
             QStyleOptionViewItem adjustedOption;
             bool exclusive = widget && widget->property(Properties::kItemViewRadioButtons).toBool();
 
-            auto drawFunction = exclusive
-                ? &QnNxStylePrivate::drawRadioButton
-                : &QnNxStylePrivate::drawCheckBox;
+            auto drawFunction =
+                [exclusive, painter, widget, d](const QStyleOption* option)
+                {
+                    if (exclusive)
+                        d->drawRadioButton(painter, option, widget);
+                    else
+                        d->drawCheckBox(painter, option, widget);
+                };
 
             if (viewItemHoverAdjusted(widget, option, adjustedOption))
-                (d->*drawFunction)(painter, &adjustedOption, widget);
+                drawFunction(&adjustedOption);
             else
-                (d->*drawFunction)(painter, option, widget);
+                drawFunction(option);
 
             return;
         }
@@ -1673,9 +1678,6 @@ void QnNxStyle::drawControl(
                 {
                     QStyleOptionToolButton optionCopy(*button);
                     optionCopy.state &= ~State_MouseOver;
-                    optionCopy.icon = QnSkin::maximumSizePixmap(button->icon, QnIcon::Pressed,
-                        button->state.testFlag(State_On) ? QIcon::On : QIcon::Off);
-
                     base_type::drawControl(CE_ToolButtonLabel, &optionCopy, painter, widget);
                     return;
                 }

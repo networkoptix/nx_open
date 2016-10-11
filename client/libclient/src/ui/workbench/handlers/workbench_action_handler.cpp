@@ -319,8 +319,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
 
         bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
         bool isMediaResource = resource->hasFlags(Qn::media);
-        bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
-            && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
+        bool isLocalResource = resource->hasFlags(Qn::local);
         bool isExportedLayout = layout->isFile();
 
         bool allowed = nonVideo || isMediaResource;
@@ -887,32 +886,11 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
         return;
     }
 
-    if (!resources.empty()) {
+    if (!resources.empty())
+    {
         parameters.setResources(resources);
-        if (menu()->canTrigger(QnActions::OpenInCurrentLayoutAction, parameters)) {
-            menu()->trigger(QnActions::OpenInCurrentLayoutAction, parameters);
-        }
-        else {
-            QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-            if (layout->isFile())
-            {
-                bool hasLocal = false;
-                foreach(const QnResourcePtr &resource, resources) {
-                    //TODO: #GDM #Common refactor duplicated code VMS-1725
-                    hasLocal |= resource->hasFlags(Qn::url | Qn::local | Qn::media)
-                        && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-                    if (hasLocal)
-                        break;
-                }
-                if (hasLocal)
-                {
-                    QnMessageBox::warning(mainWindow(),
-                        tr("Cannot add item"),
-                        tr("Cannot add a local file to Multi-Video"));
-                    return;
-                }
-            }
-        }
+        if (!menu()->triggerIfPossible(QnActions::OpenInCurrentLayoutAction, parameters))
+            menu()->triggerIfPossible(QnActions::OpenInNewLayoutAction, parameters);
     }
 
     if (!layouts.empty())

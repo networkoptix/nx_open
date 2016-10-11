@@ -3,12 +3,12 @@
 #include <core/resource_access/providers/base_resource_access_provider.h>
 
 /** Handles access to cameras and web pages, placed on shared layouts. */
-class QnSharedLayoutAccessProvider: public QnBaseResourceAccessProvider
+class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider
 {
     using base_type = QnBaseResourceAccessProvider;
 public:
-    QnSharedLayoutAccessProvider(QObject* parent = nullptr);
-    virtual ~QnSharedLayoutAccessProvider();
+    QnSharedLayoutItemAccessProvider(QObject* parent = nullptr);
+    virtual ~QnSharedLayoutItemAccessProvider();
 
 protected:
     virtual Source baseSource() const override;
