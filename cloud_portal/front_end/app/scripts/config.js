@@ -4,7 +4,6 @@ var Config = {
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
     realm: 'VMS',
-    enableUrlAuth: false,
 
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds
     updateInterval:  30 * 1000, // Update content on pages every 30 seconds

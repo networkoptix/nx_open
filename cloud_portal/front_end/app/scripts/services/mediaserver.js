@@ -49,7 +49,7 @@ angular.module('cloudApp')
                 
                 _get:function(url){
                     var auth = this.auth();
-                    if(auth && Config.enableUrlAuth){
+                    if(auth){
                         if(url.indexOf('?') == -1){
                             url += '?auth=';
                         }else{
