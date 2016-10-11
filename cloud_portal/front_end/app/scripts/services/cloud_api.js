@@ -172,10 +172,6 @@ angular.module('cloudApp')
                 return $http.get(apiBase + '/systems/' + systemId + '/auth');
             },
 
-            getSystemNonce:function(systemId){
-                return $http.get(apiBase + '/systems/' + systemId + '/nonce');
-            },
-
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');

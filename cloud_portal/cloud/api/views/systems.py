@@ -44,14 +44,6 @@ def sharing(request, system_id):
         return api_success(data)
 
 
-@api_view(['GET'])
-@permission_classes((IsAuthenticated, ))
-@handle_exceptions
-def get_nonce(request, system_id):
-    data = cloud_api.System.get_nonce(request.session['login'], request.session['password'], system_id)
-    return api_success(data)
-
-
 def md5(data):
     m = hashlib.md5()
     m.update(data)
