@@ -208,10 +208,11 @@ void QnCloudSystemsFinder::pingServerInternal(
     client->setSendTimeoutMs(kSystemConnectTimeout.count());
     client->setResponseReadTimeoutMs(kSystemConnectTimeout.count());
 
-    auto reply = new QnAsyncHttpClientReply(client, this);
+    typedef QSharedPointer<QnAsyncHttpClientReply> ReplyPtr;
+    auto reply = ReplyPtr(new QnAsyncHttpClientReply(client));
 
     const auto handleReply =
-        [this, systemId, host, serverPriority](QnAsyncHttpClientReply* reply)
+        [this, systemId, host, serverPriority, reply](QnAsyncHttpClientReply* reply)
         {
             reply->deleteLater();
 
