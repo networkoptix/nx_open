@@ -52,11 +52,8 @@ angular.module('cloudApp')
         }
 
         function clearCache(){
-            $localStorage.$reset();
             cachedResults = {};
-            for (var url in cacheReceived){
-                cacheReceived[url] = 0;
-            }
+            cacheReceived = {};
         }
 
         var getSystems = cacheGet(apiBase + '/systems');
