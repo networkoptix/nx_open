@@ -2,9 +2,9 @@
 
 angular.module('cloudApp')
     .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
-    'account', '$q', 'system', '$poll', 'page',
+    'account', '$q', 'system', '$poll', 'page', '$timeout',
     function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
-    account, $q, system, $poll, page) {
+    account, $q, system, $poll, page, $timeout) {
 
         $scope.Config = Config;
         $scope.L = L;
