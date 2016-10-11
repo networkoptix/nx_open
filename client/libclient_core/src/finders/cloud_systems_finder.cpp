@@ -257,7 +257,9 @@ void QnCloudSystemsFinder::pingServerInternal(
             else
                 systemDescription->addServer(moduleInformation, serverPriority);
 
-            systemDescription->setServerHost(serverId, host);
+            QUrl url;
+            url.setHost(host);
+            systemDescription->setServerHost(serverId, url);
         };
 
     connect(replyHolder, &QnAsyncHttpClientReply::finished, this, handleReply);

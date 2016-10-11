@@ -292,7 +292,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
 {
     connectToSystemInternal(
         systemId,
-        QUrl::fromUserInput(serverUrl),
+        QUrl(serverUrl),
         QnCredentials(userName, password),
         storePassword,
         autoLogin);
@@ -346,7 +346,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
     if (!isLoggedInToCloud())
         return;
 
-    connectToSystemInternal(systemId, QUrl::fromUserInput(serverUrl),
+    connectToSystemInternal(systemId, QUrl(serverUrl),
         qnCloudStatusWatcher->credentials(), false, false);
 }
 
@@ -366,7 +366,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
             /* We are receiving string with port but without protocol, so we must parse it. */
             const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
 
-            dialog->setUrl(QUrl::fromUserInput(serverUrl));
+            dialog->setUrl(QUrl(serverUrl));
             if (isLoggedInToCloud())
                 dialog->setCloudCredentials(qnCloudStatusWatcher->credentials());
 
