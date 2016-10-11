@@ -81,18 +81,17 @@ QnButtonsOverlay::~QnButtonsOverlay()
 
 void QnButtonsOverlay::setSimpleMode(bool isSimpleMode, bool animate)
 {
-    const bool extraVisible = !isSimpleMode;
+    auto targetValue = isSimpleMode ? 0.0 : 1.0;
 
     if (animate)
     {
-        auto targetValue = extraVisible ? 1.0 : 0.0;
         opacityAnimator(m_extraInfoLabel)->animateTo(targetValue);
         opacityAnimator(m_rightButtonsPanel)->animateTo(targetValue);
     }
     else
     {
-        m_extraInfoLabel->setVisible(extraVisible);
-        m_rightButtonsPanel->setVisible(extraVisible);
+        m_extraInfoLabel->setOpacity(targetValue);
+        m_rightButtonsPanel->setOpacity(targetValue);
     }
 }
 
