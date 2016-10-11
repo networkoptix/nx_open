@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/access_provider_test_fixture.h>
+#include <core/resource_access/providers/base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -18,7 +18,7 @@ static const auto kSource = QnAbstractResourceAccessProvider::Source::permission
 
 }
 
-class QnPermissionsResourceAccessProviderTest: public QnAccessProviderTestFixture
+class QnPermissionsResourceAccessProviderTest: public QnBaseAccessProviderTestFixture
 {
 protected:
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,

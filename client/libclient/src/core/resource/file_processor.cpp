@@ -55,28 +55,11 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls)
     return QnFileProcessor::findAcceptedFiles(files);
 }
 
-QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file)
+QnResourcePtr QnFileProcessor::createResourcesForFile(const QString& fileName)
 {
-    // saved layout
-    QString fileName = file;
-    if (fileName.startsWith(QnLayoutFileStorageResource::layoutPrefix())) {
-        /*
-         * translating filename from something like this:
-         *    layout:///home/user/videos/layout.nov?file.avi
-         * to
-         *    /home/user/videos/layout.nov
-         */
-        fileName = fileName.remove(0, QnLayoutFileStorageResource::layoutPrefix().length());
-        int n = fileName.indexOf(QLatin1Char('?'));
-        if (n >= 0)
-            fileName = fileName.remove(n, fileName.length());
-    }
-
     QnResourcePtr result = QnResourceDirectoryBrowser::resourceFromFile(fileName);
-
-    if(result)
+    if (result)
         qnResPool->addResource(result);
-
     return result;
 }
 
@@ -104,6 +87,6 @@ void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
         return;
 
     qnResPool->removeResources(resources);
-    foreach (const QnResourcePtr &resource, resources)
+    for (const QnResourcePtr& resource: resources)
         QFile::remove(resource->getUrl());
 }

@@ -162,7 +162,7 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     if (m_affectedWidget && (m_affectedWidget != widget || section == Qt::NoSection))
     {
         m_affectedWidget->unsetCursor();
-        m_affectedWidget = nullptr;
+        m_affectedWidget.clear();
     }
 
     if (!widget || section == Qt::NoSection)

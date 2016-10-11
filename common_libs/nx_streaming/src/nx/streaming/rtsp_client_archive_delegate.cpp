@@ -869,8 +869,9 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
     session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_runtimeId.toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
 
-
-    if (server) {
+    /* We can get here while client is already closing. */
+    if (server && QnNetworkProxyFactory::instance())
+    {
         QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
             session->setProxyAddr(proxy.hostName(), proxy.port());

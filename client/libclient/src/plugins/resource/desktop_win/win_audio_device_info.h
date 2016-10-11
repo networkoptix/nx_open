@@ -1,19 +1,14 @@
-#ifndef QN_WIN_AUDIO_EXTEND_INFO_H
-#define QN_WIN_AUDIO_EXTEND_INFO_H
+#pragma once
 
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_WIN
-
-#include <QtCore/QString>
 #include <QtCore/QScopedPointer>
 #include <QtGui/QPixmap>
 
 class QnWinAudioDeviceInfoPrivate;
 
-class QnWinAudioDeviceInfo {
+class QnWinAudioDeviceInfo
+{
 public:
-    QnWinAudioDeviceInfo(const QString &deviceName);
+    QnWinAudioDeviceInfo(const QString& deviceName);
     virtual ~QnWinAudioDeviceInfo();
 
     QString fullName() const;
@@ -23,7 +18,3 @@ public:
 private:
     QScopedPointer<QnWinAudioDeviceInfoPrivate> d;
 };
-
-#endif // Q_OS_WIN
-
-#endif // QN_WIN_AUDIO_EXTEND_INFO_H

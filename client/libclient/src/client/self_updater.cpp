@@ -319,7 +319,7 @@ bool SelfUpdater::isMinilaucherUpdated(const QDir& installRoot) const
     return (m_clientVersion <= minilauncherVersion);
 }
 
-bool SelfUpdater::runMinilaucher() const
+bool SelfUpdater::runMinilaucher()
 {
     const QString minilauncherPath = qApp->applicationDirPath() + L'/' + QnClientAppInfo::minilauncherBinaryName();
     const QStringList args = { lit("--exec") }; /*< We don't want another client instance here. */

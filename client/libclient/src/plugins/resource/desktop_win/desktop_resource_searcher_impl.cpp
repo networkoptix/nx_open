@@ -1,5 +1,3 @@
-#ifdef Q_OS_WIN
-
 #include <QGLWidget>
 
 #include "desktop_resource_searcher_impl.h"
@@ -49,6 +47,3 @@ QnResourceList QnDesktopResourceSearcherImpl::findResources() {
     }
     return result;
 }
-
-#endif
-

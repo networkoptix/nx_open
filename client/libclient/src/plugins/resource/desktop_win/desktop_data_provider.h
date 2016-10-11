@@ -1,9 +1,4 @@
-#ifndef QN_DESKTOP_DATA_PROVIDER_H
-#define QN_DESKTOP_DATA_PROVIDER_H
-
-#include <QtCore/QtGlobal>
-
-#if defined(Q_OS_WIN)
+#pragma once
 
 #include <QtCore/QIODevice>
 #include <QtMultimedia/QAudioInput>
@@ -142,7 +137,3 @@ private:
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };
-
-#endif // Q_OS_WIN
-
-#endif //QN_DESKTOP_DATA_PROVIDER_H

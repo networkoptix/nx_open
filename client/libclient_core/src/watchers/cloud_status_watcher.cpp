@@ -8,9 +8,14 @@
 #include <QtCore/QSettings>
 
 #include <api/global_settings.h>
-#include <cdb/connection.h>
-#include <utils/common/delayed.h>
+
 #include <client_core/client_core_settings.h>
+
+#include <cdb/connection.h>
+
+#include <utils/common/delayed.h>
+
+#include <nx/utils/log/log.h>
 
 using namespace nx::cdb;
 
@@ -247,6 +252,26 @@ void QnCloudStatusWatcher::setStayConnected(bool value)
 
     d->stayConnected = value;
     emit stayConnectedChanged();
+}
+
+void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
+{
+    Q_D(QnCloudStatusWatcher);
+
+    if (!d->cloudConnection)
+        return;
+
+    d->cloudConnection->systemManager()->recordUserSessionStart(cloudSystemId.toStdString(),
+        [cloudSystemId](api::ResultCode result)
+        {
+            if (result == api::ResultCode::ok)
+                return;
+
+            NX_LOG(lit("Error logging session %1: %2")
+                .arg(cloudSystemId)
+                .arg(QString::fromStdString(api::toString(result))),
+                cl_logINFO);
+        });
 }
 
 void QnCloudStatusWatcher::resetCloudCredentials()

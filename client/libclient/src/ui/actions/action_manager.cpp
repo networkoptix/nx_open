@@ -26,7 +26,6 @@
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
-#include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -837,7 +836,14 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    if (QnScreenRecorder::isSupported())
+    const bool screenRecordingSupported =
+#if defined(Q_OS_WIN)
+        true;
+#else
+        false;
+#endif
+
+    if (screenRecordingSupported)
     {
         factory(QnActions::ToggleScreenRecordingAction).
             flags(Qn::Main | Qn::GlobalHotkey).
@@ -1499,11 +1505,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
 
+    //TODO: #gdm restore this functionality and allow to delete exported layouts
     factory(QnActions::DeleteFromDiskAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Delete from Disk")).
         autoRepeat(false).
-        condition(hasFlags(Qn::url | Qn::local | Qn::media));
+        condition(hasFlags(Qn::local_media));
 
     factory(QnActions::SetAsBackgroundAction).
         flags(Qn::Scene | Qn::SingleTarget).

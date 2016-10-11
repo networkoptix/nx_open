@@ -5,6 +5,7 @@ Item
     id: thisComponent;
 
     property string value;
+    property string displayValue;
 
     property bool isMasked: isAvailable && isMaskedPrivate;
     property bool isAvailable: true;

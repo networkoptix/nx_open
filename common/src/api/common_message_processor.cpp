@@ -46,6 +46,8 @@
 #include "runtime_info_manager.h"
 #include <utils/common/app_info.h>
 
+#include <nx/utils/log/log.h>
+
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
@@ -629,7 +631,17 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, cons
 void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, const QnUuid& peerId)
 {
     QnLayoutResourcePtr qnLayout(new QnLayoutResource());
-    fromApiToResource(layout, qnLayout);
+    if (!layout.url.isEmpty())
+    {
+        NX_LOG(lit("Invalid server layout with url %1").arg(layout.url), cl_logWARNING);
+        auto fixed = layout;
+        fixed.url = QString();
+        fromApiToResource(fixed, qnLayout);
+    }
+    else
+    {
+        fromApiToResource(layout, qnLayout);
+    }
     updateResource(qnLayout, peerId);
 }
 

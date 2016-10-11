@@ -226,7 +226,7 @@ QnModuleInformation QnSystemDescriptionAggregator::getServer(const QnUuid& serve
     return QnModuleInformation();
 }
 
-QString QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const
+QUrl QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const
 {
     for (const auto systemDescription : m_systems)
     {

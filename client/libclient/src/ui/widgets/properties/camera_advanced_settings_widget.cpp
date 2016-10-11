@@ -59,9 +59,9 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 
     initWebView();
 
-    connect(ui->cameraAdvancedParamsWidget, 
-        &QnCameraAdvancedParamsWidget::hasChangesChanged, 
-        this, 
+    connect(ui->cameraAdvancedParamsWidget,
+        &QnCameraAdvancedParamsWidget::hasChangesChanged,
+        this,
         &QnCameraAdvancedSettingsWidget::hasChangesChanged);
 }
 
@@ -253,6 +253,8 @@ void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 
 void QnCameraAdvancedSettingsWidget::initWebView()
 {
+    //TODO: #GDM use QnWebView
+
     m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
 
@@ -310,7 +312,7 @@ void QnCameraAdvancedSettingsWidget::initWebView()
     connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
         this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
 
-    
+
 }
 
 void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator* authenticator)

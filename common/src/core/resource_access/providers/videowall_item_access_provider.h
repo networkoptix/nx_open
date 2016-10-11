@@ -3,12 +3,12 @@
 #include <core/resource_access/providers/base_resource_access_provider.h>
 
 /** Handles access to layouts, cameras and web pages, placed on videowall. */
-class QnVideoWallResourceAccessProvider: public QnBaseResourceAccessProvider
+class QnVideoWallItemAccessProvider: public QnBaseResourceAccessProvider
 {
     using base_type = QnBaseResourceAccessProvider;
 public:
-    QnVideoWallResourceAccessProvider(QObject* parent = nullptr);
-    virtual ~QnVideoWallResourceAccessProvider();
+    QnVideoWallItemAccessProvider(QObject* parent = nullptr);
+    virtual ~QnVideoWallItemAccessProvider();
 
 protected:
     virtual Source baseSource() const override;

@@ -7,7 +7,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 
-#include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/custom_style.h>
 
 #include <ui/widgets/local_settings/general_preferences_widget.h>
@@ -33,10 +32,11 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
 
     auto recordingSettingsWidget = new QnRecordingSettingsWidget(this);
 
+    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     addPage(
         RecordingPage,
         recordingSettingsWidget,
-        QnScreenRecorder::isSupported() ? tr("Screen Recording") : tr("Audio Settings") );
+        screenRecordingAction ? tr("Screen Recording") : tr("Audio Settings") );
 
 
     addPage(NotificationsPage, new QnPopupSettingsWidget(this), tr("Notifications"));

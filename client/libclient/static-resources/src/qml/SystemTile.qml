@@ -173,7 +173,12 @@ BaseTile
                 currentAreaItem.host = Qt.binding( function()
                 {
                     return (control.impl.hostsModel ?
-                        control.impl.hostsModel.firstHost : "");
+                        control.impl.hostsModel.getData("url", 0): "");
+                });
+                currentAreaItem.displayHost = Qt.binding( function()
+                {
+                    return (control.impl.hostsModel ?
+                        control.impl.hostsModel.getData("display", 0): "");
                 });
             }
             else // Cloud system

@@ -161,7 +161,7 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                         case QnAbstractResourceAccessProvider::Source::videowall:
                             return qnResIconCache->icon(QnResourceIconCache::VideoWall);
                         default:
-                            return QIcon();
+                            return QVariant();
                     }
 
 

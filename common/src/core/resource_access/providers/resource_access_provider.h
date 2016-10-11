@@ -25,26 +25,23 @@ public:
 
     /**
      * Add new base provider to the end of the list.
-     * NOTICE: this class will retain ownership!
+     * NOTICE: this class will take ownership!
      */
     void addBaseProvider(QnAbstractResourceAccessProvider* provider);
 
     /**
     * Add new base provider to the specified place.
-    * NOTICE: this class will retain ownership!
+    * NOTICE: this class will take ownership!
     */
     void insertBaseProvider(int index, QnAbstractResourceAccessProvider* provider);
 
     /**
     * Remove base provider from the module.
-    * NOTICE: this class will detach ownership! You must remove the provider yourself.
+    * NOTICE: this class will release ownership! You must remove the provider yourself.
     */
     void removeBaseProvider(QnAbstractResourceAccessProvider* provider);
 
     QList<QnAbstractResourceAccessProvider*> providers() const;
-
-    /** Count of the installed providers. */
-    int providersCount() const;
 
 private:
     void handleBaseProviderAccessChanged(const QnResourceAccessSubject& subject,

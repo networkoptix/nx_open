@@ -61,7 +61,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_period(period),
-    m_targetFilename(QnLayoutFileStorageResource::removeProtocolPrefix(filename)),
+    m_targetFilename(filename),
     m_realFilename(m_targetFilename),
     m_mode(mode),
     m_readOnly(readOnly),
@@ -69,6 +69,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_stopped(false),
     m_currentCamera(0)
 {
+    NX_ASSERT(!filename.startsWith(lit("layout:")));
     m_layout.reset(new QnLayoutResource());
     m_layout->setId(layout->getId()); //before update() uuid's must be the same
     m_layout->update(layout);
@@ -87,7 +88,8 @@ bool QnLayoutExportTool::prepareStorage()
 #else
         false;
 #endif
-    if (isExeFile || m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
+    if (isExeFile || m_realFilename == m_layout->getUrl())
+    {
         // can not override opened layout. save to tmp file, then rename
         m_realFilename += lit(".tmp");
     }
@@ -109,10 +111,8 @@ bool QnLayoutExportTool::prepareStorage()
         QFile::remove(m_realFilename);
     }
 
-    QString fullName = QnLayoutFileStorageResource::layoutPrefix() + m_realFilename;
-
     m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
-    m_storage->setUrl(fullName);
+    m_storage->setUrl(m_realFilename);
     return true;
 }
 
@@ -324,7 +324,7 @@ void QnLayoutExportTool::finishExport(bool success) {
     if (success) {
         if (m_realFilename != m_targetFilename)
         {
-            m_storage->renameFile(m_storage->getUrl(), QnLayoutFileStorageResource::layoutPrefix() + m_targetFilename);
+            m_storage->renameFile(m_storage->getUrl(), m_targetFilename);
             if (m_mode == Qn::LayoutLocalSave) {
                 QnLayoutResourcePtr layout = qnResPool->getResourceByUniqueId<QnLayoutResource>(m_layout->getUniqueId());
                 if (layout) {
@@ -344,7 +344,10 @@ void QnLayoutExportTool::finishExport(bool success) {
             {
                 QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
                 if (aviRes)
-                    qnResPool->updateUniqId(aviRes, QnLayoutFileStorageResource::updateNovParent(newUrl, item.resource.uniqueId));
+                {
+                    qnResPool->updateUniqId(aviRes,
+                        QnLayoutFileStorageResource::itemUniqueId(newUrl, item.resource.uniqueId));
+                }
             }
             m_layout->setUrl(newUrl);
             m_layout->setName(QFileInfo(newUrl).fileName());

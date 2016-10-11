@@ -48,11 +48,20 @@ QnWorkbench::~QnWorkbench() {
     clear();
 }
 
-void QnWorkbench::clear() {
-    setCurrentLayout(NULL);
+void QnWorkbench::clear()
+{
+    setCurrentLayout(nullptr);
 
-    while(!m_layouts.empty())
-        removeLayout(m_layouts.back());
+    blockSignals(true);
+
+    for (const auto layout: m_layouts)
+        removeLayout(layout);
+
+    blockSignals(false);
+
+    m_layouts.clear();
+
+    emit layoutsChanged();
 }
 
 QnWorkbenchLayout *QnWorkbench::layout(int index) const {
@@ -85,7 +94,6 @@ void QnWorkbench::insertLayout(QnWorkbenchLayout *layout, int index) {
     m_layouts.insert(index, layout);
     connect(layout, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_layout_aboutToBeDestroyed()));
 
-    emit layoutAdded(layout);
     emit layoutsChanged();
 }
 
@@ -93,17 +101,20 @@ void QnWorkbench::removeLayout(int index) {
     removeLayout(layout(index));
 }
 
-void QnWorkbench::removeLayout(QnWorkbenchLayout *layout) {
-    if(layout == NULL) {
+void QnWorkbench::removeLayout(QnWorkbenchLayout* layout)
+{
+    if (!layout)
+    {
         qnNullWarning(layout);
         return;
     }
 
-    if(!m_layouts.contains(layout))
+    if (!m_layouts.contains(layout))
         return; /* Removing a layout that is not there is OK. */
 
     /* Update current layout if it's being removed. */
-    if(layout == m_currentLayout) {
+    if (layout == m_currentLayout)
+    {
         QnWorkbenchLayout *newCurrentLayout = NULL;
 
         int newCurrentIndex = m_layouts.indexOf(m_currentLayout);
@@ -116,10 +127,8 @@ void QnWorkbench::removeLayout(QnWorkbenchLayout *layout) {
         setCurrentLayout(newCurrentLayout);
     }
 
-    emit layoutRemoved(layout);
-
     m_layouts.removeOne(layout);
-    disconnect(layout, NULL, this, NULL);
+    layout->disconnect(this);
 
     emit layoutsChanged();
 }
@@ -171,14 +180,15 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     if(!m_layouts.contains(layout) && layout != m_dummyLayout)
         addLayout(layout);
 
-    qreal oldCellAspectRatio = 0.0, newCellAspectRatio = 0.0;
-    qreal oldCellSpacing, newCellSpacing;
-
-
     emit currentLayoutAboutToBeChanged();
+
+
     /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
-    if(m_currentLayout != NULL) {
+    qreal oldCellAspectRatio = -1.0;
+    qreal oldCellSpacing = -1.0;
+    if (m_currentLayout)
+    {
         oldCellAspectRatio = m_currentLayout->cellAspectRatio();
         oldCellSpacing = m_currentLayout->cellSpacing();
 
@@ -212,8 +222,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     connect(m_currentLayout,    SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
     connect(m_currentLayout,    SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
 
-    newCellAspectRatio = m_currentLayout->cellAspectRatio();
-    newCellSpacing = m_currentLayout->cellSpacing();
+    const qreal newCellAspectRatio = m_currentLayout->cellAspectRatio();
+    const qreal newCellSpacing = m_currentLayout->cellSpacing();
 
     if(!qFuzzyEquals(newCellAspectRatio, oldCellAspectRatio))
         at_layout_cellAspectRatioChanged();

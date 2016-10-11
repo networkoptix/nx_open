@@ -31,6 +31,7 @@ class SelfUpdater
 public:
     SelfUpdater(const QnStartupParameters& startupParams);
 
+    static bool runMinilaucher();
 private:
     enum class Operation
     {
@@ -57,7 +58,7 @@ private:
     void launchWithAdminPermissions();
 
     bool isMinilaucherUpdated(const QDir& installRoot) const;
-    bool runMinilaucher() const;
+
     bool updateMinilauncherInDir(const QDir& installRoot);
     bool updateApplauncherDesktopIcon();
 
