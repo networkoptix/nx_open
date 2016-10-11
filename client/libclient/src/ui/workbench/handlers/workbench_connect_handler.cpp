@@ -539,9 +539,10 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (storeSettings->isConnectionToCloud)
     {
         using namespace nx::network;
-        auto systemId = QnUuid::fromStringSafe(info.ecsGuid);
         NX_EXPECT(SocketGlobals::addressResolver().isCloudHostName(info.ecUrl.host()));
-        qnCloudStatusWatcher->logSession(systemId);
+        /* For cloud systems id is a string now. It may be changed in the future. */
+        NX_EXPECT(!QnUuid::fromStringSafe(info.cloudSystemId).isNull());
+        qnCloudStatusWatcher->logSession(info.cloudSystemId);
         return;
     }
 

@@ -81,7 +81,7 @@ public:
     bool stayConnected() const;
     void setStayConnected(bool value);
 
-    void logSession(const QnUuid& systemId);
+    void logSession(const QString& cloudSystemId);
 
     void resetCloudCredentials();
     void setCloudCredentials(const QnCredentials& credentials, bool initial = false);
