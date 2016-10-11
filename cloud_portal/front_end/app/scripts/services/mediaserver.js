@@ -17,23 +17,6 @@ angular.module('cloudApp')
         }
         var service = function(systemId){ 
             return{
-                digest:function(login, password, realm, nonce){
-                    var digest = md5(login + ':' + realm + ':' + password);
-                    var method = md5('GET:');
-                    var authDigest = md5(digest + ':' + nonce + ':' + method);
-                    var auth = $base64.encode(login + ':' + nonce + ':' + authDigest);
-                    /*console.log("digest calc", {
-                        login:login,
-                        password:password,
-                        realm:realm,
-                        nonce:nonce,
-                        digest:digest,
-                        method:method,
-                        authDigest:authDigest,
-                        auth:auth
-                    });*/
-                    return auth;
-                },
                 login:function(auth){
                     return $localStorage[systemId] = {auth: auth};
                 },
