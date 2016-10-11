@@ -135,7 +135,7 @@
         <beta>true</beta>
         <final.artifact.name>${project.artifactId}</final.artifact.name>
         <build.suffix>${arch}</build.suffix>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
+        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-cloud_${cloudHost}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile/>
@@ -195,6 +195,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
+        <cloud.group>internal</cloud.group>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -1017,7 +1018,7 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}</finalName>
+                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-cloud_${cloudHost}</finalName>
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>
@@ -1144,5 +1145,38 @@
                 <module>unit_tests</module>
             </modules>
         </profile>
+        <profile>
+            <id>get-cloud-url</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>cloud.group</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>properties-maven-plugin</artifactId>
+                        <version>1.0-alpha-2</version>
+                        <executions>
+                            <execution>
+                                <id>get-cloud-url-property</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>read-project-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <files>
+                                        <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
+                                    </files>
+                                    <quiet>true</quiet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>             
+                </plugins>
+            </build> 
+        </profile>  
     </profiles>
 </project>
