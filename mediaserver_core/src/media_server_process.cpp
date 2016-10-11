@@ -2173,9 +2173,12 @@ void MediaServerProcess::run()
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
         ec2::ApiMediaServerData prevServerData;
-        fromResourceToApi(server, prevServerData);
-
-        if (!server) {
+        if (server)
+        {
+            fromResourceToApi(server, prevServerData);
+        }
+        else
+        {
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
