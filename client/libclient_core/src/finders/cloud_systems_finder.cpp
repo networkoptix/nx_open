@@ -209,12 +209,18 @@ void QnCloudSystemsFinder::pingServerInternal(
     client->setResponseReadTimeoutMs(kSystemConnectTimeout.count());
 
     typedef QSharedPointer<QnAsyncHttpClientReply> ReplyPtr;
-    auto reply = ReplyPtr(new QnAsyncHttpClientReply(client));
+    auto replyHolder = ReplyPtr(new QnAsyncHttpClientReply(client));
 
     const auto handleReply =
-        [this, systemId, host, serverPriority, reply](QnAsyncHttpClientReply* reply)
+        [this, systemId, host, serverPriority, replyHolder ]
+            (QnAsyncHttpClientReply* reply) mutable
         {
-            reply->deleteLater();
+            /**
+             * Forces "manual" deletion instead of "deleteLater" because we don't
+             * have event loop in this thread.
+            **/
+            const auto replyDeleter = QnRaiiGuard::createDestructable(
+                [&replyHolder]() { replyHolder.reset(); });
 
             if (reply->isFailed())
                 return;
@@ -254,7 +260,7 @@ void QnCloudSystemsFinder::pingServerInternal(
             systemDescription->setServerHost(serverId, host);
         };
 
-    connect(reply, &QnAsyncHttpClientReply::finished, this, handleReply);
+    connect(replyHolder, &QnAsyncHttpClientReply::finished, this, handleReply);
     client->doGet(lit("http://%1:0/api/moduleInformation").arg(host));
 }
 
