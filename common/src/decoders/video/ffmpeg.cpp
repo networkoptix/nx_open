@@ -438,25 +438,32 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         
         bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
-        // workaround ffmpeg crush
+        // workaround ffmpeg crash
         if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
         {
-            int nalLen = avpkt.data[2] == 0x01 ? 3 : 4;
             const quint8* dataEnd = avpkt.data + avpkt.size;
             const quint8* curPtr = avpkt.data;
-            if ((curPtr[nalLen]&0x1f) == nuDelimiter)
-                curPtr = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
-
-            if (dataEnd - curPtr > nalLen && (curPtr[nalLen]&0x1f) == nuSPS)
+			// New version scan whole data to find SPS unit.
+			// It is slower but some cameras do not put SPS the begining of a data.
+            while (curPtr < dataEnd - 2)
             {
-                SPSUnit sps;
-                const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
-                sps.decodeBuffer(curPtr + nalLen, end);
-                sps.deserialize();
-                processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
-                m_spsFound = true;
-            }
+                const int nalLen = curPtr[2] == 0x01 ? 3 : 4;
+                if (curPtr + nalLen >= dataEnd)
+                    break;
 
+                auto nalUnitType = curPtr[nalLen] & 0x1f;
+                if (nalUnitType == nuSPS)
+                {
+                    SPSUnit sps;
+                    const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
+                    sps.decodeBuffer(curPtr + nalLen, end);
+                    sps.deserialize();
+                    processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
+                    m_spsFound = true;
+                    break;
+                }
+                curPtr = NALUnit::findNALWithStartCode(curPtr + nalLen, dataEnd, true);
+            }
             if (!m_spsFound && m_context->extradata_size == 0)
                 return false; // no sps has found yet. skip frame
         }
