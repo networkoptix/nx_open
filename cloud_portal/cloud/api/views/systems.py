@@ -63,10 +63,7 @@ def digest(login, password, realm, nonce):
     method = md5('GET:')
     auth_digest = md5(dig + ':' + nonce + ':' + method)
     auth = base64.b64encode(login + ':' + nonce + ':' + auth_digest)
-    return {digest: dig,
-            auth: auth,
-            method: method,
-            auth_digest: auth_digest}
+    return auth
 
 
 @api_view(['GET'])
