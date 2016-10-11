@@ -75,7 +75,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_fixedFileName(false),
     m_endDateTime(AV_NOPTS_VALUE),
     m_startDateTime(AV_NOPTS_VALUE),
-    m_stopOnWriteError(true),
     m_currentTimeZone(-1),
     m_waitEOF(false),
     m_forceDefaultCtx(true),
@@ -167,12 +166,12 @@ void QnStreamRecorder::close()
             qint64 fileDuration = m_startDateTime !=
                 qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
 
-            fileFinished(
-                fileDuration,
-                m_recordingContextVector[i].fileName,
-                m_mediaProvider,
-                fileSize
-            );
+            if (m_lastError.lastError != FileCreateError)
+                fileFinished(
+                    fileDuration,
+                    m_recordingContextVector[i].fileName,
+                    m_mediaProvider,
+                    fileSize);
         }
     }
 
@@ -385,14 +384,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
             // clear formatCtx and ioCtx
             cleanFfmpegContexts();
 
-            if (m_stopOnWriteError)
-            {
-                m_needStop = true;
-                return false;
-            }
-            else {
-                return true; // ignore data
-            }
+            m_needStop = true;
+            return false;
         }
 
         m_firstTime = false;
@@ -843,11 +836,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             if (m_recordingContextVector[i].formatCtx->pb == 0)
             {
                 avformat_close_input(&m_recordingContextVector[i].formatCtx);
-                m_lastError = ErrorStruct(
-                    FileCreateError,
-                    m_recordingContextVector[i].storage
-                );
+                m_lastError = ErrorStruct(FileCreateError, m_recordingContextVector[i].storage);
                 NX_LOG(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
+                m_recordingFinished = true;
                 msleep(500); // avoid createFile flood
                 return false;
             }

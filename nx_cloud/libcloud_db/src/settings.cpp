@@ -88,6 +88,10 @@ namespace
     const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriod");
     const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chrono::minutes(1);
 
+    const QLatin1String kConnectionInactivityPeriod("auth/connectionInactivityPeriod");
+    const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
+
+
     //event manager settings
     const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
     const auto kDefaultMediaServerConnectionIdlePeriod = std::chrono::minutes(1);
@@ -303,6 +307,10 @@ void Settings::loadConfiguration()
         nx::utils::parseTimerDuration(
             m_settings.value(kIntermediateResponseValidityPeriod).toString(),
             kDefaultIntermediateResponseValidityPeriod));
+    m_auth.connectionInactivityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kConnectionInactivityPeriod).toString(),
+            kDefaultConnectionInactivityPeriod));
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(

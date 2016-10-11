@@ -102,6 +102,13 @@ public:
         return true;
     }
 
+    template<typename Function>
+    void forEachListener(const Function& function)
+    {
+        for (auto& listener: m_listeners)
+            function(listener.get());
+    }
+
 private:
     std::function<std::unique_ptr<SocketServerType>()> m_socketServerFactory;
     std::list<std::unique_ptr<SocketServerType> > m_listeners;

@@ -18,6 +18,7 @@ enum class DBResult
     notFound,
     cancelled,
     retryLater,
+    uniqueConstraintViolation
 };
 
 

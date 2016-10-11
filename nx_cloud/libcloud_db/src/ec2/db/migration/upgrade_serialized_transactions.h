@@ -89,9 +89,6 @@ nx::db::DBResult upgradeSerializedTransactions(
         WHERE system_id = :system_id AND tran_hash = :tran_hash
         )sql");
 
-    const int oldTransactionParamOffset =
-        QnUbjson::serialized(OldTransactionType()).size();
-
     while (fetchCurrentTransactions.next())
     {
         Transaction<OldTransactionType> oldTransaction;

@@ -493,7 +493,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
     }
 
     case Qn::OtherSystemsNode:
-        return !isAdmin || !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
+        return !isAdmin || !QnGlobalSettings::instance()->isAutoDiscoveryEnabled();
 
     case Qn::UsersNode:
     case Qn::ServersNode:

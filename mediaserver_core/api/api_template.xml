@@ -456,15 +456,12 @@
               </function>
               <function>
                 <name>setupLocalSystem</name>
-                <description>Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
+                <description>
+				  Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
+                  This method requires owner permissions.
                 </description>
-                <method>GET</method>
+                <method>POST</method>
                 <params>
-                  <param>
-                    <name>oldPassword</name>
-                    <description> Current password for admin user </description>
-                    <optional>false</optional>
-                  </param>
                   <param>
                     <name>password</name>
                     <description> New password for admin user </description>
@@ -484,14 +481,10 @@
                 <name>setupCloudSystem</name>
                 <description>
                   Configure server system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
+				  This method requires owner permissions.
                 </description>
-                <method>GET</method>
+                <method>POST</method>
                 <params>
-                  <param>
-                    <name>oldPassword</name>
-                    <description> Current password for admin user </description>
-                    <optional>false</optional>
-                  </param>
                   <param>
                     <name>systemName</name>
                     <description> New system name </description>

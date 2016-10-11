@@ -110,12 +110,6 @@ private:
     nx::db::DBResult insertTempPassword(
         nx::db::QueryContext* const queryContext,
         TemporaryAccountCredentialsEx tempPasswordData);
-    void tempPasswordAddedToDb(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult resultCode,
-        TemporaryAccountCredentialsEx tempPasswordData,
-        std::function<void(api::ResultCode)> completionHandler);
     void saveTempPasswordToCache(TemporaryAccountCredentialsEx tempPasswordData);
 
     nx::db::DBResult deleteTempPassword(

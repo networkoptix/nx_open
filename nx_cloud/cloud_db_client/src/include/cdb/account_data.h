@@ -24,7 +24,7 @@ enum class AccountStatus
     awaitingActivation = 1,
     activated = 2,
     blocked = 3,
-    inviteHasBeenSent = 4,
+    invited = 4,
 };
 
 class AccountData

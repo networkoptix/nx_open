@@ -108,22 +108,12 @@ void AccountManager::authenticateByName(
         });
 }
 
-void AccountManager::addAccount(
+void AccountManager::registerAccount(
     const AuthorizationInfo& authzInfo,
-    data::AccountData accountData,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler )
+    data::AccountData account,
+    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
 {
-    if (const auto existingAccount = m_cache.find(accountData.email))
-    {
-        NX_LOG(lm("Failed to add account with already used email %1").
-            arg(accountData.email), cl_logDEBUG1);
-        return completionHandler(
-            api::ResultCode::alreadyExists,
-            data::AccountConfirmationCode());
-    }
-
-    accountData.id = generateNewAccountId();
-    accountData.statusCode = api::AccountStatus::awaitingActivation;
+    account.statusCode = api::AccountStatus::awaitingActivation;
 
     //fetching request source
     bool requestSourceSecured = false;
@@ -132,11 +122,21 @@ void AccountManager::addAccount(
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountData, data::AccountConfirmationCode>(
         std::bind(&AccountManager::registerNewAccountInDb, this, _1, _2, _3),
-        std::move(accountData),
-        std::bind(&AccountManager::accountAdded, this,
-                    m_startedAsyncCallsCounter.getScopedIncrement(),
-                    requestSourceSecured,
-                    _2, _3, _4, std::move(completionHandler)) );
+        std::move(account),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+            completionHandler = std::move(completionHandler),
+            requestSourceSecured](
+                nx::db::QueryContext* const /*queryContext*/,
+                db::DBResult dbResult,
+                data::AccountData /*account*/,
+                data::AccountConfirmationCode confirmationCode)
+        {
+            completionHandler(
+                dbResultToApiResult(dbResult),
+                requestSourceSecured
+                    ? std::move(confirmationCode)
+                    : data::AccountConfirmationCode());
+        });
 }
 
 void AccountManager::activate(
@@ -220,25 +220,28 @@ void AccountManager::resetPassword(
     bool hasRequestCameFromSecureSource = false;
     authzInfo.get(attr::secureSource, &hasRequestCameFromSecureSource);
 
-    using namespace std::placeholders;
-
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        std::bind(&AccountManager::createPasswordResetCode, this, _1, _2, _3),
+        [this](
+            nx::db::QueryContext* const queryContext,
+            const std::string& accountEmail,
+            data::AccountConfirmationCode* const confirmationCode)
+        {
+            return resetPassword(queryContext, accountEmail, confirmationCode);
+        },
         accountEmail.email,
         [this, hasRequestCameFromSecureSource,
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::db::QueryContext* /*queryContext*/,
                 nx::db::DBResult dbResultCode,
-                std::string accountEmail,
+                std::string /*accountEmail*/,
                 data::AccountConfirmationCode confirmationCode)
         {
-            passwordResetCodeGenerated(
-                hasRequestCameFromSecureSource,
-                dbResultCode,
-                std::move(accountEmail),
-                std::move(confirmationCode),
-                std::move(completionHandler));
+            return completionHandler(
+                dbResultToApiResult(dbResultCode),
+                hasRequestCameFromSecureSource
+                    ? std::move(confirmationCode)
+                    : data::AccountConfirmationCode());
         });
 }
 
@@ -380,15 +383,17 @@ db::DBResult AccountManager::insertAccount(
     nx::db::QueryContext* const queryContext,
     data::AccountData account)
 {
-    NX_CRITICAL(!account.id.empty());
+    if (account.id.empty())
+        account.id = generateNewAccountId();
     if (account.customization.empty())
         account.customization = QnAppInfo::customizationName().toStdString();
 
-    //inserting account
     QSqlQuery insertAccountQuery(*queryContext->connection());
     insertAccountQuery.prepare(
-        "INSERT INTO account (id, email, password_ha1, full_name, customization, status_code) "
-        "VALUES  (:id, :email, :passwordHa1, :fullName, :customization, :statusCode)");
+        R"sql(
+        INSERT INTO account (id, email, password_ha1, full_name, customization, status_code)
+        VALUES  (:id, :email, :passwordHa1, :fullName, :customization, :statusCode)
+        )sql");
     QnSql::bind(account, &insertAccountQuery);
     if (!insertAccountQuery.exec())
     {
@@ -409,7 +414,47 @@ db::DBResult AccountManager::insertAccount(
     return nx::db::DBResult::ok;
 }
 
-nx::db::DBResult AccountManager::fetchExistingAccountByEmail(
+nx::db::DBResult AccountManager::updateAccount(
+    nx::db::QueryContext* const queryContext,
+    data::AccountData account)
+{
+    NX_ASSERT(!account.id.empty() && !account.email.empty());
+    if (account.id.empty() || account.email.empty())
+        return nx::db::DBResult::ioError;
+
+    QSqlQuery updateAccountQuery(*queryContext->connection());
+    updateAccountQuery.prepare(
+        R"sql(
+        UPDATE account 
+        SET password_ha1=:passwordHa1, full_name=:fullName, customization=:customization, status_code=:statusCode
+        WHERE id=:id AND email=:email
+        )sql");
+    QnSql::bind(account, &updateAccountQuery);
+    if (!updateAccountQuery.exec())
+    {
+        NX_LOG(lm("Could not update account (%1, %2) into DB. %3")
+            .arg(account.email).arg(QnLexical::serialized(account.statusCode))
+            .arg(updateAccountQuery.lastError().text()),
+            cl_logDEBUG1);
+        return nx::db::DBResult::ioError;
+    }
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, account = std::move(account)]() mutable
+        {
+            auto email = account.email;
+            m_cache.atomicUpdate(
+                email,
+                [newAccount = std::move(account)](data::AccountData& account) mutable
+                {
+                    account = std::move(newAccount);
+                });
+        });
+
+    return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult AccountManager::fetchAccountByEmail(
     nx::db::QueryContext* queryContext,
     const std::string& accountEmail,
     data::AccountData* const accountData)
@@ -530,9 +575,57 @@ nx::db::DBResult AccountManager::registerNewAccountInDb(
     const data::AccountData& accountData,
     data::AccountConfirmationCode* const confirmationCode)
 {
-    auto result = insertAccount(queryContext, accountData);
-    if (result != nx::db::DBResult::ok)
-        return result;
+    data::AccountData existingAccount;
+    auto dbResult = fetchAccountByEmail(
+        queryContext,
+        accountData.email,
+        &existingAccount);
+    if (dbResult != nx::db::DBResult::ok &&
+        dbResult != nx::db::DBResult::notFound)
+    {
+        NX_LOGX(lm("Failed to fetch account by email %1").arg(accountData.email), cl_logDEBUG1);
+        return dbResult;
+    }
+
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        if (existingAccount.statusCode != api::AccountStatus::invited)
+        {
+            NX_LOG(lm("Failed to add account with already used email %1, status %2").
+                arg(accountData.email).arg(QnLexical::serialized(existingAccount.statusCode)),
+                cl_logDEBUG1);
+            return nx::db::DBResult::uniqueConstraintViolation;
+        }
+        
+        existingAccount.statusCode = api::AccountStatus::awaitingActivation;
+        // Merging existing account with new one.
+        auto accountIdBak = std::move(existingAccount.id);
+        existingAccount = accountData;
+        existingAccount.id = std::move(accountIdBak);
+
+        dbResult = updateAccount(queryContext, std::move(existingAccount));
+        if (dbResult != nx::db::DBResult::ok)
+        {
+            NX_LOGX(lm("Failed to update existing account %1")
+                .arg(existingAccount.email), cl_logDEBUG1);
+            return dbResult;
+        }
+    }
+    else if (dbResult == nx::db::DBResult::notFound)
+    {
+        dbResult = insertAccount(queryContext, accountData);
+        if (dbResult != nx::db::DBResult::ok)
+        {
+            NX_LOGX(lm("Failed to insert new account. Email %1")
+                .arg(accountData.email), cl_logDEBUG1);
+            return dbResult;
+        }
+    }
+    else
+    {
+        NX_ASSERT(false);
+        return nx::db::DBResult::ioError;
+    }
 
     return issueAccountActivationCode(
         queryContext,
@@ -598,34 +691,17 @@ db::DBResult AccountManager::issueAccountActivationCode(
             emailVerificationCode.size());
     }
 
-    //sending confirmation email
     notification->setActivationCode(resultData->code);
     notification->setAddressee(accountEmail);
-    m_emailManager->sendAsync(
-        *notification,
-        std::function<void(bool)>());
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, notification = std::move(notification)]()
+        {
+            m_emailManager->sendAsync(
+                *notification,
+                std::function<void(bool)>());
+        });
 
     return db::DBResult::ok;
-}
-
-void AccountManager::accountAdded(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
-    bool requestSourceSecured,
-    db::DBResult resultCode,
-    data::AccountData accountData,
-    data::AccountConfirmationCode resultData,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler )
-{
-    accountData.statusCode = api::AccountStatus::awaitingActivation;
-
-    //adding activation code only in response to portal
-    completionHandler(
-        resultCode == db::DBResult::ok
-            ? api::ResultCode::ok
-            : api::ResultCode::dbError,
-        requestSourceSecured
-            ? std::move(resultData)
-            : data::AccountConfirmationCode());
 }
 
 void AccountManager::accountReactivated(
@@ -711,7 +787,7 @@ void AccountManager::accountVerified(
 {
     if( resultCode != db::DBResult::ok )
         return completionHandler(
-            fromDbResultCode(resultCode),
+            dbResultToApiResult(resultCode),
             api::AccountEmail());
 
     m_cache.atomicUpdate(
@@ -720,7 +796,7 @@ void AccountManager::accountVerified(
     api::AccountEmail response;
     response.email = accountEmail;
     completionHandler(
-        fromDbResultCode(resultCode),
+        dbResultToApiResult(resultCode),
         std::move(response));
 }
 
@@ -814,40 +890,36 @@ void AccountManager::accountUpdated(
         }
     }
 
-    completionHandler(fromDbResultCode(resultCode));
+    completionHandler(dbResultToApiResult(resultCode));
 }
 
-void AccountManager::passwordResetCodeGenerated(
-    bool hasRequestCameFromSecureSource,
-    nx::db::DBResult resultCode,
-    std::string accountEmail,
-    data::AccountConfirmationCode confirmationCode,
-    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+nx::db::DBResult AccountManager::resetPassword(
+    nx::db::QueryContext* const queryContext,
+    const std::string& accountEmail,
+    data::AccountConfirmationCode* const confirmationCode)
 {
-    if (resultCode != nx::db::DBResult::ok)
+    const auto dbResult = createPasswordResetCode(
+        queryContext, accountEmail, confirmationCode);
+    if (dbResult != nx::db::DBResult::ok)
     {
-        NX_LOG(lm("%1 (%2). Failed to save password reset code (%3)")
-            .arg(kAccountPasswordResetPath).arg(accountEmail)
-            .arg(QnLexical::serialized(resultCode)),
-            cl_logDEBUG1);
-        return completionHandler(
-            fromDbResultCode(resultCode),
-            data::AccountConfirmationCode());
+        NX_LOGX(lm("Failed to issue password reset code for account %1")
+            .arg(accountEmail), cl_logDEBUG1);
+        return dbResult;
     }
 
-    //sending password reset link
     RestorePasswordNotification notification;
     notification.setAddressee(accountEmail);
-    notification.setActivationCode(confirmationCode.code);
-    m_emailManager->sendAsync(
-        std::move(notification),
-        std::function<void(bool)>());
+    notification.setActivationCode(confirmationCode->code);
 
-    return completionHandler(
-        api::ResultCode::ok,
-        hasRequestCameFromSecureSource
-            ? std::move(confirmationCode)
-            : data::AccountConfirmationCode());
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, notification = std::move(notification)]()
+        {
+            m_emailManager->sendAsync(
+                std::move(notification),
+                std::function<void(bool)>());
+        });
+
+    return nx::db::DBResult::ok;
 }
 
 void AccountManager::temporaryCredentialsSaved(

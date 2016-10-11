@@ -1026,6 +1026,29 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << qnCommon->moduleGUID());
 }
 
+bool QnTransactionMessageBus::readApiFullInfoData(
+    QnTransactionTransport* transport, ApiFullInfoData* data)
+{
+    const auto& user = transport->getUserAccessData();
+    ErrorCode errorCode;
+    if (transport->remotePeer().peerType == Qn::PT_MobileClient)
+    {
+        errorCode = dbManager(user).readApiFullInfoDataForMobileClient(
+            data, user.userId);
+    }
+    else
+    {
+        errorCode = dbManager(user).readApiFullInfoDataComplete(data);
+    }
+
+    if (errorCode != ErrorCode::ok)
+    {
+        qWarning() << "Cannot execute query for ApiFullInfoData:" << toString(errorCode);
+        return false;
+    }
+    return true;
+}
+
 bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
 {
     /** Send all data to the client peers on the connect. */
@@ -1037,17 +1060,15 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         transport->setReadSync(true);
     }
     else if (transport->remotePeer().peerType == Qn::PT_DesktopClient ||
-        transport->remotePeer().peerType == Qn::PT_VideowallClient)     //TODO: #GDM #VW do not send fullInfo, just required part of it
+        transport->remotePeer().peerType == Qn::PT_VideowallClient ||
+        transport->remotePeer().peerType == Qn::PT_MobileClient)
     {
-        /** Request all data to be sent to the client peers on the connect. */
+        /** Request all data to be sent to the Desktop Client peers on the connect. */
         QnTransaction<ApiFullInfoData> tran;
         tran.command = ApiCommand::getFullInfo;
         tran.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tran.params) != ErrorCode::ok)
-        {
-            qWarning() << "Can't execute query for sync with client peer!";
+        if (!readApiFullInfoData(transport, &tran.params))
             return false;
-        }
 
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers, QnTranState());
@@ -1066,7 +1087,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
             transport->sendTransaction(tran, processedPeers);
         }
     }
-    else if (transport->remotePeer().peerType == Qn::PT_MobileClient)
+    else if (transport->remotePeer().peerType == Qn::PT_OldMobileClient)
     {
         /** Request all data to be sent to the client peers on the connect. */
         QnTransaction<ApiMediaServerDataExList> tranServers;
@@ -1140,8 +1161,6 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         transport->sendTransaction(tranCameraHistory, processedPeers);
         transport->setReadSync(true);
     }
-
-
 
     if (!transport->remotePeer().isClient() && !ApiPeerData::isClient(m_localPeerType))
         queueSyncRequest(transport);

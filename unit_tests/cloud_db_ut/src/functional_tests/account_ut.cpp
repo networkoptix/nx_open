@@ -175,7 +175,14 @@ TEST_F(Account, general)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(3);
+        sendAsyncMocked(
+            GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&)))
+            .Times(3);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(
+            GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&)))
+            .Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -861,8 +868,22 @@ TEST_F(Account, temporary_credentials_expiration)
     }
 }
 
-TEST_F(Account, DISABLED_created_while_sharing)
+TEST_F(Account, created_while_sharing)
 {
+    EmailManagerMocked mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))).Times(1);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/)
+        {
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
+        });
+
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto account1 = addActivatedAccount2();
@@ -877,6 +898,8 @@ TEST_F(Account, DISABLED_created_while_sharing)
     const auto newAccountAccessRoleInSystem1 = api::SystemAccessRole::cloudAdmin;
     shareSystemEx(account1, system1, newAccountEmail, newAccountAccessRoleInSystem1);
 
+    // Ignoring invitation and registering account in a regular way
+
     data::AccountData newAccount;
     newAccount.email = newAccountEmail;
     api::AccountConfirmationCode accountConfirmationCode;
@@ -888,10 +911,16 @@ TEST_F(Account, DISABLED_created_while_sharing)
         api::ResultCode::ok,
         activateAccount(accountConfirmationCode, &resultEmail));
 
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        getAccount(newAccountEmail, newAccountPassword, &newAccount));
-    ASSERT_EQ(api::AccountStatus::activated, newAccount.statusCode);
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getAccount(newAccountEmail, newAccountPassword, &newAccount));
+        ASSERT_EQ(api::AccountStatus::activated, newAccount.statusCode);
+    }
 
     ASSERT_EQ(newAccountEmail, resultEmail);
 

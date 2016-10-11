@@ -60,6 +60,12 @@ class SystemManager
     public AbstractAuthenticationDataProvider
 {
 public:
+    enum class NotificationCommand
+    {
+        sendNotification,
+        doNotSendNotification,
+    };
+
     /*!
         Fills internal cache
         \throw std::runtime_error In case of failure to pre-fill data cache
@@ -126,19 +132,6 @@ public:
         const AuthorizationInfo& authzInfo,
         data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
-
-    //void addSubscription(
-    //    const AuthorizationInfo& authzInfo,
-    //    const std::string& systemID,
-    //    const std::string& productID,
-    //    std::function<void(api::ResultCode)> completionHandler);
-    ///*!
-    //    \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
-    //*/
-    //void getActiveSubscriptions(
-    //    const AuthorizationInfo& authzInfo,
-    //    const std::string& systemID,
-    //    std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
 
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
@@ -286,19 +279,37 @@ private:
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
-    //---------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // system sharing methods. TODO: #ak: move to a separate class
 
     /**
-     * @param targetAccountData Filled with attributes of account \a sharing.accountEmail
+     * @param inviteeAccount Filled with attributes of account \a sharing.accountEmail
      */
-    nx::db::DBResult updateSharingInDb(
+    nx::db::DBResult shareSystem(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
-        data::AccountData* const targetAccountData);
+        NotificationCommand notificationCommand,
+        data::AccountData* const inviteeAccount);
 
-    nx::db::DBResult fetchUserSharing(
+    nx::db::DBResult insertOrReplaceSharing(
+        nx::db::QueryContext* const queryContext,
+        api::SystemSharingEx sharing);
+
+    template<typename Notification>
+    void fillSystemSharedNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const std::string& systemId,
+        const std::string& inviteeEmail,
+        Notification* const notification);
+
+    void scheduleSystemHasBeenSharedNotification(
+        nx::db::QueryContext* const queryContext,
+        const std::string& grantorEmail,
+        const api::SystemSharing& sharing);
+
+    nx::db::DBResult fetchSharing(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         const std::string& systemId,
@@ -309,7 +320,7 @@ private:
         const nx::db::InnerJoinFilterFields& filter,
         std::vector<api::SystemSharingEx>* const sharings);
 
-    nx::db::DBResult fetchUserSharing(
+    nx::db::DBResult fetchSharing(
         nx::db::QueryContext* const queryContext,
         const nx::db::InnerJoinFilterFields& filter,
         api::SystemSharingEx* const sharing);
@@ -321,13 +332,13 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
-        data::AccountData* const targetAccountData);
+        data::AccountData* const inviteeAccount,
+        bool* const isNewAccount);
     nx::db::DBResult inviteNewUserToSystem(
         nx::db::QueryContext* const queryContext,
         const std::string& inviterEmail,
         const data::AccountData& inviteeAccount,
-        const std::string& systemId,
-        const std::string& systemName);
+        const std::string& systemId);
     /**
      * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
      */
@@ -339,13 +350,8 @@ private:
     nx::db::DBResult updateSharingInDbAndGenerateTransaction(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
-        const data::SystemSharing& sharing);
-    void sharingUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult dbResult,
-        data::SystemSharing sharing,
-        std::function<void(api::ResultCode)> completionHandler);
+        const data::SystemSharing& sharing,
+        NotificationCommand notificationCommand);
     void updateSharingInCache(data::SystemSharing sharing);
     void updateSharingInCache(
         api::SystemSharingEx sharing,
@@ -376,7 +382,7 @@ private:
         std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
-    nx::db::DBResult saveUserSessionStartToDb(
+    nx::db::DBResult saveUserSessionStart(
         nx::db::QueryContext* queryContext,
         const data::UserSessionDescriptor& userSessionDescriptor,
         SaveUserSessionResult* const result);
@@ -386,15 +392,13 @@ private:
         const std::string& systemId,
         std::chrono::system_clock::time_point lastloginTime,
         float usageFrequency);
-    void userSessionStartSavedToDb(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult dbResult,
-        data::UserSessionDescriptor userSessionDescriptor,
-        SaveUserSessionResult result,
-        std::function<void(api::ResultCode)> completionHandler);
+    void updateSystemUsageStatisticsCache(
+        const data::UserSessionDescriptor& userSessionDescriptor,
+        const SaveUserSessionResult& usageStatistics);
 
-    /** returns sharing permissions depending on current access role */
+    /**
+     * @return Sharing permissions depending on current access role.
+     */
     api::SystemAccessRoleList getSharingPermissions(
         api::SystemAccessRole accessRole) const;
 
@@ -442,6 +446,10 @@ private:
         nx::db::DBResult dbResult,
         data::SystemNameUpdate systemNameUpdate);
 
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId,
+        const data::AccountData& inviteeAccount);
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* queryContext,
         const std::string& systemId,

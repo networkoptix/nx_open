@@ -42,6 +42,8 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
             return nx_http::StatusCode::serviceUnavailable;
         case ResultCode::invalidFormat:
             return nx_http::StatusCode::badRequest;
+        case ResultCode::retryLater:
+            return nx_http::StatusCode::serviceUnavailable;
         case ResultCode::unknownError:
             return nx_http::StatusCode::internalServerError;
     }

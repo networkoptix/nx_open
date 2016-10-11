@@ -116,8 +116,8 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
         emit networkIssue(
             toSharedPointer(this),
             qnSyncTime->currentUSecsSinceEpoch(),
-            QnBusiness::EventReason::NoReason,
-            QnNetworkIssueBusinessEvent::encodePacketLossSequence(0, 2));
+            QnBusiness::EventReason::NetworkNoResponseFromDevice,
+            QString());
 
         if (isFatal)
             setStatus(Qn::Offline);

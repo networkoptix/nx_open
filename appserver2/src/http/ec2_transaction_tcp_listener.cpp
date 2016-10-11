@@ -16,6 +16,7 @@
 #include "settings.h"
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/fusion/serialization/lexical.h>
 
 
 namespace ec2
@@ -59,20 +60,30 @@ void QnTransactionTcpProcessor::run()
     parseRequest();
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
-    bool isClient = query.hasQueryItem("isClient");
-    bool isMobileClient = query.hasQueryItem("isMobile");
-    QnUuid remoteGuid  = QnUuid(query.queryItemValue("guid"));
-    QnUuid remoteRuntimeGuid  = QnUuid(query.queryItemValue("runtime-guid"));
-    qint64 remoteSystemIdentityTime  = query.queryItemValue("system-identity-time").toLongLong();
+
+    QnUuid remoteGuid = QnUuid(query.queryItemValue("guid"));
     if (remoteGuid.isNull())
         remoteGuid = QnUuid::createUuid();
-    QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
-    bool isVideowall = (!videowallGuid.isNull());
+    QnUuid remoteRuntimeGuid = QnUuid(query.queryItemValue("runtime-guid"));
+    qint64 remoteSystemIdentityTime = query.queryItemValue("system-identity-time").toLongLong();
 
-    Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
-        : isVideowall   ? Qn::PT_VideowallClient
-        : isClient      ? Qn::PT_DesktopClient
-        : Qn::PT_Server;
+    bool deserialized = false;
+    Qn::PeerType peerType = QnLexical::deserialized<Qn::PeerType>(
+        query.queryItemValue("peerType"),
+        Qn::PT_NotDefined,
+        &deserialized);
+    if (!deserialized || peerType == Qn::PT_NotDefined)
+    {
+        QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
+        const bool isVideowall = !videowallGuid.isNull();
+        const bool isClient = query.hasQueryItem("isClient");
+        const bool isMobileClient = query.hasQueryItem("isMobile");
+
+        peerType = isMobileClient ? Qn::PT_OldMobileClient
+            : isVideowall ? Qn::PT_VideowallClient
+            : isClient ? Qn::PT_DesktopClient
+            : Qn::PT_Server;
+    }
 
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
@@ -241,7 +252,7 @@ void QnTransactionTcpProcessor::run()
         fail = !connectionLockGuard.tryAcquireConnected();
     }
 
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !isClient)
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !remotePeer.isClient())
         fail = true; // accept only allowed peers
 
     d->chunkedMode = false;

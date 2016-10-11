@@ -15,14 +15,14 @@ namespace ec2
     void QnLayoutNotificationManager::triggerNotification(const QnTransaction<ApiLayoutData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveLayout);
-        emit addedOrUpdated(tran.params);
+        emit addedOrUpdated(tran.params, tran.peerID);
     }
 
     void QnLayoutNotificationManager::triggerNotification(const QnTransaction<ApiLayoutDataList>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveLayouts);
         for (const ApiLayoutData& layout : tran.params)
-            emit addedOrUpdated(layout);
+            emit addedOrUpdated(layout, tran.peerID);
     }
 
 

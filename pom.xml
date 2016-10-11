@@ -1135,10 +1135,6 @@
             <id>unit-tests-build-only</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
                 <property>
                     <name>utb</name>
                     <value>true</value>

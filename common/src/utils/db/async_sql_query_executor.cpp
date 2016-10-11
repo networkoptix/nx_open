@@ -15,7 +15,8 @@ namespace db {
 
 static const size_t WAITING_TASKS_COEFF = 5;
 
-AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(const ConnectionOptions& connectionOptions)
+AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
+    const ConnectionOptions& connectionOptions)
     :
     m_connectionOptions(connectionOptions),
     m_connectionsBeingAdded(0)
@@ -112,5 +113,5 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
     }
 }
 
-}   //db
-}   //nx
+} // namespace db
+} // namespace nx

@@ -11,7 +11,7 @@ namespace ec2
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiWebPageData> &tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveWebPage);
-        emit addedOrUpdated(tran.params);
+        emit addedOrUpdated(tran.params, tran.peerID);
     }
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiIdData> &tran)

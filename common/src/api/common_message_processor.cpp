@@ -78,7 +78,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     };
     */
 
-#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&)>(&QnCommonMessageProcessor::updateResource)
+#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&, const QnUuid&)>(&QnCommonMessageProcessor::updateResource)
 
     connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound );
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost );
@@ -417,6 +417,18 @@ void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeData
     qnResTypePool->replaceResourceTypeList(qnResTypes);
 }
 
+template <class Datatype>
+void QnCommonMessageProcessor::updateResources(
+    const std::vector<Datatype>& resList,
+    QHash<QnUuid, QnResourcePtr>& remoteResources)
+{
+    for (const auto& resource: resList)
+    {
+        updateResource(resource, qnCommon->remoteGUID());
+        remoteResources.remove(resource.id);
+    }
+}
+
 void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullData)
 {
     /* Store all remote resources id to clean them if they are not in the list anymore. */
@@ -435,18 +447,17 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     };
     */
 
-#define updateResources(source) { for (const auto& resource : source) { updateResource(resource); remoteResources.remove(resource.id); } }
 
     /* Packet adding. */
     qnResPool->beginTran();
 
-    updateResources(fullData.users);
-    updateResources(fullData.cameras);
-    updateResources(fullData.layouts);
-    updateResources(fullData.videowalls);
-    updateResources(fullData.webPages);
-    updateResources(fullData.servers);
-    updateResources(fullData.storages);
+    updateResources(fullData.users, remoteResources);
+    updateResources(fullData.cameras, remoteResources);
+    updateResources(fullData.layouts, remoteResources);
+    updateResources(fullData.videowalls, remoteResources);
+    updateResources(fullData.webPages, remoteResources);
+    updateResources(fullData.servers, remoteResources);
+    updateResources(fullData.storages, remoteResources);
 
     qnResPool->commit();
 
@@ -605,38 +616,38 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr& )
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, const QnUuid& )
 {
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, const QnUuid& peerId)
 {
     QnUserResourcePtr qnUser(fromApiToResource(user));
-    updateResource(qnUser);
+    updateResource(qnUser, peerId);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, const QnUuid& peerId)
 {
     QnLayoutResourcePtr qnLayout(new QnLayoutResource());
     fromApiToResource(layout, qnLayout);
-    updateResource(qnLayout);
+    updateResource(qnLayout, peerId);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, const QnUuid& peerId)
 {
     QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
     fromApiToResource(videowall, qnVideowall);
-    updateResource(qnVideowall);
+    updateResource(qnVideowall, peerId);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, const QnUuid& peerId)
 {
     QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
     fromApiToResource(webpage, qnWebpage);
-    updateResource(qnWebpage);
+    updateResource(qnWebpage, peerId);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, const QnUuid& peerId)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
@@ -650,18 +661,18 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");
 
-        updateResource(qnCamera);
+        updateResource(qnCamera, peerId);
     }
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, const QnUuid& peerId)
 {
     QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
     fromApiToResource(server, qnServer);
-    updateResource(qnServer);
+    updateResource(qnServer, peerId);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage, const QnUuid& peerId)
 {
     auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
     NX_ASSERT(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
@@ -675,6 +686,6 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage
     if (qnStorage)
     {
         fromApiToResource(storage, qnStorage);
-        updateResource(qnStorage);
+        updateResource(qnStorage, peerId);
     }
 }

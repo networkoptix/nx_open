@@ -37,7 +37,7 @@ namespace ec2
             NX_ASSERT( tran.command == ApiCommand::saveEventRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
             fromApiToResource(tran.params, businessRule);
-            emit addedOrUpdated( businessRule );
+            emit addedOrUpdated( businessRule, tran.peerID);
         }
 
         void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran )
