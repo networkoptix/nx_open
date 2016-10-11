@@ -35,6 +35,26 @@ class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int MAX_PROXY_TTL = 8;
 
+/** Returns false if socket would block in blocking mode */
+static bool readSocketNonBlock(
+    int* returnValue, AbstractStreamSocket* socket,
+    void* buffer, int bufferSize)
+{
+    *returnValue = socket->recv(buffer, bufferSize, MSG_DONTWAIT);
+    if (*returnValue < 0)
+    {
+        auto code = SystemError::getLastOSErrorCode();
+        if (code == SystemError::interrupted ||
+            code == SystemError::wouldBlock ||
+            code == SystemError::again)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
@@ -87,11 +107,9 @@ int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol
 
 bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
 {
-    int readed = srcSocket->recv(buffer, bufferSize);
-#ifndef Q_OS_WIN32
-    if( readed == -1 && errno == EINTR )
+    int readed;
+    if( !readSocketNonBlock(&readed, srcSocket, buffer, bufferSize) )
         return true;
-#endif
 
     if (readed < 1)
         return false;
@@ -495,7 +513,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
 
             if( fds[0].revents & POLLIN )    //if polled returned connection closed or error state, recv will fail and we will process error
             {
-                int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+                int readed;
+                if (!readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
+                    continue;
+
                 if (readed < 1) 
                     return;
 

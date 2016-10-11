@@ -697,7 +697,29 @@ bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned 
 int CommunicatingSocket::recv( void* buffer, unsigned int bufferLen, int flags )
 {
 #ifdef _WIN32
-    int bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
+    int bytesRead;
+    if (flags & MSG_DONTWAIT)
+    {
+        bool value;
+        if (!getNonBlockingMode(&value))
+            return -1;
+
+        if (!setNonBlockingMode(true))
+            return -1;
+
+        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags & ~MSG_DONTWAIT);
+
+        // Save error code as changing mode will drop it.
+        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
+        if (!setNonBlockingMode(value))
+            return -1;
+
+        SystemError::setLastErrorCode(sysErrorCodeBak);
+    }
+    else
+    {
+        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
+    }
 #else
     unsigned int recvTimeout = 0;
     if( !getRecvTimeout( &recvTimeout ) )
