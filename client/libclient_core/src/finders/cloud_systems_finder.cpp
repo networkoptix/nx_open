@@ -212,7 +212,7 @@ void QnCloudSystemsFinder::pingServerInternal(
     auto replyHolder = ReplyPtr(new QnAsyncHttpClientReply(client));
 
     const auto handleReply =
-        [this, systemId, host, serverPriority, replyHolder ]
+        [this, systemId, host, serverPriority, replyHolder]
             (QnAsyncHttpClientReply* reply) mutable
         {
             /**
