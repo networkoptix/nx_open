@@ -606,6 +606,9 @@ module.exports = function (grunt) {
             updateTest:{
                 command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
             },
+            merge:{
+                command: 'python ../../devtools/util/merge_dev.py -t prod_3.0.0'
+            },
             version: {
                 command: 'hg parent > dist/version.txt'
             },
@@ -816,4 +819,10 @@ module.exports = function (grunt) {
     grunt.registerTask('update', [
         'shell:updateTest'
     ]);
+
+
+    grunt.registerTask('merge', [
+        'shell:merge'
+    ]);
+
 };
