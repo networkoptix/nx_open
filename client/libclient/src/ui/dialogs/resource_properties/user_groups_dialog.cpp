@@ -41,12 +41,6 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    for (auto page : allPages())
-    {
-        connect(page.widget, &QnAbstractPreferencesWidget::hasChangesChanged, this,
-            &QnUserGroupsDialog::updateButtonBox);
-    }
-
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
@@ -83,6 +77,8 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
             if (m_model->selectedGroup() == groupId)
                 return;
 
+            /* Apply page changes to current group in the model. */
+            base_type::applyChanges();
             m_model->selectGroup(groupId);
             loadDataToUi();
         });
@@ -105,18 +101,18 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
         });
 
     auto modelChanged = [this]()
-    {
-        bool hasGroups = m_model->rowCount() > 0;
-        ui->groupsTreeView->setVisible(hasGroups);
-        ui->groupsListUnderline->setVisible(hasGroups);
-
-        if (hasGroups && !ui->groupsTreeView->selectionModel()->currentIndex().isValid())
         {
-            ui->groupsTreeView->selectionModel()->setCurrentIndex(
-                m_model->index(0, 0),
-                QItemSelectionModel::SelectCurrent);
-        }
-    };
+            bool hasGroups = m_model->rowCount() > 0;
+            ui->groupsTreeView->setVisible(hasGroups);
+            ui->groupsListUnderline->setVisible(hasGroups);
+
+            if (hasGroups && !ui->groupsTreeView->selectionModel()->currentIndex().isValid())
+            {
+                ui->groupsTreeView->selectionModel()->setCurrentIndex(
+                    m_model->index(0, 0),
+                    QItemSelectionModel::SelectCurrent);
+            }
+        };
 
     connect(m_model, &QAbstractItemModel::modelReset,   this, modelChanged);
     connect(m_model, &QAbstractItemModel::rowsRemoved,  this, modelChanged);
@@ -162,11 +158,9 @@ bool QnUserGroupsDialog::hasChanges() const
 
         if (qnSharedResourcesManager->sharedResources(group) != m_model->accessibleResources(group))
             return true;
-
-        continue;
     }
 
-    return false;
+    return base_type::hasChanges();
 }
 
 void QnUserGroupsDialog::applyChanges()
