@@ -37,6 +37,14 @@ namespace {
     static const int defaultSecondStreamFpsHigh = 12;
 }
 
+QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
+{
+    // ATTENTION: This logic is similar to the one in ApiCameraData::fillId().
+    if (uniqueId.isEmpty())
+        return QnUuid();
+    return guidFromArbitraryData(uniqueId);
+}
+
 //const int PRIMARY_ENCODER_INDEX = 0;
 //const int SECONDARY_ENCODER_INDEX = 1;
 
