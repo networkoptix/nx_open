@@ -383,11 +383,13 @@ TEST_F(Account, update)
 
     api::AccountData account1;
     std::string account1Password;
-    api::ResultCode result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
 
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(account1.email, account1Password, &account1));
 
     //changing password
     std::string account1NewPassword = account1Password + "new";
@@ -396,24 +398,32 @@ TEST_F(Account, update)
         account1.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();
+    update.passwordHa1Sha256 = nx_http::calcHa1(
+        account1.email.c_str(),
+        moduleInfo().realm.c_str(),
+        account1NewPassword.c_str(),
+        "SHA-256").constData();
     update.fullName = account1.fullName + "new";
     update.customization = account1.customization + "new";
 
-    result = updateAccount(account1.email, account1Password, update);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        updateAccount(account1.email, account1Password, update));
 
     account1.fullName = update.fullName.get();
     account1.customization = update.customization.get();
 
     api::AccountData newAccount;
-    result = getAccount(account1.email, account1NewPassword, &newAccount);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(account1.email, account1NewPassword, &newAccount));
     ASSERT_EQ(newAccount, account1);
 
     restart();
 
-    result = getAccount(account1.email, account1NewPassword, &newAccount);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(account1.email, account1NewPassword, &newAccount));
     ASSERT_EQ(newAccount, account1);
 }
 

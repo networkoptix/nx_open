@@ -33,8 +33,10 @@ public:
     std::string id;
     //!User email. Used as unique user id
     std::string email;
-    //!Hex representation of HA1 (see rfc2617) digest of user's password. Realm is usually VMS
+    //!Hex representation of HA1 (see rfc2617) digest of user's password
     std::string passwordHa1;
+    //!Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash
+    std::string passwordHa1Sha256;
     std::string fullName;
     std::string customization;
     AccountStatus statusCode;
@@ -58,6 +60,8 @@ public:
     boost::optional<std::string> passwordHa1;
     boost::optional<std::string> fullName;
     boost::optional<std::string> customization;
+    //!Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash
+    boost::optional<std::string> passwordHa1Sha256;
 };
 
 

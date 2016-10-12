@@ -176,9 +176,14 @@ api::ResultCode CdbLauncher::addAccount(
     if (accountData->passwordHa1.empty())
         accountData->passwordHa1 = nx_http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
-            //accountData->email.c_str(),
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
+    if (accountData->passwordHa1Sha256.empty())
+        accountData->passwordHa1Sha256 = nx_http::calcHa1(
+            QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
+            moduleInfo().realm.c_str(),
+            password->c_str(),
+            "SHA-256").constData();
     if (accountData->customization.empty())
         accountData->customization = QnAppInfo::customizationName().toStdString();
 
@@ -186,12 +191,13 @@ api::ResultCode CdbLauncher::addAccount(
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
-        std::bind(
-            &nx::cdb::api::AccountManager::registerNewAccount,
-            connection->accountManager(),
-            *accountData,
-            std::placeholders::_1));
+    std::tie(result, *activationCode) = 
+        makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
+            std::bind(
+                &nx::cdb::api::AccountManager::registerNewAccount,
+                connection->accountManager(),
+                *accountData,
+                std::placeholders::_1));
     return result;
 }
 

@@ -24,6 +24,7 @@ using namespace nx::network;
 MAKE_FIELD_NAME_STR_CONST(AccountData, id)
 MAKE_FIELD_NAME_STR_CONST(AccountData, email)
 MAKE_FIELD_NAME_STR_CONST(AccountData, passwordHa1)
+MAKE_FIELD_NAME_STR_CONST(AccountData, passwordHa1Sha256)
 MAKE_FIELD_NAME_STR_CONST(AccountData, fullName)
 MAKE_FIELD_NAME_STR_CONST(AccountData, customization)
 MAKE_FIELD_NAME_STR_CONST(AccountData, statusCode)
@@ -33,6 +34,7 @@ bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData
     accountData->id = urlQuery.queryItemValue(AccountData_id_field).toStdString();
     accountData->email = urlQuery.queryItemValue(AccountData_email_field).toStdString();
     accountData->passwordHa1 = urlQuery.queryItemValue(AccountData_passwordHa1_field).toStdString();
+    accountData->passwordHa1Sha256 = urlQuery.queryItemValue(AccountData_passwordHa1Sha256_field).toStdString();
     accountData->fullName = urlQuery.queryItemValue(AccountData_fullName_field).toStdString();
     accountData->customization = urlQuery.queryItemValue(AccountData_customization_field).toStdString();
     bool success = true;
@@ -59,6 +61,9 @@ void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
     urlQuery->addQueryItem(
         AccountData_passwordHa1_field,
         QString::fromStdString(data.passwordHa1));
+    urlQuery->addQueryItem(
+        AccountData_passwordHa1Sha256_field,
+        QString::fromStdString(data.passwordHa1Sha256));
     urlQuery->addQueryItem(
         AccountData_fullName_field,
         QString::fromStdString(data.fullName));
@@ -101,22 +106,33 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountConfirmationCode), (json)(sql
 ////////////////////////////////////////////////////////////
 
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, passwordHa1)
+MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, passwordHa1Sha256)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, fullName)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, customization)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data)
 {
-    url::deserializeField(urlQuery, AccountUpdateData_passwordHa1_field, &data->passwordHa1);
-    url::deserializeField(urlQuery, AccountUpdateData_fullName_field, &data->fullName);
-    url::deserializeField(urlQuery, AccountUpdateData_customization_field, &data->customization);
+    url::deserializeField(
+        urlQuery, AccountUpdateData_passwordHa1_field, &data->passwordHa1);
+    url::deserializeField(
+        urlQuery, AccountUpdateData_passwordHa1Sha256_field, &data->passwordHa1Sha256);
+    url::deserializeField(
+        urlQuery, AccountUpdateData_fullName_field, &data->fullName);
+    url::deserializeField(
+        urlQuery, AccountUpdateData_customization_field, &data->customization);
     return true;
 }
 
 void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuery)
 {
-    url::serializeField(urlQuery, AccountUpdateData_passwordHa1_field, data.passwordHa1);
-    url::serializeField(urlQuery, AccountUpdateData_fullName_field, data.fullName);
-    url::serializeField(urlQuery, AccountUpdateData_customization_field, data.customization);
+    url::serializeField(
+        urlQuery, AccountUpdateData_passwordHa1_field, data.passwordHa1);
+    url::serializeField(
+        urlQuery, AccountUpdateData_passwordHa1Sha256_field, data.passwordHa1Sha256);
+    url::serializeField(
+        urlQuery, AccountUpdateData_fullName_field, data.fullName);
+    url::serializeField(
+        urlQuery, AccountUpdateData_customization_field, data.customization);
 }
 
 void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonValue)
@@ -126,6 +142,10 @@ void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonVa
         jsonObject.insert(
             AccountUpdateData_passwordHa1_field,
             QString::fromStdString(data.passwordHa1.get()));
+    if (data.passwordHa1Sha256)
+        jsonObject.insert(
+            AccountUpdateData_passwordHa1Sha256_field,
+            QString::fromStdString(data.passwordHa1Sha256.get()));
     if (data.fullName)
         jsonObject.insert(
             AccountUpdateData_fullName_field,
@@ -146,9 +166,15 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, AccountUpdateData* dat
     auto passwordHa1Iter = map.find(AccountUpdateData_passwordHa1_field);
     if (passwordHa1Iter != map.constEnd())
         data->passwordHa1 = passwordHa1Iter.value().toString().toStdString();
+
+    auto passwordHa1Sha256Iter = map.find(AccountUpdateData_passwordHa1Sha256_field);
+    if (passwordHa1Sha256Iter != map.constEnd())
+        data->passwordHa1Sha256 = passwordHa1Sha256Iter.value().toString().toStdString();
+
     auto fullNameIter = map.find(AccountUpdateData_fullName_field);
     if (fullNameIter != map.constEnd())
         data->fullName = fullNameIter.value().toString().toStdString();
+
     auto customizationIter = map.find(AccountUpdateData_customization_field);
     if (customizationIter != map.constEnd())
         data->customization = customizationIter.value().toString().toStdString();

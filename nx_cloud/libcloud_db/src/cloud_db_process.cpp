@@ -617,6 +617,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
     dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
+    dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
     return dbStructureUpdater.updateStructSync();
 }
 
