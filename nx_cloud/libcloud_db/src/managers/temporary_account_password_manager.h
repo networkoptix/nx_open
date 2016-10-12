@@ -90,12 +90,15 @@ public:
         nx::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData);
 
+    boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
+        const std::string& login) const;
+
 private:
     const conf::Settings& m_settings;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     QnCounter m_startedAsyncCallsCounter;
     //!map<login, password data>
-    std::multimap<std::string, TemporaryAccountCredentialsEx> m_accountPassword;
+    std::multimap<std::string, TemporaryAccountCredentialsEx> m_temporaryCredentialsByLogin;
     mutable QnMutex m_mutex;
 
     bool checkTemporaryPasswordForExpiration(

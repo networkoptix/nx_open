@@ -62,8 +62,8 @@ void TemporaryAccountPasswordManager::authenticateByName(
 
     QnMutexLocker lk(&m_mutex);
 
-    auto tmpPasswordsRange = m_accountPassword.equal_range(toStdString(username));
-    if (tmpPasswordsRange.first == m_accountPassword.end())
+    auto tmpPasswordsRange = m_temporaryCredentialsByLogin.equal_range(toStdString(username));
+    if (tmpPasswordsRange.first == m_temporaryCredentialsByLogin.end())
         return;
 
     for (auto it = tmpPasswordsRange.first; it != tmpPasswordsRange.second; )
@@ -177,7 +177,7 @@ void TemporaryAccountPasswordManager::removeTemporaryPasswordsFromCacheByAccount
     std::string accountEmail)
 {
     QnMutexLocker lk(&m_mutex);
-    m_accountPassword.erase(accountEmail);
+    m_temporaryCredentialsByLogin.erase(accountEmail);
 }
 
 nx::db::DBResult TemporaryAccountPasswordManager::registerTemporaryCredentials(
@@ -194,6 +194,17 @@ nx::db::DBResult TemporaryAccountPasswordManager::registerTemporaryCredentials(
         std::move(tmpPasswordDataInternal));
 }
 
+boost::optional<TemporaryAccountCredentialsEx> 
+    TemporaryAccountPasswordManager::getCredentialsByLogin(
+        const std::string& login) const
+{
+    QnMutexLocker lk(&m_mutex);
+    auto it = m_temporaryCredentialsByLogin.find(login);
+    if (it == m_temporaryCredentialsByLogin.cend())
+        return boost::none;
+    return it->second;
+}
+
 bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
     QnMutexLockerBase* const /*lk*/,
     std::multimap<std::string, TemporaryAccountCredentialsEx>::iterator passwordIter)
@@ -203,7 +214,7 @@ bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
             passwordIter->second.expirationTimestampUtc <= nx::utils::timeSinceEpoch().count()))
     {
         std::string tmpPasswordID = passwordIter->second.id;
-        m_accountPassword.erase(passwordIter);
+        m_temporaryCredentialsByLogin.erase(passwordIter);
 
         //removing password from DB
         using namespace std::placeholders;
@@ -271,7 +282,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
     {
         tmpPassword.accessRights.parse(tmpPassword.accessRightsStr);
         std::string login = tmpPassword.login;
-        m_accountPassword.emplace(
+        m_temporaryCredentialsByLogin.emplace(
             std::move(login),
             std::move(tmpPassword));
     }
@@ -319,7 +330,7 @@ void TemporaryAccountPasswordManager::saveTempPasswordToCache(
 {
     QnMutexLocker lk(&m_mutex);
     std::string login = tempPasswordData.login;
-    m_accountPassword.emplace(
+    m_temporaryCredentialsByLogin.emplace(
         std::move(login),
         std::move(tempPasswordData));
 }

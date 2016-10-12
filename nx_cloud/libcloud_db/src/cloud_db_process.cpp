@@ -256,7 +256,8 @@ int CloudDBProcess::exec()
         AuthenticationProvider authProvider(
             settings,
             accountManager,
-            systemManager);
+            systemManager,
+            tempPasswordManager);
         m_authProvider = &authProvider;
 
         MaintenanceManager maintenanceManager(

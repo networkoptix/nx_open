@@ -7,14 +7,17 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <cdb/cloud_nonce.h>
 #include <data/account_data.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
-#include <nx/fusion/model_functions.h>
-#include <utils/common/app_info.h>
 #include <nx/utils/test_support/utils.h>
+#include <utils/common/app_info.h>
+
+#include <utils/common/sync_call.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
@@ -876,6 +879,46 @@ TEST_F(Account, temporary_credentials_expiration)
             &account1);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
     }
+}
+
+TEST_F(Account, temporary_credentials_login_to_system)
+{
+    constexpr const auto expirationPeriod = std::chrono::seconds(50);
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+    const auto system = addRandomSystemToAccount(account);
+
+    api::TemporaryCredentialsParams params;
+    params.timeouts.expirationPeriod = expirationPeriod;
+    api::TemporaryCredentials temporaryCredentials;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        createTemporaryCredentials(
+            account.data.email,
+            account.password,
+            params,
+            &temporaryCredentials));
+
+    auto cdbConnection = connection(system.id, system.authKey);
+
+    api::AuthRequest authRequest;
+    authRequest.nonce = api::generateCloudNonceBase(system.id);
+    authRequest.realm = QnAppInfo::realm().toStdString();
+    authRequest.username = temporaryCredentials.login;
+
+    api::ResultCode resultCode = api::ResultCode::ok;
+    api::AuthResponse authResponse;
+    std::tie(resultCode, authResponse) =
+        makeSyncCall<api::ResultCode, api::AuthResponse>(
+            std::bind(
+                &nx::cdb::api::AuthProvider::getAuthenticationResponse,
+                cdbConnection->authProvider(),
+                authRequest,
+                std::placeholders::_1));
+    ASSERT_EQ(api::ResultCode::ok, resultCode);
+    ASSERT_EQ(account.data.email, authResponse.authenticatedAccountData.accountEmail);
 }
 
 TEST_F(Account, created_while_sharing)
