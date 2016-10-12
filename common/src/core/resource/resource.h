@@ -93,6 +93,8 @@ public:
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
     int initializationAttemptCount() const;
 
+    void flushProperties();
+
     // flags like network media and so on
     virtual Qn::ResourceFlags flags() const;
     inline bool hasFlags(Qn::ResourceFlags flags) const { return (this->flags() & flags) == flags; }
