@@ -10,7 +10,7 @@ using namespace std::chrono;
 
 namespace {
 
-static const milliseconds kExampleTime = 1min + 15s;
+static const milliseconds kExampleTime = minutes(1) + seconds(15);
 static const int kDoNotSuppress = -1;
 static const QString kSeparator(L' ');
 static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes;
