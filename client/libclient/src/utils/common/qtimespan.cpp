@@ -545,6 +545,11 @@ QTimeSpan::QTimeSpan(const QTime& reference, const QTimeSpan& other)
 }
 
 
+QTimeSpan::QTimeSpan(std::chrono::milliseconds msecs):
+    QTimeSpan(msecs.count())
+{
+}
+
 /*!
     \brief Destructor
 */
@@ -2065,6 +2070,14 @@ QDebug operator<<(QDebug debug, const QTimeSpan &ts)
 */
 QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanFormat format, unitStringFunction unitStringConverter, QString unitsSeparator)
 {
+    /* Handle negative span value. */
+    if (d->interval < 0)
+    {
+        QTimeSpan positive = this->normalized();
+        return L'-' + positive.toApproximateString(suppresSecondUnitLimit, format,
+            unitStringConverter, unitsSeparator);
+    }
+
     if (format == Qt::NoUnit)
         return QString();
 
