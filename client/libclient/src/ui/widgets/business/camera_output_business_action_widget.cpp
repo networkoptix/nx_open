@@ -20,17 +20,19 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 {
     ui->setupUi(this);
 
-    connect(ui->autoResetCheckBox, &QCheckBox::toggled, ui->autoResetSpinBox,
+    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, ui->fixedDurationSpinBox,
         &QWidget::setEnabled);
-    connect(ui->autoResetCheckBox, &QCheckBox::clicked, this,
+    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, ui->fixedDurationSuffixLabel,
+        &QWidget::setEnabled);
+    connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
 
     connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
-    connect(ui->autoResetSpinBox, QnSpinboxIntValueChanged, this,
+    connect(ui->fixedDurationSpinBox, QnSpinboxIntValueChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
 
-    connect(ui->autoResetCheckBox, &QCheckBox::toggled, this,
+    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, this,
         [this](bool checked)
         {
             // Prolonged type of event has changed. In case of instant
@@ -48,9 +50,9 @@ QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()
 void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after)
 {
     setTabOrder(before, ui->relayComboBox);
-    setTabOrder(ui->relayComboBox, ui->autoResetCheckBox);
-    setTabOrder(ui->autoResetCheckBox, ui->autoResetSpinBox);
-    setTabOrder(ui->autoResetSpinBox, after);
+    setTabOrder(ui->relayComboBox, ui->fixedDurationCheckBox);
+    setTabOrder(ui->fixedDurationCheckBox, ui->fixedDurationSpinBox);
+    setTabOrder(ui->fixedDurationSpinBox, after);
 }
 
 void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
@@ -64,8 +66,8 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
     {
         bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
         if (!hasToggleState)
-            ui->autoResetCheckBox->setChecked(true);
-        setReadOnly(ui->autoResetCheckBox, !hasToggleState);
+            ui->fixedDurationCheckBox->setChecked(true);
+        setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
     }
 
     if (fields.testFlag(QnBusiness::ActionResourcesField))
@@ -118,11 +120,11 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
 
-        int autoReset = params.durationMs / 1000;
-        ui->autoResetCheckBox->setChecked(autoReset > 0);
-        if (autoReset > 0)
+        int fixedDuration = params.durationMs / 1000;
+        ui->fixedDurationCheckBox->setChecked(fixedDuration > 0);
+        if (fixedDuration > 0)
         {
-            ui->autoResetSpinBox->setValue(autoReset);
+            ui->fixedDurationSpinBox->setValue(fixedDuration);
         }
     }
 }
@@ -134,8 +136,8 @@ void QnCameraOutputBusinessActionWidget::paramsChanged()
 
     QnBusinessActionParameters params = model()->actionParams();
     params.relayOutputId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
-    params.durationMs = ui->autoResetCheckBox->isChecked()
-        ? ui->autoResetSpinBox->value() * 1000
+    params.durationMs = ui->fixedDurationCheckBox->isChecked()
+        ? ui->fixedDurationSpinBox->value() * 1000
         : 0;
     model()->setActionParams(params);
 }
