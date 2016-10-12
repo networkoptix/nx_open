@@ -3897,4 +3897,30 @@ void QnPlOnvifResource::fillFullUrlInfo( const CapabilitiesResp& response )
         : getDeviceOnvifUrl().toStdString();
 }
 
+/**
+ * Some cameras provide model in a bit different way via native driver and ONVIF driver.
+ * Try several variants to match json data.
+ */
+bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const QString& model)
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, model);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return true;
+
+    QString shortModel = model;
+    shortModel.replace(QString(lit(" ")), QString());
+    shortModel.replace(QString(lit("-")), QString());
+    resourceData = qnCommon->dataPool()->data(manufacturer, shortModel);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return true;
+
+    if (shortModel.startsWith(manufacturer))
+        shortModel = shortModel.mid(manufacturer.length()).trimmed();
+    resourceData = qnCommon->dataPool()->data(manufacturer, shortModel);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return true;
+
+    return false;
+}
+
 #endif //ENABLE_ONVIF

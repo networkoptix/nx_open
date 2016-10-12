@@ -163,11 +163,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         QString manufacturer = resource->getVendor();
         QString modelName = resource->getModel();
 
-        QString shortModel = modelName;
-        if (modelName.startsWith(manufacturer))
-            shortModel = modelName.mid(manufacturer.length()).trimmed();
-        QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, shortModel);
-        const bool forceOnvif = resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME);
+        const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(manufacturer, modelName);
         if (!forceOnvif)
         {
             if (NameHelper::instance().isSupported(modelName))
