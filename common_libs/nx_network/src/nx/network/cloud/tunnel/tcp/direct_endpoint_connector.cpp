@@ -55,9 +55,9 @@ void DirectEndpointConnector::connect(
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
     if (!s_needVerification)
     {
+        auto endpoint = std::move(response.forwardedTcpEndpointList.front());
         return post(
-            [this, endpoint = std::move(response.forwardedTcpEndpointList.front()),
-                handler = std::move(handler)]() mutable
+            [this, endpoint = std::move(endpoint), handler = std::move(handler)]() mutable
             {
                 m_completionHandler = std::move(handler);
                 reportSuccessfulVerificationResult(std::move(endpoint), nullptr);
