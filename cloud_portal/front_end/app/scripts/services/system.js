@@ -163,8 +163,9 @@ angular.module('cloudApp')
             if(!user.isEnabled){
                 return { name: 'Disabled' }
             }
+            var roles = this.accessRoles || Config.accessRoles.predefinedRoles;
             var self = this;
-            var role = _.find(this.accessRoles,function(role){
+            var role = _.find(roles,function(role){
 
                 if(role.isOwner){ // Owner flag has top priority and overrides everything
                     return role.isOwner == user.isAdmin;
@@ -180,7 +181,7 @@ angular.module('cloudApp')
                 return role.permissions == user.permissions;
             });
 
-            return role || this.accessRoles[this.accessRoles.length - 1];
+            return role || roles[roles.length - 1];
         };
 
         system.prototype.getUsersDataFromTheSystem = function(){
