@@ -3730,7 +3730,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserDataList& userList
 {
     QString filterStr;
     if( !id.isNull() )
-        filterStr = QString("WHERE u.id = %1").arg(guidToSqlString(id));
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
 
     QString queryStr = lit(" \
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
