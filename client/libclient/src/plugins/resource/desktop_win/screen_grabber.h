@@ -28,6 +28,7 @@ Q_DECLARE_METATYPE(CaptureInfoPtr)
 
 class QnScreenGrabber: public QObject
 {
+    Q_OBJECT
 public:
 
 
