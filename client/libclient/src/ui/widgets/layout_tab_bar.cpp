@@ -33,7 +33,6 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
 
-
 QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     QTabBar(parent),
     QnWorkbenchContextAware(parent),
@@ -48,6 +47,7 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     setTabsClosable(true);
     setElideMode(Qt::ElideRight);
     setTabShape(this, style::TabShape::Rectangular);
+    setUsesScrollButtons(false);
 
     connect(this, &QTabBar::currentChanged,     this, &QnLayoutTabBar::at_currentChanged);
     connect(this, &QTabBar::tabCloseRequested,  this, &QnLayoutTabBar::at_tabCloseRequested);
@@ -121,6 +121,18 @@ void QnLayoutTabBar::submitCurrentLayout()
     checkInvariants();
 }
 
+void QnLayoutTabBar::fixGeometry()
+{
+    /*
+     * Our overridden minimumSizeHint method break QTabBar geometry calculations. As a side effect
+     * single layout with a short name may be overlapped by scroll buttons. Reason is: internal
+     * calculations depend on fact that minimum width is not less than 100px.
+     */
+    setUsesScrollButtons(count() > 1);
+    if (auto parent = parentWidget())
+        parent->layout()->activate();
+}
+
 QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
 {
     if (!layout)
@@ -179,6 +191,7 @@ void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout)
         return;
 
     setTabText(idx, newText);
+    fixGeometry();
     emit tabTextChanged();
 }
 
@@ -300,8 +313,7 @@ void QnLayoutTabBar::at_workbench_layoutsChanged()
             removeTab(count() - 1);
 
         /* Force parent widget layout recalculation: */
-        if (auto parent = parentWidget())
-            parent->layout()->activate();
+        fixGeometry();
 
         /* Current layout may have changed. Sync. */
         at_workbench_currentLayoutChanged();
