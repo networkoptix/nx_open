@@ -469,8 +469,17 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
             return soapRes == SOAP_OK;
     }
 
-    setLogin(QString());
-    setPassword(QString());
+    if (!possibleCredentials.empty())
+    {
+        auto first = possibleCredentials.cbegin();
+        setLogin(first->user);
+        setPassword(first->password);
+    }
+    else
+    {
+        setLogin(QString());
+        setPassword(QString());
+    }
 
     return false;
 }

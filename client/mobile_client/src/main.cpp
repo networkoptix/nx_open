@@ -164,18 +164,20 @@ int runUi(QGuiApplication *application) {
     return application->exec();
 }
 
-int runApplication(QGuiApplication *application, const QnUuid& videowallInstanceGuid) {
+int runApplication(QGuiApplication *application, const QnUuid& videowallInstanceGuid)
+{
+    auto peerType = Qn::PT_MobileClient;
+
     NX_ASSERT(nx::utils::TimerManager::instance());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(Qn::PT_MobileClient, nx::utils::TimerManager::instance()));
+        getConnectionFactory(peerType, nx::utils::TimerManager::instance()));
 
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = qnSettings->isLiteClientModeEnabled()
-        ? Qn::PT_LiteClient : Qn::PT_MobileClient;
+    runtimeData.peer.peerType = peerType;
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.customization = QnAppInfo::customizationName();

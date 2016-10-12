@@ -49,7 +49,6 @@ class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
-class QnScreenRecorder;
 class QnGraphicsMessageBox;
 
 class WeakGraphicsItemPointerList;
@@ -73,7 +72,7 @@ public:
     /**
      * Virtual destructor.
      */
-    virtual ~QnWorkbenchController();
+    virtual ~QnWorkbenchController() = default;
 
     QnWorkbenchGridMapper *mapper() const;
 
@@ -121,10 +120,6 @@ public:
     void setMenuEnabled(bool menuEnabled) {
         m_menuEnabled = menuEnabled;
     }
-
-public slots:
-    void startRecording();
-    void stopRecording();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -196,16 +191,9 @@ protected slots:
     void at_toggleInfoAction_triggered();
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
-    void at_recordingAction_triggered(bool checked);
     void at_toggleTourModeAction_triggered(bool checked);
     void at_fitInViewAction_triggered();
     void at_checkFileSignatureAction_triggered();
-
-    void at_screenRecorder_error(const QString &errorMessage);
-    void at_screenRecorder_recordingStarted();
-    void at_screenRecorder_recordingFinished(const QString &recordedFileName);
-
-    void at_recordingAnimation_finished();
 
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
@@ -306,15 +294,6 @@ private:
 
     /** Target geometries for concatenation of dragged and replaced item lists. */
     QList<QRect> m_dragGeometries;
-
-
-    /* Screen recording-related state. */
-
-    /** Screen recorder object. */
-    QnScreenRecorder *m_screenRecorder;
-
-    /** Screen recording countdown label. */
-    QnGraphicsMessageBox *m_recordingCountdownLabel;
 
     QnGraphicsMessageBox *m_tourModeHintLabel;
 

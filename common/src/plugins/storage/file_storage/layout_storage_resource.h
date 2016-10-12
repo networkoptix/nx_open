@@ -48,9 +48,7 @@ public:
 
     QnTimePeriodList getTimePeriods(const QnResourcePtr &resource);
 
-    static QString updateNovParent(const QString& novName, const QString& itemName);
-
-    static QString layoutPrefix();
+    static QString itemUniqueId(const QString& layoutUrl, const QString& itemUniqueId);
 
     virtual QString getPath() const override;
 public:
@@ -77,8 +75,6 @@ public:
         QnLayoutFileIndexEntry entries[MAX_FILES_AT_LAYOUT];
     };
 #pragma pack(pop)
-
-    static QString removeProtocolPrefix(const QString& url);
 
 private:
     bool addFileEntry(const QString& fileName);

@@ -42,7 +42,7 @@ protected:
     virtual void applyChanges() override;
 
 private:
-    void accessibleLayoutsChanged();
+    void at_model_currentChanged(const QModelIndex& current);
 
 private:
     Q_DISABLE_COPY(QnUserGroupsDialog)

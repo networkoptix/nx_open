@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-#include "self_updater.h"
+#include <client/self_updater.h>
 
 #include <QtCore/QString>
 #include <QtCore/QDir>

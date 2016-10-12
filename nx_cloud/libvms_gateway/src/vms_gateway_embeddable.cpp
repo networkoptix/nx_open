@@ -17,7 +17,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
     addArg("-cloudConnect/allowIpTarget", "true");
     addArg("-http/allowTargetEndpointInUrl", "true");
     //addArg("-http/connectSupport", "true");
-    addArg("cloudConnect/tcpReversePoolSize", "0");
+    addArg("-cloudConnect/tcpReversePoolSize", "0");
 
     if (isSslEnabled)
     {
@@ -34,6 +34,7 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
         auto endpoints = moduleInstance()->impl()->httpEndpoints();
         NX_ASSERT(endpoints.size() == 1);
         m_endpoint = std::move(endpoints.front());
+        qDebug() << "VmsGatewayEmbeddable has started on" << m_endpoint.toString();
     }
 }
 

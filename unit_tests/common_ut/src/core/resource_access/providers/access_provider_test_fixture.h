@@ -19,7 +19,8 @@ protected:
     virtual void SetUp();
     virtual void TearDown();
 
-    QnAbstractResourceAccessProvider* accessProvider() const;
+    void setupAwaitAccess();
+    virtual QnAbstractResourceAccessProvider* accessProvider() const = 0;
 
     void awaitAccessValue(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         QnAbstractResourceAccessProvider::Source value);
@@ -27,11 +28,8 @@ protected:
     void at_accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         QnAbstractResourceAccessProvider::Source value);
 
-    virtual QnAbstractResourceAccessProvider* createAccessProvider() const = 0;
-
 private:
     QSharedPointer<QnCommonModule> m_module;
-    QnAbstractResourceAccessProvider* m_accessProvider;
 
     struct AwaitedAccess
     {

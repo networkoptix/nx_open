@@ -64,7 +64,7 @@ MaskedComboBox
                 {
                     target: textItem;
                     property: "text";
-                    value: control.value;
+                    value: control.displayValue;
                 }
             }
 

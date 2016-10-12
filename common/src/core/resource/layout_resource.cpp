@@ -89,24 +89,21 @@ QnLayoutItemDataMap QnLayoutResource::getItems() const
     return m_items->getItems();
 }
 
-static QString removeProtocolPrefix(const QString& url)
-{
-    int prefix = url.indexOf(QLatin1String("://"));
-    return prefix == -1 ? url : url.mid(prefix + 3);
-}
-
 void QnLayoutResource::setUrl(const QString& value)
 {
-    QString oldValue = removeProtocolPrefix(getUrl());
-    QnResource::setUrl(value);
-    QString newValue = removeProtocolPrefix(getUrl());
+    NX_ASSERT(!value.startsWith(lit("layout:")));
 
-    if (!oldValue.isEmpty() && oldValue != newValue)
+    QString oldValue = getUrl();
+    QnResource::setUrl(value);
+
+    if (!oldValue.isEmpty() && oldValue != value)
     {
+        NX_ASSERT(isFile());
         // Local layout renamed
         for (auto item : m_items->getItems())
         {
-            item.resource.uniqueId = QnLayoutFileStorageResource::updateNovParent(value, item.resource.uniqueId);
+            item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(value,
+                item.resource.uniqueId);
             m_items->updateItem(item);
         }
     }
@@ -127,8 +124,7 @@ Qn::Notifier QnLayoutResource::storedItemRemoved(const QnLayoutItemData& item)
     return [r = toSharedPointer(this), item]{ emit r->itemRemoved(r, item); };
 }
 
-Qn::Notifier QnLayoutResource::storedItemChanged(const QnLayoutItemData& /*oldItem*/,
-    const QnLayoutItemData& item)
+Qn::Notifier QnLayoutResource::storedItemChanged(const QnLayoutItemData& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->itemChanged(r, item); };
 }
@@ -350,7 +346,8 @@ void QnLayoutResource::setLocked(bool value)
 
 bool QnLayoutResource::isFile() const
 {
-    return !getUrl().isEmpty();
+    NX_EXPECT(hasFlags(Qn::exported_layout) == !getUrl().isEmpty());
+    return hasFlags(Qn::exported_layout);
 }
 
 bool QnLayoutResource::isShared() const

@@ -1,15 +1,17 @@
+#include <future>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QDir>
 
 #include "functional_tests/test_setup.h"
+#include "functional_tests/test_email_manager.h"
 
 namespace nx {
 namespace cdb {
 namespace test {
 
-class DbRegress
-:
+class DbRegress:
     public CdbFunctionalTest
 {
 public:
@@ -52,7 +54,9 @@ TEST_F(DbRegress, general)
     ASSERT_EQ("Andrey Kolesnikov", testAccount.fullName);
 
     std::vector<api::SystemDataEx> systems;
-    ASSERT_EQ(api::ResultCode::ok, getSystems("akolesnikov@networkoptix.com", "123", &systems));
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystems("akolesnikov@networkoptix.com", "123", &systems));
     ASSERT_EQ(6, systems.size());
 
     const auto laOfficeTestSystemIter = std::find_if(
@@ -63,6 +67,68 @@ TEST_F(DbRegress, general)
         });
     ASSERT_NE(systems.end(), laOfficeTestSystemIter);
     ASSERT_EQ(api::SystemStatus::ssActivated, laOfficeTestSystemIter->status);
+}
+
+class DbFailure: 
+    public CdbFunctionalTest
+{
+public:
+    DbFailure()
+    {
+        QDir().mkpath(testDataDir());
+    }
+};
+
+/**
+ * Blocking db connection thread and checking if subsequent db request will fail with 
+ * retryLater result.
+ */
+TEST_F(DbFailure, basic)
+{
+    addArg("--db/maxPeriodQueryWaitsForAvailableConnection=1s");
+    addArg("--db/maxConnectionCount=1");
+
+    bool insertDelay = false;
+    TestEmailManager testEmailManager(
+        [&insertDelay](const AbstractNotification& /*notification*/)
+        {
+            if (insertDelay)
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+        });
+    
+    EMailManagerFactory::setFactory(
+        [&testEmailManager](const conf::Settings& /*settings*/)
+        {
+            return std::make_unique<EmailManagerStub>(&testEmailManager);
+        });
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+
+    auto cdbConnection = connection(account.data.email, account.password);
+    api::AccountData accountData;
+    accountData.email = generateRandomEmailAddress();
+    accountData.passwordHa1 = "sdfdsfsdf";
+    insertDelay = true;
+    std::promise<api::ResultCode> newAccountRegisteredPromise;
+    cdbConnection->accountManager()->registerNewAccount(
+        std::move(accountData),
+        [&newAccountRegisteredPromise](
+            api::ResultCode resultCode,
+            api::AccountConfirmationCode /*confirmationCode*/)
+        {
+            newAccountRegisteredPromise.set_value(resultCode);
+        });
+
+    api::AccountUpdateData accountUpdate;
+    accountUpdate.fullName = "qweasd123";
+    ASSERT_EQ(
+        api::ResultCode::retryLater,
+        updateAccount(account.data.email, account.password, accountUpdate));
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        newAccountRegisteredPromise.get_future().get());
 }
 
 } // namespace test

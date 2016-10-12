@@ -76,7 +76,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
         kHorizontalMargin,
         kVerticalMargin,
         kHorizontalMargin,
-        kVerticalMargin);  
+        kVerticalMargin);
     layout->addItem(m_label);
     setLayout(layout);
 
@@ -144,44 +144,6 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int
     return box;
 }
 
-QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text, int timeoutMsec)
-{
-    auto holder = QnGraphicsMessageBoxHolder::instance();
-    NX_ASSERT(holder);
-    if (!holder)
-        return nullptr;
-
-    QPointer<QnGraphicsMessageBox> box = new QnGraphicsMessageBox(holder, QString(), timeoutMsec);
-    holder->addItem(box);
-
-    QElapsedTimer elapsed;
-    elapsed.start();
-
-    const auto tickHandler = 
-        [box, text, timeoutMsec, e = std::move(elapsed)]
-        {
-            if (!box)
-                return;
-
-            int left = timeoutMsec - e.elapsed();
-            int n = (left + 500) / 1000;
-
-            if (n > 0)
-                box->setText(text.arg(n));
-            else
-                box->hideImmideately();
-        };
-    auto timer = new QTimer(box);
-    timer->setSingleShot(false);
-    timer->setInterval(200);
-    connect(timer, &QTimer::timeout, box, tickHandler);
-    timer->start();
-
-    tickHandler();
-
-    return box;
-}
-
 void QnGraphicsMessageBox::showAnimated()
 {
     auto animator = opacityAnimator(this);
@@ -191,7 +153,7 @@ void QnGraphicsMessageBox::showAnimated()
         setOpacity(1.0);
     else
         animator->animateTo(1.0);
-        
+
     //animator->setTimeLimit(200);
 }
 
@@ -220,6 +182,6 @@ void QnGraphicsMessageBox::hideImmideately()
         animator->stop();
     setVisible(false);
     emit finished();
-    deleteLater();  
+    deleteLater();
 }
 

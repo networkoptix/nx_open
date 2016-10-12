@@ -156,7 +156,6 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     QnResourcePtr existCamRes = qnResPool->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
         qnResPool->removeResource(existCamRes);
-    QnCommonMessageProcessor::instance()->updateResource(apiCameraData);
 
     ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()
         ->getCameraManager(Qn::kSystemAccess)
@@ -168,15 +167,9 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
             .arg(ec2::toString(errorCode)),
             cl_logWARNING
         );
-        // Here, if the transaction has failed, we have to restore Resource Pool
-        // initial (before cameraResource processing began) state.
-        qnResPool->removeResource(qnResPool->getResourceById(apiCameraData.id));
-        if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
-            QnCommonMessageProcessor::instance()->updateResource(existCamRes);
-        return errorCode;
     }
 
-    return ec2::ErrorCode::ok;
+    return errorCode;
 }
 
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const

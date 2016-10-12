@@ -4138,41 +4138,79 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabas
     return ErrorCode::ok;
 }
 
+// TODO: Change to a function. ATTENTION: Macro contains "return".
+#define DB_LOAD(ID, DATA) do \
+{ \
+    const ErrorCode errorCode = doQueryNoLock(ID, DATA); \
+    if (errorCode != ErrorCode::ok) \
+        return errorCode; \
+} while (0)
 
-// TODO: #mike Check dummy vs QnUuid
-// ApiFullInfo
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfoData& data)
+ErrorCode QnDbManager::readApiFullInfoDataComplete(ApiFullInfoData* data)
 {
-//    ErrorCode status;
+    QnWriteLocker lock(&m_mutex);
 
-#define db_load(target)      { ErrorCode status = doQueryNoLock(nullptr, target); if (status != ErrorCode::ok) return status; }
-#define db_load_uuid(target) { ErrorCode status = doQueryNoLock(QnUuid(), target); if (status != ErrorCode::ok) return status; }
-
-    db_load(data.resourceTypes);
-
-    db_load_uuid(data.servers);
-    db_load_uuid(data.serversUserAttributesList);
-    db_load_uuid(data.cameras);
-    db_load_uuid(data.cameraUserAttributesList);
-    db_load_uuid(data.users);
-    db_load_uuid(data.userGroups);
-    db_load_uuid(data.layouts);
-    db_load_uuid(data.videowalls);
-    db_load_uuid(data.webPages);
-    db_load_uuid(data.rules);
-    db_load(data.cameraHistory);
-    db_load(data.licenses);
-    db_load_uuid(data.discoveryData);
-    db_load_uuid(data.allProperties);
-    db_load_uuid(data.storages);
-    db_load_uuid(data.resStatusList);
-    db_load(data.accessRights);
-
-#undef db_load_uuid
-#undef db_load
+    DB_LOAD(nullptr, data->resourceTypes);
+    DB_LOAD(QnUuid(), data->servers);
+    DB_LOAD(QnUuid(), data->serversUserAttributesList);
+    DB_LOAD(QnUuid(), data->cameras);
+    DB_LOAD(QnUuid(), data->cameraUserAttributesList);
+    DB_LOAD(QnUuid(), data->users);
+    DB_LOAD(QnUuid(), data->userGroups);
+    DB_LOAD(QnUuid(), data->layouts);
+    DB_LOAD(QnUuid(), data->videowalls);
+    DB_LOAD(QnUuid(), data->webPages);
+    DB_LOAD(QnUuid(), data->rules);
+    DB_LOAD(nullptr, data->cameraHistory);
+    DB_LOAD(nullptr, data->licenses);
+    DB_LOAD(QnUuid(), data->discoveryData);
+    DB_LOAD(QnUuid(), data->allProperties);
+    DB_LOAD(QnUuid(), data->storages);
+    DB_LOAD(QnUuid(), data->resStatusList);
+    DB_LOAD(nullptr, data->accessRights);
 
     return ErrorCode::ok;
 }
+
+ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
+    ApiFullInfoData* data, const QnUuid& userId)
+{
+    QnWriteLocker lock(&m_mutex);
+
+    DB_LOAD(QnUuid(), data->servers);
+    DB_LOAD(QnUuid(), data->serversUserAttributesList);
+    DB_LOAD(QnUuid(), data->cameras);
+    DB_LOAD(QnUuid(), data->cameraUserAttributesList);
+
+    DB_LOAD(userId, data->users);
+    const ApiUserData* user = nullptr;
+    if (data->users.size() == 1)
+        user = &data->users[0];
+
+    if (user) // Do not load userGroups if there is no current user.
+        DB_LOAD(user->groupId, data->userGroups);
+
+    DB_LOAD(QnUuid(), data->layouts);
+    if (user) // Remove layouts belonging to other users.
+    {
+        data->layouts.erase(std::remove_if(data->layouts.begin(), data->layouts.end(),
+            [user](const ApiLayoutData& layout)
+            {
+                return layout.parentId != user->id;
+            }),
+            data->layouts.end());
+    }
+
+    DB_LOAD(nullptr, data->cameraHistory);
+    DB_LOAD(QnUuid(), data->discoveryData);
+    DB_LOAD(QnUuid(), data->allProperties);
+    DB_LOAD(QnUuid(), data->resStatusList);
+    DB_LOAD(nullptr, data->accessRights);
+
+    return ErrorCode::ok;
+}
+
+#undef DB_LOAD
 
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList &data) {
     QSqlQuery query(m_sdb);

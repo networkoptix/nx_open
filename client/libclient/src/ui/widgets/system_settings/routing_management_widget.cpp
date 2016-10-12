@@ -242,8 +242,10 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
 
 void QnRoutingManagementWidget::loadDataToUi() {
+    m_changes->changes.clear();
     ui->warningLabel->hide();
     updateModel();
+    updateUi();
 }
 
 void QnRoutingManagementWidget::applyChanges() {

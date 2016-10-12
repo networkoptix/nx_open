@@ -162,7 +162,7 @@ void serializeToUrlQuery(const SystemNameUpdate& data, QUrlQuery* const urlQuery
     url::serializeField(urlQuery, SystemNameUpdate_name_field, data.name);
 }
 
-//-----------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
 
 MAKE_FIELD_NAME_STR_CONST(UserSessionDescriptor, accountEmail)

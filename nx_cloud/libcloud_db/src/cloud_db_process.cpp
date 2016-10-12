@@ -141,7 +141,7 @@ int CloudDBProcess::exec()
         settings.load( m_argc, m_argv );
         if( settings.showHelp() )
         {
-            settings.printCmdLineArgsHelp();
+            settings.printCmdLineArgsHelpToCout();
             return 0;
         }
 
@@ -256,7 +256,8 @@ int CloudDBProcess::exec()
         AuthenticationProvider authProvider(
             settings,
             accountManager,
-            systemManager);
+            systemManager,
+            tempPasswordManager);
         m_authProvider = &authProvider;
 
         MaintenanceManager maintenanceManager(
@@ -287,7 +288,7 @@ int CloudDBProcess::exec()
 
         if (m_settings->auth().connectionInactivityPeriod.count())
         {
-            multiAddressHttpServer.forEach(
+            multiAddressHttpServer.forEachListener(
                 [&](nx_http::HttpStreamSocketServer* server)
                 {
                     server->setConnectionInactivityTimeout(
@@ -388,11 +389,11 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<PingHandler>(authorizationManager);
         });
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AccountManager
     registerHttpHandler(
         kAccountRegisterPath,
-        &AccountManager::addAccount, accountManager,
+        &AccountManager::registerAccount, accountManager,
         EntityType::account, DataActionType::insert);
 
     registerHttpHandler(
@@ -425,7 +426,7 @@ void CloudDBProcess::registerApiHandlers(
         &AccountManager::createTemporaryCredentials, accountManager,
         EntityType::account, DataActionType::update);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // SystemManager
     registerHttpHandler(
         kSystemBindPath,
@@ -468,7 +469,7 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::account, DataActionType::update);
     //< TODO: #ak: current entity:action is not suitable for this request
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // AuthenticationProvider
     registerHttpHandler(
         kAuthGetNoncePath,
@@ -480,7 +481,7 @@ void CloudDBProcess::registerApiHandlers(
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // ec2::ConnectionManager
     registerHttpHandler(
         kEstablishEc2TransactionConnectionPath,
@@ -493,7 +494,7 @@ void CloudDBProcess::registerApiHandlers(
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 
-    //------------------------------------------
+    //---------------------------------------------------------------------------------------------
     // MaintenanceManager
     registerHttpHandler(
         kMaintenanceGetVmsConnections,
@@ -617,6 +618,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddSystemUsageFrequency);
     dbStructureUpdater.addUpdateFunc(&ec2::migration::addHistoryToTransaction::migrate);
     dbStructureUpdater.addUpdateScript(db::kAddInviteHasBeenSentAccountStatus);
+    dbStructureUpdater.addUpdateScript(db::kAddHa1CalculatedUsingSha256);
     return dbStructureUpdater.updateStructSync();
 }
 

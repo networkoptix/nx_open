@@ -17,7 +17,7 @@ public:
     static inline QStringList findAcceptedFiles(const QUrl &url)
     { return QnFileProcessor::findAcceptedFiles(QStringList() << url.toLocalFile()); }
 
-    static QnResourcePtr createResourcesForFile(const QString &file);
+    static QnResourcePtr createResourcesForFile(const QString& fileName);
     static QnResourceList createResourcesForFiles(const QStringList &files);
 
     static void deleteLocalResources(const QnResourceList &resources);

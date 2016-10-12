@@ -126,6 +126,8 @@ QtObject
 
     property QtObject fonts: QtObject
     {
+        property font screenRecording: Qt.font({ pixelSize: 22, weight: Font.weight});
+
         property QtObject systemTile: QtObject
         {
             readonly property font systemName: Qt.font({ pixelSize: 20, weight: Font.Light});

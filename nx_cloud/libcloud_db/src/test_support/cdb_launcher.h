@@ -42,6 +42,9 @@ public:
     SocketAddress endpoint() const;
 
     nx::cdb::api::ConnectionFactory* connectionFactory();
+    std::unique_ptr<nx::cdb::api::Connection> connection(
+        const std::string& login,
+        const std::string& password);
     api::ModuleInfo moduleInfo() const;
 
     QString testDataDir() const;

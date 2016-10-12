@@ -1,7 +1,5 @@
 #include "desktop_stream_reader.h"
 
-#ifdef Q_OS_WIN
-
 #include <core/resource/resource.h>
 
 #include <nx/streaming/config.h>
@@ -172,6 +170,3 @@ bool QnDesktopStreamreader::isStreamOpened() const
 {
     return m_initialized;
 }
-
-#endif // Q_OS_WIN
-

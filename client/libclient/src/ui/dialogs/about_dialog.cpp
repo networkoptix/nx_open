@@ -133,7 +133,6 @@ void QnAboutDialog::retranslateUi()
         .arg(QnAppInfo::applicationArch())
         .arg(QnAppInfo::applicationCompiler());
 
-//    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QString servers = connectedServers();
     if (servers.isEmpty())
         servers = tr("Client is not connected to any system");

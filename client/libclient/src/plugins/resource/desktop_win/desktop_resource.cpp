@@ -1,7 +1,5 @@
 #include "desktop_resource.h"
 
-#if defined(Q_OS_WIN)
-
 #include "plugins/resource/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "core/resource/media_server_resource.h"
@@ -99,4 +97,3 @@ QnConstResourceAudioLayoutPtr QnWinDesktopResource::getAudioLayout(const QnAbstr
         return emptyAudioLayout;
     return m_desktopDataProvider->getAudioLayout();
 }
-#endif

@@ -14,7 +14,7 @@ public:
 
     bool isConnected() const;
 
-    virtual void updateResource(const QnResourcePtr &resource) override;
+    virtual void updateResource(const QnResourcePtr &resource, const QnUuid& peerId) override;
 
 protected:
     virtual QnResourceFactory* getResourceFactory() const override;

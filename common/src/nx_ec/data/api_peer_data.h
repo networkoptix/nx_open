@@ -54,7 +54,9 @@ struct ApiPeerData: ApiIdData
 
     bool isMobileClient() const
     {
-        return peerType == Qn::PT_MobileClient || peerType == Qn::PT_LiteClient;
+        return
+            peerType == Qn::PT_OldMobileClient ||
+            peerType == Qn::PT_MobileClient;
     }
 
     /** Unique running instance ID of the peer. */

@@ -704,14 +704,15 @@ Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters 
     return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
 }
 
-Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources) {
+Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources)
+{
     if(resources.size() != 1)
         return Qn::InvisibleAction;
 
     QnResourcePtr resource = resources[0];
-    bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
-            && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-    bool isExportedLayout = resource->hasFlags(Qn::url | Qn::local | Qn::layout);
+    bool isLocalResource = resource->hasFlags(Qn::local_media)
+        && !resource->hasFlags(Qn::exported);
+    bool isExportedLayout = resource->hasFlags(Qn::exported_layout);
 
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
 }
@@ -798,14 +799,14 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     bool isExportedLayout = layout->isFile();
     bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
-    for (const QnResourcePtr& resource : resources)
+    for (const auto& resource : resources)
     {
         bool isServer = resource->hasFlags(Qn::server);
         if (isServer && !isAdmin)
             return Qn::InvisibleAction;
     }
 
-    foreach (const QnResourcePtr &resource, resources)
+    for (const auto& resource: resources)
     {
         //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
@@ -815,8 +816,8 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
         bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
 
         bool isMediaResource = resource->hasFlags(Qn::media);
-        bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
-            && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
+        bool isLocalResource = resource->hasFlags(Qn::local_media)
+            && !resource->hasFlags(Qn::exported);
 
         bool allowed = nonVideo || isMediaResource;
         bool forbidden = isExportedLayout && (nonVideo || isLocalResource);

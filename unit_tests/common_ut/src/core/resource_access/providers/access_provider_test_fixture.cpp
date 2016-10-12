@@ -12,34 +12,12 @@
 void QnAccessProviderTestFixture::SetUp()
 {
     m_module.reset(new QnCommonModule());
-
-    for (auto provider : qnResourceAccessProvider->providers())
-    {
-        qnResourceAccessProvider->removeBaseProvider(provider);
-        delete provider;
-    }
-
-    m_accessProvider = createAccessProvider();
-    qnResourceAccessProvider->addBaseProvider(m_accessProvider);
-
-    QObject::connect(m_accessProvider,
-        &QnAbstractResourceAccessProvider::accessChanged,
-        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            QnAbstractResourceAccessProvider::Source value)
-        {
-            at_accessChanged(subject, resource, value);
-        });
 }
 
 void QnAccessProviderTestFixture::TearDown()
 {
     ASSERT_TRUE(m_awaitedAccessQueue.empty());
     m_module.clear();
-}
-
-QnAbstractResourceAccessProvider* QnAccessProviderTestFixture::accessProvider() const
-{
-    return m_accessProvider;
 }
 
 void QnAccessProviderTestFixture::awaitAccessValue(const QnResourceAccessSubject& subject,
@@ -64,5 +42,16 @@ void QnAccessProviderTestFixture::at_accessChanged(const QnResourceAccessSubject
         m_awaitedAccessQueue.pop_front();
         ASSERT_EQ(value, awaited.value);
     }
+}
+
+void QnAccessProviderTestFixture::setupAwaitAccess()
+{
+    QObject::connect(accessProvider(),
+        &QnAbstractResourceAccessProvider::accessChanged,
+        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+            QnAbstractResourceAccessProvider::Source value)
+        {
+            at_accessChanged(subject, resource, value);
+        });
 }
 

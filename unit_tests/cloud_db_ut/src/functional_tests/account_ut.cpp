@@ -7,14 +7,17 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <cdb/cloud_nonce.h>
 #include <data/account_data.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
-#include <nx/fusion/model_functions.h>
-#include <utils/common/app_info.h>
 #include <nx/utils/test_support/utils.h>
+#include <utils/common/app_info.h>
+
+#include <utils/common/sync_call.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
@@ -175,7 +178,14 @@ TEST_F(Account, general)
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
-        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(3);
+        sendAsyncMocked(
+            GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&)))
+            .Times(3);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(
+            GMOCK_DYNAMIC_TYPE_MATCHER(const SystemSharedNotification&)))
+            .Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
@@ -376,11 +386,13 @@ TEST_F(Account, update)
 
     api::AccountData account1;
     std::string account1Password;
-    api::ResultCode result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
 
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(account1.email, account1Password, &account1));
 
     //changing password
     std::string account1NewPassword = account1Password + "new";
@@ -389,24 +401,32 @@ TEST_F(Account, update)
         account1.email.c_str(),
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();
+    update.passwordHa1Sha256 = nx_http::calcHa1(
+        account1.email.c_str(),
+        moduleInfo().realm.c_str(),
+        account1NewPassword.c_str(),
+        "SHA-256").constData();
     update.fullName = account1.fullName + "new";
     update.customization = account1.customization + "new";
 
-    result = updateAccount(account1.email, account1Password, update);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        updateAccount(account1.email, account1Password, update));
 
     account1.fullName = update.fullName.get();
     account1.customization = update.customization.get();
 
     api::AccountData newAccount;
-    result = getAccount(account1.email, account1NewPassword, &newAccount);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(account1.email, account1NewPassword, &newAccount));
     ASSERT_EQ(newAccount, account1);
 
     restart();
 
-    result = getAccount(account1.email, account1NewPassword, &newAccount);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getAccount(account1.email, account1NewPassword, &newAccount));
     ASSERT_EQ(newAccount, account1);
 }
 
@@ -861,8 +881,62 @@ TEST_F(Account, temporary_credentials_expiration)
     }
 }
 
-TEST_F(Account, DISABLED_created_while_sharing)
+TEST_F(Account, temporary_credentials_login_to_system)
 {
+    constexpr const auto expirationPeriod = std::chrono::seconds(50);
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account = addActivatedAccount2();
+    const auto system = addRandomSystemToAccount(account);
+
+    api::TemporaryCredentialsParams params;
+    params.timeouts.expirationPeriod = expirationPeriod;
+    api::TemporaryCredentials temporaryCredentials;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        createTemporaryCredentials(
+            account.data.email,
+            account.password,
+            params,
+            &temporaryCredentials));
+
+    auto cdbConnection = connection(system.id, system.authKey);
+
+    api::AuthRequest authRequest;
+    authRequest.nonce = api::generateCloudNonceBase(system.id);
+    authRequest.realm = QnAppInfo::realm().toStdString();
+    authRequest.username = temporaryCredentials.login;
+
+    api::ResultCode resultCode = api::ResultCode::ok;
+    api::AuthResponse authResponse;
+    std::tie(resultCode, authResponse) =
+        makeSyncCall<api::ResultCode, api::AuthResponse>(
+            std::bind(
+                &nx::cdb::api::AuthProvider::getAuthenticationResponse,
+                cdbConnection->authProvider(),
+                authRequest,
+                std::placeholders::_1));
+    ASSERT_EQ(api::ResultCode::ok, resultCode);
+    ASSERT_EQ(account.data.email, authResponse.authenticatedAccountData.accountEmail);
+}
+
+TEST_F(Account, created_while_sharing)
+{
+    EmailManagerMocked mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const ActivateAccountNotification&))).Times(2);
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(GMOCK_DYNAMIC_TYPE_MATCHER(const InviteUserNotification&))).Times(1);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/)
+        {
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
+        });
+
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto account1 = addActivatedAccount2();
@@ -877,6 +951,8 @@ TEST_F(Account, DISABLED_created_while_sharing)
     const auto newAccountAccessRoleInSystem1 = api::SystemAccessRole::cloudAdmin;
     shareSystemEx(account1, system1, newAccountEmail, newAccountAccessRoleInSystem1);
 
+    // Ignoring invitation and registering account in a regular way
+
     data::AccountData newAccount;
     newAccount.email = newAccountEmail;
     api::AccountConfirmationCode accountConfirmationCode;
@@ -888,10 +964,16 @@ TEST_F(Account, DISABLED_created_while_sharing)
         api::ResultCode::ok,
         activateAccount(accountConfirmationCode, &resultEmail));
 
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        getAccount(newAccountEmail, newAccountPassword, &newAccount));
-    ASSERT_EQ(api::AccountStatus::activated, newAccount.statusCode);
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getAccount(newAccountEmail, newAccountPassword, &newAccount));
+        ASSERT_EQ(api::AccountStatus::activated, newAccount.statusCode);
+    }
 
     ASSERT_EQ(newAccountEmail, resultEmail);
 

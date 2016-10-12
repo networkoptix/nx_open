@@ -304,6 +304,43 @@ Rectangle
         }
     }
 
+    Rectangle
+    {
+        id: recordingHolder;
+        anchors.centerIn: parent;
+        visible: (context.countdownSeconds > 0);
+        opacity: (visible ? 1.0 : 0.0);
+
+        radius: 2;
+        color: Style.colorWithAlpha(
+            Style.darkerColor(Style.colors.brand, 2), 0.8);
+        width: recordingLabel.implicitWidth;
+        height: recordingLabel.implicitHeight;
+
+        Behavior on opacity
+        {
+            PropertyAnimation
+            {
+                target: recordingHolder;
+                property: "opacity";
+                duration: 200;
+            }
+        }
+
+        NxLabel
+        {
+            id: recordingLabel;
+            anchors.centerIn: parent;
+            font: Style.fonts.screenRecording;
+            standardColor: Style.colors.brandContrast;
+            leftPadding: 24;
+            rightPadding: leftPadding;
+            topPadding: 10;
+            bottomPadding: topPadding;
+            text: context.countdownMessage.arg(context.countdownSeconds);
+        }
+    }
+
     NxLabel
     {
         x: 8;
@@ -312,6 +349,7 @@ Rectangle
 
         text: context.softwareVersion;
         standardColor: Style.darkerColor(Style.colors.windowText, 1);
+
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
     }
 

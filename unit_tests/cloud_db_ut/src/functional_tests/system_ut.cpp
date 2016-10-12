@@ -442,7 +442,7 @@ TEST_F(System, rename)
     ASSERT_EQ(actualSystemName, systemData.name);
 }
 
-TEST_F(System, persistentSequence)
+TEST_F(System, persistent_sequence)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -517,7 +517,7 @@ void bringToTop(
     container.push_front(std::move(value));
 }
 
-TEST_F(System, sortingOrderWeightExpiration)
+TEST_F(System, sorting_order_weight_expiration)
 {
     nx::utils::test::ScopedTimeShift timeShift;
 
@@ -588,7 +588,7 @@ TEST_F(System, sortingOrderWeightExpiration)
     ASSERT_EQ(usageFrequency4, usageFrequency5);
 }
 
-TEST_F(System, sortingOrderMultipleSystems)
+TEST_F(System, sorting_order_multiple_systems)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -646,7 +646,7 @@ TEST_F(System, sortingOrderMultipleSystems)
     }
 }
 
-TEST_F(System, sortingOrderLastLoginTime)
+TEST_F(System, sorting_order_last_login_time)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -689,7 +689,7 @@ TEST_F(System, sortingOrderLastLoginTime)
     ASSERT_LT(lastLoginTime3, nx::utils::utcTime() + std::chrono::seconds(10));
 }
 
-TEST_F(System, sortingOrderNewSystemIsOnTop)
+TEST_F(System, sorting_order_new_system_is_on_top)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -749,7 +749,7 @@ TEST_F(System, sortingOrderNewSystemIsOnTop)
     }
 }
 
-TEST_F(System, sortingOrderPersistenceAfterSharingUpdate)
+TEST_F(System, sorting_order_persistence_after_sharing_update)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -785,6 +785,21 @@ TEST_F(System, sortingOrderPersistenceAfterSharingUpdate)
             });
         validateSystemsOrder(systemIdsInSortOrder, systems);
     }
+}
+
+TEST_F(System, sorting_order_unknown_system)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    const auto account1 = addActivatedAccount2();
+    const auto system1 = addRandomSystemToAccount(account1);
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        recordUserSessionStart(account1, system1.id));
+    ASSERT_EQ(
+        api::ResultCode::notFound,
+        recordUserSessionStart(account1, "{"+system1.id+"}"));
 }
 
 } // namespace cdb

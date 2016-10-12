@@ -1,18 +1,10 @@
-#ifndef QN_DESKTOP_STREAM_READER_H
-#define QN_DESKTOP_STREAM_READER_H
-
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_WIN
+#pragma once
 
 #include "core/dataprovider/spush_media_stream_provider.h"
-
 #include "buffered_screen_grabber.h"
 
-
-class QnDesktopStreamreader: public CLServerPushStreamReader {
-    Q_OBJECT
-
+class QnDesktopStreamreader: public CLServerPushStreamReader
+{
 public:
     QnDesktopStreamreader(const QnResourcePtr &dev);
     virtual ~QnDesktopStreamreader();
@@ -37,7 +29,3 @@ private:
     AVFrame* m_frame;
     AVPacket* m_outPacket;
 };
-
-#endif // Q_OS_WIN
-
-#endif //QN_DESKTOP_STREAM_READER_H

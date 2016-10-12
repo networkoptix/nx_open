@@ -9,6 +9,8 @@
 
 #include <nx/utils/log/log.h>
 
+// TODO: #ak: remove when NX_LOG supports filtering by message class
+//#define NX_STREE_ENABLE_DEBUG_LOGGING
 
 /*!
     Contains implementation of simple search tree
@@ -98,12 +100,16 @@ namespace stree
         //!Implementation of AbstractNode::get
         virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const override
         {
-            NX_LOG( lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2 );
+            #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                NX_LOG( lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2 );
+            #endif
 
             QVariant value;
             if( !in.get( m_matchResID, &value ) )
             {
-                NX_LOG( lit("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResID), cl_logDEBUG2 );
+                #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                    NX_LOG( lit("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResID), cl_logDEBUG2 );
+                #endif
                 return;
             }
 
@@ -112,12 +118,16 @@ namespace stree
             typename Container::const_iterator it = m_children.find( typedValue );
             if( it == m_children.end() )
             {
-                NX_LOG( lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2 );
+                #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                    NX_LOG( lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2 );
+                #endif
                 return;
             }
 
-            NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
-                .str(it->first).arg(value.toString()), cl_logDEBUG2);
+            #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
+                    .str(it->first).arg(value.toString()), cl_logDEBUG2);
+            #endif
             it->second->get( in, out );
         }
 

@@ -11,7 +11,7 @@ namespace ec2
     void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveUser);
-        emit addedOrUpdated(tran.params);
+        emit addedOrUpdated(tran.params, tran.peerID);
     }
 
     void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserGroupData>& tran)

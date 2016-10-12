@@ -701,6 +701,14 @@ bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subje
     return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
 }
 
+bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
+    Qn::UserRole role) const
+{
+    const auto permissions = QnUserRolesManager::userRolePermissions(role);
+    const bool isOwner = (role == Qn::UserRole::Owner);
+    return canCreateUser(subject, permissions, isOwner);
+}
+
 bool QnResourceAccessManager::canCreateVideoWall(const QnResourceAccessSubject& subject) const
 {
     if (!subject.isValid() || qnCommon->isReadOnly())

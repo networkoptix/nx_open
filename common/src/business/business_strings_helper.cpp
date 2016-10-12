@@ -391,6 +391,10 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
             result = tr("RTP packet loss detected.");
         break;
     }
+    case NetworkNoResponseFromDevice:
+    {
+        return tr("Device does not respond to network requests.");
+    }
     case ServerTerminatedReason:
     {
         result = tr("Connection to server is lost.");

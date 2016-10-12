@@ -8,19 +8,12 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/async_http_client_reply.h>
 #include <rest/server/json_rest_result.h>
 
-namespace
-{
-    enum
-    {
-        kCloudSystemsRefreshPeriodMs = 7 * 1000         // 7 seconds
-        , kCloudServerOutdateTimeoutMs = 10 * 1000      // 10 seconds
-    };
-
-    constexpr static const std::chrono::seconds kSystemConnectTimeout =
-        std::chrono::seconds(15);
-}
+static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(7);
+static const std::chrono::milliseconds kCloudServerOutdateTimeout = std::chrono::seconds(10);
+static const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seconds(15);
 
 QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     : base_type(parent)
@@ -46,7 +39,7 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
 
     connect(m_updateSystemsTimer, &QTimer::timeout
         , this, &QnCloudSystemsFinder::updateSystems);
-    m_updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriodMs);
+    m_updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod.count());
     m_updateSystemsTimer->start();
 
     onCloudStatusChanged(qnCloudStatusWatcher->status());
@@ -203,70 +196,72 @@ void QnCloudSystemsFinder::processFactoryServer(const QnModuleInformation& serve
     }
 }
 
-void QnCloudSystemsFinder::pingServerInternal(const QString &host
-    , int serverPriority
-    , const QString &systemId)
+void QnCloudSystemsFinder::pingServerInternal(
+    const QString& host,
+    int serverPriority,
+    const QString& systemId)
 {
-    static const auto kModuleInformationTemplate
-        = lit("http://%1:0/api/moduleInformation");
-    const auto apiUrl = QUrl(kModuleInformationTemplate.arg(host));
+    auto client = nx_http::AsyncHttpClient::create();
+    client->setAuthType(nx_http::AsyncHttpClient::authBasicAndDigest);
+    // First connection to a system (cloud and not cloud) may take a long time
+    // because it may require hole punching.
+    client->setSendTimeoutMs(kSystemConnectTimeout.count());
+    client->setResponseReadTimeoutMs(kSystemConnectTimeout.count());
 
-    const QPointer<QnCloudSystemsFinder> guard(this);
-    const auto onModuleInformationCompleted = [this, guard, systemId, host, serverPriority]
-        (SystemError::ErrorCode errorCode, int httpCode, nx_http::BufferType buffer)
-    {
-        if (!guard || (errorCode != SystemError::noError)
-            || (httpCode != nx_http::StatusCode::ok))
+    typedef QSharedPointer<QnAsyncHttpClientReply> ReplyPtr;
+    auto replyHolder = ReplyPtr(new QnAsyncHttpClientReply(client));
+
+    const auto handleReply =
+        [this, systemId, host, serverPriority, replyHolder]
+            (QnAsyncHttpClientReply* reply) mutable
         {
-            return;
-        }
+            /**
+             * Forces "manual" deletion instead of "deleteLater" because we don't
+             * have event loop in this thread.
+            **/
+            const auto replyDeleter = QnRaiiGuard::createDestructable(
+                [&replyHolder]() { replyHolder.reset(); });
 
-        QnJsonRestResult jsonReply;
-        if (!QJson::deserialize(buffer, &jsonReply))
-            return;
+            if (reply->isFailed())
+                return;
 
-        QnModuleInformation moduleInformation;
-        if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
-            return;
+            QnJsonRestResult jsonReply;
+            if (!QJson::deserialize(reply->data(), &jsonReply))
+                return;
 
-        const QnMutexLocker lock(&m_mutex);
-        const auto it = m_systems.find(systemId);
-        if (it == m_systems.end())
-            return;
+            QnModuleInformation moduleInformation;
+            if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
+                return;
 
-        // To prevent hanging on of fake online cloud servers
-        // It is almost not hack.
-        tryRemoveAlienServer(moduleInformation);
-        if (moduleInformation.serverFlags.testFlag(Qn::SF_NewSystem))
-        {
-            processFactoryServer(moduleInformation);
-            return;
-        }
+            const QnMutexLocker lock(&m_mutex);
+            const auto it = m_systems.find(systemId);
+            if (it == m_systems.end())
+                return;
 
-        if (systemId != moduleInformation.cloudSystemId)
-            return;
+            // To prevent hanging on of fake online cloud servers
+            // It is almost not hack.
+            tryRemoveAlienServer(moduleInformation);
+            if (moduleInformation.serverFlags.testFlag(Qn::SF_NewSystem))
+            {
+                processFactoryServer(moduleInformation);
+                return;
+            }
 
-        const auto serverId = moduleInformation.id;
-        const auto systemDescription = it.value();
-        if (systemDescription->containsServer(serverId))
-            systemDescription->updateServer(moduleInformation);
-        else
-            systemDescription->addServer(moduleInformation, serverPriority);
+            if (systemId != moduleInformation.cloudSystemId)
+                return;
 
-        systemDescription->setServerHost(serverId, host);
-    };
+            const auto serverId = moduleInformation.id;
+            const auto systemDescription = it.value();
+            if (systemDescription->containsServer(serverId))
+                systemDescription->updateServer(moduleInformation);
+            else
+                systemDescription->addServer(moduleInformation, serverPriority);
 
-    nx_http::AsyncHttpClient::Timeouts httpRequestTimeouts;
-    //first connect to a cloud (and not cloud) system may take a long time
-    //  since it may require hole punching
-    httpRequestTimeouts.sendTimeout = kSystemConnectTimeout;
-    httpRequestTimeouts.responseReadTimeout = kSystemConnectTimeout;
-    nx_http::downloadFileAsync(
-        apiUrl,
-        onModuleInformationCompleted,
-        nx_http::HttpHeaders(),
-        nx_http::AsyncHttpClient::authBasicAndDigest,
-        httpRequestTimeouts);
+            systemDescription->setServerHost(serverId, host);
+        };
+
+    connect(replyHolder, &QnAsyncHttpClientReply::finished, this, handleReply);
+    client->doGet(lit("http://%1:0/api/moduleInformation").arg(host));
 }
 
 void QnCloudSystemsFinder::checkOutdatedServersInternal(
@@ -277,7 +272,7 @@ void QnCloudSystemsFinder::checkOutdatedServersInternal(
     {
         const auto serverId = serverInfo.id;
         const auto elapsed = system->getServerLastUpdatedMs(serverId);
-        if (elapsed > kCloudServerOutdateTimeoutMs)
+        if (elapsed > kCloudServerOutdateTimeout.count())
         {
             system->removeServer(serverId);
 

@@ -28,10 +28,9 @@ namespace
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_currentTask(0),
-    m_updateTool(0),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnConnectToCurrentSystemTool>(this))
+    QnSessionAwareDelegate(parent),
+    m_currentTask(nullptr),
+    m_updateTool(nullptr)
 {
 }
 

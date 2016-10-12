@@ -28,7 +28,7 @@ namespace
 {
     static std::map<QnResourceAccessFilter::Filter, QString> kCategoryNameByFilter
     {
-        { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Media Resources") },
+        { QnResourceAccessFilter::MediaFilter, QnUserSettingsDialog::tr("Cameras && Resources") },
         { QnResourceAccessFilter::LayoutsFilter, QnUserSettingsDialog::tr("Shared Layouts") }
     };
 
@@ -53,12 +53,11 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(ProfilePage, m_profilePage, tr("Profile"));
     addPage(SettingsPage, m_settingsPage, tr("User Information"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
-    addPage(CamerasPage, m_camerasPage, tr("Media Resources"));
+    addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
-        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            Qn::Permissions permissions)
+        [this](const QnResourceAccessSubject& subject)
         {
             if (m_user && subject.user() == m_user)
                 permissionsChanged();

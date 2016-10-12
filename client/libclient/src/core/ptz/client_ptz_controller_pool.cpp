@@ -9,16 +9,17 @@ QnClientPtzControllerPool::QnClientPtzControllerPool(QObject *parent /*= NULL*/)
     : base_type(parent)
 {
     /* Auto-update presets when camera goes online. */
-    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
-    {
-        cacheCameraPresets(resource.dynamicCast<QnVirtualCameraResource>());
-    });
+    connect(qnResPool, &QnResourcePool::statusChanged, this,
+        &QnClientPtzControllerPool::cacheCameraPresets);
+
+    /* Controller may potentially be created with delay. */
+    connect(this, &QnPtzControllerPool::controllerChanged, this,
+        &QnClientPtzControllerPool::cacheCameraPresets);
 }
 
 void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) {
     base_type::registerResource(resource);
-
-    cacheCameraPresets(resource.dynamicCast<QnVirtualCameraResource>());
+    cacheCameraPresets(resource);
 }
 
 void QnClientPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
@@ -36,13 +37,15 @@ QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourceP
     return controller;
 }
 
-void QnClientPtzControllerPool::cacheCameraPresets(const QnVirtualCameraResourcePtr &camera)
+void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera || camera->getStatus() != Qn::Online)
         return;
 
     auto controller = this->controller(camera);
-    NX_ASSERT(controller, Q_FUNC_INFO, "Controller must exist here");
+
+    /* Controller may potentially be created with delay. */
     if (!controller)
         return;
 

@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
+api::ResultCode dbResultToApiResult( nx::db::DBResult dbResult )
 {
     switch( dbResult )
     {
@@ -30,6 +30,9 @@ api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
 
         case nx::db::DBResult::retryLater:
             return api::ResultCode::retryLater;
+
+        case nx::db::DBResult::uniqueConstraintViolation:
+            return api::ResultCode::alreadyExists;
     }
 
     return api::ResultCode::dbError;

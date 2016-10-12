@@ -1,7 +1,5 @@
 #include "win_audio_device_info.h"
 
-#ifdef Q_OS_WIN
-
 #include <Windows.h>
 #include <InitGuid.h>
 #include <Ks.h>
@@ -237,5 +235,3 @@ QPixmap QnWinAudioDeviceInfo::deviceIcon() const {
 bool QnWinAudioDeviceInfo::isMicrophone() const {
     return d->getIsMicrophone();
 }
-
-#endif // Q_OS_WIN

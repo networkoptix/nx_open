@@ -61,7 +61,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_period(period),
-    m_targetFilename(QnLayoutFileStorageResource::removeProtocolPrefix(filename)),
+    m_targetFilename(filename),
     m_realFilename(m_targetFilename),
     m_mode(mode),
     m_readOnly(readOnly),
@@ -69,12 +69,13 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_stopped(false),
     m_currentCamera(0)
 {
+    NX_ASSERT(!filename.startsWith(lit("layout:")));
     m_layout.reset(new QnLayoutResource());
     m_layout->setId(layout->getId()); //before update() uuid's must be the same
     m_layout->update(layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
-    if (mode == Qn::LayoutExport)
+    if (mode != Qn::LayoutLocalSave)
         m_layout->setId(QnUuid::createUuid());
 }
 
@@ -87,7 +88,8 @@ bool QnLayoutExportTool::prepareStorage()
 #else
         false;
 #endif
-    if (isExeFile || m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
+    if (isExeFile || m_realFilename == m_layout->getUrl())
+    {
         // can not override opened layout. save to tmp file, then rename
         m_realFilename += lit(".tmp");
     }
@@ -109,10 +111,8 @@ bool QnLayoutExportTool::prepareStorage()
         QFile::remove(m_realFilename);
     }
 
-    QString fullName = QnLayoutFileStorageResource::layoutPrefix() + m_realFilename;
-
     m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
-    m_storage->setUrl(fullName);
+    m_storage->setUrl(m_realFilename);
     return true;
 }
 
@@ -319,61 +319,85 @@ bool QnLayoutExportTool::exportNextCamera() {
     }
 }
 
-void QnLayoutExportTool::finishExport(bool success) {
+void QnLayoutExportTool::finishExport(bool success)
+{
+    if (!success)
+    {
+        QFile::remove(m_realFilename);
+        emit finished(false, m_targetFilename);
+        return;
+    }
 
-    if (success) {
-        if (m_realFilename != m_targetFilename)
-        {
-            m_storage->renameFile(m_storage->getUrl(), QnLayoutFileStorageResource::layoutPrefix() + m_targetFilename);
-            if (m_mode == Qn::LayoutLocalSave) {
-                QnLayoutResourcePtr layout = qnResPool->getResourceByUniqueId<QnLayoutResource>(m_layout->getUniqueId());
-                if (layout) {
-                    layout->update(m_layout);
-                    snapshotManager()->store(layout);
-                }
-            } else {
-                snapshotManager()->store(m_layout);
-            }
-        }
-        else if (m_mode == Qn::LayoutLocalSaveAs)
-        {
-            QString oldUrl = m_layout->getUrl();
-            QString newUrl = m_storage->getUrl();
+    if (m_realFilename != m_targetFilename)
+        m_storage->renameFile(m_storage->getUrl(), m_targetFilename);
 
-            for (const QnLayoutItemData &item: m_layout->getItems())
+    auto existing = qnResPool->getResourceByUrl(m_targetFilename)
+        .dynamicCast<QnLayoutResource>();
+
+    switch (m_mode)
+    {
+        case Qn::LayoutLocalSave:
+        {
+            /* Update existing layout. */
+            NX_ASSERT(existing);
+            if (existing)
             {
-                QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
-                if (aviRes)
-                    qnResPool->updateUniqId(aviRes, QnLayoutFileStorageResource::updateNovParent(newUrl, item.resource.uniqueId));
+                existing->update(m_layout);
+                snapshotManager()->store(existing);
             }
-            m_layout->setUrl(newUrl);
-            m_layout->setName(QFileInfo(newUrl).fileName());
-
-            QnLayoutFileStorageResourcePtr novStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
-            if (novStorage)
-                novStorage->switchToFile(oldUrl, newUrl, false);
-            snapshotManager()->store(m_layout);
+            break;
         }
-        else {
-            QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
-            if (!layout) {
+        case Qn::LayoutLocalSaveAs:
+        case Qn::LayoutExport:
+        {
+            /* Existing is present if we did 'Save As..' with another existing layout name. */
+            if (existing)
+                qnResPool->removeResources(existing->layoutResources().toList() << existing);
+
+            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
+            if (!layout)
+            {
                 /* Something went wrong */
                 m_errorMessage = tr("Unknown error has occurred.");
                 QFile::remove(m_realFilename);
                 emit finished(false, m_targetFilename);
                 return;
             }
-
-            if (!qnResPool->getResourceById(layout->getId()))
-            {
-                layout->setStatus(Qn::Online);
-                qnResPool->addResource(layout);
-            }
+            layout->setStatus(Qn::Online);
+            qnResPool->addResource(layout);
+            break;
         }
-    } else {
-        QFile::remove(m_realFilename);
+        default:
+            break;
     }
     emit finished(success, m_targetFilename);
+
+    /*
+    else if (m_mode == Qn::LayoutLocalSaveAs)
+    {
+        QString oldUrl = m_layout->getUrl();
+        QString newUrl = m_storage->getUrl();
+
+        for (const QnLayoutItemData &item : m_layout->getItems())
+        {
+            QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
+            if (aviRes)
+            {
+                aviRes->setUniqueId(QnLayoutFileStorageResource::itemUniqueId(newUrl,
+                    item.resource.uniqueId));
+            }
+        }
+        m_layout->setUrl(newUrl);
+        m_layout->setName(QFileInfo(newUrl).fileName());
+
+        QnLayoutFileStorageResourcePtr novStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+        if (novStorage)
+            novStorage->switchToFile(oldUrl, newUrl, false);
+        snapshotManager()->store(m_layout);
+    }
+    else
+    */
+
 }
 
 bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
@@ -516,5 +540,3 @@ bool QnLayoutExportTool::writeData( const QString &fileName, const QByteArray &d
         return true;
     } );
 }
-
-

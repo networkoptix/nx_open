@@ -10,7 +10,6 @@
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -40,7 +39,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     ui(new Ui::RecordingSettings),
     m_settings(new QnVideoRecorderSettings(this)),
     m_dwm(new QnDwm(this)),
-    m_screenRecordingSupported(QnScreenRecorder::isSupported())
+    m_screenRecordingSupported(action(QnActions::ToggleScreenRecordingAction))
 {
     ui->setupUi(this);
 

@@ -108,9 +108,6 @@ private slots:
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
 
     void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
-    void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
-            const QnVideoWallItem& oldItem,
-            const QnVideoWallItem& item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
     void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
