@@ -692,15 +692,34 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     });
 }
 
+QString getComputerName()
+{
+#if defined(Q_OS_WIN)
+    ushort tmpBuffer[1024];
+    DWORD  tmpBufferSize = sizeof(tmpBuffer);
+    if (GetComputerName((LPTSTR) tmpBuffer, &tmpBufferSize))
+        return QString::fromUtf16(tmpBuffer);
+#elif defined(Q_OS_LINUX)
+    char tmpBuffer[1024];
+    if (gethostname(tmpBuffer, sizeof(tmpBuffer)) == 0)
+        return QString::fromUtf8(tmpBuffer);
+#endif
+    return QString();
+}
 
-void setServerNameAndUrls(
+QString getDefaultServerName()
+{
+    QString id = getComputerName();
+    if (id.isEmpty())
+        id = getMacFromPrimaryIF();
+    return lit("Server %1").arg(id);
+}
+
+void setServerUrls(
     QnMediaServerResourcePtr server,
     const SocketAddress& address,
     bool sslAllowed)
 {
-    if (server->getName().isEmpty())
-        server->setName(QString("Server ") + getMacFromPrimaryIF());
-
     server->setSslAllowed(sslAllowed);
     server->setPrimaryAddress(address);
 }
@@ -1092,7 +1111,7 @@ void MediaServerProcess::updateAddressesList()
         if (!serverAddresses.isEmpty())
             newAddress = serverAddresses.front();
 
-        setServerNameAndUrls(m_mediaServer, newAddress, qnCommon->moduleInformation().sslAllowed);
+        setServerUrls(m_mediaServer, newAddress, qnCommon->moduleInformation().sslAllowed);
     }
 
     ec2::ApiMediaServerData server;
@@ -2182,6 +2201,7 @@ void MediaServerProcess::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
+            server->setName(getDefaultServerName());
             if (!noSetupWizardFlag)
                 isNewServerInstance = true;
         }
@@ -2197,7 +2217,7 @@ void MediaServerProcess::run()
         }
 
 
-        setServerNameAndUrls(
+        setServerUrls(
             server,
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()),
             qnCommon->moduleInformation().sslAllowed);
