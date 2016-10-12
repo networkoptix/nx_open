@@ -255,34 +255,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     m_warnMessagesDisplayed(false)
 {
     connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
-        [this](LogicalState logicalValue, PhysicalState physicalValue)
-        {
-            const auto resourceModeAction = action(QnActions::ResourcesModeAction);
-            const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-
-            qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
-            switch (logicalValue)
-            {
-                case LogicalState::disconnected:
-                    welcomeScreen->resetConnectingToSystem();
-                    welcomeScreen->setGlobalPreloaderVisible(false);
-                    resourceModeAction->setChecked(false);  //< Shows welcome screen
-                    break;
-                case LogicalState::connecting:
-                    if (physicalValue == PhysicalState::waiting_resources)
-                    {
-                        // If connection is successful we show global preloader while loading resources
-                        welcomeScreen->resetConnectingToSystem();
-                        welcomeScreen->setGlobalPreloaderVisible(true);
-                    }
-                    break;
-                case LogicalState::connected:
-                    resourceModeAction->setChecked(true); //< Hides welcome screen
-                    break;
-                default:
-                    break;
-            }
-        });
+        &QnWorkbenchConnectHandler::handleStateChanged);
 
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened, this,
         &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
@@ -609,6 +582,37 @@ void QnWorkbenchConnectHandler::setLogicalState(LogicalState value)
 void QnWorkbenchConnectHandler::setPhysicalState(PhysicalState value)
 {
     setState(m_logicalState, value);
+}
+
+void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
+    PhysicalState physicalValue)
+{
+    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+
+    qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
+    switch (logicalValue)
+    {
+        case LogicalState::disconnected:
+            welcomeScreen->resetConnectingToSystem();
+            welcomeScreen->setGlobalPreloaderVisible(false);
+            resourceModeAction->setChecked(false);  //< Shows welcome screen
+            break;
+        case LogicalState::connecting:
+            if (physicalValue == PhysicalState::waiting_resources)
+            {
+                // If connection is successful we show global preloader while loading resources
+                welcomeScreen->resetConnectingToSystem();
+                welcomeScreen->setGlobalPreloaderVisible(true);
+            }
+            break;
+        case LogicalState::connected:
+            stopReconnecting();
+            resourceModeAction->setChecked(true); //< Hides welcome screen
+            break;
+        default:
+            break;
+    }
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
