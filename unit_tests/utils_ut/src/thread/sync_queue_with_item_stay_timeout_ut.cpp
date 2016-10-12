@@ -1,6 +1,8 @@
-#include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
+#include <thread>
 
 #include <gtest/gtest.h>
+
+#include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
 TEST(SyncQueueWithItemStayTimeout, basic)
 {
