@@ -32,6 +32,32 @@ namespace
 
 constexpr std::chrono::milliseconds TestConnection::kDefaultRwTimeout;
 
+QString NX_NETWORK_API toString(TestTrafficLimitType type)
+{
+    switch (type)
+    {
+        case TestTrafficLimitType::none: return QLatin1String("none");
+        case TestTrafficLimitType::incoming: return QLatin1String("incoming");
+        case TestTrafficLimitType::outgoing: return QLatin1String("outgoing");
+    }
+
+    NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
+    return QString();
+}
+
+QString NX_NETWORK_API toString(TestTransmissionMode type)
+{
+    switch (type)
+    {
+        case TestTransmissionMode::spam: return QLatin1String("spam");
+        case TestTransmissionMode::ping: return QLatin1String("ping");
+        case TestTransmissionMode::pong: return QLatin1String("pong");
+    }
+
+    NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
+    return QString();
+}
+
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
     TestTrafficLimitType limitType,
@@ -447,14 +473,16 @@ ConnectionTestStatistics operator-(
 RandomDataTcpServer::RandomDataTcpServer(
     TestTrafficLimitType limitType,
     size_t trafficLimit,
-    TestTransmissionMode transmissionMode)
+    TestTransmissionMode transmissionMode,
+    bool doNotBind)
 :
     m_limitType(limitType),
     m_trafficLimit(trafficLimit),
     m_transmissionMode(transmissionMode),
     m_totalConnectionsAccepted(0),
     m_totalBytesReceivedByClosedConnections(0),
-    m_totalBytesSentByClosedConnections(0)
+    m_totalBytesSentByClosedConnections(0),
+    m_doNotBind(doNotBind)
 {
 }
 
@@ -497,7 +525,7 @@ bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
     m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
-    if( !m_serverSocket->bind(m_localAddress) ||
+    if( !(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
         !m_serverSocket->listen() )
     {
         m_serverSocket.reset();

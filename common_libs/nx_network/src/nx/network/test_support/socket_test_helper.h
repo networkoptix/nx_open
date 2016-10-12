@@ -38,6 +38,9 @@ enum class TestTransmissionMode
     pong, // reads 4K buffer, sends same buffer back, waits for futher data...
 };
 
+QString NX_NETWORK_API toString(TestTrafficLimitType type);
+QString NX_NETWORK_API toString(TestTransmissionMode type);
+
 //!Reads/writes random data to/from connection
 class NX_NETWORK_API TestConnection
 :
@@ -157,7 +160,8 @@ public:
     RandomDataTcpServer(
         TestTrafficLimitType limitType,
         size_t trafficLimit,
-        TestTransmissionMode transmissionMode);
+        TestTransmissionMode transmissionMode,
+        bool doNotBind = false);
     /** In this mode it sends \a dataToSend through connection and closes connection */
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
@@ -184,6 +188,7 @@ private:
     uint64_t m_totalBytesReceivedByClosedConnections;
     uint64_t m_totalBytesSentByClosedConnections;
     std::chrono::milliseconds m_rwTimeout;
+    bool m_doNotBind;
 
     void onNewConnection(
         SystemError::ErrorCode errorCode,
