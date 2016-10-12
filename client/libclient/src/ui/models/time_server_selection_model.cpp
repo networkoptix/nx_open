@@ -489,6 +489,11 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
 {
     static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
     static const int kDoNotSuppress = -1;
+    static const int kMinimalOffsetMs = 1000;
+    static const QString kSeparator(L' ');
+
+    if (offsetMs < kMinimalOffsetMs)
+        return QString();
 
     static const QString sSuffix = tr("s", "Suffix for displaying seconds of server time offset");
     static const QString mSuffix = tr("m", "Suffix for displaying minutes of server time offset");
@@ -516,7 +521,8 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
             return QString::number(num) + suffix;
         };
 
-    return QTimeSpan(offsetMs).toApproximateString(kDoNotSuppress, kFormat, unitStringsConverter, lit(" "));
+    return QTimeSpan(offsetMs).toApproximateString(kDoNotSuppress, kFormat, unitStringsConverter,
+        kSeparator);
 }
 
 QVariant QnTimeServerSelectionModel::offsetForeground(qint64 offsetMs) const
