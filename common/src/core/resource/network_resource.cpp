@@ -120,6 +120,9 @@ QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, cons
     QString value = getResourceProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
     if (value.isNull())
         value = getResourceProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+
+    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
+
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
     if (credentialsList.size() >= 1)
