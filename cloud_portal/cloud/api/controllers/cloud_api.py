@@ -122,7 +122,7 @@ class Account(object):
     @staticmethod
     @validate_response
     @lower_case_email
-    def register(email, password, first_name, last_name):
+    def register(email, password, first_name, last_name, code=None):
         customization = settings.CLOUD_CONNECT['customization']
         realm = settings.CLOUD_CONNECT['password_realm']
 
@@ -137,10 +137,14 @@ class Account(object):
             'fullName': ' '.join((first_name, last_name)),
             'customization': customization
         }
-        # django.utils.http.urlencode(params)
-        request = CLOUD_DB_URL + '/account/register'
 
-        return requests.post(request, json=params)
+        if not code:
+            request = CLOUD_DB_URL + '/account/register'
+            return requests.post(request, json=params)
+        else:
+            params['code'] = code
+            request = CLOUD_DB_URL + '/account/update'
+            return requests.post(request, json=params, auth=HTTPDigestAuth(email, code))
 
     @staticmethod
     @validate_response

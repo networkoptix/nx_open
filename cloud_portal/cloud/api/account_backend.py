@@ -43,10 +43,12 @@ class AccountManager(db.models.Manager):
             raise APIRequestException('Email code is absent', ErrorCodes.wrong_parameters,
                                       error_data={'email': ['This field is required.']})
         # email = self.normalize_email(email)
-        first_name = extra_fields.pop("first_name", True)
-        last_name = extra_fields.pop("last_name", True)
+        first_name = extra_fields.pop("first_name")
+        last_name = extra_fields.pop("last_name")
 
-        Account.register(email, password, first_name, last_name)
+        code = extra_fields.pop("code", None)
+
+        Account.register(email, password, first_name, last_name, code=code)
 
         user = self.model(email=email,
                           first_name=first_name,

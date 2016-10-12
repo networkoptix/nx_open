@@ -83,13 +83,14 @@ angular.module('cloudApp')
                 clearCache();
                 return $http.post(apiBase + '/account/logout');
             },
-            register:function(email,password,firstName,lastName,subscribe){
+            register:function(email, password, firstName, lastName, subscribe, code){
                 return $http.post(apiBase + '/account/register',{
-                    email:email,
-                    password:password,
-                    first_name:firstName,
-                    last_name:lastName,
-                    subscribe:subscribe
+                    email: email,
+                    password: password,
+                    first_name: firstName,
+                    last_name: lastName,
+                    subscribe: subscribe,
+                    code: code
                 });
             },
 

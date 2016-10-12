@@ -30,7 +30,8 @@ angular.module('cloudApp')
             password: '',
             firstName: '',
             lastName: '',
-            subscribe: true
+            subscribe: true,
+            code: $location.search().code
         };
 
         $scope.setRegisterForm = function(scope){
@@ -46,7 +47,8 @@ angular.module('cloudApp')
                 $scope.account.password,
                 $scope.account.firstName,
                 $scope.account.lastName,
-                $scope.account.subscribe);
+                $scope.account.subscribe,
+                $scope.account.code);
         },{
             errorCodes:{
                 alreadyExists: function(error){
