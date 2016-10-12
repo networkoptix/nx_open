@@ -13,7 +13,7 @@
 namespace nx {
 namespace db {
 
-static const size_t WAITING_TASKS_COEFF = 5;
+static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
 
 AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
@@ -24,12 +24,25 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_dropConnectionThread =
         nx::utils::thread(
             std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
+
+    using namespace std::placeholders;
+    if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
+            > std::chrono::minutes::zero())
+    {
+        m_requestQueue.enableItemStayTimeoutEvent(
+            m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection,
+            std::bind(&AsyncSqlQueryExecutor::reportQueryCancellation, this, _1));
+    }
 }
 
 AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
 {
     m_connectionsToDropQueue.push(nullptr);
     m_dropConnectionThread.join();
+
+    for (auto& dbConnection: m_dbThreadPool)
+        dbConnection->pleaseStop();
+    m_dbThreadPool.clear();
 }
 
 bool AsyncSqlQueryExecutor::init()
@@ -45,13 +58,15 @@ bool AsyncSqlQueryExecutor::openOneMoreConnectionIfNeeded()
         dropClosedConnections(&lk);
 
         //checking whether we really need a new connection
-        const auto effectiveDBConnectionCount = m_dbThreadPool.size() + m_connectionsBeingAdded;
+        const auto effectiveDBConnectionCount = 
+            m_dbThreadPool.size() + m_connectionsBeingAdded;
         const auto queueSize = static_cast< size_t >(m_requestQueue.size());
-        if (queueSize < effectiveDBConnectionCount * WAITING_TASKS_COEFF ||  //task number is not too high
-            effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)    //pool size is already at maximum
-        {
-            return true;
-        }
+        const auto maxDesiredQueueSize = 
+            effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
+        if (queueSize < maxDesiredQueueSize)
+            return true;    //< Task number is not too high.
+        if (effectiveDBConnectionCount >= m_connectionOptions.maxConnectionCount)
+            return true;    //< Pool size is already at maximum.
         ++m_connectionsBeingAdded;
     }
 
@@ -111,6 +126,13 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
         dbConnection->wait();
         dbConnection.reset();
     }
+}
+
+void AsyncSqlQueryExecutor::reportQueryCancellation(
+    std::unique_ptr<AbstractExecutor> expiredQuery)
+{
+    // We are in a random db request execution thread.
+    expiredQuery->reportErrorWithoutExecution(DBResult::cancelled);
 }
 
 } // namespace db

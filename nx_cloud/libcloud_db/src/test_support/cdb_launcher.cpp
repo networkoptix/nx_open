@@ -135,6 +135,15 @@ nx::cdb::api::ConnectionFactory* CdbLauncher::connectionFactory()
     return m_connectionFactory.get();
 }
 
+std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
+    const std::string& login,
+    const std::string& password)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(login, password);
+    return connection;
+}
+
 api::ModuleInfo CdbLauncher::moduleInfo() const
 {
     return m_moduleInfo;

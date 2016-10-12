@@ -141,7 +141,7 @@ int CloudDBProcess::exec()
         settings.load( m_argc, m_argv );
         if( settings.showHelp() )
         {
-            settings.printCmdLineArgsHelp();
+            settings.printCmdLineArgsHelpToCout();
             return 0;
         }
 

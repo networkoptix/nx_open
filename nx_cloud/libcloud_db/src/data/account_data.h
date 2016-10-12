@@ -58,6 +58,7 @@ class AccountUpdateDataWithEmail
 public:
     std::string email;
 
+    AccountUpdateDataWithEmail();
     AccountUpdateDataWithEmail(AccountUpdateData&& rhs);
 };
 

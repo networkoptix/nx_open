@@ -24,8 +24,9 @@ class AbstractExecutor
 public:
     virtual ~AbstractExecutor() {}
 
-    //!Executed within DB thread
+    /** Executed within DB connection thread. */
     virtual DBResult execute(QSqlDatabase* const connection) = 0;
+    virtual void reportErrorWithoutExecution(DBResult errorCode) = 0;
 };
 
 class BaseExecutor
@@ -33,12 +34,14 @@ class BaseExecutor
     public AbstractExecutor
 {
 protected:
-    /** Returns more detailed result code if appropriate. Otherwise returns initial one */
+    /** Returns more detailed result code if appropriate. Otherwise returns initial one. */
     DBResult detailResultCode(QSqlDatabase* const connection, DBResult result) const;
     DBResult lastDBError(QSqlDatabase* const connection) const;
 };
 
-//!Executor of data update requests without output data
+/**
+ * Executor of data update requests without output data.
+ */
 template<typename InputData>
 class UpdateExecutor
 :
@@ -92,13 +95,20 @@ public:
         return DBResult::ok;
     }
 
+    virtual void reportErrorWithoutExecution(DBResult errorCode) override
+    {
+        m_completionHandler(nullptr, errorCode, InputData());
+    }
+
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&)> m_dbUpdateFunc;
     InputData m_input;
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData)> m_completionHandler;
 };
 
-//!Executor of data update requests with output data
+/**
+ * Executor of data update requests with output data.
+ */
 template<typename InputData, typename OutputData>
 class UpdateWithOutputExecutor
 :
@@ -153,12 +163,16 @@ public:
         return DBResult::ok;
     }
 
+    virtual void reportErrorWithoutExecution(DBResult errorCode) override
+    {
+        m_completionHandler(nullptr, errorCode, InputData(), OutputData());
+    }
+
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&, OutputData* const)> m_dbUpdateFunc;
     InputData m_input;
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData, OutputData&&)> m_completionHandler;
 };
-
 
 class UpdateWithoutAnyDataExecutor
 :
@@ -210,6 +224,11 @@ public:
         return DBResult::ok;
     }
 
+    virtual void reportErrorWithoutExecution(DBResult errorCode) override
+    {
+        m_completionHandler(nullptr, errorCode);
+    }
+
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
@@ -238,6 +257,11 @@ public:
         result = detailResultCode(connection, result);
         completionHandler(&queryContext, result);
         return result;
+    }
+
+    virtual void reportErrorWithoutExecution(DBResult errorCode) override
+    {
+        m_completionHandler(nullptr, errorCode);
     }
 
 private:
@@ -273,12 +297,17 @@ public:
         return result;
     }
 
+    virtual void reportErrorWithoutExecution(DBResult errorCode) override
+    {
+        m_completionHandler(nullptr, errorCode, OutputData());
+    }
+
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext*, OutputData* const)> m_dbSelectFunc;
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, OutputData)> m_completionHandler;
 };
 
-}   //namespace db
-}   //namespace nx
+} // namespace db
+} // namespace nx
 
 #endif  //NX_CLOUD_DB_REQUEST_EXECUTOR_H

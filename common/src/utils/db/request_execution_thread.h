@@ -9,6 +9,7 @@
 #include <atomic>
 #include <memory>
 
+#include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 
@@ -27,9 +28,13 @@ class DbRequestExecutionThread
     public QnLongRunnable
 {
 public:
+    typedef nx::utils::SyncQueueWithItemStayTimeout<
+        std::unique_ptr<AbstractExecutor>
+    > QueryExecutorQueue;
+
     DbRequestExecutionThread(
         const ConnectionOptions& connectionOptions,
-        CLThreadQueue<std::unique_ptr<AbstractExecutor>>* const requestQueue );
+        QueryExecutorQueue* const queryExecutorQueue);
     virtual ~DbRequestExecutionThread();
 
     //!Establishes connection to DB
@@ -47,7 +52,7 @@ protected:
 private:
     ConnectionOptions m_connectionOptions;
     QSqlDatabase m_dbConnection;
-    CLThreadQueue<std::unique_ptr<AbstractExecutor>>* const m_requestQueue;
+    QueryExecutorQueue* const m_queryExecutorQueue;
     std::atomic<bool> m_isOpen;
 };
 

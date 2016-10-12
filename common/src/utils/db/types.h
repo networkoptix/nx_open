@@ -44,12 +44,20 @@ public:
     size_t maxConnectionCount;
     /** Connection is closed if not used for this interval. */
     std::chrono::seconds inactivityTimeout;
+    /**
+     * If scheduled request has not received DB connection during this timeout 
+     * it will be cancelled with DBResult::cancelled error code.
+     * By default it is one minute.
+     * @note Set to zero to disable this timeout.
+     */
+    std::chrono::milliseconds maxPeriodQueryWaitsForAvailableConnection;
 
     ConnectionOptions():
         driverType(RdbmsDriverType::sqlite),
         port(0),
         maxConnectionCount(1),
-        inactivityTimeout(std::chrono::minutes(10))
+        inactivityTimeout(std::chrono::minutes(10)),
+        maxPeriodQueryWaitsForAvailableConnection(std::chrono::minutes(1))
     {
     }
 };
