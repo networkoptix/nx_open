@@ -92,10 +92,9 @@ private slots:
     bool exportMediaResource(const QnMediaResourcePtr& resource);
 
     void at_camera_progressChanged(int progress);
-    void at_camera_exportFinished(
-        const QnStreamRecorder::ErrorStruct &status,
-        const QString                       &filename
-    );
+    void at_camera_exportFinished(const StreamRecorderErrorStruct& status,
+        const QString& filename);
+
     void at_camera_exportStopped();
 
 private:

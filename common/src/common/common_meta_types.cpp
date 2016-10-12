@@ -58,6 +58,7 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include <recording/stream_recorder.h>
+#include <recording/stream_recorder_data.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_mapper.h>
@@ -203,7 +204,7 @@ void QnCommonMetaTypes::initialize() {
 
 #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();
-    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
+    qRegisterMetaType<StreamRecorderErrorStruct>();
 #endif
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
@@ -292,15 +293,15 @@ void QnCommonMetaTypes::initialize() {
      * ...
      *
      * This code will require metatype, registered as:
-     *    qRegisterMetaType<QnStreamRecorder::ErrorStruct>("ErrorStruct");
+     *    qRegisterMetaType<StreamRecorderErrorStruct>("ErrorStruct");
      *
      * Much more correct behavior is to change signal declaration to following:
      * ...
      * signals:
-     *     void recordingFinished(const QnStreamRecorder::ErrorStruct &status, const QString &fileName);
+     *     void recordingFinished(const StreamRecorderErrorStruct &status, const QString &fileName);
      * ...
      * and therefore we can use simple registration:
-     *    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
+     *    qRegisterMetaType<StreamRecorderErrorStruct>();
      */
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );

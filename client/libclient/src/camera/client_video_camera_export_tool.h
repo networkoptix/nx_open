@@ -37,7 +37,7 @@ public:
     /**
      * @brief status                            Camera exporting status.
      */
-    int status() const;
+    StreamRecorderError status() const;
 
 public slots:
     /**
@@ -66,10 +66,9 @@ signals:
     void finished(bool success, const QString &filename);
 
 private slots:
-    void at_camera_exportFinished(
-        const QnStreamRecorder::ErrorStruct &status,
-        const QString                       &filename
-    );
+    void at_camera_exportFinished(const StreamRecorderErrorStruct& status,
+        const QString& filename);
+
     void at_camera_exportStopped();
 
 private:
@@ -82,5 +81,5 @@ private:
     QnImageFilterHelper m_parameters;
     qint64 m_serverTimeZoneMs;
     qint64 m_timelapseFrameStepMs;
-    int m_status;
+    StreamRecorderError m_status;
 };
