@@ -6,11 +6,11 @@
 
 #include <utils/common/qtimespan.h>
 
-using namespace std::literals::chrono_literals;
+using namespace std::chrono;
 
 namespace {
 
-static const std::chrono::milliseconds kExampleTime = 1min + 15s;
+static const milliseconds kExampleTime = 1min + 15s;
 static const int kDoNotSuppress = -1;
 static const QString kSeparator(L' ');
 static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes;
