@@ -45,7 +45,7 @@ void TimeProtocolClient::getTimeAsync(
 void TimeProtocolClient::getTimeAsyncInAioThread(
     CompletionHandler completionHandler)
 {
-    NX_LOGX(lm("rfc868 time_sync. Starting time synchronization with %1")
+    NX_LOGX(lm("rfc868 time_sync. Starting time synchronization with %1:%2")
         .str(m_timeServerEndpoint).arg(kTimeProtocolDefaultPort),
         cl_logDEBUG2);
 
