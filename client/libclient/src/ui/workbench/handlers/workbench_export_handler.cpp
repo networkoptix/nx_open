@@ -546,10 +546,6 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
     if (binaryExport)
     {
-        auto existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
-        if (existingLayout)
-            removeLayoutFromPool(existingLayout);
-
         QnLayoutResourcePtr newLayout(new QnLayoutResource());
 
         NX_ASSERT(!itemData.uuid.isNull(), Q_FUNC_INFO, "Make sure itemData is valid");
@@ -744,19 +740,6 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
     return true;
 }
 
-void QnWorkbenchExportHandler::removeLayoutFromPool(const QnLayoutResourcePtr &existingLayout)
-{
-    QnLayoutItemDataMap items = existingLayout->getItems();
-    for (QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-    {
-        QnLayoutItemData& item = itr.value();
-        QnResourcePtr layoutRes = qnResPool->getResourceByDescriptor(item.resource);
-        if (layoutRes)
-            qnResPool->removeResource(layoutRes);
-    }
-    qnResPool->removeResource(existingLayout);
-}
-
 bool QnWorkbenchExportHandler::saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target, const char *slot)
 {
     return saveLayoutToLocalFile(layout, layout->getLocalRange(), layout->getUrl(), Qn::LayoutLocalSave, readOnly, cancellable, target, slot);
@@ -875,10 +858,6 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         return false;
 
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
-
-    auto existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
-    if (existingLayout)
-        removeLayoutFromPool(existingLayout);
 
     saveLayoutToLocalFile(layout, exportPeriod, fileName, mode, readOnly, true);
 
