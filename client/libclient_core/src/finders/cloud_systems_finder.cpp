@@ -91,8 +91,8 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     SystemsHash updatedSystems;
     for (const auto system : systems)
     {
-        updatedSystems.insert(system.id
-            , QnSystemDescription::createCloudSystem(system.id
+        updatedSystems.insert(system.localId
+            , QnSystemDescription::createCloudSystem(system.localId
                 , system.name, system.ownerAccountEmail
                 , system.ownerFullName));
     }

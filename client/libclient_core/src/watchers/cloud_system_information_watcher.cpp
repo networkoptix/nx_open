@@ -77,9 +77,9 @@ void QnCloudSystemInformationWatcherPrivate::updateInformation(const QnCloudSyst
 {
     Q_Q(QnCloudSystemInformationWatcher);
 
-    if (systemId != system.id)
+    if (systemId != system.cloudId)
     {
-        systemId = system.id;
+        systemId = system.cloudId;
         emit q->systemIdChanged();
     }
 

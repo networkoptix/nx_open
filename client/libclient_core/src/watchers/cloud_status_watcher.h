@@ -13,7 +13,8 @@ class QSettings;
 
 struct QnCloudSystem
 {
-    QString id;
+    QString cloudId;
+    QString localId;
     QString name;
     QString ownerAccountEmail;
     QString ownerFullName;

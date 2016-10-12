@@ -19,21 +19,22 @@ const QString nxECId = lit("Enterprise Controller");
 const QString nxMediaServerId = lit("Media Server");
 
 QString getTargetSystemIdImpl(
-    const QString& cloudId,
+    const QString& systemName,
     const QString& localSystemId,
     const QString& serverId,
     const QnSoftwareVersion& serverVersion)
 {
     static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
-
-    if (localSystemId.isEmpty())
-        return QUuid::createUuid().toString();
+    static const auto kMinVersionWithLocalId = QnSoftwareVersion(3, 0);
 
     if (serverVersion < kMinVersionWithSystem)
-        return serverId;
+        return serverId;    //< We have only one hub-server if version is less than 2.3
 
-    if (!cloudId.isEmpty())
-        return cloudId;
+    if (serverVersion < kMinVersionWithLocalId)
+        return systemName; //< No cloud, no local id, no new systems
+
+    if (localSystemId.isEmpty())
+        return QUuid::createUuid().toString();  //< New System id
 
     return localSystemId;
 }
@@ -42,13 +43,13 @@ QString getTargetSystemIdImpl(
 
 QString helpers::getTargetSystemId(const QnConnectionInfo& info)
 {
-    return ::getTargetSystemIdImpl(info.cloudSystemId, info.localSystemId,
+    return ::getTargetSystemIdImpl(info.systemName, info.localSystemId,
         info.ecsGuid, info.version);
 }
 
 QString helpers::getTargetSystemId(const QnModuleInformation& info)
 {
-    return ::getTargetSystemIdImpl(info.cloudSystemId, info.localSystemId.toString(),
+    return ::getTargetSystemIdImpl(info.systemName, info.localSystemId.toString(),
         info.id.toString(), info.version);
 }
 

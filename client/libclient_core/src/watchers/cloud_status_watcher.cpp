@@ -30,7 +30,8 @@ using namespace nx::cdb;
 
 namespace {
 
-const auto kIdTag = lit("id");
+const auto kCloudSystemId = lit("cloudId");
+const auto kLocalSystemIdTag = lit("localId");
 const auto kNameTag = lit("name");
 const auto kOwnerAccounEmail = lit("email");
 const auto kOwnerFullName = lit("owner_full_name");
@@ -49,7 +50,8 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
             continue;
 
         QnCloudSystem system;
-        system.id = QString::fromStdString(systemData.id);
+        system.cloudId = QString::fromStdString(systemData.id);
+        system.localId = system.cloudId;// TODO: !! change for local system id when available
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -535,7 +537,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
 
     const auto it = std::find_if(
         cloudSystems.begin(), cloudSystems.end(),
-        [systemId](const QnCloudSystem& system) { return systemId == system.id; });
+        [systemId](const QnCloudSystem& system) { return systemId == system.cloudId; });
 
     if (it == cloudSystems.end())
         return;
@@ -648,7 +650,8 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 
 bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
 {
-    return ((id == other.id)
+    return ((cloudId == other.cloudId)
+        && (localId == other.localId)
         && (name == other.name)
         && (authKey == other.authKey)
         && (lastLoginTimeUtcMs == other.lastLoginTimeUtcMs)
@@ -657,16 +660,18 @@ bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
 
 bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
 {
-    return id == other.id &&
-           name == other.name &&
-           authKey == other.authKey &&
-           ownerAccountEmail == other.ownerAccountEmail &&
-           ownerFullName == other.ownerFullName;
+    return (cloudId == other.cloudId
+        && (localId == other.localId)
+        && (name == other.name)
+        && (authKey == other.authKey)
+        && (ownerAccountEmail == other.ownerAccountEmail)
+        && (ownerFullName == other.ownerFullName));
 }
 
 void QnCloudSystem::writeToSettings(QSettings* settings) const
 {
-    settings->setValue(kIdTag, id);
+    settings->setValue(kCloudSystemId, cloudId);
+    settings->setValue(kLocalSystemIdTag, localId);
     settings->setValue(kNameTag, name);
     settings->setValue(kOwnerAccounEmail, ownerAccountEmail);
     settings->setValue(kOwnerFullName, ownerFullName);
@@ -678,7 +683,8 @@ QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
 {
     QnCloudSystem result;
 
-    result.id = settings->value(kIdTag).toString();
+    result.cloudId = settings->value(kCloudSystemId).toString();
+    result.localId = settings->value(kLocalSystemIdTag).toString();
     result.name = settings->value(kNameTag).toString();
     result.ownerAccountEmail = settings->value(kOwnerAccounEmail).toString();
     result.ownerFullName = settings->value(kOwnerFullName).toString();
