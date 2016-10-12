@@ -185,7 +185,7 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
 
     /* Clean up old layout.
      * It may be NULL only when this function is called from constructor. */
-    qreal oldCellAspectRatio = -1.0;
+    qreal oldCellAspectRatio = 0.0;
     qreal oldCellSpacing = -1.0;
     if (m_currentLayout)
     {
