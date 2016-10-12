@@ -76,7 +76,9 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
 
     const int seconds = std::max((millisecondsLeft + 500) / 1000, 0);
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setCountdownSeconds(seconds);
+
+    const auto message = recordingCountdownText(seconds);
+    welcomeScreen->setMessage(seconds > 0 ? message : QString());
 
     if (m_messageBox)
     {
@@ -156,8 +158,7 @@ bool QnWorkbenchScreenRecordingHandler::isRecordingCountdown() const
 
 QString QnWorkbenchScreenRecordingHandler::recordingCountdownText(int seconds) const
 {
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    return welcomeScreen->countdownMessage().arg(seconds);
+    return tr("Recording in %1...").arg(seconds);
 }
 
 void QnWorkbenchScreenRecordingHandler::startRecordingInternal()

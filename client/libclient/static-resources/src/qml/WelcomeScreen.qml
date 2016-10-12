@@ -306,22 +306,22 @@ Rectangle
 
     Rectangle
     {
-        id: recordingHolder;
+        id: messageHolder;
         anchors.centerIn: parent;
-        visible: (context.countdownSeconds > 0);
+        visible: (context.message.length);
         opacity: (visible ? 1.0 : 0.0);
 
         radius: 2;
         color: Style.colorWithAlpha(
             Style.darkerColor(Style.colors.brand, 2), 0.8);
-        width: recordingLabel.implicitWidth;
-        height: recordingLabel.implicitHeight;
+        width: messageLabel.implicitWidth;
+        height: messageLabel.implicitHeight;
 
         Behavior on opacity
         {
             PropertyAnimation
             {
-                target: recordingHolder;
+                target: messageHolder;
                 property: "opacity";
                 duration: 200;
             }
@@ -329,7 +329,7 @@ Rectangle
 
         NxLabel
         {
-            id: recordingLabel;
+            id: messageLabel;
             anchors.centerIn: parent;
             font: Style.fonts.screenRecording;
             standardColor: Style.colors.brandContrast;
@@ -337,7 +337,7 @@ Rectangle
             rightPadding: leftPadding;
             topPadding: 10;
             bottomPadding: topPadding;
-            text: context.countdownMessage.arg(context.countdownSeconds);
+            text: context.message;
         }
     }
 

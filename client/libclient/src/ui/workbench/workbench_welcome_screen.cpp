@@ -98,7 +98,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_quickView(new QQuickView()),
     m_widget(createMainView(this, m_quickView)),
     m_pageSize(m_widget->size()),
-    m_countdownSeconds()
+    m_message()
 {
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
@@ -241,19 +241,14 @@ QString QnWorkbenchWelcomeScreen::minSupportedVersion() const
     return QnConnectionValidator::minSupportedVersion().toString();
 }
 
-int QnWorkbenchWelcomeScreen::countdownSeconds() const
+void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
 {
-    return m_countdownSeconds;
-}
-
-void QnWorkbenchWelcomeScreen::setCountdownSeconds(int value)
-{
-    if (m_countdownSeconds == value)
+    if (m_message == message)
         return;
 
-    m_countdownSeconds = value;
+    m_message = message;
 
-    emit countdownSecondsChanged();
+    emit messageChanged();
 
     m_widget->repaint();
     m_widget->window()->repaint();
@@ -263,9 +258,9 @@ void QnWorkbenchWelcomeScreen::setCountdownSeconds(int value)
     qApp->sendPostedEvents();
 }
 
-QString QnWorkbenchWelcomeScreen::countdownMessage() const
+QString QnWorkbenchWelcomeScreen::message() const
 {
-    return tr("Recording in %1...");
+    return m_message;
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const UrlsList& urls)
