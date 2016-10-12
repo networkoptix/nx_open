@@ -1,8 +1,10 @@
 import requests
 from requests.auth import HTTPDigestAuth
 from hashlib import md5, sha256
+import base64
 from cloud import settings
 from api.helpers.exceptions import validate_response
+from api.helpers.exceptions import APIRequestException
 
 CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 
@@ -118,17 +120,34 @@ class System(object):
 
 
 class Account(object):
+    @staticmethod
+    def extract_temp_credentials(code):
+        try:
+            (temp_password, email) = base64.b64decode(code).split(":")
+        except TypeError:
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
+        except ValueError:
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
+
+        if not email or not temp_password:
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
+
+        return temp_password, email
+
+    @staticmethod
+    def encode_password(email, password):
+        realm = settings.CLOUD_CONNECT['password_realm']
+        password_string = ':'.join((email, realm, password))
+        password_ha1 = md5(password_string).hexdigest()
+        password_ha1_sha256 = sha256(password_string).hexdigest()
+        return password_ha1, password_ha1_sha256
 
     @staticmethod
     @validate_response
     @lower_case_email
     def register(email, password, first_name, last_name, code=None):
         customization = settings.CLOUD_CONNECT['customization']
-        realm = settings.CLOUD_CONNECT['password_realm']
-
-        password_string = ':'.join((email, realm, password))
-        password_ha1 = md5(password_string).hexdigest()
-        password_ha1_sha256 = sha256(password_string).hexdigest()
+        password_ha1, password_ha1_sha256 = Account.encode_password(email, password)
 
         params = {
             'email': email,
@@ -142,20 +161,25 @@ class Account(object):
             request = CLOUD_DB_URL + '/account/register'
             return requests.post(request, json=params)
         else:
-            params['code'] = code
+            temp_password, code_email = Account.extract_temp_credentials(code)
+            if email != code_email:
+                raise APIRequestException('Activation code doesn\'t match email:' + code, ErrorCodes.wrong_code)
+
             request = CLOUD_DB_URL + '/account/update'
-            return requests.post(request, json=params, auth=HTTPDigestAuth(email, code))
+            return requests.post(request, json=params, auth=HTTPDigestAuth(code_email, temp_password))
+
+    @staticmethod
+    @validate_response
+    @lower_case_email
+    def restore_password(code, new_password):
+        temp_password, email = Account.extract_temp_credentials(code)
+        return Account.change_password(email, temp_password, new_password)
 
     @staticmethod
     @validate_response
     @lower_case_email
     def change_password(email, password, new_password):
-        realm = settings.CLOUD_CONNECT['password_realm']
-
-        password_string = ':'.join((email, realm, new_password))
-        password_ha1 = md5(password_string).hexdigest()
-        password_ha1_sha256 = sha256(password_string).hexdigest()
-
+        password_ha1, password_ha1_sha256 = Account.encode_password(email, new_password)
         params = {
             'passwordHa1': password_ha1,
             'passwordHa1Sha256': password_ha1_sha256

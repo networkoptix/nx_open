@@ -146,18 +146,6 @@ def activate(request):
 def restore_password(request):
     if 'code' in request.data:
         code = request.data['code']
-
-        try:
-            (temp_password, user_email) = base64.b64decode(code).split(":")
-        except TypeError:
-            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
-        except ValueError:
-            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
-        if not user_email or not temp_password:
-            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
-
-        require_params(request, ('new_password',))
-
         new_password = request.data['new_password']
         try:
             CreateAccountSerializer.validate_password(new_password)
@@ -165,7 +153,7 @@ def restore_password(request):
             raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
                                       error_data={'new_password': error.detail})
 
-        Account.change_password(user_email, temp_password, new_password)
+        Account.restore_password(code, new_password)
     elif 'user_email' in request.data:
         user_email = request.data['user_email']
         Account.reset_password(user_email)

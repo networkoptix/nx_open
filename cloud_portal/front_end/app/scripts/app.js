@@ -32,7 +32,7 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
             }
         })
-        .when('/register/:email', {
+        .when('/register/:code', {
             title: L.pageTitles.register,
             templateUrl: 'static/views/register.html',
             controller: 'RegisterCtrl'
