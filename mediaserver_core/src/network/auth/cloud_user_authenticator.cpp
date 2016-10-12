@@ -245,8 +245,7 @@ void CloudUserAuthenticator::removeExpiredRecordsFromCache(QnMutexLockerBase* co
 }
 
 QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
-    const nx_http::StringType& userName,
-    nx::cdb::api::SystemAccessRole /*cloudAccessRole*/) const
+    const nx_http::StringType& userName) const
 {
     const auto userNameQString = QString::fromUtf8(userName);
     //if there is user with same name in system, resolving to that user
@@ -366,8 +365,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
 
     //translating cloud account to local user
     auto localUser = getMappedLocalUserForCloudCredentials(
-        authorizationHeader.userid(),
-        cacheItem.data.authenticatedAccountData.accessRole);
+        cacheItem.data.authenticatedAccountData.accountEmail.c_str());
     if (!localUser)
     {
         NX_LOG(lm("CloudUserAuthenticator. Failed to translate cloud user %1 to local user").
