@@ -33,6 +33,10 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
 
+namespace {
+static const int kMinimumTabSizeWidth = 50;
+}
+
 QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     QTabBar(parent),
     QnWorkbenchContextAware(parent),
@@ -222,6 +226,22 @@ QSize QnLayoutTabBar::minimumSizeHint() const
         default:
             return QSize(); /* Just to make the compiler happy. */
     }
+}
+
+QSize QnLayoutTabBar::tabSizeHint(int index) const
+{
+    auto result = base_type::tabSizeHint(index);
+    if (result.width() < kMinimumTabSizeWidth)
+        result.setWidth(kMinimumTabSizeWidth);
+    return result;
+}
+
+QSize QnLayoutTabBar::minimumTabSizeHint(int index) const
+{
+    auto result = base_type::minimumTabSizeHint(index);
+    if (result.width() < kMinimumTabSizeWidth)
+        result.setWidth(kMinimumTabSizeWidth);
+    return result;
 }
 
 void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event)

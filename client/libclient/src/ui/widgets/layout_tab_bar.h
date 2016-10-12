@@ -29,6 +29,8 @@ signals:
 
 protected:
     virtual QSize minimumSizeHint() const override;
+    virtual QSize tabSizeHint(int index) const;
+    virtual QSize minimumTabSizeHint(int index) const;
 
     virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
