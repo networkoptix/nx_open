@@ -924,8 +924,8 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
 {
     ArchiveCameraData newCamera;
     newCamera.coreData.physicalId = fileInfo.fileName();
-    // ATTENTION: This logic is similar to ApiCameraData::fillId().
-    auto cameraGuid = guidFromArbitraryData(newCamera.coreData.physicalId.toUtf8());
+    auto cameraGuid = QnSecurityCamResource::makeCameraIdFromUniqueId(
+        newCamera.coreData.physicalId.toUtf8());
     newCamera.coreData.id = cameraGuid;
     newCamera.coreData.parentId = qnCommon->moduleGUID();
 
@@ -1652,7 +1652,7 @@ void QnStorageManager::clearBookmarks()
     if (!qnBackupStorageMan->getMinTimes(minTimes))
         return;
 
-    QMap<QString, qint64> dataToDelete;
+    QMap<QnUuid, qint64> dataToDelete;
     for (auto itr = minTimes.begin(); itr != minTimes.end(); ++itr)
     {
         const QString& uniqueId = itr.key();
@@ -1660,7 +1660,10 @@ void QnStorageManager::clearBookmarks()
 
         auto itrPrev = m_lastCatalogTimes.find(uniqueId);
         if (itrPrev != m_lastCatalogTimes.end() && itrPrev.value() != timestampMs)
-            dataToDelete.insert(uniqueId, timestampMs);
+        {
+            dataToDelete.insert(
+                QnSecurityCamResource::makeCameraIdFromUniqueId(uniqueId), timestampMs);
+        }
         m_lastCatalogTimes[uniqueId] = timestampMs;
     }
 

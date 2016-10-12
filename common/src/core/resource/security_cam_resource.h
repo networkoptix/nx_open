@@ -33,6 +33,9 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
+    static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
+
+public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
