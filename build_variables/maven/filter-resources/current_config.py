@@ -17,7 +17,7 @@ QT_LIB=_abspath("${qt.dir}/lib")
 
 LIB_PATH=_abspath("${libdir}/lib/${build.configuration}")
 BIN_PATH=_abspath("${libdir}/bin/${build.configuration}")
-WIN_PATH=_abspath("${libdir}/${arch}/bin/${build.configuration}")
+WIN_PATH=_abspath("${libdir}/bin/${build.configuration}")
 
 def _add_path(env, var, paths):
     if env.get(var,'') not in ('', None):

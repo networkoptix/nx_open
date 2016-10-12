@@ -74,11 +74,7 @@ else {
   }
 }
 
-win* {
-  OUTPUT_PATH = ${libdir}/${arch}
-} else {
-  OUTPUT_PATH = ${libdir}
-}
+OUTPUT_PATH = ${libdir}
 
 isEmpty(BUILDLIB) {
   DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
