@@ -620,7 +620,7 @@ QTimeSpan QTimeSpan::fromTimeUnit(Qt::TimeSpanUnit unit, qreal interval, const Q
             result.setFromTimeUnit(unit, interval);
             return result;
         }
-        NX_ASSERT(false, "static constructor", "Can not construct QTimeSpan from Month or Year TimeSpanUnit without a valid reference date.");
+        Q_ASSERT_X(false, "static constructor", "Can not construct QTimeSpan from Month or Year TimeSpanUnit without a valid reference date.");
         return QTimeSpan();
     }
 
@@ -640,7 +640,7 @@ int QTimeSpan::part(Qt::TimeSpanUnit unit, Qt::TimeSpanFormat format) const
 
     if (!hasValidReference()) {
         if (unit == Qt::Months || unit == Qt::Years) {
-            NX_ASSERT(false, "part", "Can not calculate Month or Year part without a reference date");
+            Q_ASSERT_X(false, "part", "Can not calculate Month or Year part without a reference date");
         }
         if (format.testFlag(Qt::Months) || format.testFlag(Qt::Years)) {
             qWarning() << "Unsetting Qt::Months and Qt::Years flags from format. Not supported without a reference date";
@@ -1242,7 +1242,7 @@ QTimeSpan & QTimeSpan::operator/=(int factor)
 */
 QTimeSpan& QTimeSpan::operator|=(const QTimeSpan& other) // Union
 {
-    NX_ASSERT((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
+    Q_ASSERT_X((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
 
     //do we need to check for self-assignment?
 
@@ -1267,7 +1267,7 @@ QTimeSpan& QTimeSpan::operator|=(const QTimeSpan& other) // Union
 */
 QTimeSpan& QTimeSpan::operator&=(const QTimeSpan &other) // Intersection
 {
-    NX_ASSERT((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
+    Q_ASSERT_X((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
 
     //do we need to check for self-assignment?
 
@@ -1322,7 +1322,7 @@ bool QTimeSpan::overlaps(const QTimeSpan &other) const
 */
 QTimeSpan QTimeSpan::overlapped(const QTimeSpan &other) const
 {
-    NX_ASSERT((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
+    Q_ASSERT_X((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
 
     const QTimeSpan* first = this;
     const QTimeSpan* last = &other;
@@ -1351,7 +1351,7 @@ QTimeSpan QTimeSpan::overlapped(const QTimeSpan &other) const
 */
 QTimeSpan QTimeSpan::united(const QTimeSpan &other) const
 {
-    NX_ASSERT((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
+    Q_ASSERT_X((hasValidReference() && other.hasValidReference()), "assignment-or operator", "Both participating time spans need a valid reference date");
 
     QDateTime start = qMin(startDate(), other.startDate());
     QDateTime end = qMax(endDate(), other.endDate());
@@ -1545,7 +1545,7 @@ qreal QTimeSpan::toTimeUnit(Qt::TimeSpanUnit unit) const
     case Qt::Milliseconds:
         break;
     default:
-        NX_ASSERT(hasValidReference(), "toTimeUnit", "Can not convert to time units that depend on the reference date (month and year).");
+        Q_ASSERT_X(hasValidReference(), "toTimeUnit", "Can not convert to time units that depend on the reference date (month and year).");
         qreal result(0.0);
         int intResult(0);
         bool succes(false);
@@ -1599,7 +1599,7 @@ void QTimeSpan::setFromTimeUnit(Qt::TimeSpanUnit unit, qreal interval)
         setFromYears(interval);
         return;
     default:
-        NX_ASSERT(false, "setFromTimeUnit", "Can not set a QTimeSpan duration from unknown TimeSpanUnit.");
+        Q_ASSERT_X(false, "setFromTimeUnit", "Can not set a QTimeSpan duration from unknown TimeSpanUnit.");
     }
 
     d->interval = qint64(interval);
@@ -1630,7 +1630,7 @@ void QTimeSpan::setFromTimeUnit(Qt::TimeSpanUnit unit, qreal interval)
   */
 void QTimeSpan::setFromMonths(qreal months)
 {
-    NX_ASSERT(hasValidReference(), "setFromMonths", "Can not set interval from time unit month if there is no reference date.");
+    Q_ASSERT_X(hasValidReference(), "setFromMonths", "Can not set interval from time unit month if there is no reference date.");
 
     int fullMonths = int(months);
     qreal fractionalMonth = months - fullMonths;
@@ -1667,7 +1667,7 @@ void QTimeSpan::setFromMonths(qreal months)
   */
 void QTimeSpan::setFromYears(qreal years)
 {
-    NX_ASSERT(hasValidReference(), "setFromYears", "Can not set interval from time unit year if there is no reference date.");
+    Q_ASSERT_X(hasValidReference(), "setFromYears", "Can not set interval from time unit year if there is no reference date.");
 
     int fullYears = int(years);
     qreal fractionalYear = years - fullYears;
@@ -2125,9 +2125,9 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
         if (unit == Qt::NoUnit)
             return 0;
 
-        NX_ASSERT(format.testFlag(unit), Q_FUNC_INFO, "Requesting invalid unit");
+        Q_ASSERT_X(format.testFlag(unit), Q_FUNC_INFO, "Requesting invalid unit");
         int* ptr = partsHash.value(unit);
-        NX_ASSERT(ptr, Q_FUNC_INFO, "Invalid hash");
+        Q_ASSERT_X(ptr, Q_FUNC_INFO, "Invalid hash");
         if (ptr)
             return *ptr;
         return 0;
@@ -2135,7 +2135,7 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
 
     int primairy = safeValue(primairyUnit);
     int secondairy = safeValue(secondairyUnit);
-    NX_ASSERT(primairy != 0 || secondairy == 0, Q_FUNC_INFO, "Secondary without primary is an error");
+    Q_ASSERT_X(primairy != 0 || secondairy == 0, Q_FUNC_INFO, "Secondary without primary is an error");
 
     auto toUnitString = [this, unitStringConverter](Qt::TimeSpanUnit unit, int num)
     {
