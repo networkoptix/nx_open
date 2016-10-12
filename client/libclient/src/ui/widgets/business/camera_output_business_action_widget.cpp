@@ -7,11 +7,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+#include <utils/common/scoped_value_rollback.h>
 
 QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -19,11 +20,24 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 {
     ui->setupUi(this);
 
-    connect(ui->autoResetCheckBox, &QCheckBox::toggled, ui->autoResetSpinBox, &QWidget::setEnabled);
+    connect(ui->autoResetCheckBox, &QCheckBox::toggled, ui->autoResetSpinBox,
+        &QWidget::setEnabled);
+    connect(ui->autoResetCheckBox, &QCheckBox::clicked, this,
+        &QnCameraOutputBusinessActionWidget::paramsChanged);
 
-    connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this, &QnCameraOutputBusinessActionWidget::paramsChanged);
-    connect(ui->autoResetCheckBox, &QCheckBox::toggled, this, &QnCameraOutputBusinessActionWidget::paramsChanged);
-    connect(ui->autoResetSpinBox, QnSpinboxIntValueChanged, this, &QnCameraOutputBusinessActionWidget::paramsChanged);
+    connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this,
+        &QnCameraOutputBusinessActionWidget::paramsChanged);
+    connect(ui->autoResetSpinBox, QnSpinboxIntValueChanged, this,
+        &QnCameraOutputBusinessActionWidget::paramsChanged);
+
+    connect(ui->autoResetCheckBox, &QCheckBox::toggled, this,
+        [this](bool checked)
+        {
+            // Prolonged type of event has changed. In case of instant
+            // action event state should be updated
+            if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
+                model()->setEventState(QnBusiness::UndefinedState);
+        });
 
     setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
 }
@@ -46,7 +60,15 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
 
     QScopedValueRollback<bool> rollback(m_updating, true);
 
-    if (fields & QnBusiness::ActionResourcesField)
+    if (fields.testFlag(QnBusiness::EventTypeField))
+    {
+        bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
+        if (!hasToggleState)
+            ui->autoResetCheckBox->setChecked(true);
+        setReadOnly(ui->autoResetCheckBox, !hasToggleState);
+    }
+
+    if (fields.testFlag(QnBusiness::ActionResourcesField))
     {
         QnIOPortDataList outputPorts;
         bool inited = false;
@@ -88,7 +110,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
             ui->relayComboBox->addItem(relayOutput.getName(), relayOutput.id);
     }
 
-    if (fields & QnBusiness::ActionParamsField)
+    if (fields.testFlag(QnBusiness::ActionParamsField))
     {
         QnBusinessActionParameters params = model()->actionParams();
 
