@@ -43,13 +43,13 @@ public:
             timeToWaitUntil = std::chrono::steady_clock::now() + *timeout;
         for (;;)
         {
-            const auto curTime = steady_clock::now();
-            if (timeToWaitUntil && (*timeToWaitUntil <= curTime))
+            const auto currentTime = steady_clock::now();
+            if (timeToWaitUntil && (*timeToWaitUntil <= currentTime))
                 return boost::none;
 
             auto popTimeout = milliseconds::zero();
             if (timeToWaitUntil)
-                popTimeout = duration_cast<milliseconds>(*timeToWaitUntil - curTime);
+                popTimeout = duration_cast<milliseconds>(*timeToWaitUntil - currentTime);
             auto itemContext = m_items.pop(popTimeout);
             if (!itemContext)
                 return boost::none;
