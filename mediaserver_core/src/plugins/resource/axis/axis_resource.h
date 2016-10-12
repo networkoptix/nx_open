@@ -4,6 +4,7 @@
 #ifdef ENABLE_AXIS
 
 #include <QtCore/QMap>
+#include <set>
 #include <nx/utils/thread/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
@@ -128,6 +129,9 @@ private:
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
     QnAudioTransmitterPtr m_audioTransmitter;
+
+    std::set<nx_http::AsyncHttpClientPtr> m_stoppingHttpClients;
+    QnWaitCondition m_stopInputMonitoringWaitCondition;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

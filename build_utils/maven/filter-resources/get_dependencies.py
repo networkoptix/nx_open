@@ -73,8 +73,6 @@ if __name__ == '__main__':
     target = "${rdep.target}"
     debug = "${build.configuration}" == "debug"
     target_dir = "${libdir}"
-    if "windows" in "${platform}":
-        target_dir = os.path.join(target_dir, "${arch}")
     packages = get_packages(target)
 
     print "------------------------------------------------------------------------"

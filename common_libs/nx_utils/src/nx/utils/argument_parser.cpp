@@ -1,5 +1,7 @@
 #include "argument_parser.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace utils {
 
@@ -46,6 +48,8 @@ void ArgumentParser::parse(int argc, const char* argv[])
                 curParamIter->second = QString::fromUtf8(arg);
         }
     }
+
+    NX_LOGX(lm("Parsed: %1").container(m_args), cl_logDEBUG2);
 }
 
 bool ArgumentParser::read(const QString& name, QString* const value) const

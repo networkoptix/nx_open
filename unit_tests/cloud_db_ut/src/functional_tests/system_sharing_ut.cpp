@@ -4,6 +4,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include "email_manager_mocked.h"
+#include "test_email_manager.h"
 #include "test_setup.h"
 
 namespace nx {
@@ -1105,34 +1106,6 @@ TEST_F(SystemSharing, changing_own_rights_on_system)
         shareSystemEx(account2, system1, account2, api::SystemAccessRole::none);
     }
 }
-
-namespace {
-class TestEmailManager:
-    public nx::cdb::AbstractEmailManager
-{
-public:
-    TestEmailManager(
-        nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> _delegate)
-        :
-        m_delegate(std::move(_delegate))
-    {
-    }
-
-    virtual void sendAsync(
-        const AbstractNotification& notification,
-        std::function<void(bool)> completionHandler) override
-    {
-        if (m_delegate)
-            m_delegate(notification);
-
-        if (completionHandler)
-            completionHandler(true);
-    }
-
-private:
-    nx::utils::MoveOnlyFunc<void(const AbstractNotification&)> m_delegate;
-};
-} // namespace
 
 TEST_F(SystemSharing, share_with_email_not_registered_as_account)
 {

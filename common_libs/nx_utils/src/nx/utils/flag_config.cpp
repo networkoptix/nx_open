@@ -78,7 +78,7 @@ class FlagConfig::Impl
 {
 public:
     Impl(const char* moduleName);
-    void reload(Output output);
+    void reload(OutputType outputType);
     void skipNextReload();
     const char* tempPath() const;
     const char* moduleName() const;
@@ -103,7 +103,7 @@ public:
         void printLine(const std::string& value, const char* valueNameSeparator,
             const char* note, bool error, bool equalsDefault) const;
 
-        virtual void reload(Output output) = 0;
+        virtual void reload(OutputType outputType) = 0;
         virtual std::string defaultValueStr() const = 0;
     };
 
@@ -121,7 +121,7 @@ private:
     bool m_skipNextReload = false;
 
 private:
-    bool parseIniFile(Output output);
+    bool parseIniFile(OutputType outputType);
     void printFlagFileHeader() const;
     std::string iniFilename() const;
     std::string flagFilename(const char* value, const char* paramName) const;
@@ -158,13 +158,13 @@ struct FlagConfig::Impl::FlagParam: FlagConfig::Impl::AbstractParam
     {
     }
 
-    virtual void reload(Output output) override;
+    virtual void reload(OutputType outputType) override;
     virtual std::string defaultValueStr() const override;
 
     static bool strToBool(const std::string& s, bool* pValue);
 };
 
-void FlagConfig::Impl::FlagParam::reload(Output output)
+void FlagConfig::Impl::FlagParam::reload(OutputType outputType)
 {
     if (kUseIniFile)
     {
@@ -181,7 +181,7 @@ void FlagConfig::Impl::FlagParam::reload(Output output)
             }
         }
 
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
             printLine(std::to_string(*pValue), " ", note, error, *pValue == defaultValue);
     }
     else
@@ -205,7 +205,7 @@ void FlagConfig::Impl::FlagParam::reload(Output output)
             note = " [.flag]";
         }
 
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
             printLine(std::to_string(*pValue), "_", note, error, *pValue == defaultValue);
     }
 }
@@ -243,11 +243,11 @@ struct FlagConfig::Impl::IntParam: FlagConfig::Impl::AbstractParam
     {
     }
 
-    virtual void reload(Output output) override;
+    virtual void reload(OutputType outputType) override;
     virtual std::string defaultValueStr() const override;
 };
 
-void FlagConfig::Impl::IntParam::reload(Output output)
+void FlagConfig::Impl::IntParam::reload(OutputType outputType)
 {
     *pValue = defaultValue;
 
@@ -269,7 +269,7 @@ void FlagConfig::Impl::IntParam::reload(Output output)
             }
         }
 
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
             printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
     }
     else
@@ -287,7 +287,7 @@ void FlagConfig::Impl::IntParam::reload(Output output)
             }
         }
 
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
         {
             const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
             printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
@@ -318,11 +318,11 @@ struct FlagConfig::Impl::StringParam: FlagConfig::Impl::AbstractParam
     {
     }
 
-    virtual void reload(Output output) override;
+    virtual void reload(OutputType outputType) override;
     virtual std::string defaultValueStr() const override;
 };
 
-void FlagConfig::Impl::StringParam::reload(Output output)
+void FlagConfig::Impl::StringParam::reload(OutputType outputType)
 {
     *pValue = defaultValue;
 
@@ -340,7 +340,7 @@ void FlagConfig::Impl::StringParam::reload(Output output)
             *pValue = strValue.c_str();
         }
 
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
         {
             std::string valueString(*pValue);
             printLine("\"" + valueString + "\"", " = ", note, error, valueString == defaultValue);
@@ -365,7 +365,7 @@ void FlagConfig::Impl::StringParam::reload(Output output)
             }
         }
 
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
         {
             const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
             printLine(*pValue, " = ", note, error, std::string(*pValue) == defaultValue);
@@ -414,7 +414,7 @@ const char* FlagConfig::Impl::moduleName() const
     return m_moduleName;
 }
 
-bool FlagConfig::Impl::parseIniFile(Output output)
+bool FlagConfig::Impl::parseIniFile(OutputType outputType)
 {
     std::string filename = iniFilename();
 
@@ -434,7 +434,7 @@ bool FlagConfig::Impl::parseIniFile(Output output)
         std::string name;
         if (!parseNameValue(lineStr.c_str(), &name, &value))
         {
-            if (output == Output::verbose && s_isOutputAllowed)
+            if (outputType == OutputType::verbose && s_isOutputAllowed)
             {
                 std::cerr << m_moduleName << " configuration WARNING: "
                     << "Unable to parse .ini: line " << line << ", file: " << filename << "\n";
@@ -448,13 +448,13 @@ bool FlagConfig::Impl::parseIniFile(Output output)
     }
     if (line == 0) //< .ini file is empty: create the file with default values.
     {
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
             std::cerr << "    ATTENTION: .ini file is empty; filling with defaults.\n";
 
         std::ofstream file(filename);
         if (!file.good())
         {
-            if (output == Output::verbose && s_isOutputAllowed)
+            if (outputType == OutputType::verbose && s_isOutputAllowed)
                 std::cerr << "    ERRPR: Unable to rewrite .ini file.\n";
         }
         else
@@ -495,7 +495,7 @@ std::string FlagConfig::Impl::txtFilename(const char* paramName) const
     return std::string(m_tempPath) + m_moduleName + "_" + paramName + ".txt";
 }
 
-void FlagConfig::Impl::reload(Output output)
+void FlagConfig::Impl::reload(OutputType outputType)
 {
     if (m_skipNextReload)
     {
@@ -506,25 +506,25 @@ void FlagConfig::Impl::reload(Output output)
     if (kUseIniFile)
     {
         bool iniExists = fileExists(iniFilename().c_str());
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
         {
             std::cerr << m_moduleName << " config (" << iniFilename()
                 << (iniExists ? "" : " not found; touch to fill with defaults") << "):\n";
         }
 
         if (iniExists)
-            parseIniFile(output);
+            parseIniFile(outputType);
         else
             m_paramsMap.clear();
     }
     else
     {
-        if (output == Output::verbose && s_isOutputAllowed)
+        if (outputType == OutputType::verbose && s_isOutputAllowed)
             printFlagFileHeader();
     }
 
     for (const auto& param: m_params)
-        param->reload(output);
+        param->reload(outputType);
 }
 
 void FlagConfig::Impl::skipNextReload()
@@ -587,9 +587,9 @@ const char* FlagConfig::regStringParam(
     return defaultValue;
 }
 
-void FlagConfig::reload(Output output)
+void FlagConfig::reload(OutputType outputType)
 {
-    d->reload(output);
+    d->reload(outputType);
 }
 
 void FlagConfig::skipNextReload()
@@ -651,7 +651,7 @@ const char* FlagConfig::regStringParam(
     return defaultValue;
 }
 
-void FlagConfig::reload(Output output)
+void FlagConfig::reload(OutputType outputType)
 {
 }
 

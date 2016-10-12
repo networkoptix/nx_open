@@ -31,7 +31,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountData* const accountData);
 void serializeToUrlQuery(const AccountData&, QUrlQuery* const urlQuery);
 
-#define AccountData_Fields (id)(email)(passwordHa1)(fullName)(customization)(statusCode)
+#define AccountData_Fields \
+    (id)(email)(passwordHa1)(passwordHa1Sha256)\
+    (fullName)(customization)(statusCode)
 
 
 ////////////////////////////////////////////////////////////

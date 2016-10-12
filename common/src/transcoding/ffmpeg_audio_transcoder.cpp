@@ -89,8 +89,11 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     av_frame_free(&m_frameDecodeTo);
     av_frame_free(&m_frameToEncode);
 
-    av_freep(m_sampleBuffers);
-    delete[] m_resampleDstBuffers;
+    if (m_sampleBuffers)
+        av_freep(m_sampleBuffers);
+
+    if (m_resampleDstBuffers)
+        delete[] m_resampleDstBuffers;
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
