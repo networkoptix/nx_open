@@ -472,7 +472,7 @@ void AddressResolver::mediatorResolve(
 
     const auto guards = grabHandlers(resolveResult, info);
     if (needDns && !info->second.isResolved(true))
-        dnsResolve(info, lk, false, ipVersion);
+        return dnsResolve(info, lk, false, ipVersion);
 
     lk->unlock(); //< Fire guards away from mutex scope.
 }
