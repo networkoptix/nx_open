@@ -843,7 +843,7 @@ QnActionManager::QnActionManager(QObject *parent):
         false;
 #endif
 
-    if (screenRecordingSupported)
+    if (screenRecordingSupported && qnRuntime->isDesktopMode())
     {
         factory(QnActions::ToggleScreenRecordingAction).
             flags(Qn::Main | Qn::GlobalHotkey).

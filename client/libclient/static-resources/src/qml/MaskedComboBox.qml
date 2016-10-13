@@ -10,6 +10,7 @@ MaskedItem
     property string comboBoxValueRole: comboBoxTextRole;
     property bool isEditableComboBox: false;
     property int currentItemIndex: (maskedArea ? maskedArea.currentIndex : -1);
+
     maskedAreaDelegate: NxComboBox
     {
         id: comboBox;
@@ -19,12 +20,6 @@ MaskedItem
         width: control.width;
         editable: control.isEditableComboBox;
         isEditMode: editable;
-
-        onVisibleChanged:
-        {
-            if (editable && visible)
-                forceActiveFocus();
-        }
 
         onTextChanged:
         {
@@ -38,5 +33,6 @@ MaskedItem
 
         KeyNavigation.tab: control.KeyNavigation.tab;
         KeyNavigation.backtab: control.KeyNavigation.backtab;
+        onAccepted: control.accepted();
     }
 }

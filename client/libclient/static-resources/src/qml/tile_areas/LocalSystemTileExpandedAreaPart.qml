@@ -28,16 +28,12 @@ Column
 
     signal connectButtonClicked();
 
-
     onOpacityChanged:
     {
         if (opacity < 1.0 || !visible)
             return;
 
-        if (loginTextItem.visible)
-            loginTextItem.forceActiveFocus();
-        else
-            passwordTextItem.forceActiveFocus();
+        passwordTextItem.forceActiveFocus();
     }
 
     Column
@@ -57,9 +53,10 @@ Column
             id: loginTextItem;
 
             visible: !control.hasRecentConnections;
+            text: "admin";
             width: parent.width;
 
-            onAccepted: control.connectClicked();
+            onAccepted: control.connectButtonClicked();
 
             KeyNavigation.tab: passwordTextItem;
             KeyNavigation.backtab: prevTabObject;
@@ -82,7 +79,7 @@ Column
             onAccepted: control.connectButtonClicked();
 
             KeyNavigation.tab: savePasswordCheckBoxControl;
-            KeyNavigation.backtab: loginTextItem;
+            KeyNavigation.backtab: (loginTextItem.visible ? loginTextItem : control.prevTabObject);
 
             enabled: !control.isConnecting;
             onEnabledChanged:
@@ -98,6 +95,7 @@ Column
             text: qsTr("Save password");
 
             enabled: !control.isConnecting;
+            onAccepted: control.connectButtonClicked();
 
             onCheckedChanged:
             {
@@ -111,6 +109,8 @@ Column
             id: autoLoginCheckBoxItem;
             enabled: savePasswordCheckBoxControl.checked && !control.isConnecting;
             text: qsTr("Auto-login");
+
+            onAccepted: control.connectButtonClicked();
         }
     }
 

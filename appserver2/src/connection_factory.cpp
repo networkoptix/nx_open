@@ -1401,6 +1401,43 @@ int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
     return reqId;
 }
 
+void Ec2DirectConnectionFactory::tryConnectToOldEC(const QUrl& ecUrl,
+    impl::ConnectHandlerPtr handler, int reqId)
+{
+    // Checking for old EC.
+    QnConcurrent::run(
+        Ec2ThreadPool::instance(),
+        [this, ecUrl, handler, reqId]()
+    {
+        using namespace std::placeholders;
+        return connectToOldEC(
+            ecUrl,
+            [reqId, handler](
+                ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
+        {
+            if (errorCode == ErrorCode::ok
+                && oldECConnectionInfo.version >= QnSoftwareVersion(2, 3, 0))
+            {
+                // Somehow connected to 2.3 server with old ec connection. Returning
+                // error, since could not connect to ec 2.3 during normal connect.
+                handler->done(
+                    reqId,
+                    ErrorCode::ioError,
+                    AbstractECConnectionPtr());
+            }
+            else
+            {
+                handler->done(
+                    reqId,
+                    errorCode,
+                    errorCode == ErrorCode::ok
+                    ? std::make_shared<OldEcConnection>(oldECConnectionInfo)
+                    : AbstractECConnectionPtr());
+            }
+        });
+    });
+}
+
 const char oldEcConnectPath[] = "/api/connect/?format=pb&guid&ping=1";
 
 static bool parseOldECConnectionInfo(
@@ -1492,41 +1529,17 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
 
     // TODO: #ak async ssl is working now, make async request to old ec here
 
-    if (errorCode != ErrorCode::ok && errorCode != ErrorCode::unauthorized)
+    switch (errorCode)
     {
-        // Checking for old EC.
-        QnConcurrent::run(
-            Ec2ThreadPool::instance(),
-            [this, ecUrl, handler, reqId]()
-            {
-                using namespace std::placeholders;
-                return connectToOldEC(
-                    ecUrl,
-                    [reqId, handler](
-                        ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
-                    {
-                        if (errorCode == ErrorCode::ok
-                            && oldECConnectionInfo.version >= QnSoftwareVersion(2, 3, 0))
-                        {
-                            // Somehow connected to 2.3 server with old ec connection. Returning
-                            // error, since could not connect to ec 2.3 during normal connect.
-                            handler->done(
-                                reqId,
-                                ErrorCode::ioError,
-                                AbstractECConnectionPtr());
-                        }
-                        else
-                        {
-                            handler->done(
-                                reqId,
-                                errorCode,
-                                errorCode == ErrorCode::ok
-                                    ? std::make_shared<OldEcConnection>(oldECConnectionInfo)
-                                    : AbstractECConnectionPtr());
-                        }
-                    });
-            });
-        return;
+        case ec2::ErrorCode::ok:
+        case ec2::ErrorCode::unauthorized:
+        case ec2::ErrorCode::ldap_temporary_unauthorized:
+        case ec2::ErrorCode::cloud_temporary_unauthorized:
+            break;
+
+        default:
+            tryConnectToOldEC(ecUrl, handler, reqId);
+            return;
     }
 
     QnConnectionInfo connectionInfoCopy(connectionInfo);

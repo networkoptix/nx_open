@@ -35,8 +35,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchC
     Q_PROPERTY(QString softwareVersion READ softwareVersion CONSTANT)
     Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
-    Q_PROPERTY(int countdownSeconds READ countdownSeconds WRITE setCountdownSeconds NOTIFY countdownSecondsChanged)
-    Q_PROPERTY(QString countdownMessage READ countdownMessage CONSTANT)
+    Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged);
 
 public:
     QnWorkbenchWelcomeScreen(QObject* parent);
@@ -66,7 +65,9 @@ public: // Properties
 
     QString connectingToSystem() const;
 
-    void resetConnectingToSystem();
+    void handleDisconnectedFromSystem();
+
+    void handleConnectingToSystem();
 
     void setConnectingToSystem(const QString& value);
 
@@ -78,11 +79,9 @@ public: // Properties
 
     QString minSupportedVersion() const;
 
-    int countdownSeconds() const;
+    void setMessage(const QString& message);
 
-    void setCountdownSeconds(int value);
-
-    QString countdownMessage() const;
+    QString message() const;
 
 public slots:
     bool isAcceptableDrag(const UrlsList& urls);
@@ -143,7 +142,9 @@ signals:
 
     void globalPreloaderVisibleChanged();
 
-    void countdownSecondsChanged();
+    void messageChanged();
+
+    void openTile(const QString& systemId);
 
 private:
     void connectToSystemInternal(
@@ -172,5 +173,5 @@ private:
     QQuickView* m_quickView;
     const WidgetPtr m_widget;
     QSize m_pageSize;
-    int m_countdownSeconds;
+    QString m_message;
 };

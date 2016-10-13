@@ -169,9 +169,9 @@ void QnOrderedSystemsModel::handleCloudSystemsChanged()
             IdWeightDataHash result;
             for (const auto system : systems)
             {
-                const auto weightData = QnWeightData( {system.id, system.weight,
+                const auto weightData = QnWeightData( {system.localId, system.weight,
                     system.lastLoginTimeUtcMs, true });   // Cloud connections are real always
-                result.insert(system.id, weightData);
+                result.insert(system.localId, weightData);
             }
             return result;
         };

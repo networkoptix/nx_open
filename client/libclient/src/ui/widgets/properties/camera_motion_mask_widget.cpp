@@ -16,12 +16,6 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/instruments/click_instrument.h>
-#include <ui/graphics/instruments/move_instrument.h>
-#include <ui/graphics/instruments/resizing_instrument.h>
-#include <ui/graphics/instruments/forwarding_instrument.h>
-#include <ui/graphics/instruments/rubber_band_instrument.h>
-#include <ui/graphics/instruments/hand_scroll_instrument.h>
-#include <ui/graphics/instruments/wheel_zoom_instrument.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
@@ -31,9 +25,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/globals.h>
-
-#include "utils/common/checked_cast.h"
-
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
     base_type(parent),
@@ -75,6 +66,7 @@ void QnCameraMotionMaskWidget::init()
     m_controller->itemLeftClickInstrument()->disable();
     m_controller->handScrollInstrument()->disable();
     m_controller->wheelZoomInstrument()->disable();
+    m_controller->gridAdjustmentInstrument()->disable();
     m_controller->setMenuEnabled(false);
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
@@ -83,7 +75,8 @@ void QnCameraMotionMaskWidget::init()
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
     /* Create motion mask selection instrument. */
-    m_motionSelectionInstrument = m_controller->motionSelectionInstrument();//new MotionSelectionInstrument(this);
+    m_motionSelectionInstrument = dynamic_cast<MotionSelectionInstrument*>(
+        m_controller->motionSelectionInstrument());
     m_motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setBrush(qnGlobals->motionMaskRubberBandColor());

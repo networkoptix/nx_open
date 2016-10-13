@@ -16,6 +16,7 @@
 #include <utils/common/delayed.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/fuzzy.h>
 
 using namespace nx::cdb;
 
@@ -29,7 +30,8 @@ using namespace nx::cdb;
 
 namespace {
 
-const auto kIdTag = lit("id");
+const auto kCloudSystemId = lit("cloudId");
+const auto kLocalSystemIdTag = lit("localId");
 const auto kNameTag = lit("name");
 const auto kOwnerAccounEmail = lit("email");
 const auto kOwnerFullName = lit("owner_full_name");
@@ -48,7 +50,8 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
             continue;
 
         QnCloudSystem system;
-        system.id = QString::fromStdString(systemData.id);
+        system.cloudId = QString::fromStdString(systemData.id);
+        system.localId = system.cloudId;// TODO: !! change for local system id when available
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -57,28 +60,6 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
             (systemData.lastLoginTime.time_since_epoch()).count();
         result.append(system);
-    }
-
-    {
-        // TODO: #ynikitenkov remove this section when weights are available
-
-        // Temporary code section.
-        const bool isTmpValues = std::all_of(result.begin(), result.end(),
-            [](const QnCloudSystem& system) -> bool { return !system.weight; });
-        if (isTmpValues)
-        {
-            static const auto initialWeight = 10000.0;
-            static const auto step = 100.0;
-
-            qreal tmpWeight = initialWeight;
-            const auto tmpLastLoginTime = QDateTime::currentMSecsSinceEpoch();
-            for (auto& system : result)
-            {
-                system.weight = tmpWeight;
-                system.lastLoginTimeUtcMs = tmpLastLoginTime;
-                tmpWeight += step;
-            }
-        }
     }
 
     return result;
@@ -556,7 +537,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
 
     const auto it = std::find_if(
         cloudSystems.begin(), cloudSystems.end(),
-        [systemId](const QnCloudSystem& system) { return systemId == system.id; });
+        [systemId](const QnCloudSystem& system) { return systemId == system.cloudId; });
 
     if (it == cloudSystems.end())
         return;
@@ -669,23 +650,28 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 
 bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
 {
-    return id == other.id &&
-           name == other.name &&
-           authKey == other.authKey;
+    return ((cloudId == other.cloudId)
+        && (localId == other.localId)
+        && (name == other.name)
+        && (authKey == other.authKey)
+        && (lastLoginTimeUtcMs == other.lastLoginTimeUtcMs)
+        && qFuzzyEquals(weight, other.weight));
 }
 
 bool QnCloudSystem::fullEqual(const QnCloudSystem& other) const
 {
-    return id == other.id &&
-           name == other.name &&
-           authKey == other.authKey &&
-           ownerAccountEmail == other.ownerAccountEmail &&
-           ownerFullName == other.ownerFullName;
+    return (cloudId == other.cloudId
+        && (localId == other.localId)
+        && (name == other.name)
+        && (authKey == other.authKey)
+        && (ownerAccountEmail == other.ownerAccountEmail)
+        && (ownerFullName == other.ownerFullName));
 }
 
 void QnCloudSystem::writeToSettings(QSettings* settings) const
 {
-    settings->setValue(kIdTag, id);
+    settings->setValue(kCloudSystemId, cloudId);
+    settings->setValue(kLocalSystemIdTag, localId);
     settings->setValue(kNameTag, name);
     settings->setValue(kOwnerAccounEmail, ownerAccountEmail);
     settings->setValue(kOwnerFullName, ownerFullName);
@@ -697,7 +683,8 @@ QnCloudSystem QnCloudSystem::fromSettings(QSettings* settings)
 {
     QnCloudSystem result;
 
-    result.id = settings->value(kIdTag).toString();
+    result.cloudId = settings->value(kCloudSystemId).toString();
+    result.localId = settings->value(kLocalSystemIdTag).toString();
     result.name = settings->value(kNameTag).toString();
     result.ownerAccountEmail = settings->value(kOwnerAccounEmail).toString();
     result.ownerFullName = settings->value(kOwnerFullName).toString();

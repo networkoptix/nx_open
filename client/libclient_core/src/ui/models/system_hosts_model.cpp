@@ -9,30 +9,12 @@ namespace {
 static const int kUrlRole = Qt::UserRole + 1;
 
 typedef QHash<int, QByteArray> RolesHash;
-static const auto kRoles =
-    []() -> RolesHash
-    {
-        RolesHash result;
-        result.insert(Qt::DisplayRole, "display");
-        result.insert(kUrlRole, "url");
-        return result;
-    }();
-
-int roleByName(const QString& name)
+static const RolesHash kRoles =
 {
-    typedef QHash<QByteArray, int> IdsHash;
-    static const auto kReversedRoles =
-        [name]() -> IdsHash
-    {
-        IdsHash roles;
-        for (auto it = kRoles.begin(); it != kRoles.end(); ++it)
-            roles.insert(it.value(), it.key());
-        return roles;
-    }();
+    {Qt::DisplayRole, "display"},
+    {kUrlRole, "url"}
+};
 
-    const auto it = kReversedRoles.find(name.toLatin1());
-    return (it == kReversedRoles.end() ? Qt::DisplayRole : it.value());
-}
 }
 
 QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
@@ -87,7 +69,7 @@ int QnSystemHostsModel::rowCount(const QModelIndex &parent) const
 
 QVariant QnSystemHostsModel::getData(const QString& dataRole, int row)
 {
-    const auto role = roleByName(dataRole);
+    const auto role = kRoles.key(dataRole.toLatin1(), Qt::DisplayRole);
     return data(index(row), role);
 }
 
@@ -101,11 +83,15 @@ QVariant QnSystemHostsModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     const auto& hostData = m_hosts.at(row);
-    if (role == Qt::DisplayRole)
-        return hostData.second.host();
-    else if (role == kUrlRole)
-        return hostData.second.toString();
-
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            return hostData.second.host();
+        case kUrlRole:
+            return hostData.second.toString();
+        default:
+            break;
+    }
     return QVariant();
 }
 

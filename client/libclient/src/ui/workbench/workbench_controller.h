@@ -24,6 +24,7 @@ class QMenu;
 class QLabel;
 class QPropertyAnimation;
 
+class Instrument;
 class InstrumentManager;
 class HandScrollInstrument;
 class WheelZoomInstrument;
@@ -39,6 +40,7 @@ class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 class ZoomWindowInstrument;
+class GridAdjustmentInstrument;
 
 class QnToggle;
 class QnActionManager;
@@ -76,41 +78,15 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    HandScrollInstrument *handScrollInstrument() const {
-        return m_handScrollInstrument;
-    }
-
-    WheelZoomInstrument *wheelZoomInstrument() const {
-        return m_wheelZoomInstrument;
-    }
-
-    MotionSelectionInstrument *motionSelectionInstrument() const {
-        return m_motionSelectionInstrument;
-    }
-
-    ClickInstrument *itemRightClickInstrument() const {
-        return m_itemRightClickInstrument;
-    }
-
-    MoveInstrument *moveInstrument() const {
-        return m_moveInstrument;
-    }
-
-    ForwardingInstrument *itemMouseForwardingInstrument() const {
-        return m_itemMouseForwardingInstrument;
-    }
-
-    ResizingInstrument *resizingInstrument() const {
-        return m_resizingInstrument;
-    }
-
-    RubberBandInstrument *rubberBandInstrument() const {
-        return m_rubberBandInstrument;
-    }
-
-    ClickInstrument *itemLeftClickInstrument() const {
-        return m_itemLeftClickInstrument;
-    }
+    Instrument* handScrollInstrument() const;
+    Instrument* wheelZoomInstrument() const;
+    Instrument* motionSelectionInstrument() const;
+    Instrument* itemRightClickInstrument() const;
+    Instrument* moveInstrument() const;
+    Instrument* resizingInstrument() const;
+    Instrument* rubberBandInstrument() const;
+    Instrument* itemLeftClickInstrument() const;
+    Instrument* gridAdjustmentInstrument() const;
 
     // TODO: #Elric split into menu_controller or smth like that
     bool isMenuEnabled() const {
@@ -255,6 +231,8 @@ private:
     ClickInstrument *m_itemLeftClickInstrument;
 
     ZoomWindowInstrument* m_zoomWindowInstrument;
+
+    GridAdjustmentInstrument* m_gridAdjustmentInstrument;
 
     bool m_selectionOverlayHackInstrumentDisabled;
     bool m_selectionOverlayHackInstrumentDisabled2; // TODO: use toggles?

@@ -5,7 +5,6 @@
 
 #include <core/resource/device_dependent_strings.h>
 
-#include <ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -23,7 +22,6 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
 
     setWarningStyle(ui->settingsWarningLabel);
 
-    QnCheckbox::autoCleanTristate(ui->autoDiscoveryCheckBox);
     connect(ui->autoSettingsCheckBox,   &QCheckBox::clicked,  this,  [this]
     {
         ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
@@ -74,15 +72,7 @@ void QnSystemSettingsWidget::applyChanges()
     if (!hasChanges())
         return;
 
-    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked)
-    {
-        qnGlobalSettings->setAutoDiscoveryEnabled(true);
-    }
-    else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked)
-    {
-        qnGlobalSettings->setAutoDiscoveryEnabled(false);
-    }
-
+    qnGlobalSettings->setAutoDiscoveryEnabled(ui->autoDiscoveryCheckBox->isChecked());
     qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
     qnGlobalSettings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());

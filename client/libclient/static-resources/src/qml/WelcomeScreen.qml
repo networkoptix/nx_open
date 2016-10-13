@@ -140,8 +140,52 @@ Rectangle
 
                 property QtObject watcher: SingleActiveItemSelector
                 {
+                    id: itemSelector;
                     variableName: "isExpanded";
                     deactivateFunc: function(item) { item.toggle(); };
+                }
+
+                Connections
+                {
+                    id: openTileHandler;
+
+                    property variant items: [];
+
+                    function addItem(item)
+                    {
+                        if (items.indexOf(item) == -1)
+                            items.push(item);
+                    }
+
+                    function removeItem(item)
+                    {
+                        var index = items.indexOf(item);
+                        if (index > -1)
+                            items.splice(index, 1); // Removes element
+                    }
+
+                    target: context;
+
+                    onOpenTile:
+                    {
+                        var foundItem = null;
+                        var count = openTileHandler.items.length;
+                        for (var i = 0; i != count; ++i)
+                        {
+                            var item = openTileHandler.items[i];
+                            if (item.systemId == systemId)
+                            {
+                                foundItem = item;
+                                break;
+                            }
+                        }
+
+                        if (foundItem && !foundItem.isCloudTile && !foundItem.isFactoryTile
+                            && !foundItem.isExpanded && foundItem.isAvailable)
+                        {
+                            foundItem.toggle();
+                        }
+                    }
                 }
 
                 model: QnOrderedSystemsModel
@@ -175,7 +219,16 @@ Rectangle
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
 
-                        Component.onCompleted: { grid.watcher.addItem(this); }
+                        Component.onCompleted:
+                        {
+                            grid.watcher.addItem(this);
+                            openTileHandler.addItem(this);
+                        }
+
+                        Component.onDestruction:
+                        {
+                            openTileHandler.removeItem(this);
+                        }
                     }
                 }
 
@@ -241,7 +294,9 @@ Rectangle
             anchors.bottomMargin: 64;   // Magic const by design
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            text: qsTr("Connect to another system");
+            text: grid.totalItemsCount > 0
+                ? qsTr("Connect to another system")
+                : qsTr("Connect to system")
 
             onClicked: context.connectToAnotherSystem();
         }
@@ -306,22 +361,22 @@ Rectangle
 
     Rectangle
     {
-        id: recordingHolder;
+        id: messageHolder;
         anchors.centerIn: parent;
-        visible: (context.countdownSeconds > 0);
+        visible: (context.message.length);
         opacity: (visible ? 1.0 : 0.0);
 
         radius: 2;
         color: Style.colorWithAlpha(
             Style.darkerColor(Style.colors.brand, 2), 0.8);
-        width: recordingLabel.implicitWidth;
-        height: recordingLabel.implicitHeight;
+        width: messageLabel.implicitWidth;
+        height: messageLabel.implicitHeight;
 
         Behavior on opacity
         {
             PropertyAnimation
             {
-                target: recordingHolder;
+                target: messageHolder;
                 property: "opacity";
                 duration: 200;
             }
@@ -329,7 +384,7 @@ Rectangle
 
         NxLabel
         {
-            id: recordingLabel;
+            id: messageLabel;
             anchors.centerIn: parent;
             font: Style.fonts.screenRecording;
             standardColor: Style.colors.brandContrast;
@@ -337,7 +392,7 @@ Rectangle
             rightPadding: leftPadding;
             topPadding: 10;
             bottomPadding: topPadding;
-            text: context.countdownMessage.arg(context.countdownSeconds);
+            text: context.message;
         }
     }
 
