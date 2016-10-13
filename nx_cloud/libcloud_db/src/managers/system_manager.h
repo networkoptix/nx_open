@@ -283,7 +283,7 @@ private:
     // system sharing methods. TODO: #ak: move to a separate class
 
     /**
-     * @param inviteeAccount Filled with attributes of account \a sharing.accountEmail
+     * @param inviteeAccount Filled with attributes of account sharing.accountEmail
      */
     nx::db::DBResult shareSystem(
         nx::db::QueryContext* const queryContext,
@@ -326,7 +326,7 @@ private:
         api::SystemSharingEx* const sharing);
 
     /**
-     * Fetches existing account or creates new one sending corresponding notification.
+     * Fetch existing account or create a new one sending corresponding notification.
      */
     nx::db::DBResult fetchAccountToShareWith(
         nx::db::QueryContext* const queryContext,

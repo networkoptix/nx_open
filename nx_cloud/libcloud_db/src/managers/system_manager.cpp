@@ -1252,7 +1252,7 @@ nx::db::DBResult SystemManager::fetchAccountToShareWith(
         case nx::db::DBResult::notFound:
             if (sharing.accessRole == api::SystemAccessRole::none)
             {
-                //< Removing sharing, no sense to create account.
+                // Removing sharing, no sense to create account.
                 return nx::db::DBResult::notFound;
             }
             break;
