@@ -111,7 +111,9 @@ angular.module('cloudApp')
             }
 
             urlProtocol.getLink(clearEmptyStrings($scope.linkSettings)).then(function(link){
-                window.location.href = link;
+                window.protocolCheck(link, function () {
+                    alert("protocol not recognized");
+                });
             });
         }
 

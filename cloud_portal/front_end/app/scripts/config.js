@@ -7,7 +7,7 @@ var Config = {
 
     cacheTimeout: 20 * 1000, // Cache lives for 30 seconds
     updateInterval:  30 * 1000, // Update content on pages every 30 seconds
-    openClientTimeout: 30 * 1000, // 30 second we wait for client to open
+    openClientTimeout: 10 * 1000, // 30 second we wait for client to open
 
     alertTimeout: 3 * 1000,  // Alerts are shown for 3 seconds
     alertsMaxCount: 5,
@@ -63,7 +63,33 @@ var Config = {
 
         editUserAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
         globalAdminAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
-
+        predefinedRoles:[
+            {
+                "isOwner": true,
+                "name": "Owner",
+                "permissions": "GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission"
+            },
+            {
+                "name": "Administrator",
+                "permissions": "GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission"
+            },
+            {
+                "name": "Advanced Viewer",
+                "permissions": "GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission"
+            },
+            {
+                "name": "Viewer",
+                "permissions": "GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalAccessAllMediaPermission"
+            },
+            {
+                "name": "Live Viewer",
+                "permissions": "GlobalAccessAllMediaPermission"
+            },
+            {
+                "name": 'Custom',
+                "permissions": 'NoPermission'
+            }
+        ],
         order: [
             'liveViewer',
             'viewer',

@@ -1,11 +1,11 @@
 customization: digitalwatchdog
 
 cloud_database:
-    host: '127.0.0.1'
-    port: 3306
-    username: root
-    password: ''
-    database: nx_cloud
+    host: '$DB_HOST'
+    port: '$DB_PORT'
+    username: '$DB_USER'
+    password: '$DB_PASSWORD'
+    database: '$DB_NAME'
 
 cloud_db:
     url: 'http://$CLOUD_DB_HOST:3346/cdb'

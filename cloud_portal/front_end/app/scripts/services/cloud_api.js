@@ -52,11 +52,8 @@ angular.module('cloudApp')
         }
 
         function clearCache(){
-            $localStorage.$reset();
             cachedResults = {};
-            for (var url in cacheReceived){
-                cacheReceived[url] = 0;
-            }
+            cacheReceived = {};
         }
 
         var getSystems = cacheGet(apiBase + '/systems');
@@ -76,8 +73,6 @@ angular.module('cloudApp')
             account: cacheGet(apiBase + '/account'),
             login:function(email, password, remember){
                 clearCache();
-                $localStorage.email = email;
-                $localStorage.password = password;
                 return $http.post(apiBase + '/account/login',{
                     email: email,
                     password: password,
@@ -88,13 +83,14 @@ angular.module('cloudApp')
                 clearCache();
                 return $http.post(apiBase + '/account/logout');
             },
-            register:function(email,password,firstName,lastName,subscribe){
+            register:function(email, password, firstName, lastName, subscribe, code){
                 return $http.post(apiBase + '/account/register',{
-                    email:email,
-                    password:password,
-                    first_name:firstName,
-                    last_name:lastName,
-                    subscribe:subscribe
+                    email: email,
+                    password: password,
+                    first_name: firstName,
+                    last_name: lastName,
+                    subscribe: subscribe,
+                    code: code
                 });
             },
 

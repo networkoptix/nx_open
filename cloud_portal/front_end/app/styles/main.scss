@@ -79,22 +79,13 @@ footer {
   display: inline-block;
   position: relative;
 
+  .btn + .btn{
+    margin-left:0; /* Overwrite for modal-footer bootstrap style */
+  }
+
   .processing {
     visibility: hidden;
   }
-
-  .progress {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-  }
-
-  .progress-bar {
-    font-size: 14px;
-    padding: 6px 12px;
-  }
-
-
 
   .loading{
     width: 100%;
@@ -103,7 +94,11 @@ footer {
 
 	text-align: center;
 	vertical-align: middle;
+	overflow: hidden;
+
 	margin: auto;
+	padding-right: 0;
+	padding-left: 0;
 
     span{
         display: inline-block;

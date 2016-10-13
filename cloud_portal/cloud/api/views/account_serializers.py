@@ -12,6 +12,8 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
     last_name = serializers.CharField(required=True, allow_blank=False, max_length=255)
     subscribe = serializers.BooleanField(required=False)
 
+    code = serializers.CharField(required=False, max_length=255)
+
     @staticmethod
     def validate_password(value):
 

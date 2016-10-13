@@ -6,8 +6,10 @@ angular.module('cloudApp')
         $http.get('static/views/static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
-        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$sessionStorage', '$routeParams', 'account', 'urlProtocol',
-        function ($scope, cloudApi, process, $location, $localStorage, $sessionStorage, $routeParams, account, urlProtocol) {
+        '$scope', 'cloudApi', 'process', '$location', '$localStorage',
+        '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64',
+        function ($scope, cloudApi, process, $location, $localStorage,
+                  $sessionStorage, $routeParams, account, urlProtocol, $base64) {
 
         account.logoutAuthorised();
         $scope.Config = Config;
@@ -16,8 +18,12 @@ angular.module('cloudApp')
 
         $scope.session.fromClient = urlProtocol.source.isApp;
 
-        var registerEmail = $routeParams.email || '';
-        $scope.lockEmail = !!$routeParams.email;
+        var registerEmail = null;
+        if($routeParams.code){
+            var decoded = $base64.decode($routeParams.code);
+            registerEmail = decoded.substring(decoded.indexOf(':') + 1)
+            $scope.lockEmail = true;
+        }
 
         $scope.registerSuccess = $routeParams.registerSuccess;
 
@@ -30,7 +36,8 @@ angular.module('cloudApp')
             password: '',
             firstName: '',
             lastName: '',
-            subscribe: true
+            subscribe: true,
+            code: $routeParams.code
         };
 
         $scope.setRegisterForm = function(scope){
@@ -46,7 +53,8 @@ angular.module('cloudApp')
                 $scope.account.password,
                 $scope.account.firstName,
                 $scope.account.lastName,
-                $scope.account.subscribe);
+                $scope.account.subscribe,
+                $scope.account.code);
         },{
             errorCodes:{
                 alreadyExists: function(error){
