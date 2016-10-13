@@ -594,7 +594,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
     switch (logicalValue)
     {
         case LogicalState::disconnected:
-            welcomeScreen->resetConnectingToSystem();
+            welcomeScreen->handleDisconnectedFromSystem();
             welcomeScreen->setGlobalPreloaderVisible(false);
             resourceModeAction->setChecked(false);  //< Shows welcome screen
             break;
@@ -602,7 +602,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
             if (physicalValue == PhysicalState::waiting_resources)
             {
                 // If connection is successful we show global preloader while loading resources
-                welcomeScreen->resetConnectingToSystem();
+                welcomeScreen->handleConnectingToSystem();
                 welcomeScreen->setGlobalPreloaderVisible(true);
             }
             break;

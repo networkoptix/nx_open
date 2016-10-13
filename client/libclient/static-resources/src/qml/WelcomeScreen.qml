@@ -140,8 +140,52 @@ Rectangle
 
                 property QtObject watcher: SingleActiveItemSelector
                 {
+                    id: itemSelector;
                     variableName: "isExpanded";
                     deactivateFunc: function(item) { item.toggle(); };
+                }
+
+                Connections
+                {
+                    id: openTileHandler;
+
+                    property variant items: [];
+
+                    function addItem(item)
+                    {
+                        if (items.indexOf(item) == -1)
+                            items.push(item);
+                    }
+
+                    function removeItem(item)
+                    {
+                        var index = items.indexOf(item);
+                        if (index > -1)
+                            items.splice(index, 1); // Removes element
+                    }
+
+                    target: context;
+
+                    onOpenTile:
+                    {
+                        var foundItem = null;
+                        var count = openTileHandler.items.length;
+                        for (var i = 0; i != count; ++i)
+                        {
+                            var item = openTileHandler.items[i];
+                            if (item.systemId == systemId)
+                            {
+                                foundItem = item;
+                                break;
+                            }
+                        }
+
+                        if (foundItem && !foundItem.isCloudTile && !foundItem.isFactoryTile
+                            && !foundItem.isExpanded && foundItem.isAvailable)
+                        {
+                            foundItem.toggle();
+                        }
+                    }
                 }
 
                 model: QnOrderedSystemsModel
@@ -175,7 +219,16 @@ Rectangle
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
 
-                        Component.onCompleted: { grid.watcher.addItem(this); }
+                        Component.onCompleted:
+                        {
+                            grid.watcher.addItem(this);
+                            openTileHandler.addItem(this);
+                        }
+
+                        Component.onDestruction:
+                        {
+                            openTileHandler.removeItem(this);
+                        }
                     }
                 }
 

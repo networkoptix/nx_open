@@ -203,7 +203,17 @@ QString QnWorkbenchWelcomeScreen::connectingToSystem() const
     return m_connectingSystemName;
 }
 
-void QnWorkbenchWelcomeScreen::resetConnectingToSystem()
+void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
+{
+    const auto systemId = connectingToSystem();
+    if (systemId.isEmpty())
+        return;
+
+    setConnectingToSystem(QString());
+    emit openTile(systemId);
+}
+
+void QnWorkbenchWelcomeScreen::handleConnectingToSystem()
 {
     setConnectingToSystem(QString());
 }

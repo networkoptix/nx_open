@@ -65,7 +65,9 @@ public: // Properties
 
     QString connectingToSystem() const;
 
-    void resetConnectingToSystem();
+    void handleDisconnectedFromSystem();
+
+    void handleConnectingToSystem();
 
     void setConnectingToSystem(const QString& value);
 
@@ -141,6 +143,8 @@ signals:
     void globalPreloaderVisibleChanged();
 
     void messageChanged();
+
+    void openTile(const QString& systemId);
 
 private:
     void connectToSystemInternal(
