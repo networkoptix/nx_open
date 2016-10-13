@@ -355,7 +355,7 @@ qint64 QnThirdPartyStorageResource::getTotalSpace() const
     return totalSpace;
 }
 
-Qn::StorageInitResult QnThirdPartyStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnThirdPartyStorageResource::initOrUpdate() 
 {
     if (!m_valid)
        return Qn::StorageInit_WrongPath;
