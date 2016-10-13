@@ -511,7 +511,7 @@
                 <applauncher.binary.name>applauncher.exe</applauncher.binary.name>
                 <minilauncher.binary.name>${product.name} Launcher.exe</minilauncher.binary.name>
                 <installation.root>C:/Program Files/${company.name}/${display.product.name}/</installation.root>
-                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
+                <init.python.dir>${environment.dir}/python</init.python.dir>
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
                 <unix>false</unix>
