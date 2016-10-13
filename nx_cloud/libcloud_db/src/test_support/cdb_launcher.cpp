@@ -641,6 +641,24 @@ api::ResultCode CdbLauncher::renameSystem(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::updateSystem(
+    const api::SystemData& system,
+    const api::SystemAttributesUpdate& updatedData)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(system.id, system.authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::update,
+                connection->systemManager(),
+                updatedData,
+                std::placeholders::_1));
+    return resCode;
+}
+
 api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& email,
     const std::string& password,

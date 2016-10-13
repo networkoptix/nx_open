@@ -129,9 +129,9 @@ public:
         data::SystemID systemID,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
 
-    void renameSystem(
+    void updateSystem(
         const AuthorizationInfo& authzInfo,
-        data::SystemNameUpdate data,
+        data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
     
     void recordUserSessionStart(
@@ -374,19 +374,25 @@ private:
         api::SystemSharingEx sharing,
         bool updateExFields = true);
 
-    nx::db::DBResult updateSystemNameInDB(
+    nx::db::DBResult updateSystem(
         nx::db::QueryContext* const queryContext,
-        const data::SystemNameUpdate& data);
+        const data::SystemAttributesUpdate& data);
+    nx::db::DBResult renameSystem(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
     nx::db::DBResult execSystemNameUpdate(
         nx::db::QueryContext* const queryContext,
-        const data::SystemNameUpdate& data);
-    void updateSystemNameInCache(
-        data::SystemNameUpdate data);
+        const data::SystemAttributesUpdate& data);
+    nx::db::DBResult execSystemOpaqueUpdate(
+        nx::db::QueryContext* const queryContext,
+        const data::SystemAttributesUpdate& data);
+    void updateSystemAttributesInCache(
+        data::SystemAttributesUpdate data);
     void systemNameUpdated(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        data::SystemNameUpdate data,
+        data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult activateSystem(
@@ -458,11 +464,11 @@ private:
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
-        data::SystemNameUpdate* const systemNameUpdate);
+        data::SystemAttributesUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        data::SystemNameUpdate systemNameUpdate);
+        data::SystemAttributesUpdate systemNameUpdate);
 
     nx::db::DBResult deleteSharing(
         nx::db::QueryContext* const queryContext,

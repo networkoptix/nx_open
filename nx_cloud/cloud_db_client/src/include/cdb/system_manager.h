@@ -78,6 +78,12 @@ public:
     /**
      * \note Currently, request can be performed by system only, not by account.
      */
+    virtual void update(
+        const SystemAttributesUpdate& updatedData,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
+    /**
+     * \note Currently, request can be performed by system only, not by account.
+     */
     virtual void rename(
         const std::string& systemId,
         const std::string& systemName,

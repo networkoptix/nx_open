@@ -25,6 +25,7 @@ extern const char* kSystemSharePath;
 extern const char* kSystemGetCloudUsersPath;
 extern const char* kSystemGetAccessRoleListPath;
 extern const char* kSystemRenamePath;
+extern const char* kSystemUpdatePath;
 extern const char* kSystemRecordUserSessionStartPath;
 
 extern const char* kAuthGetNoncePath;

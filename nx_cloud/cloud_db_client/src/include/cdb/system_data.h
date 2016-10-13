@@ -11,14 +11,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-/** Unused currently. */
-class SubscriptionData
-{
-public:
-    std::string productID;
-    std::string systemID;
-};
-
 /**
  * Information required to register system in cloud.
  */
@@ -30,6 +22,14 @@ public:
     std::string customization;
     /** Vms-specific data. Transparently stored and returned. */
     std::string opaque;
+};
+
+class SystemAttributesUpdate
+{
+public:
+    std::string systemID;
+    boost::optional<std::string> name;
+    boost::optional<std::string> opaque;
 };
 
 enum class SystemStatus

@@ -151,6 +151,9 @@ public:
         const std::string& password,
         const std::string& systemID,
         const std::string& newSystemName);
+    api::ResultCode updateSystem(
+        const api::SystemData& system,
+        const api::SystemAttributesUpdate& updatedData);
 
     //calls on system's regard
     api::ResultCode getCdbNonce(
