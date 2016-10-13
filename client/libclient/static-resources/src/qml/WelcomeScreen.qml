@@ -241,7 +241,9 @@ Rectangle
             anchors.bottomMargin: 64;   // Magic const by design
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            text: qsTr("Connect to another system");
+            text: grid.totalItemsCount > 0
+                ? qsTr("Connect to another system")
+                : qsTr("Connect to system")
 
             onClicked: context.connectToAnotherSystem();
         }
