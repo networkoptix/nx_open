@@ -21,12 +21,6 @@ MaskedItem
         editable: control.isEditableComboBox;
         isEditMode: editable;
 
-        onVisibleChanged:
-        {
-            if (editable && visible)
-                forceActiveFocus();
-        }
-
         onTextChanged:
         {
             control.displayValue = text;

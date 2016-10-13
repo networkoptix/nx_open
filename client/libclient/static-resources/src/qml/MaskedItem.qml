@@ -24,7 +24,11 @@ Item
     MouseArea
     {
         anchors.fill: (isMasked ? maskedAreaLoader : areaLoader);
-        onClicked: { thisComponent.isMaskedPrivate = !thisComponent.isMaskedPrivate; }
+        onClicked:
+        {
+            thisComponent.isMaskedPrivate = !thisComponent.isMaskedPrivate;
+            area.forceActiveFocus();
+        }
         acceptedButtons: (isAvailable ? Qt.AllButtons : Qt.NoButton);
     }
 
