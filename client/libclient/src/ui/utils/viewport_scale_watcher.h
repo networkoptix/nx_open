@@ -25,7 +25,7 @@ public:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 signals:
-    void scaleChanged();
+    void scaleChanged(qreal value);
 
 private:
     void updateScale();

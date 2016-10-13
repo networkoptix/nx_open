@@ -405,9 +405,9 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     connect(display(), &QnWorkbenchDisplay::widgetChanged,              this, &ZoomWindowInstrument::at_display_widgetChanged);
 
     connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged, this,
-        [this]()
+        [this](qreal value)
         {
-            const auto penWidth = kZoomLineWidth * m_scaleWatcher.scale();
+            const auto penWidth = kZoomLineWidth * value;
             const auto pen = QPen(m_zoomWindowColor, penWidth, Qt::SolidLine,
                 Qt::SquareCap, Qt::MiterJoin);
             if (selectionItem())
