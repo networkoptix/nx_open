@@ -457,7 +457,7 @@ void AddressResolver::mediatorResolve(
     if (kResolveOnMediator)
         return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
-    SystemError::ErrorCode resolveResult;
+    SystemError::ErrorCode resolveResult = SystemError::notImplemented;
     if (info->second.isLikelyCloudAddress
         && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
     {
