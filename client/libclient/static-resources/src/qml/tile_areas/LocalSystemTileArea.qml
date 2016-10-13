@@ -145,7 +145,7 @@ Item
         opacity: control.expandedOpacity;
         hasRecentConnections: control.impl.hasRecentConnections;
 
-        prevTabObject: (userChooseItem ? userChooseItem : control.prevTabObject);
+        prevTabObject: (userChooseItem.visible ? userChooseItem : hostChooseItem);
         nextTabObject: control.prevTabObject;
 
         onConnectButtonClicked: { control.connectRequested(); }

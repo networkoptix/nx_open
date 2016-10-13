@@ -28,7 +28,6 @@ Column
 
     signal connectButtonClicked();
 
-
     onOpacityChanged:
     {
         if (opacity < 1.0 || !visible)
@@ -80,7 +79,7 @@ Column
             onAccepted: control.connectButtonClicked();
 
             KeyNavigation.tab: savePasswordCheckBoxControl;
-            KeyNavigation.backtab: loginTextItem;
+            KeyNavigation.backtab: (loginTextItem.visible ? loginTextItem : control.prevTabObject);
 
             enabled: !control.isConnecting;
             onEnabledChanged:

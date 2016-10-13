@@ -297,7 +297,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
 {
     connectToSystemInternal(
         systemId,
-        QUrl(serverUrl),
+        QUrl::fromUserInput(serverUrl),
         QnCredentials(userName, password),
         storePassword,
         autoLogin);
