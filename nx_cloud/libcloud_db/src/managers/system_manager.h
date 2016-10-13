@@ -420,6 +420,7 @@ private:
         api::SystemAccessRole accessRole) const;
 
     nx::db::DBResult fillCache();
+    template<typename Func> nx::db::DBResult doBlockingDbQuery(Func func);
     nx::db::DBResult fetchSystems(nx::db::QueryContext* queryContext, int* const /*dummy*/);
     nx::db::DBResult fetchSystemToAccountBinder(
         nx::db::QueryContext* queryContext,

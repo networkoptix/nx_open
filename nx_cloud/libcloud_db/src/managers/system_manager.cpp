@@ -728,13 +728,17 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
 
     QSqlQuery insertSystemQuery(*queryContext->connection());
     insertSystemQuery.prepare(
-        "INSERT INTO system(id, name, customization, auth_key, owner_account_id, "
-                           "status_code, expiration_utc_timestamp) "
-        " VALUES(:id, :name, :customization, :authKey, :ownerAccountID, "
-                ":status, :expiration_utc_timestamp)");
+        R"sql(
+        INSERT INTO system(
+                id, name, customization, auth_key, owner_account_id,
+                status_code, expiration_utc_timestamp, opaque)
+        VALUES(:id, :name, :customization, :authKey, :ownerAccountID,
+               :status, :expirationTimeUtc, :opaque)
+        )sql");
     NX_ASSERT(!result->systemData.id.empty());
     result->systemData.name = newSystem.name;
     result->systemData.customization = newSystem.customization;
+    result->systemData.opaque = newSystem.opaque;
     result->systemData.authKey = QnUuid::createUuid().toSimpleString().toStdString();
     result->systemData.ownerAccountEmail = account->email;
     result->systemData.status = api::SystemStatus::ssNotActivated;
@@ -747,7 +751,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         ":ownerAccountID",
         QnSql::serialized_field(account->id));
     insertSystemQuery.bindValue(
-        ":expiration_utc_timestamp",
+        ":expirationTimeUtc",
         result->systemData.expirationTimeUtc);
     if (!insertSystemQuery.exec())
     {
@@ -1781,63 +1785,57 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
 
 nx::db::DBResult SystemManager::fillCache()
 {
-    {
-        std::promise<db::DBResult> cacheFilledPromise;
-        auto future = cacheFilledPromise.get_future();
+    using namespace std::placeholders;
 
-        //starting async operation
-        using namespace std::placeholders;
-        m_dbManager->executeSelect<int>(
-            std::bind(&SystemManager::fetchSystems, this, _1, _2),
-            [&cacheFilledPromise](
-                nx::db::QueryContext* /*queryContext*/,
-                db::DBResult dbResult,
-                int /*dummy*/)
-            {
-                cacheFilledPromise.set_value(dbResult);
-            });
-        //waiting for completion
-        future.wait();
-        if (future.get() != db::DBResult::ok)
-            return future.get();
-    }
+    auto result = doBlockingDbQuery(
+        std::bind(&SystemManager::fetchSystems, this, _1, _2));
+    if (result != db::DBResult::ok)
+        return result;
 
-    //fetching system_to_account binding
-    {
-        std::promise<db::DBResult> cacheFilledPromise;
-        auto future = cacheFilledPromise.get_future();
-
-        //starting async operation
-        using namespace std::placeholders;
-        m_dbManager->executeSelect<int>(
-            std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2),
-            [&cacheFilledPromise](
-                nx::db::QueryContext* /*queryContext*/,
-                db::DBResult dbResult,
-                int /*dummy*/)
-            {
-                cacheFilledPromise.set_value(dbResult);
-            });
-        //waiting for completion
-        const auto result = future.get();
-        if (result != db::DBResult::ok)
-            return result;
-    }
+    result = doBlockingDbQuery(
+        std::bind(&SystemManager::fetchSystemToAccountBinder, this, _1, _2));
+    if (result != db::DBResult::ok)
+        return result;
 
     return db::DBResult::ok;
 }
 
+template<typename Func> 
+nx::db::DBResult SystemManager::doBlockingDbQuery(Func func)
+{
+    std::promise<db::DBResult> cacheFilledPromise;
+    auto future = cacheFilledPromise.get_future();
+
+    //starting async operation
+    m_dbManager->executeSelect<int>(
+        std::move(func),
+        [&cacheFilledPromise](
+            nx::db::QueryContext* /*queryContext*/,
+            db::DBResult dbResult,
+            int /*dummy*/)
+        {
+            cacheFilledPromise.set_value(dbResult);
+        });
+    //waiting for completion
+    return future.get();
+}
+
 nx::db::DBResult SystemManager::fetchSystems(nx::db::QueryContext* queryContext, int* const /*dummy*/)
 {
+    constexpr const char kSelectAllSystemsQuery[] = 
+        R"sql(
+        SELECT s.id, s.name, s.customization, s.auth_key as authKey,
+               a.email as ownerAccountEmail, s.status_code as status,
+               s.expiration_utc_timestamp as expirationTimeUtc,
+               s.seq as systemSequence, s.opaque as opaque
+        FROM system s, account a
+        WHERE s.owner_account_id = a.id
+        )sql";
+
     QSqlQuery readSystemsQuery(*queryContext->connection());
     readSystemsQuery.setForwardOnly(true);
-    readSystemsQuery.prepare(
-        "SELECT s.id, s.name, s.customization, s.auth_key as authKey, "
-        "       a.email as ownerAccountEmail, s.status_code as status, "
-        "       s.expiration_utc_timestamp as expirationTimeUtc, s.seq as systemSequence "
-        "FROM system s, account a "
-        "WHERE s.owner_account_id = a.id");
-    if (!readSystemsQuery.exec())
+    if (!readSystemsQuery.prepare(kSelectAllSystemsQuery) ||
+        !readSystemsQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
             arg(readSystemsQuery.lastError().text()), cl_logWARNING);

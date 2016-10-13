@@ -19,11 +19,13 @@ namespace nx {
 namespace cdb {
 
 namespace {
+
 class System
 :
     public CdbFunctionalTest
 {
 };
+
 }
 
 TEST_F(System, unbind)
@@ -46,7 +48,7 @@ TEST_F(System, unbind)
     api::SystemData system0;
     ASSERT_EQ(
         api::ResultCode::ok,
-        bindRandomSystem(account1.email, account1Password, &system0));
+        bindRandomSystem(account1.email, account1Password, "vms opaque data", &system0));
 
     for (int i = 0; i < 4; ++i)
     {

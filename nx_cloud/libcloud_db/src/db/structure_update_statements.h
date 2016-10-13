@@ -634,6 +634,16 @@ ALTER TABLE account ADD COLUMN password_ha1_sha256 VARCHAR(255) NULL;
 
 )sql";
 
+/**
+ * #CLOUD-616. Adding opaque VMS data.
+ */
+static const char kAddVmsOpaqueData[] =
+R"sql(
+
+ALTER TABLE system ADD COLUMN opaque VARCHAR(1024) NULL;
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

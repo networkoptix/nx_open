@@ -22,6 +22,7 @@ using namespace nx::network;
 
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, name)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, customization)
+MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, opaque)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
@@ -34,13 +35,19 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const d
         url::deserializeField(
             urlQuery,
             SystemRegistrationData_customization_field,
-            &data->customization);
+            &data->customization)
+        &&
+        url::deserializeField(
+            urlQuery,
+            SystemRegistrationData_opaque_field,
+            &data->opaque);
 }
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
 {
     url::serializeField(urlQuery, SystemRegistrationData_name_field, data.name);
     url::serializeField(urlQuery, SystemRegistrationData_customization_field, data.customization);
+    url::serializeField(urlQuery, SystemRegistrationData_opaque_field, data.opaque);
 }
 
 ////////////////////////////////////////////////////////////

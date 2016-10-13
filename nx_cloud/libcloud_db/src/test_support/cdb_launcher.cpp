@@ -362,6 +362,15 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     const std::string& password,
     api::SystemData* const systemData)
 {
+    return bindRandomNotActivatedSystem(email, password, std::string(), systemData);
+}
+
+api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& opaque,
+    api::SystemData* const systemData)
+{
     auto connection = connectionFactory()->createConnection();
     connection->setCredentials(email, password);
 
@@ -369,6 +378,7 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     std::ostringstream ss;
     ss << "test_sys_" << nx::utils::random::number();
     sysRegData.name = ss.str();
+    sysRegData.opaque = opaque;
 
     api::ResultCode resCode = api::ResultCode::ok;
 
@@ -388,7 +398,16 @@ api::ResultCode CdbLauncher::bindRandomSystem(
     const std::string& password,
     api::SystemData* const systemData)
 {
-    auto resCode = bindRandomNotActivatedSystem(email, password, systemData);
+    return bindRandomSystem(email, password, std::string(), systemData);
+}
+
+api::ResultCode CdbLauncher::bindRandomSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& opaque,
+    api::SystemData* const systemData)
+{
+    auto resCode = bindRandomNotActivatedSystem(email, password, opaque, systemData);
     if (resCode != api::ResultCode::ok)
         return resCode;
 

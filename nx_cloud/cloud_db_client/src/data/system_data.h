@@ -22,7 +22,7 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-#define SystemRegistrationData_Fields (name)(customization)
+#define SystemRegistrationData_Fields (name)(customization)(opaque)
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
@@ -33,7 +33,8 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
-                          (status)(cloudConnectionSubscriptionStatus)(systemSequence)
+                          (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
+                          (opaque)
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
