@@ -166,6 +166,7 @@ TEST_F(VmsGatewayProxyTest, SslEnabled)
 
 TEST_F(VmsGatewayProxyTest, SslForbidden)
 {
+    addArg("-http/sslSupport", "false");
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     testProxyUrl(QUrl(lit("http://%1/http:%2%3")

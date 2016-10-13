@@ -55,7 +55,7 @@ namespace
     const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
 
     const QLatin1String kHttpSslSupport("http/sslSupport");
-    const QLatin1String kDefaultHttpSslSupport("false");
+    const QLatin1String kDefaultHttpSslSupport("true");
 
     const QLatin1String kHttpSslCertPath("http/sslCertPath");
     const QLatin1String kDefaultHttpSslCertPath("");
