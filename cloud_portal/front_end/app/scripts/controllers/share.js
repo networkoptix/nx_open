@@ -14,7 +14,8 @@ angular.module('cloudApp')
         $scope.isNewShare = !dialogSettings.params.user;
 
         $scope.user = dialogSettings.params.user ? _.clone(dialogSettings.params.user):{
-            accountEmail:''
+            accountEmail:'',
+            isEnabled: true
         };
 
         if(!$scope.isNewShare) {
@@ -27,7 +28,7 @@ angular.module('cloudApp')
         }
 
         function processAccessRoles(){
-            $scope.accessRoles = _.filter(system.accessRoles,function(role){
+            $scope.accessRoles = _.filter(system.accessRoles || Config.accessRoles.predefinedRoles,function(role){
                 return ! (role.isOwner || role.isAdmin && !system.isMine);
             });
 
