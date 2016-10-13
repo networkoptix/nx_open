@@ -99,22 +99,23 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     bool isCloudUser = isValidCloudUserName(userName);
     bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"]);
 
+    auto cloudUsers = qnResPool->getResources<QnUserResource>().filtered(
+        [userName](const QnUserResourcePtr& user)
+    {
+        return user->isCloud() &&
+            user->isEnabled() &&
+            user->getName().toUtf8().toLower() == userName;
+    });
+
+
     // Server has provided to the client non-cloud nonce for cloud user due to no cloud connection so far
     if (isCloudUser && !isCloudNonce && m_cloudConnectionManager->boundToCloud())
     {
-        auto users = qnResPool->getResources<QnUserResource>().filtered(
-            [userName](const QnUserResourcePtr& user)
-        {
-            return user->isCloud() &&
-                   user->isEnabled() &&
-                   user->getName().toUtf8().toLower() == userName;
-        });
-
-        if (!users.isEmpty())
+        if (!cloudUsers.isEmpty())
         {
             return std::make_tuple<Qn::AuthResult, QnResourcePtr>(
                 Qn::Auth_CloudConnectError,
-                users.first());
+                cloudUsers.first());
 
         }
     }
@@ -202,6 +203,14 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         lk.unlock();
         NX_LOGX(lm("No valid cloud auth data. username %1, cloudNonce %2").
             arg(authorizationHeader.userid()).arg(cloudNonce), cl_logDEBUG2);
+
+        if (!cloudUsers.isEmpty())
+        {
+            return std::make_tuple<Qn::AuthResult, QnResourcePtr>(
+                Qn::Auth_CloudConnectError,
+                cloudUsers.first());
+        }
+
         return m_defaultAuthenticator->authorize(
             method,
             authorizationHeader,
