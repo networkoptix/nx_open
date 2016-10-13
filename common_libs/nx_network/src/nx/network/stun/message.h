@@ -57,8 +57,20 @@ enum class MessageClass
 //!Contains STUN method types defined in RFC
 enum MethodType
 {
+    // STUN RFC 5389.
     bindingMethod = 1,
-    userMethod, //!< Starting value for custom STUN methods
+
+    // Starting value for custom NX methods in the middle of unasigned range 0x00D-0x0FF:
+    // https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
+    userMethod = 0x050,
+
+    // According to RFC 6062 indications used method codes from the same range.
+    userIndication = 0x0F0,
+
+    // Reserved by RFC 7983.
+    reservedBegin = 0x100,
+    reservedEnd = 0xFFF,
+
     invalid = -1,
 };
 
@@ -117,8 +129,9 @@ namespace attrs
         alternateServer     = 0x8023,
         fingerPrint         = 0x8028,
 
-        userDefined         = 0x9000, //!<we need this to identify our private extended stun attr
-        unknownReserved     = 0xFFFF,
+        // Starting value for custom NX attributes in the middle of unasigned range 0xC003-0xFFFF:
+        // https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
+        userDefined         = 0xE000,
     };
 
     struct NX_NETWORK_API Attribute
